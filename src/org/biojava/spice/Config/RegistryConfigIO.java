@@ -321,6 +321,7 @@ class TabbedPaneDemo extends JPanel {
     RegistryConfiguration config ;
     RegistryConfigIO registryIO  ;
     JTabbedPane tabbedPane       ;
+    List        entryFormFields  ;
 
     public TabbedPaneDemo(RegistryConfigIO registryparent, RegistryConfiguration config_) {
         super(new GridLayout(1, 1));
@@ -384,6 +385,9 @@ class TabbedPaneDemo extends JPanel {
 
 	Box vBoxRight =  Box.createVerticalBox();
 	Box vBoxLeft =  Box.createVerticalBox();
+
+	entryFormFields = new ArrayList();
+
 	for ( int i = 0 ; i < colNames.length; i++) {
 	    String col = colNames[i];
 	   
@@ -395,6 +399,7 @@ class TabbedPaneDemo extends JPanel {
 	    JTextField txt2 = new JTextField("    ");
 	    txt2.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
 	    vBoxRight.add(txt2);
+	    entryFormFields.add(txt2);
 	}
 
 
@@ -494,6 +499,21 @@ class TabbedPaneDemo extends JPanel {
 	    registryIO.saveConfiguration();
 	} else if ( pos == 1 ) {
 	    // add a new local DAS source ...
+	    System.out.println("adding new local DAS source");
+	    HashMap formdata = new HashMap();
+	    for ( int i = 0 ; i < colNames.length; i++) {
+		String col = colNames[i];
+		JTextField txt = (JTextField)entryFormFields.get(i);
+		String data = txt.getText();
+		System.out.println(col + " " + data);
+		formdata.put(col,data);
+	    }
+	    SpiceDasSource sds = new SpiceDasSource();
+	    sds.setUrl(              (String) formdata.get("url"));
+	    sds.setAdminemail(       (String) formdata.get("adminemail"));
+	    sds.setDescription(      (String) formdata.get("description"));
+	    sds.setCoordinateSystem( (String) formdata.get("coordinateSystem"));
+	    sds.setRegistered(false);
 	}
     }
 }
