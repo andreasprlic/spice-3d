@@ -122,16 +122,16 @@ class StructurePanel extends JPanel
 	//logger.finest("moving mouse over StructurePanel "+e);    	
 	int pos = viewer.findNearestAtomIndex(e.getX(),e.getY());
 	if ( pos == -1 ) { return ; }
-	Atom atom = viewer.getFrame().getAtomAt(pos);
-	if( atom.isHetero() ) { return ;} 
-	char chainId = atom.getChainID();
-	String seqcode = atom.getSeqcodeString();
-	    //logger.finest("chainid " + chainId);
-	    //logger.finest("atomIndex "+atom.getAtomIndex());
-	    //logger.finest(viewer.getElementNumber(pos));
-	    //logger.finest(viewer.getElementSymbol(pos));
-	    //logger.finest("atomName " + viewer.getAtomName(pos));
-	    //logger.finest("seqCode " + atom.getSeqcodeString());
+
+	String chainId = viewer.getAtomChain( pos) ;
+	String seqCode = viewer.getAtomSequenceCode( pos) ;
+
+	logger.finest("chainid " + chainId + " seqcode: " + seqCode);
+	//logger.finest("atomIndex "+atom.getAtomIndex());
+	//logger.finest(viewer.getElementNumber(pos));
+	//logger.finest(viewer.getElementSymbol(pos));
+	//logger.finest("atomName " + viewer.getAtomName(pos));
+	//logger.finest("seqCode " + atom.getSeqcodeString());
 
     }
     public void mouseClicked(MouseEvent e)
