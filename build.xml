@@ -186,7 +186,7 @@
     <copy todir="${build.classes.dir}/spice/org/biojava/spice/">
       <fileset dir="${resources.dir}">
         <exclude name="**/CVS/**" />
-	<include name="*.jpg" />
+	<include name="*.png" />
       </fileset>
     </copy>
 
@@ -464,7 +464,7 @@
 
 
   <!-- Creates the API documentation -->
-  <target name="javadocs-spice" depends="prepare-spice,compile-taglets"
+  <target name="javadocs-spice" depends="prepare-spice"
   description="Creates the API documentation">
     <javadoc
       packagenames="${packages}"
