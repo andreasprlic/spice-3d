@@ -768,7 +768,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
             return ;
         selectStart  = seqpos ;
         selectEnd    = 1     ;
-        
+        dragging = false;
         this.repaint();
         
     }
@@ -776,6 +776,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
     /** highlite a region */
     public void highlite( int start , int end){
         if  ( chain == null   ) return ;
+        
         //if (selectionLocked) return ;
         if ( (start > chain.getLength()) || 
                 (end   > chain.getLength())
@@ -784,7 +785,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         
         selectStart = start  ;
         selectEnd   = end    ;
-        
+        dragging = true;
         this.repaint();
         
     }
@@ -998,7 +999,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
     
     public void mousePressed(MouseEvent e)  {
         int b = e.getButton();
-        logger.finest("mousePressed "+b);
+        //logger.finest("mousePressed "+b);
         if ( b == MouseEvent.BUTTON1 )
             mouseDragStart = getSeqPos(e);
         
@@ -1006,7 +1007,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
     }
     public void mouseReleased(MouseEvent e) {
         int b = e.getButton();
-        logger.finest("mouseReleased "+b);       
+        //logger.finest("mouseReleased "+b);       
         if ( b != MouseEvent.BUTTON1) {          
             return;
         }           
@@ -1078,7 +1079,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
             return;
         
         int b = e.getButton();
-        logger.finest("dragging mouse "+b);
+        //logger.finest("dragging mouse "+b);
         
         // ARGH my linux java 142_05 does not show Button 1 when being dragged!
         //if ( b != MouseEvent.BUTTON1 ) 

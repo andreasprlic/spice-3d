@@ -24,9 +24,7 @@ package org.biojava.spice.GUI.alignmentchooser;
 
 
 import javax.swing.JProgressBar;
-import java.awt.Container;
-import java.awt.Dimension;
-import javax.swing.JPanel;
+
 
 import org.biojava.spice.SPICEFrame;
 import org.biojava.spice.DAS.AlignmentTools;

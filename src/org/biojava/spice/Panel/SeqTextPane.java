@@ -239,6 +239,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
     public void highlite( int start, int end) {
         //System.out.println("SeqTExtPane highlite " + start + " " + end);
         //select(start,end);
+        dragging = true;
         StyledDocument doc = this.getStyledDocument();
         doc.setCharacterAttributes(0,chain.getLength(), this.getStyle("black"),true);
         doc.setCharacterAttributes(start,(end-start +1), this.getStyle("red"),true);
@@ -247,6 +248,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
     
     /** highighting of single residue */    
     public void highlite( int seqpos) {
+        dragging = false ;
         //System.out.println("SeqTExtPane highlite " + seqpos);
         select(seqpos);
         StyledDocument doc = this.getStyledDocument();
@@ -258,6 +260,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
     /** select range of residues */
     public void select(int start, int end){
         //System.out.println("SeqTExtPane select " + start + " "  + end);
+        dragging = true ;
         if ( chain == null ) { return ;}
         StyledDocument doc = this.getStyledDocument();
         doc.setCharacterAttributes(0,chain.getLength(), this.getStyle("black"),true);
@@ -269,6 +272,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
     public void select( int seqpos) {
         //System.out.println("SeqTExtPane select " + seqpos);
         if ( chain == null ) { return ;}
+        dragging = false;
         StyledDocument doc = this.getStyledDocument();
         doc.setCharacterAttributes(0,chain.getLength(), this.getStyle("black"),true);
         doc.setCharacterAttributes(seqpos,1, this.getStyle("red"),true);	
