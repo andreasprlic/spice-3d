@@ -24,10 +24,12 @@
 package org.biojava.spice;
 
 import javax.swing.JPanel        ;
+import javax.swing.JTextField    ;
 import javax.swing.JLabel        ;
 import javax.swing.BoxLayout     ;
 import javax.swing.JProgressBar  ;
 import javax.swing.BorderFactory ;
+import javax.swing.Box           ;
 
 import java.awt.Dimension        ;
 import java.awt.BorderLayout     ;
@@ -45,38 +47,46 @@ public class StatusPanel
 {
 
 
-    JLabel pdbCode ;
-    JLabel spCode  ;    
+    JTextField pdbCode ;
+    JTextField spCode  ;    
     JLabel status ;
 
     JProgressBar progressBar ;
-    JPanel pdbPanel ;
-    JPanel spPanel  ;
+    //JPanel pdbPanel ;
+    //JPanel spPanel  ;
 
     public StatusPanel(){
 	this.setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
-
+	Box hBox =  Box.createHorizontalBox();
 	//status  = new JLabel();
 	//status.setText("");
 	//this.add(status);
 	
-	pdbPanel = new JPanel();
-	JLabel pdbtxt  = new JLabel("PDB code:");
-	pdbCode = new JLabel("    ");
-	//pdbPanel.setBorder(BorderFactory.createLineBorder(Color.black));
-	pdbPanel.add(pdbtxt);
-	pdbPanel.add(pdbCode);
-	//pdbPanel.setMaximumSize(new Dimension(80,20));
-	this.add(pdbPanel,BorderLayout.WEST);
+	//pdbPanel = new JPanel();
+	JTextField pdbtxt  = new JTextField("PDB code:");
+	pdbtxt.setEditable(false);
+	hBox.add(pdbtxt);
 
-	spPanel = new JPanel();
-	JLabel sptxt  = new JLabel("UniProt code:");
-	spCode = new JLabel("      ");
+	pdbCode = new JTextField("    ");
+	pdbCode.setEditable(false);
+	//pdbPanel.setBorder(BorderFactory.createLineBorder(Color.black));
+	//pdbPanel.add(pdbtxt);
+	//pdbPanel.add(pdbCode);
+	//pdbPanel.setMaximumSize(new Dimension(80,20));
+	hBox.add(pdbCode);
+	//hBox.add(pdbCode,BorderLayout.WEST);
+	
+	//spPanel = new JPanel();
+	JTextField sptxt  = new JTextField("UniProt code:");
+	sptxt.setEditable(false);
+	hBox.add(sptxt);
+
+	spCode = new JTextField("      ");
+	spCode.setEditable(false);
+	hBox.add(spCode);
 	//spPanel.setBorder(BorderFactory.createLineBorder(Color.black));
-	spPanel.add(sptxt);
-	spPanel.add(spCode);
 	//spPanel.setMaximumSize(new Dimension(80,20));
-	this.add(spPanel,BorderLayout.WEST);
+	//hBox.add(spPanel,BorderLayout.WEST);
 
 	progressBar = new JProgressBar(0,100);
 	progressBar.setValue(0);
@@ -84,7 +94,9 @@ public class StatusPanel
 	progressBar.setString(""); 
 	progressBar.setMaximumSize(new Dimension(80,20));
 	progressBar.setIndeterminate(false);
-	this.add(progressBar,BorderLayout.EAST);
+	hBox.add(progressBar,BorderLayout.EAST);
+	
+	this.add(hBox);
 
 
 	

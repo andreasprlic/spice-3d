@@ -29,6 +29,7 @@ import java.util.Map ;
 import java.util.List ;
 
 import org.biojava.bio.structure.Structure ;
+import org.biojava.bio.structure.StructureImpl ;
 import org.biojava.services.das.registry.DasSource;
 
 public class LoadStructureThread 
@@ -135,6 +136,8 @@ public class LoadStructureThread
 	    // at some point raise some IO exception, which should be defined by the Inferface
 	    e.printStackTrace();
 	    finished = true ;
+	    StructureImpl n = new StructureImpl();
+	    spiceframe.setStructure(n);
 			
 	}
 

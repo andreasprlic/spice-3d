@@ -64,9 +64,9 @@ import java.awt.BorderLayout       ;
 import java.awt.FlowLayout ;
 import java.awt.Event ;
 import java.awt.TextField ;
-
-
 import java.awt.event.*    ;
+
+import javax.swing.Box ;
 import javax.swing.text.Document ;
 import javax.swing.text.Element ;
 import javax.swing.JSplitPane ;
@@ -133,7 +133,7 @@ public class SpiceApplication
     JList ent_list;   // list available chains
     SeqFeatureCanvas dascanv ;
     JScrollPane dasPanel ;
-    JPanel leftPanel ;
+    //JPanel leftPanel ;
     JSplitPane sharedPanel;
     JSplitPane mainsharedPanel;
 
@@ -237,7 +237,10 @@ public class SpiceApplication
 	
 	structureAlignmentMode = false ;
 	      
-	this.getContentPane().setLayout(new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
+	Box vBox = Box.createVerticalBox();
+
+	//vBox.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+	//this.getContentPane().setLayout(new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
 
 
 	// add the Menu
@@ -267,6 +270,14 @@ public class SpiceApplication
 	help.add(aboutdas);
 	
 	
+	statusPanel = new StatusPanel();
+	//this.getContentPane().add(statusPanel,BorderLayout.SOUTH);
+	//this.getContentPane().add(statusPanel);
+	statusPanel.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
+	vBox.add(statusPanel);
+
+	statusPanel.setLoading(first_load);
+
 	
 	
 	// init Seqouece position
@@ -277,7 +288,8 @@ public class SpiceApplication
 	seq_pos.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
 
 	//this.getContentPane().add(seq_pos,BorderLayout.NORTH);
-	this.getContentPane().add(seq_pos);
+	//this.getContentPane().add(seq_pos);
+	vBox.add(seq_pos);
 
 
 	showStatus("contacting DAS registry");
@@ -301,6 +313,7 @@ public class SpiceApplication
 	ent_list.setPreferredSize(new Dimension(30,30));
 	ent_list.setSize(30,30);
 
+	JScrollPane chainPanel = new JScrollPane(ent_list);
 	//ent_list.setFixedCellWidth(20);
 	//JScrollPane scrollingList = new JScrollPane(ent_list);
 	//ent_list.setSize(30,180);
@@ -313,18 +326,19 @@ public class SpiceApplication
 	//getCom.addActionListener(txtlisten);
 	//getCom.setMinimumSize(new Dimension(Short.MIN_VALUE,10));
 	//
-
+	
+	/*
     	leftPanel = new JPanel() ;
 	leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
 
-	leftPanel.add(ent_list,BorderLayout.NORTH);
+	//leftPanel.add(ent_list);
 	//leftPanel.add(getCom,BorderLayout.SOUTH);
 	leftPanel.setMinimumSize(  new Dimension(30,30));
 	leftPanel.setPreferredSize(new Dimension(30,30));
 	leftPanel.setMaximumSize(  new Dimension(40,30));
 	leftPanel.setSize(30,30);
 	//ent_list.repaint();
-
+	*/
 	
 	//ScrollPane scroll = new ScrollPane();
 
@@ -349,12 +363,12 @@ public class SpiceApplication
 
 	
 	sharedPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-                           leftPanel, dasPanel);
+                           chainPanel, dasPanel);
 	sharedPanel.setOneTouchExpandable(true);
 	//sharedPanel.setDividerLocation(150);
 	sharedPanel.setPreferredSize(new Dimension(200, 200));
 	//sharedPanel.setOpaque(true);
-	sharedPanel.setResizeWeight(0);	
+	//sharedPanel.setResizeWeight(0);	
 	sharedPanel.setBackground(Color.black);
 
 	seqField      = new SeqTextPane(this);
@@ -377,7 +391,7 @@ public class SpiceApplication
 	
 	seqSplitPane.setOneTouchExpandable(true);
 	//seqSplitPane.setOpaque(true);
-	seqSplitPane.setResizeWeight(0.9);
+	seqSplitPane.setResizeWeight(0.6);
 	seqSplitPane.setBackground(Color.black);
 	//seqSplitPane.setDividerLocation(600);
 	
@@ -392,13 +406,16 @@ public class SpiceApplication
 	mainsharedPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
 					  structurePanel,seqSplitPane);
 	mainsharedPanel.setOneTouchExpandable(true);
+	//mainsharedPanel.setResizeWeight(0.9);
 	//mainsharedPanel.setDividerLocation(150);
 	//mainsharedPanel.setPreferredSize(new Dimension(200, 200));
 	//mainsharedPanel.setOpaque(true);
 	mainsharedPanel.setBackground(Color.black);
+	//mainsharedPanel.setPreferredSize(new Dimension(700,700));
 	//mainsharedPanel.setResizeWeight(0.7);
 	//this.getContentPane().add(mainsharedPanel,BorderLayout.NORTH);
-	this.getContentPane().add(mainsharedPanel);
+	//this.getContentPane().add(mainsharedPanel);
+	vBox.add(mainsharedPanel,BorderLayout.CENTER);
 
 
 
@@ -409,12 +426,12 @@ public class SpiceApplication
 	strucommand.addActionListener(listener);
 	strucommand.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
 	//this.getContentPane().add(strucommand,BorderLayout.SOUTH);
-	this.getContentPane().add(strucommand);
+	//this.getContentPane().add(strucommand);
+	vBox.add(strucommand);
 
-	statusPanel = new StatusPanel();
-	//this.getContentPane().add(statusPanel,BorderLayout.SOUTH);
-	this.getContentPane().add(statusPanel);
-	statusPanel.setLoading(first_load);
+
+	this.getContentPane().add(vBox);
+
 	/*
 	// menu
 	 menuBar = new JMenuBar();
@@ -1172,7 +1189,7 @@ public class SpiceApplication
 	//ListCellRenderer lcr = ent_list.getCellRenderer();
 	//ent_list.paint() ;
 	sharedPanel.show();
-	//dasPanel.updateUI();
+	dasPanel.updateUI();
 	//dasPanel.revalidate();
 	//dasPanel.repaint();
 
