@@ -984,7 +984,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
     public void mouseClicked(MouseEvent e)
     {  
  
-	logger.finest("mouseClicked");
+	//logger.finest("mouseClicked");
 
 	//this.setToolTipText(null);
 	return  ;
@@ -1006,7 +1006,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
     }
     public void mouseReleased(MouseEvent e) {
         int b = e.getButton();
-        logger.finest("mouseReleased "+b);       
+        //logger.finest("mouseReleased "+b);       
         if ( b != MouseEvent.BUTTON1) {          
             return;
         }           
@@ -1073,6 +1073,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
             }
         }            
     }
+    
     public void mouseDragged(MouseEvent e) {
         dragging = true;
         

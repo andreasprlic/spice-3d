@@ -29,7 +29,7 @@ import org.biojava.spice.Panel.*;
 import org.biojava.spice.Config.*;
 import org.biojava.spice.Feature.*;
 import org.biojava.spice.GUI.*;
-
+import java.lang.reflect.*;
 // for protein 3D stuff
 import org.biojava.bio.structure.*;
 
@@ -256,6 +256,21 @@ implements SPICEFrame
         System.setProperty("sun.net.client.defaultConnectTimeout", ""+timeout);
         System.setProperty("sun.net.client.defaultReadTimeout", ""+timeout);
         
+        // use reflection to determine if get and set methods for urlconnection are available
+        // seems java 1.5 does not watch the System properties any longer...
+        // and java 1.4 did not provide these...
+        try {
+            Class urlconnectionClass = Class.forName("java.net.URLConnection");
+            
+            Method method = urlconnectionClass.getMethod (
+                    "setConnectTimeout", new Class [] { Integer.class}        
+            );	
+            
+            method.invoke(null, new Object[] {new Integer(timeout)});
+            System.out.println("setting java 1.5 timeout");
+        } catch ( Exception e){
+            e.printStackTrace();
+        }
         
         // bugfix for some strange setups!!!
         String proxyHost  = System.getProperty("proxyHost");
