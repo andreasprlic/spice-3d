@@ -14,6 +14,9 @@ import javax.swing.*;
 import org.biojava.bio.structure.Structure ;
 //import org.biojava.bio.structure.io.PDBFileReader ;
 
+
+
+/** a Panel that provides a wrapper around the Jmol viewer */
 class StructurePanel extends JPanel {
 
     JmolViewer viewer;
@@ -26,26 +29,23 @@ class StructurePanel extends JPanel {
 	viewer = new JmolViewer(this, adapter);
     }
     
+    /** returns the JmolViewer */
     public JmolViewer getViewer() {
 	return viewer;
     }
 
-
-    public void forceRepaint() {
-	//System.out.println("forcing repaint");
-	//this.paint(this.getGraphics());
-	//System.out.println("done forcing repaint");
-    }
-
+    /** paint Jmol */
     public void paint(Graphics g) {
-	//System.out.println("painting structure");
+
 	viewer.setScreenDimension(getSize(currentSize));
 	Rectangle rectClip = new Rectangle();
 	g.getClipBounds(rectClip);
 	viewer.renderScreenImage(g, currentSize, rectClip);
     }
 
-    
+    /** send a RASMOL like command to Jmol
+     * @param command - a String containing a RASMOL like command. e.g. "select protein; cartoon on;"
+     */
     public void executeCmd(String command) {
 	//command += ";refresh;";
 	//System.out.println("sending Jmol command: " +command);
@@ -57,30 +57,27 @@ class StructurePanel extends JPanel {
 	//this.paint(this.getGraphics());
     }
 
+    /** display a new PDB structure in Jmol 
+     * @param structre a Biojava structure object     
+     */
     public  void setStructure(Structure structure) {
 	
-	String pdbstr = structure.toPDB();
+	String pdbstr = structure.toPDB(); 
 	
 	synchronized ( viewer) {
 	    viewer.openStringInline(pdbstr);
 	}
 	
-	//String cmd ="select *;color chain; refresh;";
-	//String cmd ="select not protein and not solvent;spacefill 1.0;select not selected;cpk off;"  ;
 	String cmd ="select all; cpk off; wireframe off;"  ;
-	//System.out.println(cmd);
 	executeCmd(cmd);
 	    
 	
 	String strError = viewer.getOpenFileError();
 	if (strError != null)
 	    System.out.println(strError);
-	//this.paint(this.getGraphics());
-	
     }
 
     
     final Dimension currentSize = new Dimension();
-
 
 }
