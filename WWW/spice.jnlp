@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- JNLP File for SwingSet2 Demo Application -->
+<!-- JNLP File the SPICE - DAS client -->
 <jnlp
   spec="1.0+"
-  codebase="file:///Users/ap3/WORK/DAS/JAVA/spice/WWW/"
-  href="spice.jnlp"
+  codebase="file:///Users/ap3/WORK/workspace/spice/WWW/"  
  >
   <information>
-    <title>The SPICE Application</title>
+    <title>The SPICE - DAS client</title>
     <vendor>Sanger Institute</vendor>
     <homepage href="http://www.sanger.ac.uk/Users/ap3/DAS/SPICE/devel/spice.html"/>
-    <description>Visualization of protein structures and their annotations.</description>
-    <description kind="short">Visualization of protein structures and their annotations.</description>
- 
+    <description>Visualization of protein structures 
+    	         and their annotations.</description>
+    <description kind="short">Visualization of protein structures 
+    		 and their annotations.</description>
+   <icon href="spiceicon.gif"/>
   </information>
   <security>
       <all-permissions/>
   </security>
   <resources>
     <j2se version="1.4 1.5"/>
-    <jar href="spice.jar"                    download="lazy"/>
+    <jar href="spice.jar" />
 
      <property name="javax.xml.parsers.DocumentBuilderFactory" 
            value="org.apache.xerces.jaxp.DocumentBuilderFactoryImpl"/>
@@ -29,7 +30,6 @@
   </resources>
   <application-desc main-class="org.biojava.spice.Spice">
 
-  <!-- old 1q22 -->
   <argument>UniProt</argument>
   <argument>P00280</argument>
   <argument>http://servlet.sanger.ac.uk:8080/axis/services/das_registry</argument>
