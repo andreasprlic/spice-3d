@@ -96,7 +96,7 @@ public class DAS_Feature_Handler  extends DefaultHandler{
 	
 	public void endDocument ()	{
 	    //System.out.println("adding feature " + feature);
-		features.add(feature);
+	    //features.add(feature);
 		
 	}
 		public void endElement(String uri, String name, String qName) {

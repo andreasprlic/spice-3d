@@ -186,7 +186,7 @@ public class SeqFeatureCanvas extends Canvas
 
     /** highlite all segments of a feature */
     private void highliteFeature(int featurenr){
-	System.out.println("highlite feature " + featurenr);
+	//System.out.println("highlite feature " + featurenr);
 	Feature feature = (Feature) features.get(featurenr) ;
 		
 	ArrayList segments = feature.getSegments() ;
@@ -199,7 +199,7 @@ public class SeqFeatureCanvas extends Canvas
 	    String fend    = (String)segment.get("END") ;
 	    int start = Integer.parseInt(fstart)  ;
 	    int end   = Integer.parseInt(fend) ;
-	    System.out.println("highilte feature " +featurenr+" " + start + " " +end );
+	    //System.out.println("highilte feature " +featurenr+" " + start + " " +end );
 	    cmd += spice.getSelectStr(current_chainnumber,start,end);
 	    String col = (String) segment.get("colorTxt");
 	    cmd += "color "+ col +";";

@@ -72,7 +72,7 @@ import java.net.URL        ;
 import java.util.Iterator  ;
 
 // for DAS registration server:
-import org.biojava.services.das.registry.*;
+//import org.biojava.services.das.registry.*;
 
 public class SpiceApplication 
     extends  Frame
@@ -133,6 +133,11 @@ public class SpiceApplication
 	CONFIG_URL   = config_url ;
 	REGISTRY_URL = registry_url ;
 	
+	// first thing is to start communication
+
+	RegistryConfiguration regi = new RegistryConfiguration (REGISTRY_URL);
+	regi.run();
+
 	structure = null ;
 	pdbcode = pdbcode_ ;
 	pdbcode2 = null ;
@@ -154,10 +159,6 @@ public class SpiceApplication
 	entColors[4] = Color.orange;
 	entColors[5] = Color.pink;
 	entColors[6] = Color.cyan;
-
-	config = readConfiguration();
-		
-	
 
 
 	first_load = true ;
@@ -203,6 +204,9 @@ public class SpiceApplication
 
 	this.add(seq_pos,BorderLayout.NORTH);
 
+
+	showStatus("contacting DAS registry");
+	config =regi.getConfiguration();
 
 	/// init Structure Panel
 	structurePanel        = new StructurePanel();
@@ -356,149 +360,11 @@ public class SpiceApplication
 	oldColor = c ;
     }
 
-    
-    /** read the configuration from config.xml file */
-    private Map readConfiguration() {
+   
 
-	Map co ;
-	
-	/* old way to read from local file system 
-	ClassLoader cl = this.getClass().getClassLoader();
-	InputStream fs = null ;
-	fs = cl.getResourceAsStream(CONFIG_FILE);
-	InputSource is = new InputSource(fs);
-	*/
-
-	// contact DAS registry server.
-	URL registry = REGISTRY_URL ;
-	System.out.println("contacting DAS registry server at: " +registry);
-	DasRegistryAxisClient rclient = new DasRegistryAxisClient(registry);
-	DasSource[] sources = rclient.listServices();
-	System.out.println("found "+sources.length+" servers");
-	
-	storeDasServers(sources);
-	
-	/*
-	  for ( int i =0;i<sources.length;i++){
-	  DasSource s = sources[i];
-	  System.out.println(s);
-	  }
-	*/
-
-	co = storeDasServers(sources);
-	return co;
-
-	// new way to read from URL
-	/*
-	URL url = CONFIG_URL;
-	HttpURLConnection huc ; 
-	InputStream inStream  ; 
-
-	try {
-	    huc = (HttpURLConnection) url.openConnection();
-	    inStream = huc.getInputStream();
-	    
-	} catch ( IOException e) {
-	    e.printStackTrace();
-	    return co ;
-	}
-	InputSource is = new InputSource(inStream);	
-	//
-
-
-	try {
-	    co = parseConfigFile(is);
-	} catch (Exception e) {
-	    e.printStackTrace() ;
-	}
-	return co;
-	*/
-    }
-
-    private Map storeDasServers(DasSource[] sources){
-	HashMap   configr         = new HashMap();
-	ArrayList featservers     = new ArrayList() ;
-	Map   structureserver = null;
-	Map   sequenceserver  = null;
-	Map   alignmentserver = null;
-
-	
-	for ( int i=0;i<sources.length;i++) {
-	    DasSource source = sources[i] ;
-	    String[] capabilities = source.getCapabilities() ;
-	    System.out.println(source.getUrl());
-	    for ( int c=0; c<capabilities.length ;c++) {
-		String capabil = capabilities[c];
-		System.out.println(capabil);
-		if ( capabil.equals("structure")){
-		    
-		    Map server = convertSourceMap(source) ;
-		    structureserver = server ;
-		}
-		if ( capabil.equals("alignment") ){
-		    if ( isSeqStrucAlignmentServer(source) ){
-			Map server = convertSourceMap(source) ;
-			alignmentserver = server ;
-		    }
-		}
-		if ( capabil.equals("sequence") ){
-		    
-		    Map server = convertSourceMap(source) ;
-		    sequenceserver = server ;
-		}
-
-		if ( capabil.equals("features") ){
-		    
-		    Map server = convertSourceMap(source) ;
-		    featservers.add(server);
-		}
-	    }
-	}
-
-	configr.put("structureserver", structureserver);
-	configr.put("sequenceserver", sequenceserver);
-	configr.put("alignmentserver", alignmentserver);
-	configr.put("featureservers",featservers);
-	return configr ;
-    }
-
-    /** test if MSD mapping  - PDB - UniProt is provide */
-       
-    private boolean isSeqStrucAlignmentServer(DasSource source) {
-	boolean msdmapping = false ;
-	String[] coordsys = source.getCoordinateSystem() ;
-	
-	boolean uniprotflag = false ;
-	boolean pdbflag     = false ;
-	
-	for ( int i = 0 ; i< coordsys.length; i++ ) {
-	    String c = coordsys[i];
-	    System.out.println(">"+c+"<");
-	    if ( c.equals("PDBresnum") ) {
-		pdbflag = true ;
-	    }
-	    if ( c.equals("UniProt") ) {
-		uniprotflag = true ;
-	    }
-	}
-	if (( uniprotflag == true) && ( pdbflag == true)) {
-	    msdmapping = true ;
-	}
-	return msdmapping ;
-    }
-
-    private Map convertSourceMap(DasSource source) {
-	    HashMap server = new HashMap();
-	    server.put("name",source.getUrl()); // for backwards compability
-	    server.put("url",source.getUrl());
-	    server.put("coordinateSystems",source.getCoordinateSystem());
-	    server.put("description",source.getDescription());
-	    server.put("adminemail",source.getAdminemail());
-	    server.put("capabilities",source.getCapabilities());
-	    return server ;
-	}
-
-    /** do the actual parsing of the config.xml file */
+   
+   
+    /* do the actual parsing of the config.xml file 
     private HashMap parseConfigFile(InputSource is) 
 	throws Exception
     {
@@ -588,7 +454,7 @@ public class SpiceApplication
 	return configr ;
 
     }
-
+    */
 
     public Map getConfiguration() {
 	return config ;
@@ -642,6 +508,7 @@ public class SpiceApplication
 	systemSettings.put("proxyPort", "3128");
 	System.setProperties(systemSettings);
 	*/
+	pdbcode = pdbcod ;
 	LoadStructureThread thr = new LoadStructureThread(this,pdbcod);
 	thr.start();
 	
@@ -774,8 +641,10 @@ public class SpiceApplication
     }
 
     private synchronized void getNewFeatures(String sp_id) {
-	ArrayList featureservers = getFeatureServers() ;
-	FeatureFetcher ff = new FeatureFetcher(featureservers,sp_id);
+	//ArrayList featureservers = getFeatureServers() ;
+	Chain chain = getChain(currentChain) ;
+	
+	FeatureFetcher ff = new FeatureFetcher(config,sp_id,pdbcode,chain);
 	ff.start() ;
 	
 	boolean done = false ;
@@ -791,12 +660,12 @@ public class SpiceApplication
 	    //System.out.println("getNewFeatures :in waitloop");
 	}
 	
-	ArrayList tmpfeat = ff.getFeatures();
+	ArrayList tmpfeat = (ArrayList) ff.getFeatures();
 	memoryfeatures.put(sp_id,tmpfeat);
 	try {
 	    setNewFeatures(tmpfeat);
 	} catch (Exception e) {e.printStackTrace();} ;
-	Chain chain = getChain(currentChain) ;
+	
 	dascanv.setChain(chain,currentChain);
     }
 
@@ -1147,7 +1016,7 @@ public class SpiceApplication
     
 
 
-    private class FeatureFetcher extends Thread {
+    private class OldFeatureFetcher extends Thread {
    
 
     
@@ -1156,7 +1025,7 @@ public class SpiceApplication
 	private ArrayList features ;
 	private String sp_id ;
 
-	FeatureFetcher (ArrayList featservers,String spid ) 
+	OldFeatureFetcher (ArrayList featservers,String spid ) 
 	{
 	    featureservers = featservers ;
 	    done = false ;
@@ -1242,6 +1111,10 @@ public class SpiceApplication
 
 	if ( event.target == props) {
 	    System.out.println("modify properties");
+	    RegistryConfiguration regi = new RegistryConfiguration(REGISTRY_URL) ;
+	    regi.run();
+	    regi.showConfigFrame();
+		
 	    return true;
 	}
 	else if ( event.target == exit) {

@@ -47,16 +47,19 @@ public class Spice extends Applet {
 	    return;
 	}
 	
-	URL url ;
+	URL url =null ;
+	URL registry_url=null ; 
 	try {
 	    //System.out.println(argv[1]);
 	    url = new URL(argv[1]);
+	    registry_url = new URL("http://localhost:8080/dasregistry/");
 	} catch (MalformedURLException e) {
+	    System.err.println(url+" " + registry_url);
 	    e.printStackTrace();
 	    return ;
 	}
-
-	addMoreSpice(argv[0],url);
+		
+	addMoreSpice(argv[0],url,registry_url);
 	
     }
 
@@ -69,8 +72,9 @@ public class Spice extends Applet {
 
     }
 
-    public static void addMoreSpice(String pdbcode,URL configfileurl){
-	SpiceApplication appFrame = new SpiceApplication(pdbcode, configfileurl) ;	
+    // replace configurl as soon as registry server communication is working properly
+    public static void addMoreSpice(String pdbcode,URL configfileurl, URL registryurl){
+	SpiceApplication appFrame = new SpiceApplication(pdbcode, configfileurl,registryurl) ;	
 	//System.out.println("init of SpiceApplication single structure mode");
 	appFrame.setTitle("SPICE") ;
 	appFrame.setSize(700, 700);
@@ -87,9 +91,9 @@ public class Spice extends Applet {
     }
 
 
-    public static void displayStructureAlignment(String pdb1, String pdb2, URL configfileurl) {
+    public static void displayStructureAlignment(String pdb1, String pdb2, URL configfileurl,URL registryurl) {
 
-	SpiceApplication appFrame = new SpiceApplication(pdb1, pdb2, configfileurl) ;	
+	SpiceApplication appFrame = new SpiceApplication(pdb1, pdb2, configfileurl,registryurl) ;	
 	//System.out.println("init of SpiceApplication structure alignment mode");
 	appFrame.setTitle("SPICE") ;
 	appFrame.setSize(700, 700);
@@ -122,11 +126,14 @@ class SpiceButton extends Button {
 		public Object run() {
 		    String defaultpdb = spice.getParameter("PDB_CODE");
 		    String configurl  = spice.getParameter("CONFIG_XML");	
-
-		    URL url ;
+		    String registryserver  = spice.getParameter("DAS_REGISTRY");	
+		    URL url   =null   ;
+		    URL registryurl=null ;
 		    try {
 			url = new URL(configurl);
+			registryurl = new URL(registryserver);
 		    } catch (MalformedURLException e) {
+			System.err.println(configurl+" " + registryserver);
 			e.printStackTrace();
 			return null ;
 		    }
@@ -138,7 +145,7 @@ class SpiceButton extends Button {
 			//System.out.println("ALGINWITH: "+alignpdb);
 			if (alignpdb != null){
 			    structurealignment = true ;
-			    spice.displayStructureAlignment(defaultpdb,alignpdb,url);
+			    spice.displayStructureAlignment(defaultpdb,alignpdb,url,registryurl);
 			}
 			
 		     } catch ( Exception e){
@@ -148,7 +155,7 @@ class SpiceButton extends Button {
 		    }
 		    if ( ! structurealignment ) {
 			//System.out.println("init single struc mode");
-			spice.addMoreSpice(defaultpdb, url);
+			spice.addMoreSpice(defaultpdb, url,registryurl);
 		    }
 
 		 

@@ -48,7 +48,7 @@ class StructurePanel extends JPanel {
     
     public void executeCmd(String command) {
 	//command += ";refresh;";
-	//System.out.println("sending Jmol command: " +command);
+	System.out.println("sending Jmol command: " +command);
 	
 	viewer.evalString(command);
 	

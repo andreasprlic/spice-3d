@@ -47,20 +47,36 @@
     <td><img src="/gfx/blank.gif" width="5" alt="" /></td>
     <td valign="top" width="690">
 
-<h3>Run the SPICE Applet</h3>
+<h3>Run SPICE</h3>
+
+<p>
+
+There are two ways to run SPICE:
+</p>
+<ul>
+<li> as a Java applet </li>
+<li> using <a target="_top" href="http://java.sun.com/products/javawebstart/">Java  Web Start</a> </li>
+</ul>
+<p>
+Both approaches are described below.
+</p>
+
+<hr>
 
 
+<h3>SPICE as a Java Applet</h3>
 
 <center>
-
-
-<applet archive="biojava.jar,spice.jar,xercesImpl.jar,xmlParserAPIs.jar,JmolApplet.jar" code="org.biojava.spice.Spice.class" >
-<param name="PDB_CODE" value="1a4a">
+<br><i>Press button to start SPICE</i></br>
+<applet archive="biojava.jar,spice.jar,xercesImpl.jar,xmlParserAPIs.jar,JmolApplet.jar,org.biojava.das.registry.jar,axis.jar,jaxrpc.jar,commons-logging.jar,commons-discovery.jar,jaxrpc.jar,saaj.jar,wsdl4j.jar,log4j-1.2.8.jar" code="org.biojava.spice.Spice.class" >
+<param name="PDB_CODE"   value="1a4a"/>
+<param name="CONFIG_XML" value="http://www.sanger.ac.uk/Users/ap3/DAS/SPICE/stable/config.xml"/>
+<param name="DAS_REGISTRY" value="http://localhost:8080/axis/services/dasregistry/"/>
 <param name="progressbar"   value="true" />
 </applet>
 
 </center>
-<br><center><i>Press button to start SPICE</i></center></br>
+
 
 <p> The applet automatically loads PDB 1a4a. The applet provides an
 entry field to display other structures, for which 3D coordiantes and
@@ -90,7 +106,31 @@ and follow the instructions in the Readme.txt file.
 </ul>
 </p>
 
-<hr>
+<hr/>
+
+<h3>SPICE and Java Web Start</h3>
+
+<p> Using <a target="_top"
+href="http://java.sun.com/products/javawebstart/">Java Web Start</a>,
+software applications can be deployed with a single click over the
+Internet. Web Start ensures the most current version of the
+application will be deployed. In contrast to Java applets, where Jar
+files need to be downloaded every time the Applet is started, using
+Web Start the application is downloaded only the first time it is
+requested. From the second call of the Application the execution if
+much faster.
+</p>
+
+<p> Press here to start SPICE using Web Start: <br/>
+<a href="http://protodas.derkholm.net/spice/spice.jnlp">Run Spice !</a>
+</p>
+
+<p> If pressing the above link does not launch Web Start, you need to
+install it first. Please read more about installation of Web Start at
+<a href="http://java.sun.com/products/javawebstart/1.2/docs/installguide.html" target="_new">http://java.sun.com/products/javawebstart/1.2/docs/installguide.html</a>
+</p>
+
+<hr/>
 
 <h4> Where can I learn more about SPICE?</h4>
 <p>

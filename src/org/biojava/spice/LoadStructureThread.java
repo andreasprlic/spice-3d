@@ -25,7 +25,7 @@ package org.biojava.spice ;
 
 import java.awt.Color ;
 import org.biojava.bio.structure.Structure ;
-
+import java.util.Map ;
 
 public class LoadStructureThread 
     extends Thread {
@@ -58,16 +58,40 @@ public class LoadStructureThread
 	return structure ;
     }
    
+
+    public String getStructureServer(){
+	Map config = spiceframe.getConfiguration();
+	Map strucconfig = (Map) config.get("structureserver");
+	String u = (String) strucconfig.get("url");
+
+	return   u;
+    }
+
+    public String getSequenceServer() {
+	Map config = spiceframe.getConfiguration();
+    	Map h = (Map) config.get("sequenceserver");
+	String u = (String) h.get("url");
+    	return   u;
+    }
+
+    
+    public String getAlignmentServer() {
+	Map config = spiceframe.getConfiguration();
+    	Map h = (Map) config.get("alignmentserver");
+    	String u = (String) h.get("url");
+    	return   u;
+    }
+
     public synchronized void loadCompound() {
 	
 	try {
 	
 	    spiceframe.showStatus("Loading...Wait...",Color.red);
 	    
-	    String dasstructurecommand = spiceframe.getStructureServer() + "structure?model=1&query=";
-	    String dassequencecommand  = spiceframe.getSequenceServer()  + "dna?segment=";
+	    String dasstructurecommand = getStructureServer() + "structure?model=1&query=";
+	    String dassequencecommand  = getSequenceServer()  + "dna?segment=";
 	    //String dassequencecommand  = spiceframe.getSequenceServer()  + "sequence?segment=";
-	    String dasalignmentcommand = spiceframe.getAlignmentServer() + "alignment?query=" ;
+	    String dasalignmentcommand = getAlignmentServer() + "alignment?query=" ;
 	    
 	    DAS_PDBFeeder pdb_f =  new DAS_PDBFeeder(dasstructurecommand,dassequencecommand,dasalignmentcommand) ;
 	    System.out.println("pdb_f.loadPDB");
