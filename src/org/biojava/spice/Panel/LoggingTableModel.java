@@ -283,6 +283,14 @@ final class LoggingTableModel extends Handler implements TableModel {
         return records[row];
     }
 
+    /** clear all log records */
+    
+    public synchronized void clearRecords() {
+	records = new LogRecord[16];
+	recordCount = 0 ;
+	
+    }
+
     /**
      * Returns the number of columns in the model.
      */

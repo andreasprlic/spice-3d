@@ -55,6 +55,16 @@ import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ChangeEvent;
 
+import javax.swing.DefaultCellEditor;
+
+
+import javax.swing.JButton;
+import javax.swing.Box;
+import java.awt.event.ActionEvent          ;
+import java.awt.event.ActionListener       ;
+
+
+
 // AWT
 import java.awt.Color;
 import java.awt.Frame;
@@ -64,6 +74,7 @@ import java.awt.BorderLayout;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
 
+import java.awt.BorderLayout       ;
 // Logging
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -180,12 +191,13 @@ public class LoggingPanel extends JPanel {
     public LoggingPanel() {
         super(new BorderLayout());
         table.setShowGrid(false);
-        //table.setCellSelectionEnabled(false);
+	// by AP
+        table.setCellSelectionEnabled(true);
 	
         table.setGridColor(Color.LIGHT_GRAY);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         table.setDefaultRenderer(Object.class, new CellRenderer());
-
+	
         if (true) {
             int width = 300;
             final TableColumnModel columns = table.getColumnModel();
@@ -197,7 +209,30 @@ public class LoggingPanel extends JPanel {
 
         final JScrollPane scroll = new JScrollPane(table);
         //new AutoScroll(scroll.getVerticalScrollBar().getModel());
-        add(scroll, BorderLayout.CENTER);
+
+	Box vBox = Box.createVerticalBox();
+
+	vBox.add(scroll);
+
+	JButton clearButton = new JButton("Clear");
+	clearButton.addActionListener(new ActionListener(){
+		// button is pressed
+		public void actionPerformed(ActionEvent e) {
+		    LoggingTableModel ltm = (LoggingTableModel) table.getModel();
+		    ltm.clearRecords();
+		    table.repaint();
+		}
+		
+	    });
+	
+	Box hBox = Box.createHorizontalBox();
+	hBox.add(clearButton,BorderLayout.WEST);
+	
+	vBox.add(hBox);
+	
+	
+
+        add(vBox);
 
         setLevelColor(Level.ALL,     Color.GRAY,       null);
         setLevelColor(Level.CONFIG,  null,             null);

@@ -274,7 +274,7 @@ public class RegistryConfigIO
 
 
 
-	ImageIcon icon = createImageIcon("spice.jpg");
+	ImageIcon icon = createImageIcon("spice.png");
 	progressFrame.setIconImage(icon.getImage());
 
 	progressFrame.setDefaultLookAndFeelDecorated(false);
@@ -380,7 +380,7 @@ public class RegistryConfigIO
 	frame.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 	//Make sure we have the standard desktop window decorations.
         JFrame.setDefaultLookAndFeelDecorated(false);
-	ImageIcon icon = createImageIcon("spice.jpg");
+	ImageIcon icon = createImageIcon("spice.png");
 	frame.setIconImage(icon.getImage());
 	
         //Create and set up the content pane.
@@ -546,7 +546,7 @@ class TabbedPaneDemo extends JPanel {
 
 
 	tabbedPane = new JTabbedPane();
-        ImageIcon icon = createImageIcon("spice.jpg");
+        ImageIcon icon = createImageIcon("spice.png");
 
 	selectMoveStartPosition = -1 ;
 

@@ -497,7 +497,7 @@ public class SpiceApplication
 	
 	//this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	this.setDefaultLookAndFeelDecorated(false);
-	ImageIcon icon = createImageIcon("spice.jpg");
+	ImageIcon icon = createImageIcon("spice.png");
 	this.setIconImage(icon.getImage());
 	this.pack();
 	
@@ -710,10 +710,9 @@ public class SpiceApplication
 
 	structure = structure_ ; 
 
-	if (logger.isLoggable(Level.FINEST)) {
-	    System.out.println(structure.toPDB());
-	    
-	}
+	//if (logger.isLoggable(Level.FINEST)) {
+	    //System.out.println(structure.toPDB());	    
+	//}
 
 
 	    	
@@ -734,6 +733,7 @@ public class SpiceApplication
 	
 	structurePanel.executeCmd(selectcmd);
 	
+	/* should be done by SeqTextPane ...
 	// get sequence
 	Chain c = structure.getChain(0);
 	List aminos = c.getGroups("amino");
@@ -744,9 +744,14 @@ public class SpiceApplication
 	}
 	
 	String s = sequence.toString();
-	seqField.setText(s);
-
+	*/
+	//seqField.setText(s);
+	//Chain c = structure.getChain(0);
+	
 	setCurrentChain(0);
+	Chain chain = getChain(currentChain) ;
+	if ( chain != null) 
+	    seqField.setChain(chain,0);
 	updateDisplays();
     
 
@@ -789,6 +794,9 @@ public class SpiceApplication
 	
     }
 
+    public int getCurrentChain() {
+	return currentChain;
+    }
     public void setCurrentChain( int newCurrentChain) {
 	logger.finer("setCurrentChain " + newCurrentChain);
 	currentChain = newCurrentChain ;
@@ -1235,11 +1243,7 @@ public class SpiceApplication
 	
 	//logger.finest( "testing for insertion code " +residuePDBcode);
 	// see if there is an "^" character indicating insertionCode...
-	String[] spl = residuePDBcode.split("\\^");
-	if ( spl.length > 1) {
-	    //logger.finest("insertion code found! " + residuePDBcode );
-	    residuePDBcode = spl[0] + spl[1];
-	}
+
 
 	//List groups = chain.getGroups();
 	

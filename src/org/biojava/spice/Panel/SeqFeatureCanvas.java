@@ -439,6 +439,8 @@ public class SeqFeatureCanvas
     public void highlite(int chain_number, int seqpos){
 	if  ( chain == null   ) return ;
 	
+	// ARGH
+	// WRONG chain_number should be START!!!!
 	if (chain_number == current_chainnumber) {
 	    if ( seqpos > chain.getLength()) 
 		return ;

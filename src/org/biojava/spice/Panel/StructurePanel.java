@@ -117,6 +117,9 @@ class StructurePanel extends JPanel
 	    }
 	}
     }
+
+ 
+
     public void mouseDragged(MouseEvent e) {
 	//logger.finest("dragging mouse "+e);
     }	
@@ -133,7 +136,14 @@ class StructurePanel extends JPanel
 	String chainId = viewer.getAtomChain( pos) ;
 	String seqCode = viewer.getAtomSequenceCode( pos) ;
 
-	logger.finest("chainid " + chainId + " seqcode: " + seqCode);
+	String[] spl = seqCode.split("\\^");
+	if ( spl.length > 1) {
+	    //logger.finest("insertion code found! " + residuePDBcode );
+	    seqCode = spl[0] + spl[1];
+	}
+
+
+	//logger.finest("chainid " + chainId + " seqcode: " + seqCode);
 	int chainpos = 0 ;
 	if  ( chainId != null ) 
 	    chainpos   = spice.getChainPosByPDB(chainId);
@@ -142,6 +152,7 @@ class StructurePanel extends JPanel
 	if (chainpos == -1 )
 	    chainpos = 0 ;
 	int residuepos = spice.getSeqPosByPDB(seqCode);
+
 	spice.select(chainpos,residuepos);
 	spice.showSeqPos(chainpos,residuepos);
 
@@ -154,7 +165,9 @@ class StructurePanel extends JPanel
     }
     public void mouseClicked(MouseEvent e)
     {
-	//logger.finest("mouseClick in structure Panel"+e);
+	logger.finest("mouseClick in structure Panel"+e);
+
+	viewer.popupMenu(e.getX(),e.getY());
 
 	int pos = viewer.findNearestAtomIndex(e.getX(),e.getY());
 	if ( pos == -1 ) { return ; }
@@ -162,7 +175,15 @@ class StructurePanel extends JPanel
 	String chainId = viewer.getAtomChain( pos) ;
 	String seqCode = viewer.getAtomSequenceCode( pos) ;
 
-	logger.finest("chainid " + chainId + " seqcode: " + seqCode);
+	String[] spl = seqCode.split("\\^");
+	if ( spl.length > 1) {
+	    //logger.finest("insertion code found! " + residuePDBcode );
+	    seqCode = spl[0] + spl[1];
+	}
+
+
+
+	//logger.finest("chainid " + chainId + " seqcode: " + seqCode);
 	int chainpos = 0 ;
 	if  ( chainId != null ) 
 	    chainpos   = spice.getChainPosByPDB(chainId);
@@ -171,8 +192,12 @@ class StructurePanel extends JPanel
 	if (chainpos == -1 )
 	    chainpos = 0 ;
 	int residuepos = spice.getSeqPosByPDB(seqCode);
+
 	spice.highlite(chainpos,residuepos);
 	spice.showSeqPos(chainpos,residuepos);	
+
+
+
     }
     public void mouseEntered(MouseEvent e)  {}
     public void mouseExited(MouseEvent e)   {}

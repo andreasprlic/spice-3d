@@ -77,7 +77,9 @@ public interface SPICEFrame  {
 
     /** set the chain nr chainnr as the active one */
     public void setCurrentChain(int chainnr);
-
+    
+    /** get the chain nr of the currently active chain */
+    public int getCurrentChain() ;
   
     /** retreive the chainNumber by PDB character
 	@param PDB code for chain
