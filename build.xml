@@ -205,9 +205,10 @@
   <target name="prepare-spice" depends="prepare"
   description="Prepares spice source files">
     <!-- Creates directories -->
-    <mkdir dir="${build.dest.spice}" />
-    <mkdir dir="${build.docs.spice}" />
-    <mkdir dir="${build.doccheck.spice}" />
+    <mkdir dir="${build.dest.spice}"     />
+    <mkdir dir="${build.docs.spice}"     />
+    <mkdir dir="${build.doccheck.spice}" />  
+	<mkdir dir="${thirdparty.dir}/tmp/"  />
   </target>
 
   <!-- Prepares the test source code -->
@@ -316,8 +317,7 @@
       source="${javac.source}"
       debug="${javac.debug}">
       <classpath>
-        <pathelement path="${classpath}" />
-        <pathelement path="${build.dest.grammars}" />
+        <pathelement path="${java.class.path}" />
       </classpath>
     </javac>
   </target>
