@@ -17,6 +17,7 @@
  *
  *      http://www.biojava.org/
  *
+ * @author Andreas Prlic
  *
  */
 
