@@ -182,7 +182,7 @@ public class SpiceApplication
 	
 	
 	LoggingPanel loggingPanel = new LoggingPanel(logger);
-	loggingPanel.getHandler().setLevel(Level.FINER);
+	loggingPanel.getHandler().setLevel(Level.FINEST);
 	loggingPanel.show(null);
 	//ConsoleHandler handler = new ConsoleHandler();
 	//handler.setLevel(Level.FINEST);
@@ -327,7 +327,8 @@ public class SpiceApplication
 	//structurePanel.setLayout(new BoxLayout(structurePanel, BoxLayout.X_AXIS));
 	structurePanel.setPreferredSize(new Dimension(700, 700));
 	structurePanel.setMinimumSize(new Dimension(200,200));
-
+	structurePanel.addMouseMotionListener(structurePanel);
+	structurePanel.addMouseListener(      structurePanel);
 	//this.add(structurePanel,BorderLayout.CENTER);
 
 
@@ -381,7 +382,7 @@ public class SpiceApplication
 	dascanv.setForeground(Color.black);
 	dascanv.setBackground(Color.black);
 	dascanv.addMouseMotionListener(dascanv);
-	dascanv.addMouseListener(dascanv);
+	dascanv.addMouseListener(      dascanv);
 	//dascanv.setOpaque(true) ;
 	dascanv.setPreferredSize(new Dimension(200, 200));
 	//dascanv.setSize(700,300);
@@ -801,12 +802,15 @@ public class SpiceApplication
 	    }
 	    getNewFeatures(sp_id) ;
 	} else {
-	    
-	    setFeatures(sp_id,tmpfeat);	    
+	    logger.finest("setting features for seq " + sp_id + " features size: " + tmpfeat.size());
+	    //setFeatures(sp_id,tmpfeat);	    
+	    //features.clear()                     ;
+	    features = tmpfeat                   ;
 	    //SeqFeatureCanvas dascanv = daspanel.getCanv();
-	    dascanv.setChain(chain,currentChain);
-	    dascanv.setBackground(Color.black);
+	    dascanv.setChain(chain,currentChain) ;
+	    dascanv.setBackground(Color.black)   ;
 	    seqField.setChain(chain,currentChain);
+	    //updateDisplays();
 	}
 	
 
@@ -862,17 +866,25 @@ public class SpiceApplication
 
     // store all features in memory -> speed up
     private ArrayList getFeaturesFromMemory(String sp_id) {
-	logger.finest("getFeaturesFromMemory");
+	logger.entering(this.getClass().getName(), "getFeaturesFromMemory()",  new Object[]{sp_id});
+	//logger.finest("getFeaturesFromMemory");
 	ArrayList arr = new ArrayList() ;
 	
 	for (Iterator ti = memoryfeatures.keySet().iterator(); ti.hasNext(); ) {
 	    String key = (String) ti.next() ;
-	    
+	    logger.finest("in mem: " + key);
 	    //logger.finest(key);
 	    if ( key == null) { continue; }
 
 	    if (key.equals(sp_id)) {
+		logger.finest("found features in memory for spi_id " + sp_id);
+
 		arr = (ArrayList) memoryfeatures.get(sp_id) ;
+
+		for ( int i = 0 ; i < arr.size() ; i++ ) {
+		    Feature f = (Feature) arr.get(i);
+		    logger.finest(" got memory feature " + f.toString());
+		}
 		return arr ;
 	    }
 	}
@@ -1136,7 +1148,7 @@ public class SpiceApplication
     
     /** update the DIsplays of the subpanes */
     public void updateDisplays() {
-	//logger.finest("updateDisplays");
+	logger.finest("updateDisplays + features size: " + features.size());
 	//SeqFeatureCanvas dascanv = daspanel.getCanv();
 	dascanv.setFeatures(features);
 	//dascanv.paint(dascanv.getGraphics());
