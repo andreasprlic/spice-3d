@@ -230,6 +230,8 @@ public class LoggingPanel extends JPanel {
 
 	vBox.add(scroll);
 
+	
+	// modifications by AP 20050305
 	JButton clearButton = new JButton("Clear");
 	clearButton.addActionListener(new ActionListener(){
 		// button is pressed
@@ -243,12 +245,27 @@ public class LoggingPanel extends JPanel {
 	
 	//Box hBox = Box.createHorizontalBox();
 	//hBox.add(clearButton,BorderLayout.WEST);
-	vBox.add(Box.createGlue());
-	vBox.add(clearButton);
+	//vBox.add(Box.createGlue());
+	//vBox.add(clearButton);
 
+	/*JButton close = new JButton("Close");
+	close.addActionListener(new ActionListener(){
+	    public void actionPerformed(ActionEvent event) {
+	        /hm do not know about frame here :-/
+	        dispose();
+	     }	
+	 });	
+	 */	
+	
+	 Box hBoxb = Box.createHorizontalBox();
+	 hBoxb.add(Box.createGlue());
+	 hBoxb.add(clearButton,BorderLayout.EAST);
+	 //hBoxb.add(close,BorderLayout.EAST);
+	 
+	 vBox.add(hBoxb);
 	
 
-        add(vBox);
+     	add(vBox);
 
         setLevelColor(Level.ALL,     Color.GRAY,       null);
         setLevelColor(Level.CONFIG,  null,             null);
