@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 
 <!--
+		
+	this file requires quite some cleanup ... :-/
 
   Ant build file for the entire spice tree
 
@@ -464,8 +466,8 @@
     </copy>
     
     <signjar jar="${www.dir}/${name.spice}.jar" 
-	     alias="protodas" 
-	     storepass="Kan0n3"/>
+	     alias="" 
+	     storepass=""/>
   </target>
 
   <target
