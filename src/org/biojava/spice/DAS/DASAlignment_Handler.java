@@ -36,10 +36,8 @@ import org.biojava.bio.symbol.IllegalSymbolException   ;
 import org.biojava.bio.*                               ;
 
 import java.util.*                                     ;
-
 import java.util.logging.*                             ;
 
-import java.io.*                                       ;
 
 /** connects to a UniPro to PDB alignment service and
  * creates a structure object that corresponds to a UniProt +

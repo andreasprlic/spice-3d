@@ -147,6 +147,7 @@ class SpiceButton extends Button {
 			if (alignpdb != null){
 			    structurealignment = true ;
 			    spice.displayStructureAlignment(defaultpdb,alignpdb,url,registryurl);
+			    
 			}
 			
 		     } catch ( Exception e){

@@ -1,4 +1,4 @@
-/*
+/**
  *                    BioJava development code
  *
  * This code may be freely distributed and modified under the
@@ -27,14 +27,9 @@ package org.biojava.spice.DAS;
 import java.net.URL                         ;
 import java.io.InputStream                  ;
 import org.xml.sax.InputSource              ;
-import org.xml.sax.helpers.XMLReaderFactory ;
 import org.xml.sax.XMLReader                ;
 import javax.xml.parsers.*                  ;
 import org.xml.sax.SAXException             ;
-import org.xml.sax.InputSource              ;
-import org.xml.sax.helpers.XMLReaderFactory ;
-import org.xml.sax.XMLReader                ;
-import org.xml.sax.helpers.*                ;
 import org.xml.sax.*                        ;
 import java.util.ArrayList                  ;
 import java.util.logging.*                  ;

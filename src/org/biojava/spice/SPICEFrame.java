@@ -39,6 +39,13 @@ import java.util.List ;
  */
 public interface SPICEFrame  {
 
+	
+	/** starts a new thread and loads a new biological object into spice 
+	 * @param type the type of the code provided. currently supported: PDB, UniProt, ENSP
+	 * @param code the code of the entry. e.g. 1a4a, P00280, 1q22 
+	 */
+	public void load(String type, String code);
+	
     /** retrieve configuration for DAS servers to use */    
     public RegistryConfiguration getConfiguration();
 
@@ -52,7 +59,7 @@ public interface SPICEFrame  {
 	DAS structure command from some other server this thread will
 	call the setStructure method to set the protein structure.
     */
-    public void getStructure(String pdbcode) ;
+    //public void getStructure(String pdbcode) ;
 
     /** show status notification in defaul color */
     public void   showStatus( String status ) ;

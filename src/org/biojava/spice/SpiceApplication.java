@@ -28,6 +28,7 @@ package org.biojava.spice ;
 import org.biojava.spice.Panel.*;
 import org.biojava.spice.Config.*;
 import org.biojava.spice.Feature.*;
+import org.biojava.spice.GUI.*;
 
 // for protein 3D stuff
 import org.biojava.bio.structure.*;
@@ -45,51 +46,56 @@ import java.net.URL;
 
 // logging
 import java.util.logging.* ;
+import java.util.Iterator  ;
 
 // gui
-import java.awt.Dialog          ;
-import java.awt.Dimension          ;
-import java.awt.Color          ;
-import java.awt.Frame          ;
-import java.awt.Button          ;
-import java.awt.Panel          ;
-import java.awt.BorderLayout       ;
-import java.awt.Event ;
-//import java.awt.TextField ;
-import java.awt.event.*    ;
+import java.awt.Dimension                       ;
+import java.awt.Color                           ;
+import java.awt.BorderLayout                    ;
+import java.awt.Event                           ;
+import java.awt.event.*                         ;
 
 import javax.swing.Box                          ;
-//import javax.swing.text.Document                ;
-//import javax.swing.text.Element                 ;
 import javax.swing.JSplitPane                   ;
 import javax.swing.JFrame                       ;
-import javax.swing.JPanel                       ;
-//import javax.swing.BoxLayout                    ;
 import javax.swing.JList                        ;
-//import javax.swing.ListCellRenderer             ;
 import javax.swing.JScrollPane                  ;
 import javax.swing.DefaultListModel             ;
 import javax.swing.JTextField                   ;
-//import javax.swing.JTextArea                    ;
-//import javax.swing.JEditorPane                  ;
 import javax.swing.event.ListSelectionListener  ;
 import javax.swing.event.ListSelectionEvent     ;  
 import javax.swing.ImageIcon                    ;
 import javax.swing.BorderFactory                ;
-import javax.swing.JDialog                      ;
+import javax.swing.JMenuBar                     ;
+import javax.swing.JMenu                        ;
+import javax.swing.JMenuItem                    ;
+
+
+//import java.awt.Button          ;
+
+//import java.awt.TextField ;
+
+//import javax.swing.text.Document                ;
+//import javax.swing.text.Element                 ;
+//import javax.swing.JComboBox;
+//import javax.swing.JPanel                       ;
+//import javax.swing.BoxLayout                    ;
+//import javax.swing.ListCellRenderer             ;
+
+//import javax.swing.JTextArea                    ;
+//import javax.swing.JEditorPane                  ;
+
+//import javax.swing.JDialog                      ;
 //import javax.swing.event.CaretEvent;
 //import javax.swing.event.CaretListener;
 
 // menu
-import javax.swing.JMenuBar    ;
-import javax.swing.JMenu       ;
-import javax.swing.JMenuItem   ;
 
 // features
-import java.util.Iterator  ;
+
 
 // text coloring 
-import javax.swing.JTextPane   ;
+//import javax.swing.JTextPane   ;
 
 
 // for DAS registration server:
@@ -381,7 +387,7 @@ public class SpiceApplication
 	//sharedPanel.setResizeWeight(0);	
 	sharedPanel.setBackground(Color.black);
 
-	seqField      = new SeqTextPane(this);
+	seqField = new SeqTextPane(this);
 	seqField.setSize( 700, 30);
 	seqField.setPreferredSize(new Dimension(700, 30));
 	seqField.setMinimumSize(new Dimension(700, 30));
@@ -470,7 +476,7 @@ public class SpiceApplication
 	//this.show();
 	
 	//this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-	this.setDefaultLookAndFeelDecorated(false);
+	JFrame.setDefaultLookAndFeelDecorated(false);
 	ImageIcon icon = createImageIcon("spice.png");
 	this.setIconImage(icon.getImage());
 	this.pack();
@@ -504,6 +510,34 @@ public class SpiceApplication
     }
 
 
+    /* (non-Javadoc)
+     * @see org.biojava.spice.SPICEFrame#load(java.lang.String, java.lang.String)
+     */
+    public void load(String type, String code){
+    	if (type.equals("PDB")){
+    		if ( code.length() == 4 ) 
+    		    this.getStructure(code);
+    		
+    	}
+    	else if (type.equals("UniProt")) {
+    		logger.info("load UniProt not implemented, yet!");
+    	}
+    	else if (type.equals("ENSP")) {
+    		logger.info("load ENSP not implemented, yet!");
+    		
+    	}
+    	else {
+    		// unknown code type!
+    		System.err.println("unknown code type >"+type+"< currently supported: PDB,UniProt,ENSP");
+    		return;
+    	}
+    		
+    	
+    }
+    
+    /**
+     * @returns the Menu to be displayed on top of the application
+     */
     private JMenuBar initMenu() {
 
 	JMenuBar menu = new JMenuBar();
@@ -516,7 +550,7 @@ public class SpiceApplication
 	menu.add(file);
 
 
-	JMenuItem openpdb = new JMenuItem("open PDB");
+	JMenuItem openpdb = new JMenuItem("open");
 	openpdb.setMnemonic(KeyEvent.VK_O);
 	JMenuItem exit    = new JMenuItem("Exit");
 	exit.setMnemonic(KeyEvent.VK_X);
@@ -1291,7 +1325,7 @@ public class SpiceApplication
 	//lcr.paint();
 	//ListCellRenderer lcr = ent_list.getCellRenderer();
 	//ent_list.paint() ;
-	sharedPanel.show();
+	sharedPanel.setVisible(true);
 	dasPanel.updateUI();
 	//dasPanel.revalidate();
 	//dasPanel.repaint();
@@ -1347,8 +1381,6 @@ public class SpiceApplication
 	return -1 ;
     }
     
-  
-   
 
     /** Event handling */
     public boolean handleEvent(Event event) 
@@ -1366,11 +1398,9 @@ public class SpiceApplication
 		//case Event.ACTION_EVENT:				
 	    }
 
-
 	return true ;
 
     }
-
 
 }
 
@@ -1388,11 +1418,11 @@ class SpiceMenuListener
     }
 
     public void actionPerformed(ActionEvent e) {
-	System.out.println(e);
-	System.out.println(e.getActionCommand());
+	//System.out.println(e);
+	//System.out.println(e.getActionCommand());
 	
 	String cmd = e.getActionCommand();
-	if ( cmd.equals("open PDB") ) {
+	if ( cmd.equals("open") ) {
 	    OpenDialog op = new OpenDialog(parent);
 	    op.show();
 	    
@@ -1441,46 +1471,6 @@ class SpiceMenuListener
 
 
 
-//class ApplicationCloser extends WindowAdapter {
-//  public void windowClosing(WindowEvent e) {
-//    System.exit(0);
-//  }
-//}
-
-
-class TextFieldListener 
-    implements ActionListener {
-    JTextField textfield ;
-    SPICEFrame spice    ;
-    static Logger logger      = Logger.getLogger("org.biojava.spice");
-
-    public TextFieldListener (SPICEFrame spice_, JTextField textfield_) {
-	super();
-	spice = spice_ ;
-	textfield = textfield_ ;
-    }
-    public void actionPerformed(ActionEvent event) {
-	//logger.finest("in TextField");
-	//logger.finest("EVENT!");
-	//logger.finest(event);
-
-	if ( spice.isLoading() ) {
-	    logger.finest("loading data, please be patient");
-	    return ;
-	}
-	String pdbcod = textfield.getText();
-	//spice.executeCmd(cmd);
-	spice.getStructure(pdbcod);
-	textfield.setText("");
-	//logger.finest(event.getActionCommand());
-	//logger.finest(event.getModifiers());
-	//logger.finest(event.paramString());
-    
-	//logger.finest(event.id);
-    }
-}
-
-
 
  
 //class EntListCommandListener implements ItemListener {
@@ -1521,139 +1511,6 @@ class EntListCommandListener implements ListSelectionListener {
 
 }
 
-
-class OpenDialog extends Dialog
-{
-    static int H_SIZE = 200;
-    static int V_SIZE = 90;
-    SPICEFrame spice ;
-    JTextField getCom ;
-    
-    public OpenDialog(SPICEFrame parent){
-	// Calls the parent telling it this
-	// dialog is modal(i.e true)	
-	super((Frame)parent, true); 
-
-	this.addWindowListener(new WindowAdapter() {
-		public void windowClosing(WindowEvent evt) {
-		    Frame frame = (Frame) evt.getSource();
-		    frame.setVisible(false);
-		    frame.dispose();
-		}
-	    });
-
-	spice = parent ;
-	Panel p = new Panel();
-	this.setTitle("enter PDBcode") ;
-	getCom = new JTextField(4);
-	//TextFieldListener txtlisten = new TextFieldListener(parent,getCom);
-	//getCom.addActionListener(txtlisten);
-
-	getCom.addActionListener(new ActionListener()  {
-		public void actionPerformed(ActionEvent e) {
-		    String pdbc = e.getActionCommand();
-		    if ( pdbc.length() == 4 ) {
-			spice.getStructure(pdbc);
-			dispose();	
-		    }
-		}
-	    });
-
-	p.add(getCom);
-	p.add(new Button("Open"));
-	p.add(new Button("Cancel"));
-	add(p);
-	resize(H_SIZE, V_SIZE);
-    }
-    
-    public boolean action(Event evt, Object arg)
-    {
-	// If action label(i.e arg) equals 
-	// "Close" then dispose this dialog
-
-	if(arg.equals("Cancel"))
-	    {
-		dispose();
-		return true;
-	    }
-	else if ( arg.equals("Open"))
-	    {
-		if ( spice.isLoading() ) {
-		    getCom.setText("please wait, already loading");
-		    return true ;
-		}
-		//logger.finest("open" + getCom.getText());
-		String pdbcod = getCom.getText();
-		if ( pdbcod.length() == 4 ) {
-		    spice.getStructure(pdbcod);
-		    dispose();
-		}
-		return true;	
-	    }
-
-	return super.handleEvent(evt);
-    }
-
-}
-
-
-class AboutDialog extends JDialog
-{
-    static int H_SIZE = 200;
-    static int V_SIZE = 400;
-    //JTextField txt ;
-    String displayText     ;
-    JTextPane txt         ;
-    public AboutDialog(JFrame parent)
-    {
-	// Calls the parent telling it this
-	// dialog is modal(i.e true)
-	super(parent, true);         
-	//setBackground(Color.gray);
-	//setLayout(new BorderLayout());
-	this.setSize(new Dimension(H_SIZE, V_SIZE)) ;
-	
-	displayText="" ;
-	txt = new JTextPane();
-
-	txt.setEditable(false);
-	// Two buttons "Close" and "Help"
-	//txt = new JTextField();
-	JScrollPane scroll = new JScrollPane(txt);
-	//scroll.setPreferredSize(new Dimension(H_SIZE, V_SIZE-50)) ;
-	scroll.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-	JPanel p = new JPanel();
-	p.add("Center",scroll);
-	//p.add(txt);
-	p.add("Sourth",new Button("Close"));
-	//p.add(new Button("Help"));
-	
-	//add("South", p);
-	this.getContentPane().add(p);
-	//this.getContentPane().add(new Button("Close"));
-	
-	//resize(H_SIZE, V_SIZE);
-
-    }
-
-    public boolean action(Event evt, Object arg)
-    {
-	// If action label(i.e arg) equals 
-	// "Close" then dispose this dialog
-	if(arg.equals("Close"))
-	    {
-		dispose();
-		return true;
-	    }
-	return super.handleEvent(evt);
-    }
-
-    public void setText(String t) {
-	displayText = t ;
-	txt.setText(t);
-    }
-
-}
 
 class StructureCommandListener 
     implements ActionListener {
