@@ -71,7 +71,7 @@ implements ActionListener
         } else if (cmd.equals("Reset")) {
             parent.resetDisplay();
         } else if (cmd.equals("About SPICE")) {
-            AboutDialog asd = new AboutDialog((JFrame)parent);
+            AboutDialog asd = new AboutDialog(parent);
             
             //asd.setText(DESCRIPTION_TEXT) ;
             

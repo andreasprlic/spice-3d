@@ -85,8 +85,7 @@ extends  JFrame
 implements SPICEFrame 
 
 {
-    
-    
+      
     public static Logger logger =  Logger.getLogger("org.biojava.spice");
     
     public static ImageIcon firefoxIcon = createImageIcon("firefox.png");
@@ -138,8 +137,7 @@ implements SPICEFrame
     
     StructureCommandPanel  strucommand; 
     StatusPanel statusPanel ;
-    String[] txtColor     ;
-    Color[] entColors ;
+   
     Color oldColor ; 
     boolean first_load ;
     boolean selectionLocked ;
@@ -162,15 +160,12 @@ implements SPICEFrame
         currentChainNumber = -1 ;
         currentChain = null;
         
-        LoggingPanel loggingPanel = new LoggingPanel(logger);
-        loggingPanel.getHandler().setLevel(Level.FINEST);	
-        loggingPanel.show(null);
-        logger.setLevel(Level.FINEST);
+        // init logging related stuff
+        initLoggingPanel();
         
+        // set some system properties
         setSystemProperties();
-        
-        
-        
+
         REGISTRY_URL = registry_url ;
         
         // first thing is to start communication
@@ -181,34 +176,10 @@ implements SPICEFrame
         structure = null ;
         pdbcode   = null ;
         pdbcode2  = null ;
-        txtColor  = new String[7] ;
-        txtColor[0]="blue";
-        txtColor[1]="pink";
-        txtColor[2]="green";
-        txtColor[3]="magenta";
-        txtColor[4]="orange";
-        txtColor[5]="pink";
-        txtColor[6]="cyan";
-        
-        
-        entColors = new Color [7];
-        entColors[0] = Color.blue;
-        entColors[1] = Color.pink;
-        entColors[2] = Color.green;
-        entColors[3] = Color.magenta;
-        entColors[4] = Color.orange;
-        entColors[5] = Color.pink;
-        entColors[6] = Color.cyan;
-        
-        
+               
         //first_load = false ;
         
         structureAlignmentMode = false ;
-        
-        
-        //vBox.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        //this.getContentPane().setLayout(new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
-        
         
         // add the Menu
         JMenuBar menu = initMenu();
@@ -230,11 +201,9 @@ implements SPICEFrame
         
         memoryfeatures = new HashMap();
         features = new ArrayList();
-        
-        
-        
-        this.setTitle("SPICE") ;
-        this.setSize(700, 700);
+                
+        //this.setTitle("SPICE") ;
+        //this.setSize(700, 700);
         //this.show();
         
         //this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -252,17 +221,24 @@ implements SPICEFrame
             String msg = "Unable to contact DAS registration service, can not continue!" ;
             seq_pos.setText(msg);
             logger.log(Level.SEVERE,msg);
-            System.err.println(msg);
+            //System.err.println(msg);
             
             return ;
             
         }
     }
+   
+    private void initLoggingPanel(){
+        LoggingPanel loggingPanel = new LoggingPanel(logger);
+        loggingPanel.getHandler().setLevel(Level.FINEST);	
+        logger.setLevel(Level.FINEST);
+        loggingPanel.show(null);
+    }
     
     /** set  a couple of System Properties */
    
     private void setSystemProperties(){
-//      on osx move menu to the top of the screen
+        //  on osx move menu to the top of the screen
         System.setProperty("apple.laf.useScreenMenuBar", "true");
         
         // do xml validation when parsing DAS responses (true/false)
@@ -270,15 +246,16 @@ implements SPICEFrame
         
         int timeout = 15000;
         
-        if (logger.isLoggable(Level.FINEST)) {
-            logger.finest("setting timeouts to " + timeout);
-        }
+        
+        logger.finest("setting timeouts to " + timeout);
+        
         
         // timeouts when doing http connections
         System.setProperty("sun.net.client.defaultConnectTimeout", ""+timeout);
         System.setProperty("sun.net.client.defaultReadTimeout", ""+timeout);
         
         
+        // bugfix for some strange setups!!!
         String proxyHost  = System.getProperty("proxyHost");
         String proxyPort  = System.getProperty("proxyPort");
         
@@ -337,8 +314,7 @@ implements SPICEFrame
             String structureLocation){
         
         Box vBox = Box.createVerticalBox();
-        
-        
+                
         // move to submenu
         //this.getContentPane().add(statusPanel,BorderLayout.SOUTH);
         //this.getContentPane().add(statusPanel);
@@ -352,7 +328,7 @@ implements SPICEFrame
         // init Seqouece position
         seq_pos.setForeground(new Color(255, 255, 255));
         seq_pos.setBackground(new Color(0, 0, 0));
-        seq_pos.setSize(700, 30);
+        //seq_pos.setSize(700, 30);
         seq_pos.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
         seq_pos.setBorder(BorderFactory.createEmptyBorder());
         //this.getContentPane().add(seq_pos,BorderLayout.NORTH);
@@ -364,15 +340,13 @@ implements SPICEFrame
         /// init Structure Panel
         
         //structurePanel.setLayout(new BoxLayout(structurePanel, BoxLayout.X_AXIS));
-        structurePanel.setPreferredSize(new Dimension(500, 300));
+        //structurePanel.setPreferredSize(new Dimension(500, 300));
         structurePanel.setMinimumSize(new Dimension(200,200));
         //structurePanel.addMouseMotionListener(structurePanel);
         //structurePanel.addMouseListener(      structurePanel);
         //this.add(structurePanel,BorderLayout.CENTER);
-        
-        
-        
-        
+                      
+      
         DefaultListModel model = new DefaultListModel();
         model.add(0,"");
         ent_list=new JList(model);
@@ -384,7 +358,6 @@ implements SPICEFrame
         JScrollPane chainPanel = new JScrollPane(ent_list);
         chainPanel.setPreferredSize(new Dimension(30,30));
         
-        
         // init dascanv
         
         //dascanv.setForeground(Color.black);
@@ -392,7 +365,7 @@ implements SPICEFrame
         dascanv.addMouseMotionListener(dascanv);
         dascanv.addMouseListener(      dascanv);
         //dascanv.setOpaque(true) ;
-        dascanv.setPreferredSize(new Dimension(200, 200));
+        //dascanv.setPreferredSize(new Dimension(200, 200));
         //dascanv.setSize(700,300);
         
         dasPanel = new JScrollPane(dascanv);
@@ -416,7 +389,7 @@ implements SPICEFrame
         //sharedPanel.setBackground(Color.black);
         
         seqField = new SeqTextPane(this);
-        seqField.setSize( 700, 30);
+        //seqField.setSize( 700, 30);
         seqField.setPreferredSize(new Dimension(700, 30));
         seqField.setMinimumSize(new Dimension(700, 30));
         seqField.addMouseMotionListener(seqField);
@@ -426,7 +399,7 @@ implements SPICEFrame
         // add onMouseOver action
         
         seqScrollPane = new JScrollPane(seqField) ;
-        seqScrollPane.setSize( 700, 30);
+        //seqScrollPane.setSize( 700, 30);
         //seqScrollPane.setPreferredSize(new Dimension(700, 30));;
         //seqScrollPane.setMinimumSize(  new Dimension(700, 30));;
         
@@ -435,7 +408,7 @@ implements SPICEFrame
         
         seqSplitPane.setOneTouchExpandable(true);
         //seqSplitPane.setOpaque(true);
-        seqSplitPane.setResizeWeight(0.6);
+        seqSplitPane.setResizeWeight(0.7);
         //seqSplitPane.setBackground(Color.black);
         seqSplitPane.setPreferredSize(new Dimension(300,300));
         
@@ -449,6 +422,7 @@ implements SPICEFrame
         //sharedPanel.setMaximumSize(new Dimension(Short.MAX_VALUE,300));
         //this.add(sharedPanel,BorderLayout.SOUTH);
         
+        
         if (structureLocation.equals("top"))
             mainsharedPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, structurePanel,seqSplitPane);
         else if  (structureLocation.equals("bottom"))
@@ -459,7 +433,7 @@ implements SPICEFrame
             mainsharedPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, seqSplitPane,structurePanel);
         
         mainsharedPanel.setOneTouchExpandable(true);
-        //mainsharedPanel.setResizeWeight(0.5);
+        mainsharedPanel.setResizeWeight(0.5);
         //mainsharedPanel.setDividerLocation(150);
         //mainsharedPanel.setPreferredSize(new Dimension(200, 200));
         //mainsharedPanel.setOpaque(true);
@@ -469,7 +443,7 @@ implements SPICEFrame
         //this.getContentPane().add(mainsharedPanel,BorderLayout.NORTH);
         //this.getContentPane().add(mainsharedPanel);
         mainsharedPanel.setBorder(BorderFactory.createEmptyBorder());
-        vBox.add(mainsharedPanel,BorderLayout.CENTER);
+        vBox.add(mainsharedPanel);
         
         strucommand.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
         //this.getContentPane().add(strucommand,BorderLayout.SOUTH);
@@ -482,37 +456,6 @@ implements SPICEFrame
     
     
     
-    
-    /* (non-Javadoc)
-     * @see org.biojava.spice.SPICEFrame#load(java.lang.String, java.lang.String)
-     */
-    public void load(String type, String code){
-        if (type.equals("PDB")){
-            if ( code.length() == 4 ) 
-                this.getStructure(code);
-            else  
-                logger.info("please provide only 4 characters for the PDB code.");
-            
-        }
-        else if (type.equals("UniProt")) {
-            //logger.info("got uniprot");
-            // connect to Uniprot -pdb alignment service, get PDB code and load it ...
-            getUniprot(code);
-            
-        }
-        else if (type.equals("ENSP")) {
-            logger.info("load ENSP not implemented, yet!");
-            
-        }
-        else {
-            // unknown code type!
-            //System.err.println("unknown code type >"+type+"< currently supported: PDB,UniProt,ENSP");
-            logger.warning("unknown code type >"+type+"< currently supported: PDB,UniProt,ENSP");
-            return;
-        }
-        
-        
-    }
     
     /**
      * @returns the Menu to be displayed on top of the application
@@ -750,6 +693,37 @@ implements SPICEFrame
             return null;
         }
     }
+
+    /* (non-Javadoc)
+     * @see org.biojava.spice.SPICEFrame#load(java.lang.String, java.lang.String)
+     */
+    public void load(String type, String code){
+        if (type.equals("PDB")){
+            if ( code.length() == 4 ) 
+                this.getStructure(code);
+            else  
+                logger.info("please provide only 4 characters for the PDB code.");
+            
+        }
+        else if (type.equals("UniProt")) {
+            //logger.info("got uniprot");
+            // connect to Uniprot -pdb alignment service, get PDB code and load it ...
+            getUniprot(code);
+            
+        }
+        else if (type.equals("ENSP")) {
+            logger.info("load ENSP not implemented, yet!");
+            
+        }
+        else {
+            // unknown code type!
+            //System.err.println("unknown code type >"+type+"< currently supported: PDB,UniProt,ENSP");
+            logger.warning("unknown code type >"+type+"< currently supported: PDB,UniProt,ENSP");
+            return;
+        }
+        
+        
+    }
     
     
     
@@ -787,14 +761,7 @@ implements SPICEFrame
         }
         
     }
-    
-    
-    
-    /** remember the previous color */
-    public void setOldColor(Color c) {
-        oldColor = c ;
-    }
-    
+       
     
     public RegistryConfiguration getConfiguration() {
         return config ;

@@ -81,7 +81,7 @@ public class Spice extends Applet {
 	SpiceApplication appFrame = new SpiceApplication(registryurl) ;	
 	//System.out.println("init of SpiceApplication single structure mode");
 	appFrame.setTitle("SPICE") ;
-	//appFrame.setSize(700, 700);
+	appFrame.setSize(800, 600);
 	System.out.println("addMoreSpice calling show()");
 	//appFrame.show();
 	appFrame.load(codetype,code);

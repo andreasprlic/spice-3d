@@ -151,10 +151,7 @@ public interface SPICEFrame
 
     /** display an URL in the browser that started SPICE */
     public boolean showURL(URL url);
-    
-    // color management
-    public void setOldColor(Color c) ;
-
+   
     // rescale the windo size 
     public void scale() ;
     
