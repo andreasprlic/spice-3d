@@ -4,128 +4,42 @@
 <html>
   <head>
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" >
-    <title>run the SPICE applet</title>
+    <title>run the SPICE - DAS client</title>
 <link rel="stylesheet" type="text/css" href="http://dev.efamily.org.uk/css/efamily.css" />
 
   </head>
+
   <body bgcolor="#ffffff" text="#000000" link="#000070" vlink="#000070" marginheight="4" topmargin="4"><table border="0" cellpadding="0" cellspacing="0">
-    <tr>
 
-      <td><a href="/"><img alt="eFamily" src="/gfx/efamily-small.png" /></a></td>
-      <td><img src="/gfx/blank.gif" width="310" height="10" alt="" /></td>
-      <td><a href="http://www.mrc.ac.uk/"><img alt="MRC - Medical Research Council" src="/gfx/mrc.gif" /></a></td>
-      <td><a href="http://www.sanger.ac.uk/"><img alt="The Wellcome Trust Sanger Institute" src="/gfx/wtsi-header.gif" /></a></td>
-    </tr>
-    <!--tr>
-      <td colspan="2">Integrating Biological Sequence and Structure Databases</td>
-    </tr-->
-    <tr>
-      <td colspan="4" class="ruler"><img src="/gfx/blank.gif" height="1" width="1" alt="" /></td>
-    </tr>
-
-</table>
-<table border="0" cellpadding="0" cellspacing="2">
-  <tr>
-    <td valign="top" align="center" width="110">
-      <div id="navlist">
-        <ul>
-<li id="menu1"><a href="/">Home</a></li>
-<li id="menu1"><a href="/news.shtml">News</a></li>
-<li id="menu1"><a href="/meetings/">Meetings</a></li>
-<li id="menu1"><a href="/software/">Software</a></li>
-
-<li id="menu1"><a href="/software/">Services</a></li>
-<li id="menu1"><a href="/publications/">Publications</a></li>
-<li id="menu1"><a href="/contacts.shtml">Contacts</a></li>
-<li id="menu1"><a href="/partners.shtml">Partners</a></li>
-<li id="menu1"><a href="/links.shtml">Other Links</a></li>
-
-	</ul>
-      </div>
-    </td>
-
-    <td><img src="/gfx/blank.gif" width="5" alt="" /></td>
-    <td valign="top" width="690">
-
-<h3>Run SPICE</h3>
-
-<p>
-
-There are two ways to run SPICE:
-</p>
-<ul>
-<li> as a Java applet </li>
-<li> using <a target="_top" href="http://java.sun.com/products/javawebstart/">Java  Web Start</a> </li>
-</ul>
-<p>
-Both approaches are described below.
+<p> Press here to start SPICE using Java Web Start: <br/>
+<a href="spice.jnlp">Run Spice</a>
 </p>
 
-<hr>
-
-
-
-<h3>SPICE as a Java Applet</h3>
-
-<center>
-<br><i>Press button to start SPICE</i></br>
-<applet archive="biojava.jar,spice.jar,xercesImpl.jar,xmlParserAPIs.jar,resolver.jar,xml-apis.jar,JmolApplet.jar,org.biojava.das.registry.jar,axis.jar,jaxrpc.jar,commons-logging.jar,commons-discovery.jar,jaxrpc.jar,saaj.jar,wsdl4j.jar,log4j-1.2.8.jar" code="org.biojava.spice.Spice.class" >
-<param name="PDB_CODE"   value="1a4a"/>
-<param name="CONFIG_XML" value="http://www.sanger.ac.uk/Users/ap3/DAS/SPICE/stable/config.xml"/>
-<param name="DAS_REGISTRY" value="http://localhost:8080/axis/services/dasregistry/"/>
-<param name="progressbar"   value="true" />
-</applet>
-
-</center>
-
-
-<p> The applet automatically loads PDB 1a4a. The applet provides an
-entry field to display other structures, for which 3D coordiantes and
-SwissProt-PDB mappings are available.
-</p>
-<hr/>
-You might want to open the Java Console of your browse to see more details about the DAS communication that is going on in the background.
-
-
-
-<hr/> 
-
-<p>
-The applet has been tested successfully using java 1.4, Mozilla,
-Firefox, and IE6 under Linux, OSX and Windows XP operating systems.
-
-
-<br>
-<ul><li>Java 1.4 on OSX: 
-If you have troubles running the applet under OSX:
-Download the replacement Java plugin from:
-
-     <a href="http://javaplugin.sourceforge.net/">http://javaplugin.sourceforge.net/</a>
-
-and follow the instructions in the Readme.txt file. 
-</li>
-</ul>
-</p>
+<p> The SPICE client automatically loads the structure of Azurin (PDB
+accession code 1a4a). </p>
 
 <hr/>
 
-<h3>SPICE and Java Web Start</h3>
+<h4> Where can I learn more about SPICE?</h4>
+<p>
+Please go <a href="index.shtml">here</a>.
+</p>
+
+
+<hr/>
+
+<h4>Java Web Start</h4>
 
 <p> Using <a target="_top"
 href="http://java.sun.com/products/javawebstart/">Java Web Start</a>,
 software applications can be deployed with a single click over the
 Internet. Web Start ensures the most current version of the
 application will be deployed. In contrast to Java applets, where Jar
-files need to be downloaded every time the Applet is started, using
+files need to be downloaded every time the applet is started, using
 Web Start the application is downloaded only the first time it is
-requested. From the second call of the Application the execution if
+requested. From the second call of the application the execution if
 much faster.
 </p>
-
-<p> Press here to start SPICE using Web Start: <br/>
-<a href="http://protodas.derkholm.net/spice/spice.jnlp">Run Spice !</a>
-</p>
-
 <p> If pressing the above link does not launch Web Start, you need to
 install it first. Please read more about installation of Web Start at
 <a href="http://java.sun.com/products/javawebstart/1.2/docs/installguide.html" target="_new">http://java.sun.com/products/javawebstart/1.2/docs/installguide.html</a>
@@ -133,12 +47,21 @@ install it first. Please read more about installation of Web Start at
 
 <hr/>
 
-<h4> Where can I learn more about SPICE?</h4>
-<p>
-Please go <a href="index.html">here</a>.
+<h4> Requirements </h4>
+
+<ul>
+</li>Your system should have installed Java 1.4.2+ 
+</ul>
+
+<p> To test the current Java version of your browser, please proceed to <a href="http://www.javatester.org/version.html"> here</a>. Note: this is not necessarily the Java version used to run Java Web Start.</p>
+
+<hr/>
+<br>
+The Client has been tested successfully using Java 1.4.2, Mozilla,
+Firefox, and IE6 under Linux, OSX and Windows XP operating
+systems.
+
+
 </p>
 
-
-
-</BODY>
-</HTML>
+<!--#include virtual="/perl/footer" -->
