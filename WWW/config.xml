@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+
+<!-- config file for jpdb viewer -->
+
+
+<jpdbconfig>
+	<!--<structureserver name="derkholmstruc"  url="http://protodas.derkholm.net/dazzle/mystruc/"/>-->
+	
+	<structureserver name="sangerstructure"  url="http://das.sanger.ac.uk/das/structure/"/>
+	<sequenceserver  name="ensemblsp"      url= "http://das.ensembl.org/das/swissprot/"/>
+	<!--<alignmentserver name ="derkholmalig"  url = "http://protodas.derkholm.net/dazzle/myalig/"/>-->
+
+	<!--<alignmentserver name ="localalig"  url = "http://localhost:8080/dazzle/aligpdbsp/"/>-->
+	<alignmentserver name ="sangeralignment"  url = "http://das.sanger.ac.uk/das/aligpdbsp/"/>
+
+	<!--<featureserver   name="pfamdomains"    url="http://pfam1b.internal.sanger.ac.uk:9000/das/pfam/"/>-->
+	<featureserver   name="interpro"       url="http://das.sanger.ac.uk/das/interpro/"/>
+	<featureserver   name="swissprot"      url="http://das.ensembl.org/das/swissprot/"/>
+	<featureserver   name="cosmic"	       url="http://das.sanger.ac.uk/das/cosmic/"/>
+	<!--	<featureserver name="pfaminteract" url=	"http://pfam1b.internal.sanger.ac.uk:9000/das/pfaminteract/"/>-->
+
+</jpdbconfig>
