@@ -36,7 +36,8 @@ import javax.swing.*;
 // biojava structure stuff
 import org.biojava.bio.structure.Structure ;
 
-
+// logging
+import java.util.logging.*;
 
 /** a Panel that provides a wrapper around the Jmol viewer. Code heavily
  * inspired by
@@ -45,12 +46,15 @@ import org.biojava.bio.structure.Structure ;
  * 
  */
 class StructurePanel extends JPanel {
-
-    JmolViewer viewer;
-    JmolAdapter adapter;
-    TextField strucommand  ; 
-
     
+    final  Dimension currentSize = new Dimension();
+    static Logger    logger      = Logger.getLogger("org.biojava.spice");
+
+    JmolViewer  viewer;
+    JmolAdapter adapter;
+    TextField   strucommand  ; 
+
+
     StructurePanel() {
 	adapter = new SmarterJmolAdapter(null);
 	viewer = new JmolViewer(this, adapter);
@@ -74,7 +78,12 @@ class StructurePanel extends JPanel {
      * @param command - a String containing a RASMOL like command. e.g. "select protein; cartoon on;"
      */
     public void executeCmd(String command) {
-	//System.out.println("sending Jmol command: " +command);	
+	
+	if (logger.isLoggable(Level.FINEST)) {
+	    logger.finest("sending Jmol command: "+command);
+	}
+
+	
 	viewer.evalString(command);
     }
 
@@ -95,11 +104,13 @@ class StructurePanel extends JPanel {
 	    
 	
 	String strError = viewer.getOpenFileError();
-	if (strError != null)
-	    System.out.println(strError);
+	if (strError != null) {
+	    if (logger.isLoggable(Level.WARNING)) {
+		logger.severe("could not open PDB file in viewer "+ strError);
+	    }
+	}
     }
-
     
-    final Dimension currentSize = new Dimension();
+
 
 }

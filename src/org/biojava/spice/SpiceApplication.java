@@ -49,6 +49,9 @@ import java.net.HttpURLConnection ;
 import java.net.URL;
 import java.io.IOException ;
 
+// logging
+import java.util.logger.* ;
+
 // gui
 import java.awt.Dialog          ;
 import java.awt.Dimension          ;
@@ -164,15 +167,26 @@ public class SpiceApplication
     MenuItem aboutdas   ;
     MenuItem openpdb    ;
 
+    static Logger    logger      = Logger.getLogger("org.biojava.spice");
+
 
     SpiceApplication(String pdbcode_, URL config_url, URL registry_url) {
 	super();
 
-
+	
 
 	System.setProperty("XMLVALIDATION",XMLVALIDATION);
 	int timeout = 15000;
-	System.out.println("setting timeouts to " + timeout) ;
+
+	ConsoleHandler handler = new ConsoleHandler();
+	handler.setLevel(Level.FINEST);
+	logger.setHandler(handler);
+	
+
+	if (logger.isLoggable(Level.FINEST)) {
+	    logger.finest("setting timeouts to " + timeout);
+	}
+	
 	System.setProperty("sun.net.client.defaultConnectTimeout", ""+timeout);
 	System.setProperty("sun.net.client.defaultReadTimeout", ""+timeout);
 
@@ -185,11 +199,13 @@ public class SpiceApplication
 	//
 	String proxyHost  = System.getProperty("proxyHost");
 	String proxyPort  = System.getProperty("proxyPort");
-	System.out.println("proxyHost"         + proxyHost);
-	System.out.println("proxyPort"         + proxyPort);
-	System.out.println("http.proxyHost"    + System.getProperty("http.proxyHost"));
-	System.out.println("http.proxyPort"    + System.getProperty("http.proxyPort"));
 	
+	if (logger.isLoggable(Level.FINEST)) {
+	    logger.finest("proxyHost"         + proxyHost);
+	    logger.finest("proxyPort"         + proxyPort);
+	    logger.finest("http.proxyHost"    + System.getProperty("http.proxyHost"));
+	    logger.finest("http.proxyPort"    + System.getProperty("http.proxyPort"));
+	}
 	if ( proxyHost != null ) {
 	    System.setProperty("proxySet","true");
 	    if ( System.getProperty("http.proxyHost") == null ){
@@ -202,8 +218,9 @@ public class SpiceApplication
 		System.setProperty("http.proxyPort",proxyPort);
 	    }
 	}
-	System.out.println("using Proxy:" + System.getProperty("proxySet"));
-
+	if (logger.isLoggable(Level.FINEST)) {
+	    logger.finest("using Proxy:" + System.getProperty("proxySet"));
+	}
 
 	CONFIG_URL   = config_url ;
 	REGISTRY_URL = registry_url ;
@@ -463,7 +480,7 @@ public class SpiceApplication
 	ImageIcon icon = createImageIcon("spice.jpg");
 	this.setIconImage(icon.getImage());
 	this.pack();
-	System.out.println("setting Visible true");
+	
 	this.setVisible(true);
 
 	config =regi.getConfiguration();
@@ -575,6 +592,12 @@ public class SpiceApplication
 	systemSettings.put("proxyPort", "3128");
 	System.setProperties(systemSettings);
 	*/
+
+	if (logger.isLoggable(Level.FINER)) {
+	    logger.entering(this.getClass().getName(), "getStructure",
+			   new Object[]{pdbcod);
+            }
+	}
 	System.out.println("SpiceApplication: getStructure "+ pdbcod);
 	first_load = true ;
 	statusPanel.setLoading(true);
