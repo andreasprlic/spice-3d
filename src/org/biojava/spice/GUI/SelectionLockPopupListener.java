@@ -25,9 +25,8 @@ package org.biojava.spice.GUI;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import javax.swing.MenuElement;
+
 
 import org.biojava.spice.SPICEFrame;
 

@@ -34,7 +34,7 @@ import org.xml.sax.*                        ;
 import java.util.ArrayList                  ;
 import java.util.logging.*                  ;
 import java.net.HttpURLConnection           ;
-import java.lang.reflect.*;
+
 
 /**
  * A class to perform a DAS features request

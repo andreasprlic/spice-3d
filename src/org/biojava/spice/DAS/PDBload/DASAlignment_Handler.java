@@ -44,6 +44,7 @@ import org.biojava.spice.DAS.*                         ;
  * assoc. PDB-Chain. 
  *
  * @author Andreas Prlic
+ * TODO move to StructureBuilder
  */
 
 public class DASAlignment_Handler extends Thread
@@ -141,12 +142,12 @@ public class DASAlignment_Handler extends Thread
 
 	String server = alignmentserver ;
 	logger.info("requesting alignment from " + server+"/alignment?query="+pdb_code);
-	DASAlignmentClient dasc= new DASAlignmentClient(server);
+	//DASAlignmentClient dasc= new DASAlignmentClient(server);
 	Alignment[] alignments = null ;
-
+	AlignmentTools at = new AlignmentTools(config);
 	
 	try{
-	    alignments = dasc.getAlignments(pdb_code);	 
+	    alignments = at.getAlignments(pdb_code);	 
 
 	    logger.finest("DASAlignmentHandler: got "+ alignments.length +" alignment(s):");
 
@@ -160,7 +161,7 @@ public class DASAlignment_Handler extends Thread
    
 	} catch (Exception e){
 	    //e.printStackTrace();
-	    logger.log(Level.SEVERE,"unable to retreive UniProt - PDB alignment",e);
+	    logger.log(Level.SEVERE,"unable to retreive UniProt - PDB alignment " + e.getMessage(),e);
 	}
 	downloadFinished = true ;
 	master.setMappingDone(true) ;

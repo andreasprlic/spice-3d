@@ -28,9 +28,12 @@ import java.util.logging.*;
 
 import org.biojava.bio.Annotation;
 import org.biojava.bio.program.das.dasalignment.Alignment;
-import org.biojava.bio.program.das.dasalignment.DASAlignmentClient;
+import org.biojava.bio.program.das.dasalignment.DASAlignmentCall;
 import org.biojava.spice.Config.RegistryConfiguration;
 import org.biojava.spice.Config.SpiceDasSource;
+import java.net.*;
+import java.io.*;
+import java.util.zip.GZIPInputStream;
 
 /**
  * @author Andreas Prlic
@@ -40,7 +43,7 @@ public class AlignmentTools {
 
     Logger logger;
     RegistryConfiguration config;
-    
+    DASAlignmentCall dasalignmentCall;
     /**
      * 
      */
@@ -48,7 +51,8 @@ public class AlignmentTools {
         super();
         config=conf;
         logger = Logger.getLogger("org.biojava.spice");
-
+        dasalignmentCall= new DASAlignmentCall();
+		
 
     }
     
@@ -66,7 +70,7 @@ public class AlignmentTools {
     	for ( int i =0 ; i < aligservers.size() ; i++ ) {
     	    SpiceDasSource sds= (SpiceDasSource)aligservers.get(i);
     	   
-    	    logger.finest("investigating " + sds.getUrl());
+    	    logger.finest("investigating " + i + " url" + sds.getUrl());
     	    //System.out.println("investigating" + sds.getUrl());
     	    // only consider those serving uniprot and PDB alignments
     	    if ( config.isSeqStrucAlignmentServer(sds) ) {
@@ -80,10 +84,10 @@ public class AlignmentTools {
 
     		logger.info("contacing alignment server " + dasalignmentcommand+code);
     		//System.out.println("contacing alignment server " + dasalignmentcommand);
-    		DASAlignmentClient dasc= new DASAlignmentClient(dasalignmentcommand);
     		
     		try{
-    		    alignments = dasc.getAlignments(code);
+    		    //alignments = dasc.getAlignments(code);
+    		    alignments= retreiveAlignments(dasalignmentcommand+code);
     		    
     		    logger.finest("DASAlignmentHandler: got "+ alignments.length +" alignment(s):");
     		    if ( alignments.length == 0 ) {
@@ -120,4 +124,65 @@ public class AlignmentTools {
 	return null ;
     }
 
+    private Alignment[] retreiveAlignments(String url)
+	throws IOException
+    {
+	/* now connect to DAS server */
+	
+	URL dasUrl = null ;
+	try {
+	    dasUrl = new URL(url);
+	} catch (Exception e) {
+	    throw new IOException("error during creation of URL " + e.getMessage());
+	}
+	
+	InputStream inStream = connectDASServer(dasUrl);
+	
+
+	Alignment[] ali = null;
+	try{
+	    ali =  dasalignmentCall.parseDASResponse(inStream) ;
+	} catch (Exception e) {
+	    throw new IOException("error during creation of URL " + e.getMessage());
+	}
+	return ali;
+	
+    }
+
+
+    /** connect to DAS server and return result as an InputStream.
+     *
+     */    
+    private InputStream connectDASServer(URL url) 
+	throws IOException
+    {
+	InputStream inStream = null ;
+				
+	System.out.println("opening connection to "+url);
+	HttpURLConnection huc = org.biojava.spice.SpiceApplication.openHttpURLConnection(url);  
+	 
+
+	//System.out.println("temporarily disabled: accepting gzip encoding ");
+	// should make communication much faster!
+	huc.setRequestProperty("Accept-Encoding", "gzip");
+	
+	System.out.println("response code " +huc.getResponseCode());
+	String contentEncoding = huc.getContentEncoding();
+	System.out.println("getting InputStream");
+	inStream = huc.getInputStream();
+	if (contentEncoding != null) {
+	    if (contentEncoding.indexOf("gzip") != -1) {
+		// we have gzip encoding
+		inStream = new GZIPInputStream(inStream);
+		System.out.println("using gzip encoding!");
+	    }
+	}
+	System.out.println("got InputStream from  DAS Alignment server");
+	System.out.println("encoding: " + contentEncoding);
+
+	return inStream;
+	
+    }
+    
+    
 }

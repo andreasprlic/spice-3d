@@ -100,7 +100,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
     static Cursor defaultCursor = new Cursor(Cursor.DEFAULT_CURSOR);
     
     JPopupMenu popupMenu ;
-    
+    int oldposition;
     int selectStart ;
     int selectEnd      ;
     int mouseDragStart ;
@@ -136,6 +136,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
      */
     public SeqFeaturePanel(SPICEFrame spicefr ) {
         super();
+        int oldposition = -1;
         //logger = Logger.getLogger("org.biojava.spice");
         setDoubleBuffered(true) ;
         
@@ -926,6 +927,9 @@ implements SeqPanel, MouseListener, MouseMotionListener
         int seqpos = getSeqPos(e);
         int linenr = getLineNr(e);
         
+        if ( seqpos == oldposition)
+            return;
+        oldposition = seqpos;
         
         //int featurenr = get_featurenr(y); 
         

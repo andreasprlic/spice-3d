@@ -24,14 +24,14 @@
 
 package org.biojava.spice;
 
-import org.biojava.spice.Config.*         ;
+import org.biojava.spice.Config.*;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.Chain;
 
-import java.awt.Color ;
-import java.util.List ;
-import java.net.URL  ;
-
+import java.awt.Color;
+import java.util.List;
+import java.net.URL;
+import java.io.File;
 
 /** an interface that defined methods that are required by sub frames
  * of SPICE to communicate with the master application 
@@ -81,9 +81,15 @@ public interface SPICEFrame
      */
     public void   setStructure(Structure structure );
 
+    	/** retreive the internal Structure object */
+    	public Structure getStructure();
+    	
     /** set the new features to be displayed in sequence panels */
     public void setFeatures(String sp_id, List features);
 
+    /** get the displayed features */
+    	public List getFeatures();
+    
     /** set the chain nr chainnr as the active one */
     public void setCurrentChainNumber(int chainnr);
     
@@ -195,7 +201,6 @@ public interface SPICEFrame
    
     /** returns currently displayed UniProt code; null if none*/
     public String getUniProtCode();
-    
     
     
 }

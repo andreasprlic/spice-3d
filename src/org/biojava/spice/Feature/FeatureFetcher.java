@@ -130,6 +130,10 @@ public class FeatureFetcher extends Thread
             nrservers +=  pdbresservs.size();
         
         logger.finest("total: " + nrservers + "feature servers applicable here");
+        // no network connection ( to registry);
+        if ( nrservers == 0)
+            return;
+        
         subthreads = new DasResponse[nrservers];
         
         int responsecounter = 0 ;
@@ -207,7 +211,8 @@ public class FeatureFetcher extends Thread
                 //logger.finest("FeatureFetcher waiting "+done);
                 if ( updateDisplay ) {
                     List l = getFeatures();
-                    parent.setFeatures(spId,l);
+                    if ( l != null )
+                        parent.setFeatures(spId,l);
                     updateDisplay = false ;
                 }
             } catch (InterruptedException e) {

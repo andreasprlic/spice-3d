@@ -63,6 +63,12 @@ implements ActionListener
         if ( cmd.equals("Open") ) {
             OpenDialog op = new OpenDialog(parent);
             op.show();
+        } else if (cmd.equals("Save")){
+            SaveLoadSession save = new SaveLoadSession(parent);
+            save.save();
+        } else if (cmd.equals("Load")){
+            SaveLoadSession load = new SaveLoadSession(parent);
+            load.load();
         } else if (cmd.equals("Exit")) {
             System.exit(0);
         } else if (cmd.equals("Properties")) {

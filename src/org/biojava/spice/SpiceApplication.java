@@ -54,7 +54,6 @@ import java.util.logging.* ;
 import java.util.Iterator  ;
 
 // relfection for setting HttpURLConnectiontimeouts
-import java.lang.reflect.*;
 
 // gui
 import java.awt.Dimension                       ;
@@ -239,8 +238,8 @@ implements SPICEFrame
    
     private void initLoggingPanel(){
         LoggingPanel loggingPanel = new LoggingPanel(logger);
-        loggingPanel.getHandler().setLevel(Level.INFO);	
-        logger.setLevel(Level.INFO);
+        loggingPanel.getHandler().setLevel(Level.FINEST);	
+        logger.setLevel(Level.FINEST);
         loggingPanel.show(null);
     }
     
@@ -525,7 +524,10 @@ implements SPICEFrame
         props.setMnemonic(KeyEvent.VK_P);
         
         SpiceMenuListener ml = new SpiceMenuListener(this) ;
+        
         openpdb.addActionListener( ml );
+        save.addActionListener   ( ml );
+        revert.addActionListener ( ml );
         exit.addActionListener   ( ml );
         props.addActionListener  ( ml );
         
@@ -723,7 +725,7 @@ implements SPICEFrame
     public void load(String type, String code){
         if (type.equals("PDB")){
             if ( code.length() == 4 ) 
-                this.getStructure(code);
+                this.loadStructure(code);
             else  
                 logger.info("please provide only 4 characters for the PDB code.");
             
@@ -731,7 +733,7 @@ implements SPICEFrame
         else if (type.equals("UniProt")) {
             //logger.info("got uniprot");
             // connect to Uniprot -pdb alignment service, get PDB code and load it ...
-            getUniprot(code);
+            loadUniprot(code);
             
         }
         else if (type.equals("ENSP")) {
@@ -771,7 +773,7 @@ implements SPICEFrame
         
         if ( ! structureAlignmentMode ) {
             logger.finest("not in alignment mode");
-            getStructure(pdbcode);
+            loadStructure(pdbcode);
         } else {
             showStatus("Loading...Wait...",Color.red);
             
@@ -799,7 +801,7 @@ implements SPICEFrame
     /** start a new thead that retrieves uniprot sequence, and if available
      protein structure
      */
-    public void getUniprot(String uniprot) {
+    public void loadUniprot(String uniprot) {
         logger.info("SpiceApplication getUniprot " + uniprot);
         currentChain = null;
         statusPanel.setLoading(true);
@@ -818,7 +820,7 @@ implements SPICEFrame
      DAS structure command from some other server this thread will
      call the setStructure method to set the protein structure.
      */
-    public void getStructure(String pdbcod) {
+    public void loadStructure(String pdbcod) {
         
         
         currentChain = null ;
@@ -843,25 +845,35 @@ implements SPICEFrame
         
         LoadStructureThread thr = new LoadStructureThread(this,pdbcod);
         thr.start();
-        
-        
+               
         
     }
+    
+    
 
     private String makeFeatureMemoryCode(String sp_id){
         int i = getCurrentChainNumber();
-        
+        // test if not PDB structure has been loaded (e.g. no network connection, 
+        // seq not mapped to PDB, etc.).
+        if ( i == -1 )
+            return sp_id;
         Chain c = getChain(i); 
         String mem_id = sp_id +","+pdbcode + c.getName() ;
         return mem_id;
     }
 
+    /** return the features */
+    public List getFeatures(){
+        return features;
+    }
+    
     /**  update the currently displayed features */
     public void setFeatures(String sp_id, List tmpfeat) {
         // todo create Feature for structure mapping
         //first_load = false ;
+        logger.info("SpiceAplication setting features for "+sp_id);
         String mem_id = makeFeatureMemoryCode(sp_id);
-        
+        System.out.println(mem_id);
        
         // TODO: need to move caching of features on a different level.
         // We need to distinguish SP and PDB features...
@@ -900,6 +912,7 @@ implements SPICEFrame
         clearBrowsableButtons();
         while (iter.hasNext()){
             FeatureImpl f = (FeatureImpl)iter.next();
+            //System.out.println(f);
             String link =f.getLink();
             if ( link != null){
                 if ( knownFeatureLinks.contains(link))
@@ -1123,6 +1136,10 @@ implements SPICEFrame
         
     }
     
+    public Structure getStructure(){
+        return structure;
+    }
+    
     /** send a command to Jmol */
     public void executeCmd(String cmd) {
         //logger.finest("executing Command "+ cmd);
@@ -1189,7 +1206,7 @@ implements SPICEFrame
         
         if ( tmpfeat.size() == 0 ) {
             if ( isLoading()) {
-                logger.log(Level.WARNING,"already loading data, please wait");
+                //logger.log(Level.WARNING,"already loading data, please wait");
                 return ;
             }
             getNewFeatures(sp_id) ;
@@ -1326,7 +1343,8 @@ implements SPICEFrame
     
     public void highlite(int chainNumber, int start, int end, String colour){
         //logger.finest("highlite start end" + start + " " + end );
-        if ( first_load)       return ;		
+        //if ( first_load)       return ;		
+        if ( currentChain == null ) return ;
         if ( start       < 0 ) return ;
         if ( chainNumber < 0 ) return ;
         //if ( selectionLocked ) return ;
@@ -1358,7 +1376,7 @@ implements SPICEFrame
     
     public void highlite(int chainNumber, int seqpos, String colour) {
         //logger.finest("highlite " + seqpos);
-        if (first_load)       return ;		
+        if (currentChain == null)       return ;		
         if ( seqpos     < 0 ) return ;
         if (chainNumber < 0 ) return ;
         //if ( selectionLocked ) return ;
@@ -1696,10 +1714,10 @@ implements SPICEFrame
 	    //e.printStackTrace();
 	    // most likely it was a NoSuchMEthodException and we are running java 1.4.
 	}
-	
 	return huc;
     }
-
+     
+  
 }
 
 
