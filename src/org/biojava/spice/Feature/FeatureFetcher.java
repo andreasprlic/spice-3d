@@ -145,7 +145,7 @@ public class FeatureFetcher extends Thread
 	   
 	    SpiceDasSource featureserver = (SpiceDasSource) pdbresservs.get(f) ;
 	    String url = featureserver.getUrl();
-	    String queryString = url + "features?segment="+ pdbId+chain.getName() ;
+	    String queryString = url + "features?segment="+ pdbId+"."+chain.getName() ;
 	    URL spUrl = null ;
 	    try {
 		spUrl = new URL(queryString);
