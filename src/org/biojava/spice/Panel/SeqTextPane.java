@@ -134,6 +134,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         if ( popupMenu.isVisible())
             return;
         
+        
         isearchListener.clear();
         
         int seqpos = getSeqPos(e);
@@ -142,6 +143,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         if ( seqpos > this.getText().length()) return ;
         
         spice.showSeqPos(current_chainnumber,seqpos);
+        if ( dragging) return;
         spice.select(current_chainnumber,seqpos);
         
     }
@@ -158,13 +160,19 @@ implements SeqPanel, MouseListener, MouseMotionListener
         return seqpos  ;
     }
     
-    public void mouseClicked(MouseEvent e)  { }
+    public void mouseClicked(MouseEvent e)  { 
+        if ( dragging) {
+            dragging = false;
+            return;
+        }    
+    
+    }
     public void mouseEntered(MouseEvent e)  {}
     public void mouseExited(MouseEvent e)   {}
     
     public void mousePressed(MouseEvent e)  {
         int b = e.getButton();
-        //logger.finest("mousePressed " + b);
+        logger.finest("mousePressed " + b);
         if ( b == MouseEvent.BUTTON3) return;
         selectionStart = getSeqPos(e);
         
@@ -180,10 +188,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         if ( popupMenu.isVisible())
             return;
         
-        if ( dragging) {
-            dragging = false;
-            return;
-        }
+        if ( dragging) return ;
         if (  spice.isSelectionLocked())   return;
         
         int seqpos = getSeqPos(e);

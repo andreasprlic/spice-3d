@@ -873,7 +873,14 @@ implements SeqPanel, MouseListener, MouseMotionListener
         int start = segment.getStart() -1 ; 
         int end   = segment.getEnd()   -1 ; 
         
-        toolstr += " " + type + " start " + start + " end " + end + " Note:" + note; 
+        toolstr +=  " start " + start + " end " + end ;
+        if ( method != null)
+            toolstr += " Method: " + method;
+        if ( type != null)
+            toolstr += " Type: " + type ;
+        if ( note != null )
+            toolstr += " Note: " + note; 
+        
         
         //logger.finest(toolstr);
         
@@ -970,7 +977,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         if ( spice.isSelectionLocked()) 
             return;
         
-        
+        if ( dragging) return;
         spice.select(current_chainnumber,seqpos);
         return  ;
     }
@@ -979,11 +986,10 @@ implements SeqPanel, MouseListener, MouseMotionListener
     
     
     public void mouseClicked(MouseEvent e)
-    {
-        // removed functionality, because of different behaviour of 
-        //implementations between OSX and Linux !!!!!! ARGH!!
-        
-        return  ;
+    {  
+       dragging = false;
+       //this.setToolTipText(null);
+       return  ;
     }	
     
     public void mouseEntered(MouseEvent e)  {}
@@ -1016,8 +1022,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
             mouseDragStart =  -1 ;
         
         if ( dragging ) {
-            // we are stopping to drag...
-            dragging = false;
+            this.setToolTipText(null);
             return;
         }
         
