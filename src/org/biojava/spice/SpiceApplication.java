@@ -179,10 +179,27 @@ public class SpiceApplication
 	//sprops.put("proxyPort", "3128" );
 	//sprops.put("http.proxyHost", "wwwcache.sanger.ac.uk");
 	//sprops.put("http.proxyPort", "3128");
-	System.out.println("using Proxy:" + System.getProperty("proxySet"));
-	System.out.println("proxyHost"    + System.getProperty("proxyHost"));
-	System.out.println("proxyPort"    + System.getProperty("proxyPort"));
+	//
+	String proxyHost  = System.getProperty("proxyHost");
+	String proxyPort  = System.getProperty("proxyPort");
+	System.out.println("proxyHost"         + proxyHost);
+	System.out.println("proxyPort"         + proxyPort);
+	System.out.println("http.proxyHost"    + System.getProperty("http.proxyHost"));
+	System.out.println("http.proxyPort"    + System.getProperty("http.proxyPort"));
+	
+	if ( proxyHost != null ) {
+	    System.setProperty("proxySet","true");
+	    if ( System.getProperty("http.proxyHost") == null ){
+		System.setProperty("http.proxyHost",proxyHost) ;
+	    }
+	}
 
+	if ( proxyPort != null ) {
+	    if ( System.getProperty("http.proxyPort") == null ){
+		System.setProperty("http.proxyPort",proxyPort);
+	    }
+	}
+	System.out.println("using Proxy:" + System.getProperty("proxySet"));
 
 
 	CONFIG_URL   = config_url ;
