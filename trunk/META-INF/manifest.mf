@@ -1,9 +1,0 @@
-Manifest-Version: 1.0
-Main-Class: org.biojava.spice.Spice
-Class-Path: biojava.jar org.biojava.das.registry.jar JmolApplet.jar xerces.jar biojava.jar servlet.jar axis.jar  jaxrpc.jar wsdl4j.jar resolver.jar xercesImpl.jar commons-discovery.jar log4j-1.2.8.jar saaj.jar xml-apis.jar commons-logging.jar xmlParserAPIs.jar
-
-
-Name: org/biojava/spice/Spice.class
-
-
-
