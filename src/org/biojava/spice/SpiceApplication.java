@@ -8,7 +8,7 @@
  *
  *      http://www.gnu.org/copyleft/lesser.html
  *
- * Copyright for this cilode is held jointly by the individual
+ * Copyright for this code is held jointly by the individual
  * authors.  These should be listed in @author doc comments.
  *
  * For more information on the BioJava project and its aims,
@@ -42,6 +42,7 @@ import java.io.InputStream ;
 import java.util.Properties;
 import java.util.HashMap   ;
 import java.util.ArrayList ;
+import java.util.Map ;
 
 // to get config file via http
 import java.net.HttpURLConnection ;
@@ -55,6 +56,7 @@ import javax.swing.JFrame  ;
 import javax.swing.JPanel  ;
 import javax.swing.BoxLayout;
 import javax.swing.JList       ;
+import javax.swing.ListCellRenderer ;
 import javax.swing.JScrollPane ;
 import javax.swing.DefaultListModel   ;
 import javax.swing.JTextField   ;
@@ -69,14 +71,20 @@ import javax.swing.JMenuItem   ;
 import java.net.URL        ;
 import java.util.Iterator  ;
 
+// for DAS registration server:
+import org.biojava.services.das.registry.*;
+
 public class SpiceApplication 
     extends  Frame
     implements SPICEFrame 
 {
 
     //public static final String CONFIG_FILE = "config.xml";
-    URL CONFIG_URL  ; 
-    HashMap config      ;
+    URL CONFIG_URL      ; 
+    URL REGISTRY_URL    ;
+    
+    static String INIT_SELECT = "select all; cpk off ; wireframe off ; backbone on ; colour chain;select not protein and not solvent;spacefill 2.0;";
+    Map config      ;
     Structure structure ; 
     String pdbcode      ;
     String pdbcode2     ; // only set if displaying structure alignments 
@@ -114,14 +122,16 @@ public class SpiceApplication
     MenuBar  menu ;
     MenuItem exit ;
     MenuItem props ;
+    MenuItem reset ;
     MenuItem aboutspice ;
     MenuItem aboutdas ;
 
 
-    SpiceApplication(String pdbcode_, URL config_url) {
+    SpiceApplication(String pdbcode_, URL config_url, URL registry_url) {
 	super();
 
-	CONFIG_URL = config_url ;
+	CONFIG_URL   = config_url ;
+	REGISTRY_URL = registry_url ;
 	
 	structure = null ;
 	pdbcode = pdbcode_ ;
@@ -167,7 +177,9 @@ public class SpiceApplication
 	
 	exit  = new MenuItem("Exit");
 	props = new MenuItem("Properties");
+	reset = new MenuItem("Reset");
 	//exit.addActionListener(this);
+	file.add(reset);
 	file.add(props);
 	file.add(exit);
 	
@@ -206,12 +218,12 @@ public class SpiceApplication
 	DefaultListModel model = new DefaultListModel();
 	model.add(0,"loading...");
 	ent_list=new JList(model);
-	ent_list.setFixedCellWidth(20);
+	//ent_list.setFixedCellWidth(20);
 	//JScrollPane scrollingList = new JScrollPane(ent_list);
 	EntListCommandListener entact = new EntListCommandListener(this);
 	//ent_list.setSize(30,180);
-	ent_list.setFixedCellWidth(40);
-	ent_list.setFixedCellHeight(18);
+	//ent_list.setFixedCellWidth(40);
+	//ent_list.setFixedCellHeight(18);
 	//ent_list.addItemListener(entact);
 	ent_list.addListSelectionListener(entact);
 	System.out.println("ENT_LIST " + ent_list);
@@ -269,8 +281,8 @@ public class SpiceApplication
 
     /** Constructor for structure alignment visualization 
      */
-    SpiceApplication(String pdb1, String pdb2, URL config_url) {
-	this(pdb1, config_url);
+    SpiceApplication(String pdb1, String pdb2, URL config_url, URL registry_url) {
+	this(pdb1, config_url,registry_url);
 	structureAlignmentMode = true ;
 	pdbcode2 = pdb2 ;
 	System.out.println("finished init of structure alignment");
@@ -346,9 +358,9 @@ public class SpiceApplication
 
     
     /** read the configuration from config.xml file */
-    private HashMap readConfiguration() {
+    private Map readConfiguration() {
 
-	HashMap co = new HashMap() ;
+	Map co ;
 	
 	/* old way to read from local file system 
 	ClassLoader cl = this.getClass().getClassLoader();
@@ -357,7 +369,27 @@ public class SpiceApplication
 	InputSource is = new InputSource(fs);
 	*/
 
+	// contact DAS registry server.
+	URL registry = REGISTRY_URL ;
+	System.out.println("contacting DAS registry server at: " +registry);
+	DasRegistryAxisClient rclient = new DasRegistryAxisClient(registry);
+	DasSource[] sources = rclient.listServices();
+	System.out.println("found "+sources.length+" servers");
+	
+	storeDasServers(sources);
+	
+	/*
+	  for ( int i =0;i<sources.length;i++){
+	  DasSource s = sources[i];
+	  System.out.println(s);
+	  }
+	*/
+
+	co = storeDasServers(sources);
+	return co;
+
 	// new way to read from URL
+	/*
 	URL url = CONFIG_URL;
 	HttpURLConnection huc ; 
 	InputStream inStream  ; 
@@ -380,7 +412,91 @@ public class SpiceApplication
 	    e.printStackTrace() ;
 	}
 	return co;
+	*/
     }
+
+    private Map storeDasServers(DasSource[] sources){
+	HashMap   configr         = new HashMap();
+	ArrayList featservers     = new ArrayList() ;
+	Map   structureserver = null;
+	Map   sequenceserver  = null;
+	Map   alignmentserver = null;
+
+	
+	for ( int i=0;i<sources.length;i++) {
+	    DasSource source = sources[i] ;
+	    String[] capabilities = source.getCapabilities() ;
+	    System.out.println(source.getUrl());
+	    for ( int c=0; c<capabilities.length ;c++) {
+		String capabil = capabilities[c];
+		System.out.println(capabil);
+		if ( capabil.equals("structure")){
+		    
+		    Map server = convertSourceMap(source) ;
+		    structureserver = server ;
+		}
+		if ( capabil.equals("alignment") ){
+		    if ( isSeqStrucAlignmentServer(source) ){
+			Map server = convertSourceMap(source) ;
+			alignmentserver = server ;
+		    }
+		}
+		if ( capabil.equals("sequence") ){
+		    
+		    Map server = convertSourceMap(source) ;
+		    sequenceserver = server ;
+		}
+
+		if ( capabil.equals("features") ){
+		    
+		    Map server = convertSourceMap(source) ;
+		    featservers.add(server);
+		}
+	    }
+	}
+
+	configr.put("structureserver", structureserver);
+	configr.put("sequenceserver", sequenceserver);
+	configr.put("alignmentserver", alignmentserver);
+	configr.put("featureservers",featservers);
+	return configr ;
+    }
+
+    /** test if MSD mapping  - PDB - UniProt is provide */
+       
+    private boolean isSeqStrucAlignmentServer(DasSource source) {
+	boolean msdmapping = false ;
+	String[] coordsys = source.getCoordinateSystem() ;
+	
+	boolean uniprotflag = false ;
+	boolean pdbflag     = false ;
+	
+	for ( int i = 0 ; i< coordsys.length; i++ ) {
+	    String c = coordsys[i];
+	    System.out.println(">"+c+"<");
+	    if ( c.equals("PDBresnum") ) {
+		pdbflag = true ;
+	    }
+	    if ( c.equals("UniProt") ) {
+		uniprotflag = true ;
+	    }
+	}
+	if (( uniprotflag == true) && ( pdbflag == true)) {
+	    msdmapping = true ;
+	}
+	return msdmapping ;
+    }
+
+    private Map convertSourceMap(DasSource source) {
+	    HashMap server = new HashMap();
+	    server.put("name",source.getUrl()); // for backwards compability
+	    server.put("url",source.getUrl());
+	    server.put("coordinateSystems",source.getCoordinateSystem());
+	    server.put("description",source.getDescription());
+	    server.put("adminemail",source.getAdminemail());
+	    server.put("capabilities",source.getCapabilities());
+	    return server ;
+	}
 
     /** do the actual parsing of the config.xml file */
     private HashMap parseConfigFile(InputSource is) 
@@ -474,31 +590,35 @@ public class SpiceApplication
     }
 
 
-    /** return the urn of the structuresercer */
-    public String getStructureServer() {
-	HashMap strucconfig = (HashMap) config.get("structureserver");
-	String u = (String) strucconfig.get("url");
-
-	return   u;
+    public Map getConfiguration() {
+	return config ;
     }
 
     /** return the urn of the structuresercer */
-    public String getSequenceServer() {
-	HashMap h = (HashMap) config.get("sequenceserver");
-	String u = (String) h.get("url");
-	return   u;
-    }
+    //public String getStructureServer() {
+    //	HashMap strucconfig = (HashMap) config.get("structureserver");
+    //	String u = (String) strucconfig.get("url");
+
+    //	return   u;
+    //}
 
     /** return the urn of the structuresercer */
-    public String getAlignmentServer() {
-	HashMap h = (HashMap) config.get("alignmentserver");
-	String u = (String) h.get("url");
-	return   u;
-    }
+    //public String getSequenceServer() {
+    //	HashMap h = (HashMap) config.get("sequenceserver");
+    //	String u = (String) h.get("url");
+    //	return   u;
+    //    }
+
+    /** return the urn of the structuresercer */
+    //public String getAlignmentServer() {
+    //	HashMap h = (HashMap) config.get("alignmentserver");
+    //	String u = (String) h.get("url");
+    //	return   u;
+    //}
 
 
     /** return the feature servers */
-    public ArrayList getFeatureServers() {
+    private ArrayList getFeatureServers() {
 	ArrayList featconfig = (ArrayList) config.get("featureservers");
 	return featconfig ;
     }
@@ -619,7 +739,7 @@ public class SpiceApplication
      */
     public void setStructure(Structure structure_ ) {
 	//System.out.println("setting structure");
-	String cmd = "select all; cpk off ; wireframe off ; backbone on ; colour chain;select not protein and not solvent;spacefill 2.0;";
+	String cmd = INIT_SELECT;
 
 	setStructure(structure_,cmd);
 
@@ -627,7 +747,7 @@ public class SpiceApplication
 
     /** send a command to Jmol */
     public void executeCmd(String cmd) {
-	System.out.println("executing Command "+ cmd);
+	//System.out.println("executing Command "+ cmd);
 	structurePanel.executeCmd(cmd);	
     }
 
@@ -811,8 +931,8 @@ public class SpiceApplication
 	// almost the same as Chain.clone(), here:
 	// browse through all groups and only keep those that are amino acids...
 	ChainImpl n = new ChainImpl() ;
-	System.out.println(c.getName());
-	System.out.println(c.getSwissprotId());
+	//System.out.println(c.getName());
+	//System.out.println(c.getSwissprotId());
 	n.setName(c.getName());
 	n.setSwissprotId(c.getSwissprotId());
 	
@@ -829,6 +949,8 @@ public class SpiceApplication
 	if (first_load)       return ;		
 	if ( start    < 0 ) return ;
 	if (chainNumber < 0 ) return ;
+
+	
 	String cmd = getSelectStr( chainNumber,  start,  end);
 	
 	cmd += "colour "+ colour+";";
@@ -945,6 +1067,22 @@ public class SpiceApplication
     
     /** return a select command that can be send to executeCmd*/
     public String getSelectStr(int chain_number,int seqpos) {
+
+	String pdbdat = getSelectStrSingle(chain_number, seqpos);
+	
+	if (pdbdat.equals("")){
+	    return "" ;
+	}	
+	String cmd = "select " + pdbdat + ";";
+	return cmd ;
+
+    }
+
+    /** return the pdbcode + chainid to select a single residue. This
+     * can be used to create longer select statements for individual
+     * amino acids. */
+
+    public String getSelectStrSingle(int chain_number, int seqpos) {
 	Chain chain = getChain(chain_number) ;
 	
 	if ( ! ((seqpos >= 0) && (seqpos < chain.getLength()))) {
@@ -957,12 +1095,11 @@ public class SpiceApplication
 	    return "" ;
 	}
 	String pdbcod = g.getPDBCode() ;
-	String pdbname = g.getPDBName() ;
+	//String pdbname = g.getPDBName() ;
 	String chainid = chain.getName() ;
 	//System.out.println("selected "+pdbcod+" " +pdbname);
-	String cmd =  "select "+pdbcod+chainid+";" ;
+	String cmd =  pdbcod+chainid ;
 	return cmd ;
-
     }
 
     /** select a range of  residue */
@@ -999,7 +1136,10 @@ public class SpiceApplication
 	sharedPanel.paint(sharedPanel.getGraphics());
 	//leftPanel.paint(leftPanel.getGraphics());
 	ent_list.paint(ent_list.getGraphics());
-
+	
+	//lcr.paint();
+	//ListCellRenderer lcr = ent_list.getCellRenderer();
+	//ent_list.paint() ;
 	sharedPanel.show();
 	this.repaint();
     }
@@ -1092,6 +1232,13 @@ public class SpiceApplication
 		return true;
 		//case Event.ACTION_EVENT:				
 	    }
+
+	if ( event.target == reset) {
+	    System.out.println("resetting display");
+	    String cmd = INIT_SELECT;
+	    executeCmd(cmd);
+	    return true;
+	}
 
 	if ( event.target == props) {
 	    System.out.println("modify properties");
@@ -1234,7 +1381,7 @@ class EntListCommandListener implements ListSelectionListener {
 	    System.out.println("loading data, please be patient");
 	    return ;
 	}
-	
+
 	//System.out.println("EVENT!");
 	//System.out.println(event);
 	JList list = (JList)event.getSource();

@@ -27,10 +27,12 @@ import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.Chain;
 
 import java.awt.*;
-
+import java.util.Map ;
 
 /** an interface that defined methods that are required by sub frames
- * of SPICE to communicate with the master application */
+ * of SPICE to communicate with the master application 
+ * @author Andreas Prlic
+ */
 public interface SPICEFrame  {
 
     /** returns a flag if data is being loaded using DAS. This is
@@ -65,13 +67,8 @@ public interface SPICEFrame  {
     /** set the chain nr chainnr as the active one */
     public void setCurrentChain(int chainnr);
 
-    /** retrieve configuration for DAS structure server to use */
-    public String getStructureServer() ;
-    /** retrieve configuration for DAS sequence server to use */
-    public String getSequenceServer()  ;
-    /** retrieve configuration for DAS alignment server to use */
-    public String getAlignmentServer() ;
-
+    /** retrieve configuration for DAS servers to use */    
+    public Map getConfiguration();
   
 
     /** highighting of range of residues */
@@ -92,7 +89,6 @@ public interface SPICEFrame  {
     /** select single residue */
     public void select(int chainNumber, int seqpos);
 
-
     /** colour range of residues */
     public void colour(int chainNumber, int start, int end, String colour);
     
@@ -104,6 +100,11 @@ public interface SPICEFrame  {
     /** return command that can be send to executeCmd*/
     public String getSelectStr(int chain_number,int seqpos) ;
 
+    /** return the pdbcode + chainid to select a single residue. This
+     * can be used to create longer select statements for individual
+     * amino acids. */
+    public String getSelectStrSingle(int chain_number, int seqpos) ;
+    
     /** send a command to the Jmol panel*/
     public void executeCmd(String cmd);
     
