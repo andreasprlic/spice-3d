@@ -72,6 +72,7 @@ public class SeqFeatureCanvas
     public static final int    DEFAULT_Y_BOTTOM  = 16 ;
     public static final int    TIMEDELAY        = 0 ;
     
+    int selectPosition = -1 ;
     // the master application
     SPICEFrame spice ;
 
@@ -96,7 +97,7 @@ public class SeqFeatureCanvas
     //mouse events
     Date lastHighlight ;
     // highliting
-    int seqOldPos ;
+
     Font plainFont ;
     Logger logger        ;
     /**
@@ -135,7 +136,7 @@ public class SeqFeatureCanvas
 	lastHighlight = new Date();
 				
 	current_chainnumber = -1 ;
-	seqOldPos = -1 ;
+
 	plainFont = new Font("SansSerif", Font.PLAIN, 10);
 	//setOpaque(true);
 
@@ -414,48 +415,24 @@ public class SeqFeatureCanvas
      * only if chain_number is currently being displayed
      */
     public void highlite(int chain_number, int seqpos){
-				
-	Dimension dstruc=this.getSize();
-
-	Graphics gstruc=this.getGraphics();
-		
-	/*if (seqOldPos != -1) {
-	    // clean old highlited region
-	    gstruc.setColor(this.getBackground());
-	    gstruc.fillRect(0 , 0, dstruc.width, dstruc.height);
-	    //gstruc.clearRect(0 , 0, dstruc.width, dstruc.height);
-	    
-	}
-	*/
-	this.paintComponent(gstruc);
+	if  ( chain == null   ) return ;
 	
 	if (chain_number == current_chainnumber) {
-	    //int seqpos =  java.lang.Math.round(x/scale) ;
-	    gstruc.setColor(Color.darkGray);
-	    int seqx = java.lang.Math.round(seqpos*scale)+DEFAULT_X_START ;
-	    int aminosize = java.lang.Math.round(1*scale) ;
-	    int tmpfill ;
-	    if (aminosize <1) tmpfill = 1;
-	    else tmpfill = aminosize ;
-	    //logger.finest("draw rec");
-	    gstruc.fillRect(seqx , 0, tmpfill, dstruc.height);
-	    
-	    seqOldPos = seqpos ;
+	    if ( seqpos > chain.getLength()) 
+		return ;
+	    selectPosition = seqpos ;
 	}
-
-	// this.repaint();
-	// repaint does not work here! -> will create a new Graphics object,
-	// but we want to keep the rectangular selection ...
+	else 
+	    selectPosition = -1 ;
+	
+	this.repaint();
 
     }
     
 
 
     public void paintComponent( Graphics g) {
-	super.paintComponent(g); 
-
-
-
+	super.paintComponent(g); 	
 
 	//logger.finest("PAINTINGDAS!!!") ;	
 	//logger.finest("DasCanv - paintComponent");
@@ -465,11 +442,13 @@ public class SeqFeatureCanvas
 	if ( chain == null   ) return ;
 
 	Dimension dstruc=this.getSize();
-	//Image imbuf = this.createImage(dstruc.width,dstruc.height);
+	Image imbuf = this.createImage(dstruc.width,dstruc.height);
 	
 	Graphics gstruc = g ;
 	//Graphics gstruc = imbuf.getGraphics();
+
 	gstruc.setFont(plainFont);
+
 	//gstruc.setBackground(this.getBackground());
 	//gstruc.setColor(this.getBackground());
 	//gstruc.fillRect(0 , 0, dstruc.width, dstruc.height);
@@ -585,6 +564,18 @@ public class SeqFeatureCanvas
 			gstruc.fillRect(xstart,y,width,height);
 		    }
 		}
+	    }
+	    
+	    //int seqpos =  java.lang.Math.round(x/scale) ;
+	    if ( selectPosition > -1 ) {
+		gstruc.setColor(Color.darkGray);
+		seqx = java.lang.Math.round(selectPosition*scale)+DEFAULT_X_START ;
+		//aminosize = java.lang.Math.round(1*scale) ;
+		int tmpfill ;
+		if (aminosize <1) tmpfill = 1;
+		else tmpfill = aminosize ;
+		//logger.finest("draw rec");
+		gstruc.fillRect(seqx , 0, tmpfill, dstruc.height);
 	    }
 
 	    //g.drawImage(imbuf,0,0,this.getBackground(),this);
