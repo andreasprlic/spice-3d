@@ -710,9 +710,9 @@ public class SpiceApplication
 
 	structure = structure_ ; 
 
-	//if (logger.isLoggable(Level.FINEST)) {
-	//  System.out.println(structure.toPDB());	    
-	//}
+	if (logger.isLoggable(Level.FINEST)) {
+	    System.out.println(structure.toPDB());	    
+	}
 
 
 	    	

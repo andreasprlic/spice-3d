@@ -41,7 +41,7 @@ import java.util.logging.*;
 
 
 
-//import org.openscience.jmol.ui.JmolPopup;
+import org.openscience.jmol.ui.JmolPopup;
 
 
 /** a Panel that provides a wrapper around the Jmol viewer. Code heavily
@@ -63,14 +63,14 @@ class StructurePanel extends JPanel
     JmolAdapter adapter;
     
     SPICEFrame  spice ;
-    //JmolPopup jmolpopup ;
+    JmolPopup jmolpopup ;
     
     StructurePanel(SPICEFrame parent) {
 	spice   = parent ;
 	adapter = new SmarterJmolAdapter(null);
 	viewer  = org.jmol.viewer.Viewer.allocateJmolViewer(this, adapter);
 	viewer.setJmolStatusListener(this);
-	//jmolpopup = JmolPopup.newJmolPopup(viewer);
+	jmolpopup = JmolPopup.newJmolPopup(viewer);
 	
     }
     
@@ -128,7 +128,7 @@ class StructurePanel extends JPanel
 		logger.severe("could not open PDB file in viewer "+ strError);
 	    }
 	}
-	//jmolpopup.updateComputedMenus();
+	jmolpopup.updateComputedMenus();
 
     }
 
@@ -190,11 +190,6 @@ class StructurePanel extends JPanel
 	
 
 	// if right mouse button 
-	if ( e.getButton() == MouseEvent.BUTTON3 ) {
-	    viewer.popupMenu(e.getX(),e.getY());
-	    //jmolpopup.show(e.getX(),e.getY());
-	}
-      
 	
 
 	int pos = viewer.findNearestAtomIndex(e.getX(),e.getY());
@@ -237,17 +232,23 @@ class StructurePanel extends JPanel
     }
 
     public void notifyFileLoaded(String fullPathName, String fileName,
-				 String modelName, Object clientFile){}
+				 String modelName, Object clientFile){
+	logger.finest("Jmol loaded File "+ fileName); 
+    }
 
     public void notifyFileNotLoaded(String fullPathName, String errorMsg){}
     
-    public void setStatusMessage(String statusMessage){}
+    public void setStatusMessage(String statusMessage){
+	logger.log(Level.INFO,statusMessage);
+    }
 
     public void scriptEcho(String strEcho){
 	logger.log(Level.INFO,strEcho);
     }
 
-    public void scriptStatus(String strStatus){}
+    public void scriptStatus(String strStatus){
+	logger.log(Level.INFO,strStatus);
+    }
 
     public void notifyScriptTermination(String statusMessage, int msWalltime){
 
@@ -255,6 +256,11 @@ class StructurePanel extends JPanel
 
     public void handlePopupMenu(int x, int y){
 	logger.finest("handlePopupMenu");
+	//viewer.popupMenu(e.getX(),e.getY());
+	jmolpopup.show(x,y);
+
+      
+
     }
 
     public void notifyMeasurementsChanged(){
