@@ -25,7 +25,7 @@
 package org.biojava.spice.Feature ;
 
 import java.awt.Color ;
-
+import java.awt.Graphics2D;
 
 /** a class to keep track of location information for a feature */
 public class Segment {
@@ -66,5 +66,11 @@ public class Segment {
     
     public void setTxtColor(String str) { txtColor = str; }
     public String getTxtColor() { return txtColor;}
+    
+    /** paint this segment on a a graphics panel 
+     * */
+    public void paint(Graphics2D g, int y){
+        
+    }
     
 }

@@ -40,8 +40,8 @@ public class FeatureComparator
     }
 
     public int compare(Object a, Object b) {
-	Feature x = (Feature) a;
-	Feature y = (Feature) b;
+	FeatureImpl x = (FeatureImpl) a;
+	FeatureImpl y = (FeatureImpl) b;
 
 	String typea = x.getType();
 	String typeb = y.getType();

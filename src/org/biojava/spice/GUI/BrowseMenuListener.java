@@ -43,7 +43,13 @@ public class BrowseMenuListener implements ActionListener {
     
     
     SPICEFrame spice;
+    String url;
     public BrowseMenuListener(SPICEFrame parent){
+        url="";
+        spice = parent;
+    }
+    public BrowseMenuListener(SPICEFrame parent,String link){
+        url=link;
         spice = parent;
     }
 
@@ -52,13 +58,13 @@ public class BrowseMenuListener implements ActionListener {
       String txt = source.getText();
       if (txt.equals("PDB")){
           // open PDB file
-          String url = PDBLINK+spice.getPDBCode();
+          String u = PDBLINK+spice.getPDBCode();
           spice.showDocument(url);
       } else if ( txt.equals("UniProt")){
-          String url = UNIPROTLINK+spice.getUniProtCode();
+          String u = UNIPROTLINK+spice.getUniProtCode();
           spice.showDocument(url);
       } else {
-          String url = txt.substring(16,txt.length());
+          //String url = txt.substring(16,txt.length());
           spice.showDocument(url);
       }
       

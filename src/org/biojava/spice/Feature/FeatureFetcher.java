@@ -344,8 +344,8 @@ public class FeatureFetcher extends Thread
     }
 
 
-    private Feature getNewFeat(Map currentFeatureMap) {
-	Feature feat = new Feature();
+    private FeatureImpl getNewFeat(Map currentFeatureMap) {
+	FeatureImpl feat = new FeatureImpl();
 	//logger.finest(currentFeatureMap);
 	feat.setSource((String)currentFeatureMap.get("dassource"));
 	feat.setName(  (String)currentFeatureMap.get("NAME"));
@@ -364,7 +364,7 @@ public class FeatureFetcher extends Thread
 	String prevtype = "@prevtype" ;
 	boolean first = true ;
 	
-	Feature feat    = null ;
+	FeatureImpl feat    = null ;
 	Segment segment = null ;
 	
 

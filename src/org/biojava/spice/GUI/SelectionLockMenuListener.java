@@ -24,7 +24,6 @@ package org.biojava.spice.GUI;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.URL;
 import javax.swing.JMenuItem;
 
 import org.biojava.spice.SPICEFrame;

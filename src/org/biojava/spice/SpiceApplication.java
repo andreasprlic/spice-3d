@@ -75,7 +75,6 @@ import javax.swing.JMenuItem                    ;
 
 
 
-
 /** the main application layer of SPICE
  * do not interact with this class directly, but interact with SPICEFrame interface.
  *
@@ -158,9 +157,9 @@ implements SPICEFrame
         currentChain = null;
         
         LoggingPanel loggingPanel = new LoggingPanel(logger);
-        loggingPanel.getHandler().setLevel(Level.FINEST);	
+        loggingPanel.getHandler().setLevel(Level.INFO);	
         loggingPanel.show(null);
-        logger.setLevel(Level.FINEST);
+        logger.setLevel(Level.INFO);
         //ConsoleHandler handler = new ConsoleHandler();
         //handler.setLevel(Level.FINEST);
         //logger.addHandler(loggingPanel.getHandler());
@@ -372,7 +371,7 @@ implements SPICEFrame
         
         // init dascanv
         
-        dascanv.setForeground(Color.black);
+        //dascanv.setForeground(Color.black);
         dascanv.setBackground(Color.black);
         dascanv.addMouseMotionListener(dascanv);
         dascanv.addMouseListener(      dascanv);
@@ -382,7 +381,7 @@ implements SPICEFrame
         
         dasPanel = new JScrollPane(dascanv);
         //dasPanel.setOpaque(true);
-        dasPanel.setBackground(Color.black);
+        //dasPanel.setBackground(Color.black);
         dasPanel.getVerticalScrollBar().setUnitIncrement(DEFAULT_Y_SCROLL);
         dasPanel.getHorizontalScrollBar().setUnitIncrement(DEFAULT_Y_SCROLL);
         //scroll.add(dascanv);
@@ -398,7 +397,7 @@ implements SPICEFrame
         sharedPanel.setPreferredSize(new Dimension(400, 400));
         //sharedPanel.setOpaque(true);
         //sharedPanel.setResizeWeight(0);	
-        sharedPanel.setBackground(Color.black);
+        //sharedPanel.setBackground(Color.black);
         
         seqField = new SeqTextPane(this);
         seqField.setSize( 700, 30);
@@ -421,7 +420,7 @@ implements SPICEFrame
         seqSplitPane.setOneTouchExpandable(true);
         //seqSplitPane.setOpaque(true);
         seqSplitPane.setResizeWeight(0.6);
-        seqSplitPane.setBackground(Color.black);
+        //seqSplitPane.setBackground(Color.black);
         seqSplitPane.setPreferredSize(new Dimension(300,300));
         
         //seqSplitPane.setDividerLocation(600);
@@ -448,7 +447,7 @@ implements SPICEFrame
         //mainsharedPanel.setDividerLocation(150);
         //mainsharedPanel.setPreferredSize(new Dimension(200, 200));
         //mainsharedPanel.setOpaque(true);
-        mainsharedPanel.setBackground(Color.black);
+        //mainsharedPanel.setBackground(Color.black);
         //mainsharedPanel.setPreferredSize(new Dimension(700,700));
         //mainsharedPanel.setResizeWeight(0.7);
         //this.getContentPane().add(mainsharedPanel,BorderLayout.NORTH);
@@ -876,8 +875,7 @@ implements SPICEFrame
         if ( chain != null) 
             seqField.setChain(chain,0);
         updateDisplays();
-        
-        
+                
     }
     
     
@@ -962,7 +960,7 @@ implements SPICEFrame
             features = tmpfeat                   ;
             //SeqFeatureCanvas dascanv = daspanel.getCanv();
             dascanv.setChain(chain,currentChainNumber) ;
-            dascanv.setBackground(Color.black)   ;
+            //dascanv.setBackground(Color.black)   ;
             seqField.setChain(chain,currentChainNumber);
             //updateDisplays();
         }
@@ -981,7 +979,7 @@ implements SPICEFrame
         ff.start() ;
         statusPanel.setLoading(true);
         dascanv.setChain(chain,currentChainNumber);
-        dascanv.setBackground(Color.black);
+        //dascanv.setBackground(Color.);
         seqField.setChain(chain,currentChainNumber);
         
         /**
@@ -1042,18 +1040,18 @@ implements SPICEFrame
     private void registerBrowsableFeatures(List feats){
         Iterator iter = feats.iterator();
         // add to menu
-        ActionListener bl = new BrowseMenuListener(this);
+        
    
         clearBrowsableButtons();
         while (iter.hasNext()){
-            Feature f = (Feature)iter.next();
+            FeatureImpl f = (FeatureImpl)iter.next();
             String link =f.getLink();
             if ( link != null){
                 if ( knownFeatureLinks.contains(link))
                     continue ;
                 
-                JMenuItem item = new JMenuItem("open in browser "+ link);
-                            
+                JMenuItem item = new JMenuItem("open in browser "+ f.getName());
+                ActionListener bl = new BrowseMenuListener(this,link);                    
                 item.addActionListener(bl);
                 browseMenu.add(item);
                 knownFeatureLinks.add(link);
@@ -1088,7 +1086,7 @@ implements SPICEFrame
                 arr = (ArrayList) memoryfeatures.get(sp_id) ;
                 
                 for ( int i = 0 ; i < arr.size() ; i++ ) {
-                    Feature f = (Feature) arr.get(i);
+                    FeatureImpl f = (FeatureImpl) arr.get(i);
                     logger.finest(" got memory feature " + f.toString());
                 }
                 return arr ;

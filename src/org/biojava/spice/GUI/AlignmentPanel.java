@@ -37,7 +37,7 @@ import java.util.HashMap;
 import org.biojava.spice.*;
 import org.biojava.spice.Panel.SeqFeaturePanel;
 
-import org.biojava.spice.Feature.Feature;
+import org.biojava.spice.Feature.FeatureImpl;
 import org.biojava.spice.DAS.AlignmentTools;
 
 import org.biojava.bio.structure.Chain;
@@ -189,7 +189,7 @@ public class AlignmentPanel extends JPanel {
                 end = i;
             } else {
                 if ( start > -1) {
-                    Feature f = makeFeat(start,end,pdbcode);
+                    FeatureImpl f = makeFeat(start,end,pdbcode);
                     features.add(f);
                     start = -1 ;
                 }
@@ -197,7 +197,7 @@ public class AlignmentPanel extends JPanel {
         }
         // finish
         if ( start > -1){
-            Feature f = makeFeat(start,end,pdbcode);
+            FeatureImpl f = makeFeat(start,end,pdbcode);
             features.add(f);
         }
         
@@ -206,9 +206,9 @@ public class AlignmentPanel extends JPanel {
     }
     
     /** create a feature */
-    public Feature makeFeat(int start, int end, String pdbcode){
+    public FeatureImpl makeFeat(int start, int end, String pdbcode){
         
-        Feature f = new Feature();
+        FeatureImpl f = new FeatureImpl();
         f.setName(pdbcode);
         String txt ="sequence covered with structure (PDB code "+ pdbcode +")";
         f.addSegment(start,end,txt);

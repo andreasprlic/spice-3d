@@ -455,7 +455,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         
         drawLines          = new ArrayList();
         List currentLine   = new ArrayList();
-        Feature oldFeature = new Feature();
+        Feature oldFeature = new FeatureImpl();
         boolean start      = true ;
         String featureSource = "" ;
         clearOldLinkMenus();
@@ -477,7 +477,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
                 if ( ! start) {
                     drawLines.add(currentLine);
                 }
-                Feature tmpfeat = new Feature();
+                Feature tmpfeat = new FeatureImpl();
                 tmpfeat.setSource(ds);
                 tmpfeat.setMethod("_SPICE_LINESEPARATOR");		
                 currentLine = new ArrayList();
