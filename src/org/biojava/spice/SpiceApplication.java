@@ -108,14 +108,18 @@ import javax.swing.text.*;
 
 
 
-/** the main application layer of SPICE */
+/** the main application layer of SPICE
+ * do not interact with this class directly, but interact with SPICEFrame interface.
+ *
+ * @author Andreas Prlic
+ */
 public class SpiceApplication 
     extends  JFrame
     implements SPICEFrame 
 {
     
 	
-
+    public static Logger logger =  Logger.getLogger("org.biojava.spice");;
    
 
     //public static final String CONFIG_FILE = "config.xml";
@@ -323,7 +327,7 @@ public class SpiceApplication
 	showStatus("contacting DAS registry");
 
 	/// init Structure Panel
-	structurePanel        = new StructurePanel();
+	structurePanel        = new StructurePanel(this);
 	//structurePanel.setLayout(new BoxLayout(structurePanel, BoxLayout.X_AXIS));
 	structurePanel.setPreferredSize(new Dimension(700, 700));
 	structurePanel.setMinimumSize(new Dimension(200,200));
@@ -692,8 +696,7 @@ public class SpiceApplication
 	if (logger.isLoggable(Level.FINER)) {
 	    logger.entering(this.getClass().getName(), "setStructure",  new Object[]{"got structure object"});
 	}
-
-
+	
 
 	first_load = false ;
 	statusPanel.setLoading(false);
@@ -706,7 +709,12 @@ public class SpiceApplication
 
 
 	structure = structure_ ; 
-	
+
+	if (logger.isLoggable(Level.FINEST)) {
+	    System.out.println(structure.toPDB());
+	    
+	}
+
 
 	    	
 	DefaultListModel model = (DefaultListModel) ent_list.getModel() ;
@@ -1040,6 +1048,17 @@ public class SpiceApplication
 	return null ;
     }
 
+    /** test if pdbserial has an insertion code */
+    private boolean hasInsertionCode(String pdbserial) {
+	try {
+	    int pos = Integer.parseInt(pdbserial) ;
+	} catch (NumberFormatException e) {
+	    return true ;
+	}
+	return false ;
+    }
+
+
     /** return a select command that can be send to executeCmd*/
     public String getSelectStr(int chain_number, int start, int end) {
 	Chain chain = getChain(chain_number) ;
@@ -1078,7 +1097,10 @@ public class SpiceApplication
 	
 	if (pdbdat.equals("")){
 	    return "" ;
-	}	
+	}
+
+	
+	
 	String cmd = "select " + pdbdat + ";";
 	return cmd ;
 
@@ -1096,13 +1118,24 @@ public class SpiceApplication
 	    logger.finest("seqpos " + seqpos + "chainlength:" + chain.getLength());
 	    return "" ;
 	}
+	
 	//SeqFeatureCanvas dascanv = daspanel.getCanv();
-	dascanv.highlite(chain_number,seqpos);
+	//dascanv.highlite(chain_number,seqpos);
+	
 	Group g = chain.getGroup(seqpos);
 	if (! g.has3D()){
 	    return "" ;
 	}
+
 	String pdbcod = g.getPDBCode() ;
+	
+	if ( hasInsertionCode(pdbcod) ) {
+	    String inscode = pdbcod.substring(pdbcod.length()-1,pdbcod.length());
+	    String rawcode = pdbcod.substring(0,pdbcod.length()-1);
+	    pdbcod = rawcode +"^" + inscode;
+	}
+
+
 	//String pdbname = g.getPDBName() ;
 	String chainid = chain.getName() ;
 	//logger.finest("selected "+pdbcod+" " +pdbname);
@@ -1169,6 +1202,58 @@ public class SpiceApplication
     }
 
     
+
+/** retreive the chainNumber by PDB character
+	@param PDB code for chain
+	@return number of chain in current structure, or -1.
+    */
+    public int getChainPosByPDB(String chainPDBcode){
+
+
+	List chains = (List) structure.getChains(0);
+	for (int i=0; i< chains.size();i++) {
+	    Chain ch = (Chain) chains.get(i);
+	    if ( ch.getName().equals(chainPDBcode))
+		return i ;
+	}
+	return -1 ;
+	
+    }
+
+    /** retreive the sequence position for a residue by it's PDB code.
+	if there is an insertion code append it.
+	e.g.
+	getSeqPosByPDB("122");
+	getSeqPosByPDB("122A");
+	@param residuePDBcode PDB Code for residue. append insertion code if needed.
+	@return position of group in currently displayed chain or -1.
+    */
+    public int getSeqPosByPDB(String residuePDBcode){
+	
+	Chain chain = getChain(currentChain) ;
+	if ( chain == null ) return -1 ;
+	
+	//logger.finest( "testing for insertion code " +residuePDBcode);
+	// see if there is an "^" character indicating insertionCode...
+	String[] spl = residuePDBcode.split("\\^");
+	if ( spl.length > 1) {
+	    //logger.finest("insertion code found! " + residuePDBcode );
+	    residuePDBcode = spl[0] + spl[1];
+	}
+
+	//List groups = chain.getGroups();
+	
+	for ( int i = 0 ; i < chain.getLength(); i++ ) {
+	    Group g = chain.getGroup(i);
+	    if ( g.has3D()) 
+		if (g.getPDBCode().equals(residuePDBcode)) {
+		    return i;
+	    }
+	}
+	return -1 ;
+    }
+    
+
    
 
     /** Event handling */
@@ -1255,6 +1340,7 @@ class StructureCommandListener
     implements ActionListener {
     JTextField textfield ;
     SPICEFrame spice    ;
+    static Logger logger      = Logger.getLogger("org.biojava.spice");
     
     public StructureCommandListener (SPICEFrame spice_, JTextField textfield_) {
 	super();
@@ -1267,7 +1353,7 @@ class StructureCommandListener
 	//logger.finest("EVENT!");
 	//logger.finest(event);
 	if ( spice.isLoading() ) {
-	    spice.logger.finest("loading data, please be patient");
+	    logger.finest("loading data, please be patient");
 	    return ;
 	}
 	String cmd = textfield.getText();
@@ -1287,6 +1373,7 @@ class TextFieldListener
     implements ActionListener {
     JTextField textfield ;
     SPICEFrame spice    ;
+    static Logger logger      = Logger.getLogger("org.biojava.spice");
 
     public TextFieldListener (SPICEFrame spice_, JTextField textfield_) {
 	super();
@@ -1299,7 +1386,7 @@ class TextFieldListener
 	//logger.finest(event);
 
 	if ( spice.isLoading() ) {
-	    spice.logger.finest("loading data, please be patient");
+	    logger.finest("loading data, please be patient");
 	    return ;
 	}
 	String pdbcod = textfield.getText();
@@ -1320,7 +1407,8 @@ class TextFieldListener
 //class EntListCommandListener implements ItemListener {
 class EntListCommandListener implements ListSelectionListener {
     SPICEFrame spice ;
-
+    static Logger logger      = Logger.getLogger("org.biojava.spice");
+    
     public EntListCommandListener ( SPICEFrame spice_) {
 	super();
 	spice = spice_;
@@ -1329,7 +1417,7 @@ class EntListCommandListener implements ListSelectionListener {
     public void valueChanged(ListSelectionEvent event) {
 	
 	if ( spice.isLoading() ) {
-	    spice.logger.log(Level.WARNING,"loading data, please be patient");
+	    logger.log(Level.WARNING,"loading data, please be patient");
 	    return ;
 	}
 

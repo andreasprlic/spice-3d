@@ -58,9 +58,11 @@ class StructurePanel extends JPanel
     JmolViewer  viewer;
     JmolAdapter adapter;
     TextField   strucommand  ; 
+    
+    SPICEFrame  spice ;
 
-
-    StructurePanel() {
+    StructurePanel(SPICEFrame parent) {
+	spice = parent ;
 	adapter = new SmarterJmolAdapter(null);
 	viewer = new JmolViewer(this, adapter);
     }
@@ -118,6 +120,11 @@ class StructurePanel extends JPanel
     public void mouseDragged(MouseEvent e) {
 	//logger.finest("dragging mouse "+e);
     }	
+
+    /** when the mouse is moved of the structure panel,
+	the corresponing position in the sequence is highlited
+    */
+    
     public void mouseMoved(MouseEvent e) {
 	//logger.finest("moving mouse over StructurePanel "+e);    	
 	int pos = viewer.findNearestAtomIndex(e.getX(),e.getY());
@@ -127,6 +134,17 @@ class StructurePanel extends JPanel
 	String seqCode = viewer.getAtomSequenceCode( pos) ;
 
 	logger.finest("chainid " + chainId + " seqcode: " + seqCode);
+	int chainpos = 0 ;
+	if  ( chainId != null ) 
+	    chainpos   = spice.getChainPosByPDB(chainId);
+	
+	// what is the default return value for empty chain in Jmol ?
+	if (chainpos == -1 )
+	    chainpos = 0 ;
+	int residuepos = spice.getSeqPosByPDB(seqCode);
+	spice.select(chainpos,residuepos);
+	spice.showSeqPos(chainpos,residuepos);
+
 	//logger.finest("atomIndex "+atom.getAtomIndex());
 	//logger.finest(viewer.getElementNumber(pos));
 	//logger.finest(viewer.getElementSymbol(pos));
@@ -137,9 +155,24 @@ class StructurePanel extends JPanel
     public void mouseClicked(MouseEvent e)
     {
 	//logger.finest("mouseClick in structure Panel"+e);
-	int x = e.getX();
-	int y = e.getY();
-	viewer.popupMenu(x,y);
+
+	int pos = viewer.findNearestAtomIndex(e.getX(),e.getY());
+	if ( pos == -1 ) { return ; }
+
+	String chainId = viewer.getAtomChain( pos) ;
+	String seqCode = viewer.getAtomSequenceCode( pos) ;
+
+	logger.finest("chainid " + chainId + " seqcode: " + seqCode);
+	int chainpos = 0 ;
+	if  ( chainId != null ) 
+	    chainpos   = spice.getChainPosByPDB(chainId);
+	
+	// what is the default return value for empty chain in Jmol ?
+	if (chainpos == -1 )
+	    chainpos = 0 ;
+	int residuepos = spice.getSeqPosByPDB(seqCode);
+	spice.highlite(chainpos,residuepos);
+	spice.showSeqPos(chainpos,residuepos);	
     }
     public void mouseEntered(MouseEvent e)  {}
     public void mouseExited(MouseEvent e)   {}

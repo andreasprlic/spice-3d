@@ -38,8 +38,10 @@ import java.util.logging.* ;
  * @author Andreas Prlic
  */
 public interface SPICEFrame  {
-    /** the logger of spice */
-    public static Logger logger =  Logger.getLogger("org.biojava.spice");;
+
+    /** retrieve configuration for DAS servers to use */    
+    public RegistryConfiguration getConfiguration();
+
 
     /** returns a flag if data is being loaded using DAS. This is
      * needed for the differnt sub-frames to prevent them from having
@@ -76,9 +78,22 @@ public interface SPICEFrame  {
     /** set the chain nr chainnr as the active one */
     public void setCurrentChain(int chainnr);
 
-    /** retrieve configuration for DAS servers to use */    
-    public RegistryConfiguration getConfiguration();
   
+    /** retreive the chainNumber by PDB character
+	@param PDB code for chain
+	@return number of chain in current structure, or -1.
+    */
+    public int getChainPosByPDB(String chainPDBcode);
+
+    /** retreive the sequence position for a residue by it's PDB code.
+	if there is an insertion code append it.
+	e.g.
+	getSeqPosByPDB("122");
+	getSeqPosByPDB("122A");
+	@param residuePDBcode PDB Code for residue. append insertion code if needed.
+	@return position of group in currently displayed chain or -1.
+    */
+    public int getSeqPosByPDB(String residuePDBcode);
 
     /** highighting of range of residues */
     public void highlite(int chainNumber, int start, int end, String colour);

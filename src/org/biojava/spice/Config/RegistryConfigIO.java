@@ -106,7 +106,7 @@ public class RegistryConfigIO
     JProgressBar progressBar ;
     JFrame progressFrame      ;
     SPICEFrame spice  ;
-
+    static Logger logger      = Logger.getLogger("org.biojava.spice");
 
     public RegistryConfigIO ( SPICEFrame parent , URL registryurl) {
 	spice = parent ;
@@ -131,23 +131,29 @@ public class RegistryConfigIO
     private synchronized void getData()
 	throws ConfigurationException
     {
-	//spice.logger.finest("DAS Registry server config thread loadData");
-
-	PersistentConfig  persistentc = new PersistentConfig();
-	RegistryConfiguration persistentconfig = null ;
+	//logger.finest("DAS Registry server config thread loadData");
+	PersistentConfig  persistentc = null ;
+	RegistryConfiguration persistentconfig = null;
 	try {
+	    persistentc = new PersistentConfig();
+	    persistentconfig = null ;
+	    
 	    persistentconfig  = persistentc.load();
-	} catch (Exception e) {
+	} catch ( javax.jnlp.UnavailableServiceException e) {
 	    System.err.println("an error occured during loading of local config");
 	    e.printStackTrace();
-	 
+	    logger.log(Level.WARNING,e.getMessage() + "while loading of local config");
+	    doRegistryUpdate();
+	    done = true ; 
+	    notifyAll(); 
+	    return ;
 	}
 	
 	if ( persistentconfig != null ) {
 	    config = persistentconfig ;
 
 	    String behave = config.getUpdateBehave();
-	    spice.logger.finest("behave: " + behave);	    
+	    logger.finest("behave: " + behave);	    
 	    //behave="always";
 	    if ( behave.equals("day")) {
 		// test if we did already an update today
@@ -160,13 +166,13 @@ public class RegistryConfigIO
 		if (( timenow - timelast ) < TIME_BETWEEN_UPDATES ) {
 		    doRegistryUpdate();
 		} else {
-		    spice.logger.finest("last update < 1 day, using saved config");
+		    logger.finest("last update < 1 day, using saved config");
 		}
 
 		// test if perhaps registry was changed in config file
 		String oldregistry = config.getRegistryUrl();
 		if (! oldregistry.equals(REGISTRY.toString())) {
-		    spice.logger.finest("registry url was changed since last contact, contacting new registry service");
+		    logger.finest("registry url was changed since last contact, contacting new registry service");
 		    doRegistryUpdate();
 		}
 		
@@ -193,7 +199,7 @@ public class RegistryConfigIO
 	showProgressBar();
 	
 	done = false ;
-	spice.logger.log(Level.INFO,"contacting DAS registry server at: " +REGISTRY);
+	logger.log(Level.INFO,"contacting DAS registry server at: " +REGISTRY);
 
 	RegistryConfiguration oldconfig = config;
 
@@ -210,10 +216,10 @@ public class RegistryConfigIO
 	
 	if ( sources==null) {
 	    done = true ; 
-	    spice.logger.log(Level.SEVERE,"Could not connect to registration service at " + REGISTRY);
+	    logger.log(Level.SEVERE,"Could not connect to registration service at " + REGISTRY);
 	    throw new ConfigurationException("Could not connect to registration service at " + REGISTRY);
 	}
-	spice.logger.log(Level.CONFIG,"found "+sources.length+" servers"); 
+	logger.log(Level.CONFIG,"found "+sources.length+" servers"); 
 	//config = getDasServers(sources); 
 	
 	ArrayList servers = new ArrayList();
@@ -235,7 +241,7 @@ public class RegistryConfigIO
 	    for ( int i = 0 ; i < localservers.size() ; i++ ) {
 
 		SpiceDasSource ds = (SpiceDasSource) localservers.get(i);
-		spice.logger.finest("adding localserver to new config " + ds.getUrl());
+		logger.finest("adding localserver to new config " + ds.getUrl());
 		config.addServer(ds,ds.getStatus());
 	    }
 	}
@@ -243,7 +249,7 @@ public class RegistryConfigIO
 	Date now = new Date();
 	config.setContactDate(now);
 
-	spice.logger.finest("adding registry "+ REGISTRY.toString());
+	logger.finest("adding registry "+ REGISTRY.toString());
 	config.setRegistryUrl(REGISTRY.toString());
 	disposeProgressBar();
 	
@@ -319,9 +325,15 @@ public class RegistryConfigIO
     /** write back the config to the SPICE application */
     public void saveConfiguration() {
 	
-	spice.logger.finest("trying PersistentConfig");
-	PersistentConfig ps = new PersistentConfig();
-	ps.save(config);
+	logger.finest("trying PersistentConfig");
+	try {
+	    PersistentConfig ps = new PersistentConfig();
+	    ps.save(config);
+	}
+	catch ( javax.jnlp.UnavailableServiceException e) {
+	    logger.log(Level.WARNING,e.getMessage() + "while saving config locally");
+	}
+
 
 	
 	spice.setConfiguration(config);
@@ -428,7 +440,8 @@ class MenuListener
     RegistryConfiguration config ;
     TabbedPaneDemo parent        ;
     SPICEFrame spice             ;
-
+    static Logger    logger      = Logger.getLogger("org.biojava.spice");
+    
     public MenuListener( SPICEFrame spice_, JTable tab,RegistryConfiguration conf,TabbedPaneDemo tabd ){
 	table  = tab  ;
 	config = conf ;
@@ -444,7 +457,7 @@ class MenuListener
 	int    pos = table.getSelectedRow();
 	if ( pos < 0) 
 	    return ;
-	//spice.logger.finest("selected in row "+pos+" cmd "+cmd);
+	//logger.finest("selected in row "+pos+" cmd "+cmd);
 	SpiceDasSource ds = config.getServer(pos);
 	String[] colNames = parent.getColNames();
 
@@ -457,7 +470,7 @@ class MenuListener
 	    table.setValueAt(new Boolean(false),pos,colNames.length-1);
 	}
 	else if ( cmd.equals("delete")) { 
-	    spice.logger.finest("deleteting das source ..." +pos);
+	    logger.finest("deleteting das source ..." +pos);
 	    config.deleteServer(pos);
 	}
 
@@ -518,7 +531,8 @@ class TabbedPaneDemo extends JPanel {
 
     int selectMoveStartPosition        ;
     SPICEFrame spice                   ;
-    
+    static Logger    logger      = Logger.getLogger("org.biojava.spice");
+
     public TabbedPaneDemo(SPICEFrame spice_,RegistryConfigIO registryparent, RegistryConfiguration config_) {
         super(new GridLayout(1, 1));
 	spice = spice_;
@@ -1002,7 +1016,7 @@ class TabbedPaneDemo extends JPanel {
         if (imgURL != null) {
             return new ImageIcon(imgURL);
         } else {
-	    spice.logger.log(Level.WARNING,"Couldn't find file: " + path);
+	    logger.log(Level.WARNING,"Couldn't find file: " + path);
             //System.err.println("Couldn't find file: " + path);
             return null;
         }
@@ -1045,7 +1059,7 @@ class TabbedPaneDemo extends JPanel {
 
     public void setServerStatus(String url, Boolean status){
 	//System.out.print("Setting server status " + url + " " + status);
-	spice.logger.finer("setting server status " + url + " " + status);
+	logger.finer("setting server status " + url + " " + status);
 	boolean flag = status.booleanValue();
 	config.setStatus(url,flag);
     }
@@ -1066,7 +1080,7 @@ class TabbedPaneDemo extends JPanel {
 	else if ( pos == 1 ) {	    
 	
 	    //System.out.println("adding new local DAS source");
-	    spice.logger.finest("adding new local DAS source");
+	    logger.finest("adding new local DAS source");
 	    HashMap formdata = new HashMap();
 	    int formPos = -1 ;
 	    for ( int i = 0 ; i < colNames.length; i++) {
@@ -1139,7 +1153,7 @@ class TabbedPaneDemo extends JPanel {
 	    String behave = (String)updateBehaveList.getSelectedItem();
 	    
 	    //System.out.println("setting update behaviour to " + behave);
-	    spice.logger.finest("setting update behaviour to " + behave);
+	    logger.finest("setting update behaviour to " + behave);
 	    if ( behave.equals("once per day"))
 		behave = "day" ;
 	    config.setUpdateBehave(behave);

@@ -49,20 +49,18 @@ public class PersistentConfig
     PersistenceService ps; 
     BasicService bs      ; 
     Logger logger        ;
-    public PersistentConfig(){
+    public PersistentConfig()
+
+	throws UnavailableServiceException
+    {
 
 	
 	logger = Logger.getLogger("org.biojava.spice");
 	
 	logger.finest("init PersistentConfig");
-	try { 
-	    ps = (PersistenceService)ServiceManager.lookup("javax.jnlp.PersistenceService"); 
-	    bs = (BasicService)ServiceManager.lookup("javax.jnlp.BasicService"); 
-	} catch (UnavailableServiceException e) { 
-	    e.printStackTrace();
-	    ps = null; 
-	    bs = null; 
-	} 
+
+	ps = (PersistenceService)ServiceManager.lookup("javax.jnlp.PersistenceService"); 
+	bs = (BasicService)ServiceManager.lookup("javax.jnlp.BasicService"); 
     }
 
     /** writes the configuration */
