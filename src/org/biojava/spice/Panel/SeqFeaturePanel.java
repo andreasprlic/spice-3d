@@ -230,7 +230,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         drawStructureRegion(g2D,aminosize);
         
         // draw features
-        drawFeatures(g2D,aminosize);
+        drawFeatures(g2D,aminosize, chainlength);
         
         // highlite selection
         drawSelection(g2D, aminosize, seqx);
@@ -311,7 +311,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
      * returns the scaled length of the sequence */
     public  int drawSequence(Graphics2D g2D, float chainlength){
         g2D.setColor(Color.white);
-        int seqx = java.lang.Math.round(chainlength * scale) ;
+        int seqx = java.lang.Math.round((chainlength-1) * scale) ;
         g2D.drawString("Sequence",1,10+DEFAULT_Y_HEIGHT);
         g2D.fillRect(0+DEFAULT_X_START, 10, seqx, 6);
         return seqx ;
@@ -364,14 +364,14 @@ implements SeqPanel, MouseListener, MouseMotionListener
     
     
     /** draw the features */
-    public void drawFeatures(Graphics g2D, int aminosize){
+    public void drawFeatures(Graphics g2D, int aminosize, int chainlength){
         int y = DEFAULT_Y_START ;
-        drawFeatures(g2D,aminosize,y);
+        drawFeatures(g2D,aminosize,y, chainlength);
     }
     /** draw the features starting at position y
      * returns the y coordinate of the last feature ;
      * */
-    public int drawFeatures(Graphics g2D, int aminosize, int y){
+    public int drawFeatures(Graphics g2D, int aminosize, int y, int chainlength){
         //logger.finest("number features: "+features.size());
         //System.out.println("seqFeatCanvas aminosize "+ aminosize);
         
@@ -404,10 +404,10 @@ implements SeqPanel, MouseListener, MouseMotionListener
                 List segments = feature.getSegments() ;
                 
                 // draw text
-                if ( segments.size() < 1) {
+                //if ( segments.size() < 1) {
                     //logger.finest(feature.getMethod());
-                    continue ;
-                }
+                  //  continue ;
+                //}
                 Segment seg0 = (Segment) segments.get(0) ;
                 Color col =  seg0.getColor();	
                 g2D.setColor(col);
@@ -417,14 +417,23 @@ implements SeqPanel, MouseListener, MouseMotionListener
                 for (int s=0; s<segments.size();s++){
                     Segment segment=(Segment) segments.get(s);
                     
-                    int start     = segment.getStart()-1 ;
-                    int end       = segment.getEnd()  -1 ;
+                    int start     = segment.getStart() -1 ;
+                    int end       = segment.getEnd()   -1 ;
+                    
+                    // hum some people say this if annotation relates to whole seq.
+                    if (( start == -1) && ( end == -1 )){
+                        //System.out.println(feature);
+                        start = 0;
+                        end = chainlength - 1;
+                        segment.setStart(1);
+                        segment.setEnd(chainlength);
+                    }
                     
                     col = segment.getColor();
                     g2D.setColor(col);
                     
                     int xstart =  java.lang.Math.round(start * scale) + DEFAULT_X_START;
-                    int width   = java.lang.Math.round(end * scale) - xstart +  DEFAULT_X_START+aminosize ;
+                    int width   = java.lang.Math.round(  end * scale) - xstart +  DEFAULT_X_START+aminosize ;
                     
                     int height = DEFAULT_Y_HEIGHT ;
                     //logger.finest(feature+ " " + end +" " + width);
@@ -460,11 +469,11 @@ implements SeqPanel, MouseListener, MouseMotionListener
         clearOldLinkMenus();
         for (int i=0; i< feats.size(); i++) {
             Feature feat = (Feature)feats.get(i);
-            
+            //logger.finest(feat.toString());
             // add link to popupmenu
             String link = feat.getLink();
             if ( link != null) {
-                registerLinkMenu(link,feat.getName() );
+                registerLinkMenu(link,feat.getMethod() );
             }
             
             
@@ -652,8 +661,12 @@ implements SeqPanel, MouseListener, MouseMotionListener
         
         int start = segment.getStart();
         int end   = segment.getEnd()  ;
+        
+        // we assume that DAS features start with 1
+        // internal in SPICE they start with 0
         start = start -1 ;
         end   = end   -1 ;
+        
         String type =  segment.getParent().getType() ;
         //logger.finest(start+" " + end+" "+type);
         //logger.finest(segment);
@@ -867,19 +880,30 @@ implements SeqPanel, MouseListener, MouseMotionListener
         String method  = parent.getMethod() ;
         String type    = parent.getType() ;
         String note    = parent.getNote() ;
+        String score   = parent.getScore() ;
         
-        int start = segment.getStart() -1 ; 
-        int end   = segment.getEnd()   -1 ; 
         
+        int start = segment.getStart();  
+        int end   = segment.getEnd(); 
         toolstr +=  " start " + start + " end " + end ;
+        
+        // DAS features are starting with 1,
+        // in SPICE they start with 0
+        //start--;
+        //end--;
+         
         if ( method != null)
             toolstr += " Method: " + method;
         if ( type != null)
             toolstr += " Type: " + type ;
-        if ( note != null )
-            toolstr += " Note: " + note; 
-        
-        
+        if ( note != null ) {
+            if ( ! note.equals(""))
+                toolstr += " Note: " + note;
+        }
+        if (score != null) {
+            if ( ! score.equals("-"))
+                toolstr += " Score: " + score;
+        }
         //logger.finest(toolstr);
         
         //new ToolTip(toolstr, this);

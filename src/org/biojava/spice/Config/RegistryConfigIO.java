@@ -211,7 +211,7 @@ extends Thread
             rclient = new DasRegistryAxisClient(REGISTRY);
         } catch (Exception e) {
             logger.log(Level.SEVERE,e.getMessage());
-            throw new ConfigurationException("Could not init client to contact registration service");
+            throw new ConfigurationException("Could not init client to contact registration service " + e.getMessage());
         }
         
         String[] capabs ;
@@ -1001,8 +1001,7 @@ class TabbedPaneDemo extends JPanel {
         
         
         MouseListener popupListener = new PopupListener(tablePopup,dasSourceTable,config);
-        
-        
+      
         dasSourceTable.addMouseListener(popupListener);
         
         // Add the table to a scrolling pane

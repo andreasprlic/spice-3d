@@ -55,6 +55,10 @@ public interface Feature {
     public abstract void setLink(String lnk);
 
     public abstract String getLink();
+    
+    public abstract void setScore(String score);
+    
+    public abstract String getScore();
 
     /** add a segment to this feature */
     public abstract void addSegment(int start, int end, String name);

@@ -134,6 +134,8 @@ implements JmolStatusListener {
      *
      */
     public  void setStructure(Structure structure) {
+        if ( structure == null )
+            return;
         
         String pdbstr = structure.toPDB(); 
         //System.out.println(pdbstr);
@@ -258,7 +260,7 @@ implements JmolStatusListener {
     
     public void notifyFileLoaded(String fullPathName, String fileName,
             String modelName, Object clientFile){
-        logger.finest("Jmol loaded File "+ fileName); 
+        //logger.finest("Jmol loaded File "+ fileName); 
     }
     
     public void notifyFileNotLoaded(String fullPathName, String errorMsg){}

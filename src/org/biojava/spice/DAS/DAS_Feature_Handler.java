@@ -87,7 +87,8 @@ public class DAS_Feature_Handler  extends DefaultHandler{
 		      qName.equals("START") ||
 		      qName.equals("END") ||
 		      qName.equals("NOTE") ||
-		      qName.equals("LINK") 
+		      qName.equals("LINK") ||
+		      qName.equals("SCORE")
 		      ){
 		characterdata ="";
 		featurefield = qName ;
@@ -111,7 +112,8 @@ public class DAS_Feature_Handler  extends DefaultHandler{
 			     qName.equals("START") ||
 			     qName.equals("END") ||
 			     qName.equals("NOTE") ||
-			     qName.equals("LINK") 
+			     qName.equals("LINK") ||
+			     qName.equals("SCORE")
 			) {
 			    add_featuredata(uri,name,qName);
 			}

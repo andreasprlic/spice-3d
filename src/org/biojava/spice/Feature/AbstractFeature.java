@@ -45,6 +45,7 @@ public abstract class AbstractFeature implements Feature {
     String note   ;
     String link   ;
     String source ;
+    String score;
 
     public AbstractFeature() {
 	source = "Unknown";
@@ -52,6 +53,7 @@ public abstract class AbstractFeature implements Feature {
 	type   = "Unknown";
 	note   = "";
 	link   = "";
+	score  = "";
 	
 	segments = new ArrayList();
 	       
@@ -83,6 +85,9 @@ public abstract class AbstractFeature implements Feature {
     public void setLink(String lnk) { link = lnk;}
     public String getLink() { return link;}
 
+    public void setScore(String s){ score = s;}
+    public String getScore() { return score;}
+    
     /** add a segment to this feature */
     public void addSegment(int start, int end, String name) {
 	Segment s = new Segment() ;

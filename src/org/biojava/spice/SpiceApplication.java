@@ -40,8 +40,6 @@ import java.net.MalformedURLException;
 import java.net.HttpURLConnection;
 import java.net.ConnectException;
 
-// jnlp - to display URL in browser 
-import javax.jnlp.*;
 // some utils 
 import java.util.HashMap   ;
 import java.util.ArrayList ;
@@ -58,7 +56,6 @@ import java.util.Iterator  ;
 // gui
 import java.awt.Dimension                       ;
 import java.awt.Color                           ;
-import java.awt.BorderLayout                    ;
 import java.awt.Event                           ;
 import java.awt.event.*                         ;
 
@@ -238,8 +235,8 @@ implements SPICEFrame
    
     private void initLoggingPanel(){
         LoggingPanel loggingPanel = new LoggingPanel(logger);
-        loggingPanel.getHandler().setLevel(Level.FINEST);	
-        logger.setLevel(Level.FINEST);
+        loggingPanel.getHandler().setLevel(Level.INFO);	
+        logger.setLevel(Level.INFO);
         loggingPanel.show(null);
     }
     
@@ -919,9 +916,9 @@ implements SPICEFrame
                     continue ;
                 JMenuItem item;
                 if ( firefoxIcon == null)
-                     item = new JMenuItem("open in browser "+ f.getName());
+                     item = new JMenuItem("open in browser "+ f.getMethod());
                 else
-                    item = new JMenuItem("open in browser "+ f.getName(), firefoxIcon);
+                    item = new JMenuItem("open in browser "+ f.getMethod(), firefoxIcon);
                 URL u;
                 try {
                     u = new URL(link);
@@ -1039,7 +1036,7 @@ implements SPICEFrame
             
         }
         
-        String drstr = "Seq pos "+ seqpos + "("+amino1+","+name+")" + " PDB ("+ pdbstr +")";  	
+        String drstr = "Seq pos "+ (seqpos +1) + "("+amino1+","+name+")" + " PDB ("+ pdbstr +")";  	
         return drstr ;
         
     }
@@ -1292,15 +1289,7 @@ implements SPICEFrame
     
     /** display an URL in the browser that started SPICE */
     public boolean showURL(URL url) {
-        try {
-            // Lookup the javax.jnlp.BasicService object
-            BasicService bs = (BasicService)ServiceManager.lookup("javax.jnlp.BasicService");
-            // Invoke the showDocument method
-            return bs.showDocument(url);
-        } catch(UnavailableServiceException ue) {
-            // Service is not supported
-            return false;
-        }
+        return showDocument(url);
     }
     
     

@@ -277,12 +277,17 @@ public class SaveLoadSession {
         String name = f.getName();
         if (name == null) name = "";
         
+        String score = f.getScore();
+        if (score == null) score = "";
+        
         xw.attribute("name",name);
         xw.attribute("type",type);
         xw.attribute("source",source);
         xw.attribute("method", method);
         xw.attribute("note", note);
         xw.attribute("link",link);
+        xw.attribute("score",score);
+        
         List segments = f.getSegments();
         Iterator iter = segments.iterator();
         xw.openTag("segments");
@@ -396,7 +401,7 @@ class MyParser
         currentFeature.setMethod(attrs.getValue("method"));
         currentFeature.setLink(attrs.getValue("link"));
         currentFeature.setNote(attrs.getValue("note"));
-        
+        currentFeature.setScore(attrs.getValue("score"));
         
     }
     private void addSegment(Attributes attrs){
