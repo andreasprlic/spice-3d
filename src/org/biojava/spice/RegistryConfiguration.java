@@ -115,6 +115,18 @@ public class RegistryConfiguration
 	serverdata.add(ds);	
     }
 
+
+    public void setStatus(String url, boolean status) {
+	for ( int i = 0 ; i < serverdata.size() ; i++ ) {
+	    Map m = (Map) serverdata.get(i);
+	    DasSource ds = (DasSource)m.get("server");
+	    if ( ds.getUrl().equals(url)) {
+		setStatus(i,status);
+		return ;
+	    }
+	}
+	
+    }
     public void setStatus(int serverpos, boolean status) {
 	if ( serverpos > serverdata.size() ) return  ;
 	if ( serverpos < 0 ) return  ;
@@ -138,6 +150,8 @@ public class RegistryConfiguration
 	    return false ;
 
     }
+
+    
     public DasSource getServer(int serverpos) {
 	if ( serverpos > serverdata.size() ) return null ;
 	if ( serverpos < 0 ) return null ;

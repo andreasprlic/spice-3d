@@ -39,10 +39,11 @@ import org.biojava.services.das.registry.*;
 
 
 // for GUI;
+
 import java.awt.Frame ;
 import java.awt.event.*    ;
 
-
+import javax.swing.JButton ;
 import javax.swing.JTabbedPane;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -61,6 +62,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.KeyEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 
 /** a class to contact and retreive the configuration from a DAS
@@ -192,7 +195,7 @@ public class RegistryConfigIO
 
         //Create and set up the window.
         Frame frame = new Frame("SPICE configuration window");
-        //frame.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+	//frame.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 	frame.addWindowListener(new WindowAdapter() {
 		public void windowClosing(WindowEvent evt) {
 		    Frame frame = (Frame) evt.getSource();
@@ -208,12 +211,22 @@ public class RegistryConfigIO
 
         //frame.getContentPane().add(new TabbedPaneDemo(config),
 	//                       BorderLayout.CENTER);
-	frame.add(new TabbedPaneDemo(config));
+	TabbedPaneDemo tpd = new TabbedPaneDemo(config);
+	frame.add(tpd);
+
+		
+	JButton saveb   = new JButton("Save");
+	JButton cancelb = new JButton("Cancel");
+	saveb.addActionListener(   new ButtonListener(frame, tpd) );
+	cancelb.addActionListener( new ButtonListener(frame, tpd) );
+	
+	frame.add(saveb);
+	frame.add(cancelb);
         //Display the window.
         frame.pack();
         frame.setVisible(true);
     }
-
+    
     /** set status of server */
     public void setServerStatus(String url, Boolean flag) {
 	// browse through config and set status of server
@@ -237,16 +250,6 @@ class TabbedPaneDemo extends JPanel {
 
     RegistryConfiguration config ;
     
-    private Map convertSource2Map(DasSource source) {
-	HashMap server = new HashMap();
-	server.put("name",source.getUrl()); // for backwards compability
-	server.put("url",source.getUrl());
-	server.put("coordinateSystems",source.getCoordinateSystem());
-	server.put("description",source.getDescription());
-	server.put("adminemail",source.getAdminemail());
-	server.put("capabilities",source.getCapabilities());
-	return server ;
-    }
     
     public TabbedPaneDemo(RegistryConfiguration config_) {
         super(new GridLayout(1, 1));
@@ -279,85 +282,23 @@ class TabbedPaneDemo extends JPanel {
 	JScrollPane seqscrollPane = table.createScrollPaneForTable( table );
 	seqstrucpanel.add( seqscrollPane, BorderLayout.CENTER );
 
-	/*
-	// add structure servers
-	List structureservers= new ArrayList();
-	structureservers.add(config.get("structureserver"));
-	String strucdata[][] = getTabData(structureservers);
-	MyTableModel stm = new MyTableModel(this,strucdata);
-	//JTable stable = new JTable(strucdata,colNames);
-	JTable stable = new JTable(stm);
-	stable.setShowHorizontalLines( false );
-	stable.setRowSelectionAllowed( true );
-	stable.setColumnSelectionAllowed( true );
+	
+	//JButton saveb = new JButton("Save");
+	//JButton cancelb = new JButton("Cancel");
+	//saveb.addActionListener(new ButtonListener(this ) );
+	//cancelb.addActionListener(new ButtonListener(this));
+	//seqstrucpanel.add(saveb);
+	//seqstrucpanel.add(cancelb);
+	
 
-	JScrollPane strucScrollPane = stable.createScrollPaneForTable( stable );
-	seqstrucpanel.add( strucScrollPane, BorderLayout.CENTER );
-
-	*/
 	tabbedPane.addTab("Seq./Struc. ", icon, seqstrucpanel,
                           "configure sequence and structure servers");
         tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
 	
-	/*
-	// Features
-	List featureservers = (List) config.get("featureservers");
-	String[][] featdata=getTabData(featureservers);
-	MyTableModel ftm = new MyTableModel(this,featdata);
-	//JTable stable = new JTable(strucdata,colNames);
-	JTable ftab = new JTable(ftm);
-	//JTable ftab = new JTable(featdata,colNames);
-	// Configure some of JTable's paramters
-	ftab.setShowHorizontalLines( false );
-	ftab.setRowSelectionAllowed( true );
-	ftab.setColumnSelectionAllowed( true );
-	JScrollPane scrollFeatPane = 	ftab.createScrollPaneForTable(ftab);
-	JPanel featpanel = new JPanel();
-	featpanel.setLayout(new BoxLayout(featpanel, BoxLayout.Y_AXIS));
-	featpanel.add(scrollFeatPane, BorderLayout.CENTER );
-	
-	// and structure features
-	List pdbresfeatureservers = (List) config.get("pdbresfeatureservers");
-	String[][] pdbresfeatdata=getTabData(pdbresfeatureservers);
-	MyTableModel ptm = new MyTableModel(this,pdbresfeatdata);
-	JTable pftab = new JTable(ptm);
-	//	JTable pftab = new JTable(pdbresfeatdata,colNames);
-	// Configure some of JTable's paramters
-	pftab.setShowHorizontalLines( false );
-	pftab.setRowSelectionAllowed( true );
-	pftab.setColumnSelectionAllowed( true );
-	JScrollPane pdbresscrollFeatPane = 	pftab.createScrollPaneForTable(pftab);
-	JPanel pdbresfeatpanel = new JPanel();
-
-	featpanel.add(pdbresscrollFeatPane, BorderLayout.CENTER );
 	
 
-        tabbedPane.addTab("Feature ", icon,featpanel ,
-                          "Config Feature servers");
-        tabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
 
-
-	// Alignment
-	List alignmentservers = new ArrayList();
-	alignmentservers.add( config.get("alignmentserver"));	
-	String[][] alidata =getTabData(alignmentservers);
-	MyTableModel atm = new MyTableModel(this,alidata);
-	JTable atab = new JTable(atm);
-	//JTable atab = new JTable(alidata,colNames);
-	atab.setShowHorizontalLines( false );
-	atab.setRowSelectionAllowed( true );
-	atab.setColumnSelectionAllowed( true );
-	JScrollPane scrollAliPane = 	atab.createScrollPaneForTable(atab);
-	JPanel alipanel = new JPanel();
-	alipanel.setLayout(new BoxLayout(alipanel, BoxLayout.Y_AXIS));
-	alipanel.add(scrollAliPane, BorderLayout.CENTER );
-
-        tabbedPane.addTab("Alignment ", icon, alipanel,
-			                  "config alignment servers");
-        tabbedPane.setMnemonicAt(2, KeyEvent.VK_3);
-
-	*/
-
+	
         //Add the tabbed pane to this panel.
         add(tabbedPane);
         
@@ -375,6 +316,18 @@ class TabbedPaneDemo extends JPanel {
         panel.add(filler);
         return panel;
     }
+
+    private Map convertSource2Map(DasSource source) {
+	HashMap server = new HashMap();
+	server.put("name",source.getUrl()); // for backwards compability
+	server.put("url",source.getUrl());
+	server.put("coordinateSystems",source.getCoordinateSystem());
+	server.put("description",source.getDescription());
+	server.put("adminemail",source.getAdminemail());
+	server.put("capabilities",source.getCapabilities());
+	return server ;
+    }
+
 
     /** Returns an ImageIcon, or null if the path was invalid. */
     protected static ImageIcon createImageIcon(String path) {
@@ -417,12 +370,16 @@ class TabbedPaneDemo extends JPanel {
 	return data ;
     }
 
-    //public void setServerStatus(String url, Boolean status){
-    //System.out.print("Setting server status " + url + " " + status);
-	
-    //config.setStatus(url,status);
-    //}
-    
+    public void setServerStatus(String url, Boolean status){
+	//System.out.print("Setting server status " + url + " " + status);
+	boolean flag = status.booleanValue();
+	config.setStatus(url,flag);
+    }
+
+
+    public void saveConfig() {
+	System.out.println("saving config");
+    }
 }
 
 
@@ -554,3 +511,26 @@ class MyTableModel extends AbstractTableModel {
 }
 
 
+class ButtonListener
+    implements ActionListener
+	       
+{
+    Frame parent ;
+    TabbedPaneDemo configpane ;
+    void ButtonListener(Frame parent_,TabbedPaneDemo tpd) {
+	parent = parent_ ;
+	configpane = tpd ;
+    }
+
+    public void actionPerformed(ActionEvent e) {
+	String cmd = e.getActionCommand();
+	System.out.println("button pressed:" + cmd);
+	if ( cmd.equals("Close")) {
+	    parent.dispose();
+	} else  if (cmd.equals("Save")) {
+	    configpane.saveConfig();
+	}
+
+    
+    }
+}

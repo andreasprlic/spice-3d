@@ -37,6 +37,8 @@ import java.awt.Color ;
 import org.biojava.bio.structure.Chain ;
 import org.biojava.bio.structure.Group ;
 
+import org.biojava.services.das.registry.DasSource;
+
 /** a class to fetch all Features  in parallel threads
 
   * @author Andreas Prlic
@@ -125,8 +127,8 @@ public class FeatureFetcher extends Thread
 	    DasResponse d=new DasResponse("UniProt");
 	    subthreads[responsecounter] = d; 
 	   
-	    HashMap featureserver = (HashMap) featservs.get(f) ;
-	    String url = (String) featureserver.get("url");
+	    DasSource featureserver = (DasSource) featservs.get(f) ;
+	    String url = featureserver.getUrl();
 	    String queryString = url + "features?segment="+ spId ;
 	    URL spUrl = null ;
 	    try {

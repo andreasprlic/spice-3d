@@ -746,6 +746,15 @@ public class SpiceApplication
 	structurePanel.executeCmd(cmd);	
     }
 
+
+    public void setConfiguration(RegistryConfiguration reg) {
+	config = reg;
+	Chain chain = getChain(currentChain) ;
+	String sp_id = chain.getSwissprotId() ;
+	getNewFeatures(sp_id) ;
+	updateDisplays();
+    }
+
     public void setCurrentChain( int newCurrentChain) {
 	System.out.println("setCurrentChain " + newCurrentChain);
 	currentChain = newCurrentChain ;

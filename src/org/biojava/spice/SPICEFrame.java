@@ -127,7 +127,8 @@ public interface SPICEFrame  {
     /** display status in status window */
     public void showSeqPos(int chainnumber, int seqpos);
 
-
+    /** set the configuration from outside */
+    public void setConfiguration(RegistryConfiguration conf);
 
     
 }
