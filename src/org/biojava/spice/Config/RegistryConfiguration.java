@@ -241,6 +241,27 @@ public class RegistryConfiguration
     }
 
     
+    /** move a server in the list of servers ... */
+    public void moveServer(int startpos, int endpos) {
+	//System.out.println("moveServer " + startpos + " " + endpos );
+
+	if ( ( startpos < 0 ) ||
+	     ( endpos > allservers.size() ) 
+	     )
+	    return ;
+	
+	if ( endpos > startpos )
+	    endpos = endpos - 1 ;
+	
+
+	SpiceDasSource ds = getServer(startpos);
+	allservers.remove(startpos);
+	allservers.add(endpos,ds);
+
+    }
+	
+    
+
     public SpiceDasSource getServer(int serverpos) {
 	if ( serverpos > allservers.size() ) return null ;
 	if ( serverpos < 0 ) return null ;

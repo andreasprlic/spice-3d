@@ -298,10 +298,13 @@ public class RegistryConfigIO
 
     /** write back the config to the SPICE application */
     public void saveConfiguration() {
-	spice.setConfiguration(config);
+	
 	System.out.println("trying PersistentConfig");
 	PersistentConfig ps = new PersistentConfig();
 	ps.save(config);
+
+
+	spice.setConfiguration(config);
 	    
 	
     }
@@ -404,6 +407,8 @@ class MenuListener
     JTable table ;
     RegistryConfiguration config ;
     TabbedPaneDemo parent ;
+
+
     public MenuListener( JTable tab,RegistryConfiguration conf,TabbedPaneDemo tabd ){
 	table  = tab  ;
 	config = conf ;
@@ -434,7 +439,8 @@ class MenuListener
 	    System.out.println("deleteting das source ..." +pos);
 	    config.deleteServer(pos);
 	}
-	
+
+
 	parent.updateDasSourceTable();
 
     }
@@ -488,6 +494,9 @@ class TabbedPaneDemo extends JPanel {
     JTextArea sourceDescription        ;
     JPopupMenu tablePopup              ;
     JComboBox updateBehaveList         ;
+
+    int selectMoveStartPosition        ;
+
     public TabbedPaneDemo(RegistryConfigIO registryparent, RegistryConfiguration config_) {
         super(new GridLayout(1, 1));
 	registryIO = registryparent ;
@@ -502,7 +511,7 @@ class TabbedPaneDemo extends JPanel {
 	tabbedPane = new JTabbedPane();
         ImageIcon icon = createImageIcon("spice.jpg");
 
-	
+	selectMoveStartPosition = -1 ;
 
 
 	////////////////////////////////////////////////////////
@@ -841,24 +850,63 @@ class TabbedPaneDemo extends JPanel {
 			    sourceDescription.setText(ds.toString());
 			}
 		    }
-		    
 		   
 		}
 	    });
 
 	dasSourceTable.setSelectionModel(lsm);
 
-	
+	dasSourceTable.addMouseListener(new MouseAdapter(){
+		public void mouseClicked(MouseEvent e) {
+		    //System.out.println("click!");
+		    ListSelectionModel lsm = dasSourceTable.getSelectionModel();
+		    
+		    //dasSourceTable.getSelectionModel()
+		    int minIndex = lsm.getMinSelectionIndex();
+		    //int maxIndex = lsm.getMaxSelectionIndex();
+		    //System.out.println(selectMoveStartPosition + " " + minIndex+" " + maxIndex);
+		    //System.out.println("mouselistener settingMoveStartPos" + minIndex);
+		    selectMoveStartPosition = minIndex ;
+		    
+		}
+	    });
+
+
 	// sorting of order of sources within table ...
 	dasSourceTable.addKeyListener(new KeyListener(){
 		public void keyTyped(KeyEvent e){}
 		public void keyPressed(KeyEvent e){}
 		public void keyReleased(KeyEvent e){
 		    int code = e.getKeyCode();
-		    System.out.println(code + "" + e.getKeyText(code));
-		    if ( code == KeyEvent.VK_PAGE_UP) {
-			System.out.println("cursor up");
+		    System.out.println(code + "" + e.getKeyText(code) + " "  );
+
+		    // get selected DAS source 
+		    ListSelectionModel lsm = dasSourceTable.getSelectionModel();
+		    
+		    //dasSourceTable.getSelectionModel()
+		    int minIndex = lsm.getMinSelectionIndex();
+		    int maxIndex = lsm.getMaxSelectionIndex();
+		    System.out.println(selectMoveStartPosition + " " + minIndex+" " + maxIndex);
+		    
+		    if (selectMoveStartPosition == -1 ) {
+			return ;
 		    }
+		    		    		  
+		    if  (
+			 ( code == KeyEvent.VK_PAGE_UP) || 
+			 ( code == KeyEvent.VK_UP) ||
+			 ( code == KeyEvent.VK_PAGE_DOWN) ||
+			 ( code == KeyEvent.VK_DOWN) 
+			 )
+
+			{
+			    config.moveServer(selectMoveStartPosition,minIndex);
+			    updateDasSourceTable();
+			}
+
+		   
+		    System.out.println("keylistener settingMoveStartPos" + minIndex);
+		    selectMoveStartPosition = minIndex ;
 		    
 		    
 		}
@@ -868,9 +916,11 @@ class TabbedPaneDemo extends JPanel {
 	
 	//Create the popup menu.
 	tablePopup = new JPopupMenu();
-	JMenuItem menuItem = new JMenuItem("activate");
-
+	
+      
 	MenuListener ml = new MenuListener(dasSourceTable,config,this);
+
+	JMenuItem menuItem = new JMenuItem("activate");
 	menuItem.addActionListener(ml);
 	tablePopup.add(menuItem);
 	menuItem = new JMenuItem("delete");
