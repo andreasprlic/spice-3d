@@ -44,7 +44,7 @@ import java.util.Iterator ;
 import java.util.Date ;
 import java.util.Calendar ;
  
-
+import javax.swing.JPanel ;
 import javax.swing.JLabel ;
 import javax.swing.ImageIcon ;
 
@@ -57,7 +57,7 @@ import javax.swing.ImageIcon ;
  * requires an arraylist of featrures
  */
 public class SeqFeatureCanvas 
-    extends JLabel 
+    extends JPanel 
     implements SeqPanel, MouseListener, MouseMotionListener
 				      
 {
@@ -446,7 +446,7 @@ public class SeqFeatureCanvas
     }
 	
     public void paintComponent( Graphics g) {
-	//super.paintComponent(g); not needed here, since we fill all of the space
+	super.paintComponent(g); 
 
 	//System.out.println("PAINTINGDAS!!!") ;	
 	//System.out.println("DasCanv - paintComponent");
@@ -458,8 +458,8 @@ public class SeqFeatureCanvas
 	Dimension dstruc=this.getSize();
 	Graphics gstruc = g ;
 
-	gstruc.setColor(this.getBackground());
-	gstruc.fillRect(0 , 0, dstruc.width, dstruc.height);
+	//gstruc.setColor(this.getBackground());
+	//gstruc.fillRect(0 , 0, dstruc.width, dstruc.height);
 	//g.clearRect(0 , 0, dstruc.width, dstruc.height);
 	
 

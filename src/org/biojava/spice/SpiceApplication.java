@@ -111,7 +111,7 @@ public class SpiceApplication
     URL REGISTRY_URL    ;
 
     static String XMLVALIDATION = "false" ;   
-    static String INIT_SELECT = "select all; cpk off ; wireframe off ; backbone off; cartoon on; colour chain;select not protein and not solvent;spacefill 2.0;";
+    static String INIT_SELECT = "select all; cpk off ; wireframe off ; backbone off; cartoon on; colour chain;select not protein and not solvent;spacefill 1.0;";
     RegistryConfiguration config      ;
     Structure structure ; 
     String pdbcode      ;
@@ -144,8 +144,8 @@ public class SpiceApplication
     JMenuBar menuBar ;
     JTextField getCom ;
 
-    JTextField strucommand  ; 
-
+    JTextField  strucommand  ; 
+    StatusPanel statusPanel ;
     String[] txtColor     ;
     Color[] entColors ;
     Color oldColor ; 
@@ -234,7 +234,7 @@ public class SpiceApplication
 
 
 	first_load = true ;
-
+	
 	structureAlignmentMode = false ;
 	      
 	this.getContentPane().setLayout(new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
@@ -276,7 +276,8 @@ public class SpiceApplication
 	seq_pos.setSize(700, 30);
 	seq_pos.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
 
-	this.getContentPane().add(seq_pos,BorderLayout.NORTH);
+	//this.getContentPane().add(seq_pos,BorderLayout.NORTH);
+	this.getContentPane().add(seq_pos);
 
 
 	showStatus("contacting DAS registry");
@@ -396,7 +397,8 @@ public class SpiceApplication
 	//mainsharedPanel.setOpaque(true);
 	mainsharedPanel.setBackground(Color.black);
 	//mainsharedPanel.setResizeWeight(0.7);
-	this.getContentPane().add(mainsharedPanel,BorderLayout.NORTH);
+	//this.getContentPane().add(mainsharedPanel,BorderLayout.NORTH);
+	this.getContentPane().add(mainsharedPanel);
 
 
 
@@ -406,8 +408,13 @@ public class SpiceApplication
 	ActionListener listener = new StructureCommandListener(this,strucommand) ;
 	strucommand.addActionListener(listener);
 	strucommand.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
-	this.getContentPane().add(strucommand,BorderLayout.SOUTH);
+	//this.getContentPane().add(strucommand,BorderLayout.SOUTH);
+	this.getContentPane().add(strucommand);
 
+	statusPanel = new StatusPanel();
+	//this.getContentPane().add(statusPanel,BorderLayout.SOUTH);
+	this.getContentPane().add(statusPanel);
+	statusPanel.setLoading(first_load);
 	/*
 	// menu
 	 menuBar = new JMenuBar();
@@ -688,6 +695,7 @@ public class SpiceApplication
 	System.setProperties(systemSettings);
 	*/
 	first_load = true ;
+	statusPanel.setLoading(true);
 	pdbcode = pdbcod ;
 	LoadStructureThread thr = new LoadStructureThread(this,pdbcod);
 	thr.start();
@@ -754,8 +762,9 @@ public class SpiceApplication
     
     public void setStructure(Structure structure_, String selectcmd ) {
 	first_load = false ;
+	statusPanel.setLoading(false);
 	structure = structure_ ; 
-
+	
 	System.out.println("got final structure:"+structure);
 	    	
 	DefaultListModel model = (DefaultListModel) ent_list.getModel() ;
@@ -770,7 +779,9 @@ public class SpiceApplication
 	}
 	
 	structurePanel.setStructure(structure);
-
+	
+	statusPanel.setPDB(structure.getPDBCode());
+	
 	structurePanel.executeCmd(selectcmd);
 	
 	// get sequence
@@ -829,6 +840,8 @@ public class SpiceApplication
 	String sp_id = chain.getSwissprotId() ;
 	System.out.println("SP_ID "+sp_id);
 	
+	statusPanel.setSP(sp_id);
+
 	ArrayList tmpfeat = getFeaturesFromMemory(sp_id) ;
 	
 	if ( tmpfeat.size() == 0 ) {
@@ -849,9 +862,9 @@ public class SpiceApplication
 	//ArrayList featureservers = getFeatureServers() ;
 	Chain chain = getChain(currentChain) ;
 	
-	FeatureFetcher ff = new FeatureFetcher(this,config,sp_id,pdbcode,chain);
+	FeatureFetcher ff = new FeatureFetcher(this,config,sp_id,pdbcode,chain);	
 	ff.start() ;
-
+	statusPanel.setLoading(true);
 	dascanv.setChain(chain,currentChain);
 	dascanv.setBackground(Color.black);
 	seqField.setChain(chain,currentChain);
@@ -883,7 +896,7 @@ public class SpiceApplication
 	// todo create Feature for structure mapping
 
 	memoryfeatures.put(sp_id,tmpfeat);
-
+	statusPanel.setLoading(false);
 	features.clear();
 	features = tmpfeat ;
 	//this.paint(this.getGraphics());

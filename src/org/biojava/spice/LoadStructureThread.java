@@ -122,6 +122,7 @@ public class LoadStructureThread
 	    //System.out.println("pdb_f.getStructure");
 	    
 	    structure = pdb_f.getStructure() ;
+	    structure.setPDBCode(pdb_file);
 	    // System.out.println("set Structure");
 	    
 	    spiceframe.setStructure(structure);
