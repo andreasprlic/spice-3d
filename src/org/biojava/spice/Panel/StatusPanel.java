@@ -49,7 +49,7 @@ public class StatusPanel
     extends JPanel
 {
     public static String PDBLINK = "http://www.rcsb.org/pdb/cgi/explore.cgi?pdbId=";
-    public static String UNIPROTLINK = "http://us.expasy.org/cgi-bin/niceprot.pl?" ;
+    public static String UNIPROTLINK = "http://www.ebi.uniprot.org/uniprot-srv/uniProtView.do?proteinAc=" ;
     
     
         JTextField pdbCode ;

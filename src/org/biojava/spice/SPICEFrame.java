@@ -189,6 +189,15 @@ public interface SPICEFrame  {
      * */
     public boolean showDocument(URL url);
         
+    /** converts a String to an URL and then calls showDocument(URL url)*/
+    public boolean showDocument(String urlstring);
+    
+    /** returns currently displayed PDB code; null if none*/
+    public String getPDBCode();
+    
+    /** returns currently displayed UniProt code; null if none*/
+    public String getUniProtCode();
+    
     
     
 }

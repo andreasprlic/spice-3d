@@ -43,7 +43,8 @@ implements ActionListener
     
     static String DESCRIPTION_TEXT = "The SPICE Applet. V 0.55 (C) Andreas Prlic, Tim Hubbard\n"+
     "The Wellcome Trust Sanger Institute 2004 mailto:ap3@sanger.ac.uk";
-    static String reset = "select all; cpk off ; wireframe off ; backbone off; cartoon off ; ribbons off; " ;
+    static String alloff = "cpk off ; wireframe off ; backbone off; cartoon off ; ribbons off; " ;
+    static String reset = "select all; " + alloff;
     static String noselect = "select none; ";
     
     SPICEFrame parent ;
@@ -55,7 +56,7 @@ implements ActionListener
     public void actionPerformed(ActionEvent e) {
         //System.out.println(e);
         //System.out.println(">"+e.getActionCommand()+"<");
-
+        
         String cmd = e.getActionCommand();
         if ( cmd.equals("Open") ) {
             OpenDialog op = new OpenDialog(parent);
@@ -76,33 +77,67 @@ implements ActionListener
             
             asd.show();	    
         } else if ( cmd.equals("Backbone") ){
-            String dcmd  = reset + "backbone 0.5;  " +noselect;
+            String dcmd;
+            if ( parent.isSelectionLocked()) 
+                dcmd  = alloff + "backbone 0.5;  ";
+            else 
+                dcmd  = reset + "backbone 0.5;  " +noselect;
             parent.executeCmd(dcmd);
         } else if ( cmd.equals("Wireframe") ){
-            String dcmd  = reset + "wireframe on; "+noselect;
+            String dcmd ;
+            if (parent.isSelectionLocked())
+                dcmd= alloff + "wireframe on; ";
+            else
+                dcmd= reset + "wireframe on; "+noselect;
             parent.executeCmd(dcmd);
         } else if ( cmd.equals("Cartoon") ){
-            String dcmd  = reset + "cartoon on; "+noselect;
+            String dcmd ;
+            if (parent.isSelectionLocked())
+                dcmd  = alloff + "cartoon on; ";
+            else
+                dcmd  = reset + "cartoon on; "+noselect;
             parent.executeCmd(dcmd);
         } else if ( cmd.equals("Ball and Stick") ){
-            String dcmd  = reset + "wireframe 0.3; spacefill 0.5; "+noselect;
+            String dcmd ;
+            if (parent.isSelectionLocked())
+                dcmd  = alloff + "wireframe 0.3; spacefill 0.5; ";
+            else
+                dcmd  = reset + "wireframe 0.3; spacefill 0.5; "+noselect;
             parent.executeCmd(dcmd);
         } else if ( cmd.equals("Spacefill") ){
-            String dcmd  = reset + "spacefill on; "+noselect;
+            String dcmd ;
+            if (parent.isSelectionLocked())
+                dcmd  = alloff + "spacefill on; ";
+            else
+                dcmd  = reset + "spacefill on; "+noselect;
             parent.executeCmd(dcmd);
         } else if ( cmd.equals("Color - chain")) {
-            String dcmd = "select all; color chain;" +noselect;
+            String dcmd ;
+            if (parent.isSelectionLocked())
+                dcmd = "color chain;";
+            else
+                dcmd = "select all; color chain;" +noselect;
             parent.executeCmd(dcmd);
         } else if ( cmd.equals("Color - secondary")) {
-            String dcmd = "select all; color structure;" +noselect;
+            String dcmd ;
+            if (parent.isSelectionLocked())
+                dcmd = "color structure;";
+            else
+                dcmd = "select all; color structure;" +noselect;
             parent.executeCmd(dcmd);
         } else if ( cmd.equals("Color - cpk")) {
-            String dcmd = "select all; color cpk;" +noselect;
+            String dcmd ;
+            if (parent.isSelectionLocked())
+                dcmd = "color cpk;";
+            else
+                dcmd = "select all; color cpk;" +noselect;
             parent.executeCmd(dcmd);
         } else if ( cmd.equals("Choose")){
             //System.out.println("pressed alig window open");
             AlignmentChooser aligc = new AlignmentChooser(parent);
             aligc.show();
+        } else if (cmd.equals("Unlock Selection")){
+            parent.setSelectionLocked(false);
         } else {
             System.out.println("unknown menu comand " + cmd);
         }

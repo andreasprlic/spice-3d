@@ -41,21 +41,26 @@ import java.awt.image.BufferedImage       ;
 import java.awt.Font                      ;
 import java.awt.Dimension                 ;
 
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseListener       ; 
 import java.awt.event.MouseMotionListener ;
 import java.awt.event.MouseEvent          ;
 import java.awt.Graphics2D                ;
 import java.awt.* ;
 
+import java.net.URL;
+
 import java.util.List                     ;
 import java.util.ArrayList                ;
 
 import java.util.Date        ;
+import java.util.logging.Logger;
 //import java.uti.logging.*   ;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel    ;
 import javax.swing.JPopupMenu;
-import javax.swing.MenuElement;
+
 
 
 
@@ -91,6 +96,8 @@ implements SeqPanel, MouseListener, MouseMotionListener
     // use this font for the text
     public static final Font plainFont = new Font("SansSerif", Font.PLAIN, 10);
     
+    static Cursor handCursor = new Cursor(Cursor.HAND_CURSOR);
+    static Cursor defaultCursor = new Cursor(Cursor.DEFAULT_CURSOR);
     
     JPopupMenu popupMenu ;
     
@@ -113,7 +120,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
     float scale ;
     
     List drawLines ;
-    //ArrayList features ;
+    ArrayList knownLinks;
     
     //mouse events
     Date lastHighlight ;
@@ -143,6 +150,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         spice = spicefr;
         //features = new ArrayList();
         drawLines = new ArrayList();
+        knownLinks = new ArrayList();
         chain = null ;
                 
         lastHighlight = new Date();
@@ -450,9 +458,16 @@ implements SeqPanel, MouseListener, MouseMotionListener
         Feature oldFeature = new Feature();
         boolean start      = true ;
         String featureSource = "" ;
-        
+        clearOldLinkMenus();
         for (int i=0; i< feats.size(); i++) {
             Feature feat = (Feature)feats.get(i);
+            
+            // add link to popupmenu
+            String link = feat.getLink();
+            if ( link != null) {
+                registerLinkMenu(link);
+            }
+            
             
             String ds =feat.getSource();
             // check if new feature source
@@ -516,6 +531,31 @@ implements SeqPanel, MouseListener, MouseMotionListener
         this.repaint();
         
     }
+    
+    private void registerLinkMenu(String link){
+        
+        //  add link to the menu
+        //ActionListener ml = new LinkMenuListener(spice,link);
+        if ( knownLinks.contains(link))
+            return;
+        System.out.println("adding menu:" + link);
+        ActionListener ml = new SelectionLockMenuListener(spice);
+        JMenuItem menuItem = new JMenuItem("open in browser "+ link);
+        menuItem.addActionListener(ml);
+        popupMenu.add(menuItem);
+        knownLinks.add(link);
+        
+    }
+    
+    private void clearOldLinkMenus(){
+        int nr = popupMenu.getComponentCount();
+        for ( int i = nr-1; i > 0; i--){
+            popupMenu.remove(i);
+        }
+        knownLinks = new ArrayList();
+    }
+    
+    
     
     /** return height of image. dpends on number of features! */
     
@@ -879,13 +919,38 @@ implements SeqPanel, MouseListener, MouseMotionListener
             spice.showStatus(toolstr) ;
             // display ToolTip
             this.setToolTipText(toolstr);
+            
+            /*
+            Feature feat = segment.getParent();
+            String link = feat.getLink();
+            
+            //logger.finest(segment);
+            if (link != null ) {
+                // check if this feature has a link, if yes,
+                // change mouse cursor
+                System.out.println("setting cursor to hand cursor");
+                addLinkMenu(link);      
+                setCursor(handCursor);
+            } else {
+                System.out.println("setting cursor to default cursor");
+                setCursor(defaultCursor);
+                removeLinkMenu();
+            }
+            */
+            
         } else {
             this.setToolTipText(null);
-            
+            setCursor(defaultCursor);
             spice.showSeqPos(current_chainnumber,seqpos);
             
         }
-               
+          
+        
+        
+        // slowing down the whole thing?
+        
+        
+        
         if ( spice.isSelectionLocked()) 
             return;
         
@@ -895,16 +960,20 @@ implements SeqPanel, MouseListener, MouseMotionListener
     }
     
     
+    
+    
     public void mouseClicked(MouseEvent e)
     {
-        int b = e.getButton();
-        if ( b == MouseEvent.BUTTON3) return;
-        
+
         int seqpos = getSeqPos(e);
         int lineNr = getLineNr(e);
         if ( seqpos    > chain.getLength()) return ;
         
-        
+        int b = e.getButton();
+        if ( b == MouseEvent.BUTTON3) {
+          
+            return;
+        }           
         
         if ( b == MouseEvent.BUTTON1 && ( ! spice.isSelectionLocked()))
         {
@@ -965,17 +1034,24 @@ implements SeqPanel, MouseListener, MouseMotionListener
         int b = e.getButton();
         if ( b == MouseEvent.BUTTON1 )
             mouseDragStart =  -1 ;
+        
+        // remove the link button from poopup
+        //if ( popupMenu.getComponentCount() > 1) {
+          //  removeLinkMenu();
+        //}
     }
     public void mouseDragged(MouseEvent e) {
         //System.out.println("dragging mouse "+e);
         if ( mouseDragStart < 0 )
-            return ;
+            return ;        
+        
+        int seqpos = getSeqPos(e);
+       
         if (spice.isSelectionLocked())
             return;
-        int selEnd =  getSeqPos(e);
+        int selEnd =  seqpos;
         int start = mouseDragStart ;
         int end   = selEnd         ;
-        
         if ( selEnd < mouseDragStart ) {
             start = selEnd ;
             end = mouseDragStart ;
@@ -984,9 +1060,6 @@ implements SeqPanel, MouseListener, MouseMotionListener
     }
   
 }
-
-
-
 
 
 

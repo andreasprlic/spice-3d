@@ -24,7 +24,7 @@ package org.biojava.spice.GUI;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
+import java.net.URL;
 import javax.swing.JMenuItem;
 
 import org.biojava.spice.SPICEFrame;
@@ -45,11 +45,25 @@ implements ActionListener {
     
     public void actionPerformed(ActionEvent e){
         JMenuItem source = (JMenuItem)(e.getSource());
+        //System.out.println(source);
+ 
+        //System.out.println(source.getText());
+        String txt = source.getText();
+        //System.out.println("source txt >"+txt+"<");
+        if ( txt.equals("Lock Selection")|| (txt.equals("Unlock Selection"))){
+            boolean locked = spice.isSelectionLocked();
+            if ( locked )
+                spice.setSelectionLocked(false);
+            else
+                spice.setSelectionLocked(true);
+        } else {
+            String start = txt.substring(0,15);
+            System.out.println(start);
+            String url = txt.substring(16,txt.length());
+            System.out.println(url);
+            spice.showDocument(url);
                 
-        boolean locked = spice.isSelectionLocked();
-        if ( locked )
-            spice.setSelectionLocked(false);
-        else
-            spice.setSelectionLocked(true);
+        
+        }
     }
 }

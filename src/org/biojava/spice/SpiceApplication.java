@@ -42,6 +42,7 @@ import java.util.List ;
 
 // to get config file via http
 import java.net.URL;
+import java.net.MalformedURLException;
 
 // jnlp - to display URL in browser 
 import javax.jnlp.*;
@@ -121,7 +122,8 @@ implements SPICEFrame
     //JPanel leftPanel ;
     JSplitPane sharedPanel;
     JSplitPane mainsharedPanel;
-    
+    JMenuItem pdbMenu;
+    JMenuItem upMenu;
     JScrollPane seqScrollPane ;
     JSplitPane  seqSplitPane  ;
     SeqTextPane seqField      ;
@@ -582,6 +584,28 @@ implements SPICEFrame
         
         
         
+        // Browse menu
+        
+        JMenu browse = new JMenu("Browse");
+        browse.setMnemonic(KeyEvent.VK_B);
+        browse.getAccessibleContext().setAccessibleDescription("open links in browser");
+        
+        // unique action listener for the browse buttons
+        ActionListener bl = new BrowseMenuListener(this);
+        menu.add(browse);
+        pdbMenu = new JMenuItem("PDB");
+        pdbMenu.setMnemonic(KeyEvent.VK_P);
+        pdbMenu.setEnabled(false);
+        pdbMenu.addActionListener(bl);
+        browse.add(pdbMenu);
+        
+        upMenu = new JMenuItem("UniProt");
+        upMenu.setMnemonic(KeyEvent.VK_U);
+        upMenu.setEnabled(false);
+        upMenu.addActionListener(bl);
+        browse.add(upMenu);
+        
+        
         
         // Alignment submenu
         JMenu align = new JMenu("Alignment");
@@ -689,6 +713,8 @@ implements SPICEFrame
         statusPanel.setSP(uniprot);	
         LoadUniProtThread thr = new LoadUniProtThread(this,uniprot) ;
         thr.start();
+        pdbMenu.setEnabled(false);
+        upMenu.setEnabled(false);
     }
     
     
@@ -805,6 +831,8 @@ implements SPICEFrame
         structure = structure_ ; 
         pdbcode = structure.getPDBCode();
         
+        if (pdbcode != null)
+            pdbMenu.setEnabled(true);
         //if (logger.isLoggable(Level.FINEST)) {
         //System.out.println(structure.toPDB());	    
         //}
@@ -872,7 +900,15 @@ implements SPICEFrame
         structurePanel.executeCmd(cmd);	
     }
     
+    public String getPDBCode(){
+        return structure.getPDBCode();
+    }
     
+    public String getUniProtCode(){
+        int c = getCurrentChainNumber();
+        Chain chain = getChain(c);
+        return chain.getSwissprotId();
+    }
     public void setConfiguration(RegistryConfiguration reg) {
         config = reg;
         List s = config.getServers();
@@ -906,6 +942,11 @@ implements SPICEFrame
         logger.finest("SP_ID "+sp_id);
         
         statusPanel.setSP(sp_id);
+        if (sp_id != null){
+            upMenu.setEnabled(true);
+        } else {
+            upMenu.setEnabled(false);
+        }
         
         ArrayList tmpfeat = getFeaturesFromMemory(sp_id) ;
         
@@ -1448,6 +1489,15 @@ implements SPICEFrame
         return false;
     }
     
+    public boolean showDocument(String urlstring){
+        try{
+            URL url = new URL(urlstring);
+            return showDocument(url);
+        } catch (MalformedURLException e){
+            logger.warning(e.getMessage());
+            return false;
+        }
+    }
 }
 
 
