@@ -81,7 +81,7 @@ public class Spice extends Applet {
 	appFrame.setSize(700, 700);
 	appFrame.show();
 	
-	appFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 	
     }

@@ -427,7 +427,7 @@ public class SpiceApplication
 	this.setSize(700, 700);
 	//this.show();
 	
-	this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	//this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	this.setDefaultLookAndFeelDecorated(false);
 	ImageIcon icon = createImageIcon("spice.jpg");
 	this.setIconImage(icon.getImage());
@@ -1195,7 +1195,7 @@ public class SpiceApplication
 	    return true;
 	}
 	else if ( event.target == exit) {
-	    dispose();
+	    System.exit(0);
 	    return true;
 	}
 	else if ( event.target == openpdb ) {

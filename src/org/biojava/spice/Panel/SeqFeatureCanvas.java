@@ -365,7 +365,8 @@ public class SeqFeatureCanvas
 	    //}
 	}
 	if ( ( feature.getType().equals("METAL")) ||
-	     ( feature.getType().equals("SITE"))
+	     ( feature.getType().equals("SITE"))  ||
+	     ( feature.getType().equals("ACT_SITE")) 	     
 	       ){
 	    cmd += " spacefill on; " ;
 	}
@@ -757,6 +758,7 @@ public class SeqFeatureCanvas
 		    Feature feature = (Feature) features.get(i);
 		    cmd += highliteFeature(feature);		    
 		}
+		System.out.println(cmd);
 		spice.executeCmd(cmd);
 		return  ;
 	    }
