@@ -117,10 +117,8 @@ public class SpiceApplication
 	
     public static Logger logger =  Logger.getLogger("org.biojava.spice");;
    
-
-    //public static final String CONFIG_FILE = "config.xml";
-    URL CONFIG_URL      ; 
-    URL REGISTRY_URL    ;
+    
+    URL REGISTRY_URL    ; // the url to the registration server
 
 
     static int    DEFAULT_Y_SCROLL = 50 ;
@@ -170,13 +168,18 @@ public class SpiceApplication
     //public static Logger logger = Logger.getLogger("org.biojava.spice");
 
 
-    SpiceApplication(String pdbcode_, URL config_url, URL registry_url) {
+
+
+
+    /** start the spice appplication
+     */
+    SpiceApplication( URL registry_url) {
 	super();
 
 	
 	
 	LoggingPanel loggingPanel = new LoggingPanel(logger);
-	loggingPanel.getHandler().setLevel(Level.FINEST);
+	loggingPanel.getHandler().setLevel(Level.INFO);
 	loggingPanel.show(null);
 	//ConsoleHandler handler = new ConsoleHandler();
 	//handler.setLevel(Level.FINEST);
@@ -224,7 +227,6 @@ public class SpiceApplication
 	    logger.finest("using Proxy:" + System.getProperty("proxySet"));
 	}
 
-	CONFIG_URL   = config_url ;
 	REGISTRY_URL = registry_url ;
 	
 	// first thing is to start communication
@@ -233,9 +235,9 @@ public class SpiceApplication
 	regi.run();
 
 	structure = null ;
-	pdbcode = pdbcode_ ;
-	pdbcode2 = null ;
-	txtColor = new String[7] ;
+	pdbcode   = null ;
+	pdbcode2  = null ;
+	txtColor  = new String[7] ;
 	txtColor[0]="blue";
 	txtColor[1]="pink";
 	txtColor[2]="green";
@@ -255,7 +257,7 @@ public class SpiceApplication
 	entColors[6] = Color.cyan;
 
 
-	first_load = true ;
+	//first_load = false ;
 	
 	structureAlignmentMode = false ;
 	     
@@ -278,7 +280,7 @@ public class SpiceApplication
 	Box vBox = arrangePanels(statusPanel,seq_pos,structurePanel,dascanv,strucommand,"left"); 
 
 	this.getContentPane().add(vBox);
-	this.setLoading(first_load);
+	this.setLoading(false);
 	
 
 	memoryfeatures = new HashMap();
@@ -312,7 +314,7 @@ public class SpiceApplication
 
 
     /** Constructor for structure alignment visualization 
-     */
+	currently disabled
     SpiceApplication(String pdb1, String pdb2, URL config_url, URL registry_url) {
 	this(pdb1, config_url,registry_url);
 	structureAlignmentMode = true ;
@@ -320,7 +322,7 @@ public class SpiceApplication
 	logger.finest("finished init of structure alignment");
 		
     }
-
+    */
     
     
     /**
@@ -379,7 +381,7 @@ public class SpiceApplication
 
 
 	DefaultListModel model = new DefaultListModel();
-	model.add(0,"loading...");
+	model.add(0,"");
 	ent_list=new JList(model);
 	EntListCommandListener entact = new EntListCommandListener(this);
 	ent_list.addListSelectionListener(entact);
@@ -505,7 +507,10 @@ public class SpiceApplication
     		
     	}
     	else if (type.equals("UniProt")) {
-    		logger.info("load UniProt not implemented, yet!");
+	    //logger.info("load UniProt not implemented, yet!");
+	    // connect to Uniprot -pdb alignment service, get PDB code and load it ...
+	    this.getUniprot(code);
+		
     	}
     	else if (type.equals("ENSP")) {
     		logger.info("load ENSP not implemented, yet!");
@@ -513,8 +518,9 @@ public class SpiceApplication
     	}
     	else {
     		// unknown code type!
-    		System.err.println("unknown code type >"+type+"< currently supported: PDB,UniProt,ENSP");
-    		return;
+    		//System.err.println("unknown code type >"+type+"< currently supported: PDB,UniProt,ENSP");
+	    logger.warning("unknown code type >"+type+"< currently supported: PDB,UniProt,ENSP");
+	    return;
     	}
     		
     	
@@ -684,6 +690,14 @@ public class SpiceApplication
 	return config.getServers("feature");
     }
 
+    /** start a new thead that retrieves uniprot sequence, and if available
+	protein structure
+    */
+    public void getUniprot(String uniprot) {
+	statusPanel.setLoading(true);
+	LoadUniProtThread thr = new LoadUniProtThread(this,uniprot) ;
+	thr.start();
+    }
 
 
     /** starts a new thread that retreives protein structure using the
@@ -691,18 +705,7 @@ public class SpiceApplication
 	call the setStructure method to set the protein structure.
      */
     public void getStructure(String pdbcod) {
-	//String server = "http://protodas.derkholm.net/dazzle/mystruc/structure?query=";
-	
 
-	// proxy should be set at startup ( if called from command line) otherwise the browsery proxy settings are being used ...
-
-	/*
-	Properties systemSettings = System.getProperties();
-	systemSettings.put("proxySet", "true");
-	systemSettings.put("proxyHost", "wwwcache.sanger.ac.uk");
-	systemSettings.put("proxyPort", "3128");
-	System.setProperties(systemSettings);
-	*/
 
 	if (logger.isLoggable(Level.FINER)) {
 	    logger.entering(this.getClass().getName(), "getStructure",  new Object[]{pdbcod});
@@ -1009,7 +1012,7 @@ public class SpiceApplication
     public Chain getChain(int chainnumber) {
 	
 	if ( structure == null ) {
-	    logger.log(Level.WARNING,"no structure loaded, yet");
+	    //logger.log(Level.WARNING,"no structure loaded, yet");
 	    return null ;
 	}
 

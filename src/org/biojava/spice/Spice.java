@@ -45,8 +45,8 @@ public class Spice extends Applet {
     
     public static void main(String[] argv) {
 
-	if ( argv.length != 2 ) {
-	    System.err.println(" wrong arguments: correct call: java -jar spice.jar PDBcode registryurl "+ System.getProperty("line.separator")+" example: java -jar spice.jar 5pti http://servlet.sanger.ac.uk:8080/axis/services/das_registry/");
+	if ( argv.length != 3 ) {
+	    System.err.println(" wrong arguments: correct call: java -jar spice.jar type code registryurl "+ System.getProperty("line.separator")+" example: java -jar spice.jar PDB 5pti http://servlet.sanger.ac.uk:8080/axis/services/das_registry/");
 	    return;
 	}
 	
@@ -54,16 +54,16 @@ public class Spice extends Applet {
 	URL registry_url=null ; 
 	try {
 	    //System.out.println(argv[1]);
-	    url = new URL(argv[1]);
+	    //url = new URL(argv[2]);
 	    //registry_url = new URL("http://localhost:8080/axis/services/dasregistry/");
-	    registry_url = new URL(argv[1]);
+	    registry_url = new URL(argv[2]);
 	} catch (MalformedURLException e) {
 	    System.err.println(url+" " + registry_url);
 	    e.printStackTrace();
 	    return ;
 	}
 		
-	addMoreSpice(argv[0],url,registry_url);
+	addMoreSpice(argv[0],argv[1],registry_url);
 	
     }
 
@@ -77,14 +77,15 @@ public class Spice extends Applet {
     }
 
     // replace configurl as soon as registry server communication is working properly
-    public static void addMoreSpice(String pdbcode,URL configfileurl, URL registryurl){
+    public static void addMoreSpice(String codetype, String code, URL registryurl){
 	System.out.println("Welcome to the SPICE - DAS client!");
-	SpiceApplication appFrame = new SpiceApplication(pdbcode, configfileurl,registryurl) ;	
+	SpiceApplication appFrame = new SpiceApplication(registryurl) ;	
 	//System.out.println("init of SpiceApplication single structure mode");
 	appFrame.setTitle("SPICE") ;
 	//appFrame.setSize(700, 700);
 	System.out.println("addMoreSpice calling show()");
-	appFrame.show();
+	//appFrame.show();
+	appFrame.load(codetype,code);
 	
 	appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -94,12 +95,13 @@ public class Spice extends Applet {
 
     public static void displayStructureAlignment(String pdb1, String pdb2, URL configfileurl,URL registryurl) {
 
-	SpiceApplication appFrame = new SpiceApplication(pdb1, pdb2, configfileurl,registryurl) ;	
+	//SpiceApplication appFrame = new SpiceApplication(pdb1, pdb2, configfileurl,registryurl) ;	
 	//System.out.println("init of SpiceApplication structure alignment mode");
-	appFrame.setTitle("SPICE") ;
+	//appFrame.setTitle("SPICE") ;
 	//appFrame.setSize(700, 700);
-	appFrame.show();
-
+	//appFrame.show();
+	System.out.println("currently disabled");
+	/*
 	appFrame.addWindowListener(new WindowAdapter() {
 		public void windowClosing(WindowEvent evt) {
 		    Frame frame = (Frame) evt.getSource();
@@ -107,6 +109,7 @@ public class Spice extends Applet {
 		    frame.dispose();
 		}
 	    });
+	*/
     }
 
 }
@@ -157,7 +160,7 @@ class SpiceButton extends Button {
 		    }
 		    if ( ! structurealignment ) {
 			//System.out.println("init single struc mode");
-			spice.addMoreSpice(defaultpdb, url,registryurl);
+			//spice.addMoreSpice(defaultpdb, url,registryurl);
 		    }
 
 		 
