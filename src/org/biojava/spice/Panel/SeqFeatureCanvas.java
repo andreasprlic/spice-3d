@@ -63,6 +63,7 @@ public class SeqFeatureCanvas
 				      
 {
 
+
     public static final int    DEFAULT_X_START  = 60  ;
     public static final int    DEFAULT_X_RIGHT_BORDER = 20 ;
     public static final int    DEFAULT_Y_START  = 16 ;
@@ -104,6 +105,8 @@ public class SeqFeatureCanvas
     public SeqFeatureCanvas(SPICEFrame spicefr ) {
 	super();
 	logger = Logger.getLogger("org.biojava.spice");
+	setDoubleBuffered(true) ;
+
 	// TODO Auto-generated constructor stub
 	Dimension dstruc=this.getSize();
 	//imbuf    = this.createImage(dstruc.width, dstruc.height);
@@ -457,13 +460,17 @@ public class SeqFeatureCanvas
 	//logger.finest("PAINTINGDAS!!!") ;	
 	//logger.finest("DasCanv - paintComponent");
 	//logger.finest(this.getBackground());
-	g.setFont(plainFont);
+
 
 	if ( chain == null   ) return ;
 
 	Dimension dstruc=this.getSize();
+	//Image imbuf = this.createImage(dstruc.width,dstruc.height);
+	
 	Graphics gstruc = g ;
-
+	//Graphics gstruc = imbuf.getGraphics();
+	gstruc.setFont(plainFont);
+	//gstruc.setBackground(this.getBackground());
 	//gstruc.setColor(this.getBackground());
 	//gstruc.fillRect(0 , 0, dstruc.width, dstruc.height);
 	//g.clearRect(0 , 0, dstruc.width, dstruc.height);
@@ -579,6 +586,8 @@ public class SeqFeatureCanvas
 		    }
 		}
 	    }
+
+	    //g.drawImage(imbuf,0,0,this.getBackground(),this);
 	}
 	
 
@@ -665,6 +674,7 @@ public class SeqFeatureCanvas
 	int end   = segment.getEnd()   -1 ; 
 	
 	 toolstr += " " + type + " start " + start + " end " + end + " Note:" + note; 
+
 	//logger.finest(toolstr);
 		
 	//new ToolTip(toolstr, this);

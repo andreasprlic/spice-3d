@@ -198,7 +198,7 @@ public class DAS_SequenceRetreive {
 		
 		//huc = proxyUrl.openConnection();
 		
-		logger.finest("opening "+url);
+		logger.finer("opening "+url);
 		huc = (HttpURLConnection) url.openConnection();
 		
 		

@@ -132,9 +132,9 @@ public class FeatureFetcher extends Thread
 		responsecounter++;
 		continue ;
 	    }
-	    logger.finest("starting thread");
+
 	    SingleFeatureThread sft = new SingleFeatureThread ( this ,spUrl,responsecounter);
-	    sft.run();
+	    sft.start();
 	    responsecounter++;
 	}
 
@@ -156,9 +156,9 @@ public class FeatureFetcher extends Thread
 		responsecounter++;
 		continue ;
 	    }
-	    logger.finest("starting thread");
+	    //logger.finest("starting thread");
 	    SingleFeatureThread sft = new SingleFeatureThread ( this ,spUrl,responsecounter);
-	    sft.run();
+	    sft.start();
 	    responsecounter++;
 	}
 
@@ -166,10 +166,10 @@ public class FeatureFetcher extends Thread
 	boolean done = false ;
 	while ( ! done) {
 	    done = allFinished();
-	    logger.finest("FeatureFetcher waiting for features to be retreived: "+done);
+	    //logger.finest("FeatureFetcher waiting for features to be retreived: "+done);
 	    try {
 		wait(300);
-		logger.finest("FeatureFetcher waiting "+done);
+		//logger.finest("FeatureFetcher waiting "+done);
 	    } catch (InterruptedException e) {
 		e.printStackTrace();
 		done = true ;
@@ -458,43 +458,3 @@ class DasResponse{
 
 
 
-class SingleFeatureThread
-    extends Thread {
-    URL dascommand ;
-    FeatureFetcher parentfetcher ;
-    int myId ;
-    /** contact a single DAS feature server and retreive features 
-	@param parent a link to the parent class
-	@param urlstring string of server
-	@param threadid id for this thread, if job is finished parent
-	is told that threadid has finised
-     */
-    public SingleFeatureThread(FeatureFetcher parent, URL dascmd,int threadid) {
-	//logger.finest("init new thread " + threadid + " " + dascmd);
-	dascommand = dascmd ;
-	parentfetcher = parent ;
-	myId = threadid ;
-    }
-    /** start thread */
-    public void run() {
-	doDasConnection();
-    }
-
-    private synchronized void doDasConnection() {
-	
-	DAS_FeatureRetreive ftmp = new DAS_FeatureRetreive(dascommand);
-	ArrayList features = ftmp.get_features();
-	//logger.finest("doDasConnection got " + features.size() + " features") ;
-	//new ArrayList();
-	//ArrayList tmp = 
-	//for (int i=0; i<tmp.size();i++){
-	//   HashMap feat = (HashMap)tmp.get(i);			
-	    //logger.finest("got feature: "+feat);
-	//    features.add(feat) ;		
-	//} 
-	//logger.finest("done "+ dascommand);
-	parentfetcher.setFinished(myId,features);
-	notifyAll();
-    }
-
-}

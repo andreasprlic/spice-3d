@@ -141,7 +141,7 @@ public class DASAlignment_Handler extends Thread
 	//pdb_container = new Simple_PDB_Container() ;
 
 	String server = alignmentserver ;
-
+	logger.finest("contacing alignment server " + server);
 	DASAlignmentClient dasc= new DASAlignmentClient(server);
 	Alignment[] alignments = null ;
 
@@ -160,7 +160,8 @@ public class DASAlignment_Handler extends Thread
 	    
    
 	} catch (Exception e){
-	    e.printStackTrace();
+	    //e.printStackTrace();
+	    logger.log(Level.SEVERE,"unable to retreive UniProt - PDB alignment",e);
 	}
 	downloadFinished = true ;
 	master.setMappingDone(true) ;

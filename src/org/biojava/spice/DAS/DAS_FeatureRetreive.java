@@ -24,36 +24,40 @@
 package org.biojava.spice;
 
 
-import java.net.URL;
-import java.io.InputStream ;
-import org.xml.sax.InputSource ;
-import org.xml.sax.helpers.XMLReaderFactory;
-import org.xml.sax.XMLReader;
-import javax.xml.parsers.*;
-import org.xml.sax.SAXException;
-import org.xml.sax.InputSource ;
-import org.xml.sax.helpers.XMLReaderFactory;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.*;
-import org.xml.sax.*;
-import java.util.ArrayList ;
-import java.net.HttpURLConnection;
+import java.net.URL                         ;
+import java.io.InputStream                  ;
+import org.xml.sax.InputSource              ;
+import org.xml.sax.helpers.XMLReaderFactory ;
+import org.xml.sax.XMLReader                ;
+import javax.xml.parsers.*                  ;
+import org.xml.sax.SAXException             ;
+import org.xml.sax.InputSource              ;
+import org.xml.sax.helpers.XMLReaderFactory ;
+import org.xml.sax.XMLReader                ;
+import org.xml.sax.helpers.*                ;
+import org.xml.sax.*                        ;
+import java.util.ArrayList                  ;
+import java.util.logging.*                  ;
+import java.net.HttpURLConnection           ;
 
 
 /**
- * A class to retreive performe a DAS features request
+ * A class to perform a DAS features request
  * @author Andreas Prlic
  *
  */
 public class DAS_FeatureRetreive {
 
 	ArrayList features ;
+    Logger logger     ;
+    
 	/**
 	 * 
 	 */
 	public DAS_FeatureRetreive(URL url) {
 		super();
 		// TODO Auto-generated constructor stub
+		logger = Logger.getLogger("org.biojava.spice");
 		features = new ArrayList() ;
 		
 		try {
@@ -64,7 +68,8 @@ public class DAS_FeatureRetreive {
 		    try {
 			dasInStream	= open(url); 
 		    } catch (Exception e ){
-			System.err.println("could not open connection to " + url);
+			
+			logger.log(Level.WARNING,"could not open connection to " + url,e);
 			return ;
 		    }
 			
@@ -102,14 +107,14 @@ public class DAS_FeatureRetreive {
 			try {
 			    xmlreader.setFeature("http://xml.org/sax/features/validation", validation);
 			} catch (SAXException e) {
-			    System.err.println("Cannot set validation " + validation); 
+			    logger.log(Level.WARNING,"Cannot set validation " + validation); 
 			}
 			
 			try {
 			    xmlreader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",validation);
 			} catch (SAXNotRecognizedException e){
 			    //e.printStackTrace();
-			    System.err.println("Cannot set load-external-dtd "+validation); 
+			    logger.log(Level.WARNING,"Cannot set load-external-dtd "+validation); 
 			    
 			}
 			
@@ -125,7 +130,8 @@ public class DAS_FeatureRetreive {
 			    features = cont_handle.get_features();
 			} 
 			catch ( Exception e){
-			    System.err.println("error while parsing response from "+ url);
+			    logger.log(Level.WARNING,"error while parsing response from "+ url);
+			    
 			    features = new ArrayList();
 			}
 			
@@ -145,17 +151,18 @@ public class DAS_FeatureRetreive {
 
 				
 	HttpURLConnection huc = null;
-	System.out.println("opening "+url);
+	logger.finest("opening "+url);
 	huc = (HttpURLConnection) url.openConnection();
 	
-		
-	System.out.println("got connection: "+huc.getResponseMessage());
+	
+	logger.finest("got connection: "+huc.getResponseMessage());
 	String contentEncoding = huc.getContentEncoding();
 	inStream = huc.getInputStream();		
 	return inStream;
     
     }
 	
+    /** returns a List of Features */
     public ArrayList get_features() {
 	//System.out.println("DAS_FeatureRetrieve: returning features");
 	return features;

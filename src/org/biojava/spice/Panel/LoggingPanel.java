@@ -403,8 +403,16 @@ public class LoggingPanel extends JPanel {
      *         a {@link JDialog} or a {@link JFrame}.
      */
     public Component show(final Component owner) { 
+
+	int frameWidth  = 750 ;
+	int frameHeight = 300 ;
+	
+	// Get the size of the default screen
+	java.awt.Dimension dim = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+	
 	//System.out.println("LoggingPanel show!!!!!!!");
 	JFrame frame = new JFrame();
+	frame.setLocation((dim.width - frameWidth),(dim.height - frameHeight));
 	frame.setTitle("SPICE - log");
 	frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.addWindowListener(new WindowAdapter()
@@ -417,7 +425,7 @@ public class LoggingPanel extends JPanel {
         frame.pack();
 	
 						       
-        frame.setSize(750, 300);
+        frame.setSize(frameWidth, frameHeight);
         frame.setVisible(true);
         doLayout();
 	frame.show();

@@ -251,6 +251,9 @@ public class RegistryConfigIO
     
 
     private void showProgressBar(){
+
+    
+
 	progressFrame = new JFrame("contacting DAS registration service");
 	progressFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	/*progressFrame.addWindowListener(new WindowAdapter() {
@@ -261,6 +264,10 @@ public class RegistryConfigIO
 		}
 	    });
 	*/
+
+
+
+
 	ImageIcon icon = createImageIcon("spice.jpg");
 	progressFrame.setIconImage(icon.getImage());
 
@@ -289,6 +296,18 @@ public class RegistryConfigIO
 	panel.add(vbox);
 	progressFrame.getContentPane().add(panel);
 	progressFrame.pack();
+	
+	// get resolution of screen
+	Dimension dim = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+	// Determine the new location of the window
+	int w = progressFrame.getSize().width;
+	int h = progressFrame.getSize().height;
+	int x = (dim.width-w)/2;
+	int y = (dim.height-h)/2;
+    
+	// Move the window
+	progressFrame.setLocation(x, y);
+
 	progressFrame.setVisible(true);
 	
     }

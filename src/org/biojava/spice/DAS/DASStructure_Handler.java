@@ -86,17 +86,6 @@ public class DASStructure_Handler
     
     
 
-    protected String getTimeStamp(){
-
-	Calendar cal = Calendar.getInstance() ;
-	// Get the components of the time
-	int hour24 = cal.get(Calendar.HOUR_OF_DAY);     // 0..23
-	int min = cal.get(Calendar.MINUTE);             // 0..59
-	int sec = cal.get(Calendar.SECOND);             // 0..59
-	String s = "time: "+hour24+" "+min+" "+sec;
-	return s ;
-    }
-
     
    
 
@@ -119,7 +108,7 @@ public class DASStructure_Handler
 		if ( url.substring(0,7).equals("file://") ) {
 		    // load local PDB file
 		    String dir  = url.substring(7);
-		    logger.finest("trying to get PDB file from " + dir);
+		    logger.finer("trying to get PDB file from " + dir);
 		    structure = getLocalPDB(dir,pdb_id);
 		    if ( structure != null) {
 			logger.exiting(this.getClass().getName(), "loadStructure");
@@ -134,11 +123,16 @@ public class DASStructure_Handler
 	    
 
 		    DASStructureClient dasc= new DASStructureClient(dasstructurecommand);
-		    logger.finest(getTimeStamp() );
-		    logger.finest("getting structure "+pdb_id);	    
-		    structure = dasc.getStructureById(pdb_id);	    
+		    logger.finer("getting structure "+dasstructurecommand + " " +pdb_id);	    
+		    try {
+			structure = dasc.getStructureById(pdb_id);	    			
+		    }
+		    catch (Exception e) {
+			logger.log(Level.WARNING,"could not retreive structure from "+dasstructurecommand ,e);
+			
+		    }
 		    logger.finest("DASStructure_Handler: got structure:");
-		    logger.finest(getTimeStamp() );
+
 		    //logger.finest(structure);
 		    //convertStructureContainer(container,structure);
 		    //container = structure  ;

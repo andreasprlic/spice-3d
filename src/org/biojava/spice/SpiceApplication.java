@@ -179,7 +179,7 @@ public class SpiceApplication
 	
 	
 	LoggingPanel loggingPanel = new LoggingPanel(logger);
-	loggingPanel.getHandler().setLevel(Level.FINEST);
+	loggingPanel.getHandler().setLevel(Level.FINER);
 	loggingPanel.show(null);
 	//ConsoleHandler handler = new ConsoleHandler();
 	//handler.setLevel(Level.FINEST);
@@ -335,10 +335,15 @@ public class SpiceApplication
 	ent_list=new JList(model);
 	EntListCommandListener entact = new EntListCommandListener(this);
 	ent_list.addListSelectionListener(entact);
-	ent_list.setPreferredSize(new Dimension(30,30));
-	ent_list.setSize(30,30);
+	//ent_list.setPreferredSize(new Dimension(30,30));
+	
 
 	JScrollPane chainPanel = new JScrollPane(ent_list);
+	chainPanel.setPreferredSize(new Dimension(30,30));
+	
+	//chainPanel.setSize(30,30);
+
+	//chainPanel.setMinimumSize(new Dimension(30,30));
 	//ent_list.setFixedCellWidth(20);
 	//JScrollPane scrollingList = new JScrollPane(ent_list);
 	//ent_list.setSize(30,180);
@@ -494,7 +499,9 @@ public class SpiceApplication
 	if ( config == null ) {
 	    String msg = "Unable to contact DAS registration service, can not continue!" ;
 	    seq_pos.setText(msg);
+	    logger.log(Level.SEVERE,msg);
 	    System.err.println(msg);
+
 	    return ;
 	    
 	}
@@ -510,7 +517,7 @@ public class SpiceApplication
 	this(pdb1, config_url,registry_url);
 	structureAlignmentMode = true ;
 	pdbcode2 = pdb2 ;
-	System.out.println("finished init of structure alignment");
+	logger.finest("finished init of structure alignment");
 		
     }
 
@@ -520,7 +527,7 @@ public class SpiceApplication
         if (imgURL != null) {
             return new ImageIcon(imgURL);
         } else {
-            System.err.println("Couldn't find file: " + path);
+	    logger.log(Level.WARNING,"Couldn't find file: " + path);
             return null;
         }
     }
@@ -603,6 +610,9 @@ public class SpiceApplication
 	if (logger.isLoggable(Level.FINER)) {
 	    logger.entering(this.getClass().getName(), "getStructure",  new Object[]{pdbcod});
 	}
+
+	logger.log(Level.INFO,"getting new structure "+pdbcod);
+
 	if (logger.isLoggable(Level.FINEST)) {
 	    logger.finest("SpiceApplication: getStructure "+ pdbcod);
 	}
@@ -622,6 +632,7 @@ public class SpiceApplication
     
     public String getToolString(int chainnumber,int seqpos) {
 	Chain chain = getChain(chainnumber);
+	if ( chain == null) return "" ;
 	
 	if ( ! ((seqpos >= 0) && (seqpos < chain.getLength()))) {
 	    return "" ;
@@ -678,8 +689,18 @@ public class SpiceApplication
 	    logger.entering(this.getClass().getName(), "setStructure",  new Object[]{"got structure object"});
 	}
 
+
+
 	first_load = false ;
 	statusPanel.setLoading(false);
+
+	if ( structure_.size() < 1 ){
+	    logger.log(Level.WARNING,"got no structure");
+	    return ;
+	}
+
+
+
 	structure = structure_ ; 
 	
 
@@ -757,11 +778,12 @@ public class SpiceApplication
     }
 
     public void setCurrentChain( int newCurrentChain) {
-	logger.finest("setCurrentChain " + newCurrentChain);
+	logger.finer("setCurrentChain " + newCurrentChain);
 	currentChain = newCurrentChain ;
 	
 	// update features to be displayed ...
 	Chain chain = getChain(currentChain) ;
+	if ( chain == null) return ;
 	String sp_id = chain.getSwissprotId() ;
 	logger.finest("SP_ID "+sp_id);
 	
@@ -770,6 +792,10 @@ public class SpiceApplication
 	ArrayList tmpfeat = getFeaturesFromMemory(sp_id) ;
 	
 	if ( tmpfeat.size() == 0 ) {
+	    if ( isLoading()) {
+		logger.log(Level.WARNING,"already loading data, please wait");
+		return ;
+	    }
 	    getNewFeatures(sp_id) ;
 	} else {
 	    
@@ -785,8 +811,10 @@ public class SpiceApplication
 
     private  void getNewFeatures(String sp_id) {
 	//ArrayList featureservers = getFeatureServers() ;
+
 	Chain chain = getChain(currentChain) ;
-	
+	if ( chain == null) return ;
+	first_load = true ;
 	FeatureFetcher ff = new FeatureFetcher(this,config,sp_id,pdbcode,chain);	
 	ff.start() ;
 	statusPanel.setLoading(true);
@@ -814,12 +842,13 @@ public class SpiceApplication
 	setNewFeatures(tmpfeat);	
 	//SeqFeatureCanvas dascanv = daspanel.getCanv();
 	*/
+
     }
 
     /**  update the currently displayed features */
-    public  void setFeatures(String sp_id, List tmpfeat) {
+    public   void setFeatures(String sp_id, List tmpfeat) {
 	// todo create Feature for structure mapping
-
+	first_load = false ;
 	memoryfeatures.put(sp_id,tmpfeat);
 	statusPanel.setLoading(false);
 	features.clear();
@@ -847,10 +876,27 @@ public class SpiceApplication
 	
 	return arr ;
     }
-    /** retreive info regarding structure */
+    /** get Chain number X from structure 
+     * @return a Chain object or null ;
+     */
     public Chain getChain(int chainnumber) {
-	Chain c = structure.getChain(chainnumber);
+	
+	if ( structure == null ) {
+	    logger.log(Level.WARNING,"no structure loaded, yet");
+	    return null ;
+	}
 
+	if ( structure.size() < 1 ) {
+	    logger.log(Level.WARNING,"structure object is empty, please load new structure");
+	    return null ;
+	}
+	    
+	if ( chainnumber > structure.size()) {
+	    logger.log(Level.WARNING,"requested chain number "+chainnumber+" but structure has size " + structure.size());
+	    return null ;
+	}
+
+	Chain c = structure.getChain(chainnumber);
 	// almost the same as Chain.clone(), here:
 	// browse through all groups and only keep those that are amino acids...
 	ChainImpl n = new ChainImpl() ;
@@ -963,7 +1009,7 @@ public class SpiceApplication
 
     private Group getGroupNext(int chain_number,int startpos, String direction) {
 	Chain chain = getChain(chain_number) ;
-
+	if ( chain == null) return null ;
 
 	while ( (startpos >= 0 ) && (startpos < chain.getLength())){
 	    Group g = chain.getGroup(startpos);	
@@ -982,6 +1028,7 @@ public class SpiceApplication
     /** return a select command that can be send to executeCmd*/
     public String getSelectStr(int chain_number, int start, int end) {
 	Chain chain = getChain(chain_number) ;
+	if ( chain == null) return "" ;
 	String chainid = chain.getName() ;
 	
 	Group gs = getGroupNext( chain_number,(start-1),"incr");
@@ -1028,6 +1075,7 @@ public class SpiceApplication
 
     public String getSelectStrSingle(int chain_number, int seqpos) {
 	Chain chain = getChain(chain_number) ;
+	if ( chain == null) return "" ;
 	
 	if ( ! ((seqpos >= 0) && (seqpos < chain.getLength()))) {
 	    logger.finest("seqpos " + seqpos + "chainlength:" + chain.getLength());
@@ -1266,7 +1314,7 @@ class EntListCommandListener implements ListSelectionListener {
     public void valueChanged(ListSelectionEvent event) {
 	
 	if ( spice.isLoading() ) {
-	    spice.logger.finest("loading data, please be patient");
+	    spice.logger.log(Level.WARNING,"loading data, please be patient");
 	    return ;
 	}
 

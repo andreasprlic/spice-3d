@@ -164,7 +164,7 @@ public class SeqTextPane
     /** select range of residues */
     public void select(int start, int end){
 	//System.out.println("SeqTExtPane select " + start + " "  + end);
-
+	if ( chain == null ) { return ;}
 	StyledDocument doc = this.getStyledDocument();
 	doc.setCharacterAttributes(0,chain.getLength(), this.getStyle("black"),true);
 	doc.setCharacterAttributes(start,(end-start +1), this.getStyle("red"),true);
@@ -174,7 +174,7 @@ public class SeqTextPane
     /** select single residue */
     public void select( int seqpos) {
 	//System.out.println("SeqTExtPane select " + seqpos);
-
+	if ( chain == null ) { return ;}
 	StyledDocument doc = this.getStyledDocument();
 	doc.setCharacterAttributes(0,chain.getLength(), this.getStyle("black"),true);
 	doc.setCharacterAttributes(seqpos,1, this.getStyle("red"),true);
