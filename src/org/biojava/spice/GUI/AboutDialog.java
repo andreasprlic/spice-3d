@@ -26,12 +26,15 @@ package org.biojava.spice.GUI;
 import java.awt.Button;
 import java.awt.Dimension;
 import java.awt.Event;
+import java.awt.event.ActionEvent;
 
+import javax.swing.Box;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.JButton;
 import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
+import javax.swing.JEditorPane;
+import java.awt.event.ActionListener;
 
 /**
  * @author Andreas Prlic
@@ -41,13 +44,27 @@ import javax.swing.JTextPane;
  */
 public class AboutDialog
 	extends JDialog {
-    	
+    	static String VERSION = "0.6-pre2";
+    static String DESCRIPTION_TEXT = "<html><body>"+
+    "<b>The SPICE DAS client</b> V "+ VERSION +" <br>"+
+    "(C) Andreas Prlic, Tim Hubbard <br>"+
+    "The Wellcome Trust Sanger Institute 2005<br>"+
+    "<a href=\"mailto:ap3@sanger.ac.uk\">ap3@sanger.ac.uk</a><p>"+
     
-    static int H_SIZE = 200;
-    static int V_SIZE = 400;
+    " Thanks to the following Projects:<br>"+
+    " <b>Jmol</b> - http://www.jmol.org - for the 3D rendering API  <br>"+
+    " <b>BioJava</b> - http://www.biojava.org - for various libs     <br>"+
+    " <b>Geotools</b> - http://modules.geotools.org/ for the logging panel <br>"+
+    " <b>Nuvola</b> - http://www.icon-king.com - for a couple of icons  <br>"+
+    "</body></html>";
+    
+    static int H_SIZE = 400;
+    static int V_SIZE = 600;
     //JTextField txt ;
     String displayText     ;
-    JTextPane txt         ;
+    
+    JEditorPane txt;
+    
     public AboutDialog(JFrame parent)
     {
 	// Calls the parent telling it this
@@ -58,7 +75,7 @@ public class AboutDialog
 	this.setSize(new Dimension(H_SIZE, V_SIZE)) ;
 	
 	displayText="" ;
-	txt = new JTextPane();
+	txt = new JEditorPane("text/html", DESCRIPTION_TEXT);
 
 	txt.setEditable(false);
 	// Two buttons "Close" and "Help"
@@ -66,31 +83,33 @@ public class AboutDialog
 	JScrollPane scroll = new JScrollPane(txt);
 	//scroll.setPreferredSize(new Dimension(H_SIZE, V_SIZE-50)) ;
 	scroll.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-	JPanel p = new JPanel();
-	p.add("Center",scroll);
+	//JPanel p = new JPanel();
+	//p.add("Center",scroll);
 	//p.add(txt);
-	p.add("Sourth",new Button("Close"));
+	//p.add("Sourth",new Button("Close"));
 	//p.add(new Button("Help"));
 	
+	 Box vBox = Box.createVerticalBox();
+	 vBox.add(scroll);
+	 JButton close = new JButton("Close");
+	 vBox.add(close);
+	 
+	 close.addActionListener(new ActionListener(){
+	     public void actionPerformed(ActionEvent event) {
+	         dispose();
+	     }
+	 });
+	 
 	//add("South", p);
-	this.getContentPane().add(p);
+	this.getContentPane().add(vBox);
+	
 	//this.getContentPane().add(new Button("Close"));
 	
 	//resize(H_SIZE, V_SIZE);
 
     }
     
-    public boolean action(Event evt, Object arg)
-    {
-	// If action label(i.e arg) equals 
-	// "Close" then dispose this dialog
-	if(arg.equals("Close"))
-	    {
-		dispose();
-		return true;
-	    }
-	return super.handleEvent(evt);
-    }
+    
 
     public void setText(String t) {
 	displayText = t ;

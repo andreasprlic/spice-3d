@@ -129,6 +129,8 @@ implements SPICEFrame
     JMenuItem pdbMenu;
     JMenuItem upMenu;
     JMenuItem dastyMenu;
+    JMenuItem proviewMenu;
+    
     //JMenuBar menuBar ;
     JTextField getCom ;
     List knownFeatureLinks;
@@ -691,6 +693,12 @@ implements SPICEFrame
         dasclientsMenu.add(dastyMenu);
         dastyMenu.setEnabled(false);
         
+        proviewMenu = new JMenuItem("Proview");
+        proviewMenu.setMnemonic(KeyEvent.VK_P);
+        proviewMenu.addActionListener(bl);
+        dasclientsMenu.add(proviewMenu);
+        proviewMenu.setEnabled(false);
+        
         // Alignment submenu
         JMenu align = new JMenu("Alignment");
         align.setMnemonic(KeyEvent.VK_A);
@@ -812,6 +820,7 @@ implements SPICEFrame
         pdbMenu.setEnabled(false);
         upMenu.setEnabled(false);
         dastyMenu.setEnabled(false);
+        proviewMenu.setEnabled(false);
     }
     
     
@@ -863,8 +872,7 @@ implements SPICEFrame
         //first_load = false ;
         String mem_id = makeFeatureMemoryCode(sp_id);
         
-        
-
+       
         // TODO: need to move caching of features on a different level.
         // We need to distinguish SP and PDB features...
         // ev. better move cache to FeatureFetcher
@@ -1190,9 +1198,13 @@ implements SPICEFrame
         if (sp_id != null){
             upMenu.setEnabled(true);
             dastyMenu.setEnabled(true);
+            proviewMenu.setEnabled(true);
+            
         } else {
             upMenu.setEnabled(false);
             dastyMenu.setEnabled(false);
+            proviewMenu.setEnabled(false);
+            
             logger.info("no UniProt sequence found for"+chain.getName());
         }
         

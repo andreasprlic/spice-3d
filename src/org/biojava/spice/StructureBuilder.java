@@ -293,8 +293,7 @@ public class StructureBuilder{
         Chain retchain = addChainAlignment(chain,ali);
         //logger.finest(retchain);
         return retchain ;
-        
-        
+              
     } 
     
     /** convert one character amino acid codes into three character

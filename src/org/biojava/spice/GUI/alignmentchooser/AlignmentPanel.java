@@ -122,7 +122,9 @@ public class AlignmentPanel extends SequencePanel {
   
             
             FeatureBlockSequenceRenderer fbr = new FeatureBlockSequenceRenderer();     
-            FeatureRenderer featr = new BasicFeatureRenderer();
+            BasicFeatureRenderer featr = new BasicFeatureRenderer();
+            featr.setOutline(Color.white);
+            //featr.setPaint(Color);
             fbr.setFeatureRenderer(featr);
             bumpR = new BumpedRenderer(fbr);        
             

@@ -42,8 +42,7 @@ implements ActionListener
 {
     
     
-    static String DESCRIPTION_TEXT = "The SPICE Applet. V 0.55 (C) Andreas Prlic, Tim Hubbard\n"+
-    "The Wellcome Trust Sanger Institute 2004 mailto:ap3@sanger.ac.uk";
+    
     static String alloff = "cpk off ; wireframe off ; backbone off; cartoon off ; ribbons off; " ;
     static String reset = "select all; " + alloff;
     static String noselect = "select none; ";
@@ -74,7 +73,7 @@ implements ActionListener
         } else if (cmd.equals("About SPICE")) {
             AboutDialog asd = new AboutDialog((JFrame)parent);
             
-            asd.setText(DESCRIPTION_TEXT) ;
+            //asd.setText(DESCRIPTION_TEXT) ;
             
             asd.show();	    
         } else if ( cmd.equals("Backbone") ){
