@@ -120,7 +120,10 @@ implements SPICEFrame
     JScrollPane seqScrollPane ;
     JSplitPane  seqSplitPane  ;
     SeqTextPane seqField      ;
+    JMenuItem lock;
     JMenuItem unlock;
+    JMenuItem lockMenu;
+    
     JMenu browseMenu;
     JMenuItem pdbMenu;
     JMenuItem upMenu;
@@ -452,7 +455,7 @@ implements SPICEFrame
             mainsharedPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, seqSplitPane,structurePanel);
         
         mainsharedPanel.setOneTouchExpandable(true);
-        mainsharedPanel.setResizeWeight(0.6);
+        //mainsharedPanel.setResizeWeight(0.5);
         //mainsharedPanel.setDividerLocation(150);
         //mainsharedPanel.setPreferredSize(new Dimension(200, 200));
         //mainsharedPanel.setOpaque(true);
@@ -522,11 +525,45 @@ implements SPICEFrame
         menu.add(file);
         
         
-        JMenuItem openpdb = new JMenuItem("Open");
+        JMenuItem openpdb;
+        ImageIcon openIcon = createImageIcon("network.png");
+        if ( openIcon == null)
+            openpdb = new JMenuItem("Open");
+        else
+            openpdb = new JMenuItem("Open", openIcon);
+        
         openpdb.setMnemonic(KeyEvent.VK_O);
-        JMenuItem exit    = new JMenuItem("Exit");
+        
+        JMenuItem save ;
+        ImageIcon saveIcon = createImageIcon("3floppy_unmount.png");
+        if ( saveIcon == null)
+            save = new JMenuItem("Save");
+        else
+            save = new JMenuItem("Save",saveIcon);
+        save.setMnemonic(KeyEvent.VK_S);
+        
+        JMenuItem revert;
+        ImageIcon revertIcon = createImageIcon("revert.png");
+        if (revertIcon == null)
+            revert = new JMenuItem("Load");
+        else
+            revert = new JMenuItem("Load",revertIcon);
+        revert.setMnemonic(KeyEvent.VK_L);
+        
+        ImageIcon exitIcon = createImageIcon("exit.png");
+        JMenuItem exit;
+        if ( exitIcon != null)
+            exit    = new JMenuItem("Exit",exitIcon);
+        else
+            exit    = new JMenuItem("Exit");
         exit.setMnemonic(KeyEvent.VK_X);
-        JMenuItem props   = new JMenuItem("Properties");
+        
+        ImageIcon propIcon = createImageIcon("configure.png");
+        JMenuItem props ;
+        if ( propIcon != null )
+            props   = new JMenuItem("Properties",propIcon);
+        else
+            props   = new JMenuItem("Properties");
         props.setMnemonic(KeyEvent.VK_P);
         
         SpiceMenuListener ml = new SpiceMenuListener(this) ;
@@ -537,7 +574,11 @@ implements SPICEFrame
         
         
         file.add( openpdb );
+        file.add( save    );
+        file.add( revert  );
+        file.addSeparator();
         file.add( props   );
+        file.addSeparator();
         file.add( exit    );
         
         // DIsplay submenu
@@ -548,11 +589,30 @@ implements SPICEFrame
         
         menu.add(display);
         
-        JMenuItem reset   = new JMenuItem("Reset");
+        ImageIcon resetIcon = createImageIcon("reload.png");
+        JMenuItem reset;
+        if ( resetIcon == null)
+            reset   = new JMenuItem("Reset");
+        else
+            reset   = new JMenuItem("Reset",resetIcon);
         reset.setMnemonic(KeyEvent.VK_R);
-        unlock = new JMenuItem("Unlock Selection");
-        unlock.setMnemonic(KeyEvent.VK_U);
-        unlock.setEnabled(selectionLocked);
+        
+        ImageIcon lockIcon = createImageIcon("lock.png");
+        
+        if (lockIcon != null)
+            lock = new JMenuItem("Lock Selection",lockIcon);
+        else
+            lock = new JMenuItem("Lock Selection");
+        
+        ImageIcon unlockIcon = createImageIcon("decrypted.png");
+        if ( unlockIcon == null)
+            unlock = new JMenuItem("Unlock Selection");
+        else
+            unlock = new JMenuItem("Unlock Selection", unlockIcon);
+        
+        lockMenu = unlock;
+        lockMenu.setMnemonic(KeyEvent.VK_U);
+        lockMenu.setEnabled(selectionLocked);
         
         JMenuItem backbone   = new JMenuItem("Backbone");
         JMenuItem wireframe  = new JMenuItem("Wireframe");
@@ -565,7 +625,7 @@ implements SPICEFrame
         JMenuItem colorcpk   = new JMenuItem("Color - cpk");
         
         reset.addActionListener     ( ml );
-        unlock.addActionListener    ( ml );
+        lockMenu.addActionListener    ( ml );
         backbone.addActionListener  ( ml );
         wireframe.addActionListener ( ml );	
         cartoon.addActionListener   ( ml );
@@ -577,7 +637,7 @@ implements SPICEFrame
         
         
         display.add( reset   );
-        display.add( unlock  );
+        display.add( lockMenu  );
         display.addSeparator();
         
         display.add( backbone   );
@@ -635,7 +695,13 @@ implements SPICEFrame
         help.getAccessibleContext().setAccessibleDescription("get help");
         menu.add(help);
         
-        JMenuItem aboutspice = new JMenuItem("About SPICE");
+        ImageIcon helpIcon = createImageIcon("help.png");
+        
+        JMenuItem aboutspice;
+        if ( helpIcon == null )
+            aboutspice = new JMenuItem("About SPICE");
+        else
+            aboutspice = new JMenuItem("About SPICE",helpIcon);
         aboutspice.addActionListener  ( ml );
         help.add(aboutspice);
         
@@ -820,7 +886,15 @@ implements SPICEFrame
                     continue ;
                 
                 JMenuItem item = new JMenuItem("open in browser "+ f.getName());
-                ActionListener bl = new BrowseMenuListener(this,link);                    
+                URL u;
+                try {
+                    u = new URL(link)
+                } catch (MalformedURLException e){
+                    // if somebody e.g. provides the accession code 
+                    // instead of a proper url in the link field...
+                    continue;
+                }
+                ActionListener bl = new BrowseMenuListener(this,u);                    
                 item.addActionListener(bl);
                 browseMenu.add(item);
                 knownFeatureLinks.add(link);
@@ -1124,7 +1198,7 @@ implements SPICEFrame
     
     public void setSelectionLocked(boolean status) {
         selectionLocked = status ;
-        unlock.setEnabled(selectionLocked);     
+        lockMenu.setEnabled(selectionLocked);     
     }
     
     public boolean isSelectionLocked() {
