@@ -237,8 +237,8 @@ public class DAS_SequenceRetreive {
 		
 		//huc = proxyUrl.openConnection();
 		
-		logger.finer("opening "+url);
-		huc = (HttpURLConnection) url.openConnection();
+		//logger.finer("opening "+url);
+		huc = org.biojava.spice.SpiceApplication.openHttpURLConnection(url);
 		
 		
 		logger.finest(huc.getResponseMessage());

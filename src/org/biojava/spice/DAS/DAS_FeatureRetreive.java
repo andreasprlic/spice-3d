@@ -34,7 +34,7 @@ import org.xml.sax.*                        ;
 import java.util.ArrayList                  ;
 import java.util.logging.*                  ;
 import java.net.HttpURLConnection           ;
-
+import java.lang.reflect.*;
 
 /**
  * A class to perform a DAS features request
@@ -146,10 +146,7 @@ public class DAS_FeatureRetreive {
 	InputStream inStream = null;
 
 				
-	HttpURLConnection huc = null;
-	logger.finest("opening "+url);
-	huc = (HttpURLConnection) url.openConnection();
-	
+	HttpURLConnection huc = org.biojava.spice.SpiceApplication.openHttpURLConnection(url);
 	
 	logger.finest("got connection: "+huc.getResponseMessage());
 	//String contentEncoding = huc.getContentEncoding();
