@@ -353,7 +353,7 @@ public class SeqFeatureCanvas
 		cmd += spice.getSelectStr(current_chainnumber,start-1);
 		cmd += "colour cpk; spacefill on;";
 		cmd += spice.getSelectStr(current_chainnumber,end-1);
-		cmd += "colour cpk; spacefill on";
+		cmd += "colour cpk; spacefill on;";
 		
 	    } else {
 		cmd += spice.getSelectStr(current_chainnumber,start,end);
