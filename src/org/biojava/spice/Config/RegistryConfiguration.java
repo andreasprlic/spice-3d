@@ -45,25 +45,26 @@ import java.awt.Frame ;
 import java.awt.event.*    ;
 
 
-import javax.swing.JTabbedPane;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-import javax.swing.JLabel;
-import javax.swing.BoxLayout;
-import javax.swing.JComponent;
-import javax.swing.JTable;
-import javax.swing.JProgressBar;
+import javax.swing.JTabbedPane            ;
+import javax.swing.ImageIcon              ;
+import javax.swing.JLabel                 ;
+import javax.swing.JPanel                 ;
+import javax.swing.JFrame                 ;
+import javax.swing.JScrollPane            ;
+import javax.swing.JLabel                 ;
+import javax.swing.BoxLayout              ;
+import javax.swing.JComponent             ;
+import javax.swing.JTable                 ;
+import javax.swing.JProgressBar           ;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.event.TableModelEvent;
-import javax.swing.BorderFactory;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.event.KeyEvent;
+import javax.swing.event.TableModelEvent  ;
+import javax.swing.BorderFactory          ;
+import java.awt.BorderLayout              ;
+import java.awt.Dimension                 ;
+import java.awt.GridLayout                ;
+import java.awt.event.KeyEvent            ;
 
+import java.text.SimpleDateFormat         ;
 import java.text.DateFormat               ;
 import java.util.Date                     ;
 
@@ -346,7 +347,8 @@ public class RegistryConfiguration
 
 	// last contact with registry
 	xw.openTag("lastContact");
-	DateFormat df = DateFormat.getDateInstance();
+	DateFormat df = new SimpleDateFormat("dd.MM.yyyy"); 
+	//	DateFormat df = DateFormat.getDateInstance();
 	String lcontact = df.format(lastContact);
 	xw.attribute("date",lcontact);
 	xw.closeTag("lastContact");

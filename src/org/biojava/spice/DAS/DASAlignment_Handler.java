@@ -428,15 +428,18 @@ public class DASAlignment_Handler extends Thread
 	    //System.out.println(strustart + " " + struend);
 	} catch (Exception e) {
 	    // if this does not work  there is an insertion code
+
+
 	    // -> segment must be of size one.
 	    //  alignment from seq to structure HAS TO BE provided as a one to one mapping
 	   
 	    //System.out.println("CAUGHT!!!!! conversion of >"+ (String)arr[1].get("start") + "<") ;
-
+	    //e.printStackTrace();
 
 	    if ( segsize != 1 ) {
-		throw new DASException(" alignment is not a 1:1 mapping! -> this does not work!");		
+		throw new DASException(" alignment is not a 1:1 mapping! there is an insertion code -> this does not work!");		
 	    }
+	    
 	    String pdbcode = (String)arr[1].getProperty("start") ;
 	    if ( pdbcode.equals("-")) {
 		// not mapped ...

@@ -338,6 +338,8 @@ public class DAS_PDBFeeder
 	throw new DASException("no chain with ID >"+ chainID +"< found");
     }
 
+
+    /** find the group that has PDBCode pdbcode in Chain mapped_chain */
     private Group getMatchingGroup(Chain mapped_chain,String pdbcode) 
 	throws DASException
     {
@@ -351,9 +353,9 @@ public class DAS_PDBFeeder
 	    String pdbtmp = amino.getPDBCode();
 	    if (pdbtmp == null) continue ;
 	    if (pdbtmp.equals(pdbcode)){
-		return amino ;
-	    }
-	}
+		return amino ; 
+	    } 
+	} 
 	
 	// can happen aat N terminal MET that is not aligned . e.g. pdb 103m
 	throw new DASException("no aminoacid found with pdbcode >"+pdbcode+"<");

@@ -50,10 +50,10 @@ public class ConfigXMLHandler extends DefaultHandler {
     public ConfigXMLHandler() {
 	super();
 	
-	config       = new RegistryConfiguration();
-	source       = null ;
-	extensions   = new ArrayList();
-	coords       = new ArrayList();
+	config         = new RegistryConfiguration();
+	source         = null ;
+	extensions     = new ArrayList();
+	coords         = new ArrayList();
 	capabs         = new ArrayList();
 	possibleCapabs = new ArrayList();
 	myDateFormat   = new SimpleDateFormat("dd.MM.yyyy");
@@ -142,6 +142,7 @@ public class ConfigXMLHandler extends DefaultHandler {
 	} else if ( qName.equals("SpiceDasSource")) {
 	    String[] exts = (String[])extensions.toArray(new String[extensions.size()]);
 	    config.setPDBFileExtensions(exts);
+	} else if ( qName.equals("SpiceConfig")){
 	    String[] c =  (String[])possibleCapabs.toArray(new String[possibleCapabs.size()]);
 	    config.setCapabilities(c);
 	}

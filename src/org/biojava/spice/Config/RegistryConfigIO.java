@@ -59,6 +59,7 @@ import javax.swing.JLabel                  ;
 import javax.swing.BoxLayout               ;
 import javax.swing.JComponent              ;
 import javax.swing.JTable                  ;
+import javax.swing.table.TableColumn       ;
 import javax.swing.JProgressBar            ;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.event.TableModelEvent   ;
@@ -724,9 +725,9 @@ class TabbedPaneDemo extends JPanel {
 		if ( list.getMaxSelectionIndex() > 3) {
 		    list.setSelectedIndex(4);
 		}
-		list.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
+		list.setMaximumSize(new Dimension(Short.MAX_VALUE,60));
 		JScrollPane jsp = new JScrollPane(list);
-		jsp.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
+		jsp.setMaximumSize(new Dimension(Short.MAX_VALUE,60));
 		jsp.setViewportView(list);
 		vBoxRight.add(jsp);
 		entryFormFields.add(list);
@@ -776,7 +777,15 @@ class TabbedPaneDemo extends JPanel {
 
 	dasSourceTable  = new JTable(dasSourceTableModel);
 
-	
+	// Disable auto resizing
+	//dasSourceTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+    
+	// Set the first visible column to 100 pixels wide
+	int vColIndex = colNames.length -2;
+	TableColumn col = dasSourceTable.getColumnModel().getColumn(vColIndex);
+	int width = 50;
+	col.setPreferredWidth(width);
+
 
 	// Configure some of JTable's paramters
 	dasSourceTable.setShowHorizontalLines( false );

@@ -992,7 +992,8 @@ public class SpiceApplication
 	Chain chain = getChain(chain_number) ;
 	
 	if ( ! ((seqpos >= 0) && (seqpos < chain.getLength()))) {
-	   return "" ;
+	    System.out.println("seqpos " + seqpos + "chainlength:" + chain.getLength());
+	    return "" ;
 	}
 	//SeqFeatureCanvas dascanv = daspanel.getCanv();
 	dascanv.highlite(chain_number,seqpos);

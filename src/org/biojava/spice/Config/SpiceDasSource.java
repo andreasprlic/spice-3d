@@ -30,7 +30,10 @@ import java.io.PrintWriter                ;
 import java.io.StringWriter               ;
 import java.io.IOException                ;
 import java.text.DateFormat               ;
+import java.text.SimpleDateFormat         ;
 
+
+/** Manages all data about a DAS source that SPICE requires */
 public class SpiceDasSource
     extends DasSource 
 
@@ -75,8 +78,8 @@ public class SpiceDasSource
 	//xw.attribute("description",getDescription());
 	xw.attribute("status",""+status);
 	xw.attribute("registered",""+registered);
-
-	DateFormat df = DateFormat.getDateInstance();
+	DateFormat df = new SimpleDateFormat("dd.MM.yyyy"); 
+	//DateFormat df = DateFormat.getDateInstance();
 	String rds = df.format(getRegisterDate());
 	String lds = df.format(getLeaseDate());
 	xw.attribute("registerDate",rds);
