@@ -259,7 +259,7 @@ public class SpiceApplication
 	file.add(exit);
 	
 	aboutspice = new MenuItem("About SPICE");
-	aboutdas = new MenuItem("About DAS");
+	aboutdas = new MenuItem("About 3D-DAS");
 
 	//aboutspice.addActionListener(this);
 	//aboutdas.addActionListener(this);
@@ -399,7 +399,7 @@ public class SpiceApplication
 
 
 	strucommand = new JTextField()  ;
-	strucommand.setText("enter command...");
+	strucommand.setText("enter RASMOL like command...");
 	ActionListener listener = new StructureCommandListener(this,strucommand) ;
 	strucommand.addActionListener(listener);
 	strucommand.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
@@ -1210,7 +1210,7 @@ public class SpiceApplication
 	    //asd.setText("DAS homepage: http://www.biodas.org") ;
 	    //asd.show();
 	     AboutDialog asd = new AboutDialog(this);
-	     asd.setText("DAS homepage: http://www.biodas.org") ;
+	     asd.setText("3D-DAS homepage: http://protodas.derkholm.net) ;
 	     asd.show();
 	    
 	    return true;
@@ -1373,13 +1373,21 @@ class OpenDialog extends Dialog
 	//TextFieldListener txtlisten = new TextFieldListener(parent,getCom);
 	//getCom.addActionListener(txtlisten);
 
+	getCom.addActionListener(new ActionListener()  {
+		public void actionPerformed(ActionEvent e) {
+		    String pdbc = e.getActionCommand();
+		    if ( pdbc.length() == 4 ) {
+			spice.getStructure(pdbc);
+			dispose();	
+		    }
+		}
+	    });
+
 	p.add(getCom);
 	p.add(new Button("Open"));
 	p.add(new Button("Cancel"));
 	add(p);
 	resize(H_SIZE, V_SIZE);
-
-
     }
     
     public boolean action(Event evt, Object arg)
@@ -1400,8 +1408,10 @@ class OpenDialog extends Dialog
 		}
 		//System.out.println("open" + getCom.getText());
 		String pdbcod = getCom.getText();
-		spice.getStructure(pdbcod);
-		dispose();
+		if ( pdbcod.length() == 4 ) {
+		    spice.getStructure(pdbcod);
+		    dispose();
+		}
 		return true;	
 	    }
 
