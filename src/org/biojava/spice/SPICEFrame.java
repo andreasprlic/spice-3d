@@ -72,7 +72,7 @@ public interface SPICEFrame  {
     public void setCurrentChain(int chainnr);
 
     /** retrieve configuration for DAS servers to use */    
-    public Map getConfiguration();
+    public RegistryConfiguration getConfiguration();
   
 
     /** highighting of range of residues */

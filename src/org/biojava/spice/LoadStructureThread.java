@@ -24,8 +24,12 @@
 package org.biojava.spice ;
 
 import java.awt.Color ;
-import org.biojava.bio.structure.Structure ;
+
 import java.util.Map ;
+import java.util.List ;
+
+import org.biojava.bio.structure.Structure ;
+import org.biojava.services.das.registry.DasSource;
 
 public class LoadStructureThread 
     extends Thread {
@@ -60,17 +64,21 @@ public class LoadStructureThread
    
 
     public String getStructureServer(){
-	Map config = spiceframe.getConfiguration();
-	Map strucconfig = (Map) config.get("structureserver");
-	String u = (String) strucconfig.get("url");
+	RegistryConfiguration config = spiceframe.getConfiguration();
+	//Map strucconfig = (Map) config.get("structureserver");
+	List servers = config.getServers("structure","PDBresnum");
+	DasSource ds = (DasSource)servers.get(0);
+	String u = ds.getUrl();
 
 	return   u;
     }
 
     public String getSequenceServer() {
-	Map config = spiceframe.getConfiguration();
-    	Map h = (Map) config.get("sequenceserver");
-	String u = (String) h.get("url");
+	RegistryConfiguration config = spiceframe.getConfiguration();
+	//Map strucconfig = (Map) config.get("structureserver");
+	List servers = config.getServers("sequence","UniProt");
+	DasSource ds = (DasSource)servers.get(0);
+	String u = ds.getUrl();	
     	return   u;
     }
 
@@ -78,15 +86,22 @@ public class LoadStructureThread
     public String getAlignmentServer() 
 	throws ConfigurationException
     {
-	Map config = spiceframe.getConfiguration();
-    	Map h = (Map) config.get("alignmentserver");
-	if ( h == null) {
-	    String msg = "No Alignment Server configured! unable to provide alignment";
-	    throw new ConfigurationException(msg);
-	    
-	}
-    	String u = (String) h.get("url");
+
+	RegistryConfiguration config = spiceframe.getConfiguration();
+	//Map strucconfig = (Map) config.get("structureserver");
+	List servers = config.getServers("alignment");
+	DasSource ds = (DasSource)servers.get(0);
+	String u = ds.getUrl();
     	return   u;
+	//Map config = spiceframe.getConfiguration();
+    	//Map h = (Map) config.get("alignmentserver");
+	//if ( h == null) {
+	//  String msg = "No Alignment Server configured! unable to provide alignment";
+	//  throw new ConfigurationException(msg);
+	    
+	//}
+    	//String u = (String) h.get("url");
+
     }
 
     public synchronized void loadCompound() {

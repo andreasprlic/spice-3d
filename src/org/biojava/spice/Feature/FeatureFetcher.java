@@ -47,7 +47,7 @@ public class FeatureFetcher extends Thread
     boolean finished ;
     String spId ;
     String pdbId ;
-    Map spiceconfig ;
+    RegistryConfiguration spiceconfig ;
     List allFeatures ;
     DasResponse[] subthreads ;
     Chain chain ;
@@ -60,7 +60,7 @@ public class FeatureFetcher extends Thread
      * @param pdb_id PDB ID
      * @param c Chain object to which these features should be linked
      */
-    public FeatureFetcher(SPICEFrame spice, Map config, String sp_id, String pdb_id, Chain c ) {
+    public FeatureFetcher(SPICEFrame spice, RegistryConfiguration config, String sp_id, String pdb_id, Chain c ) {
 	parent      = spice ;
 	finished    = false ;
 	spId        = sp_id ;
@@ -111,8 +111,9 @@ public class FeatureFetcher extends Thread
 	
 	finished = false ;
 	// contact sequence feature servers
-	ArrayList featservs   = (ArrayList) spiceconfig.get("featureservers");
-	ArrayList pdbresservs = (ArrayList) spiceconfig.get("pdbresfeatureservers");
+	List featservs    =  spiceconfig.getServers("features","UniProt");
+	List pdbresservs  =  spiceconfig.getServers("features","PDBresnum");
+	
 	
 	int nrservers = featservs.size() + pdbresservs.size();
 	System.out.println("total: " + nrservers + "feature servers");

@@ -109,7 +109,7 @@ public class SpiceApplication
 
     static String XMLVALIDATION = "false" ;   
     static String INIT_SELECT = "select all; cpk off ; wireframe off ; backbone on ; colour chain;select not protein and not solvent;spacefill 2.0;";
-    Map config      ;
+    RegistryConfiguration config      ;
     Structure structure ; 
     String pdbcode      ;
     String pdbcode2     ; // only set if displaying structure alignments 
@@ -174,7 +174,7 @@ public class SpiceApplication
 	
 	// first thing is to start communication
 
-	RegistryConfiguration regi = new RegistryConfiguration (REGISTRY_URL);
+	RegistryConfigIO regi = new RegistryConfigIO (REGISTRY_URL);
 	regi.run();
 
 	structure = null ;
@@ -572,7 +572,7 @@ public class SpiceApplication
     }
     */
 
-    public Map getConfiguration() {
+    public RegistryConfiguration getConfiguration() {
 	return config ;
     }
 
@@ -600,9 +600,8 @@ public class SpiceApplication
 
 
     /** return the feature servers */
-    private ArrayList getFeatureServers() {
-	ArrayList featconfig = (ArrayList) config.get("featureservers");
-	return featconfig ;
+    private List getFeatureServers() {
+	return config.getServers("feature");
     }
 
 
@@ -1118,7 +1117,7 @@ public class SpiceApplication
 
 	if ( event.target == props) {
 	    System.out.println("modify properties");
-	    RegistryConfiguration regi = new RegistryConfiguration(REGISTRY_URL) ;
+	    RegistryConfigIO regi = new RegistryConfigIO(REGISTRY_URL) ;
 	    regi.run();
 	    regi.showConfigFrame();
 		
