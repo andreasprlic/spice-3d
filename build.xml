@@ -437,8 +437,8 @@
 
 <target name="war" depends="package-spice">
     <signjar jar="${build.dir}/${name.spice}.jar" 
-	     alias="protodas" 
-	     storepass="Kan0n3"/> 
+	     alias="" 
+	     storepass=""/> 
 
       <war 	destfile="spice.war" 
       		webxml="${webapp.dir}/WEB-INF/web.xml" 		
