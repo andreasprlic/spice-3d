@@ -23,7 +23,7 @@
  */
 
 
-package org.biojava.spice ;
+package org.biojava.spice.Feature ;
 
 import java.util.Comparator ;
 import java.util.Map ;

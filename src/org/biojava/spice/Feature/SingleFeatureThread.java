@@ -22,8 +22,9 @@
  *
  */
 
-package org.biojava.spice ;
+package org.biojava.spice.Feature ;
 
+import org.biojava.spice.DAS.*		   ;
 import java.util.logging.*             ;
 import java.util.Map                   ;
 import java.util.HashMap               ;

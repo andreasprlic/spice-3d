@@ -22,13 +22,13 @@
  *
  */
 
-package org.biojava.spice ;
+package org.biojava.spice.Feature ;
 
 import java.awt.Color ;
 
 
 /** a class to keep track of location information for a feature */
-class Segment {
+public class Segment {
     int start   ;
     int end     ;
     String name ;

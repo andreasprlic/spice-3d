@@ -23,8 +23,10 @@
  *
  */
 
-package org.biojava.spice ;
+package org.biojava.spice.Feature ;
 
+import org.biojava.spice.SPICEFrame    ;
+import org.biojava.spice.Config.*    ;
 import java.util.Map                   ;
 import java.util.HashMap               ;
 import java.util.List                  ;
