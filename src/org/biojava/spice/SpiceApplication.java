@@ -42,6 +42,7 @@ import java.io.InputStream ;
 import java.util.Properties;
 import java.util.HashMap   ;
 import java.util.ArrayList ;
+import java.util.List ;
 import java.util.Map ;
 
 // to get config file via http
@@ -50,7 +51,22 @@ import java.net.URL;
 import java.io.IOException ;
 
 // gui
-import java.awt.*          ;
+import java.awt.Dialog          ;
+import java.awt.Dimension          ;
+import java.awt.Color          ;
+import java.awt.MenuItem          ;
+import java.awt.Menu          ;
+import java.awt.MenuBar          ;
+import java.awt.Graphics          ;
+import java.awt.Frame          ;
+import java.awt.Button          ;
+import java.awt.Panel          ;
+import java.awt.BorderLayout       ;
+import java.awt.FlowLayout ;
+import java.awt.Event ;
+import java.awt.TextField ;
+import java.awt.ScrollPane ;
+
 import java.awt.event.*    ;
 import javax.swing.JFrame  ;
 import javax.swing.JPanel  ;
@@ -82,7 +98,8 @@ public class SpiceApplication
     //public static final String CONFIG_FILE = "config.xml";
     URL CONFIG_URL      ; 
     URL REGISTRY_URL    ;
-    
+
+    static String XMLVALIDATION = "false" ;   
     static String INIT_SELECT = "select all; cpk off ; wireframe off ; backbone on ; colour chain;select not protein and not solvent;spacefill 2.0;";
     Map config      ;
     Structure structure ; 
@@ -91,7 +108,7 @@ public class SpiceApplication
 
     int currentChain = -1 ;
     HashMap memoryfeatures; // all features in memory
-    ArrayList features ;    // currently being displayed 
+    List features ;    // currently being displayed 
 
 
     //  the GUI:
@@ -129,6 +146,8 @@ public class SpiceApplication
 
     SpiceApplication(String pdbcode_, URL config_url, URL registry_url) {
 	super();
+
+	System.setProperty("XMLVALIDATION",XMLVALIDATION);
 
 	CONFIG_URL   = config_url ;
 	REGISTRY_URL = registry_url ;
@@ -242,16 +261,19 @@ public class SpiceApplication
 	ent_list.repaint();
 
 	
-	
+	//ScrollPane scroll = new ScrollPane();
 
 	dascanv=new SeqFeatureCanvas(this);       
 	dascanv.setForeground(new Color(255, 255, 255));
 	dascanv.setBackground(new Color(0, 0, 0));
 	dascanv.setSize(700,300);
 	
+	//scroll.add(dascanv);
+
 	sharedPanel = new JPanel();
 	sharedPanel.setLayout(new BoxLayout(sharedPanel, BoxLayout.X_AXIS));
 	sharedPanel.add(leftPanel,BorderLayout.EAST);
+	//sharedPanel.add(scroll,BorderLayout.WEST);
 	sharedPanel.add(dascanv,BorderLayout.WEST);
 	sharedPanel.setMaximumSize(new Dimension(Short.MAX_VALUE,300));
 	this.add(sharedPanel,BorderLayout.SOUTH);
@@ -631,9 +653,8 @@ public class SpiceApplication
 	if ( tmpfeat.size() == 0 ) {
 	    getNewFeatures(sp_id) ;
 	} else {
-	    try { 
-		setNewFeatures(tmpfeat);
-	    } catch (Exception e) {e.printStackTrace();} ;
+	    
+	    setNewFeatures(tmpfeat);	    
 	    dascanv.setChain(chain,currentChain);
 	}
 	
@@ -661,121 +682,18 @@ public class SpiceApplication
 	}
 	
 	ArrayList tmpfeat = (ArrayList) ff.getFeatures();
+	System.out.println("got new features: " + tmpfeat);
 	memoryfeatures.put(sp_id,tmpfeat);
-	try {
-	    setNewFeatures(tmpfeat);
-	} catch (Exception e) {e.printStackTrace();} ;
-	
+	setNewFeatures(tmpfeat);	
 	dascanv.setChain(chain,currentChain);
     }
 
     /**  update the currently displayed features */
     private void setNewFeatures(ArrayList tmpfeat) {
+
 	features.clear();
-
-		
-	//features = new ArrayList();
-	boolean secstruc = false ;
-	String prevtype = "@prevtype" ;
-	boolean first = true ;
-	Feature feat  = null ;
-
-	for (int i = 0 ; i< tmpfeat.size();i++) {
-	    HashMap segment = (HashMap) tmpfeat.get(i);
-	    // small bugfix, but just fights a cause,not the real symptom.
-	    if ( segment == null ) { continue ; }
-	    String type = (String) segment.get("TYPE") ;
-		    
-	    if ( type.equals("reference")){
-		continue ;
-	    }
-		    
-	    if ( ! type.equals(prevtype)){
-		// a new feature!
-		//System.out.println(type + " " + prevtype);
-
-		if (! first) 
-		    {
-				
-			/*
-			  System.out.println(type + " " +(
-			  type.equals("HELIX")  || 
-			  type.equals("STRAND") || 
-			  type.equals("TURN")  
-			  ));
-			*/
-			if ( ! secstruc ) {
-				    
-				   
-			    //System.out.println("adding feature " + feat);
-			    features.add(feat);
-				    
-			} else if ( ! 
-				    (
-				     type.equals("HELIX")  || 
-				     type.equals("STRAND") || 
-				     type.equals("TURN")  
-				     ) 
-				    )
-			    {
-				secstruc = false ;
-				//System.out.println("adding feature " + feat);
-				features.add(feat);
-			    }
-		    }
-		    
-		first = false ;				
-		if ( ! secstruc) {
-		    feat = new Feature();
-		}
-			
-	    }
-		    
-	    if (type.equals("STRAND")){
-		secstruc = true ;
-		segment.put("color",Color.yellow);
-		segment.put("colorTxt","yellow");
-		feat.setName("SECSTRUC");
-	    }
-		    
-	    else if (type.equals("HELIX")) {
-		secstruc = true ;
-		segment.put("color",Color.red);
-		segment.put("colorTxt","red");
-		feat.setName("SECSTRUC");
-	    }	
-
-	    else if (type.equals("TURN")) {
-		secstruc = true ;
-		segment.put("color",Color.white);
-		segment.put("colorTxt","white");
-		feat.setName("SECSTRUC");
-	    } 
-
-	    else {
-		secstruc = false ;
-		segment.put("color",entColors[i%entColors.length]);
-		segment.put("colorTxt",txtColor[i%entColors.length]);
-		try {
-		    feat.setName(type);
-		} catch ( NullPointerException e) {
-		    //e.printStackTrace();
-		    feat.setName("null");
-		}
-	    }
-		    
-		    
-	    feat.addSegment(segment);
-	    prevtype = type;
-	}
-
-	if ( ! (feat==null))  features.add(feat);
-
-
-	//System.out.println("repainting segdas ");
+	features = tmpfeat ;
 	this.paint(this.getGraphics());
-
-
     }
 
     // store all features in memory -> speed up
@@ -1014,77 +932,7 @@ public class SpiceApplication
     }
 
     
-
-
-    private class OldFeatureFetcher extends Thread {
    
-
-    
-	private ArrayList featureservers ;
-	private boolean done ;
-	private ArrayList features ;
-	private String sp_id ;
-
-	OldFeatureFetcher (ArrayList featservers,String spid ) 
-	{
-	    featureservers = featservers ;
-	    done = false ;
-	    features = new ArrayList();
-	    sp_id = spid ;
-	}
-
-	public void run() {
-	    retreive() ;
-	}
-	public boolean isDone(){
-	    //System.out.println("featurefetcher:" +done);
-	    return done ;
-	}
-
-	public ArrayList getFeatures(){
-	    return features;
-	}
-	public synchronized void retreive() {
-	    
-	    try {
-		done = false;
-		/// at the moment  only servers serving in sp coordinates is allowed ..		
-		for ( int f =0;f<featureservers.size();f++) {	    
-		    HashMap featureserver = (HashMap) featureservers.get(f) ;
-		    
-		    // String queryString = "http://das.ensembl.org/das/swissprot/features?segment="+ sp_id ;
-		    String url = (String) featureserver.get("url");
-		    String queryString = url + "features?segment="+ sp_id ;
-		    
-		    System.out.println("contacting DAS server to retreive features @ " + queryString) ;
-		    notifyAll();
-		    
-		    URL spUrl = new URL(queryString);
-		    DAS_FeatureRetreive ftmp = new DAS_FeatureRetreive(spUrl);
-		    
-		    ArrayList tmp = ftmp.get_features();
-		    for (int i=0; i<tmp.size();i++){
-			HashMap feat = (HashMap)tmp.get(i);			
-			//System.out.println("got feature: "+feat);
-			features.add(feat) ;		
-		    } 
-		    notifyAll();
-
-
-		}
-		done = true;
-	    } catch ( Exception e) {
-		e.printStackTrace();
-	    }
-	    notifyAll();
-	    
-
-	}
- 
-
-
-
-    }
 
     /** Event handling */
     public boolean handleEvent(Event event) 

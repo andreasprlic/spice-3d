@@ -24,15 +24,21 @@
 package org.biojava.spice;
 
 import org.biojava.bio.structure.Chain ;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Canvas;
+import java.awt.Image;
+import java.awt.Dimension;
+import java.awt.Event;
 
-
+import java.util.List ;
 import java.util.ArrayList ;
 import java.util.HashMap ;
 
 import java.io.* ;
 import java.util.Iterator ;
-
+import java.util.Date ;
+import java.util.Calendar ;
 //import ToolTip.* ;
 
 /**
@@ -47,6 +53,8 @@ public class SeqFeatureCanvas extends Canvas
     public static final int    DEFAULT_Y_STEP   = 10 ;
     public static final int    DEFAULT_Y_HEIGHT = 4 ;
 
+    public static final int    TIMEDELAY        = 0 ;
+    
     // the master application
     SPICEFrame spice ;
 
@@ -63,15 +71,16 @@ public class SeqFeatureCanvas extends Canvas
 	
     float scale ;
 	
-    ArrayList features ;
+    List drawLines ;
+    //ArrayList features ;
     Chain chain ;
 	
 	
     //mouse events
-
+    Date lastHighlight ;
     // highliting
     int seqOldPos ;
-	
+    
 
     /**
      * 
@@ -84,7 +93,8 @@ public class SeqFeatureCanvas extends Canvas
 	imbuf=null; 
 	imbufDim = new Dimension(-1, -1);
 	spice = spicefr;
-	features = new ArrayList();
+	//features = new ArrayList();
+	drawLines = new ArrayList();
 	chain = null ;
 		
 	entColors = new Color [7];
@@ -95,7 +105,8 @@ public class SeqFeatureCanvas extends Canvas
 	entColors[4] = Color.orange;
 	entColors[5] = Color.pink;
 	entColors[6] = Color.cyan;
-		
+	
+	lastHighlight = new Date();
 				
 	current_chainnumber = -1 ;
 	seqOldPos = -1 ;
@@ -103,34 +114,103 @@ public class SeqFeatureCanvas extends Canvas
     }
 
 
-    public void setFeatures( ArrayList feats) {
-	//System.out.println("DasCanv setFeatures");
-	features = feats ;
+    public void setFeatures( List feats) {
+	System.out.println("DasCanv setFeatures");
+	//features = feats ;
+	// check if features are overlapping, if yes, add to a new line 
+
+	drawLines          = new ArrayList();
+	List currentLine   = new ArrayList();
+	Feature oldFeature = new Feature();
+	boolean start      = true ;
+	
+	for (int i=0; i< feats.size(); i++) {
+	    Feature feat = (Feature)feats.get(i);
+	    System.out.println(feat);
+	    if (oldFeature.getType().equals(feat.getType())){
+		// see if they are overlapping
+		if ( overlap(oldFeature,feat)) {
+		    System.out.println("OVERLAP found!" + oldFeature+ " "+ feat);
+		    drawLines.add(currentLine);
+		    currentLine = new ArrayList();
+		    currentLine.add(feat);
+		    oldFeature = feat ; 
+		} else {
+		    // not overlapping, they fit into the same line
+		    System.out.println("same line" +  oldFeature+ " "+ feat);
+		    currentLine.add(feat);
+		    oldFeature = feat ;
+		}
+	    } else {
+		// a new feature type has been found
+		// always put into a new line
+		if ( ! start ) {
+		    drawLines.add(currentLine);
+		    currentLine = new ArrayList();
+		}
+		start = false;
+		currentLine.add(feat);
+		oldFeature = feat ;
+	    }
+	}
+
+	drawLines.add(currentLine);
+	
+	imbuf = null ;
 	this.paint(this.getGraphics());
 
     }
     
+    // an overlap occurs if any of the segments overlap ...
+
+    private boolean overlap (Feature a, Feature b) {
+	List segmentsa = a.getSegments() ;
+	List segmentsb = b.getSegments();
+
+	for ( int i =0; i< segmentsa.size();i++) {
+	    Segment sa = (Segment)segmentsa.get(i) ;
+	    int starta = sa.getStart();
+	    int enda   = sa.getEnd();
+		
+	    for (int j = 0; j<segmentsb.size();j++){
+		Segment sb = (Segment)segmentsb.get(j) ;
+		
+		// compare boundaries:
+		int startb = sb.getStart();
+		int endb   = sb.getEnd();
+
+		// overlap!
+		if  (( starta <= endb ) && ( enda >= startb)) 
+		    return true ;		
+		if  (( startb <= enda ) && ( endb >= starta))
+		    return true ;
+		
+	    }
+	}
+	return false ;
+    }
+
     public void setChain(Chain c,int chainnumber) {
 	chain = c;
 	current_chainnumber = chainnumber ;
+	this.paint(this.getGraphics());
     }
     
 
     /** select a single segment */
-    private void selectSegment (HashMap segment) {
+    private void selectSegment (Segment segment) {
+	/*
 	System.out.println("select Segment");
 
 	// clicked on a segment!
-	Color col = (Color) segment.get("color");
+	Color col =  segment.getColor();
 	//seqColorOld = col ;
 	//spice.setOldColor(col) ;
 	
-	String fstart  = (String)segment.get("START") ;
-	String fend    = (String)segment.get("END") ;
-	int start = Integer.parseInt(fstart)-1 ;
-	int end   = Integer.parseInt(fend)-1 ;
+	int start  = segment.getStart() ;
+	int end    = segment.getEnd() ;
 	
-	String type = (String) segment.get("TYPE") ;
+	String type =  segment.getType() ;
 	if ( type.equals("DISULFID")){
 	    System.out.println("selectSegment DISULFID " + (start+1) + " " + (end+1));
 	    
@@ -145,25 +225,25 @@ public class SeqFeatureCanvas extends Canvas
 	    spice.select(current_chainnumber,start+1,end+1);
     	    
 	}
+	*/
     }
 
     /** highlite a single segment */
-    private void highliteSegment (HashMap segment) {
-	//System.out.println("highlite Segment");
-
+    private void highliteSegment (Segment segment) {
+	System.out.println("highlite Segment");
+	System.out.println("segment");
+	
 	// clicked on a segment!
-	String col = (String) segment.get("colorTxt");
+	String col =  segment.getTxtColor();
 	//seqColorOld = col ;
 	//spice.setOldColor(col) ;
 	
-	String fstart  = (String)segment.get("START") ;
-	String fend    = (String)segment.get("END") ;
-	//System.out.println("fstart:"+fstart+" fend:"+fend);
-	int start = Integer.parseInt(fstart) ;
-	int end   = Integer.parseInt(fend) ;
+
+	int start = segment.getStart();
+	int end   = segment.getEnd()  ;
 	start = start -1 ;
 	end   = end   -1 ;
-	String type = (String) segment.get("TYPE") ;
+	String type =  segment.getParent().getType() ;
 	System.out.println(start+" " + end+" "+type);
 	System.out.println(segment);
 	if ( type.equals("DISULFID")){
@@ -182,26 +262,28 @@ public class SeqFeatureCanvas extends Canvas
 	} else {
 	    spice.colour(current_chainnumber,start+1  ,end+1  ,col);	    
 	}
+	
     }
 
     /** highlite all segments of a feature */
-    private void highliteFeature(int featurenr){
+    private void highliteFeature(Feature feature){
 	//System.out.println("highlite feature " + featurenr);
-	Feature feature = (Feature) features.get(featurenr) ;
-		
-	ArrayList segments = feature.getSegments() ;
+	//Feature feature = (Feature) features.get(featurenr) ;
+	System.out.println("highlite feature " + feature);
+	
+	List segments = feature.getSegments() ;
 	String cmd = "" ;
+	
 	for ( int i =0; i< segments.size() ; i++ ) {
-	    HashMap segment = (HashMap) segments.get(i);
+	    Segment segment = (Segment) segments.get(i);
 	    //highliteSegment(segment);
 
-	    String fstart  = (String)segment.get("START") ;
-	    String fend    = (String)segment.get("END") ;
-	    int start = Integer.parseInt(fstart)  ;
-	    int end   = Integer.parseInt(fend) ;
+	    int start = segment.getStart();
+	    int end   = segment.getEnd();
 	    //System.out.println("highilte feature " +featurenr+" " + start + " " +end );
+	    
 	    cmd += spice.getSelectStr(current_chainnumber,start,end);
-	    String col = (String) segment.get("colorTxt");
+	    String col = segment.getTxtColor();
 	    cmd += "color "+ col +";";
 	    //if ( start == end ) {
 	    //cmd += " spacefill on;";
@@ -209,6 +291,7 @@ public class SeqFeatureCanvas extends Canvas
 	}
 	System.out.println("cmd: "+cmd);
 	spice.executeCmd(cmd);
+	
     }
 
 
@@ -248,7 +331,7 @@ public class SeqFeatureCanvas extends Canvas
 	if ( chain == null   ) return ;
 	//System.out.println("PAINTINGDAS!!!") ;
 		
-	//System.out.println("DasCAnv - paint");
+	System.out.println("DasCanv - paint");
 	Dimension dstruc=this.getSize();
 
 	if(!imbufDim.equals(dstruc)) spice.scale();
@@ -257,7 +340,7 @@ public class SeqFeatureCanvas extends Canvas
 	    imbuf=this.createImage(dstruc.width, dstruc.height);
 	    imbufDim = dstruc;
 	}
-		
+	
 	Graphics gstruc=imbuf.getGraphics();
 	
 	Color bg=this.getBackground();
@@ -301,55 +384,50 @@ public class SeqFeatureCanvas extends Canvas
 	int aminosize = Math.round(1 * scale) ;
 
 	boolean secstruc = false ;
-	for (int i = 0 ; i< features.size();i++) {
+	for (int i = 0 ; i< drawLines.size();i++) {
 	    //System.out.println(i%entColors.length);
 	    //gstruc.setColor(entColors[i%entColors.length]);
 
 	    y = y + DEFAULT_Y_STEP ;
-	    Feature feature = (Feature) features.get(i);
+
+	    List features = (List) drawLines.get(i) ;
+	    for ( int f =0 ; f< features.size();f++) {
+		Feature feature = (Feature) features.get(f);
 	    	    
-	    //String type = (String)feature.get("TYPE") ;
-	    //System.out.println("type "+type);
-			
-	    //if ( type.equals("reference")){
-	    ///	continue ;
-	    //}
-			
-	    //String featid = (String) feature.get("id");
-	    //System.out.println(featid);
-	    ArrayList segments = feature.getSegments() ;
 	    
-	    // draw text
-	    HashMap seg0 = (HashMap) segments.get(0) ;
-	    Color col = (Color) seg0.get("color");	
-   	    gstruc.setColor(col);
-
-	    gstruc.drawString(feature.getName(), 1,y+DEFAULT_Y_HEIGHT);
+		List segments = feature.getSegments() ;
 	    
-	    for (int s=0; s<segments.size();s++){
-		HashMap segment=(HashMap) segments.get(s);
-		String fstart = (String)segment.get("START") ;
-		String fend   = (String)segment.get("END") ;
-		int start     = Integer.parseInt(fstart) -1 ;
-		int end       = Integer.parseInt(fend)   -1 ;
-
-		col = (Color) segment.get("color");
+		// draw text
+		Segment seg0 = (Segment) segments.get(0) ;
+		Color col =  seg0.getColor();	
 		gstruc.setColor(col);
-
-		int xstart =  java.lang.Math.round(start * scale) + DEFAULT_X_START;
-		int width   = java.lang.Math.round(end * scale) - xstart +  DEFAULT_X_START+aminosize ;
-
-		int height = DEFAULT_Y_HEIGHT ;
-		//System.out.println(feature+ " " + end +" " + width);
-		//System.out.println("color"+entColors[i%entColors.length]);
-		//System.out.println("new feature  ("+i+"): x1:"+ xstart+" y1:"+y+" width:"+width+" height:"+height);
-		String type = (String) segment.get("TYPE") ;
-		if ( ! type.equals("DISULFID")){
-		    gstruc.fillRect(xstart,y,width,height);
-		} else {
-		    gstruc.fillRect(xstart,y,aminosize,height);
-		    gstruc.fillRect(xstart,y+(height/2),width,1);
+		
+		gstruc.drawString(feature.getName(), 1,y+DEFAULT_Y_HEIGHT);
+		
+		for (int s=0; s<segments.size();s++){
+		    Segment segment=(Segment) segments.get(s);
+		    
+		    int start     = segment.getStart()-1 ;
+		    int end       = segment.getEnd()  -1 ;
+		    
+		    col = segment.getColor();
+		    gstruc.setColor(col);
+		    
+		    int xstart =  java.lang.Math.round(start * scale) + DEFAULT_X_START;
+		    int width   = java.lang.Math.round(end * scale) - xstart +  DEFAULT_X_START+aminosize ;
+		    
+		    int height = DEFAULT_Y_HEIGHT ;
+		    //System.out.println(feature+ " " + end +" " + width);
+		    //System.out.println("color"+entColors[i%entColors.length]);
+		    //System.out.println("new feature  ("+i+"): x1:"+ xstart+" y1:"+y+" width:"+width+" height:"+height);
+		    String type = feature.getType() ;
+		    if ( ! type.equals("DISULFID")){
+			gstruc.fillRect(xstart,y,width,height);
+		    } else {
+			gstruc.fillRect(xstart,y,aminosize,height);
+			gstruc.fillRect(xstart,y+(height/2),width,1);
 		    gstruc.fillRect(xstart+width-aminosize,y,aminosize,height);
+		    }
 		}
 	    }
 	}
@@ -367,68 +445,83 @@ public class SeqFeatureCanvas extends Canvas
      * To change the template for this generated type comment go to
      * Window - Preferences - Java - Code Generation - Code and Comments
      */
-    private int get_featurenr(int mouseY){
+    private int getLineNr(int mouseY){
 		
 	float top = mouseY - DEFAULT_Y_START +1 ;
 	// java.lang.Math.round((y-DEFAULT_Y_START)/ (DEFAULT_Y_STEP + DEFAULT_Y_HEIGHT-1));
 	float interval  = DEFAULT_Y_STEP  ;
 		
-	int featurenr = java.lang.Math.round(top/interval) -1 ;
+	int linenr = java.lang.Math.round(top/interval) -1 ;
 	//System.out.println("top "+top+" interval "+ interval + " top/interval =" + (top/interval) );	
-	if ( featurenr >= features.size()){
+	if ( linenr >= drawLines.size()){
 	    // can happen at bottom part
 	    // simply skip it ...
 	    return -1;
 	}
 			
-	return featurenr ;
+	return linenr ;
 			
+    }
+
+    private Feature getFeatureAt(int seqpos, int lineNr){
+	System.out.println("getFeatureAt " + seqpos + " " + lineNr);
+	Segment s = getSegmentUnder(seqpos,lineNr);
+	if (s == null ) 
+	    return null;
+	
+	return s.getParent();
+	
     }
 
 
     /** check if mouse is over a segment and if it is, return the segment */
-    private HashMap getSegmentUnder(int featurenr, int seqpos){
-	if ( ( featurenr < 0) || ( featurenr >= features.size() ) ){
+    private Segment getSegmentUnder( int seqpos,int lineNr){
+
+	if ( ( lineNr < 0) || ( lineNr >= drawLines.size() ) ){
 	    return null ;
 	}
-	Feature feature = (Feature) features.get(featurenr) ;
-	
-	
-	ArrayList segments = feature.getSegments() ;
-	for ( int i =0; i< segments.size() ; i++ ) {
-	    
-	    HashMap segment = (HashMap) segments.get(i);
-	    
-	    String fstart = (String)segment.get("START") ;
-	    String fend   = (String)segment.get("END") ;
-	    
-	    int start = Integer.parseInt(fstart) -1 ;
-	    int end   = Integer.parseInt(fend)-1 ;
-	    
-	    if ( (start <= seqpos) && (end >= seqpos) ) {
-		return segment ;
+
+	List features = (List) drawLines.get(lineNr);
+
+	for ( int i =0; i<features.size();i++ ){
+	    Feature feature = (Feature) features.get(i) ;
+	    List segments = feature.getSegments() ;
+	    for ( int j =0; j< segments.size() ; j++ ) {
+		
+		Segment segment = (Segment) segments.get(j);
+		int start = segment.getStart() -1 ;
+		int end   = segment.getEnd()   -1 ;
+		
+		if ( (start <= seqpos) && (end >= seqpos) ) {
+		    return segment ;
+		}
 	    }
 	}
 	return null ;
     }
+    
 
     /** create a tooltip string */
-    private String getToolString(int seqpos, HashMap segment){
+    private String getToolString(int seqpos, Segment segment){
 	// current position is seqpos
 	String toolstr = spice.getToolString(current_chainnumber,seqpos);
 	
-	String method  = (String)segment.get("METHOD") ;
-	String note    = (String)segment.get("NOTE") ;
-	String fstart  = (String)segment.get("START") ;
-	String fend    = (String)segment.get("END") ;
-	int start = Integer.parseInt(fstart) -1 ;
-	int end   = Integer.parseInt(fend)-1 ;
+	System.out.println("getToolString");
 	
-	 toolstr += " " + method + " start " + start + " end " + end + " Note:" + note;
+	Feature parent = segment.getParent() ;
+	String method  = parent.getMethod() ;
+	String type    = parent.getType() ;
+	String note    = parent.getNote() ;
+	
+	int start = segment.getStart() -1 ; 
+	int end   = segment.getEnd()   -1 ; 
+	
+	 toolstr += " " + type + " start " + start + " end " + end + " Note:" + note; 
 	//System.out.println(toolstr);
 		
 	//new ToolTip(toolstr, this);
 	//this.repaint();
+	
 	return toolstr ;
 
     }
@@ -446,29 +539,50 @@ public class SeqFeatureCanvas extends Canvas
     {	
 	int seqpos =  java.lang.Math.round((x-DEFAULT_X_START)/scale) ;
 		
-	int featurenr = get_featurenr(y); 
+	int linenr   = getLineNr(y);
+	
+       
+	//int featurenr = get_featurenr(y); 
 
-	if ( featurenr < 0 ) return true;
+	if ( linenr < 0 ) return true;
 	if ( seqpos    < 0 ) return true; 
 
 	//String drstr = "x "+ seqpos + " y " + featurenr ;
 
 	//g.drawString(drstr,5,13);
-
+	
 	spice.showSeqPos(current_chainnumber,seqpos);
 	//spice.showStatus(drstr);
+	
+	
 
 	
 	// and the feature display
 	
-	HashMap segment = getSegmentUnder(featurenr,seqpos);
+	Feature feature = getFeatureAt(seqpos,linenr);
+
+	Segment segment = getSegmentUnder(seqpos,linenr);
 	if ( segment != null) {
 	    String toolstr = getToolString(seqpos,segment);
 	    //gfeat.drawString(toolstr,5,13);
 	    spice.showStatus(toolstr) ;
 	}
 
-	spice.select(current_chainnumber,seqpos);
+
+	// add a new Thread that highlites the position of the mouse every two seconds.
+	
+	
+	// add a time delay for repainting the bar
+	Date currentTime = new Date();
+	long timediff = currentTime.getTime() - lastHighlight.getTime() ;
+	System.out.println("timediff:" + timediff);
+	if ( timediff  > TIMEDELAY) {
+	    System.out.println("highliting");
+	    highlite(current_chainnumber,seqpos);	    
+	    spice.select(current_chainnumber,seqpos);
+	    lastHighlight = currentTime ;
+	}
+
 	
 	return true ;
     }
@@ -477,18 +591,24 @@ public class SeqFeatureCanvas extends Canvas
     public boolean mouseUp(Event e, int x, int y)
     {
 
+	int seqpos =  java.lang.Math.round((x-DEFAULT_X_START)/scale)  ;		
+	int lineNr    = getLineNr(y);
 	
+	//int featurenr = get_featurenr(y) ;
+	//System.out.println("CLICK! "+seqpos + " " +featurenr+ " " + chain.getLength());
 	
-	int seqpos =  java.lang.Math.round((x-DEFAULT_X_START)/scale)  ;
-		
-	int featurenr = get_featurenr(y) ;
-	System.out.println("CLICK! "+seqpos + " " +featurenr+ " " + chain.getLength());
-	if ( featurenr < 0 ) return true;
+	if ( lineNr < 0 ) return true;
 	if ( seqpos    < 0 ) {
 	    // check if the name was clicked
 	    if (nameClicked(x)){
 		// highlight all features in the line
-		highliteFeature(featurenr);
+		//Feature feature = getFeatureAt(seqpos,lineNr);
+		List features = (List) drawLines.get(lineNr);
+		for ( int i=0; i<features.size(); i++) {
+		    Feature feature = (Feature) features.get(i);
+		    highliteFeature(feature);
+		    
+		}
 		return true ;
 	    }
 	} 
@@ -496,12 +616,12 @@ public class SeqFeatureCanvas extends Canvas
 	
 	if ( seqpos    > chain.getLength()) return true; 
 
-	String drstr = "x "+ seqpos + " y " + featurenr ;
+	String drstr = "x "+ seqpos + " y " + lineNr ;
 
 	spice.showStatus(drstr);
 
 	
-	HashMap segment = getSegmentUnder(featurenr,seqpos);
+	Segment segment = getSegmentUnder(seqpos,lineNr);
 	//System.out.println(segment);
 	if (segment != null ) {
 	

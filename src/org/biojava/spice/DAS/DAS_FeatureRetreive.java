@@ -87,20 +87,26 @@ public class DAS_FeatureRetreive {
 			    e.printStackTrace();
 			}
 	
+			String vali = System.getProperty("XMLVALIDATION");
+			boolean validation = false ;
+			if ( vali.equals("true") ) {
+			    validation = true ;
+			}
+			
 			XMLReader xmlreader = saxParser.getXMLReader();
 			
 			//XMLReader xmlreader = XMLReaderFactory.createXMLReader();
 			try {
-			    xmlreader.setFeature("http://xml.org/sax/features/validation", true);
+			    xmlreader.setFeature("http://xml.org/sax/features/validation", validation);
 			} catch (SAXException e) {
-			    System.err.println("Cannot activate validation."); 
+			    System.err.println("Cannot set validation " + validation); 
 			}
 			
 			try {
-			    xmlreader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",true);
+			    xmlreader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",validation);
 			} catch (SAXNotRecognizedException e){
 			    //e.printStackTrace();
-			    System.err.println("Cannot activate load-external-dtd."); 
+			    System.err.println("Cannot set load-external-dtd "+validation); 
 			    
 			}
 			

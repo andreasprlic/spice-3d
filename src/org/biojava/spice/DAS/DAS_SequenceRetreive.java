@@ -76,8 +76,12 @@ public class DAS_SequenceRetreive {
 
 	    SAXParserFactory spfactory =
 		SAXParserFactory.newInstance();
-			
-	    spfactory.setValidating(true);
+	    
+	    String vali = System.getProperty("XMLVALIDATION");
+	    boolean validate = false ;
+	    if ( vali.equals("true") ) 
+		validate = true ;
+	    spfactory.setValidating(validate);
 			
 	    SAXParser saxParser = null ;
 			
@@ -91,21 +95,21 @@ public class DAS_SequenceRetreive {
 	    XMLReader xmlreader = saxParser.getXMLReader();
 			
 	    try {
-		xmlreader.setFeature("http://xml.org/sax/features/validation", true);
+		xmlreader.setFeature("http://xml.org/sax/features/validation", validate);
 	    } catch (SAXException e) {
-		System.err.println("Cannot activate validation."); 
+		System.err.println("Cannot set validation to " + validate); 
 	    }
 			
 	    try {
-		xmlreader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",true);
+		xmlreader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",validate);
 	    } catch (SAXNotRecognizedException e){
 		//e.printStackTrace();
-		System.err.println("Cannot activate load-external-dtd."); 
+		System.err.println("Cannot set load-external-dtd to" + validate); 
 	    }
 
 
-	    DAS_DNA_Handler cont_handle = new DAS_DNA_Handler() ;
-	    //DAS_Sequence_Handler cont_handle = new DAS_Sequence_Handler() ;
+	    //DAS_DNA_Handler cont_handle = new DAS_DNA_Handler() ;
+	    DAS_Sequence_Handler cont_handle = new DAS_Sequence_Handler() ;
 	    xmlreader.setContentHandler(cont_handle);
 	    xmlreader.setErrorHandler(new org.xml.sax.helpers.DefaultHandler());
 	    InputSource insource = new InputSource() ;

@@ -89,7 +89,7 @@ public class LoadStructureThread
 	    spiceframe.showStatus("Loading...Wait...",Color.red);
 	    
 	    String dasstructurecommand = getStructureServer() + "structure?model=1&query=";
-	    String dassequencecommand  = getSequenceServer()  + "dna?segment=";
+	    String dassequencecommand  = getSequenceServer()  + "sequence?segment=";
 	    //String dassequencecommand  = spiceframe.getSequenceServer()  + "sequence?segment=";
 	    String dasalignmentcommand = getAlignmentServer() + "alignment?query=" ;
 	    
