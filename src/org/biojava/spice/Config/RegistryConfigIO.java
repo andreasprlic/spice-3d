@@ -338,7 +338,8 @@ class ButtonListener
 
 
 class TabbedPaneDemo extends JPanel {
-    static String[] colNames= new String [] {"url","coordinateSystems","adminemail","capabilities","description","public","active"};
+    //static String[] colNames= new String [] {"url","coordinateSystems","adminemail","capabilities","description","public","active"};
+    static String[] colNames= new String [] {"url","coordinateSystems","capabilities","public","active"};
 
     RegistryConfiguration config       ;
     RegistryConfigIO registryIO        ;
@@ -508,6 +509,7 @@ class TabbedPaneDemo extends JPanel {
 	    JTextField txt1 = new JTextField(col);
 	    txt1.setEditable(false);
 	    txt1.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
+	    txt1.setBorder(BorderFactory.createEmptyBorder());
 	    vBoxLeft.add(txt1);
 
 	    if (col.equals("coordinateSystems")) {
@@ -738,7 +740,7 @@ class TabbedPaneDemo extends JPanel {
     public void saveConfiguration() {
 	System.out.println("saving config");
 	int pos = tabbedPane.getSelectedIndex();
-	System.out.println("index: " + pos);
+	System.out.println("active tab: " + pos);
 
 	// save overall registry
 	if ( pos == 0 ) {

@@ -135,8 +135,13 @@ public class RegistryConfiguration
 		setStatus(i,status);
 		// test if server in active list, if not, add
 		if ( status) {
-		    activeservers.add(ds);
-		}
+		    if ( ! activeservers.contains(ds)){
+			activeservers.add(ds);
+		    }
+		} else {
+		    // remove from active servers ...
+		    removeFromActive(ds);
+		} 
 		return ;
 	    }
 	}
@@ -151,8 +156,11 @@ public class RegistryConfiguration
 	if ( ! status) {
 	    // remove from active servers ...
 	    removeFromActive(m);
+	} else {
+	    if ( ! activeservers.contains(m)){
+		activeservers.add(m);
+	    }
 	}
-	
     }
     
     public boolean getStatus(int serverpos) {
@@ -232,13 +240,16 @@ public class RegistryConfiguration
     /** remove a server from the list of active servers */
     private void removeFromActive(SpiceDasSource ds) {
 	String serverurl = ds.getUrl();
+	activeservers.remove(ds);
+	/*
 	ListIterator iter = activeservers.listIterator();
 	while (iter.hasNext()) {
-	    SpiceDasSource sds = (SpiceDasSource) iter.next();
-	    if (sds.getUrl().equals(serverurl));
-	    iter.remove();
-	    return ;	    
+	SpiceDasSource sds = (SpiceDasSource) iter.next();
+	if (sds.getUrl().equals(serverurl));
+	iter.remove();
+	return ;	    
 	}	
+	*/
     }
 
 }
