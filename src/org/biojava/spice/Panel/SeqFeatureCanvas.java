@@ -166,6 +166,7 @@ public class SeqFeatureCanvas
 
 
     public void setFeatures( List feats) {
+	logger.entering(this.getClass().getName(), "setFeatures",  new Object[]{" features size: " +feats.size()});
 	//logger.finest("DasCanv setFeatures");
 	//features = feats ;
 	// check if features are overlapping, if yes, add to a new line 
@@ -352,6 +353,8 @@ public class SeqFeatureCanvas
 	} else if (type.equals("METAL") ){
 	    spice.highlite(current_chainnumber,start+1,end+1  ,"cpk");
 	    
+	} else if ( type.equals("MSD_SITE")) {
+	    spice.highlite(current_chainnumber,start+1,end+1  ,"wireframe");	    
 	} else if ( (end - start) == 0 ) {
 	    // feature of size 1
 	    spice.highlite(current_chainnumber,start+1,start+1  ,"cpk");	     
@@ -398,6 +401,8 @@ public class SeqFeatureCanvas
 	     ( feature.getType().equals("ACT_SITE")) 	     
 	       ){
 	    cmd += " spacefill on; " ;
+	} else if ( feature.getType().equals("MSD_SITE") ) {
+	    cmd += " wireframe on; " ;
 	}
 		    
 	//logger.finest("cmd: "+cmd); 
