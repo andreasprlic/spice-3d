@@ -167,8 +167,7 @@ public class SeqFeatureCanvas extends Canvas
 	System.out.println(start+" " + end+" "+type);
 	System.out.println(segment);
 	if ( type.equals("DISULFID")){
-	    //spice.highlite(current_chainnumber,start+1,start+1,"cpk");
-	    //spice.highlite(current_chainnumber,end+1  ,end+1  ,"cpk"); 
+
 	    String pdb1 = spice.getSelectStrSingle(current_chainnumber,start);
 	    String pdb2 = spice.getSelectStrSingle(current_chainnumber,end);
 	    String cmd = "select "+pdb1 +", " + pdb2 + "; spacefill on; colour cpk;" ;
@@ -187,6 +186,7 @@ public class SeqFeatureCanvas extends Canvas
 
     /** highlite all segments of a feature */
     private void highliteFeature(int featurenr){
+	System.out.println("highlite feature " + featurenr);
 	Feature feature = (Feature) features.get(featurenr) ;
 		
 	ArrayList segments = feature.getSegments() ;
@@ -194,10 +194,12 @@ public class SeqFeatureCanvas extends Canvas
 	for ( int i =0; i< segments.size() ; i++ ) {
 	    HashMap segment = (HashMap) segments.get(i);
 	    //highliteSegment(segment);
+
 	    String fstart  = (String)segment.get("START") ;
 	    String fend    = (String)segment.get("END") ;
-	    int start = Integer.parseInt(fstart) -1 ;
-	    int end   = Integer.parseInt(fend)-1 ;
+	    int start = Integer.parseInt(fstart)  ;
+	    int end   = Integer.parseInt(fend) ;
+	    System.out.println("highilte feature " +featurenr+" " + start + " " +end );
 	    cmd += spice.getSelectStr(current_chainnumber,start,end);
 	    String col = (String) segment.get("colorTxt");
 	    cmd += "color "+ col +";";
