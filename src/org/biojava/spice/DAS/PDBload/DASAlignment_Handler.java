@@ -22,7 +22,7 @@
  *
  */
 
-package org.biojava.spice.DAS                          ;
+package org.biojava.spice.DAS.PDBload                  ;
 
 import org.biojava.spice.Config.*                      ;
 import org.biojava.bio.structure.*                     ;
@@ -37,7 +37,7 @@ import org.biojava.bio.*                               ;
 
 import java.util.*                                     ;
 import java.util.logging.*                             ;
-
+import org.biojava.spice.DAS.*                         ;
 
 /** connects to a UniPro to PDB alignment service and
  * creates a structure object that corresponds to a UniProt +

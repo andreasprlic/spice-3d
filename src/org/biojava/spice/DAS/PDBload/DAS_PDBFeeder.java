@@ -21,7 +21,7 @@
  * @author Andreas Prlic
  *
  */
-package org.biojava.spice.DAS;
+package org.biojava.spice.DAS.PDBload;
 
 
 import org.biojava.spice.Config.*;
@@ -41,6 +41,7 @@ import java.util.List 							;
 import java.util.Calendar                      	;
 import java.util.logging.*                     	;
 
+import org.biojava.spice.DAS.* ;
 
 
 

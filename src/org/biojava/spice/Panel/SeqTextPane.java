@@ -25,19 +25,14 @@ package org.biojava.spice.Panel;
 
 import org.biojava.spice.SPICEFrame ;
 import javax.swing.JTextPane              ;
-import java.awt.Dimension                 ;
 import java.awt.event.MouseListener       ;
 import java.awt.event.MouseMotionListener ;
 import java.awt.event.MouseEvent          ;
 import javax.swing.text.*                 ;
 import java.awt.Color                     ;
 import org.biojava.bio.structure.Chain    ;
-import java.awt.Graphics                  ;
-import javax.swing.text.Document          ;
-import javax.swing.text.Element           ;
 import java.awt.Point                     ;  
 import java.awt.event.KeyEvent            ;
-import java.awt.event.KeyListener         ;
 import java.awt.event.KeyAdapter          ;
 import java.util.logging.*                ;
 import java.util.List                     ;
@@ -307,7 +302,7 @@ class ISearchListener
 	if ( start != -1 ) {
 	    lasthit = start ;
 	    // highlite text
-	    int chainnr = spice.getCurrentChain();
+	    int chainnr = spice.getCurrentChainNumber();
 	    spice.highlite(chainnr,start,start+searchtext.length()-1);
 	} else {
 	    logger.finest("no substring " + searchtext + " found");

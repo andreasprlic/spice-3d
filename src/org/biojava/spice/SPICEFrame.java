@@ -30,6 +30,7 @@ import org.biojava.bio.structure.Chain;
 
 import java.awt.Color ;
 import java.util.List ;
+import java.net.URL  ;
 
 
 
@@ -83,10 +84,10 @@ public interface SPICEFrame  {
     public void setFeatures(String sp_id, List features);
 
     /** set the chain nr chainnr as the active one */
-    public void setCurrentChain(int chainnr);
+    public void setCurrentChainNumber(int chainnr);
     
     /** get the chain nr of the currently active chain */
-    public int getCurrentChain() ;
+    public int getCurrentChainNumber() ;
   
     /** retreive the chainNumber by PDB character
 	@param PDB code for chain
@@ -147,6 +148,9 @@ public interface SPICEFrame  {
     /** show Config */
     public void showConfig();
 
+    /** display an URL in the browser that started SPICE */
+    public boolean showURL(URL url);
+    
     // color management
     public void setOldColor(Color c) ;
 

@@ -23,7 +23,7 @@
  */
 package org.biojava.spice ;
 
-import org.biojava.spice.DAS.* ;
+import org.biojava.spice.DAS.PDBload.* ;
 import java.awt.Color ;
 
 

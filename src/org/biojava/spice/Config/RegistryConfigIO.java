@@ -35,7 +35,7 @@ import java.util.Map                       ;
 import java.util.List                      ;
 
 // for DAS registration server:
-import org.biojava.services.das.registry.* ;
+import org.biojava.services.das.dasregistry.* ;
 
 import org.biojava.spice.SPICEFrame   	   ;
 import org.biojava.spice.SpiceApplication  ;
@@ -276,7 +276,7 @@ public class RegistryConfigIO
 	ImageIcon icon = createImageIcon("spice.png");
 	progressFrame.setIconImage(icon.getImage());
 
-	progressFrame.setDefaultLookAndFeelDecorated(false);
+	JFrame.setDefaultLookAndFeelDecorated(false);
 	//progressFrame.setUndecorated(true);
 
 	JPanel panel = new JPanel();
@@ -441,7 +441,9 @@ class MenuListener
     SPICEFrame spice             ;
     static Logger    logger      = Logger.getLogger("org.biojava.spice");
     
-    public MenuListener( SPICEFrame spice_, JTable tab,RegistryConfiguration conf,TabbedPaneDemo tabd ){
+    public MenuListener( SPICEFrame spice_, 
+            JTable tab,RegistryConfiguration conf,
+            TabbedPaneDemo tabd ){
 	table  = tab  ;
 	config = conf ;
 	parent = tabd  ;
@@ -990,7 +992,7 @@ class TabbedPaneDemo extends JPanel {
 	dasSourceTable.addMouseListener(popupListener);
 					 
 	// Add the table to a scrolling pane
-	JScrollPane seqscrollPane = dasSourceTable.createScrollPaneForTable( dasSourceTable );
+	JScrollPane seqscrollPane = JTable.createScrollPaneForTable( dasSourceTable );
 
 	seqscrollPane.setBorder(dasborder1);
 	

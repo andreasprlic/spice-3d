@@ -35,14 +35,8 @@ import org.biojava.bio.structure.Chain ;
 import org.biojava.bio.structure.Group ;
 import org.biojava.bio.structure.Atom ;
 
-import org.biojava.bio.seq.ProteinTools                ;
-import org.biojava.bio.seq.io.SymbolTokenization       ;
-import org.biojava.bio.symbol.Alphabet                 ;
-import org.biojava.bio.symbol.Symbol                   ;
-import org.biojava.bio.symbol.IllegalSymbolException   ;
 import org.biojava.bio.*                               ;
 
-import java.awt.Color							;
 import java.io.*								;
 import java.util.Iterator 						;
 import java.util.ArrayList 						;
@@ -67,8 +61,6 @@ public class DAS_UniProtFeeder
     Structure pdb_container ; // used for alignment
     Structure pdb_structure ; // retreived from DAS structure requres
     
-
-    //String dassequencecommand ;
     String dasalignmentcommand ;
 
     boolean structureDone ;
@@ -76,22 +68,12 @@ public class DAS_UniProtFeeder
     Logger logger        ;
 
     
-
-    //public DAS_PDBFeeder( String struccommand,String seqcommand, String aligcommand) {
     public DAS_UniProtFeeder( RegistryConfiguration configuration) {
 	logger = Logger.getLogger("org.biojava.spice");
 
 	config = configuration ;
 
 	
-
-	//List seqservers = config.getServers("sequence","UniProt");
-	//SpiceDasSource ds = (SpiceDasSource)seqservers.get(0);
-	
-	//dassequencecommand  = ds.getUrl()  + "sequence?segment=";
-
-
-
 	pdb_container =  new StructureImpl();
 	pdb_structure =  new StructureImpl();
 
@@ -110,77 +92,13 @@ public class DAS_UniProtFeeder
     }
 
 
-    private  Alignment[] getAlignments(String uniprotcode) {
-	logger.finest("searching for alignments of "+uniprotcode+" against PDB");
-	Alignment[] alignments = null ;
 
-	List aligservers = config.getServers("alignment");
-	logger.finest("found " + aligservers.size() + " alignment servers");
-
-	dasalignmentcommand = null  ;
-	
-	// loop over all available alignment servers 
-	for ( int i =0 ; i < aligservers.size() ; i++ ) {
-	    SpiceDasSource sds= (SpiceDasSource)aligservers.get(i);
-	   
-	    logger.finest("investigating " + sds.getUrl());
-	    //System.out.println("investigating" + sds.getUrl());
-	    // only consider those serving uniprot and PDB alignments
-	    if ( config.isSeqStrucAlignmentServer(sds) ) {
-		
-		
-		String url = sds.getUrl() ;
-		char lastChar = url.charAt(url.length()-1);		 
-		if ( ! (lastChar == '/') ) 
-		    url +="/" ;
-		dasalignmentcommand  = url +  "alignment?query=" ;
-
-		logger.info("contacing alignment server " + dasalignmentcommand+uniprotcode);
-		//System.out.println("contacing alignment server " + dasalignmentcommand);
-		DASAlignmentClient dasc= new DASAlignmentClient(dasalignmentcommand);
-		
-		try{
-		    alignments = dasc.getAlignments(uniprotcode);
-		    
-		    logger.finest("DASAlignmentHandler: got "+ alignments.length +" alignment(s):");
-		    if ( alignments.length == 0 ) {
-			// check next alignment server ...
-			continue ;
-		    }
-		    return alignments ;
-		} catch (Exception e) {
-		    e.printStackTrace();
-		}
-	    }
-	}
-	
-	    
-
-	logger.log(Level.SEVERE,"no UniProt - PDBresnum alignment found!, unable to map sequence to structure");
-	
-	
-
-	return null ;
-    }
-    
-    private String getPDBCodeFromAlignment(Alignment ali) {
-	Annotation[] objects = ali.getObjects();
-	for (int i =0 ; i<objects.length;i++) {
-	    Annotation object = objects[i];
-	    String dbCoordSys = (String)object.getProperty("dbCoordSys");
-
-	    if ( dbCoordSys.equals("PDBresnum") ) {		
-		return (String)object.getProperty("dbAccessionId") ;
-	    }
-	}
-	
-	return null ;
-    }
 
     
     public synchronized Structure loadUniProt(String uniprotcode)
 	throws FileNotFoundException, IOException {
 	Structure struc = new StructureImpl();
+	AlignmentTools aligTools = new AlignmentTools(config);
 	try {
 	    
 	    logger.finest("in DAS_UniProtFeeder ...");
@@ -188,7 +106,7 @@ public class DAS_UniProtFeeder
 	    // get matching pdb codes
 	    // by making DAS_Alignment request
 
-	    Alignment[] alignments = getAlignments(uniprotcode);
+	    Alignment[] alignments = aligTools.getAlignments(uniprotcode);
 
 	    if ( alignments == null ) {
 		// aargh catch exception ...	
@@ -208,7 +126,7 @@ public class DAS_UniProtFeeder
 	    for ( int i = 0 ; i< alignments.length ; i++ ) {
 
 		ali = alignments[i];
-		pdbcode = getPDBCodeFromAlignment(ali);
+		pdbcode = aligTools.getPDBCodeFromAlignment(ali);
 		if ( pdbcode.equals("null"))
 		     continue ;
 		if ( pdbcode != null )

@@ -47,6 +47,20 @@ import org.biojava.bio.structure.Group ;
   */
 public class FeatureFetcher extends Thread
 {
+    
+    public static Color[] entColors = new Color []{
+            new Color(153,153,255), 
+            new Color(255,153,153), 
+            new Color(153,255,153), 
+            new Color(255,255,102),
+            new Color(102,255,102),
+            new Color(0,51,204),
+            new Color(253,0,153)
+    };
+    
+    public static final Color HELIX_COLOR  = new Color(255,51,51);
+    public static final Color STRAND_COLOR = new Color(255,204,51);
+    public static final Color TURN_COLOR   = new Color(204,204,204); 
     SPICEFrame parent ;
     boolean finished ;
     String spId ;
@@ -57,7 +71,9 @@ public class FeatureFetcher extends Thread
     Chain chain ;
     
     String[] txtColors;
-    Color [] entColors ;
+    
+    
+    
     Logger logger        ;
 
     boolean updateDisplay ;
@@ -76,15 +92,6 @@ public class FeatureFetcher extends Thread
 	spiceconfig = config ;
 	allFeatures = new ArrayList();
 	chain       = c ;
-
-	entColors = new Color [7];
-	entColors[0] = Color.blue;
-	entColors[1] = Color.pink;
-	entColors[2] = Color.green;
-	entColors[3] = Color.magenta;
-	entColors[4] = Color.orange;
-	entColors[5] = Color.pink;
-	entColors[6] = Color.cyan;
 
 	txtColors   = new String[] { "blue","pink","green","magenta","orange","pink","cyan"};
 	updateDisplay = false ;
@@ -408,21 +415,21 @@ public class FeatureFetcher extends Thread
 	    
 	    if (type.equals("STRAND")){
 		secstruc = true ;
-		currentFeatureMap.put("color",Color.yellow);
+		currentFeatureMap.put("color",STRAND_COLOR);
 		currentFeatureMap.put("colorTxt","yellow");
 		feat.setName("SECSTRUC");		
 	    }
 	    
 	    else if (type.equals("HELIX")) {
 		secstruc = true ;
-		currentFeatureMap.put("color",Color.red);
+		currentFeatureMap.put("color",HELIX_COLOR);
 		currentFeatureMap.put("colorTxt","red");
 		feat.setName("SECSTRUC");
 	    }	
 
 	    else if (type.equals("TURN")) {
 		secstruc = true ;
-		currentFeatureMap.put("color",Color.white);
+		currentFeatureMap.put("color",TURN_COLOR);
 		currentFeatureMap.put("colorTxt","white");
 		feat.setName("SECSTRUC");
 	    } 	  

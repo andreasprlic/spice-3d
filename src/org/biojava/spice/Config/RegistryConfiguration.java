@@ -25,52 +25,20 @@
 
 package org.biojava.spice.Config ;
 
-// to get config file via http
-import java.net.HttpURLConnection ;
-import java.net.URL;
+
 import java.io.IOException ;
-
-import java.util.HashMap   ;
-import java.util.ArrayList ;
-import java.util.Map ;
-import java.util.List ;
-import java.util.ListIterator ;
-// for DAS registration server:
-//import org.biojava.services.das.registry.*;
-
-import java.io.* ;
-
-// for GUI;
-import java.awt.Frame ;
-import java.awt.event.*    ;
-
-
-import javax.swing.JTabbedPane            ;
-import javax.swing.ImageIcon              ;
-import javax.swing.JLabel                 ;
-import javax.swing.JPanel                 ;
-import javax.swing.JFrame                 ;
-import javax.swing.JScrollPane            ;
-import javax.swing.JLabel                 ;
-import javax.swing.BoxLayout              ;
-import javax.swing.JComponent             ;
-import javax.swing.JTable                 ;
-import javax.swing.JProgressBar           ;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.event.TableModelEvent  ;
-import javax.swing.BorderFactory          ;
-import java.awt.BorderLayout              ;
-import java.awt.Dimension                 ;
-import java.awt.GridLayout                ;
-import java.awt.event.KeyEvent            ;
+import java.io.PrintWriter                ;
 
 import java.text.SimpleDateFormat         ;
 import java.text.DateFormat               ;
+
 import java.util.Date                     ;
+import java.util.ArrayList ;
+import java.util.List ;
 
 import org.biojava.utils.xml.*            ; 
-import java.io.PrintWriter                ;
-import java.io.StringWriter               ;
+
+
 
 /** Container class for configuration
  */

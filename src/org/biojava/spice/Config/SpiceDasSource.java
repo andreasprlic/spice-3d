@@ -24,14 +24,11 @@
 
 package org.biojava.spice.Config ;
 
-import org.biojava.services.das.registry.*;
+import org.biojava.services.das.dasregistry.*;
 import org.biojava.utils.xml.*            ; 
-import java.io.PrintWriter                ;
-import java.io.StringWriter               ;
 import java.io.IOException                ;
 import java.text.DateFormat               ;
 import java.text.SimpleDateFormat         ;
-
 
 /** Manages all data about a DAS source that SPICE requires */
 public class SpiceDasSource

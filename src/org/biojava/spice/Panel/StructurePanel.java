@@ -26,7 +26,6 @@ package org.biojava.spice.Panel ;
 import org.biojava.spice.SPICEFrame;
 
 import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
 
 // for Jmol stuff

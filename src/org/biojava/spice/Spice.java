@@ -28,8 +28,6 @@ package org.biojava.spice ;
 import java.awt.*;
 import java.applet.Applet;
 import java.security.*;
-import java.awt.event.WindowAdapter ;
-import java.awt.event.WindowEvent ;
 import javax.swing.JFrame ;
 
 // for config file 
@@ -150,8 +148,9 @@ class SpiceButton extends Button {
 			//System.out.println("ALGINWITH: "+alignpdb);
 			if (alignpdb != null){
 			    structurealignment = true ;
-			    spice.displayStructureAlignment(defaultpdb,alignpdb,url,registryurl);
-			    
+			    //spice.displayStructureAlignment(defaultpdb,alignpdb,url,registryurl);
+			    // CURRENTLY DISABLED!
+			    System.out.println("currently disabled");
 			}
 			
 		     } catch ( Exception e){
