@@ -67,6 +67,7 @@ public class LoadStructureThread
     public String getStructureServer(){
 	RegistryConfiguration config = spiceframe.getConfiguration();
 	//Map strucconfig = (Map) config.get("structureserver");
+	System.out.println("spice config:" + config);
 	List servers = config.getServers("structure","PDBresnum");
 	DasSource ds = (DasSource)servers.get(0);
 	String u = ds.getUrl();

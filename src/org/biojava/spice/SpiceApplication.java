@@ -512,6 +512,9 @@ public class SpiceApplication
 	//System.out.println("SpiceApplication show() : getting Structure data from new thread");
 	// and now load data ...
 	
+	// need to call showduring init, to make sure das registry frame and threads can set status.
+	// threads can only be started once the config is loaded from registry 
+	
 	if ( config == null ) {
 	    return ;
 	}

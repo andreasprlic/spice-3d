@@ -63,7 +63,7 @@ import javax.swing.BorderFactory           ;
 import javax.swing.JComboBox               ;
 import javax.swing.JList                   ;
 import javax.swing.ListSelectionModel      ;
-
+import javax.swing.JFileChooser            ;
 import java.awt.BorderLayout               ;
 import java.awt.Dimension                  ;
 import java.awt.GridLayout                 ;
@@ -331,7 +331,7 @@ class ButtonListener
 
 
 class TabbedPaneDemo extends JPanel {
-    static String[] colNames= new String [] {"url","coordinateSystems","adminemail","capabilities","description"};
+    static String[] colNames= new String [] {"url","coordinateSystems","adminemail","capabilities","description","public","active"};
 
     RegistryConfiguration config       ;
     RegistryConfigIO registryIO        ;
@@ -339,15 +339,200 @@ class TabbedPaneDemo extends JPanel {
     List        entryFormFields        ;
     MyTableModel dasSourceTableModel   ;
     JTable       dasSourceTable        ;
+    JTextField   pdbDirectory ;
+    JFileChooser chooser = new JFileChooser(); 
+		  
+
 
     public TabbedPaneDemo(RegistryConfigIO registryparent, RegistryConfiguration config_) {
         super(new GridLayout(1, 1));
 	registryIO = registryparent ;
 	config = config_;
 
+	chooser = new JFileChooser();
+	chooser.setCurrentDirectory(new java.io.File("."));
+	chooser.setDialogTitle("select directory containing PDB files");
+	chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
+
 	tabbedPane = new JTabbedPane();
         ImageIcon icon = createImageIcon("spice.jpg");
 
+
+	////////////////////////////////////////////////////////
+	/// list available DAS servers
+	////////////////////////////////////////////////////////
+	
+
+	JPanel seqstrucpanel = getAvailablePanel();
+	tabbedPane.addTab("list sources", icon, seqstrucpanel,
+                          "configure sequence and structure servers");
+        tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
+		
+	
+	////////////////////////////////////////////////////////
+	/// add a local DAS source Panel 
+	////////////////////////////////////////////////////////
+
+
+	JPanel addLocalPanel = getAddLocalPanel();
+	//tabbedPane.setMnemonicAt(1, KeyEvent.VK_1);       
+	tabbedPane.addTab("Add local source", icon, addLocalPanel,"add a local DAS source");
+
+	
+	////////////////////////////////////////////////////////
+	/// get PDB from local installation
+	////////////////////////////////////////////////////////
+
+	JPanel localPDBPanel = getLocalPDBPanel();
+	tabbedPane.addTab("PDB files from local dir.", icon, localPDBPanel,"try to load PDB files from local directory first.");
+	
+        //Add the tabbed pane to this panel.
+        add(tabbedPane);
+        
+        //Uncomment the following line to use scrolling tabs.
+        tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+    }
+
+
+    protected JPanel getLocalPDBPanel() {
+	JPanel localPDBPanel = new JPanel();
+	
+
+	TitledBorder dasborder3;
+	dasborder3 = BorderFactory.createTitledBorder("get PDB from local dir");
+
+	JPanel pdbDirForm = new JPanel();
+
+	Box v = Box.createVerticalBox();
+	
+	pdbDirForm.setBorder(dasborder3);
+
+	Box h = Box.createHorizontalBox();
+
+	JTextField txt = new JTextField("try to get PDB files from local directory, if not found, get from public DAS server");
+	txt.setEditable(false);
+	txt.setBorder(BorderFactory.createEmptyBorder());
+	v.add(txt);
+
+	
+	//txt.setEditable(false);
+		
+	JTextField f = new JTextField("file://");
+	f.setEditable(false);
+	f.setBorder(BorderFactory.createEmptyBorder());
+	h.add(f);
+	pdbDirectory = new JTextField("");
+	//pdbDirectory.setMaximumSize(new Dimension(300,30));
+	pdbDirectory.setPreferredSize(new Dimension(300,30));
+	h.add(pdbDirectory);
+
+	JButton go = new JButton("Choose ...");
+	
+	go.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    int result;
+		    		   
+		    if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) { 
+			
+			System.out.println("getCurrentDirectory(): " +  chooser.getCurrentDirectory());
+			System.out.println("getSelectedFile() : " +  chooser.getSelectedFile());
+			pdbDirectory.setText( chooser.getSelectedFile().toString());
+		
+		    }
+		    else {
+			System.out.println("No Selection ");
+		    }
+		}	
+		
+	    });
+	
+	h.add(go);
+	v.add(h);
+	pdbDirForm.add(v);
+	localPDBPanel.add(pdbDirForm);
+	return localPDBPanel ;
+
+    }
+   
+    protected JPanel getAddLocalPanel() {
+	JPanel addLocalPanel = new JPanel();
+	addLocalPanel.setLayout(new BoxLayout(addLocalPanel, BoxLayout.LINE_AXIS));
+
+	TitledBorder dasborder2;
+	dasborder2 = BorderFactory.createTitledBorder("add local DAS source");
+
+	JPanel entryForm = new JPanel();
+	entryForm.setBorder(dasborder2);
+	entryForm.setLayout(new BoxLayout(entryForm, BoxLayout.LINE_AXIS));
+
+	Box vBoxRight =  Box.createVerticalBox();
+	Box vBoxLeft  =  Box.createVerticalBox();
+
+	
+	entryFormFields = new ArrayList();
+
+	
+	for ( int i = 0 ; i < colNames.length; i++) {
+	    String col = colNames[i];
+
+	    if ( col.equals("public")  || col.equals("active") ) 
+		continue ;
+	    
+	    JTextField txt1 = new JTextField(col);
+	    txt1.setEditable(false);
+	    txt1.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
+	    vBoxLeft.add(txt1);
+
+	    if (col.equals("coordinateSystems")) {
+		// display coordinateSystems box
+		String[] coords = { "UniProt","PDBresnum"};
+		JComboBox list = new JComboBox(coords) ;		
+		list.setEditable(false);
+		list.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
+		list.setSelectedIndex(0);
+		vBoxRight.add(list);	
+		entryFormFields.add(list);
+		
+	    } else if ( col.equals("capabilities")) {
+		JList list = new JList(config.getCapabilities());
+		list.setVisibleRowCount(1);
+		//list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		list.setSelectedIndex(4);
+		list.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
+		JScrollPane jsp = new JScrollPane(list);
+		jsp.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
+		jsp.setViewportView(list);
+		vBoxRight.add(jsp);
+		entryFormFields.add(list);
+
+		/**
+		JComboBox comboBox = new JComboBox(config.getCapabilities());
+		comboBox.setEditable(false);
+		comboBox.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
+		comboBox.setSelectedIndex(4);
+		vBoxRight.add(comboBox);
+		
+		entryFormFields.add(comboBox);
+		*/
+	
+	    } else {
+
+		JTextField txt2 = new JTextField("");
+		txt2.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
+		vBoxRight.add(txt2);
+		entryFormFields.add(txt2);
+	    }
+	}
+
+
+	entryForm.add(vBoxLeft);
+	entryForm.add(vBoxRight);
+	addLocalPanel.add(entryForm);
+	return addLocalPanel ;
+    }
+
+    protected JPanel getAvailablePanel() {
 	TitledBorder dasborder1;
 	dasborder1 = BorderFactory.createTitledBorder("available DAS sources");
 
@@ -379,99 +564,8 @@ class TabbedPaneDemo extends JPanel {
 	seqscrollPane.setBorder(dasborder1);
 
 	seqstrucpanel.add( seqscrollPane, BorderLayout.CENTER );
-
-	
-
-	tabbedPane.addTab("list sources", icon, seqstrucpanel,
-                          "configure sequence and structure servers");
-        tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
-	
-	
-
-
-	/// add a local DAS source Panel 
-	JPanel addLocalPanel = new JPanel();
-	addLocalPanel.setLayout(new BoxLayout(addLocalPanel, BoxLayout.LINE_AXIS));
-
-	TitledBorder dasborder2;
-	dasborder2 = BorderFactory.createTitledBorder("add local DAS source");
-
-	JPanel entryForm = new JPanel();
-	entryForm.setBorder(dasborder2);
-	entryForm.setLayout(new BoxLayout(entryForm, BoxLayout.LINE_AXIS));
-
-	Box vBoxRight =  Box.createVerticalBox();
-	Box vBoxLeft  =  Box.createVerticalBox();
-
-	entryFormFields = new ArrayList();
-
-	
-	for ( int i = 0 ; i < colNames.length; i++) {
-	    String col = colNames[i];
-
-	    JTextField txt1 = new JTextField(col);
-	    txt1.setEditable(false);
-	    txt1.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
-	    vBoxLeft.add(txt1);
-
-	    if (col.equals("coordinateSystems")) {
-		// display coordinateSystems box
-		String[] coords = { "UniProt","PDBresnum"};
-		JComboBox list = new JComboBox(coords) ;		
-		list.setEditable(false);
-		list.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
-		list.setSelectedIndex(0);
-		vBoxRight.add(list);	
-		entryFormFields.add(list);
-		
-	    } else if ( col.equals("capabilities")) {
-		JList list = new JList(config.getCapabilities());
-		list.setVisibleRowCount(1);
-		//list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		list.setSelectedIndex(4);
-		list.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
-		JScrollPane jsp = new JScrollPane(list);
-		jsp.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
-		vBoxRight.add(jsp);
-		entryFormFields.add(list);
-
-		/**
-		JComboBox comboBox = new JComboBox(config.getCapabilities());
-		comboBox.setEditable(false);
-		comboBox.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
-		comboBox.setSelectedIndex(4);
-		vBoxRight.add(comboBox);
-		
-		entryFormFields.add(comboBox);
-		*/
-	
-	    } else {
-
-		JTextField txt2 = new JTextField("");
-		txt2.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
-		vBoxRight.add(txt2);
-		entryFormFields.add(txt2);
-	    }
-	}
-
-
-	entryForm.add(vBoxLeft);
-	entryForm.add(vBoxRight);
-	addLocalPanel.add(entryForm);
-	
-
-
-	tabbedPane.addTab("Add local source", icon, addLocalPanel,"add a local DAS source");
-
-	
-        //Add the tabbed pane to this panel.
-        add(tabbedPane);
-        
-        //Uncomment the following line to use scrolling tabs.
-        tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+	return seqstrucpanel ;
     }
-
-    
 
     protected JComponent makeTextPanel(String text) {
         JPanel panel = new JPanel(false);
@@ -489,6 +583,10 @@ class TabbedPaneDemo extends JPanel {
 	server.put("coordinateSystems",source.getCoordinateSystem());
 	server.put("description",source.getDescription());
 	server.put("adminemail",source.getAdminemail());
+	if (source.getRegistered()) 
+	    server.put("public","Y");
+	else 
+	    server.put("public","N");
 	server.put("capabilities",source.getCapabilities());
 	return server ;
     }
@@ -525,6 +623,7 @@ class TabbedPaneDemo extends JPanel {
 		    for ( int u = 0; u<stmp.length;u++){
 			s += stmp[u]+" ";
 		    }
+		    
 		} else {
 		    s = (String)server.get(colname);
 		}
@@ -553,24 +652,30 @@ class TabbedPaneDemo extends JPanel {
 	    // add a new local DAS source ...
 	    System.out.println("adding new local DAS source");
 	    HashMap formdata = new HashMap();
+	    int formPos = -1 ;
 	    for ( int i = 0 ; i < colNames.length; i++) {
 		String col = colNames[i];
-		
-		Object o = entryFormFields.get(i);
+		if ( col.equals("public") || col.equals("active")) 
+		    continue ;
+		formPos++ ;
+		Object o = entryFormFields.get(formPos);
 
-		if ( o.getClass().getName().equals("javax.swing.JTextField")) {
+		if ( o instanceof JTextField ) {
 		//JTextField txt = (JTextField)entryFormFields.get(i);
 		    JTextField txt = (JTextField)o;
 		    String data = txt.getText();
 		    System.out.println(col + " " + data);
 		    formdata.put(col,data);
-		} else if ( o.getClass().getName().equals("javax.swing.JList")) {
+		} else if ( o instanceof JList ) {
 		    JList l = (JList) o ;
-		    String[] data = (String[])l.getSelectedValues();
+		    Object[] obj = l.getSelectedValues();
+		    String[] data = new String[obj.length];
+		    System.arraycopy(obj,0,(Object[])data,0,obj.length);
 		    formdata.put(col,data);		    
-		} else if ( o.getClass().getName().equals("javax.swing.JComboBox")) {
+		} else if ( o  instanceof JComboBox) {
 		    JComboBox j = (JComboBox) o ;
-		    String data = (String)j.getSelectedItem();
+		    String[] data = new String[1];
+		    data[0] = (String)j.getSelectedItem();
 		    formdata.put(col,data);
 		}
 	    }
@@ -621,14 +726,7 @@ class MyTableModel extends AbstractTableModel {
     }
 
 				      
-    /*private String[]   columnNames = {"URL",
-      "capabilities",
-      "coordinate system",
-      "admin email",
-      "description",				   
-      "active"
-      };
-    */
+  
    
 
 
