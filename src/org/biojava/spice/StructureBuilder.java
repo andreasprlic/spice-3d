@@ -70,6 +70,9 @@ public class StructureBuilder{
 
     }
 
+
+  
+
     /** create a structure to be displayed in SPICE */
     public Structure createSpiceStructure(Alignment alignment, Structure pdbStructure, String sequence) 
 	throws DASException
@@ -242,20 +245,10 @@ public class StructureBuilder{
     }
 
 
-    public Chain  createChain(Alignment ali, String sequence) 
-	throws DASException
-    {
-	Annotation object     = getAlignmentObject(ali,SEQUENCEDATABASE);
-	Annotation struobject = getAlignmentObject(ali,STRUCTUREDATABASE);
-	String swissp_id = (String) object.getProperty("dbAccessionId") ;
-	//logger.finest(swissp_id);
-	//logger.finest(sequence);
+    public Chain getChainFromSequence(String id, String sequence){
 	
 	Chain chain =  new ChainImpl();
-	String chainname = (String) struobject.getProperty("dbAccessionId");
-	
-	chain.setName(getChainFromPDBCode(chainname));
-	chain.setSwissprotId(swissp_id);
+	chain.setSwissprotId(id);
 
 	for ( int pos = 0 ; pos < sequence.length() ; pos ++ ){
 	    AminoAcidImpl s_amino = new AminoAcidImpl();
@@ -277,7 +270,26 @@ public class StructureBuilder{
 		
 	    }
 	    chain.addGroup(s_amino) ;	    
-	} 
+	  
+
+	}
+	return chain;
+    }
+
+
+    public Chain  createChain(Alignment ali, String sequence) 
+	throws DASException
+    {
+	Annotation object     = getAlignmentObject(ali,SEQUENCEDATABASE);
+	Annotation struobject = getAlignmentObject(ali,STRUCTUREDATABASE);
+	String swissp_id = (String) object.getProperty("dbAccessionId") ;
+	//logger.finest(swissp_id);
+	//logger.finest(sequence);
+	String chainname = (String) struobject.getProperty("dbAccessionId");
+	
+	Chain chain = getChainFromSequence(swissp_id,sequence) ;
+	chain.setName(getChainFromPDBCode(chainname));
+	
 	//logger.finest(chain);
 	Chain retchain = addChainAlignment(chain,ali);
 	//logger.finest(retchain);

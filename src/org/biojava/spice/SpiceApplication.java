@@ -179,9 +179,9 @@ public class SpiceApplication
 	
 	
 	LoggingPanel loggingPanel = new LoggingPanel(logger);
-	loggingPanel.getHandler().setLevel(Level.FINEST);	
+	loggingPanel.getHandler().setLevel(Level.INFO);	
 	loggingPanel.show(null);
-	logger.setLevel(Level.FINEST);
+	logger.setLevel(Level.INFO);
 	//ConsoleHandler handler = new ConsoleHandler();
 	//handler.setLevel(Level.FINEST);
 	//logger.addHandler(loggingPanel.getHandler());
@@ -196,13 +196,7 @@ public class SpiceApplication
 	System.setProperty("sun.net.client.defaultConnectTimeout", ""+timeout);
 	System.setProperty("sun.net.client.defaultReadTimeout", ""+timeout);
 
-	//Properties sprops = System.getProperties() ;
-	//sprops.put("proxySet", "true" );
-	//sprops.put("proxyHost", "wwwcache.sanger.ac.uk" );
-	//sprops.put("proxyPort", "3128" );
-	//sprops.put("http.proxyHost", "wwwcache.sanger.ac.uk");
-	//sprops.put("http.proxyPort", "3128");
-	//
+
 	String proxyHost  = System.getProperty("proxyHost");
 	String proxyPort  = System.getProperty("proxyPort");
 	
@@ -212,6 +206,7 @@ public class SpiceApplication
 	    logger.finest("http.proxyHost"    + System.getProperty("http.proxyHost"));
 	    logger.finest("http.proxyPort"    + System.getProperty("http.proxyPort"));
 	}
+	// hack around some config problems ... argh!
 	if ( proxyHost != null ) {
 	    System.setProperty("proxySet","true");
 	    if ( System.getProperty("http.proxyHost") == null ){
@@ -300,8 +295,10 @@ public class SpiceApplication
 	this.pack();
 	
 	this.setVisible(true);
-
+	
+	logger.finest("getting config");
 	config =regi.getConfiguration();
+	logger.finest("got config");
 	if ( config == null ) {
 	    String msg = "Unable to contact DAS registration service, can not continue!" ;
 	    seq_pos.setText(msg);
@@ -508,7 +505,7 @@ public class SpiceApplication
     		
     	}
     	else if (type.equals("UniProt")) {
-	    logger.info("got uniprot");
+	    //logger.info("got uniprot");
 	    // connect to Uniprot -pdb alignment service, get PDB code and load it ...
 	    getUniprot(code);
 		
@@ -542,7 +539,7 @@ public class SpiceApplication
 	menu.add(file);
 
 
-	JMenuItem openpdb = new JMenuItem("open");
+	JMenuItem openpdb = new JMenuItem("Open");
 	openpdb.setMnemonic(KeyEvent.VK_O);
 	JMenuItem exit    = new JMenuItem("Exit");
 	exit.setMnemonic(KeyEvent.VK_X);
@@ -697,6 +694,8 @@ public class SpiceApplication
     public void getUniprot(String uniprot) {
 	logger.info("SpiceApplication getUniprot " + uniprot);
 	statusPanel.setLoading(true);
+	statusPanel.setPDB("");
+	statusPanel.setSP(uniprot);	
 	LoadUniProtThread thr = new LoadUniProtThread(this,uniprot) ;
 	thr.start();
     }
@@ -719,15 +718,16 @@ public class SpiceApplication
 	    logger.finest("SpiceApplication: getStructure "+ pdbcod);
 	}
 	this.setLoading(true);
+
 	//first_load = true ;
 	statusPanel.setLoading(true);
+	statusPanel.setPDB(pdbcode);
+	statusPanel.setSP("");
+
 	pdbcode = pdbcod ;
 	LoadStructureThread thr = new LoadStructureThread(this,pdbcod);
 	thr.start();
 	
-
-
-	 
 
 	
     }
@@ -791,6 +791,8 @@ public class SpiceApplication
 	if (logger.isLoggable(Level.FINER)) {
 	    logger.entering(this.getClass().getName(), "setStructure",  new Object[]{"got structure object"});
 	}
+
+	logger.finest("SpiceApplication got structure " + structure_);
 	
 	this.setLoading(false);
 	//first_load = false ;
@@ -805,6 +807,7 @@ public class SpiceApplication
 
 	structure = structure_ ; 
 	pdbcode = structure.getPDBCode();
+
 	//if (logger.isLoggable(Level.FINEST)) {
 	//System.out.println(structure.toPDB());	    
 	//}
@@ -964,15 +967,16 @@ public class SpiceApplication
 
     }
 
-    public synchronized void setLoading(boolean status){
+    public void setLoading(boolean status){
         first_load = status;
         statusPanel.setLoading(status);
     }
     
     /**  update the currently displayed features */
-    public   void setFeatures(String sp_id, List tmpfeat) {
+    public void setFeatures(String sp_id, List tmpfeat) {
 	// todo create Feature for structure mapping
 	//first_load = false ;
+
 	memoryfeatures.put(sp_id,tmpfeat);
 	//statusPanel.setLoading(false);
 	features.clear();
@@ -1420,7 +1424,7 @@ class SpiceMenuListener
 	//System.out.println(e.getActionCommand());
 	
 	String cmd = e.getActionCommand();
-	if ( cmd.equals("open") ) {
+	if ( cmd.equals("Open") ) {
 	    OpenDialog op = new OpenDialog(parent);
 	    op.show();
 	    

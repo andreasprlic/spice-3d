@@ -54,7 +54,7 @@ public class DAS_FeatureRetreive {
 		// TODO Auto-generated constructor stub
 		logger = Logger.getLogger("org.biojava.spice");
 		features = new ArrayList() ;
-		
+		logger.info("requesting features from " + url);
 		try {
 			
 		    //DAS_httpConnector dhtp = new DAS_httpConnector() ;

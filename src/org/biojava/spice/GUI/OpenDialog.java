@@ -49,14 +49,15 @@ public class OpenDialog
 	extends JDialog 
 	 {
 
-	static final String[] supportedCoords = { "PDB","UniProt","ENSP"};
-    static int H_SIZE = 200;
-    static int V_SIZE = 90 ;
-    SPICEFrame spice       ;
-    JTextField getCom      ;
-    JComboBox  list        ;
-    String     currentType ;
-    
+	     //static final String[] supportedCoords = { "PDB","UniProt","ENSP"};
+	     static final String[] supportedCoords = { "PDB","UniProt"};
+	     static int H_SIZE = 200;
+	     static int V_SIZE = 90 ;
+	     SPICEFrame spice       ;
+	     JTextField getCom      ;
+	     JComboBox  list        ;
+	     String     currentType ;
+	     
     
  
     /** a dialog responsible for opening new entries. */

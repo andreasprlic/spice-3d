@@ -114,14 +114,22 @@ public class FeatureFetcher extends Thread
 	List featservs    =  spiceconfig.getServers("features","UniProt");
 	List pdbresservs  =  spiceconfig.getServers("features","PDBresnum");
 	
+	int nrservers =0;
+	if (spId != null) 
+	    nrservers += featservs.size() ;
+	if (pdbId != null)
+	    nrservers +=  pdbresservs.size();
 	
-	int nrservers = featservs.size() + pdbresservs.size();
-	logger.finest("total: " + nrservers + "feature servers");
+	logger.finest("total: " + nrservers + "feature servers applicable here");
 	subthreads = new DasResponse[nrservers];
 	
 	int responsecounter = 0 ;
 	// start all the sub -threads ;
 	for ( int f =0;f<featservs.size();f++) {
+	    if (spId == null ) 
+		continue ;
+	  
+
 	    DasResponse d=new DasResponse("UniProt");
 	    subthreads[responsecounter] = d; 
 	   
@@ -152,6 +160,10 @@ public class FeatureFetcher extends Thread
 
 	// and the servers serving in structure coordinates
 	for ( int f =0;f<pdbresservs.size();f++) {
+	    if (pdbId == null ) 
+		continue ;
+	    
+	    
 	    DasResponse d=new DasResponse("PDBresnum");
 	    subthreads[responsecounter] = d; 
 	   

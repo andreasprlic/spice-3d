@@ -49,6 +49,7 @@ import java.util.logging.*                     	;
  * @author Andreas Prlic
 */
 public class DAS_PDBFeeder 
+    implements SpiceStructureFeeder
 {
 
     /* make connectin to a DAS structure service and 
@@ -146,7 +147,7 @@ public class DAS_PDBFeeder
 	try {
 	    
 	    // connect to structure service and retireve structure entry
-	    DASStructure_Handler structure_handler = new DASStructure_Handler(config,pdbcode);
+	    DASStructure_Handler structure_handler = new DASStructure_Handler(config,pdbcode,this);
 	    
 	    // wait for threads to be finished ..
 	    boolean done = false ;
@@ -198,7 +199,8 @@ public class DAS_PDBFeeder
 
 		if ( structure_handler.isDone()){
 		    structureDone = true ;
-		    pdb_structure = structure_handler.getStructure();
+		    // structurehandler sets structure here.
+		    //pdb_structure = structure_handler.getStructure();
 		}
 
 		if ( structureDone && mappingDone) { 

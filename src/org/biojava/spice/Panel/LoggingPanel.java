@@ -59,7 +59,7 @@ import javax.swing.event.TableModelListener ;
 import javax.swing.event.TableModelEvent ;
 
 import javax.swing.DefaultCellEditor;
-
+import javax.swing.ListSelectionModel            ;
 
 import javax.swing.JButton;
 import javax.swing.Box;
@@ -196,8 +196,10 @@ public class LoggingPanel extends JPanel {
      */
     public LoggingPanel() {
         super(new BorderLayout());
+
         table.setShowGrid(false);
 	// by AP
+	table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setCellSelectionEnabled(true);
 	
         table.setGridColor(Color.LIGHT_GRAY);

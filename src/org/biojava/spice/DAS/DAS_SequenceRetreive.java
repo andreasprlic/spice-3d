@@ -157,10 +157,10 @@ public class DAS_SequenceRetreive {
 	throws Exception 
     {
 
-	logger.finest("trying: " + connstr) ;
+	//logger.finest("trying: " + connstr) ;
 	URL dasUrl = new URL(connstr);
 	//DAS_httpConnector dhtp = new DAS_httpConnector() ;
-	
+	logger.info("requesting sequence from " + connstr);
 	InputStream dasInStream =open(dasUrl); 
 	
 	

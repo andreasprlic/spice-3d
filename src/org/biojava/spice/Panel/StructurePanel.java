@@ -101,7 +101,7 @@ public class StructurePanel extends JPanel
     public void notifyFileLoaded(String fullPathName, String fileName,
             String modelName, Object clientFile,
             String errorMessage){
-        logger.finest("StructurePanel notifyFileLosted ");
+        logger.finest("StructurePanel notifyFileLoaded ");
         if (errorMessage != null){
             logger.log(Level.SEVERE,errorMessage);
         }
@@ -131,7 +131,7 @@ public class StructurePanel extends JPanel
     public  void setStructure(Structure structure) {
 	
 	String pdbstr = structure.toPDB(); 
-	
+	//System.out.println(pdbstr);
 	synchronized ( viewer) {
 	    viewer.openStringInline(pdbstr);
 	}
@@ -265,7 +265,7 @@ public class StructurePanel extends JPanel
     }
 
     public void scriptStatus(String strStatus){
-	logger.log(Level.INFO,"jmol scriptStatus: " +strStatus);
+	logger.log(Level.FINEST,"jmol scriptStatus: " +strStatus);
     }
 
     public void notifyScriptTermination(String statusMessage, int msWalltime){

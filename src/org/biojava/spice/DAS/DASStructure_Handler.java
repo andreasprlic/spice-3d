@@ -53,15 +53,17 @@ public class DASStructure_Handler
     List   structureservers     ;
     String pdbCode              ;
     Logger logger               ;             
+    SpiceStructureFeeder parent ;
 
-    public DASStructure_Handler(RegistryConfiguration configuration, String pdbcode) {
+    public DASStructure_Handler(RegistryConfiguration configuration, String pdbcode,SpiceStructureFeeder parent_) {
 	super () ;
-
+	
+	parent = parent_ ;
 	logger = Logger.getLogger("org.biojava.spice");
 
 	pdbCode = pdbcode ;
 	finished = false ;
-	//mastqueryer = parent 
+
 	structure = null ;;
 	config = configuration ;
 
@@ -126,7 +128,7 @@ public class DASStructure_Handler
 	    
 
 		    DASStructureClient dasc= new DASStructureClient(dasstructurecommand);
-		    logger.finer("getting structure "+dasstructurecommand + " " +pdb_id);	    
+		    logger.info("requesting structure from "+dasstructurecommand  +pdb_id);	    
 		    try {
 			structure = dasc.getStructureById(pdb_id);	    			
 		    }
@@ -141,6 +143,7 @@ public class DASStructure_Handler
 		    //container = structure  ;
 		   
 		    if ( structure != null) {
+			parent.setStructure(structure);
 			finished=true;
 			notifyAll();
 			return ;
@@ -151,9 +154,8 @@ public class DASStructure_Handler
 
 	    }
 
-
-	    finished = true ;
-	    
+	    parent.setStructure(structure);
+	    finished = true ;	    
 	    notifyAll();
 	    
 	    
@@ -189,8 +191,9 @@ public class DASStructure_Handler
     public boolean isDone(){
 	return finished ;
     }
-    public Structure getStructure(){
-	return structure ;
-    }
+    
+    //public Structure getStructure(){
+    //return structure ;
+    //}
 
 }

@@ -25,6 +25,7 @@ package org.biojava.spice ;
 
 import org.biojava.spice.DAS.DAS_UniProtFeeder ;
 import org.biojava.bio.structure.Structure ;
+import org.biojava.bio.structure.StructureImpl ;
 import java.util.logging.*                             ;
 
 
@@ -57,7 +58,7 @@ public class LoadUniProtThread
 	
 	try {
 	    logger.finest("loading uniprot " + uniprot);
-	    //spiceframe.showStatus("Loading...Wait...",Color.red);
+	    spiceframe.showStatus("Loading...Wait...");
 	    spiceframe.setLoading(true);
 	    
 	    // do something ...
@@ -68,12 +69,15 @@ public class LoadUniProtThread
 	    finished = true ;
 
 	    spiceframe.setLoading(false);
+	    spiceframe.showStatus(uniprot +" loaded");
 	    notifyAll();
 
 	}catch (Exception e){ 
 	    // at some point raise some IO exception, which should be defined by the Inferface
 	    e.printStackTrace();
-	    finished = true ;	  			
+	    finished = true ;	  
+	    StructureImpl n = new StructureImpl();
+	    spiceframe.setStructure(n);
 	}
     }
 }
