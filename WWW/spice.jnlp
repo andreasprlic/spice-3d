@@ -2,12 +2,13 @@
 <!-- JNLP File for SwingSet2 Demo Application -->
 <jnlp
   spec="1.0+"
-  codebase="file:///home/andreas/WORK/DAS/JAVA/spice/WWW/"
-  href="spice.jnlp">
+  codebase="file:///nfs/team71/phd/ap3/WORK/DAS/JAVA/spice/WWW/"
+  href="spice.jnlp"
+ >
   <information>
     <title>The SPICE Application</title>
     <vendor>Sanger Institute</vendor>
-    <homepage href="http://www.sanger.ac.uk/Users/ap3/DAS/SPICE/devel/stable.html"/>
+    <homepage href="http://www.sanger.ac.uk/Users/ap3/DAS/SPICE/devel/spice.html"/>
     <description>Visualization of protein structures and their annotations.</description>
     <description kind="short">Visualization of protein structures and their annotations.</description>
  
@@ -16,20 +17,26 @@
       <all-permissions/>
   </security>
   <resources>
-    <j2se version="1.4"/>
+    <j2se version="1.4 1.5"/>
     <jar href="spice.jar"                    download="lazy"/>
-    <jar href="biojava.jar"                  download="lazy"/>
-    <jar href="JmolApplet.jar"               download="lazy"/>
-    <jar href="org.biojava.das.registry.jar" download="lazy"/> 
 
-    <extension name="axis stuff" href="axis.jnlp"/> 
-    <extension name="xerces stuff" href="xerces.jnlp"/> 
+     <property name="javax.xml.parsers.DocumentBuilderFactory" 
+           value="org.apache.xerces.jaxp.DocumentBuilderFactoryImpl"/>
 
+     <property name="javax.xml.parsers.SAXParserFactory"
+	   value="org.apache.xerces.jaxp.SAXParserFactoryImpl"/>
 
   </resources>
   <application-desc main-class="org.biojava.spice.Spice">
-  <argument>1h4w</argument>
+
+  <!-- old 1q22 -->
+  <argument>UniProt</argument>
+  <argument>P00280</argument>
   <argument>http://protodas.derkholm.net/axis/services/das_registry</argument>
+
+ 
+
   </application-desc>
  
 </jnlp> 
+
