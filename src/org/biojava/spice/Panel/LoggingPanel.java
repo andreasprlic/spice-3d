@@ -214,13 +214,13 @@ public class LoggingPanel extends JPanel {
         }
 
 	scroll = new JScrollPane(table);
-        //new AutoScroll(scroll.getVerticalScrollBar().getModel());
+
+	// added a new record, scroll to end
 	model.addTableModelListener(new TableModelListener(){
 		public void tableChanged(TableModelEvent e){
 		    if ( e.getType() == TableModelEvent.INSERT ) {
-			// added a new record, scroll to end
-			scroll.getViewport().setViewPosition(new java.awt.Point(0, (table.getSize().height)));	
-			
+
+			scroll.getVerticalScrollBar().setValue(scroll.getVerticalScrollBar().getMaximum());
 		    }
 		}
 	    });
