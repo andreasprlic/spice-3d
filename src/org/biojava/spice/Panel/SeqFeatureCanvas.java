@@ -58,7 +58,7 @@ import javax.swing.ImageIcon ;
  */
 public class SeqFeatureCanvas 
     extends JLabel 
-    implements MouseListener, MouseMotionListener
+    implements SeqPanel, MouseListener, MouseMotionListener
 				      
 {
 
@@ -125,7 +125,7 @@ public class SeqFeatureCanvas
 	entColors[4] = Color.orange;
 	entColors[5] = Color.pink;
 	entColors[6] = Color.cyan;
-	//setBasckground(Color.black) ;
+	setBackground(Color.black) ;
 
 	lastHighlight = new Date();
 				
@@ -332,7 +332,28 @@ public class SeqFeatureCanvas
 	
     }
 
+    
+    /** select single position
+       select a position
+     */
+    public void select(int seqpos){	
+	highlite(current_chainnumber,seqpos);
 
+    }
+    
+    /** select range */
+    public void select(int start, int end) {
+	// don't know what to do ...
+	return ;
+    }
+
+    
+    /** same as select here */
+    public void highlite(int seqpos){	
+	highlite(current_chainnumber,seqpos);
+
+    }
+    
     /* draw a line at current seqence position
      * only if chain_number is currently being displayed
      */
@@ -635,7 +656,7 @@ public class SeqFeatureCanvas
 	//System.out.println("timediff:" + timediff);
 	if ( timediff  > TIMEDELAY) {
 	    //System.out.println("highliting "+current_chainnumber + " " + seqpos);
-	    highlite(current_chainnumber,seqpos);	    
+	    //highlite(current_chainnumber,seqpos);	    
 	    spice.select(current_chainnumber,seqpos);
 	    lastHighlight = currentTime ;
 	}
