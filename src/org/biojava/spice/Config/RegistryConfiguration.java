@@ -71,20 +71,23 @@ public class RegistryConfiguration
 
     //List serverdata ;
     
-    List allservers    ;
-    List activeservers ;
-    String[] capabilities ;
-
+    List allservers          ;
+    List activeservers       ;
+    String[] capabilities    ;
+    String[] pdbFileExtensions ;
     public RegistryConfiguration () {
 	super();
 	//serverdata = new ArrayList();
 	allservers    = new ArrayList();
 	activeservers = new ArrayList();
 	capabilities  = null ;
+	pdbFileExtensions = new String[] { ".pdb",".ent"};
+	
     }
 
-   
-
+    public String[] getPDBFileExtensions() { return pdbFileExtensions ;}
+    public void setPDBFileExtensions(String[] exts) { pdbFileExtensions = exts ; } 
+    
     private boolean isSeqStrucAlignmentServer(SpiceDasSource source) {
 	boolean msdmapping = false ;
 	String[] coordsys = source.getCoordinateSystem() ;
@@ -170,6 +173,10 @@ public class RegistryConfiguration
 	return ds ;
     }
 
+    public List getAllServers(){
+	return allservers ;
+    }
+
     // todo ...
     public List getServers(){
 	return activeservers ;	
@@ -204,6 +211,8 @@ public class RegistryConfiguration
 		    if ( capabil.equals("alignment") ){
 			if ( isSeqStrucAlignmentServer(ds) ){
 			    retservers.add(ds);
+			} else {
+			    System.out.println("DasSource " + ds.getUrl() + " is not a UniProt to PDB alignment service, unable to use");
 			}
 		    } else {
 			retservers.add(ds);

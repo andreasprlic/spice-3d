@@ -111,7 +111,7 @@ public class SpiceApplication
     URL REGISTRY_URL    ;
 
     static String XMLVALIDATION = "false" ;   
-    static String INIT_SELECT = "select all; cpk off ; wireframe off ; backbone off; cartoon on; colour chain;select not protein and not solvent;spacefill 1.0;";
+    static String INIT_SELECT = "select all; cpk off ; wireframe off ; backbone off; cartoon on; colour chain;select not protein and not solvent;spacefill 2.0;";
     RegistryConfiguration config      ;
     Structure structure ; 
     String pdbcode      ;
@@ -704,9 +704,11 @@ public class SpiceApplication
     public void setConfiguration(RegistryConfiguration reg) {
 	config = reg;
 	Chain chain = getChain(currentChain) ;
-	String sp_id = chain.getSwissprotId() ;
-	getNewFeatures(sp_id) ;
-	//updateDisplays();
+	if ( chain != null) {
+	    String sp_id = chain.getSwissprotId() ;
+	    getNewFeatures(sp_id) ;
+	    //updateDisplays();
+	}
 	
     }
 

@@ -30,7 +30,6 @@ import java.util.List ;
 
 import org.biojava.bio.structure.Structure ;
 import org.biojava.bio.structure.StructureImpl ;
-import org.biojava.services.das.registry.DasSource;
 
 public class LoadStructureThread 
     extends Thread {
@@ -64,61 +63,17 @@ public class LoadStructureThread
     }
    
 
-    public String getStructureServer(){
-	RegistryConfiguration config = spiceframe.getConfiguration();
-	//Map strucconfig = (Map) config.get("structureserver");
-	System.out.println("spice config:" + config);
-	List servers = config.getServers("structure","PDBresnum");
-	DasSource ds = (DasSource)servers.get(0);
-	String u = ds.getUrl();
-
-	return   u;
-    }
-
-    public String getSequenceServer() {
-	RegistryConfiguration config = spiceframe.getConfiguration();
-	//Map strucconfig = (Map) config.get("structureserver");
-	List servers = config.getServers("sequence","UniProt");
-	DasSource ds = (DasSource)servers.get(0);
-	String u = ds.getUrl();	
-    	return   u;
-    }
-
-    
-    public String getAlignmentServer() 
-	throws ConfigurationException
-    {
-
-	RegistryConfiguration config = spiceframe.getConfiguration();
-	//Map strucconfig = (Map) config.get("structureserver");
-	List servers = config.getServers("alignment");
-	DasSource ds = (DasSource)servers.get(0);
-	String u = ds.getUrl();
-    	return   u;
-	//Map config = spiceframe.getConfiguration();
-    	//Map h = (Map) config.get("alignmentserver");
-	//if ( h == null) {
-	//  String msg = "No Alignment Server configured! unable to provide alignment";
-	//  throw new ConfigurationException(msg);
-	    
-	//}
-    	//String u = (String) h.get("url");
-
-    }
 
     public synchronized void loadCompound() {
 	
 	try {
 	
-	   
-	    
-	    String dasstructurecommand = getStructureServer() + "structure?model=1&query=";
-	    String dassequencecommand  = getSequenceServer()  + "sequence?segment=";
 	    //String dassequencecommand  = spiceframe.getSequenceServer()  + "sequence?segment=";
-	    String dasalignmentcommand = dasalignmentcommand = getAlignmentServer() + "alignment?query=" ;
+	    //String dasalignmentcommand = dasalignmentcommand = getAlignmentServer() + "alignment?query=" ;
 	   
 	    spiceframe.showStatus("Loading...Wait...",Color.red);
-	    DAS_PDBFeeder pdb_f =  new DAS_PDBFeeder(dasstructurecommand,dassequencecommand,dasalignmentcommand) ;
+	    //DAS_PDBFeeder pdb_f =  new DAS_PDBFeeder(structureURL,dassequencecommand,dasalignmentcommand) ;
+	    DAS_PDBFeeder pdb_f =  new DAS_PDBFeeder(spiceframe.getConfiguration()) ;
 	    //System.out.println("pdb_f.loadPDB");
 	    pdb_f.loadPDB(pdb_file);
 	    //System.out.println("pdb_f.getStructure");

@@ -35,6 +35,7 @@ import java.awt.Color;
 import java.io.*;
 import java.util.Iterator ;
 import java.util.ArrayList ;
+import java.util.List ;
 
 
 
@@ -58,18 +59,18 @@ public class DAS_PDBFeeder
     
 
     Color currentColor, initColor, seColors[][], entColors[];
-    String dasstructurecommand ;
     String dassequencecommand ;
     String dasalignmentcommand ;
 
     boolean structureDone ;
     boolean mappingDone   ;
-    
+    RegistryConfiguration config ;
 
-    public DAS_PDBFeeder( String struccommand,String seqcommand, String aligcommand) {
+    //public DAS_PDBFeeder( String struccommand,String seqcommand, String aligcommand) {
+    public DAS_PDBFeeder( RegistryConfiguration configuration) {
 	structureDone = false ;
 	mappingDone   = false ;
-	
+	config = configuration ;
 	entColors = new Color [7];
 	entColors[0] = Color.blue;
 	entColors[1] = Color.red;
@@ -78,12 +79,25 @@ public class DAS_PDBFeeder
 	entColors[4] = Color.orange;
 	entColors[5] = Color.pink;
 	entColors[6] = Color.yellow;
-	dasstructurecommand  = struccommand      ;
-	dassequencecommand   = seqcommand   ;
-	dasalignmentcommand  = aligcommand  ;
+
+	List seqservers = config.getServers("sequence","UniProt");
+	SpiceDasSource ds = (SpiceDasSource)seqservers.get(0);
+	
+	dassequencecommand  = ds.getUrl()  + "sequence?segment=";
+
+	List aligservers = config.getServers("alignment");
+	if ( aligservers.size() > 0 ) {
+	    SpiceDasSource ads = (SpiceDasSource)aligservers.get(0);	    
+	    dasalignmentcommand  = ads.getUrl() +  "alignment?query=" ; 
+	} else {
+	    System.err.println("no alignment server found!, unable to map sequence to structure");
+	    dasalignmentcommand = "";
+	}
 
 	pdb_container =  new StructureImpl();
 	pdb_structure =  new StructureImpl();
+
+
     }
 
 
@@ -116,9 +130,7 @@ public class DAS_PDBFeeder
 	try {
 	    
 	    // connect to structure service and retireve structure entry
-	    DASStructure_Handler structure_handler = new DASStructure_Handler(dasstructurecommand);
-
-
+	    DASStructure_Handler structure_handler = new DASStructure_Handler(config,pdbcode);
 	    
 	    // wait for threads to be finished ..
 	    boolean done = false ;
@@ -132,7 +144,7 @@ public class DAS_PDBFeeder
 	    //structure_handler.set_id(pdb_id) ;
 	    
 	    structure_handler.start();
-	    structure_handler.loadStructure(pdb_id);
+	    //structure_handler.loadStructure();
 	    
 	   
 	    // if not found   -> add error message ...

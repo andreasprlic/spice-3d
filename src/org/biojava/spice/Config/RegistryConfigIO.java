@@ -45,6 +45,7 @@ import java.awt.event.*                    ;
 import javax.swing.Box                     ;
 import javax.swing.border.TitledBorder     ;
 import javax.swing.JTextField              ;
+import javax.swing.JTextArea               ;
 import javax.swing.JButton                 ;
 import javax.swing.JTabbedPane             ;
 import javax.swing.ImageIcon               ;
@@ -63,13 +64,19 @@ import javax.swing.BorderFactory           ;
 import javax.swing.JComboBox               ;
 import javax.swing.JList                   ;
 import javax.swing.ListSelectionModel      ;
+import javax.swing.event.ListSelectionListener   ;
+import javax.swing.event.ListSelectionEvent      ;
 import javax.swing.JFileChooser            ;
+import javax.swing.JPopupMenu              ;
+import javax.swing.JMenuItem               ;
+
 import java.awt.BorderLayout               ;
 import java.awt.Dimension                  ;
 import java.awt.GridLayout                 ;
 import java.awt.event.KeyEvent             ;
 import java.awt.event.ActionEvent          ;
 import java.awt.event.ActionListener       ;
+import java.awt.event.MouseAdapter         ;
 
 
 /** a class to contact and retreive the configuration from a DAS
@@ -204,7 +211,7 @@ public class RegistryConfigIO
 
     /** write back the config to the SPICE application */
     public void saveConfiguration() {
-	spice.setConfiguration(config);
+	spice.setConfiguration(config);	
     }
 
     /** returns the Config for SPICE */
@@ -285,7 +292,7 @@ public class RegistryConfigIO
     /** set status of server */
     public void setServerStatus(String url, Boolean flag) {
 	// browse through config and set status of server
-	List servers =  config.getServers();
+	List servers =  config.getAllServers();
 	for (int i = 0 ; i < servers.size(); i++) {
 	    Map s = (Map)servers.get(i) ;
 	    SpiceDasSource ds = (SpiceDasSource) s.get("server");
@@ -339,10 +346,11 @@ class TabbedPaneDemo extends JPanel {
     List        entryFormFields        ;
     MyTableModel dasSourceTableModel   ;
     JTable       dasSourceTable        ;
-    JTextField   pdbDirectory ;
+    JTextField   pdbDirectory          ;
     JFileChooser chooser = new JFileChooser(); 
-		  
-
+    JTextField fileExtensions          ;	  
+    JTextArea sourceDescription        ;
+    JPopupMenu tablePopup              ;
 
     public TabbedPaneDemo(RegistryConfigIO registryparent, RegistryConfiguration config_) {
         super(new GridLayout(1, 1));
@@ -357,6 +365,8 @@ class TabbedPaneDemo extends JPanel {
 
 	tabbedPane = new JTabbedPane();
         ImageIcon icon = createImageIcon("spice.jpg");
+
+	
 
 
 	////////////////////////////////////////////////////////
@@ -435,13 +445,13 @@ class TabbedPaneDemo extends JPanel {
 		    		   
 		    if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) { 
 			
-			System.out.println("getCurrentDirectory(): " +  chooser.getCurrentDirectory());
-			System.out.println("getSelectedFile() : " +  chooser.getSelectedFile());
+			//System.out.println("getCurrentDirectory(): " +  chooser.getCurrentDirectory());
+			//System.out.println("getSelectedFile() : " +  chooser.getSelectedFile());
 			pdbDirectory.setText( chooser.getSelectedFile().toString());
 		
 		    }
 		    else {
-			System.out.println("No Selection ");
+			//System.out.println("No Selection ");
 		    }
 		}	
 		
@@ -449,6 +459,22 @@ class TabbedPaneDemo extends JPanel {
 	
 	h.add(go);
 	v.add(h);
+	
+	Box h2 = Box.createHorizontalBox();
+	
+	JTextField fileExtensionsTxt = new JTextField("file extensions for PDB files:");
+	fileExtensionsTxt.setEditable(false);
+	fileExtensionsTxt.setBorder(BorderFactory.createEmptyBorder());
+	
+	h2.add(fileExtensionsTxt);
+
+	fileExtensions = new JTextField( ".ent .pdb .ent.Z .pdb.Z" );
+	fileExtensions.setPreferredSize( new Dimension(300,30)      );
+	h2.add(fileExtensions);
+
+	v.add(h2);
+	
+	
 	pdbDirForm.add(v);
 	localPDBPanel.add(pdbDirForm);
 	return localPDBPanel ;
@@ -556,14 +582,82 @@ class TabbedPaneDemo extends JPanel {
 	// Configure some of JTable's paramters
 	dasSourceTable.setShowHorizontalLines( false );
 	dasSourceTable.setRowSelectionAllowed( true );
-	dasSourceTable.setColumnSelectionAllowed( true );
-		
+	//dasSourceTable.setColumnSelectionAllowed( true );
+	dasSourceTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+	JList tmp = new JList() ;
+
+	ListSelectionModel lsm = tmp.getSelectionModel();
+	lsm.addListSelectionListener(new ListSelectionListener() {
+		public void valueChanged(ListSelectionEvent e) {
+		    ListSelectionModel lsm = (ListSelectionModel)e.getSource();
+		    
+		    int firstIndex = e.getFirstIndex();
+		    int lastIndex = e.getLastIndex();
+		    boolean isAdjusting = e.getValueIsAdjusting();
+		    //System.out.println("Event for indexes "
+		    //+ firstIndex + " - " + lastIndex
+		    //	       + "; isAdjusting is " + isAdjusting
+		    //	       + "; selected indexes:");
+		    if (lsm.isSelectionEmpty()) {
+			return ;
+		    }
+		    List servers = config.getAllServers();
+		   
+		    int minIndex = lsm.getMinSelectionIndex();
+		    int maxIndex = lsm.getMaxSelectionIndex();
+		    //System.out.println(minIndex + " " + maxIndex);
+		    for (int i = minIndex; i <= maxIndex; i++) {
+			if (lsm.isSelectedIndex(i)) {
+			    SpiceDasSource ds = (SpiceDasSource) servers.get(i);  
+			    sourceDescription.setText(ds.toString());
+			}
+		    }
+		    
+		   
+		}
+	    });
+
+	dasSourceTable.setSelectionModel(lsm);
+
+	//Create the popup menu.
+	tablePopup = new JPopupMenu();
+	JMenuItem menuItem = new JMenuItem("activate");
+	menuItem.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    JMenuItem source = (JMenuItem)(e.getSource());
+		    String s = "Action event detected."
+			+ "    Event source: " + source.getText() ;
+		    System.out.println(s);
+		}
+	    });
+	tablePopup.add(menuItem);
+	menuItem = new JMenuItem("delete");
+	menuItem.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    JMenuItem source = (JMenuItem)(e.getSource());
+		    String s = "Action event detected."
+			+ "    Event source: " + source.getText();
+		    System.out.println(s);
+		}
+	    });
+	tablePopup.add(menuItem);
+
+
+	MouseListener popupListener = new PopupListener(tablePopup);
+	
+
+	dasSourceTable.addMouseListener(popupListener);
+					 
 	// Add the table to a scrolling pane
 	JScrollPane seqscrollPane = dasSourceTable.createScrollPaneForTable( dasSourceTable );
 
 	seqscrollPane.setBorder(dasborder1);
+	
+	sourceDescription = new JTextArea("");
 
 	seqstrucpanel.add( seqscrollPane, BorderLayout.CENTER );
+	seqstrucpanel.add(sourceDescription);
 	return seqstrucpanel ;
     }
 
@@ -605,7 +699,7 @@ class TabbedPaneDemo extends JPanel {
 
 
     public String[][] getTabData() {
-	List servers = config.getServers();
+	List servers = config.getAllServers();
 
 	String[][] data = new String[servers.size()][colNames.length+1];
 
@@ -645,11 +739,16 @@ class TabbedPaneDemo extends JPanel {
 	System.out.println("saving config");
 	int pos = tabbedPane.getSelectedIndex();
 	System.out.println("index: " + pos);
+
+	// save overall registry
 	if ( pos == 0 ) {
 	
 	    registryIO.saveConfiguration();
-	} else if ( pos == 1 ) {
-	    // add a new local DAS source ...
+	
+	} 
+	// add a new local DAS source ...
+	else if ( pos == 1 ) {	    
+	
 	    System.out.println("adding new local DAS source");
 	    HashMap formdata = new HashMap();
 	    int formPos = -1 ;
@@ -696,14 +795,61 @@ class TabbedPaneDemo extends JPanel {
 
 	    config.addServer(sds,true);
 
-	    String seqdata[][] = getTabData();
-	    dasSourceTableModel = new MyTableModel(this,seqdata,colNames);
+	    updateDasSourceTable() ;
 
-	    this.repaint();
-	    tabbedPane.setSelectedIndex(0);
-	    dasSourceTable.setModel(dasSourceTableModel);
 	    //registryIO.saveConfiguration();
 	}
+	// get PDB files from locally
+	else if ( pos == 2 ) {
+	    String e = fileExtensions.getText() ;
+	    String[] exts = e.split(" ");
+	    config.setPDBFileExtensions(exts);
+	    // add a new "pseudo" DAS source
+
+	    SpiceDasSource sds = new SpiceDasSource();
+	    sds.setRegistered(false);
+	    sds.setUrl("file://"+pdbDirectory.getText());
+	    sds.setAdminemail("unknown@localhost.org");
+	    sds.setDescription("Access PDB files from local installation. If file not found, retreive from public DAS server");
+	    String[] coordSys = new String[] { "PDBresnum", };
+	    String[] capabs   = new String[] { "structure", };
+	    sds.setCoordinateSystem(coordSys);
+	    sds.setCapabilities(capabs);
+	    config.addServer(sds,true);
+	    updateDasSourceTable();
+	}
+    }
+
+    private void updateDasSourceTable(){
+	String seqdata[][] = getTabData();
+	dasSourceTableModel = new MyTableModel(this,seqdata,colNames);
+	dasSourceTable.setModel(dasSourceTableModel);
+	this.repaint();
+	tabbedPane.setSelectedIndex(0);
+    }
+}
+
+class PopupListener extends MouseAdapter {
+    JPopupMenu popup;
+
+    PopupListener(JPopupMenu popupMenu) {
+	popup = popupMenu;
+    }
+
+    public void mousePressed(MouseEvent e) {
+	//System.out.println(e);
+        maybeShowPopup(e);
+    }
+
+    public void mouseReleased(MouseEvent e) {
+        maybeShowPopup(e);
+    }
+
+    private void maybeShowPopup(MouseEvent e) {
+        if (e.isPopupTrigger()) {
+            popup.show(e.getComponent(),
+                       e.getX(), e.getY());
+        }
     }
 }
 
