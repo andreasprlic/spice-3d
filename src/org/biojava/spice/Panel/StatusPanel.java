@@ -30,10 +30,12 @@ import javax.swing.BoxLayout     ;
 import javax.swing.JProgressBar  ;
 import javax.swing.BorderFactory ;
 import javax.swing.Box           ;
+import javax.swing.border.* ;
 
 import java.awt.Dimension        ;
 import java.awt.BorderLayout     ;
 import java.awt.Color            ;
+import java.awt.Graphics;
 
 /** a class to display status information 
  * contains 
@@ -49,44 +51,38 @@ public class StatusPanel
 
     JTextField pdbCode ;
     JTextField spCode  ;    
-    JLabel status ;
+    JTextField status ;
 
     JProgressBar progressBar ;
-    //JPanel pdbPanel ;
-    //JPanel spPanel  ;
 
     public StatusPanel(){
 	this.setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+	this.setBorder(BorderFactory.createEmptyBorder());
 	Box hBox =  Box.createHorizontalBox();
-	//status  = new JLabel();
-	//status.setText("");
-	//this.add(status);
-	
-	//pdbPanel = new JPanel();
+
 	JTextField pdbtxt  = new JTextField("PDB code:");
 	pdbtxt.setEditable(false);
+	pdbtxt.setBorder(BorderFactory.createEmptyBorder());
 	hBox.add(pdbtxt);
 
 	pdbCode = new JTextField("    ");
 	pdbCode.setEditable(false);
-	//pdbPanel.setBorder(BorderFactory.createLineBorder(Color.black));
-	//pdbPanel.add(pdbtxt);
-	//pdbPanel.add(pdbCode);
-	//pdbPanel.setMaximumSize(new Dimension(80,20));
+
+	pdbCode.setBorder(BorderFactory.createEmptyBorder());
 	hBox.add(pdbCode);
-	//hBox.add(pdbCode,BorderLayout.WEST);
+	hBox.add(pdbCode,BorderLayout.WEST);
 	
-	//spPanel = new JPanel();
+
 	JTextField sptxt  = new JTextField("UniProt code:");
 	sptxt.setEditable(false);
+	sptxt.setBorder(BorderFactory.createEmptyBorder());
 	hBox.add(sptxt);
 
 	spCode = new JTextField("      ");
+	spCode.setBorder(BorderFactory.createEmptyBorder());
 	spCode.setEditable(false);
 	hBox.add(spCode);
-	//spPanel.setBorder(BorderFactory.createLineBorder(Color.black));
-	//spPanel.setMaximumSize(new Dimension(80,20));
-	//hBox.add(spPanel,BorderLayout.WEST);
+
 
 	progressBar = new JProgressBar(0,100);
 	progressBar.setValue(0);
@@ -94,15 +90,15 @@ public class StatusPanel
 	progressBar.setString(""); 
 	progressBar.setMaximumSize(new Dimension(80,20));
 	progressBar.setIndeterminate(false);
+	progressBar.setBorder(BorderFactory.createEmptyBorder());
 	hBox.add(progressBar,BorderLayout.EAST);
 	
-	this.add(hBox);
-
-
-	
+	this.add(hBox);	
 
     }
     
+ 
+
     public void setStatus(String txt) { status.setText(txt); }
     
     public void setLoading(boolean flag){

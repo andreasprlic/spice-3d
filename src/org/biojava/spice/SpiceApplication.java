@@ -66,22 +66,22 @@ import java.awt.Event ;
 import java.awt.TextField ;
 import java.awt.event.*    ;
 
-import javax.swing.Box ;
-import javax.swing.text.Document ;
-import javax.swing.text.Element ;
-import javax.swing.JSplitPane ;
-import javax.swing.JFrame  ;
-import javax.swing.JPanel  ;
-import javax.swing.BoxLayout;
-import javax.swing.JList       ;
-import javax.swing.ListCellRenderer ;
-import javax.swing.JScrollPane ;
-import javax.swing.DefaultListModel   ;
-import javax.swing.JTextField   ;
+import javax.swing.Box                          ;
+import javax.swing.text.Document                ;
+import javax.swing.text.Element                 ;
+import javax.swing.JSplitPane                   ;
+import javax.swing.JFrame                       ;
+import javax.swing.JPanel                       ;
+import javax.swing.BoxLayout                    ;
+import javax.swing.JList                        ;
+import javax.swing.ListCellRenderer             ;
+import javax.swing.JScrollPane                  ;
+import javax.swing.DefaultListModel             ;
+import javax.swing.JTextField                   ;
 import javax.swing.event.ListSelectionListener  ;
-import javax.swing.event.ListSelectionEvent ;  
-import javax.swing.ImageIcon;
-
+import javax.swing.event.ListSelectionEvent     ;  
+import javax.swing.ImageIcon                    ;
+import javax.swing.BorderFactory                ;
 //import javax.swing.event.CaretEvent;
 //import javax.swing.event.CaretListener;
 
@@ -415,6 +415,7 @@ public class SpiceApplication
 	//mainsharedPanel.setResizeWeight(0.7);
 	//this.getContentPane().add(mainsharedPanel,BorderLayout.NORTH);
 	//this.getContentPane().add(mainsharedPanel);
+	mainsharedPanel.setBorder(BorderFactory.createEmptyBorder());
 	vBox.add(mainsharedPanel,BorderLayout.CENTER);
 
 
@@ -971,7 +972,7 @@ public class SpiceApplication
 	
 	cmd += "colour "+ colour+";";
 	structurePanel.executeCmd(cmd);
-	structurePanel.forceRepaint();
+	//structurePanel.forceRepaint();
 
 	    
     }
@@ -984,7 +985,7 @@ public class SpiceApplication
 	
 	cmd += "colour "+ colour+";";
 	structurePanel.executeCmd(cmd);
-	structurePanel.forceRepaint();
+	//structurePanel.forceRepaint();
 	
 	    
     }
@@ -1003,7 +1004,7 @@ public class SpiceApplication
 	    colour(chainNumber,start,end,colour) ;
 	}
 	structurePanel.executeCmd(cmd);
-	structurePanel.forceRepaint();
+	//structurePanel.forceRepaint();
 	
 
 	/*seqField.setSelectionStart(start);
@@ -1032,7 +1033,7 @@ public class SpiceApplication
 	String cmd = getSelectStr( chainNumber,  seqpos);
 	cmd +=  " spacefill on ;" ;
 	structurePanel.executeCmd(cmd);
-	structurePanel.forceRepaint();
+	//structurePanel.forceRepaint();
 
 	if ( colour  != "") {
 	    colour(chainNumber,seqpos,colour) ;
@@ -1148,7 +1149,7 @@ public class SpiceApplication
 	if (cmd.equals("")) { return ; } 
 	cmd += " set display selected;" ;
 	structurePanel.executeCmd(cmd);
-	structurePanel.forceRepaint();
+	//structurePanel.forceRepaint();
 	
 		
 	
@@ -1164,7 +1165,7 @@ public class SpiceApplication
 	if (cmd.equals("")) { return ; } 
 	cmd += " set display selected;" ;
 	structurePanel.executeCmd(cmd);
-	structurePanel.forceRepaint();
+	//structurePanel.forceRepaint();
 	
 
     }
