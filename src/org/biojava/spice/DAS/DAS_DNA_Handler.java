@@ -28,10 +28,8 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.Attributes;
 
 /**
+ * a class to parse the XML response of a DAS-DNA request.
  * @author andreas
- *
- * To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Generation - Code and Comments
  */
 public class DAS_DNA_Handler extends DefaultHandler {
 

@@ -28,10 +28,9 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.Attributes;
 
 /**
- * @author andreas
+ * a class that parses the XML response of a DAS - sequence command.
+ * @author Andreas Prlic
  *
- * To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Generation - Code and Comments
  */
 public class DAS_Sequence_Handler extends DefaultHandler {
 

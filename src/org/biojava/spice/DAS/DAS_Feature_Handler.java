@@ -30,10 +30,9 @@ import java.util.ArrayList ;
 import java.util.HashMap ;
 
 /**
- * @author andreas
+ * a class to parse the response of a DAS - Feature request
+ * @author Andreas Prlic
  *
- * To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Generation - Code and Comments
  */
 public class DAS_Feature_Handler  extends DefaultHandler{
 

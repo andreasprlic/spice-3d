@@ -87,6 +87,7 @@ public class RegistryConfiguration
     String[] pdbFileExtensions ;
     String updateBehave        ;
     Date   lastContact         ;
+    String registryUrl         ;
 
     public RegistryConfiguration () {
 	super();
@@ -98,8 +99,18 @@ public class RegistryConfiguration
 	pdbFileExtensions = new String[] { ".pdb",".ent"};
 	updateBehave      = "always";
 	lastContact       = null ;
+	registryUrl       = "http://servlet.sanger.ac.uk:8080/axis/services/das_registry";
     }
 
+
+
+    public void setRegistryUrl(String url) {
+	registryUrl = url;
+    }
+
+    public String getRegistryUrl() {
+	return registryUrl ;
+    }
 
     public void setContactDate(Date d) {
 	lastContact = d;
@@ -108,6 +119,9 @@ public class RegistryConfiguration
     public Date getContactDate() {
 	return lastContact;
     }
+
+
+
 
     /** set to "always", "day" */
     public void setUpdateBehave(String b) {
@@ -360,6 +374,11 @@ public class RegistryConfiguration
 	    xw.attribute("name",capabilities[i]);
 	    xw.closeTag("possibleCapability");
 	}
+
+
+	xw.openTag("registryUrl");
+	xw.attribute("url",registryUrl);
+	xw.closeTag("registryUrl");
 
 	xw.closeTag("SpiceConfig");
 	return xw ;

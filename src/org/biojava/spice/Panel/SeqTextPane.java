@@ -36,6 +36,12 @@ import javax.swing.text.Document ;
 import javax.swing.text.Element ;
 import java.awt.Point ; 
 
+
+
+/** a JTexPane - SeqPanel object that displays the amino acid sequence
+ * of a protein.
+ * @author Andreas Prlic
+ */
 public class SeqTextPane
     extends JTextPane
        

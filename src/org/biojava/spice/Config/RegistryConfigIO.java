@@ -159,6 +159,13 @@ public class RegistryConfigIO
 		} else {
 		    System.out.println("last update < 1 day, using saved config");
 		}
+
+		// test if perhaps registry was changed in config file
+		String oldregistry = config.getRegistryUrl();
+		if (! oldregistry.equals(REGISTRY.toString())) {
+		    System.out.println("registry url was changed since last contact, contacting new registry service");
+		    doRegistryUpdate();
+		}
 		
 	    } else {
 		// behave == always
@@ -192,7 +199,7 @@ public class RegistryConfigIO
 
 	
 	DasRegistryAxisClient rclient = new DasRegistryAxisClient(REGISTRY);
-	
+
 	String[] capabs = rclient.getAllCapabilities();
 	config.setCapabilities(capabs);
 	//Date d = new Date();
@@ -231,6 +238,9 @@ public class RegistryConfigIO
 
 	Date now = new Date();
 	config.setContactDate(now);
+
+	System.out.println("adding registry "+ REGISTRY.toString());
+	config.setRegistryUrl(REGISTRY.toString());
 	disposeProgressBar();
 
 
@@ -594,6 +604,16 @@ class TabbedPaneDemo extends JPanel {
 	    
 	    
 	v.add(h);
+
+
+	// config which registry to use.	
+	JTextField regdesc  = new JTextField("use registry");
+	regdesc.setEditable(false);
+	regdesc.setBorder(BorderFactory.createEmptyBorder());
+	v.add(regdesc);
+	JTextField registry = new JTextField(config.getRegistryUrl());
+	v.add(registry);
+
 	generalConfigForm.add(v);
 	//generalConfigForm.add(contactRegistryNow);
 
@@ -828,6 +848,24 @@ class TabbedPaneDemo extends JPanel {
 
 	dasSourceTable.setSelectionModel(lsm);
 
+	
+	// sorting of order of sources within table ...
+	dasSourceTable.addKeyListener(new KeyListener(){
+		public void keyTyped(KeyEvent e){}
+		public void keyPressed(KeyEvent e){}
+		public void keyReleased(KeyEvent e){
+		    int code = e.getKeyCode();
+		    System.out.println(code + "" + e.getKeyText(code));
+		    if ( code == KeyEvent.VK_PAGE_UP) {
+			System.out.println("cursor up");
+		    }
+		    
+		    
+		}
+		
+	    });
+
+	
 	//Create the popup menu.
 	tablePopup = new JPopupMenu();
 	JMenuItem menuItem = new JMenuItem("activate");

@@ -54,7 +54,8 @@ import javax.swing.ImageIcon ;
 //import ToolTip.* ;
 
 /**
- * requires an arraylist of featrures
+ * A class the provides a graphical reqpresentation of the Features of a protein sequences. Requires an arraylist of features.
+ @author Andreas Prlic
  */
 public class SeqFeatureCanvas 
     extends JPanel 

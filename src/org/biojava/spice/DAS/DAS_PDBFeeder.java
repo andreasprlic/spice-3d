@@ -48,6 +48,12 @@ import org.xml.sax.XMLReader;
 
 import java.awt.Color;
 
+
+
+/** a class that connects to a DAS structure service and retreives a
+ * structure.
+ * @author Andreas Prlic
+*/
 public class DAS_PDBFeeder 
 {
 
@@ -59,7 +65,7 @@ public class DAS_PDBFeeder
     
 
     Color currentColor, initColor, seColors[][], entColors[];
-    String dassequencecommand ;
+    //String dassequencecommand ;
     String dasalignmentcommand ;
 
     boolean structureDone ;
@@ -80,10 +86,10 @@ public class DAS_PDBFeeder
 	entColors[5] = Color.pink;
 	entColors[6] = Color.yellow;
 
-	List seqservers = config.getServers("sequence","UniProt");
-	SpiceDasSource ds = (SpiceDasSource)seqservers.get(0);
+	//List seqservers = config.getServers("sequence","UniProt");
+	//SpiceDasSource ds = (SpiceDasSource)seqservers.get(0);
 	
-	dassequencecommand  = ds.getUrl()  + "sequence?segment=";
+	//dassequencecommand  = ds.getUrl()  + "sequence?segment=";
 
 	List aligservers = config.getServers("alignment");
 	if ( aligservers.size() > 0 ) {
@@ -155,7 +161,7 @@ public class DAS_PDBFeeder
 	    // and find out to which UniProt sequence this chain mapps to ...
 
 	    System.out.println(getTimeStamp() );
-	    DASAlignment_Handler dasali = new DASAlignment_Handler(this,pdb_container,dassequencecommand,dasalignmentcommand,pdb_id);
+	    DASAlignment_Handler dasali = new DASAlignment_Handler(this,pdb_container,config,dasalignmentcommand,pdb_id);
 	   
 	    dasali.start();
 	    

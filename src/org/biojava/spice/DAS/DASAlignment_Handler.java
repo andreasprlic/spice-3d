@@ -39,6 +39,13 @@ import java.util.* ;
 
 import java.io.*;
 
+/** connects to a UniPro to PDB alignment service and
+ * creates a structure object that corresponds to a UniProt +
+ * assoc. PDB-Chain. 
+ *
+ * @author Andreas Prlic
+ */
+
 public class DASAlignment_Handler extends Thread
 {
 
@@ -51,7 +58,7 @@ public class DASAlignment_Handler extends Thread
     //static String SEQUENCESERVER    = "http://das.ensembl.org/das/swissprot/dna?segment=" ;
 	  
     String alignmentserver ;
-    String sequenceserver  ;
+    //String sequenceserver  ;
     
     // hard coded that refference is UniProt!!!
     // find a better solution ...
@@ -68,15 +75,18 @@ public class DASAlignment_Handler extends Thread
     String pdb_id ;
     boolean downloadFinished ;
     DAS_PDBFeeder master ;
+
+    RegistryConfiguration config ;
+
     /** set the connection commands */
 
 
-    public DASAlignment_Handler(DAS_PDBFeeder parent, Structure pdbcontainer, String sequenceserv,String alignmentserv,String pdbid) {
+    public DASAlignment_Handler(DAS_PDBFeeder parent, Structure pdbcontainer, RegistryConfiguration configuration,String alignmentserv,String pdbid) {
 	master = parent ;
 	pdb_container =  pdbcontainer;
 	sequencelist = new ArrayList() ;
 	alignmentserver = alignmentserv ;
-	sequenceserver  = sequenceserv  ;
+	config = configuration ;
 	pdb_id = pdbid ;
 	downloadFinished = false ;
 
@@ -250,9 +260,15 @@ public class DASAlignment_Handler extends Thread
 	
 	if ( sequence == null ) {
 
-	    String connstr = sequenceserver ;
-	    DAS_SequenceRetreive seq_das = new DAS_SequenceRetreive(connstr) ;
-	    sequence              = seq_das.get_sequence(swissp_id);
+	    //String connstr = sequenceserver ;
+	    DAS_SequenceRetreive seq_das = new DAS_SequenceRetreive(config) ;
+	    try {
+		sequence              = seq_das.get_sequence(swissp_id);
+	    } catch ( ConfigurationException e) {
+		e.printStackTrace();
+		System.out.println("could not retreive any sequence from DAS servers");
+		return "";
+	    }
 	    //System.out.println("got sequence using DAS: " + sequence);
 	    addSequenceToMemory(sequence,swissp_id);
 	}

@@ -41,10 +41,9 @@ import java.net.HttpURLConnection;
 
 
 /**
- * @author andreas
+ * A class to retreive performe a DAS features request
+ * @author Andreas Prlic
  *
- * To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Generation - Code and Comments
  */
 public class DAS_FeatureRetreive {
 

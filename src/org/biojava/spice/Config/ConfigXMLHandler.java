@@ -112,6 +112,9 @@ public class ConfigXMLHandler extends DefaultHandler {
 	else if (qName.equals("possibleCapability")) {
 	    possibleCapabs.add(atts.getValue("name"));
 	}
+	else if (qName.equals("registryUrl")) {
+	    config.setRegistryUrl(atts.getValue("url"));
+	}
     }
 	
     private Date getDatefromString(String d){

@@ -39,7 +39,10 @@ import javax.xml.parsers.*                 ;
 
 import org.biojava.utils.xml.*             ; 
 
-/** a class to store the config */
+/** a class to store the config using the Java Web Start
+ * PersistenService.
+ * @author Andreas Prlic
+*/
 public class PersistentConfig
 {
 

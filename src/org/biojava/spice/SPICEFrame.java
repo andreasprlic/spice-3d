@@ -54,14 +54,14 @@ public interface SPICEFrame  {
     
     /** set a structure to be displayed and sends a script command to
      * color structure 
-     * @param structre_ a Biojava structure object
+     * @param structure a Biojava structure object
      * @param selectcmd a rasmol like select command ( all commands in one line, spearated by ";"
      */
     public void   setStructure(Structure structure, String selectcmd );
 
     /** set a structure to be displayed. Use a default select command
      * to color structure
-     * @param structre_ a Biojava structure object
+     * @param structure a Biojava structure object
      */
     public void   setStructure(Structure structure );
 

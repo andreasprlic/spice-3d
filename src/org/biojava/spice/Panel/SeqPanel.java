@@ -27,6 +27,12 @@ package org.biojava.spice;
 import org.biojava.bio.structure.Chain ;
 
 
+/** All "SeqPanel" object need to implement these functions. SeqPanel
+ * objects have the UniProt sequence (i.e. the central SPICEFrame
+ * structure object) as coordinate System 
+ * @author Andreas Prlic
+*/
+
 public interface SeqPanel {
 
     /** set a Chain, tells which chain number in spice master application */

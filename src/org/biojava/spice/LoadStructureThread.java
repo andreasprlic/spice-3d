@@ -31,6 +31,12 @@ import java.util.List ;
 import org.biojava.bio.structure.Structure ;
 import org.biojava.bio.structure.StructureImpl ;
 
+
+/** Loads a structure object in an independent Thread.  once loading
+ * is finished sets the new structure object in the master SPICEFrame
+ * @author Andreas Prlic
+ */
+
 public class LoadStructureThread 
     extends Thread {
 

@@ -100,6 +100,9 @@ import javax.swing.text.*;
 // for DAS registration server:
 //import org.biojava.services.das.registry.*;
 
+
+
+/** the main application layer of SPICE */
 public class SpiceApplication 
     extends  JFrame
     implements SPICEFrame 
@@ -635,7 +638,7 @@ public class SpiceApplication
 
     /** set a structure to be displayed and sends a script command to
      * color structure 
-     * @param structre_ a Biojava structure object
+     * @param structure_ a Biojava structure object
      * @param selectcmd a rasmol like select command ( all commands in one line, spearated by ";"
      */
     
@@ -684,7 +687,7 @@ public class SpiceApplication
 
     /** set a structure to be displayed. Use a default select command
      * to color structure
-     * @param structre_ a Biojava structure object
+     * @param structure_ a Biojava structure object
      */
     public void setStructure(Structure structure_ ) {
 	//System.out.println("setting structure");

@@ -36,6 +36,9 @@ import javax.swing.JFrame ;
 import java.net.URL;
 import java.net.MalformedURLException ;
 
+
+
+/** the startup class of SPICE */
 public class Spice extends Applet {
 
     SpiceButton spicebutton ;

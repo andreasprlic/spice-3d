@@ -30,7 +30,10 @@ import java.util.List ;
 import java.io.IOException ;
 import org.biojava.bio.Annotation;
 
-
+/** Loads a structure alignment in an independent Thread.  once loading
+ * is finished sets the new structure object in the master SPICEFrame
+ * @author Andreas Prlic
+ */
 public class LoadStructureAlignmentThread 
     extends Thread {
     SPICEFrame spiceframe ;
