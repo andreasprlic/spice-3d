@@ -546,7 +546,8 @@ implements SPICEFrame
             reset   = new JMenuItem("Reset",resetIcon);
         reset.setMnemonic(KeyEvent.VK_R);
         
-        ImageIcon lockIcon = createImageIcon("lock.png");
+        /*
+         * ImageIcon lockIcon = createImageIcon("lock.png");
         
         if (lockIcon != null)
             lock = new JMenuItem("Lock Selection",lockIcon);
@@ -562,7 +563,7 @@ implements SPICEFrame
         lockMenu = unlock;
         lockMenu.setMnemonic(KeyEvent.VK_U);
         lockMenu.setEnabled(selectionLocked);
-        
+        */
         JMenuItem backbone   = new JMenuItem("Backbone");
         JMenuItem wireframe  = new JMenuItem("Wireframe");
         JMenuItem cartoon    = new JMenuItem("Cartoon");
@@ -574,7 +575,7 @@ implements SPICEFrame
         JMenuItem colorcpk   = new JMenuItem("Color - cpk");
         
         reset.addActionListener     ( ml );
-        lockMenu.addActionListener    ( ml );
+        //lockMenu.addActionListener    ( ml );
         backbone.addActionListener  ( ml );
         wireframe.addActionListener ( ml );	
         cartoon.addActionListener   ( ml );
@@ -586,7 +587,7 @@ implements SPICEFrame
         
         
         display.add( reset   );
-        display.add( lockMenu  );
+        //display.add( lockMenu  );
         display.addSeparator();
         
         display.add( backbone   );
@@ -1205,7 +1206,7 @@ implements SPICEFrame
     
     public void setSelectionLocked(boolean status) {
         selectionLocked = status ;
-        lockMenu.setEnabled(selectionLocked);     
+        //lockMenu.setEnabled(selectionLocked);     
     }
     
     public boolean isSelectionLocked() {
@@ -1319,7 +1320,7 @@ implements SPICEFrame
         if ( first_load)       return ;		
         if ( start       < 0 ) return ;
         if ( chainNumber < 0 ) return ;
-        if ( selectionLocked ) return ;
+        //if ( selectionLocked ) return ;
         
         // highlite structure
         String cmd = getSelectStr( chainNumber,  start,  end);
@@ -1351,7 +1352,7 @@ implements SPICEFrame
         if (first_load)       return ;		
         if ( seqpos     < 0 ) return ;
         if (chainNumber < 0 ) return ;
-        if ( selectionLocked ) return ;
+        //if ( selectionLocked ) return ;
         
         
         String cmd = getSelectStr( chainNumber,  seqpos);
@@ -1492,7 +1493,7 @@ implements SPICEFrame
     /** select a range of  residue */
     public void select(int chain_number, int start, int end) {
         //logger.finest("select start end" + start + " " + end);
-        if ( selectionLocked ) return ;
+        //if ( selectionLocked ) return ;
         
         if ( chain_number == currentChainNumber ) {
             seqField.select(start,end);		
@@ -1513,7 +1514,7 @@ implements SPICEFrame
     /** select a single residue */
     public void select(int chain_number,int seqpos){
         //logger.finest("select seqpos" + seqpos);
-        if ( selectionLocked ) return ;
+        //if ( selectionLocked ) return ;
         
         if ( chain_number == currentChainNumber ){
             seqField.select(seqpos);

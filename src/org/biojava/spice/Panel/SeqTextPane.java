@@ -94,10 +94,10 @@ implements SeqPanel, MouseListener, MouseMotionListener
         
         SelectionLockMenuListener ml = new SelectionLockMenuListener(spice, null);
         
-        JMenuItem menuItem = new JMenuItem("lock selection");
+        /*JMenuItem menuItem = new JMenuItem("lock selection");
         menuItem.addActionListener(ml);
         popupMenu.add(menuItem);
-        //menuItem = new JMenuItem("delete");
+        *///menuItem = new JMenuItem("delete");
         //menuItem.addActionListener(ml);
         //tablePopup.add(menuItem);
         
@@ -161,10 +161,10 @@ implements SeqPanel, MouseListener, MouseMotionListener
     }
     
     public void mouseClicked(MouseEvent e)  { 
-        if ( dragging) {
-            dragging = false;
-            return;
-        }    
+    
+           	dragging = false;
+           	spice.setSelectionLocked(false);
+        
     
     }
     public void mouseEntered(MouseEvent e)  {}
@@ -206,6 +206,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
     public void mouseDragged(MouseEvent e) {
         //System.out.println("dragging mouse "+e);
         dragging = true ;
+        spice.setSelectionLocked(true);
         if ( selectionStart < 0 )
             return ;
         int b = e.getButton();
@@ -240,6 +241,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         //System.out.println("SeqTExtPane highlite " + start + " " + end);
         //select(start,end);
         dragging = true;
+        spice.setSelectionLocked(true);
         StyledDocument doc = this.getStyledDocument();
         doc.setCharacterAttributes(0,chain.getLength(), this.getStyle("black"),true);
         doc.setCharacterAttributes(start,(end-start +1), this.getStyle("red"),true);
@@ -249,6 +251,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
     /** highighting of single residue */    
     public void highlite( int seqpos) {
         dragging = false ;
+        spice.setSelectionLocked(false);
         //System.out.println("SeqTExtPane highlite " + seqpos);
         select(seqpos);
         StyledDocument doc = this.getStyledDocument();
@@ -261,6 +264,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
     public void select(int start, int end){
         //System.out.println("SeqTExtPane select " + start + " "  + end);
         dragging = true ;
+        spice.setSelectionLocked(true);
         if ( chain == null ) { return ;}
         StyledDocument doc = this.getStyledDocument();
         doc.setCharacterAttributes(0,chain.getLength(), this.getStyle("black"),true);
@@ -273,6 +277,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         //System.out.println("SeqTExtPane select " + seqpos);
         if ( chain == null ) { return ;}
         dragging = false;
+        spice.setSelectionLocked(false);
         StyledDocument doc = this.getStyledDocument();
         doc.setCharacterAttributes(0,chain.getLength(), this.getStyle("black"),true);
         doc.setCharacterAttributes(seqpos,1, this.getStyle("red"),true);	

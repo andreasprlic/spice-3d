@@ -138,8 +138,6 @@ implements ActionListener
             //System.out.println("pressed alig window open");
             AlignmentChooser aligc = new AlignmentChooser(parent);
             aligc.show();
-        } else if (cmd.equals("Unlock Selection")){
-            parent.setSelectionLocked(false);
         } else {
             //System.out.println("unknown menu comand " + cmd);
         }

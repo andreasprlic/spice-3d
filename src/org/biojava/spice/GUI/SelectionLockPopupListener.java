@@ -56,7 +56,7 @@ extends MouseAdapter {
     private void maybeShowPopup(MouseEvent e) {
         if (e.isPopupTrigger()) {
             
-            // get the menu items
+            /*// get the menu items
             MenuElement[] m =	popup.getSubElements() ;
             JMenuItem m0 = (JMenuItem)m[0].getComponent();
             //JMenuItem m1 = (JMenuItem)m[1].getComponent();
@@ -66,7 +66,7 @@ extends MouseAdapter {
                 m0.setText("Unlock Selection") ;
             else 
                 m0.setText("Lock Selection");
-                       
+                  */     
             popup.show(e.getComponent(),		       
                     e.getX(), e.getY());
         }

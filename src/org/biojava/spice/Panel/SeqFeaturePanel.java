@@ -171,9 +171,9 @@ implements SeqPanel, MouseListener, MouseMotionListener
         
         SelectionLockMenuListener ml = new SelectionLockMenuListener(spice,null);
         
-        JMenuItem menuItem = new JMenuItem("lock selection");
-        menuItem.addActionListener(ml);
-        popupMenu.add(menuItem);
+        //JMenuItem menuItem = new JMenuItem("lock selection");
+        //menuItem.addActionListener(ml);
+        //popupMenu.add(menuItem);
         //menuItem = new JMenuItem("delete");
         //menuItem.addActionListener(ml);
         //tablePopup.add(menuItem);
@@ -182,15 +182,9 @@ implements SeqPanel, MouseListener, MouseMotionListener
         MouseListener popupListener = new SelectionLockPopupListener(popupMenu,spice);
         this.addMouseListener(popupListener);
         
-        
     }
     
-    public void lockSelection(){
-        spice.setSelectionLocked(true);
-    }
-    public void unlockSelection(){
-        spice.setSelectionLocked(false);
-    }
+    
     
     
     
@@ -559,7 +553,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
     
     private void clearOldLinkMenus(){
         int nr = popupMenu.getComponentCount();
-        for ( int i = nr-1; i > 0; i--){
+        for ( int i = nr-1; i >= 0; i--){
             popupMenu.remove(i);
         }
         knownLinks = new ArrayList();
@@ -769,6 +763,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         selectStart  = seqpos ;
         selectEnd    = 1     ;
         dragging = false;
+        spice.setSelectionLocked(false);
         this.repaint();
         
     }
@@ -786,6 +781,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         selectStart = start  ;
         selectEnd   = end    ;
         dragging = true;
+        spice.setSelectionLocked(true);
         this.repaint();
         
     }
@@ -975,8 +971,8 @@ implements SeqPanel, MouseListener, MouseMotionListener
             
         }
         
-        if ( spice.isSelectionLocked()) 
-            return;
+        //if ( spice.isSelectionLocked()) 
+        //    return;
         
         if ( dragging) return;
         spice.select(current_chainnumber,seqpos);
@@ -989,6 +985,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
     public void mouseClicked(MouseEvent e)
     {  
        dragging = false;
+       spice.setSelectionLocked(false);
        //this.setToolTipText(null);
        return  ;
     }	
@@ -1007,7 +1004,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
     }
     public void mouseReleased(MouseEvent e) {
         int b = e.getButton();
-        //logger.finest("mouseReleased "+b);       
+        logger.finest("mouseReleased "+b);       
         if ( b != MouseEvent.BUTTON1) {          
             return;
         }           
@@ -1019,15 +1016,16 @@ implements SeqPanel, MouseListener, MouseMotionListener
         //logger.finest("mouseReleased at " + seqpos + " line " + lineNr);
         if ( seqpos    > chain.getLength()) return ;
         
-        if ( b == MouseEvent.BUTTON1 )
+        if ( b == MouseEvent.BUTTON1 ) {
             mouseDragStart =  -1 ;
         
+            
+        }
         if ( dragging ) {
             this.setToolTipText(null);
             return;
         }
-        
-        if ( b == MouseEvent.BUTTON1 && ( ! spice.isSelectionLocked()))
+        if ( b == MouseEvent.BUTTON1 )
         {
             //System.out.println("checking more");
             if ( lineNr < 0 ) return ;
@@ -1045,6 +1043,8 @@ implements SeqPanel, MouseListener, MouseMotionListener
                     }
                     //logger.finest(cmd);
                     spice.executeCmd(cmd);
+                    dragging=true;
+                    spice.setSelectionLocked(true);
                     return  ;
                 } 
             } else {
@@ -1053,6 +1053,8 @@ implements SeqPanel, MouseListener, MouseMotionListener
                 //logger.finest(segment.toString());
                 if (segment != null ) {
                     highliteSegment(segment);
+                    spice.setSelectionLocked(true);
+                    dragging = true;
                     
                     //String drstr = "x "+ seqpos + " y " + lineNr ;
                     String toolstr = getToolString(seqpos,segment);
@@ -1062,8 +1064,8 @@ implements SeqPanel, MouseListener, MouseMotionListener
                     
                     
                 } else {
-                    if ( ! spice.isSelectionLocked())
-                        spice.highlite(current_chainnumber,seqpos);
+                    
+                    spice.highlite(current_chainnumber,seqpos);
                     this.setToolTipText(null);
                 }
             }
@@ -1075,8 +1077,8 @@ implements SeqPanel, MouseListener, MouseMotionListener
         if ( mouseDragStart < 0 )
             return ;        
         
-        if (spice.isSelectionLocked())
-            return;
+        //if (spice.isSelectionLocked())
+          //  return;
         
         int b = e.getButton();
         //logger.finest("dragging mouse "+b);
