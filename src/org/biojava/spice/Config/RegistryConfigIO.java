@@ -141,6 +141,7 @@ public class RegistryConfigIO
 	    System.err.println("an error occured during loading of local config");
 	    e.printStackTrace();
 	    logger.log(Level.WARNING,e.getMessage() + "while loading of local config");
+	    //logger.log(Level.INFO,"contacting registration server");
 	    doRegistryUpdate();
 	    done = true ; 
 	    notifyAll(); 
@@ -177,7 +178,7 @@ public class RegistryConfigIO
 		
 	    } else {
 		// behave == always
-		doRegistryUpdate();
+	        doRegistryUpdate();
 	    }
 	} else {
 	    // persistent config = null
@@ -203,8 +204,13 @@ public class RegistryConfigIO
 	RegistryConfiguration oldconfig = config;
 
 	config = new RegistryConfiguration();
-	
-	DasRegistryAxisClient rclient = new DasRegistryAxisClient(REGISTRY);
+	DasRegistryAxisClient rclient;
+	try {
+	    rclient = new DasRegistryAxisClient(REGISTRY);
+	} catch (Exception e) {
+	    logger.log(Level.SEVERE,e.getMessage());
+	    throw new ConfigurationException("Could not init client to contact registration service");
+	}
 
 	String[] capabs = rclient.getAllCapabilities();
 	config.setCapabilities(capabs);
@@ -259,7 +265,7 @@ public class RegistryConfigIO
 
     
 
-	progressFrame = new JFrame("contacting DAS registration service");
+	progressFrame = new JFrame("contacting registration service");
 	progressFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	/*progressFrame.addWindowListener(new WindowAdapter() {
 		public void windowClosing(WindowEvent evt) {
@@ -270,12 +276,10 @@ public class RegistryConfigIO
 	    });
 	*/
 
-
-
-
 	ImageIcon icon = createImageIcon("spice.png");
-	progressFrame.setIconImage(icon.getImage());
-
+	if (icon != null) {
+	    progressFrame.setIconImage(icon.getImage());
+	}
 	JFrame.setDefaultLookAndFeelDecorated(false);
 	//progressFrame.setUndecorated(true);
 
@@ -283,21 +287,25 @@ public class RegistryConfigIO
 	panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
 	Box vbox = Box.createVerticalBox();
-	JLabel txt = new JLabel("detecting available DAS servers", JLabel.RIGHT);	
+	JLabel txt = new JLabel("detecting available DAS servers");	
 	vbox.add(txt);
 
-	progressBar = new JProgressBar();
+	progressBar = new JProgressBar(0,100);
 	progressBar.setStringPainted(true); //get space for the string
 	progressBar.setString("");          //but don't paint it
 	progressBar.setIndeterminate(true);
+	progressBar.setValue(0);
+	progressBar.setMaximumSize(new Dimension(400,20));
+	progressBar.setBorder(BorderFactory.createEmptyBorder());
 	
 	//progressBar.setMaximum(100);
 	//progressBar.setValue(50);
 	
 	vbox.add(progressBar);
 
-	JLabel server = new JLabel("contacting "+REGISTRY, JLabel.RIGHT);	
-	vbox.add(server);
+	//JLabel server = new JLabel("contacting "+REGISTRY, JLabel.RIGHT);
+	//logger.info("contacting DAS registry at "+REGISTRY);
+	//vbox.add(server);
 	panel.add(vbox);
 	progressFrame.getContentPane().add(panel);
 	progressFrame.pack();
@@ -332,11 +340,8 @@ public class RegistryConfigIO
 	catch ( javax.jnlp.UnavailableServiceException e) {
 	    logger.log(Level.WARNING,e.getMessage() + "while saving config locally");
 	}
-
-
 	
-	spice.setConfiguration(config);
-	    
+	spice.setConfiguration(config);    
 	
     }
 
