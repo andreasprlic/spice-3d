@@ -54,8 +54,8 @@
     <property name="classpath" value="bytecode.jar:htmlparser.jar:commons-cli.jar:commons-dbcp-1.1.jar:commons-pool-1.1.jar:hsqldb.jar" />
 
     <property name="ant-tasks.path" value="ant-lib/sablecc.jar:ant-lib/anttask.jar" />
-
     <property name="docbook.tools.file" value="docbook.jar" />
+    <property name="thirdparty.dir" value="./thirdparty" />
 
     <!-- Check the current system classpath for JUnit -->
     <available classpath="${java.class.path}"
@@ -131,7 +131,7 @@
     <property name="build.docs.spice" value="${build.dest.docs}/${name.spice}" />
     <property name="build.doccheck.spice" value="${build.dest.doccheck}/${name.spice}" />
     <property name="jar.spice" value="${build.dir}/${name.spice}.jar" />
-    <property name="manifest.file.spice" value="${manifest.dir}/manifest.mf" />
+    <property name="manifest.file.spice" value="${manifest.dir}/MANIFEST.MF" />
     <!-- Subdirectories for tests source and classes -->
     <property name="name.tests" value="tests" />
     <property name="build.dest.tests" value="${build.classes.dir}/${name.tests}" />
@@ -374,6 +374,16 @@
   </target>
 
 
+  <target name="unjar-libs" >
+  <!-- unjar thirdparty libs -->
+  <unjar dest="${thirdparty.dir}/tmp/">
+       <fileset dir="${thirdparty.dir}">
+       	    <filename name="**/*.jar"/>
+       </fileset>
+  </unjar>
+
+  </target>
+
   <!--
     Creates the .jar files containing each distributable component.
 
@@ -388,13 +398,18 @@
 
   <target name="package-spice" depends="compile-spice"
   description="create spice class jar file">
+  <echo message="did you           ant unjar-libs   ?"/>
     <jar
       jarfile="${jar.spice}"
       manifest="${manifest.file.spice}"
     >
-      <fileset dir="${build.dest.spice}" />
-      <fileset dir="${resources.dir}" />
+      <fileset dir="${build.dest.spice}"    />
+      <fileset dir="${resources.dir}"       />
+      <fileset dir="${thirdparty.dir}/tmp/" />
     </jar>
+
+    
+
   </target>
 
   <!-- Create the demo package -->
@@ -415,9 +430,27 @@
       jarfile="${jar.apps}"
       manifest="${manifest.dir}/apps.txt"
     >
-      <fileset dir="${build.dest.apps}" />
+      <fileset dir="${build.dest.apps}" />    
     </jar>
   </target>
+
+
+<target name="war" depends="package-spice">
+    <signjar jar="${build.dir}/${name.spice}.jar" 
+	     alias="protodas" 
+	     storepass="Kan0n3"/> 
+
+      <war 	destfile="spice.war" 
+      		webxml="${webapp.dir}/WEB-INF/web.xml" 		
+         	manifest="${manifest.file.main}" 	
+	>
+	<lib     dir="${build.dir}"/>
+	<lib     dir="${thirdparty.dir}"/>
+	<classes dir="${build.classes.dir}"/>
+	<fileset dir="${webapp.dir}"/>	   
+      </war>
+
+</target>
 
 
   <!-- copy into WWW dir -->
@@ -431,8 +464,8 @@
     </copy>
     
     <signjar jar="${www.dir}/${name.spice}.jar" 
-	     alias="myalias" 
-	     storepass="secret"/>
+	     alias="protodas" 
+	     storepass="Kan0n3"/>
   </target>
 
   <target
@@ -636,5 +669,8 @@
   <target name="clean" depends="init"
   description="Cleans everything">
     <delete dir="${build.dir}" />
+    <!-- clean up thirdparty libs -->
+    <delete dir="${thirdparty.dir}/tmp/" />
+
   </target>
 </project>
