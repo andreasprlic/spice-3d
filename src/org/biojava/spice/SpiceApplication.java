@@ -592,6 +592,9 @@ public class SpiceApplication
 	display.add(colorcpk)  ;
 
 
+	menu.add(Box.createGlue());
+
+
 	// Help submenu
 	JMenu help = new JMenu("Help");
 	help.setMnemonic(KeyEvent.VK_H);
@@ -1250,12 +1253,13 @@ public class SpiceApplication
 	    dascanv.select(start,end);
 	}
 	
-
+	
 	String cmd = getSelectStr( chain_number,  start,  end);
 	if (cmd.equals("")) { return ; } 
 	cmd += " set display selected;" ;
 	structurePanel.executeCmd(cmd);
 	//structurePanel.forceRepaint();
+	
 
 
     }
@@ -1269,11 +1273,13 @@ public class SpiceApplication
 	    dascanv.select(seqpos);
 	}
 
+
 	String cmd = getSelectStr( chain_number, seqpos) ;
 	if (cmd.equals("")) { return ; } 
 	cmd += " set display selected;" ;
 	structurePanel.executeCmd(cmd);
 	//structurePanel.forceRepaint();
+
 	
 
     }

@@ -60,7 +60,8 @@ public class SeqTextPane
     int current_chainnumber ;
 
     int selectionStart  ;
-
+    ISearchListener isearchListener ;
+    
     public SeqTextPane (SPICEFrame spicef) {
 	super();
 	spice = spicef;
@@ -82,7 +83,8 @@ public class SeqTextPane
 	//StyleConstants.setBold(bstyle,false);
 
 	this.setEditable(false);
-	this.addKeyListener(new ISearchListener(spice,this));
+	isearchListener = new ISearchListener(spice,this);
+	this.addKeyListener(isearchListener);
     }
 
 
@@ -108,6 +110,7 @@ public class SeqTextPane
 
     public void mouseMoved(MouseEvent e)
     {	
+	isearchListener.clear();
 
 	int seqpos = getSeqPos(e);
 	if ( seqpos < 0 ) return ; 
@@ -247,8 +250,11 @@ class ISearchListener
 	validText = Pattern.compile("[a-zA-Z]");
 	
     }
-    
-    
+    /** clear the current searchtext */
+    public void clear(){
+	searchtext ="" ;
+
+    }
 
     public void keyReleased(KeyEvent e){
 	int code = e.getKeyCode();

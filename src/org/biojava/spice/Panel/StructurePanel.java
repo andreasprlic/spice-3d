@@ -64,13 +64,21 @@ class StructurePanel extends JPanel
     
     SPICEFrame  spice ;
     JmolPopup jmolpopup ;
+
+    JTextField  strucommand  ; 
     
     StructurePanel(SPICEFrame parent) {
 	spice   = parent ;
+
 	adapter = new SmarterJmolAdapter(null);
+
 	viewer  = org.jmol.viewer.Viewer.allocateJmolViewer(this, adapter);
 	viewer.setJmolStatusListener(this);
 	jmolpopup = JmolPopup.newJmolPopup(viewer);
+	
+
+	
+
 	
     }
     
@@ -272,3 +280,5 @@ class StructurePanel extends JPanel
 
 
 }
+
+

@@ -94,12 +94,16 @@ public class DAS_FeatureRetreive {
 			} catch (ParserConfigurationException e) {
 			    e.printStackTrace();
 			}
-	
+			
+		
+		
 			String vali = System.getProperty("XMLVALIDATION");
+			
 			boolean validation = false ;
-			if ( vali.equals("true") ) {
-			    validation = true ;
-			}
+			if ( vali != null )
+			    if ( vali.equals("true") ) 
+				validation = true ;
+			
 			
 			XMLReader xmlreader = saxParser.getXMLReader();
 			

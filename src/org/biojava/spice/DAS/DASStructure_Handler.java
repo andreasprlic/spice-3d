@@ -47,7 +47,7 @@ public class DASStructure_Handler
     //String DASSTRUCTURECOMMAND = "http://protodas.derkholm.net/dazzle/mystruc/structure?query=" ;
     
     boolean finished            ;
-    DAS_PDBFeeder master        ;
+    //DAS_PDBFeeder master        ;
     
     Structure structure         ; 
     RegistryConfiguration config;
@@ -118,7 +118,11 @@ public class DASStructure_Handler
 		    }
 		    continue ;
 		} else {
-		    // trying structure server ...
+		    // trying structure server ..
+		    char lastChar = url.charAt(url.length()-1);		 
+		    if ( ! (lastChar == '/') ) 
+			url +="/" ;
+
 		    String dasstructurecommand = url + "structure?model=1&query=";
 	    
 

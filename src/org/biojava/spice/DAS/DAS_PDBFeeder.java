@@ -91,12 +91,27 @@ public class DAS_PDBFeeder
 	//dassequencecommand  = ds.getUrl()  + "sequence?segment=";
 
 	List aligservers = config.getServers("alignment");
-	if ( aligservers.size() > 0 ) {
-	    SpiceDasSource ads = (SpiceDasSource)aligservers.get(0);	    
-	    dasalignmentcommand  = ads.getUrl() +  "alignment?query=" ; 
-	} else {
-	    logger.log(Level.SEVERE,"no alignment server found!, unable to map sequence to structure");
-	    dasalignmentcommand = "";
+	dasalignmentcommand = null  ;
+	
+	for ( int i =0 ; i < aligservers.size() ; i++ ) {
+	    SpiceDasSource sds= (SpiceDasSource)aligservers.get(i);
+	   
+	    if ( config.isSeqStrucAlignmentServer(sds) ) {
+	
+		//
+		String url = sds.getUrl() ;
+		char lastChar = url.charAt(url.length()-1);		 
+		if ( ! (lastChar == '/') ) 
+		    url +="/" ;
+		dasalignmentcommand  = url +  "alignment?query=" ;
+		break ;
+	    }
+	}
+	
+	    
+	if ( dasalignmentcommand == null ) {
+	    logger.log(Level.SEVERE,"no UniProt - PDBresnum alignment server found!, unable to map sequence to structure");
+	    dasalignmentcommand = "" ;
 	}
 
 	pdb_container =  new StructureImpl();

@@ -138,7 +138,7 @@ public class RegistryConfiguration
     public String[] getPDBFileExtensions() { return pdbFileExtensions ;}
     public void setPDBFileExtensions(String[] exts) { pdbFileExtensions = exts ; } 
     
-    private boolean isSeqStrucAlignmentServer(SpiceDasSource source) {
+    public boolean isSeqStrucAlignmentServer(SpiceDasSource source) {
 	boolean msdmapping = false ;
 	String[] coordsys = source.getCoordinateSystem() ;
 	
@@ -147,7 +147,7 @@ public class RegistryConfiguration
 	
 	pdbflag     =  hasCoordSys("PDBresnum",source) ;
 	uniprotflag =  hasCoordSys("UniProt",source)   ;
-	
+	//System.out.println(pdbflag + " " + uniprotflag);
 	if (( uniprotflag == true) && ( pdbflag == true)) {
 	    msdmapping = true ;
 	}
@@ -273,7 +273,6 @@ public class RegistryConfiguration
 	return allservers ;
     }
 
-    // todo ...
     public List getServers(){
 	return activeservers ;	
     }
@@ -303,16 +302,18 @@ public class RegistryConfiguration
 	    for ( int c=0; c<capabilities.length ;c++) {
 		String capabil = capabilities[c];
 		if ( capability.equals(capabil)){
-		    // at the moment we only know about UniProt PDB servers,,,
-		    if ( capabil.equals("alignment") ){
-			if ( isSeqStrucAlignmentServer(ds) ){
-			    retservers.add(ds);
-			} else {
-			    System.out.println("DasSource " + ds.getUrl() + " is not a UniProt to PDB alignment service, unable to use");
-			}
-		    } else {
-			retservers.add(ds);
-		    }
+		    // knowledge about about UniProt PDB servers needs to be handled by clients...
+		    retservers.add(ds);
+		    //if ( capabil.equals("alignment") ){
+			
+			//if ( isSeqStrucAlignmentServer(ds) ){
+		
+			//} else {
+			//System.out.println("DasSource " + ds.getUrl() + " is not a UniProt to PDB alignment service, unable to use");
+			//}
+		    //} else {
+		    //retservers.add(ds);
+		    //}
 		}
 	    }
 	}

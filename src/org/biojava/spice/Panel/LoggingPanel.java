@@ -55,6 +55,9 @@ import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ChangeEvent;
 
+import javax.swing.event.TableModelListener ;
+import javax.swing.event.TableModelEvent ;
+
 import javax.swing.DefaultCellEditor;
 
 
@@ -111,6 +114,9 @@ import java.util.ArrayList;
  * @author Martin Desruisseaux
  */
 public class LoggingPanel extends JPanel {
+
+    JScrollPane scroll ;
+
     /**
      * Enumeration class for columns to be shown in a {@link LoggingPanel}.
      * Valid columns include {@link #LOGGER LOGGER}, {@link #CLASS CLASS},
@@ -207,9 +213,17 @@ public class LoggingPanel extends JPanel {
             }
         }
 
-        final JScrollPane scroll = new JScrollPane(table);
+	scroll = new JScrollPane(table);
         //new AutoScroll(scroll.getVerticalScrollBar().getModel());
-
+	model.addTableModelListener(new TableModelListener(){
+		public void tableChanged(TableModelEvent e){
+		    if ( e.getType() == TableModelEvent.INSERT ) {
+			// added a new record, scroll to end
+			scroll.getViewport().setViewPosition(new java.awt.Point(0, (table.getSize().height)));	
+			
+		    }
+		}
+	    });
 	Box vBox = Box.createVerticalBox();
 
 	vBox.add(scroll);
@@ -225,11 +239,11 @@ public class LoggingPanel extends JPanel {
 		
 	    });
 	
-	Box hBox = Box.createHorizontalBox();
-	hBox.add(clearButton,BorderLayout.WEST);
-	
-	vBox.add(hBox);
-	
+	//Box hBox = Box.createHorizontalBox();
+	//hBox.add(clearButton,BorderLayout.WEST);
+	vBox.add(Box.createGlue());
+	vBox.add(clearButton);
+
 	
 
         add(vBox);

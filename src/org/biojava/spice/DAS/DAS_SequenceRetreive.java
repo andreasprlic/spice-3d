@@ -88,7 +88,11 @@ public class DAS_SequenceRetreive {
 	    if ( gotSequence ) break ;
 	    
 	    SpiceDasSource ds = (SpiceDasSource) iter.next();
-	    String dascmd = ds.getUrl() + "/sequence?segment=";
+	    String url = ds.getUrl() ;
+	    char lastChar = url.charAt(url.length()-1);		 
+	    if ( ! (lastChar == '/') ) 
+		url +="/" ;
+	    String dascmd = url + "sequence?segment=";
 	    String connstr = dascmd + sp_accession ;
 	    
 	    try {

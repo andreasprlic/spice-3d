@@ -64,26 +64,26 @@ import javax.swing.JComponent              ;
 import javax.swing.JTable                  ;
 import javax.swing.table.TableColumn       ;
 import javax.swing.JProgressBar            ;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.event.TableModelEvent   ;
-import javax.swing.BorderFactory           ;
-import javax.swing.JComboBox               ;
-import javax.swing.JList                   ;
-import javax.swing.ListSelectionModel      ;
+import javax.swing.table.AbstractTableModel      ;
+import javax.swing.event.TableModelEvent         ;
+import javax.swing.BorderFactory                 ;
+import javax.swing.JComboBox                     ;
+import javax.swing.JList                         ;
+import javax.swing.ListSelectionModel            ;
 import javax.swing.event.ListSelectionListener   ;
 import javax.swing.event.ListSelectionEvent      ;
-import javax.swing.JFileChooser            ;
-import javax.swing.JPopupMenu              ;
-import javax.swing.JMenuItem               ;
-import javax.swing.MenuElement             ;
-
-import java.awt.BorderLayout               ;
-import java.awt.Dimension                  ;
-import java.awt.GridLayout                 ;
-import java.awt.event.KeyEvent             ;
-import java.awt.event.ActionEvent          ;
-import java.awt.event.ActionListener       ;
-import java.awt.event.MouseAdapter         ;
+import javax.swing.JFileChooser                  ;
+import javax.swing.JPopupMenu                    ;
+import javax.swing.JMenuItem                     ;
+import javax.swing.MenuElement                   ;
+import javax.swing.JSplitPane                    ;
+import java.awt.BorderLayout                     ;
+import java.awt.Dimension                        ;
+import java.awt.GridLayout                       ;
+import java.awt.event.KeyEvent                   ;
+import java.awt.event.ActionEvent                ;
+import java.awt.event.ActionListener             ;
+import java.awt.event.MouseAdapter               ;
 
 
 /** a class to contact and retreive the configuration from a DAS
@@ -96,7 +96,7 @@ public class RegistryConfigIO
 {
     // in milliseconds
     // 100 milliseconds * 60 seconds * 60 minutes * 24 hours = 1 day
-    public static final long  TIME_BETWEEN_UPDATES = 100*60*60*24;
+    public static final long  TIME_BETWEEN_UPDATES = 10*60*60*24;
 
     URL REGISTRY  ;
 	
@@ -858,6 +858,7 @@ class TabbedPaneDemo extends JPanel {
 	// Configure some of JTable's paramters
 	dasSourceTable.setShowHorizontalLines( false );
 	dasSourceTable.setRowSelectionAllowed( true );
+	dasSourceTable.setMinimumSize(new Dimension( 200,200));
 	//dasSourceTable.setColumnSelectionAllowed( true );
 	dasSourceTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
@@ -978,9 +979,16 @@ class TabbedPaneDemo extends JPanel {
 	seqscrollPane.setBorder(dasborder1);
 	
 	sourceDescription = new JTextArea("");
+	JScrollPane descriptscrollPane = new JScrollPane(sourceDescription);
+	
+	JSplitPane jsplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, seqscrollPane, descriptscrollPane);
+	//seqstrucpanel.add( seqscrollPane, BorderLayout.CENTER );
+	//seqstrucpanel.add(sourceDescription);
+	jsplit.setOneTouchExpandable(true);
+	//seqSplitPane.setOpaque(true);
+	jsplit.setResizeWeight(0.6);
 
-	seqstrucpanel.add( seqscrollPane, BorderLayout.CENTER );
-	seqstrucpanel.add(sourceDescription);
+	seqstrucpanel.add(jsplit);
 	return seqstrucpanel ;
     }
 

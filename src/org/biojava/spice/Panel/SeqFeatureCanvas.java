@@ -73,7 +73,7 @@ public class SeqFeatureCanvas
     public static final int    DEFAULT_Y_STEP         = 10 ;
     public static final int    DEFAULT_Y_HEIGHT       = 4 ;
     public static final int    DEFAULT_Y_BOTTOM       = 16 ;
-    public static final int    TIMEDELAY              = 0 ;
+    public static final int    TIMEDELAY              = 300 ;
 
 
 
@@ -745,6 +745,9 @@ public class SeqFeatureCanvas
 
     public void mouseMoved(MouseEvent e)
     {	
+
+	
+
 	//, int x, int y
 	int seqpos = getSeqPos(e);
 	int linenr = getLineNr(e);
@@ -757,7 +760,9 @@ public class SeqFeatureCanvas
 	
 	// and the feature display
 	
-	Feature feature = getFeatureAt(seqpos,linenr);
+	//Feature feature = getFeatureAt(seqpos,linenr);
+
+
 
 	Segment segment = getSegmentUnder(seqpos,linenr);
 	if ( segment != null) {
@@ -767,13 +772,30 @@ public class SeqFeatureCanvas
 	    // display ToolTip
 	    this.setToolTipText(toolstr);
 	} else {
+	    spice.showSeqPos(current_chainnumber,seqpos);
 	    this.setToolTipText(null);
 	}
-
-
-	//spice.showSeqPos(current_chainnumber,seqpos);
-	spice.select(current_chainnumber,seqpos);
 	
+	/*
+	// only do this every X millisec.
+	Date now = new Date() ;
+	
+	long diff = now.getTime() - lastHighlight.getTime() ; 
+	System.out.println(diff);
+	if ( diff > TIMEDELAY ) {
+	    //return ; 
+	    
+	    //spice.showSeqPos(current_chainnumber,seqpos);
+
+
+	    
+	    
+	    lastHighlight = new Date();
+	}
+	*/
+
+	// disabled Jmol - slows down things a lot...
+	spice.select(current_chainnumber,seqpos);
 	return  ;
     }
 	
