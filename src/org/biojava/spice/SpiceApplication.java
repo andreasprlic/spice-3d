@@ -102,6 +102,7 @@ public class SpiceApplication
     extends  JFrame
     implements SPICEFrame 
 {
+    
 
     //public static final String CONFIG_FILE = "config.xml";
     URL CONFIG_URL      ; 
@@ -162,11 +163,22 @@ public class SpiceApplication
     SpiceApplication(String pdbcode_, URL config_url, URL registry_url) {
 	super();
 
+
+
 	System.setProperty("XMLVALIDATION",XMLVALIDATION);
 	int timeout = 10000;
 	System.out.println("setting timeouts to " + timeout) ;
 	System.setProperty("sun.net.client.defaultConnectTimeout", ""+timeout);
 	System.setProperty("sun.net.client.defaultReadTimeout", ""+timeout);
+
+	Properties sprops = System.getProperties() ;
+	sprops.put("proxySet", "true" );
+	sprops.put("proxyHost", "wwwcache.sanger.ac.uk" );
+	sprops.put("proxyPort", "3128" );
+	sprops.put("http.proxyHost", "wwwcache.sanger.ac.uk");
+	sprops.put("http.proxyPort", "3128");
+
+
 
 
 	CONFIG_URL   = config_url ;
@@ -174,7 +186,7 @@ public class SpiceApplication
 	
 	// first thing is to start communication
 
-	RegistryConfigIO regi = new RegistryConfigIO (REGISTRY_URL);
+	RegistryConfigIO regi = new RegistryConfigIO (this,REGISTRY_URL);
 	regi.run();
 
 	structure = null ;
@@ -308,8 +320,8 @@ public class SpiceApplication
 	dascanv.setBackground(Color.black);
 	dascanv.addMouseMotionListener(dascanv);
 	dascanv.addMouseListener(dascanv);
-	dascanv.setOpaque(true) ;
-	//dascanv.setPreferredSize(new Dimension(200, 200));
+	//dascanv.setOpaque(true) ;
+	dascanv.setPreferredSize(new Dimension(200, 200));
 	//dascanv.setSize(700,300);
 	
 	dasPanel = new JScrollPane(dascanv);
@@ -842,7 +854,7 @@ public class SpiceApplication
 	for (Iterator ti = memoryfeatures.keySet().iterator(); ti.hasNext(); ) {
 	    String key = (String) ti.next() ;
 	    
-	    System.out.println(key);
+	    //System.out.println(key);
 	    if ( key == null) { continue; }
 
 	    if (key.equals(sp_id)) {
@@ -904,7 +916,7 @@ public class SpiceApplication
     }
 
     public void highlite(int chainNumber, int start, int end, String colour){
-	System.out.println("highlite start end" + start + " " + end );
+	//System.out.println("highlite start end" + start + " " + end );
 	if (first_load)       return ;		
 	if ( start    < 0 ) return ;
 	if (chainNumber < 0 ) return ;
@@ -936,7 +948,7 @@ public class SpiceApplication
     }
 
     public void highlite(int chainNumber, int seqpos, String colour) {
-	System.out.println("highlite " + seqpos);
+	//System.out.println("highlite " + seqpos);
 	if (first_load)       return ;		
 	if ( seqpos     < 0 ) return ;
 	if (chainNumber < 0 ) return ;
@@ -1054,7 +1066,7 @@ public class SpiceApplication
 
     /** select a range of  residue */
     public void select(int chain_number, int start, int end) {
-	System.out.println("select start end" + start + " " + end);
+	//System.out.println("select start end" + start + " " + end);
 
 	seqField.select(start,end);
 
@@ -1071,7 +1083,7 @@ public class SpiceApplication
 
     /** select a single residue */
     public void select(int chain_number,int seqpos){
-	System.out.println("select seqpos" + seqpos);
+	//System.out.println("select seqpos" + seqpos);
 	seqField.select(seqpos);
 
 	String cmd = getSelectStr( chain_number, seqpos) ;
@@ -1114,8 +1126,8 @@ public class SpiceApplication
     public boolean handleEvent(Event event) 
     {
 	//System.out.println("EVENT!");
-	System.out.println(event.target);
-	System.out.println(event.id);
+	//System.out.println(event.target);
+	//System.out.println(event.id);
 
 	
 	switch(event.id) 
@@ -1127,15 +1139,15 @@ public class SpiceApplication
 	    }
 
 	if ( event.target == reset) {
-	    System.out.println("resetting display");
+	    //System.out.println("resetting display");
 	    String cmd = INIT_SELECT;
 	    executeCmd(cmd);
 	    return true;
 	}
 
 	if ( event.target == props) {
-	    System.out.println("modify properties");
-	    RegistryConfigIO regi = new RegistryConfigIO(REGISTRY_URL) ;
+	    //System.out.println("modify properties");
+	    RegistryConfigIO regi = new RegistryConfigIO(this,REGISTRY_URL) ;
 	    regi.run();
 	    regi.showConfigFrame();
 		
@@ -1146,13 +1158,13 @@ public class SpiceApplication
 	    return true;
 	}
 	else if ( event.target == openpdb ) {
-	    System.out.println("open DAS");
+	    //System.out.println("open DAS");
 	    OpenDialog op = new OpenDialog(this);
 	    op.show();
 	}
 
 	else if ( event.target == aboutdas ) {
-	    System.out.println("about DAS");
+	    //System.out.println("about DAS");
 	    //AboutDialog asd = new AboutDialog(this);
 	    //asd.setText("DAS homepage: http://www.biodas.org") ;
 	    //asd.show();
@@ -1163,7 +1175,7 @@ public class SpiceApplication
 	    return true;
 	}
 	else if ( event.target ==  aboutspice ) {
-	    System.out.println("about SPICE");
+	    //System.out.println("about SPICE");
 	    AboutDialog asd = new AboutDialog(this);
 
 	    asd.setText("The SPICE Applet. V 0.1 (C) Andreas Prlic, Tim Hubbard\n The Wellcome Trust Sanger Institute 2004 mailto:ap3@sanger.ac.uk") ;

@@ -47,9 +47,10 @@ public class Feature {
     List   segments ;
     String note   ;
     String link   ;
-
+    String source ;
 
     public Feature() {
+	source = "Unknown";
 	method = "Unknown";
 	type   = "Unknown";
 	note   = "";
@@ -65,6 +66,10 @@ public class Feature {
 	str += segments ;
 	return str ;
     }
+
+    public void setSource(String s) { source = s;}
+    public String getSource() { return source; };
+
 
     public void setName(String nam) { name = nam; }
     public String getName() { return name; }

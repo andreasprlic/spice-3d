@@ -113,30 +113,27 @@ public class LoadStructureThread
 	    String dasstructurecommand = getStructureServer() + "structure?model=1&query=";
 	    String dassequencecommand  = getSequenceServer()  + "sequence?segment=";
 	    //String dassequencecommand  = spiceframe.getSequenceServer()  + "sequence?segment=";
-	    String dasalignmentcommand = "" ;
-	    try {
-		dasalignmentcommand = getAlignmentServer() + "alignment?query=" ;
-	    } catch ( ConfigurationException e) {
-		e.printStackTrace();
-	    }
+	    String dasalignmentcommand = dasalignmentcommand = getAlignmentServer() + "alignment?query=" ;
+	   
 	    spiceframe.showStatus("Loading...Wait...",Color.red);
 	    DAS_PDBFeeder pdb_f =  new DAS_PDBFeeder(dasstructurecommand,dassequencecommand,dasalignmentcommand) ;
-	    System.out.println("pdb_f.loadPDB");
+	    //System.out.println("pdb_f.loadPDB");
 	    pdb_f.loadPDB(pdb_file);
-	    System.out.println("pdb_f.getStructure");
+	    //System.out.println("pdb_f.getStructure");
 	    
 	    structure = pdb_f.getStructure() ;
 	    // System.out.println("set Structure");
 	    
 	    spiceframe.setStructure(structure);
 	    spiceframe.showStatus(pdb_file +" loaded");
-	    System.out.println("LoadStructureThread finished");
+	    //System.out.println("LoadStructureThread finished");
 	    finished = true ;
 	    notifyAll();
 	    }
 	catch (Exception e){ 
 	    // at some point raise some IO exception, which should be defined by the Inferface
 	    e.printStackTrace();
+	    finished = true ;
 			
 	}
 

@@ -42,7 +42,7 @@ import org.biojava.services.das.registry.*;
 
 import java.awt.Frame ;
 import java.awt.event.*    ;
-
+import javax.swing.Box ;
 import javax.swing.JButton ;
 import javax.swing.JTabbedPane;
 import javax.swing.ImageIcon;
@@ -82,8 +82,9 @@ public class RegistryConfigIO
 
     JProgressBar progressBar ;
     JFrame progressFrame      ;
-
-    public RegistryConfigIO ( URL registryurl) {
+    SPICEFrame spice  ;
+    public RegistryConfigIO ( SPICEFrame parent , URL registryurl) {
+	spice = parent ;
 	REGISTRY = registryurl ;
 	done = false ;
     }
@@ -125,7 +126,9 @@ public class RegistryConfigIO
 	
 	for (int i = 0 ; i < sources.length; i++) {
 	    DasSource s = sources[i];	    
-	    config.addServer(s,true);
+	    SpiceDasSource sds = new SpiceDasSource();
+	    sds.fromDasSource(s);
+	    config.addServer(sds,true);
 	}
 
 	done = true ; 
@@ -148,10 +151,17 @@ public class RegistryConfigIO
 		}
 	    });
 	*/
-	progressFrame.setUndecorated(true);
+	
+
+	progressFrame.setDefaultLookAndFeelDecorated(false);
+	//progressFrame.setUndecorated(true);
+
 	JPanel panel = new JPanel();
-	JLabel txt = new JLabel("detecting available DAS servers", JLabel.RIGHT);
-	panel.add(txt);
+	panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+	Box vbox = Box.createVerticalBox();
+	JLabel txt = new JLabel("detecting available DAS servers", JLabel.RIGHT);	
+	vbox.add(txt);
 
 	progressBar = new JProgressBar();
 	progressBar.setStringPainted(true); //get space for the string
@@ -161,14 +171,22 @@ public class RegistryConfigIO
 	//progressBar.setMaximum(100);
 	//progressBar.setValue(50);
 	
-	panel.add(progressBar);
-	panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+	vbox.add(progressBar);
+
+	JLabel server = new JLabel("contacting "+REGISTRY, JLabel.RIGHT);	
+	vbox.add(server);
+	panel.add(vbox);
 	progressFrame.getContentPane().add(panel);
 	progressFrame.pack();
 	progressFrame.setVisible(true);
     }
     private void disposeProgressBar(){
 	progressFrame.dispose();
+    }
+
+    /** write back the config to the SPICE application */
+    public void saveConfiguration() {
+	spice.setConfiguration(config);
     }
 
     /** returns the Config for SPICE */
@@ -192,12 +210,12 @@ public class RegistryConfigIO
  
 
     public void showConfigFrame(){
-	//Make sure we have nice window decorations.
-        JFrame.setDefaultLookAndFeelDecorated(true);
 
         //Create and set up the window.
         JFrame frame = new JFrame("SPICE configuration window");
 	frame.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+	//Make sure we have the standard desktop window decorations.
+        JFrame.setDefaultLookAndFeelDecorated(false);
 	
 	
 	
@@ -207,18 +225,28 @@ public class RegistryConfigIO
 
         //frame.getContentPane().add(new TabbedPaneDemo(config),
 	//                       BorderLayout.CENTER);
-	TabbedPaneDemo tpd = new TabbedPaneDemo(config);
-	frame.getContentPane().add(tpd);
+	TabbedPaneDemo tpd = new TabbedPaneDemo(this,config);
+	//frame.getContentPane().add(tpd);
 
 		
-	//JButton saveb   = new JButton("Save");
-	//JButton cancelb = new JButton("Cancel");
-	//saveb.addActionListener(   new ButtonListener(frame, tpd) );
-	//cancelb.addActionListener( new ButtonListener(frame, tpd) );
+	JButton saveb   = new JButton("Save");
+	JButton cancelb = new JButton("Close");
+	saveb.addActionListener(   new ButtonListener(frame, tpd) );
+	cancelb.addActionListener( new ButtonListener(frame, tpd) );
 	
-	//frame.add(saveb);
-	//frame.add(cancelb);
+	Box vbox = Box.createVerticalBox();
+	vbox.add(tpd);
+
+	//frame.getContentPane().add(saveb);
+	//frame.getContentPane().add(cancelb);
+	Box hbox = Box.createVerticalBox();
+	hbox.add(saveb);
+	hbox.add(cancelb);
+
+	vbox.add(hbox);
+	
         //Display the window.
+	frame.getContentPane().add(vbox);
         frame.pack();
         frame.setVisible(true);
     }
@@ -229,7 +257,7 @@ public class RegistryConfigIO
 	List servers =  config.getServers();
 	for (int i = 0 ; i < servers.size(); i++) {
 	    Map s = (Map)servers.get(i) ;
-	    DasSource ds = (DasSource) s.get("server");
+	    SpiceDasSource ds = (SpiceDasSource) s.get("server");
 	    String surl = ds.getUrl();
 	    if ( surl.equals(url) ) {
 		boolean f = flag.booleanValue();
@@ -255,9 +283,10 @@ class ButtonListener
 	String cmd = e.getActionCommand();
 	System.out.println("button pressed:" + cmd);
 	if ( cmd.equals("Close")) {
+	    //System.out.println("closing..");
 	    parent.dispose();
 	} else  if (cmd.equals("Save")) {
-	    configpane.saveConfig();
+	    configpane.saveConfiguration();
 	}
 
     
@@ -269,11 +298,11 @@ class TabbedPaneDemo extends JPanel {
     static String[] colNames= new String [] {"name","url","coordinateSystems","adminemail","capabilities","description"};
 
     RegistryConfiguration config ;
+    RegistryConfigIO registryIO;
     
-    
-    public TabbedPaneDemo(RegistryConfiguration config_) {
+    public TabbedPaneDemo(RegistryConfigIO registryparent, RegistryConfiguration config_) {
         super(new GridLayout(1, 1));
-
+	registryIO = registryparent ;
 	config = config_;
 
         JTabbedPane tabbedPane = new JTabbedPane();
@@ -303,13 +332,6 @@ class TabbedPaneDemo extends JPanel {
 	seqstrucpanel.add( seqscrollPane, BorderLayout.CENTER );
 
 	
-	JButton saveb = new JButton("Save");
-	JButton cancelb = new JButton("Cancel");
-	//saveb.addActionListener(new ButtonListener(this ) );
-	//cancelb.addActionListener(new ButtonListener(this));
-	//seqstrucpanel.add(saveb);
-	//seqstrucpanel.add(cancelb);
-	
 
 	tabbedPane.addTab("Seq./Struc. ", icon, seqstrucpanel,
                           "configure sequence and structure servers");
@@ -337,7 +359,7 @@ class TabbedPaneDemo extends JPanel {
         return panel;
     }
 
-    private Map convertSource2Map(DasSource source) {
+    private Map convertSource2Map(SpiceDasSource source) {
 	HashMap server = new HashMap();
 	server.put("name",source.getUrl()); // for backwards compability
 	server.put("url",source.getUrl());
@@ -367,7 +389,7 @@ class TabbedPaneDemo extends JPanel {
 	String[][] data = new String[servers.size()][colNames.length+1];
 
 	for ( int i =0; i< servers.size(); i++ ) {
-	    DasSource ds = (DasSource) servers.get(i);
+	    SpiceDasSource ds = (SpiceDasSource) servers.get(i);
 	    Map server = convertSource2Map(ds);
 	    for ( int j =0;j<colNames.length;j++){
 		String colname = colNames[j];
@@ -391,14 +413,15 @@ class TabbedPaneDemo extends JPanel {
     }
 
     public void setServerStatus(String url, Boolean status){
-	//System.out.print("Setting server status " + url + " " + status);
+	System.out.print("Setting server status " + url + " " + status);
 	boolean flag = status.booleanValue();
 	config.setStatus(url,flag);
     }
 
 
-    public void saveConfig() {
+    public void saveConfiguration() {
 	System.out.println("saving config");
+	registryIO.saveConfiguration();
     }
 }
 
@@ -450,7 +473,7 @@ class MyTableModel extends AbstractTableModel {
     }
     
     public Object getValueAt(int row, int col) {
-	System.out.println("getValueAt");
+	//System.out.println("getValueAt");
 	if ((row > data.length) || ( col > columnNames.length))
 	    {
 		System.out.println("out of range");
@@ -466,7 +489,7 @@ class MyTableModel extends AbstractTableModel {
      * rather than a check box.
      */
     public Class getColumnClass(int c) {
-	System.out.println("getColumnClass " + c);
+	//System.out.println("getColumnClass " + c);
 	return getValueAt(0, c).getClass();
     }
     
@@ -489,7 +512,7 @@ class MyTableModel extends AbstractTableModel {
      * data can change.
      */
     public void setValueAt(Object value, int row, int col) {
-
+	
 	System.out.println("Setting value at " + row + "," + col
 			   + " to " + value
 			   + " (an instance of "
@@ -510,7 +533,7 @@ class MyTableModel extends AbstractTableModel {
     }
 
     public void tableChanged(TableModelEvent e) {
-	System.out.println("tableChanged");
+	//System.out.println("tableChanged");
         int row = e.getFirstRow();
         int column = e.getColumn();
         MyTableModel model = (MyTableModel)e.getSource();

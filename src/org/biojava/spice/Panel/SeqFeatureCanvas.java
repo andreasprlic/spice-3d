@@ -132,7 +132,7 @@ public class SeqFeatureCanvas
 	current_chainnumber = -1 ;
 	seqOldPos = -1 ;
 	
-	setOpaque(true);
+	//setOpaque(true);
 
 	this.paintComponent(this.getGraphics());
 	//ImageIcon icon = new ImageIcon(imbuf);
@@ -141,7 +141,7 @@ public class SeqFeatureCanvas
 
 
     public void setFeatures( List feats) {
-	System.out.println("DasCanv setFeatures");
+	//System.out.println("DasCanv setFeatures");
 	//features = feats ;
 	// check if features are overlapping, if yes, add to a new line 
 
@@ -183,8 +183,9 @@ public class SeqFeatureCanvas
 	drawLines.add(currentLine);
 
 	Dimension dstruc=this.getSize();
-	int imageheight = getImageHeight();
-	imbuf=this.createImage(dstruc.width, imageheight);
+	//int imageheight = getImageHeight();
+	//imbuf=this.createImage(dstruc.width, imageheight)
+	imbuf=this.createImage(dstruc.width, dstruc.height);
 	//imbuf = new BufferedImage(dstruc.width, dstruc.height,BufferedImage.TYPE_INT_RGB);
 	imbufDim = dstruc;
 	this.paintComponent(this.getGraphics());
@@ -237,8 +238,9 @@ public class SeqFeatureCanvas
 
     /** select a single segment */
     private void selectSegment (Segment segment) {
-	/*
 	System.out.println("select Segment");
+	/*
+
 
 	// clicked on a segment!
 	Color col =  segment.getColor();
@@ -269,7 +271,7 @@ public class SeqFeatureCanvas
     /** highlite a single segment */
     private void highliteSegment (Segment segment) {
 	System.out.println("highlite Segment");
-	System.out.println("segment");
+	//System.out.println("segment");
 	
 	// clicked on a segment!
 	String col =  segment.getTxtColor();
@@ -307,9 +309,9 @@ public class SeqFeatureCanvas
 
     /** highlite all segments of a feature */
     private void highliteFeature(Feature feature){
-	//System.out.println("highlite feature " + featurenr);
-	//Feature feature = (Feature) features.get(featurenr) ;
 	System.out.println("highlite feature " + feature);
+	//Feature feature = (Feature) features.get(featurenr) ;
+	//System.out.println("highlite feature " + feature);
 	
 	List segments = feature.getSegments() ;
 	String cmd = "" ;
@@ -406,8 +408,8 @@ public class SeqFeatureCanvas
 	if(!imbufDim.equals(dstruc)) spice.scale();
 		
 	if(imbuf == null || !imbufDim.equals(dstruc)) {
-	    int imageheight = getImageHeight();
-	    imbuf=this.createImage(dstruc.width, imageheight);
+	    //int imageheight = getImageHeight();
+	    imbuf=this.createImage(dstruc.width, dstruc.height);
 
 	    //imbuf = new BufferedImage(dstruc.width, dstruc.height,BufferedImage.TYPE_INT_RGB);
 	    imbufDim = dstruc;
@@ -456,6 +458,8 @@ public class SeqFeatureCanvas
 	int aminosize = Math.round(1 * scale) ;
 
 	boolean secstruc = false ;
+	String featureSource = "" ;
+
 	for (int i = 0 ; i< drawLines.size();i++) {
 	    //System.out.println(i%entColors.length);
 	    //gstruc.setColor(entColors[i%entColors.length]);
@@ -465,7 +469,15 @@ public class SeqFeatureCanvas
 	    List features = (List) drawLines.get(i) ;
 	    for ( int f =0 ; f< features.size();f++) {
 		Feature feature = (Feature) features.get(f);
-	    	    
+		String ds =feature.getSource(); 
+		if ( featureSource != ds ) {
+		    //System.out.println("new DAS source " + ds );
+		    gstruc.setColor(Color.white);
+		    gstruc.drawString(ds,DEFAULT_X_START,y+DEFAULT_Y_HEIGHT);
+		    y = y + DEFAULT_Y_STEP ;
+		    
+		}
+		featureSource = ds ;
 	    
 		List segments = feature.getSegments() ;
 	    
@@ -578,7 +590,7 @@ public class SeqFeatureCanvas
 
     /** create a tooltip string */
     private String getToolString(int seqpos, Segment segment){
-	System.out.println("getToolString");
+	//System.out.println("getToolString");
 	// current position is seqpos
 	String toolstr = spice.getToolString(current_chainnumber,seqpos);
 	
@@ -675,7 +687,7 @@ public class SeqFeatureCanvas
     
     public void mouseClicked(MouseEvent e)
     {
-	System.out.println("CLICK");
+	//System.out.println("CLICK");
 	int x = e.getX();
 	int y = e.getY();
 
@@ -683,7 +695,7 @@ public class SeqFeatureCanvas
 	int lineNr    = getLineNr(y);
 	
 	//int featurenr = get_featurenr(y) ;
-	//System.out.println("CLICK! "+seqpos + " " +featurenr+ " " + chain.getLength());
+	System.out.println("CLICK! "+seqpos + " " +lineNr+ " " + chain.getLength());
 	
 	if ( lineNr < 0 ) return ;
 	if ( seqpos    < 0 ) {
@@ -707,8 +719,6 @@ public class SeqFeatureCanvas
 	String drstr = "x "+ seqpos + " y " + lineNr ;
 
 	spice.showStatus(drstr);
-
-	
 	Segment segment = getSegmentUnder(seqpos,lineNr);
 	//System.out.println(segment);
 	if (segment != null ) {

@@ -37,7 +37,7 @@ import java.awt.Color ;
 import org.biojava.bio.structure.Chain ;
 import org.biojava.bio.structure.Group ;
 
-import org.biojava.services.das.registry.DasSource;
+//import org.biojava.services.das.registry.DasSource;
 
 /** a class to fetch all Features  in parallel threads
 
@@ -127,7 +127,7 @@ public class FeatureFetcher extends Thread
 	    DasResponse d=new DasResponse("UniProt");
 	    subthreads[responsecounter] = d; 
 	   
-	    DasSource featureserver = (DasSource) featservs.get(f) ;
+	    SpiceDasSource featureserver = (SpiceDasSource) featservs.get(f) ;
 	    String url = featureserver.getUrl();
 	    String queryString = url + "features?segment="+ spId ;
 	    URL spUrl = null ;
@@ -150,8 +150,8 @@ public class FeatureFetcher extends Thread
 	    DasResponse d=new DasResponse("PDBresnum");
 	    subthreads[responsecounter] = d; 
 	   
-	    HashMap featureserver = (HashMap) pdbresservs.get(f) ;
-	    String url = (String) featureserver.get("url");
+	    SpiceDasSource featureserver = (SpiceDasSource) pdbresservs.get(f) ;
+	    String url = featureserver.getUrl();
 	    String queryString = url + "features?segment="+ pdbId+chain.getName() ;
 	    URL spUrl = null ;
 	    try {
@@ -276,6 +276,8 @@ public class FeatureFetcher extends Thread
 
     private Feature getNewFeat(Map currentFeatureMap) {
 	Feature feat = new Feature();
+	System.out.println(currentFeatureMap);
+	feat.setSource((String)currentFeatureMap.get("dassource"));
 	feat.setName(  (String)currentFeatureMap.get("NAME"));
 	feat.setType(  (String)currentFeatureMap.get("TYPE"));
 	feat.setLink(  (String)currentFeatureMap.get("LINK"));

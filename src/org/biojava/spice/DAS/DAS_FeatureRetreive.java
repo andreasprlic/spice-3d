@@ -115,6 +115,7 @@ public class DAS_FeatureRetreive {
 			}
 			
 			DAS_Feature_Handler cont_handle = new DAS_Feature_Handler() ;
+			cont_handle.setDASCommand(url.toString());
 			xmlreader.setContentHandler(cont_handle);
 			xmlreader.setErrorHandler(new org.xml.sax.helpers.DefaultHandler());
 			InputSource insource = new InputSource() ;

@@ -140,19 +140,19 @@ public class SeqTextPane
 
     /** highighting of range of residues */
     public void highlite( int start, int end) {
-	System.out.println("SeqTExtPane highlite " + start + " " + end);
+	//System.out.println("SeqTExtPane highlite " + start + " " + end);
 	select(start,end);
     }
 
     /** highighting of single residue */    
     public void highlite( int seqpos) {
-	System.out.println("SeqTExtPane highlite " + seqpos);
+	//System.out.println("SeqTExtPane highlite " + seqpos);
 	select(seqpos);
     }
 
     /** select range of residues */
     public void select(int start, int end){
-	System.out.println("SeqTExtPane select " + start + " "  + end);
+	//System.out.println("SeqTExtPane select " + start + " "  + end);
 
 	StyledDocument doc = this.getStyledDocument();
 	doc.setCharacterAttributes(0,chain.getLength(), this.getStyle("black"),true);

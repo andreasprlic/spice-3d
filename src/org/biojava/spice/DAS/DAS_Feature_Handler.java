@@ -40,12 +40,12 @@ public class DAS_Feature_Handler  extends DefaultHandler{
 	/**
 	 * 
 	 */
-	ArrayList features ;
-	boolean first_flag ;
-	HashMap feature ;
-	String featurefield ;
-	String characterdata ;
-	
+    ArrayList features ;
+    boolean first_flag ;
+    HashMap feature ;
+    String featurefield ;
+    String characterdata ;
+    String dasCommand ;
 	public DAS_Feature_Handler() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -53,7 +53,11 @@ public class DAS_Feature_Handler  extends DefaultHandler{
 		first_flag = true ;
 		featurefield = "" ;
 		characterdata = "";
+		dasCommand = "" ;
 	}
+
+    public void setDASCommand(String cmd) { dasCommand = cmd ;}
+    public String getDASCommand() { return dasCommand; }
 
 	public ArrayList get_features() {
 		return features ;
@@ -62,6 +66,7 @@ public class DAS_Feature_Handler  extends DefaultHandler{
 		feature = new HashMap() ;
 		String id 	= atts.getValue("id");
 		feature.put("id",id);
+		feature.put("dassource",dasCommand);
 		characterdata = "";
 	}
 	

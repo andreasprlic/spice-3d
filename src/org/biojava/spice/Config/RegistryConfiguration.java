@@ -34,8 +34,9 @@ import java.util.HashMap   ;
 import java.util.ArrayList ;
 import java.util.Map ;
 import java.util.List ;
+import java.util.ListIterator ;
 // for DAS registration server:
-import org.biojava.services.das.registry.*;
+//import org.biojava.services.das.registry.*;
 
 
 // for GUI;
@@ -68,16 +69,21 @@ import java.awt.event.KeyEvent;
 public class RegistryConfiguration 
 {
 
-    List serverdata ;
+    //List serverdata ;
+    
+    List allservers    ;
+    List activeservers ;
 
     public RegistryConfiguration () {
 	super();
-	serverdata = new ArrayList();
+	//serverdata = new ArrayList();
+	allservers    = new ArrayList();
+	activeservers = new ArrayList();
     }
 
    
 
-    private boolean isSeqStrucAlignmentServer(DasSource source) {
+    private boolean isSeqStrucAlignmentServer(SpiceDasSource source) {
 	boolean msdmapping = false ;
 	String[] coordsys = source.getCoordinateSystem() ;
 	
@@ -93,7 +99,7 @@ public class RegistryConfiguration
 	return msdmapping ;
     }
     
-    private boolean hasCoordSys(String coordSys,DasSource source ) {
+    private boolean hasCoordSys(String coordSys,SpiceDasSource source ) {
 	String[] coordsys = source.getCoordinateSystem() ;
 	for ( int i = 0 ; i< coordsys.length; i++ ) {
 	    String c = coordsys[i];
@@ -105,21 +111,18 @@ public class RegistryConfiguration
 
     }
 
-    public void addServer(DasSource s, boolean status) {
-	HashMap ds = new HashMap();
-	ds.put("server",s);
-	if ( status)
-	    ds.put("status","1");
-	else
-	    ds.put("status","0");
-	serverdata.add(ds);	
+    public void addServer(SpiceDasSource s, boolean status) {	
+	allservers.add(s);
+	if (s.getStatus()) {
+	    activeservers.add(s);
+	}
     }
 
 
     public void setStatus(String url, boolean status) {
-	for ( int i = 0 ; i < serverdata.size() ; i++ ) {
-	    Map m = (Map) serverdata.get(i);
-	    DasSource ds = (DasSource)m.get("server");
+	for ( int i = 0 ; i < allservers.size() ; i++ ) {
+	    SpiceDasSource ds = (SpiceDasSource) allservers.get(i);
+	    //SpiceDasSource ds = (SpiceDasSource)m.get();
 	    if ( ds.getUrl().equals(url)) {
 		setStatus(i,status);
 		return ;
@@ -128,54 +131,54 @@ public class RegistryConfiguration
 	
     }
     public void setStatus(int serverpos, boolean status) {
-	if ( serverpos > serverdata.size() ) return  ;
+	if ( serverpos > allservers.size() ) return  ;
 	if ( serverpos < 0 ) return  ;
-	Map m = (Map) serverdata.get(serverpos);
-	if ( status)
-	    m.put("status","1");
-	else
-	    m.put("status","0");
-
+	SpiceDasSource m = (SpiceDasSource) allservers.get(serverpos);
+	m.setStatus(status);
+	
+	if ( ! status) {
+	    // remove from active servers ...
+	    removeFromActive(m);
+	}
 	
     }
     
     public boolean getStatus(int serverpos) {
-	if ( serverpos > serverdata.size() ) return false ;
+	if ( serverpos > allservers.size() ) return false ;
 	if ( serverpos < 0 ) return false ;
-	Map m = (Map) serverdata.get(serverpos);
-	String status = (String) m.get("status");
-	if( status.equals("1") )
-	    return true ;
-	else 
-	    return false ;
+	SpiceDasSource m = (SpiceDasSource) allservers.get(serverpos);
+	
+	return m.getStatus();
+	//String status = (String) m.get("status");
+	//if( status.equals("1") )
+	//  return true ;
+	//else 
+	//  return false ;
 
     }
 
     
-    public DasSource getServer(int serverpos) {
-	if ( serverpos > serverdata.size() ) return null ;
+    public SpiceDasSource getServer(int serverpos) {
+	if ( serverpos > allservers.size() ) return null ;
 	if ( serverpos < 0 ) return null ;
-	Map m = (Map) serverdata.get(serverpos);
-	DasSource ds = (DasSource)m.get("server");
+	SpiceDasSource ds = (SpiceDasSource) allservers.get(serverpos);
 	return ds ;
     }
+
+    // todo ...
     public List getServers(){
-	ArrayList retservers = new ArrayList();
-	for ( int i = 0 ; i < serverdata.size() ; i++ ) {
-	    Map m = (Map) serverdata.get(i);
-	    DasSource ds = (DasSource)m.get("server");
-	    retservers.add(ds);
-	}
-	return retservers ;
+	return activeservers ;	
     }
 
     public List getServers(String capability, String coordSys){
 	List servers = getServers(capability);
 	ArrayList retservers = new ArrayList();
 	for ( int i = 0 ; i < servers.size() ; i++ ) {
-	    DasSource ds = (DasSource)servers.get(i);
-	    if ( hasCoordSys(coordSys,ds)) {
-		retservers.add(ds);
+	    SpiceDasSource ds = (SpiceDasSource)servers.get(i);
+	    if ( ds.getStatus()) {
+		if ( hasCoordSys(coordSys,ds)) {
+		    retservers.add(ds);
+		}
 	    }
 	}
 	return retservers ;
@@ -185,31 +188,41 @@ public class RegistryConfiguration
 
     public List getServers(String capability) {
 	ArrayList retservers = new ArrayList();
-	for ( int i = 0 ; i < serverdata.size() ; i++ ) {
-	    Map m = (Map) serverdata.get(i);
-	    DasSource ds = (DasSource)m.get("server");
-	    String status = (String) m.get("status");
-	    // true == active
-	    if ( status.equals("1") ) {
-		String[] capabilities = ds.getCapabilities() ;
-		for ( int c=0; c<capabilities.length ;c++) {
-		    String capabil = capabilities[c];
-		    if ( capability.equals(capabil)){
-			// at the moment we only know about UniProt PDB servers,,,
-			if ( capabil.equals("alignment") ){
-			    if ( isSeqStrucAlignmentServer(ds) ){
-				retservers.add(ds);
-			    }
-			} else {
+	for ( int i = 0 ; i < activeservers.size() ; i++ ) {
+	    SpiceDasSource ds = (SpiceDasSource) activeservers.get(i);
+	    
+	    String[] capabilities = ds.getCapabilities() ;
+	    for ( int c=0; c<capabilities.length ;c++) {
+		String capabil = capabilities[c];
+		if ( capability.equals(capabil)){
+		    // at the moment we only know about UniProt PDB servers,,,
+		    if ( capabil.equals("alignment") ){
+			if ( isSeqStrucAlignmentServer(ds) ){
 			    retservers.add(ds);
 			}
+		    } else {
+			retservers.add(ds);
 		    }
 		}
 	    }
-
 	}
+
 	return retservers ;
     }
+
+
+    /** remove a server from the list of active servers */
+    private void removeFromActive(SpiceDasSource ds) {
+	String serverurl = ds.getUrl();
+	ListIterator iter = activeservers.listIterator();
+	while (iter.hasNext()) {
+	    SpiceDasSource sds = (SpiceDasSource) iter.next();
+	    if (sds.getUrl().equals(serverurl));
+	    iter.remove();
+	    return ;	    
+	}	
+    }
+
 }
 
 
