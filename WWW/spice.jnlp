@@ -29,7 +29,7 @@
   </resources>
   <application-desc main-class="org.biojava.spice.Spice">
   <argument>1h4w</argument>
-  <argument>http://localhost:8080/axis/services/dasregistry/</argument>
+  <argument>http://protodas.derkholm.net/axis/services/das_registry</argument>
   </application-desc>
  
 </jnlp> 

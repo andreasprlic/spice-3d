@@ -183,6 +183,13 @@
       </fileset>
     </copy>
 
+    <copy todir="${build.classes.dir}/spice/org/biojava/spice/">
+      <fileset dir="${resources.dir}">
+        <exclude name="**/CVS/**" />
+	<include name="*.jpg" />
+      </fileset>
+    </copy>
+
   </target>
 
 

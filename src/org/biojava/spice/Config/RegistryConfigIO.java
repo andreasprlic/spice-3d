@@ -179,6 +179,7 @@ public class RegistryConfigIO
 	progressFrame.getContentPane().add(panel);
 	progressFrame.pack();
 	progressFrame.setVisible(true);
+	
     }
     private void disposeProgressBar(){
 	progressFrame.dispose();
@@ -306,8 +307,8 @@ class TabbedPaneDemo extends JPanel {
 	config = config_;
 
         JTabbedPane tabbedPane = new JTabbedPane();
-        ImageIcon icon = createImageIcon("images/middle.gif");
-
+        ImageIcon icon = createImageIcon("Images/spice.gif");
+	
 
 	// Make sequence and structure Panel
 	JPanel seqstrucpanel = new JPanel();

@@ -79,7 +79,9 @@ import javax.swing.JScrollPane ;
 import javax.swing.DefaultListModel   ;
 import javax.swing.JTextField   ;
 import javax.swing.event.ListSelectionListener  ;
-import javax.swing.event.ListSelectionEvent ;    
+import javax.swing.event.ListSelectionEvent ;  
+import javax.swing.ImageIcon;
+
 //import javax.swing.event.CaretEvent;
 //import javax.swing.event.CaretListener;
 
@@ -415,6 +417,8 @@ public class SpiceApplication
 	
 	this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	this.setDefaultLookAndFeelDecorated(false);
+	ImageIcon icon = createImageIcon("spice.jpg");
+	this.setIconImage(icon.getImage());
 	this.pack();
 	this.setVisible(true);
     }
@@ -429,6 +433,18 @@ public class SpiceApplication
 	System.out.println("finished init of structure alignment");
 		
     }
+
+    /** Returns an ImageIcon, or null if the path was invalid. */
+    protected static ImageIcon createImageIcon(String path) {
+        java.net.URL imgURL = SpiceApplication.class.getResource(path);
+        if (imgURL != null) {
+            return new ImageIcon(imgURL);
+        } else {
+            System.err.println("Couldn't find file: " + path);
+            return null;
+        }
+    }
+
 
 
     public boolean isLoading() {
@@ -1195,11 +1211,11 @@ public class SpiceApplication
 
 
 
-class ApplicationCloser extends WindowAdapter {
-  public void windowClosing(WindowEvent e) {
-    System.exit(0);
-  }
-}
+//class ApplicationCloser extends WindowAdapter {
+//  public void windowClosing(WindowEvent e) {
+//    System.exit(0);
+//  }
+//}
 
 class StructureCommandListener 
     implements ActionListener {
