@@ -50,7 +50,7 @@ import java.net.URL;
 import java.io.IOException ;
 
 // logging
-import java.util.logger.* ;
+import java.util.logging.* ;
 
 // gui
 import java.awt.Dialog          ;
@@ -167,7 +167,7 @@ public class SpiceApplication
     MenuItem aboutdas   ;
     MenuItem openpdb    ;
 
-    static Logger    logger      = Logger.getLogger("org.biojava.spice");
+    static Logger logger = Logger.getLogger("org.biojava.spice");
 
 
     SpiceApplication(String pdbcode_, URL config_url, URL registry_url) {
@@ -180,7 +180,7 @@ public class SpiceApplication
 
 	ConsoleHandler handler = new ConsoleHandler();
 	handler.setLevel(Level.FINEST);
-	logger.setHandler(handler);
+	logger.addHandler(handler);
 	
 
 	if (logger.isLoggable(Level.FINEST)) {
@@ -594,10 +594,9 @@ public class SpiceApplication
 	*/
 
 	if (logger.isLoggable(Level.FINER)) {
-	    logger.entering(this.getClass().getName(), "getStructure",
-			   new Object[]{pdbcod);
-            }
+	    logger.entering(this.getClass().getName(), "getStructure",  new Object[]{pdbcod});
 	}
+	
 	System.out.println("SpiceApplication: getStructure "+ pdbcod);
 	first_load = true ;
 	statusPanel.setLoading(true);

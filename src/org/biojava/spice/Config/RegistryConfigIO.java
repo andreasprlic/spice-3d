@@ -189,14 +189,12 @@ public class RegistryConfigIO
 	// show dialog
 	showProgressBar();
 	
-
 	done = false ;
 	System.out.println("contacting DAS registry server at: " +REGISTRY);
 
 	RegistryConfiguration oldconfig = config;
 
 	config = new RegistryConfiguration();
-
 	
 	DasRegistryAxisClient rclient = new DasRegistryAxisClient(REGISTRY);
 
@@ -231,7 +229,9 @@ public class RegistryConfigIO
 
 	    List localservers = oldconfig.getLocalServers();
 	    for ( int i = 0 ; i < localservers.size() ; i++ ) {
+
 		SpiceDasSource ds = (SpiceDasSource) localservers.get(i);
+		System.out.println("adding localserver to new config " + ds.getUrl());
 		config.addServer(ds,ds.getStatus());
 	    }
 	}
@@ -242,9 +242,6 @@ public class RegistryConfigIO
 	System.out.println("adding registry "+ REGISTRY.toString());
 	config.setRegistryUrl(REGISTRY.toString());
 	disposeProgressBar();
-
-
-
 	
     }
     
@@ -303,7 +300,7 @@ public class RegistryConfigIO
 	PersistentConfig ps = new PersistentConfig();
 	ps.save(config);
 
-
+	
 	spice.setConfiguration(config);
 	    
 	
@@ -596,6 +593,8 @@ class TabbedPaneDemo extends JPanel {
 		public void actionPerformed(ActionEvent e) {
 		    try {
 			registryIO.doRegistryUpdate(); 
+			registryIO.saveConfiguration();
+			updateDasSourceTable();
 		    } catch (Exception ex) {
 			ex.printStackTrace();
 		    }
