@@ -175,6 +175,8 @@ public class FeatureFetcher extends Thread
 	}
 
 
+
+	// wait for results to come back
 	boolean done = false ;
 	while ( ! done) {
 	    done = allFinished();
@@ -194,6 +196,8 @@ public class FeatureFetcher extends Thread
 	    //logger.finest("getNewFeatures :in waitloop");
 	}
 
+
+	// finally all sub-threads are finished and we can sent all features back to the main application
 	// reset and re-paint all features 
 	allFeatures = new ArrayList();
 
@@ -207,8 +211,12 @@ public class FeatureFetcher extends Thread
        	notifyAll();
     }
     
-    /** browse through chain and get UniProt position with pdbResNum */
-    private String getUniProtCoord(String pdbResNumb, Chain chain) {
+    /** browse through chain and get UniProt position with pdbResNum 
+	@throws an exception if link can not be established...
+    */
+    private String getUniProtCoord(String pdbResNumb, Chain chain) 
+	throws Exception 
+    {
 
 	ArrayList groups = chain.getGroups();
 
@@ -217,7 +225,7 @@ public class FeatureFetcher extends Thread
 	    
 
 	    String pdbCode = g.getPDBCode() ;
-	    if ( g.has3D()){
+	    if ( pdbCode != null ){
 		//logger.finest(g);
 		if ( pdbCode.equals(pdbResNumb)) {
 		    return "" + ( i+1);
@@ -225,7 +233,10 @@ public class FeatureFetcher extends Thread
 	    }
 	    
 	}
-	return "" + chain.getLengthAminos();
+	// could not map position!
+	//return "" + 0 ;
+	//return "" + chain.getLengthAminos();
+	throw new Exception("could not find residue " + pdbResNumb + " in chain!");
 
     }
 
@@ -247,14 +258,19 @@ public class FeatureFetcher extends Thread
 		
 		String mappDone  = (String)feat.get("PDBmappingDone");
 		if ( mappDone == null) {
-		    String startOrig = (String)feat.get("START");
-		    String endOrig   = (String)feat.get("END");
-		    //logger.finest("pdbresnum feature: "+feat);
-		    String startNew  = getUniProtCoord(startOrig,chain);
-		    String endNew    = getUniProtCoord(endOrig,chain);
-		    feat.put("START",startNew);
-		    feat.put("END",endNew);
-		    feat.put("PDBmappingDone","true");
+		    try {
+			String startOrig = (String)feat.get("START");
+			String endOrig   = (String)feat.get("END");
+			//logger.finest("pdbresnum feature: "+feat);
+			
+			String startNew  = getUniProtCoord(startOrig,chain);
+			String endNew    = getUniProtCoord(endOrig,chain);
+			feat.put("START",startNew);
+			feat.put("END",endNew);
+			feat.put("PDBmappingDone","true");
+		    } catch (Exception e) {
+			logger.warning("could not map feature to PDB chain " + feat);
+		    }
 		    //logger.finest("pdb feature: "+feat);
 		}
 		allFeatures.add(feat) ;		    

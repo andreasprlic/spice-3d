@@ -1431,7 +1431,7 @@ class SpiceMenuListener
 	} else if (cmd.equals("About SPICE")) {
 	    AboutDialog asd = new AboutDialog((JFrame)parent);
 	    
-	    asd.setText("The SPICE Applet. V 0.53(C) Andreas Prlic, Tim Hubbard\n The Wellcome Trust Sanger Institute 2004 mailto:ap3@sanger.ac.uk") ;
+	    asd.setText("The SPICE Applet. V 0.54(C) Andreas Prlic, Tim Hubbard\n The Wellcome Trust Sanger Institute 2004 mailto:ap3@sanger.ac.uk") ;
 	    
 	    asd.show();	    
 	} else if ( cmd.equals("Backbone") ){
