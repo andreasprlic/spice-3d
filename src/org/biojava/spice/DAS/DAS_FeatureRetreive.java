@@ -129,6 +129,7 @@ public class DAS_FeatureRetreive {
 			    features = cont_handle.get_features();
 			} 
 			catch ( Exception e){
+			    //e.printStackTrace();
 			    logger.log(Level.WARNING,"error while parsing response from "+ url);
 			    
 			    features = new ArrayList();

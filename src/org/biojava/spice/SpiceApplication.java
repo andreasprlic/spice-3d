@@ -1286,13 +1286,13 @@ public class SpiceApplication
 	    dascanv.select(seqpos);
 	}
 
-	/*
+	
 	String cmd = getSelectStr( chain_number, seqpos) ;
 	if (cmd.equals("")) { return ; } 
 	cmd += " set display selected;" ;
 	structurePanel.executeCmd(cmd);
 	//structurePanel.forceRepaint();
-	*/
+	
 	
 
     }
