@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+ <jnlp spec="1.0+" 
+	codebase="file:///home/andreas/WORK/DAS/JAVA/spice/WWW/" 
+	href="axis.jnlp">
+ <component-desc/>
+ <information>
+<title>xerces libs</title>
+<vendor>xerces stuff</vendor>
+ </information>
+ <security> 
+       <all-permissions/> 
+   </security> 
+<resources>
+    <jar href="xercesImpl.jar"               />
+    <jar href="xmlParserAPIs.jar"            />
+    <jar href="resolver.jar"                 />
+    <jar href="xml-apis.jar"                 />
+</resources>
+
+</jnlp> 

@@ -1,0 +1,640 @@
+<?xml version="1.0"?>
+
+<!--
+
+  Ant build file for the entire spice tree
+
+  see:
+  <a href="http://ant.apache.org/">Ant Project Homepage</a>
+
+  targets:
+
+    compile
+    compile-tests     compiles JUnit tests
+    compile-demos     compiles the demo files
+    compile-apps      compiles the application files
+    package-spice     builds the spice.jar file (default)
+    package-demos     builds the demos.jar file
+    package-apps      builds the jar.apps file
+    runtests          runs all tests (requires Ant 1.6.0 or later)
+    runtests-fork     runs all tests in separate virtual machines
+    www	              builds spice and copies .jar file to WWW subdir
+    javadocs-spice    builds spice API documentation
+    javadocs-biojava  builds biojava API documentation
+    javadocs-taglets  builds taglets API documentation
+    javadocs-demos    builds demos API documentation
+    javadocs-all      builds API documentation for all the above
+    docbook           builds DocBook documentation
+    clean             cleans up the build & dist directories
+
+  The 'runtests' target can be restricted to portions of the tree, e.g.:
+
+       ant -Dtest.subtree=org/biojava/bio/symbol runtests
+       ant -Dtest.subtree=org/biojava/bio/seq/** runtests
+
+  author:  Michael Heuer,
+           Keith James (JUnit support, DocBook support)
+           Greg Cox (fixed documentation)
+           Thomas Down (clean up, remove source-copying steps
+  version: $Id: build.xml,v 1.2 2004/07/06 14:50:12 ap3 Exp $
+
+  portions Copyright (c) 1999-2000 The Apache Software Foundation.
+
+-->
+
+<project name="spice" default="package-spice" basedir=".">
+
+  <!-- Checks environment and setup variables -->
+  <target name="init" description="Checks environment and setup variables">
+    <tstamp />
+    <property name="version" value="live" />
+
+    <property name="build.compiler" value="modern" />
+
+    <property name="classpath" value="bytecode.jar:htmlparser.jar:commons-cli.jar:commons-dbcp-1.1.jar:commons-pool-1.1.jar:hsqldb.jar" />
+
+    <property name="ant-tasks.path" value="ant-lib/sablecc.jar:ant-lib/anttask.jar" />
+
+    <property name="docbook.tools.file" value="docbook.jar" />
+
+    <!-- Check the current system classpath for JUnit -->
+    <available classpath="${java.class.path}"
+               classname="junit.framework.TestCase"
+               property="junit.present" />
+
+    <!-- Check for XSLT OutputProperty support in Ant (only in Ant >= 1.5) -->
+    <available classpath="${java.class.path}"
+               classname="org.apache.tools.ant.taskdefs.XSLTProcess$OutputProperty"
+               property="outputproperty.support" />
+
+    <!-- Check for JUnit support in Ant (only in >= 1.3) -->
+    <available classpath="${java.class.path}"
+               classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTest"
+               property="junit.support" />
+
+    <!-- Check for Java 1.4 -->
+    <available classpath="${java.class.path}"
+               classname="java.nio.Buffer"
+               property="java14">
+    </available>
+
+    <available classpath="${java.class.path}:${ant-tasks.path}"
+               classname="org.sablecc.ant.taskdef.Sablecc"
+               property="sableCC.support">
+    </available>
+
+    <available classpath="${classpath}"
+               classname="org.hsqldb.jdbcDriver"
+               property="sqlDriver.hsqldb">
+    </available>
+
+    <!-- Echo information -->
+    <echo message="Building spice-${version}" />
+    <echo message="JUnit present:                   ${junit.present}" />
+    <echo message="JUnit supported by Ant:          ${junit.support}" />
+    <echo message="SableCC supported by Ant:        ${sableCC.support}" />
+    <echo message="HSQLDB driver presend:           ${sqlDriver.hsqldb}" />
+
+    <property name="readme" value="./README" />
+    <property name="license" value="./LICENSE" />
+    <property name="src.dir" value="./src" />
+    <property name="tests.dir" value="./tests" />
+    <property name="demos.dir" value="./demos" />
+    <property name="apps.dir" value="./apps" />
+    <property name="docs.dir" value="./docs" />
+    <property name="doc.css.file" value="spice-doc.css" />
+    <property name="reports.dir" value="./reports" />
+    <property name="manifest.dir" value="./META-INF" />
+    <property name="resources.dir" value="./resources" />
+    <property name="taglets.dir" value="./taglets" />
+    
+    <!-- Main build directory -->
+    <property name="build.dir" value="./ant-build" />
+    <property name="www.dir" value="./WWW" />
+    <property name="build.classes.dir" value="${build.dir}/classes" />
+
+    <!-- Javac properties -->
+    <property name="javac.depend" value="false" />
+    <property name="javac.debug" value="true" />
+    <property name="javac.deprecation" value="false" />
+    <property name="javac.source" value="1.4" />
+
+    <!-- Javadoc properties -->
+    <property name="build.dest.docs" value="${build.dir}/docs" />
+    <property name="build.dest.doccheck" value="${build.dir}/docs/check" />
+    <property name="packages" value="org.*" />
+
+    <!-- Subdirectories for main source and classes -->
+    <property name="name.spice" value="spice" />
+    <property name="Name.spice" value="SPICE" />
+    <property name="build.dest.spice" value="${build.classes.dir}/${name.spice}" />
+    <property name="build.docs.spice" value="${build.dest.docs}/${name.spice}" />
+    <property name="build.doccheck.spice" value="${build.dest.doccheck}/${name.spice}" />
+    <property name="jar.spice" value="${build.dir}/${name.spice}.jar" />
+    <property name="manifest.file.spice" value="${manifest.dir}/manifest.mf" />
+    <!-- Subdirectories for tests source and classes -->
+    <property name="name.tests" value="tests" />
+    <property name="build.dest.tests" value="${build.classes.dir}/${name.tests}" />
+    <property name="build.docs.tests" value="${build.dest.docs}/${name.tests}" />
+    <property name="reports.tests" value="./reports/tests" />
+    <!-- Subdirectories for demos source and classes -->
+    <property name="name.demos" value="demos" />
+    <property name="Name.demos" value="Spice Demos" />
+    <property name="build.dest.demos" value="${build.classes.dir}/${name.demos}" />
+    <property name="build.docs.demos" value="${build.dest.docs}/${name.demos}" />
+    <property name="jar.demos" value="${build.dir}/${name.demos}.jar" />
+    <property name="manifest.file.demos" value="${manifest.dir}/${name.demos}.txt" />
+    <!-- Subdirectories for apps source and classes -->
+    <property name="name.apps" value="apps" />
+    <property name="Name.apps" value="Spice Applications" />
+    <property name="build.dest.apps" value="${build.classes.dir}/${name.apps}" />
+    <property name="build.docs.apps" value="${build.dest.docs}/${name.apps}" />
+    <property name="jar.apps" value="${build.dir}/${name.apps}.jar" />
+    <property name="manifest.file.apps" value="${manifest.dir}/${name.apps}.txt" />
+
+    <!-- Subdirectory for libraries used during build -->
+    <property name="build.lib" value="${build.dir}/lib" />
+    <!-- Subdirectory for taglets -->
+    <property name="name.taglets" value="taglets" />
+    <property name="Name.taglets" value="Spice Taglets" />
+    <property name="build.dest.taglets" value="${build.classes.dir}/${name.taglets}" />
+    <property name="build.docs.taglets" value="${build.dest.docs}/${name.taglets}" />
+
+    <property name="dist.root" value="./dist" />
+    <property name="dist.dir" value="${dist.root}/${name.spice}-${version}" />
+  </target>
+
+
+  <!--
+    Prepare each part of the project.
+
+    Each preparation creates working directories and copies files over.
+  -->
+
+  <!-- Prepares the basic stuff -->
+  <target name="prepare" depends="init" description="creates basic directories">
+    <!-- Creates directories -->
+    <mkdir dir="${build.dir}" />
+    <mkdir dir="${build.lib}" />
+
+    <!-- Copies jars -->
+    <copy todir="${build.dir}">
+      <fileset dir=".">
+        <include name="*.jar" />
+        <exclude name="${docbook.tools.file}" />
+      </fileset>
+    </copy>
+
+    <copy todir="${build.classes.dir}/spice/org/biojava/spice/">
+      <fileset dir="${resources.dir}">
+        <exclude name="**/CVS/**" />
+	<include name="*.png" />
+      </fileset>
+    </copy>
+
+  </target>
+
+
+  <!-- Copies taglet files -->
+  <target name="prepare-taglets" depends="prepare" description="Copies taglet files">
+    <mkdir dir="${build.dest.taglets}" />
+    <mkdir dir="${build.docs.taglets}" />
+  </target>
+
+  <!-- Prepares the spice source code -->
+  <target name="prepare-spice" depends="prepare"
+  description="Prepares spice source files">
+    <!-- Creates directories -->
+    <mkdir dir="${build.dest.spice}" />
+    <mkdir dir="${build.docs.spice}" />
+    <mkdir dir="${build.doccheck.spice}" />
+  </target>
+
+  <!-- Prepares the test source code -->
+  <target name="prepare-tests" depends="prepare"
+  description="Prepares the test source code">
+
+    <!-- Creates directories -->
+    <mkdir dir="${build.dest.tests}" />
+    <mkdir dir="${build.docs.tests}" />
+    <mkdir dir="${reports.tests}" />
+  </target>
+
+  <!-- Prepares the demos code -->
+  <target name="prepare-demos" depends="prepare"
+  description="Prepares the demos code">
+
+    <!-- Creates directories -->
+    <mkdir dir="${build.dest.demos}" />
+    <mkdir dir="${build.docs.demos}" />
+  </target>
+
+  <!-- Prepares the apps code -->
+  <target name="prepare-apps" depends="prepare"
+  description="Prepares the apps code">
+
+    <!-- Creates directories -->
+    <mkdir dir="${build.dest.apps}" />
+    <mkdir dir="${build.docs.apps}" />
+  </target>
+
+  <!-- Prepares the javadocs -->
+  <target name="prepare-javadocs" depends="prepare" description="Prepares the javadocs">
+
+    <!-- Creates directories -->
+    <mkdir dir="${build.dest.docs}" />
+  </target>
+
+  <!-- Prepares DocBook environment and encloses it from older Ant versions -->
+  <target name="prepare-docs" depends="prepare" if="outputproperty.support"
+  description="Prepares DocBook environment">
+    <!-- Check the current system classpath for Trax -->
+    <available classpath="${java.class.path}"
+               classname="javax.xml.transform.Transformer"
+               property="trax.present">
+    </available>
+    <echo message="Trax API present:                ${trax.present}" />
+
+    <!-- DocBook XML DTD path -->
+    <property name="docbook.dir" value="${build.lib}/xml-dtd-4.2" />
+    <property name="docbook.dtd" value="${docbook.dir}/docbookx.dtd" />
+
+    <!-- DocBook XML stylesheet path -->
+    <property name="stylesheet.dir" value="${build.lib}/docbook-xsl-1.44" />
+    <property name="docbook.xsl" value="${stylesheet.dir}/xhtml/chunk.xsl" />
+
+    <!-- DocBook Public ID -->
+    <property name="docbook.public.id" value="-//OASIS//DTD DocBook XML V4.2//EN" />
+
+    <!-- Setup DocBook XML catalog -->
+    <xmlcatalog id="docbook.cat">
+      <dtd publicId="${docbook.public.id}" location="${docbook.dtd}" />
+    </xmlcatalog>
+
+    <!-- unjar the DTD and stylesheets for use -->
+    <unjar src="${docbook.tools.file}" dest="${build.lib}">
+      <patternset>
+        <include name="**" />
+        <exclude name="META-INF/*" />
+      </patternset>
+    </unjar>
+  </target>
+
+  <!--
+    Compile each part of the project.
+
+    This runs javac or any other tasks necisary to turn the source code into
+    .class files.
+  -->
+
+ 
+
+  <!-- Compiles the taglets directory -->
+  <target name="compile-taglets" depends="init,prepare-taglets"
+  description="Compiles the taglets directory">
+    <javac
+      srcdir="${taglets.dir}"
+      destdir="${build.dest.taglets}"
+      depend="${javac.depend}"
+      deprecation="${javac.deprecation}"
+      source="${javac.source}"
+      debug="${javac.debug}">
+      <classpath>
+        <pathelement path="${classpath}" />
+      </classpath>
+    </javac>
+  </target>
+
+  <!-- Compiles the source directory -->
+  <target name="compile-spice" depends="prepare-spice"
+  description="Compiles the source directory">
+    <javac
+      srcdir="${src.dir}"
+      destdir="${build.dest.spice}"
+      depend="${javac.depend}"
+      deprecation="${javac.deprecation}"
+      source="${javac.source}"
+      debug="${javac.debug}">
+      <classpath>
+        <pathelement path="${classpath}" />
+        <pathelement path="${build.dest.grammars}" />
+      </classpath>
+    </javac>
+  </target>
+
+  <!-- Compiles the tests directory -->
+  <target name="compile-tests" depends="prepare-tests,package-spice"
+  description="Compiles the tests directory">
+    <javac
+      srcdir="${tests.dir}"
+      destdir="${build.dest.tests}"
+      depend="${javac.depend}"
+      deprecation="${javac.deprecation}"
+      source="${javac.source}"
+      debug="${javac.debug}">
+      <classpath>
+        <pathelement path="${classpath}" />
+        <pathelement path="${jar.spice}" />
+      </classpath>
+    </javac>
+  </target>
+
+  <!-- Compiles the demos directory -->
+  <target name="compile-demos" depends="prepare-demos,package-spice"
+  description="Compiles the demos directory">
+    <javac
+      srcdir="${demos.dir}"
+      destdir="${build.dest.demos}"
+      depend="${javac.depend}"
+      deprecation="${javac.deprecation}"
+      source="${javac.source}"
+      debug="${javac.debug}">
+      <classpath>
+        <pathelement path="${classpath}" />
+        <pathelement path="${jar.spice}" />
+      </classpath>
+    </javac>
+  </target>
+
+  <!-- Compiles the apps directory -->
+  <target name="compile-apps" depends="prepare-apps,package-spice"
+  description="Compiles the apps directory">
+    <javac
+      srcdir="${apps.dir}"
+      destdir="${build.dest.apps}"
+      depend="${javac.depend}"
+      deprecation="${javac.deprecation}"
+      source="${javac.source}"
+      debug="${javac.debug}">
+      <classpath>
+        <pathelement path="${classpath}" />
+        <pathelement path="${jar.spice}" />
+      </classpath>
+    </javac>
+  </target>
+
+
+  <!--
+    Creates the .jar files containing each distributable component.
+
+    This probably just jars up the .class files and any resources as well as
+    a manifest for each distributable component.
+  -->
+
+  <!-- Creates the spice package (tests are left in the parallel tree) -->
+
+  <!-- this ought to depend on compile-grammars at well, but until conditional
+        sablecc works, that's a Bad Idea -->
+
+  <target name="package-spice" depends="compile-spice"
+  description="create spice class jar file">
+    <jar
+      jarfile="${jar.spice}"
+      manifest="${manifest.file.spice}"
+    >
+      <fileset dir="${build.dest.spice}" />
+      <fileset dir="${resources.dir}" />
+    </jar>
+  </target>
+
+  <!-- Create the demo package -->
+  <target name="package-demos" depends="init,package-spice,compile-demos"
+  description="create the demo jar file">
+    <jar
+      jarfile="${jar.demos}"
+      manifest="${manifest.dir}/demos.txt"
+    >
+      <fileset dir="${build.dest.demos}" />
+    </jar>
+  </target>
+
+  <!-- Create the apps package -->
+  <target name="package-apps" depends="init,package-spice,compile-apps"
+  description="create the apps jar file">
+    <jar
+      jarfile="${jar.apps}"
+      manifest="${manifest.dir}/apps.txt"
+    >
+      <fileset dir="${build.dest.apps}" />
+    </jar>
+  </target>
+
+
+  <!-- copy into WWW dir -->
+  <target name="www" depends="package-spice"
+  description="copy into WWW dir">
+    <copy todir="${www.dir}">
+      <fileset dir="${build.dir}">
+        <include name="${name.spice}.jar" />
+        <exclude name="${docbook.tools.file}" />
+      </fileset>
+    </copy>
+    
+    <signjar jar="${www.dir}/${name.spice}.jar" 
+	     alias="myalias" 
+	     storepass="secret"/>
+  </target>
+
+  <target
+    name="package-all"
+    depends="package-spice,package-demos,package-apps"
+    description="create all the jar files" />
+
+  <!--
+    Create Javadoc and other documentation for each distribution package.
+
+    This probably just calls javadoc, but may call other documentation gubbins.
+  -->
+
+  <!-- Create taglet API documentation -->
+  <target name="javadocs-taglets" depends="prepare-taglets"
+  description="Create taglet API documentation">
+    <javadoc
+      sourcepath="${taglets.dir}"
+      classpath="${classpath}:${java.home}/../lib/tools.jar"
+      destdir="${build.docs.taglets}"
+      author="true"
+      version="true"
+      use="true"
+      source="1.4"
+      windowtitle="${Name.taglets} API"
+      doctitle="${Name.taglets}"
+      maxmemory="96m">
+      <fileset dir="${taglets.dir}" />
+      <link href="http://java.sun.com/j2se/1.4.2/docs/api/" offline="false" />
+      <link href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/javadoc/doclet/"  offline="false"/>
+    </javadoc>
+  </target>
+
+
+
+  <!-- Creates the API documentation -->
+  <target name="javadocs-spice" depends="prepare-spice,compile-taglets"
+  description="Creates the API documentation">
+    <javadoc
+      packagenames="${packages}"
+      sourcepath="${src.dir}"
+      destdir="${build.docs.spice}"
+      author="true"
+      version="true"
+      use="true"
+      source="1.4"
+      windowtitle="${Name.spice} API"
+      doctitle="${Name.spice}"
+      maxmemory="96m">
+       <link href="http://java.sun.com/j2se/1.4.2/docs/api/" offline="false"/>
+
+       <group title="Biojava SPICE"
+       	packages="org.biojava.spice" />
+             
+    </javadoc>
+  </target>
+
+  <!-- Create demos API documentation -->
+  <target name="javadocs-demos" depends="prepare-demos,compile-spice,compile-taglets"
+  description="Create the demos API documentation">
+    <javadoc
+      packagenames="**"
+      sourcepath="${demos.dir}"
+      classpath="${classpath}:${build.dest.spice}"
+      destdir="${build.docs.demos}"
+      author="true"
+      version="true"
+      use="true"
+      source="1.4"
+      windowtitle="${Name.demos} API"
+      doctitle="${Name.demos}"
+      maxmemory="96m">
+      <link href="http://java.sun.com/j2se/1.4.2/docs/api/" offline="false"/>
+      <link href="../spice" offline="true" packagelistLoc="${build.docs.spice}/package-list}"/>
+      <taglet name="UserLevel" path="${build.dest.taglets}" />
+      <taglet name="MetaData" path="${build.dest.taglets}:${classpath}" />
+      <taglet name="Option" path="${build.dest.taglets}"/>
+    </javadoc>
+  </target>
+
+
+  <!-- Creates the DocBook documentation -->
+  <target name="docbook" depends="prepare-docs" if="trax.present"
+  description="Creates the DocBook documentation">
+
+    <xslt
+      in="${docs.dir}/spice-doc-main.xml"
+      out="${build.dest.docs}/index.html"
+      style="${docbook.xsl}"
+      force="true">
+        <!-- Pass XSL parameters to transformer -->
+        <param name="html.stylesheet" expression="${doc.css.file}" />
+        <param name="html.ext" expression=".html" />
+        <param name="using.chunker" expression="1" />
+        <param name="chunk.sections" expression="0" />
+        <param name="use.id.as.filename" expression="1" />
+        <outputproperty name="method" value="xml" />
+        <outputproperty name="standalone" value="yes" />
+        <outputproperty name="encoding" value="UTF-8" />
+        <outputproperty name="indent" value="no" />
+    </xslt>
+    <!-- CSS file used by HTML output -->
+    <copy file="${docs.dir}/${doc.css.file}" todir="${build.dest.docs}" />
+    <!-- Images used by HTML output -->
+    <copy todir="${build.dest.docs}">
+      <fileset dir="${docs.dir}">
+        <include name="*/*.png" />
+        <include name="*/*.jpg" />
+        <include name="*/*.gif" />
+      </fileset>
+    </copy>
+  </target>
+
+  <target
+    name="javadocs-all"
+    depends="javadocs-taglets,javadocs-spice,javadocs-demos,docbook"
+    description="Creates the javadocs for all components"
+  />
+
+  <!-- Runs tests if the Ant optional JUnit support is available -->
+  <target name="runtests" depends="compile-tests"
+  description="Run all tests, can be quite slow">
+    <property name="test.subtree" value="**" />
+    <echo message="Running tests:           ${test.subtree}" />
+    <junit maxmemory="128m" printsummary="yes" haltonfailure="no" reloading="no">
+      <formatter type="plain" usefile="true" />
+      <classpath>
+        <!-- main classes from build -->
+        <pathelement path="${build.dest.spice}" />
+        <!-- resources -->
+        <pathelement path="${resources.dir}" />
+        <!-- test classes from build -->
+        <pathelement path="${build.dest.tests}" />
+        <!-- test data from build -->
+        <pathelement path="${tests.dir}/files" />
+        <!-- currently the move isn't complete -->
+        <pathelement path="${tests.dir}" />
+        <!-- classes specified in this file -->
+        <pathelement path="${classpath}" />
+        <!-- classes specified in system classpath -->
+        <pathelement path="${java.class.path}" />
+      </classpath>
+      <!-- The junit task doesn't support 'if' so we test for JUnit here -->
+      <batchtest fork="no" todir="${reports.tests}" if="junit.present">
+        <fileset dir="${build.dest.tests}">
+          <include name="${test.subtree}/*Test.class" />
+          <include name="${test.subtree}/*TestSuite.class" />
+          <exclude name="**/Abstract*Test.class" />
+        </fileset>
+      </batchtest>
+    </junit>
+  </target>
+
+  <target name="runtests-fork" depends="compile-tests"
+  description="Run all tests, can be quite slow">
+    <property name="test.subtree" value="**" />
+    <echo message="Running tests:           ${test.subtree}" />
+    <junit maxmemory="128m" printsummary="yes" haltonfailure="no" dir="${build.dest.tests}">
+      <formatter type="plain" usefile="true" />
+      <classpath>
+        <!-- main classes from build -->
+        <pathelement path="${build.dest.spice}" />
+        <!-- resources -->
+        <pathelement path="${resources.dir}" />
+        <!-- test classes from build -->
+        <pathelement path="${build.dest.tests}" />
+        <!-- test data from build -->
+        <pathelement path="${tests.dir}/files" />
+        <!-- currently the move isn't complete -->
+        <pathelement path="${tests.dir}" />
+        <!-- classes specified in this file -->
+        <pathelement path="${classpath}" />
+         <!-- classes specified in system classpath -->
+        <pathelement path="${java.class.path}" />
+      </classpath>
+      <!-- The junit task doesn't support 'if' so we test for JUnit here -->
+      <batchtest fork="yes" todir="${reports.tests}" if="junit.present">
+        <fileset dir="${build.dest.tests}">
+          <include name="${test.subtree}/*Test.class" />
+          <include name="${test.subtree}/*TestSuite.class" />
+          <exclude name="**/Abstract*Test.class" />
+        </fileset>
+      </batchtest>
+    </junit>
+  </target>
+
+  <target name="doccheck-spice" depends="prepare-spice"
+    description="Checks the API documentation">
+    <javadoc
+      doclet="com.sun.tools.doclets.doccheck.DocCheck"
+      docletpath="doccheck.jar"
+      packagenames="${packages}"
+      sourcepath="${src.dir}"
+      destdir="${build.doccheck.spice}"
+      source="1.4"
+      maxmemory="96m">
+    </javadoc>
+  </target>
+
+  <!-- Cleans everything -->
+  <target name="clean" depends="init"
+  description="Cleans everything">
+    <delete dir="${build.dir}" />
+  </target>
+</project>
