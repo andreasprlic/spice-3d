@@ -992,7 +992,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
     
     public void mousePressed(MouseEvent e)  {
         int b = e.getButton();
-        //logger.finest("mousePressed "+b);
+        logger.finest("mousePressed "+b);
         if ( b == MouseEvent.BUTTON1 )
             mouseDragStart = getSeqPos(e);
         
@@ -1000,11 +1000,12 @@ implements SeqPanel, MouseListener, MouseMotionListener
     }
     public void mouseReleased(MouseEvent e) {
         int b = e.getButton();
-        //logger.finest("mouseReleased "+b);       
-        if ( b == MouseEvent.BUTTON3) {          
+        logger.finest("mouseReleased "+b);       
+        if ( b != MouseEvent.BUTTON1) {          
             return;
         }           
-        
+                
+        if ( popupMenu.isVisible()) return;
         
         int seqpos = getSeqPos(e);
         int lineNr = getLineNr(e);
@@ -1072,7 +1073,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
             return;
         
         int b = e.getButton();
-        // logger.finest("dragging mouse "+b);
+        logger.finest("dragging mouse "+b);
         
         // ARGH my linux java 142_05 does not show Button 1 when being dragged!
         //if ( b != MouseEvent.BUTTON1 ) 
