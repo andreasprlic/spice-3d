@@ -1216,7 +1216,7 @@ public class SpiceApplication
 	    //logger.finest("about SPICE");
 	    AboutDialog asd = new AboutDialog(this);
 
-	    asd.setText("The SPICE Applet. V 0.1 (C) Andreas Prlic, Tim Hubbard\n The Wellcome Trust Sanger Institute 2004 mailto:ap3@sanger.ac.uk") ;
+	    asd.setText("The SPICE Applet. V 0.5 (C) Andreas Prlic, Tim Hubbard\n The Wellcome Trust Sanger Institute 2004 mailto:ap3@sanger.ac.uk") ;
 
 	    asd.show();
 	    return true;

@@ -32,12 +32,15 @@ import java.awt.image.BufferedImage;
 import java.awt.Font ;
 import java.awt.Dimension;
 import java.awt.Event;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseEvent;
-import java.util.List ;
-import java.util.ArrayList ;
-import java.util.HashMap ;
+import java.awt.event.MouseListener       ; 
+import java.awt.event.MouseMotionListener ;
+import java.awt.event.MouseEvent          ;
+import java.awt.Graphics2D                ;
+import java.awt.* ;
+
+import java.util.List                     ;
+import java.util.ArrayList                ;
+import java.util.HashMap                  ;
 
 import java.io.*             ;
 import java.util.Iterator    ;
@@ -71,7 +74,10 @@ public class SeqFeatureCanvas
     public static final int    DEFAULT_Y_HEIGHT = 4 ;
     public static final int    DEFAULT_Y_BOTTOM  = 16 ;
     public static final int    TIMEDELAY        = 0 ;
-    
+
+    // Alpha value for the image
+    static AlphaComposite composite = AlphaComposite.SrcOver;
+
     int selectPosition = -1 ;
     // the master application
     SPICEFrame spice ;
@@ -82,7 +88,7 @@ public class SeqFeatureCanvas
 	
     Color seqColorOld ;
     Color strucColorOld ;
-	
+
     int current_chainnumber;
 	
     //int seqPosOld, strucPosOld ;
@@ -93,6 +99,7 @@ public class SeqFeatureCanvas
     //ArrayList features ;
     Chain chain ;
 	
+    Color cursorColor ;
 	
     //mouse events
     Date lastHighlight ;
@@ -132,7 +139,17 @@ public class SeqFeatureCanvas
 	entColors[6] = Color.cyan;
 	//this.setBackground(Color.black) ;
 	//super.setBackground(Color.black) ;
+	
+	/*
 
+	float r = Color.GRAY.getRed();
+	float g = Color.GRAY.getGreen();
+	float b = Color.GRAY.getBlue();
+	float a = 0.5f ;
+
+	*/
+
+	cursorColor   = new Color(0.7f, 0.7f, 0.7f, 0.5f);
 	lastHighlight = new Date();
 				
 	current_chainnumber = -1 ;
@@ -568,14 +585,19 @@ public class SeqFeatureCanvas
 	    
 	    //int seqpos =  java.lang.Math.round(x/scale) ;
 	    if ( selectPosition > -1 ) {
-		gstruc.setColor(Color.darkGray);
+		gstruc.setColor(cursorColor);
 		seqx = java.lang.Math.round(selectPosition*scale)+DEFAULT_X_START ;
 		//aminosize = java.lang.Math.round(1*scale) ;
 		int tmpfill ;
 		if (aminosize <1) tmpfill = 1;
 		else tmpfill = aminosize ;
 		//logger.finest("draw rec");
-		gstruc.fillRect(seqx , 0, tmpfill, dstruc.height);
+
+		
+		Graphics2D g2D = (Graphics2D)gstruc;
+
+		g2D.setComposite(composite);                   // Set current alpha
+		g2D.fillRect(seqx , 0, tmpfill, dstruc.height);
 	    }
 
 	    //g.drawImage(imbuf,0,0,this.getBackground(),this);

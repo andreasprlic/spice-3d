@@ -180,7 +180,8 @@ public class LoggingPanel extends JPanel {
     public LoggingPanel() {
         super(new BorderLayout());
         table.setShowGrid(false);
-        table.setCellSelectionEnabled(false);
+        //table.setCellSelectionEnabled(false);
+	
         table.setGridColor(Color.LIGHT_GRAY);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         table.setDefaultRenderer(Object.class, new CellRenderer());
