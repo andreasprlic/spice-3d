@@ -126,8 +126,10 @@ public class SpiceApplication
     URL CONFIG_URL      ; 
     URL REGISTRY_URL    ;
 
+
+    static int    DEFAULT_Y_SCROLL = 50 ;
     static String XMLVALIDATION = "false" ;   
-    static String INIT_SELECT = "select all; cpk off ; wireframe off ; backbone off; cartoon on; colour chain;select not protein and not solvent;spacefill 2.0;";
+    static String INIT_SELECT = "select all; cpk off ; wireframe off ; backbone off; cartoon on; colour chain;select not protein and not solvent;spacefill 2.0;";    
     RegistryConfiguration config      ;
     Structure structure ; 
     String pdbcode      ;
@@ -186,7 +188,7 @@ public class SpiceApplication
 	
 	
 	LoggingPanel loggingPanel = new LoggingPanel(logger);
-	loggingPanel.getHandler().setLevel(Level.FINEST);
+	loggingPanel.getHandler().setLevel(Level.FINE);
 	loggingPanel.show(null);
 	//ConsoleHandler handler = new ConsoleHandler();
 	//handler.setLevel(Level.FINEST);
@@ -394,6 +396,8 @@ public class SpiceApplication
 	dasPanel = new JScrollPane(dascanv);
 	//dasPanel.setOpaque(true);
 	dasPanel.setBackground(Color.black);
+	dasPanel.getVerticalScrollBar().setUnitIncrement(DEFAULT_Y_SCROLL);
+	dasPanel.getHorizontalScrollBar().setUnitIncrement(DEFAULT_Y_SCROLL);
 	//scroll.add(dascanv);
 
 	//daspanel = new SeqPanel(this);
@@ -458,7 +462,7 @@ public class SpiceApplication
 
 
 
-
+	
 	strucommand = new JTextField()  ;
 	strucommand.setText("enter RASMOL like command...");
 	ActionListener listener = new StructureCommandListener(this,strucommand) ;
@@ -467,7 +471,7 @@ public class SpiceApplication
 	//this.getContentPane().add(strucommand,BorderLayout.SOUTH);
 	//this.getContentPane().add(strucommand);
 	vBox.add(strucommand);
-
+	
 	//vBox.add(loggingPanel);
 
 
@@ -710,9 +714,9 @@ public class SpiceApplication
 
 	structure = structure_ ; 
 
-	if (logger.isLoggable(Level.FINEST)) {
-	    System.out.println(structure.toPDB());	    
-	}
+	//if (logger.isLoggable(Level.FINEST)) {
+	//System.out.println(structure.toPDB());	    
+	//}
 
 
 	    	
@@ -1345,38 +1349,6 @@ public class SpiceApplication
 //  }
 //}
 
-class StructureCommandListener 
-    implements ActionListener {
-    JTextField textfield ;
-    SPICEFrame spice    ;
-    static Logger logger      = Logger.getLogger("org.biojava.spice");
-    
-    public StructureCommandListener (SPICEFrame spice_, JTextField textfield_) {
-	super();
-	spice = spice_ ;
-	textfield = textfield_ ;
-	
-    }
-    public void actionPerformed(ActionEvent event) {
-	//logger.finest("in TextField");
-	//logger.finest("EVENT!");
-	//logger.finest(event);
-	if ( spice.isLoading() ) {
-	    logger.finest("loading data, please be patient");
-	    return ;
-	}
-	String cmd = textfield.getText();
-	spice.executeCmd(cmd);
-	textfield.setText("");
-	
-	//logger.finest(event.getActionCommand());
-	//logger.finest(event.getModifiers());
-	//logger.finest(event.paramString());
-	//logger.finest(event.id);
-    }
-
-    
-}
 
 class TextFieldListener 
     implements ActionListener {
@@ -1584,3 +1556,32 @@ class AboutDialog extends JDialog
     }
 
 }
+
+class StructureCommandListener 
+    implements ActionListener {
+    JTextField textfield ;
+    SPICEFrame spice    ;
+    static Logger logger      = Logger.getLogger("org.biojava.spice");
+    
+    public StructureCommandListener (SPICEFrame spice_, JTextField textfield_) {
+	super();
+	spice = spice_ ;
+	textfield = textfield_ ;
+	
+    }
+    public void actionPerformed(ActionEvent event) {
+
+	if ( spice.isLoading() ) {
+	    logger.finest("loading data, please be patient");
+	    return ;
+	}
+	String cmd = textfield.getText();
+	spice.executeCmd(cmd);
+	textfield.setText("");
+	
+
+    }
+
+    
+}
+
