@@ -102,7 +102,7 @@ public class FeatureFetcher extends Thread
         doDasCommunication() ;
 	
         List l = getFeatures();
-        logger.finest("setting Features in spice");
+        logger.finest("finished loading Features");
         parent.setFeatures(spId,l);
         parent.setLoading(false);
     }
@@ -245,14 +245,18 @@ public class FeatureFetcher extends Thread
 	    for (int j=0; j<features.size();j++){
 		HashMap feat = (HashMap)features.get(j);			
 		
-		String startOrig = (String)feat.get("START");
-		String endOrig   = (String)feat.get("END");
-		//logger.finest("pdbresnum feature: "+feat);
-		String startNew  = getUniProtCoord(startOrig,chain);
-		String endNew    = getUniProtCoord(endOrig,chain);
-		feat.put("START",startNew);
-		feat.put("END",endNew);
-		//logger.finest("uniprot feature: "+feat);
+		String mappDone  = (String)feat.get("PDBmappingDone");
+		if ( mappDone == null) {
+		    String startOrig = (String)feat.get("START");
+		    String endOrig   = (String)feat.get("END");
+		    //logger.finest("pdbresnum feature: "+feat);
+		    String startNew  = getUniProtCoord(startOrig,chain);
+		    String endNew    = getUniProtCoord(endOrig,chain);
+		    feat.put("START",startNew);
+		    feat.put("END",endNew);
+		    feat.put("PDBmappingDone","true");
+		    //logger.finest("pdb feature: "+feat);
+		}
 		allFeatures.add(feat) ;		    
 	    } 
 	    
@@ -263,7 +267,7 @@ public class FeatureFetcher extends Thread
 	    for (int j=0; j<features.size();j++){
 		HashMap feat = (HashMap)features.get(j);			
 		//Feature feat = (Feature)features.get(j);			
-		//logger.finest("got feature: "+feat);
+		//logger.finest("uniprot feature: "+feat);
 		allFeatures.add(feat) ;		
 	    } 
 	} 

@@ -116,7 +116,7 @@ public class DAS_Feature_Handler  extends DefaultHandler{
 			    add_featuredata(uri,name,qName);
 			}
 			else if ( qName.equals("FEATURE")) {
-			    System.out.println("adding ffeature " + feature);
+			    //System.out.println("adding ffeature " + feature);
 			    features.add(feature);
 			}
 		}

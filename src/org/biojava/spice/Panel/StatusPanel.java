@@ -56,7 +56,6 @@ public class StatusPanel
 	this.setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 	this.setBorder(BorderFactory.createEmptyBorder());
 	Box hBox =  Box.createHorizontalBox();
-
 	JTextField pdbtxt  = new JTextField("PDB code:");
 	pdbtxt.setEditable(false);
 	pdbtxt.setBorder(BorderFactory.createEmptyBorder());

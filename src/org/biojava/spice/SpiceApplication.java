@@ -176,7 +176,7 @@ public class SpiceApplication
 	
 	
 	LoggingPanel loggingPanel = new LoggingPanel(logger);
-	loggingPanel.getHandler().setLevel(Level.FINER);
+	loggingPanel.getHandler().setLevel(Level.FINEST);
 	loggingPanel.show(null);
 	//ConsoleHandler handler = new ConsoleHandler();
 	//handler.setLevel(Level.FINEST);
@@ -347,6 +347,7 @@ public class SpiceApplication
 	// move to submenu
 	//this.getContentPane().add(statusPanel,BorderLayout.SOUTH);
 	//this.getContentPane().add(statusPanel);
+
 	statusPanel.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
 	vBox.add(statusPanel);
 	
@@ -358,7 +359,7 @@ public class SpiceApplication
 	seq_pos.setBackground(new Color(0, 0, 0));
 	seq_pos.setSize(700, 30);
 	seq_pos.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
-
+	seq_pos.setBorder(BorderFactory.createEmptyBorder());
 	//this.getContentPane().add(seq_pos,BorderLayout.NORTH);
 	//this.getContentPane().add(seq_pos);
 	vBox.add(seq_pos);
@@ -1307,7 +1308,8 @@ public class SpiceApplication
 	logger.finest("updateDisplays + features size: " + features.size());
 	//SeqFeatureCanvas dascanv = daspanel.getCanv();
 	dascanv.setFeatures(features);
-	//dascanv.paint(dascanv.getGraphics());
+	//dascanv.repaint();
+	dascanv.paint(dascanv.getGraphics());
 	
 	sharedPanel.paint(sharedPanel.getGraphics());
 	//leftPanel.paint(leftPanel.getGraphics());
@@ -1501,6 +1503,7 @@ class EntListCommandListener implements ListSelectionListener {
     }
 
 }
+
 
 
 class StructureCommandListener 
