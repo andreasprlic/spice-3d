@@ -30,10 +30,12 @@ import java.net.HttpURLConnection          ;
 import java.net.URL                        ;
 import java.io.IOException                 ;
 
+import java.util.Date                      ;
 import java.util.HashMap                   ;
 import java.util.ArrayList                 ;
 import java.util.Map                       ;
 import java.util.List                      ;
+
 // for DAS registration server:
 import org.biojava.services.das.registry.* ;
 
@@ -87,8 +89,9 @@ public class RegistryConfigIO
     extends Thread
     
 {
-
-
+    // in milliseconds
+    // 100 milliseconds * 60 seconds * 60 minutes * 24 hours = 1 day
+    public static final long  TIME_BETWEEN_UPDATES = 100*60*60*24;
 
     URL REGISTRY  ;
 	
@@ -98,6 +101,8 @@ public class RegistryConfigIO
     JProgressBar progressBar ;
     JFrame progressFrame      ;
     SPICEFrame spice  ;
+
+
     public RegistryConfigIO ( SPICEFrame parent , URL registryurl) {
 	spice = parent ;
 	REGISTRY = registryurl ;
@@ -121,20 +126,76 @@ public class RegistryConfigIO
     private synchronized void getData()
 	throws ConfigurationException
     {
+	//System.out.println("DAS Registry server config thread loadData");
+
+	PersistentConfig  persistentc = new PersistentConfig();
+	RegistryConfiguration persistentconfig = null ;
+	try {
+	    persistentconfig  = persistentc.load();
+	} catch (Exception e) {
+	    System.err.println("an error occured during loading of local config");
+	    e.printStackTrace();
+	 
+	}
+	
+	if ( persistentconfig != null ) {
+	    config = persistentconfig ;
+
+	    String behave = config.getUpdateBehave();
+	    System.out.println("behave: " + behave);	    
+	    //behave="always";
+	    if ( behave.equals("day")) {
+		// test if we did already an update today
+		// if not do update now
+		Date now = new Date();
+		Date lastContact = persistentconfig.getContactDate();
+		long timenow     = now.getTime();
+		long timelast    = lastContact.getTime();
+
+		if (( timenow - timelast ) < TIME_BETWEEN_UPDATES ) {
+		    doRegistryUpdate();
+		} else {
+		    System.out.println("last update < 1 day, using saved config");
+		}
+		
+	    } else {
+		// behave == always
+		doRegistryUpdate();
+	    }
+	} else {
+	    // persistent config = null
+	    // we need to do an initial contact
+	    doRegistryUpdate();
+	}
+	
+	done = true ; 
+	notifyAll(); 
+
+    }
+
+    /** contact DAS registry and update sources ... */
+    public synchronized void doRegistryUpdate()
+	throws ConfigurationException
+    {
 	// show dialog
 	showProgressBar();
 	
-	System.out.println("DAS Registry server config thread loadData");
+
 	done = false ;
 	System.out.println("contacting DAS registry server at: " +REGISTRY);
 
+	RegistryConfiguration oldconfig = config;
+
 	config = new RegistryConfiguration();
 
+	
 	DasRegistryAxisClient rclient = new DasRegistryAxisClient(REGISTRY);
 	
 	String[] capabs = rclient.getAllCapabilities();
 	config.setCapabilities(capabs);
-
+	//Date d = new Date();
+	//config.setContactDate(d);
+	
 	DasSource[] sources = rclient.listServices();
 	
 	if ( sources==null) {
@@ -153,9 +214,23 @@ public class RegistryConfigIO
 	    config.addServer(sds,true);
 	}
 
-	done = true ; 
+
+	// copy old local servers to new config ...
+	if ( oldconfig != null ) {
+	    config.setUpdateBehave(oldconfig.getUpdateBehave());
+	    config.setPDBFileExtensions(oldconfig.getPDBFileExtensions());
+
+	    List localservers = oldconfig.getLocalServers();
+	    for ( int i = 0 ; i < localservers.size() ; i++ ) {
+		SpiceDasSource ds = (SpiceDasSource) localservers.get(i);
+		config.addServer(ds,ds.getStatus());
+	    }
+	}
+
+	Date now = new Date();
+	config.setContactDate(now);
 	disposeProgressBar();
-	notifyAll(); 
+
 
 
 	
@@ -211,7 +286,12 @@ public class RegistryConfigIO
 
     /** write back the config to the SPICE application */
     public void saveConfiguration() {
-	spice.setConfiguration(config);	
+	spice.setConfiguration(config);
+	System.out.println("trying PersistentConfig");
+	PersistentConfig ps = new PersistentConfig();
+	ps.save(config);
+	    
+	
     }
 
     /** returns the Config for SPICE */
@@ -352,7 +432,7 @@ class TabbedPaneDemo extends JPanel {
     JTextField fileExtensions          ;	  
     JTextArea sourceDescription        ;
     JPopupMenu tablePopup              ;
-
+    JComboBox updateBehaveList         ;
     public TabbedPaneDemo(RegistryConfigIO registryparent, RegistryConfiguration config_) {
         super(new GridLayout(1, 1));
 	registryIO = registryparent ;
@@ -376,7 +456,7 @@ class TabbedPaneDemo extends JPanel {
 	
 
 	JPanel seqstrucpanel = getAvailablePanel();
-	tabbedPane.addTab("list sources", icon, seqstrucpanel,
+	tabbedPane.addTab("list", icon, seqstrucpanel,
                           "configure sequence and structure servers");
         tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
 		
@@ -388,7 +468,7 @@ class TabbedPaneDemo extends JPanel {
 
 	JPanel addLocalPanel = getAddLocalPanel();
 	//tabbedPane.setMnemonicAt(1, KeyEvent.VK_1);       
-	tabbedPane.addTab("Add local source", icon, addLocalPanel,"add a local DAS source");
+	tabbedPane.addTab("add local", icon, addLocalPanel,"add a local DAS source");
 
 	
 	////////////////////////////////////////////////////////
@@ -396,8 +476,18 @@ class TabbedPaneDemo extends JPanel {
 	////////////////////////////////////////////////////////
 
 	JPanel localPDBPanel = getLocalPDBPanel();
-	tabbedPane.addTab("PDB files from local dir.", icon, localPDBPanel,"try to load PDB files from local directory first.");
+	tabbedPane.addTab("local PDB files", icon, localPDBPanel,"try to load PDB files from local directory first.");
+
+
+	////////////////////////////////////////////////////////
+	/// general Spice Config
+	////////////////////////////////////////////////////////
+
+	JPanel generalConfigPanel = getGeneralConfigPanel();
+	tabbedPane.addTab("general config", icon, generalConfigPanel,"general Spice config");
+
 	
+	////////////////////////////////////////////////////////
         //Add the tabbed pane to this panel.
         add(tabbedPane);
         
@@ -405,6 +495,65 @@ class TabbedPaneDemo extends JPanel {
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
     }
 
+
+    protected JPanel getGeneralConfigPanel(){
+	JPanel panel = new JPanel();
+	
+	TitledBorder dasborder;
+	dasborder = BorderFactory.createTitledBorder("general");
+
+	JPanel generalConfigForm = new JPanel();
+
+	generalConfigForm.setBorder(dasborder);
+
+	Box v = Box.createVerticalBox();
+	JTextField txt = new JTextField(" contact DAS-registration server");
+	txt.setEditable(false);
+	txt.setBorder(BorderFactory.createEmptyBorder());
+	v.add(txt);
+
+	String[] freq = { "always","once per day"};
+	updateBehaveList = new JComboBox(freq) ;		
+	updateBehaveList.setEditable(false);
+	updateBehaveList.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
+	String selectedFreq = config.getUpdateBehave();
+	int index = 1 ;
+	if (selectedFreq.equals("always")) 
+	    index = 0 ;
+	updateBehaveList.setSelectedIndex(index);
+	
+	v.add(updateBehaveList);
+	
+	
+	JButton contactRegistryNow = new JButton ("Now");
+	contactRegistryNow.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    try {
+			registryIO.doRegistryUpdate(); 
+		    } catch (Exception ex) {
+			ex.printStackTrace();
+		    }
+		}	
+		
+	    });
+	
+	Box h = Box.createHorizontalBox();
+	JTextField txt2 = new JTextField("detect available servers") ;
+	txt2.setEditable(false);
+	txt2.setBorder(BorderFactory.createEmptyBorder());
+
+	h.add(txt2);
+	h.add(contactRegistryNow);
+	    
+	    
+	v.add(h);
+	generalConfigForm.add(v);
+	//generalConfigForm.add(contactRegistryNow);
+
+	return generalConfigForm;
+
+	
+    }
 
     protected JPanel getLocalPDBPanel() {
 	JPanel localPDBPanel = new JPanel();
@@ -526,7 +675,9 @@ class TabbedPaneDemo extends JPanel {
 		JList list = new JList(config.getCapabilities());
 		list.setVisibleRowCount(1);
 		//list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		list.setSelectedIndex(4);
+		if ( list.getMaxSelectionIndex() > 3) {
+		    list.setSelectedIndex(4);
+		}
 		list.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
 		JScrollPane jsp = new JScrollPane(list);
 		jsp.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
@@ -818,6 +969,15 @@ class TabbedPaneDemo extends JPanel {
 	    sds.setCoordinateSystem(coordSys);
 	    sds.setCapabilities(capabs);
 	    config.addServer(sds,true);
+	    updateDasSourceTable();
+	}
+	else if ( pos == 3 ) {
+	    String behave = (String)updateBehaveList.getSelectedItem();
+	    
+	    System.out.println("setting update behaviour to " + behave);
+	    if ( behave.equals("once per day"))
+		behave = "day" ;
+	    config.setUpdateBehave(behave);
 	    updateDasSourceTable();
 	}
     }

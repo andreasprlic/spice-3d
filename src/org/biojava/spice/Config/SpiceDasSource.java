@@ -25,11 +25,17 @@
 package org.biojava.spice ;
 
 import org.biojava.services.das.registry.*;
+import org.biojava.utils.xml.*            ; 
+import java.io.PrintWriter                ;
+import java.io.StringWriter               ;
+import java.io.IOException                ;
+import java.text.DateFormat               ;
 
 public class SpiceDasSource
     extends DasSource 
 
 {
+
 
     boolean status ;
     boolean registered ; // a flag to trace if source comes from registry or from user vonfig
@@ -57,5 +63,53 @@ public class SpiceDasSource
 	this.setLeaseDate(ds.getLeaseDate());
     }
 
+
+    /** convert to XML. */
+    public XMLWriter toXML(XMLWriter xw)
+	throws IOException
+    {
+	System.out.println("writing XML of" + getUrl());
+	xw.openTag("SpiceDasSource");
+	xw.attribute("url",getUrl());
+	xw.attribute("adminemail",getAdminemail());
+	//xw.attribute("description",getDescription());
+	xw.attribute("status",""+status);
+	xw.attribute("registered",""+registered);
+
+	DateFormat df = DateFormat.getDateInstance();
+	String rds = df.format(getRegisterDate());
+	String lds = df.format(getLeaseDate());
+	xw.attribute("registerDate",rds);
+	xw.attribute("leaseDate",lds);
+
+	// description
+	xw.openTag("description");
+	xw.print(getDescription());
+	xw.closeTag("description");
+
+	// coordinateSystems
+	xw.openTag("coordinateSystems");
+	String[] coords = getCoordinateSystem();
+	for (int i = 0; i < coords.length; i++){
+	    xw.openTag("coordinateSystem");
+	    xw.attribute("name",coords[i]);
+	    xw.closeTag("coordinateSystem");
+	} 
+	xw.closeTag("coordinateSystems");
+
+	// capabilities
+	xw.openTag("capabilities");
+	String[] caps = getCapabilities();
+	for (int i = 0; i < caps.length; i++){
+	    xw.openTag("capability");
+	    xw.attribute("service",caps[i]);
+	    xw.closeTag("capability");
+	} 
+	xw.closeTag("capabilities");
+
+	xw.closeTag("SpiceDasSource");
+	return xw ;
+    }
+    
 
 }

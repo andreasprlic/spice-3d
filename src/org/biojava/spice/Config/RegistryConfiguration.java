@@ -38,6 +38,7 @@ import java.util.ListIterator ;
 // for DAS registration server:
 //import org.biojava.services.das.registry.*;
 
+import java.io.* ;
 
 // for GUI;
 import java.awt.Frame ;
@@ -63,26 +64,60 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.KeyEvent;
 
+import java.text.DateFormat               ;
+import java.util.Date                     ;
+
+import org.biojava.utils.xml.*            ; 
+import java.io.PrintWriter                ;
+import java.io.StringWriter               ;
 
 /** Container class for configuration
  */
 public class RegistryConfiguration 
 {
 
-    //List serverdata ;
-    
-    List allservers          ;
-    List activeservers       ;
-    String[] capabilities    ;
+    public static final String XML_CONTENT_TYPE = "text/xml";
+    public static final String XML_DTD          = "spiceconfig.dtd";
+
+
+    List allservers            ;
+    List activeservers         ;
+    String[] capabilities      ;
     String[] pdbFileExtensions ;
+    String updateBehave        ;
+    Date   lastContact         ;
+
     public RegistryConfiguration () {
 	super();
-	//serverdata = new ArrayList();
-	allservers    = new ArrayList();
-	activeservers = new ArrayList();
-	capabilities  = null ;
-	pdbFileExtensions = new String[] { ".pdb",".ent"};
+
 	
+	allservers        = new ArrayList();
+	activeservers     = new ArrayList();
+	capabilities      = new String[] { "sequence","structure","alignment","features","entry_points"} ;
+	pdbFileExtensions = new String[] { ".pdb",".ent"};
+	updateBehave      = "always";
+	lastContact       = null ;
+    }
+
+
+    public void setContactDate(Date d) {
+	lastContact = d;
+    }
+
+    public Date getContactDate() {
+	return lastContact;
+    }
+
+    /** set to "always", "day" */
+    public void setUpdateBehave(String b) {
+	if (b.equals("always"))
+	    updateBehave = b;
+	else if (b.equals("day"))
+	    updateBehave = b ;
+    }
+
+    public String getUpdateBehave() {
+	return updateBehave;
     }
 
     public String[] getPDBFileExtensions() { return pdbFileExtensions ;}
@@ -114,6 +149,19 @@ public class RegistryConfiguration
 	}
 	return false ;
 
+    }
+
+
+    /** returns a list of local SpiceDasSources */
+    public List getLocalServers(){
+	
+	ArrayList tmp = new ArrayList();
+	for ( int i = 0 ; i < allservers.size() ; i++ ) {
+	    SpiceDasSource ds = (SpiceDasSource) allservers.get(i);
+	    if ( ! ds.getRegistered() ) 
+		tmp.add(ds);
+	}
+	return tmp ;
     }
 
     public void addServer(SpiceDasSource s, boolean status) {	
@@ -241,17 +289,74 @@ public class RegistryConfiguration
     private void removeFromActive(SpiceDasSource ds) {
 	String serverurl = ds.getUrl();
 	activeservers.remove(ds);
-	/*
-	ListIterator iter = activeservers.listIterator();
-	while (iter.hasNext()) {
-	SpiceDasSource sds = (SpiceDasSource) iter.next();
-	if (sds.getUrl().equals(serverurl));
-	iter.remove();
-	return ;	    
-	}	
-	*/
+    }
+    
+
+    /** convert Configuration to an XML file so it can be serialized
+     */
+    
+    public XMLWriter toXML(PrintWriter pw) 
+	throws IOException
+    {
+	//StringWriter stw = new StringWriter   ()   ;
+	//PrintWriter   pw = new PrintWriter    (stw);
+	XMLWriter     xw = new PrettyXMLWriter( pw);
+
+
+
+
+	toXML(xw);
+	return xw ;
     }
 
+
+    /** convert Configuration to an XML file so it can be serialized
+	add to an already existing xml file.
+     */
+    public XMLWriter toXML(XMLWriter xw) 
+	throws IOException
+    {
+	xw.printRaw("<?xml version='1.0' standalone='no' ?>");
+	//xw.printRaw("<!DOCTYPE " + XML_CONTENT_TYPE + " SYSTEM '" + XML_DTD + "' >");
+	xw.openTag("SpiceConfig");
+	for ( int i = 0 ; i < allservers.size() ; i++ ) {
+	    SpiceDasSource ds = (SpiceDasSource) allservers.get(i);
+	    ds.toXML(xw);
+	}
+
+	//pdbFileExtensions ;
+	for (int i =0;i<pdbFileExtensions.length;i++){
+	    System.out.println("pdb ext" + pdbFileExtensions[i]);
+
+	    xw.openTag("pdbFileExtension");
+	    xw.attribute("name",pdbFileExtensions[i]);
+	    xw.closeTag("pdbFileExtension");
+	}
+	xw.openTag("update");
+	xw.attribute("behave",updateBehave);
+	xw.closeTag("update");
+
+	// last contact with registry
+	xw.openTag("lastContact");
+	DateFormat df = DateFormat.getDateInstance();
+	String lcontact = df.format(lastContact);
+	xw.attribute("date",lcontact);
+	xw.closeTag("lastContact");
+
+
+	// all possible capabilities
+	for (int i=0;i<capabilities.length;i++){
+	    xw.openTag("possibleCapability");
+	    xw.attribute("name",capabilities[i]);
+	    xw.closeTag("possibleCapability");
+	}
+
+	xw.closeTag("SpiceConfig");
+	return xw ;
+
+    }
+
+	
 }
 
 
