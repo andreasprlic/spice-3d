@@ -34,22 +34,27 @@ import java.lang.reflect.*;
 import org.biojava.bio.structure.*;
 
 
+// to get config file via http
+import java.net.URL;
+import java.net.MalformedURLException;
+import java.net.HttpURLConnection;
+import java.net.ConnectException;
+
+// jnlp - to display URL in browser 
+import javax.jnlp.*;
 // some utils 
 import java.util.HashMap   ;
 import java.util.ArrayList ;
 import java.util.List ;
 
-
-// to get config file via http
-import java.net.URL;
-import java.net.MalformedURLException;
-
-// jnlp - to display URL in browser 
-import javax.jnlp.*;
+import java.io.IOException;
 
 // logging
 import java.util.logging.* ;
 import java.util.Iterator  ;
+
+// relfection for setting HttpURLConnectiontimeouts
+import java.lang.reflect.*;
 
 // gui
 import java.awt.Dimension                       ;
@@ -92,7 +97,7 @@ implements SPICEFrame
     
     URL REGISTRY_URL    ; // the url to the registration server
     
-    
+    static int    CONNECTION_TIMEOUT = 15000;// timeout for http connection = 15. sec
     static int    DEFAULT_Y_SCROLL = 50 ;
     static String XMLVALIDATION = "false" ;   
     static String INIT_SELECT = "select all; cpk off ; wireframe off ; backbone off; cartoon on; colour chain;select not protein and not solvent;spacefill 2.0;";    
@@ -160,8 +165,10 @@ implements SPICEFrame
         currentChainNumber = -1 ;
         currentChain = null;
         
+
         // init logging related stuff
         initLoggingPanel();
+
         
         // set some system properties
         setSystemProperties();
@@ -232,12 +239,12 @@ implements SPICEFrame
    
     private void initLoggingPanel(){
         LoggingPanel loggingPanel = new LoggingPanel(logger);
-        loggingPanel.getHandler().setLevel(Level.FINEST);	
-        logger.setLevel(Level.FINEST);
+        loggingPanel.getHandler().setLevel(Level.INFO);	
+        logger.setLevel(Level.INFO);
         loggingPanel.show(null);
     }
     
-    /** set  a couple of System Properties */
+    /** set  a couple of System Properties also contains some hacks around some strange implementation differences*/
    
     private void setSystemProperties(){
         //  on osx move menu to the top of the screen
@@ -246,32 +253,19 @@ implements SPICEFrame
         // do xml validation when parsing DAS responses (true/false)
         System.setProperty("XMLVALIDATION",XMLVALIDATION);
         
-        int timeout = 15000;
+        int timeout = CONNECTION_TIMEOUT;
         
         
-        logger.finest("setting timeouts to " + timeout);
+        //logger.finest("setting timeouts to " + timeout);
         
         
         // timeouts when doing http connections
+	// this only applies to java 1.4
+	// java 1.5 timeouts are set by openHttpURLConnection
         System.setProperty("sun.net.client.defaultConnectTimeout", ""+timeout);
         System.setProperty("sun.net.client.defaultReadTimeout", ""+timeout);
         
-        // use reflection to determine if get and set methods for urlconnection are available
-        // seems java 1.5 does not watch the System properties any longer...
-        // and java 1.4 did not provide these...
-        try {
-            Class urlconnectionClass = Class.forName("java.net.URLConnection");
-            
-            Method method = urlconnectionClass.getMethod (
-                    "setConnectTimeout", new Class [] { Integer.class}        
-            );	
-            
-            method.invoke(null, new Object[] {new Integer(timeout)});
-            System.out.println("setting java 1.5 timeout");
-        } catch ( Exception e){
-            e.printStackTrace();
-        }
-        
+              
         // bugfix for some strange setups!!!
         String proxyHost  = System.getProperty("proxyHost");
         String proxyPort  = System.getProperty("proxyPort");
@@ -1650,7 +1644,8 @@ implements SPICEFrame
             boolean success = JNLPProxy.showDocument(url); 
             if ( ! success)
                 logger.info("could not open URL "+url+" in browser. check your config or browser version.");
-        		return success;
+	    return success;
+	    
         }
         else
             return false;
@@ -1666,6 +1661,45 @@ implements SPICEFrame
             return false;
         }
     }
+
+
+    /** open HttpURLConnection. Recommended way to open
+     * HttpURLConnections, since this take care of setting timeouts
+     * properly for java 1.4 and 1.5*/
+    public static HttpURLConnection openHttpURLConnection(URL url) 
+	throws IOException, ConnectException {
+	HttpURLConnection huc = null;
+	huc = (HttpURLConnection) url.openConnection();
+	//logger.finest("opening "+url);
+
+
+	// use reflection to determine if get and set timeout methods for urlconnection are available
+        // seems java 1.5 does not watch the System properties any longer...
+        // and java 1.4 did not provide these...
+	// for 1.4 see setSystemProperties
+	int timeout = CONNECTION_TIMEOUT;
+	try {
+	    // try to use reflection to set timeout property
+	    Class urlconnectionClass = Class.forName("java.net.HttpURLConnection");
+	    
+            Method setconnecttimeout = urlconnectionClass.getMethod (
+								     "setConnectTimeout", new Class [] {int.class}        
+								     );	
+	    setconnecttimeout.invoke(huc,new Object[] {new Integer(timeout)});
+	    
+	    Method setreadtimeout = urlconnectionClass.getMethod (
+								  "setReadTimeout", new Class[] {int.class}
+								  );
+	    setreadtimeout.invoke(huc,new Object[] {new Integer(timeout)});
+	    //System.out.println("successfully set java 1.5 timeout");
+	} catch (Exception e) {
+	    //e.printStackTrace();
+	    // most likely it was a NoSuchMEthodException and we are running java 1.4.
+	}
+	
+	return huc;
+    }
+
 }
 
 
@@ -1703,6 +1737,8 @@ class EntListCommandListener implements ListSelectionListener {
         //logger.finest(event.arg);
         
     }
+
+   
     
 }
 
