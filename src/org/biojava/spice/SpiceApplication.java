@@ -1633,7 +1633,7 @@ implements SPICEFrame
         if ( url != null ){
             boolean success = JNLPProxy.showDocument(url); 
             if ( ! success)
-                logger.info("could not open URL "+url+" in browser. check your config or browser version.")
+                logger.info("could not open URL "+url+" in browser. check your config or browser version.");
         		return success;
         }
         else
