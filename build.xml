@@ -376,10 +376,10 @@
   </target>
 
 
-  <target name="unjar-libs" >
+  <target name="unjar-libs" depends="prepare-spice">
   <!-- unjar thirdparty libs -->
   <unjar dest="${thirdparty.dir}/tmp/">
-       <fileset dir="${thirdparty.dir}">
+       <fileset dir="${thirdparty.dir}/">
        	    <filename name="**/*.jar"/>
        </fileset>
   </unjar>
