@@ -135,8 +135,11 @@ class SpiceButton extends Button {
 		    boolean structurealignment = false ;
 		    try {
 			String alignpdb = spice.getParameter("ALIGNWITH");
-			structurealignment = true ;
-			spice.displayStructureAlignment(defaultpdb,alignpdb,url);
+			//System.out.println("ALGINWITH: "+alignpdb);
+			if (alignpdb != null){
+			    structurealignment = true ;
+			    spice.displayStructureAlignment(defaultpdb,alignpdb,url);
+			}
 			
 		     } catch ( Exception e){
 			e.printStackTrace();
