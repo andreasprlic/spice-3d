@@ -127,22 +127,23 @@ public class SeqFeatureCanvas extends Canvas
 	
 	String fstart  = (String)segment.get("START") ;
 	String fend    = (String)segment.get("END") ;
-	int start = Integer.parseInt(fstart) -1 ;
+	int start = Integer.parseInt(fstart)-1 ;
 	int end   = Integer.parseInt(fend)-1 ;
 	
 	String type = (String) segment.get("TYPE") ;
-	if ( ! type.equals("DISULFID")){
-	    spice.select(current_chainnumber,start,end);
-	} else {
-	    String cmd = spice.getSelectStr(current_chainnumber,start,start);
-	    cmd += spice.getSelectStr(current_chainnumber,end,end);
+	if ( type.equals("DISULFID")){
+	    System.out.println("selectSegment DISULFID " + (start+1) + " " + (end+1));
+	    
+	    //String cmd = spice.getSelectStr(current_chainnumber,start+1);
+	    //cmd += spice.getSelectStr(current_chainnumber,end+1);
+	    String pdb1 = spice.getSelectStrSingle(current_chainnumber,start+1);
+	    String pdb2 = spice.getSelectStrSingle(current_chainnumber,end+1);
+	    String cmd = "select "+pdb1 +", " + pdb2 + "; spacefill on; cpk on;" ;
 
-	    // disulfid + yellow
-	    //cmd += "spacefill on ; color yellow ;" ;
-	    //spice.select(current_chainnumber,start,start);
-	    //spice.select(current_chainnumber,end,end);
-	    System.out.println(cmd);
 	    spice.executeCmd(cmd);
+	} else {
+	    spice.select(current_chainnumber,start+1,end+1);
+    	    
 	}
     }
 
@@ -166,14 +167,19 @@ public class SeqFeatureCanvas extends Canvas
 	System.out.println(start+" " + end+" "+type);
 	System.out.println(segment);
 	if ( type.equals("DISULFID")){
-	    
-	    spice.highlite(current_chainnumber,start,start,"cpk");
-	    spice.highlite(current_chainnumber,end  ,end  ,"cpk"); 
+	    //spice.highlite(current_chainnumber,start+1,start+1,"cpk");
+	    //spice.highlite(current_chainnumber,end+1  ,end+1  ,"cpk"); 
+	    String pdb1 = spice.getSelectStrSingle(current_chainnumber,start);
+	    String pdb2 = spice.getSelectStrSingle(current_chainnumber,end);
+	    String cmd = "select "+pdb1 +", " + pdb2 + "; spacefill on; colour cpk;" ;
+
+	    spice.executeCmd(cmd);
 	} else if (type.equals("METAL") ){
-	    spice.highlite(current_chainnumber,start,end  ,"cpk");
+	    spice.highlite(current_chainnumber,start+1,end+1  ,"cpk");
+	    
 	} else if ( (end - start) == 0 ) {
 	    // feature of size 1
-	    spice.highlite(current_chainnumber,start,start  ,"cpk");	     
+	    spice.highlite(current_chainnumber,start+1,start+1  ,"cpk");	     
 	} else {
 	    spice.colour(current_chainnumber,start+1  ,end+1  ,col);	    
 	}
