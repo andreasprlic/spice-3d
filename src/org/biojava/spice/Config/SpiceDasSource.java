@@ -32,20 +32,18 @@ public class SpiceDasSource
 {
 
     boolean status ;
-
+    boolean registered ; // a flag to trace if source comes from registry or from user vonfig
     public SpiceDasSource() {
 	super();
-	status = true ;
+	status    = true ;  // default source is actived and used .
+	registered = true ; // default true = source comes from registry
     }
 
-    public void setStatus(boolean flag) {
-	status = flag ;
-    }
+    public void    setStatus(boolean flag) { status = flag ; }
+    public boolean getStatus()             { return status ; }
 
-    public boolean getStatus() {
-	return status ;
-    }
-
+    public void    setRegistered(boolean flag) { registered = flag ; }
+    public boolean getRegistered()             { return registered ; }
     
     
     /** convert DasSource to SpiceDasSource */

@@ -43,6 +43,8 @@ import org.biojava.services.das.registry.*;
 import java.awt.Frame ;
 import java.awt.event.*    ;
 import javax.swing.Box ;
+import javax.swing.border.TitledBorder ;
+import javax.swing.JTextField  ;
 import javax.swing.JButton ;
 import javax.swing.JTabbedPane;
 import javax.swing.ImageIcon;
@@ -74,6 +76,8 @@ public class RegistryConfigIO
     extends Thread
     
 {
+
+
 
     URL REGISTRY  ;
 	
@@ -239,18 +243,19 @@ public class RegistryConfigIO
 	TabbedPaneDemo tpd = new TabbedPaneDemo(this,config);
 	//frame.getContentPane().add(tpd);
 
-		
-	JButton saveb   = new JButton("Save");
-	JButton cancelb = new JButton("Close");
-	saveb.addActionListener(   new ButtonListener(frame, tpd) );
-	cancelb.addActionListener( new ButtonListener(frame, tpd) );
-	
 	Box vbox = Box.createVerticalBox();
 	vbox.add(tpd);
 
+		
+	JButton saveb   = new JButton("Save");
+	JButton cancelb = new JButton("Close");
+	
+	saveb.addActionListener(   new ButtonListener(frame, tpd) );
+	cancelb.addActionListener( new ButtonListener(frame, tpd) );
+
 	//frame.getContentPane().add(saveb);
 	//frame.getContentPane().add(cancelb);
-	Box hbox = Box.createVerticalBox();
+	Box hbox = Box.createHorizontalBox();
 	hbox.add(saveb);
 	hbox.add(cancelb);
 
@@ -297,11 +302,16 @@ class ButtonListener
 	    //System.out.println("closing..");
 	    parent.dispose();
 	} else  if (cmd.equals("Save")) {
+	    
 	    configpane.saveConfiguration();
-	}
+
+	    
+	} 
 
     
     }
+
+   
 }
 
 
@@ -309,16 +319,19 @@ class TabbedPaneDemo extends JPanel {
     static String[] colNames= new String [] {"url","coordinateSystems","adminemail","capabilities","description"};
 
     RegistryConfiguration config ;
-    RegistryConfigIO registryIO;
-    
+    RegistryConfigIO registryIO  ;
+    JTabbedPane tabbedPane       ;
+
     public TabbedPaneDemo(RegistryConfigIO registryparent, RegistryConfiguration config_) {
         super(new GridLayout(1, 1));
 	registryIO = registryparent ;
 	config = config_;
 
-        JTabbedPane tabbedPane = new JTabbedPane();
-        ImageIcon icon = createImageIcon("Images/spice.gif");
-	
+	tabbedPane = new JTabbedPane();
+        ImageIcon icon = createImageIcon("spice.jpg");
+
+	TitledBorder dasborder1;
+	dasborder1 = BorderFactory.createTitledBorder("available DAS sources");
 
 	// Make sequence and structure Panel
 	JPanel seqstrucpanel = new JPanel();
@@ -332,7 +345,11 @@ class TabbedPaneDemo extends JPanel {
 	//JTable table= new JTable(seqdata,colNames);
 	MyTableModel mtm = new MyTableModel(this,seqdata,colNames);
 	//mtm.getModel().addTableModelListener(this);
+
 	JTable table  = new JTable(mtm);
+
+	
+
 	// Configure some of JTable's paramters
 	table.setShowHorizontalLines( false );
 	table.setRowSelectionAllowed( true );
@@ -340,16 +357,54 @@ class TabbedPaneDemo extends JPanel {
 		
 	// Add the table to a scrolling pane
 	JScrollPane seqscrollPane = table.createScrollPaneForTable( table );
+
+	seqscrollPane.setBorder(dasborder1);
+
 	seqstrucpanel.add( seqscrollPane, BorderLayout.CENTER );
 
 	
 
-	tabbedPane.addTab("Seq./Struc. ", icon, seqstrucpanel,
+	tabbedPane.addTab("list sources", icon, seqstrucpanel,
                           "configure sequence and structure servers");
         tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
 	
 	
 
+
+	/// add a local DAS source Panel 
+	JPanel addLocalPanel = new JPanel();
+	addLocalPanel.setLayout(new BoxLayout(addLocalPanel, BoxLayout.LINE_AXIS));
+
+	TitledBorder dasborder2;
+	dasborder2 = BorderFactory.createTitledBorder("add local DAS source");
+
+	JPanel entryForm = new JPanel();
+	entryForm.setBorder(dasborder2);
+	entryForm.setLayout(new BoxLayout(entryForm, BoxLayout.LINE_AXIS));
+
+	Box vBoxRight =  Box.createVerticalBox();
+	Box vBoxLeft =  Box.createVerticalBox();
+	for ( int i = 0 ; i < colNames.length; i++) {
+	    String col = colNames[i];
+	   
+	    JTextField txt1 = new JTextField(col);
+	    txt1.setEditable(false);
+	    txt1.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
+	    vBoxLeft.add(txt1);
+
+	    JTextField txt2 = new JTextField("    ");
+	    txt2.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
+	    vBoxRight.add(txt2);
+	}
+
+
+	entryForm.add(vBoxLeft);
+	entryForm.add(vBoxRight);
+	addLocalPanel.add(entryForm);
+	
+
+
+	tabbedPane.addTab("Add local source", icon, addLocalPanel,"add a local DAS source");
 
 	
         //Add the tabbed pane to this panel.
@@ -432,7 +487,14 @@ class TabbedPaneDemo extends JPanel {
 
     public void saveConfiguration() {
 	System.out.println("saving config");
-	registryIO.saveConfiguration();
+	int pos = tabbedPane.getSelectedIndex();
+	System.out.println("index: " + pos);
+	if ( pos == 0 ) {
+	
+	    registryIO.saveConfiguration();
+	} else if ( pos == 1 ) {
+	    // add a new local DAS source ...
+	}
     }
 }
 
