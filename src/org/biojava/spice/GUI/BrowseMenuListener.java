@@ -28,7 +28,7 @@ import org.biojava.spice.SPICEFrame;
 
 import javax.swing.JMenuItem;
 
-import org.biojava.bio.structure.Chain;
+
 
 /**
  * @author Andreas Prlic
@@ -56,6 +56,9 @@ public class BrowseMenuListener implements ActionListener {
           spice.showDocument(url);
       } else if ( txt.equals("UniProt")){
           String url = UNIPROTLINK+spice.getUniProtCode();
+          spice.showDocument(url);
+      } else {
+          String url = txt.substring(16,txt.length());
           spice.showDocument(url);
       }
       

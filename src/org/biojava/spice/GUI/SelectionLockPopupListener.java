@@ -63,9 +63,9 @@ extends MouseAdapter {
             
             // adapt the display of the MenuItems
             if ( spice.isSelectionLocked()) 
-                m0.setText("unlock selection") ;
+                m0.setText("Unlock Selection") ;
             else 
-                m0.setText("lock selection");
+                m0.setText("Lock Selection");
                        
             popup.show(e.getComponent(),		       
                     e.getX(), e.getY());

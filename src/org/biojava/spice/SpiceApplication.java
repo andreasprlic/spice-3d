@@ -108,12 +108,7 @@ implements SPICEFrame
     List features ;    // currently being displayed 
     
     
-    //  the GUI:
-    //JFrame frame                  ;
-    //Panel mainPanel               ;
-    //GridBagLayout gridbag         ;
-    //GridBagConstraints c          ;
-    //SequenceDASPanel seqDasPanel  ;    
+    
     StructurePanel structurePanel ;    
     JTextField seq_pos ;
     JList ent_list;   // list available chains
@@ -122,14 +117,18 @@ implements SPICEFrame
     //JPanel leftPanel ;
     JSplitPane sharedPanel;
     JSplitPane mainsharedPanel;
-    JMenuItem pdbMenu;
-    JMenuItem upMenu;
+    
     JScrollPane seqScrollPane ;
     JSplitPane  seqSplitPane  ;
     SeqTextPane seqField      ;
     JMenuItem unlock;
+    JMenu browseMenu;
+    JMenuItem pdbMenu;
+    JMenuItem upMenu;
     //JMenuBar menuBar ;
     JTextField getCom ;
+    List knownFeatureLinks;
+    
     
     StructureCommandPanel  strucommand; 
     StatusPanel statusPanel ;
@@ -586,24 +585,24 @@ implements SPICEFrame
         
         // Browse menu
         
-        JMenu browse = new JMenu("Browse");
-        browse.setMnemonic(KeyEvent.VK_B);
-        browse.getAccessibleContext().setAccessibleDescription("open links in browser");
+        browseMenu = new JMenu("Browse");
+        browseMenu.setMnemonic(KeyEvent.VK_B);
+        browseMenu.getAccessibleContext().setAccessibleDescription("open links in browser");
         
         // unique action listener for the browse buttons
         ActionListener bl = new BrowseMenuListener(this);
-        menu.add(browse);
+        menu.add(browseMenu);
         pdbMenu = new JMenuItem("PDB");
         pdbMenu.setMnemonic(KeyEvent.VK_P);
         pdbMenu.setEnabled(false);
         pdbMenu.addActionListener(bl);
-        browse.add(pdbMenu);
+        browseMenu.add(pdbMenu);
         
         upMenu = new JMenuItem("UniProt");
         upMenu.setMnemonic(KeyEvent.VK_U);
         upMenu.setEnabled(false);
         upMenu.addActionListener(bl);
-        browse.add(upMenu);
+        browseMenu.add(upMenu);
         
         
         
@@ -1022,8 +1021,44 @@ implements SPICEFrame
         //statusPanel.setLoading(false);
         features.clear();
         features = tmpfeat ;
+        
+        // test if features have a LINK field
+        // if yes, add to browse menu
+        registerBrowsableFeatures(tmpfeat);
+        
         //this.paint(this.getGraphics());
         updateDisplays();
+    }
+    
+    private void clearBrowsableButtons(){
+        int nr = browseMenu.getItemCount();
+        //System.out.println("cleaning "+nr+ " menus");
+        for ( int i = nr-1; i > 1; i--){
+            browseMenu.remove(i);
+        }
+        knownFeatureLinks = new ArrayList();
+    }
+    
+    private void registerBrowsableFeatures(List feats){
+        Iterator iter = feats.iterator();
+        // add to menu
+        ActionListener bl = new BrowseMenuListener(this);
+   
+        clearBrowsableButtons();
+        while (iter.hasNext()){
+            Feature f = (Feature)iter.next();
+            String link =f.getLink();
+            if ( link != null){
+                if ( knownFeatureLinks.contains(link))
+                    continue ;
+                
+                JMenuItem item = new JMenuItem("open in browser "+ link);
+                            
+                item.addActionListener(bl);
+                browseMenu.add(item);
+                knownFeatureLinks.add(link);
+            }
+        }
     }
     
     public void setSelectionLocked(boolean status) {

@@ -57,10 +57,10 @@ implements ActionListener {
             else
                 spice.setSelectionLocked(true);
         } else {
-            String start = txt.substring(0,15);
-            System.out.println(start);
+            //String start = txt.substring(0,15);
+            //System.out.println(start);
             String url = txt.substring(16,txt.length());
-            System.out.println(url);
+            //System.out.println(url);
             spice.showDocument(url);
                 
         
