@@ -57,6 +57,9 @@ public class FeatureFetcher extends Thread
     String[] txtColors;
     Color [] entColors ;
     Logger logger        ;
+
+    boolean updateDisplay ;
+    
     /** @param config the SPICE config Map
      * @param sp_id SwissProt ID
      * @param pdb_id PDB ID
@@ -82,7 +85,7 @@ public class FeatureFetcher extends Thread
 	entColors[6] = Color.cyan;
 
 	txtColors   = new String[] { "blue","pink","green","magenta","orange","pink","cyan"};
-
+	updateDisplay = false ;
     }
 
 
@@ -121,6 +124,12 @@ public class FeatureFetcher extends Thread
 	   
 	    SpiceDasSource featureserver = (SpiceDasSource) featservs.get(f) ;
 	    String url = featureserver.getUrl();
+	    
+	    char lastChar = url.charAt(url.length()-1);		 
+	    if ( ! (lastChar == '/') ) 
+		url +="/" ;
+	 
+	    
 	    String queryString = url + "features?segment="+ spId ;
 	    URL spUrl = null ;
 	    try {
@@ -170,6 +179,11 @@ public class FeatureFetcher extends Thread
 	    try {
 		wait(300);
 		//logger.finest("FeatureFetcher waiting "+done);
+		if ( updateDisplay ) {
+		    List l = getFeatures();
+		    parent.setFeatures(spId,l);
+		    updateDisplay = false ;
+		}
 	    } catch (InterruptedException e) {
 		e.printStackTrace();
 		done = true ;
@@ -177,6 +191,8 @@ public class FeatureFetcher extends Thread
 	    //logger.finest("getNewFeatures :in waitloop");
 	}
 
+	// reset and re-paint all features 
+	allFeatures = new ArrayList();
 
 	// now: extract the features and convert them so they can be used for spice...
 	for ( int i = 0 ; i < subthreads.length; i++ ) {
@@ -244,6 +260,39 @@ public class FeatureFetcher extends Thread
 	//logger.finest("Got "+ features.size()+ " features from " + threadId);
 	DasResponse d = subthreads[threadId] ;
 	d.setFeatures(features);
+
+	String coordSys = d.getCoordinateSystem();
+
+	// paint feature.
+	// feature is being repainted once all features are finished ...
+	if ( coordSys.equals("UniProt")) {
+	    for (int j=0; j<features.size();j++){
+		HashMap feat = (HashMap)features.get(j);			
+		//Feature feat = (Feature)features.get(j);			
+		//logger.finest("got feature: "+feat);
+		allFeatures.add(feat) ;		
+	    } 
+	} else if ( coordSys.equals("PDBresnum")) {
+	    // covnert PDB resnum coordinates to UniProt coordinates ;
+	    for (int j=0; j<features.size();j++){
+		HashMap feat = (HashMap)features.get(j);			
+		//Feature feat = (Feature)features.get(j);			
+		
+		//allFeatures.add(feat) ;		
+		String startOrig = (String)feat.get("START");
+		String endOrig   = (String)feat.get("END");
+		//logger.finest("pdbresnum feature: "+feat);
+		String startNew  = getUniProtCoord(startOrig,chain);
+		String endNew    = getUniProtCoord(endOrig,chain);
+		feat.put("START",startNew);
+		feat.put("END",endNew);
+		//logger.finest("uniprot feature: "+feat);
+		allFeatures.add(feat) ;
+		
+	    } 
+	    
+	}
+	updateDisplay = true ;
 	notifyAll();	
     }
 
