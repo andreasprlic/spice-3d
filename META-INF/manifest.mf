@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Main-Class: org.biojava.spice.Spice
+Class-Path: biojava.jar JmolApplet.jar
+
+Name: org/biojava/spice/Spice.class
+
+
+
+
+
