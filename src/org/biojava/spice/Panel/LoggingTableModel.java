@@ -35,7 +35,7 @@
  *             Institut Maurice-Lamontagne
  *             mailto:osl@osl.gc.ca
  */
-package org.biojava.spice ;
+package org.biojava.spice.Panel ;
 
 // Logging
 import java.util.logging.Level;

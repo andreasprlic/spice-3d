@@ -21,17 +21,19 @@
  * @author Andreas Prlic
  *
  */
-package org.biojava.spice;
+package org.biojava.spice.Panel;
 
-import org.biojava.bio.structure.Chain ;
+import org.biojava.spice.SPICEFrame  	;
+import org.biojava.spice.Feature.*     	;
+import org.biojava.spice.Panel.SeqPanel	;
+import org.biojava.bio.structure.Chain 	;
+
+
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Canvas;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.Font ;
 import java.awt.Dimension;
-import java.awt.Event;
 import java.awt.event.MouseListener       ; 
 import java.awt.event.MouseMotionListener ;
 import java.awt.event.MouseEvent          ;
@@ -40,16 +42,11 @@ import java.awt.* ;
 
 import java.util.List                     ;
 import java.util.ArrayList                ;
-import java.util.HashMap                  ;
 
-import java.io.*             ;
-import java.util.Iterator    ;
 import java.util.Date        ;
-import java.util.Calendar    ;
 import java.util.logging.*   ;
 import javax.swing.JPanel    ;
-import javax.swing.JLabel    ;
-import javax.swing.ImageIcon ;
+
 
 
 

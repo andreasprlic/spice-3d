@@ -21,7 +21,7 @@
  * @author Andreas Prlic
  *
  */
-package org.biojava.spice;
+package org.biojava.spice.Panel;
 
 import javax.swing.JPanel        ;
 import javax.swing.JTextField    ;

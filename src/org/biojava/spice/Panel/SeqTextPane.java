@@ -21,8 +21,9 @@
  * @author Andreas Prlic
  *
  */
-package org.biojava.spice;
+package org.biojava.spice.Panel;
 
+import org.biojava.spice.SPICEFrame ;
 import javax.swing.JTextPane              ;
 import java.awt.Dimension                 ;
 import java.awt.event.MouseListener       ;

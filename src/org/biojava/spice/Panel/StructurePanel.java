@@ -21,7 +21,9 @@
  *
  */
 
-package org.biojava.spice ;
+package org.biojava.spice.Panel ;
+
+import org.biojava.spice.SPICEFrame;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -51,7 +53,7 @@ import org.openscience.jmol.ui.JmolPopup;
  * Here some mouse listeners are added that talk back to the main SPICE application.
  * 
  */
-class StructurePanel extends JPanel
+public class StructurePanel extends JPanel
     implements JmolStatusListener {
     
     final  Dimension currentSize = new Dimension();
@@ -67,7 +69,7 @@ class StructurePanel extends JPanel
 
     JTextField  strucommand  ; 
     
-    StructurePanel(SPICEFrame parent) {
+    public StructurePanel(SPICEFrame parent) {
 	spice   = parent ;
 
 	adapter = new SmarterJmolAdapter(null);
