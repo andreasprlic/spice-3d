@@ -43,6 +43,10 @@ import java.util.Properties;
 import java.util.HashMap   ;
 import java.util.ArrayList ;
 
+// to get config file via http
+import java.net.HttpURLConnection ;
+import java.net.URL;
+import java.io.IOException ;
 
 // gui
 import java.awt.*          ;
@@ -70,8 +74,8 @@ public class SpiceApplication
     implements SPICEFrame 
 {
 
-    public static final String CONFIG_FILE = "config.xml";
-
+    //public static final String CONFIG_FILE = "config.xml";
+    URL CONFIG_URL  ; 
     HashMap config      ;
     Structure structure ; 
     String pdbcode      ;
@@ -103,12 +107,15 @@ public class SpiceApplication
     Color oldColor ; 
     boolean first_load ;
 
-    MenuBar menu ;
-    
-
-
-    SpiceApplication(String pdbcode_) {
+    MenuBar  menu ;
+    MenuItem exit ;
+    MenuItem props ;
+    MenuItem aboutspice ;
+    MenuItem aboutdas ;
+    SpiceApplication(String pdbcode_, URL config_url) {
 	super();
+
+	CONFIG_URL = config_url ;
 	
 	structure = null ;
 	pdbcode = pdbcode_ ;
@@ -152,14 +159,16 @@ public class SpiceApplication
 	menu.add(file);
 	menu.add(help);
 	
-	MenuItem exit = new MenuItem("Exit");
-	exit.addActionListener(this);
+	exit  = new MenuItem("Exit");
+	props = new MenuItem("Properties");
+	//exit.addActionListener(this);
+	file.add(props);
 	file.add(exit);
 	
-	MenuItem aboutspice = new MenuItem("About SPICE");
-	MenuItem aboutdas = new MenuItem("About DAS");
-	aboutspice.addActionListener(this);
-	aboutdas.addActionListener(this);
+	aboutspice = new MenuItem("About SPICE");
+	aboutdas = new MenuItem("About DAS");
+	//aboutspice.addActionListener(this);
+	//aboutdas.addActionListener(this);
 	help.add(aboutspice);
 	help.add(aboutdas);
 	
@@ -256,11 +265,6 @@ public class SpiceApplication
 	return first_load;
     }
 
-    public void actionPerformed(ActionEvent event) {
-    }
-
-
-
     public void show(){
 	super.show();
 	//System.out.println("SHOW: getting Structure data from new thread");
@@ -309,27 +313,33 @@ public class SpiceApplication
     
     /** read the configuration from config.xml file */
     private HashMap readConfiguration() {
-	
-	ClassLoader cl = this.getClass().getClassLoader();
-	/*
-	URL u = cl.getResource(".");
-	System.out.println("url: "+u);
-	String path = u.toString() ;
-	*/
-	// config file must be in same
-	String configpath = "/"+CONFIG_FILE ;
-	
-	InputStream fs = null ;
-	
-	    //fs = new FileInputStream(configpath) ;
-	fs = cl.getResourceAsStream(CONFIG_FILE);
-
-
-	InputSource is = new InputSource(fs);
-	//InputSource is = new InputSource(ctx.getResourceAsStream(path+CONFIG_FILE));
-
 
 	HashMap co = new HashMap() ;
+	
+	/* old way to read from local file system 
+	ClassLoader cl = this.getClass().getClassLoader();
+	InputStream fs = null ;
+	fs = cl.getResourceAsStream(CONFIG_FILE);
+	InputSource is = new InputSource(fs);
+	*/
+
+	// new way to read from URL
+	URL url = CONFIG_URL;
+	HttpURLConnection huc ; 
+	InputStream inStream  ; 
+
+	try {
+	    huc = (HttpURLConnection) url.openConnection();
+	    inStream = huc.getInputStream();
+	    
+	} catch ( IOException e) {
+	    e.printStackTrace();
+	    return co ;
+	}
+	InputSource is = new InputSource(inStream);	
+	//
+
+
 	try {
 	    co = parseConfigFile(is);
 	} catch (Exception e) {
@@ -1042,8 +1052,8 @@ public class SpiceApplication
     public boolean handleEvent(Event event) 
     {
 	//System.out.println("EVENT!");
-	//System.out.println(event.target);
-	//System.out.println(event.id);
+	System.out.println(event.target);
+	System.out.println(event.id);
 
 	
 	switch(event.id) 
@@ -1053,6 +1063,50 @@ public class SpiceApplication
 		return true;
 		//case Event.ACTION_EVENT:				
 	    }
+
+	if ( event.target == props) {
+	    System.out.println("modify properties");
+	    return true;
+	}
+	else if ( event.target == exit) {
+	    dispose();
+	    return true;
+	}
+	else if ( event.target == aboutdas ) {
+	    System.out.println("about DAS");
+	    //AboutDialog asd = new AboutDialog(this);
+	    //asd.setText("DAS homepage: http://www.biodas.org") ;
+	    //asd.show();
+	    
+	    Dialog dialog = new Dialog(this, "About DAS", true);
+
+	    FlowLayout layout = new FlowLayout();
+	    
+	    dialog.setLayout(layout);
+
+	    TextField textField = new TextField("DAS homepage: http://www.biodas.org", 20);
+	    
+	    Button button = new Button("OK");
+	    
+	    dialog.add(button);
+	    
+	    dialog.add(textField);
+	    dialog.resize(200, 200);
+	    dialog.show();
+
+
+
+
+	    return true;
+	}
+	else if ( event.target ==  aboutspice ) {
+	    System.out.println("about SPICE");
+	    AboutDialog asd = new AboutDialog(this);
+	    asd.setText("The SPICE Applet. V 0.1 (C) Andreas Prlic 2004") ;
+	    asd.show();
+	    return true;
+	}
+
 	return true ;
 
     }
@@ -1171,4 +1225,65 @@ class EntListCommandListener implements ListSelectionListener {
 	
     }
 
+}
+
+
+class AboutDialog extends Dialog
+{
+    static int H_SIZE = 200;
+    static int V_SIZE = 200;
+    //JTextField txt ;
+    String displayText ;
+
+    public AboutDialog(Frame parent)
+    {
+	// Calls the parent telling it this
+	// dialog is modal(i.e true)
+	super(parent, true);         
+	setBackground(Color.gray);
+	setLayout(new BorderLayout());
+	
+	displayText="" ;
+
+	// Two buttons "Close" and "Help"
+	//txt = new JTextField();
+	
+	Panel p = new Panel();
+	//p.add(txt);
+	p.add(new Button("Close"));
+	p.add(new Button("Help"));
+	
+	add("South", p);
+	resize(H_SIZE, V_SIZE);
+    }
+
+    public boolean action(Event evt, Object arg)
+    {
+	// If action label(i.e arg) equals 
+	// "Close" then dispose this dialog
+	if(arg.equals("Close"))
+	    {
+		dispose();
+		return true;
+	    }
+	return super.handleEvent(evt);
+    }
+
+    public void setText(String txt) {
+	displayText = txt ;
+    }
+
+    public void paint(Graphics g)
+    {
+	
+	g.drawString(displayText, H_SIZE/7, V_SIZE/3);
+	//txt.setText(displayText) ;
+	/*g.setColor(Color.white);
+	g.drawString("The SPICE Applet"      , H_SIZE/4, V_SIZE/3);
+	g.drawString("Version 0.1"           , (H_SIZE/4)+20, V_SIZE/3+20);      
+	g.drawString("(C) Andreas Prlic 2004", (H_SIZE/4)+40, V_SIZE/3);      
+	g.drawString("to learn more about SPICE, please go to", (H_SIZE/4)+60, V_SIZE/3);      
+	g.drawString("http://www.sanger.ac.uk/Users/ap3/DAS/SPICE/stable/stable.html", (H_SIZE/4)+60, V_SIZE/3);      
+	*/
+    }
 }

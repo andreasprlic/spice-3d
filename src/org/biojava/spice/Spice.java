@@ -32,18 +32,31 @@ import java.awt.event.WindowAdapter ;
 import java.awt.event.WindowEvent ;
 import javax.swing.JFrame ;
 
+// for config file 
+import java.net.URL;
+import java.net.MalformedURLException ;
+
 public class Spice extends Applet {
 
     SpiceButton spicebutton ;
     
     public static void main(String[] argv) {
 
-	if ( argv.length < 1) {
-	    System.err.println(" wrong arguments: please specify PDB code to display");
+	if ( argv.length != 2 ) {
+	    System.err.println(" wrong arguments: correct call: java -jar spice.jar PDBcode configfileUrl"+ System.getProperty("line.separator")+" example: java -jar spice.jar 5pti http://www.sanger.ac.uk/Users/ap3/DAS/SPICE/stable/config.xml");
 	    return;
 	}
+	
+	URL url ;
+	try {
+	    //System.out.println(argv[1]);
+	    url = new URL(argv[1]);
+	} catch (MalformedURLException e) {
+	    e.printStackTrace();
+	    return ;
+	}
 
-	addMoreSpice(argv[0]);
+	addMoreSpice(argv[0],url);
 	
     }
 
@@ -56,8 +69,8 @@ public class Spice extends Applet {
 
     }
 
-    public static void addMoreSpice(String pdbcode){
-	SpiceApplication appFrame = new SpiceApplication(pdbcode) ;	
+    public static void addMoreSpice(String pdbcode,URL configfileurl){
+	SpiceApplication appFrame = new SpiceApplication(pdbcode, configfileurl) ;	
 	System.out.println("back from init of SpiceApplication");
 	appFrame.setTitle("SPICE") ;
 	appFrame.setSize(700, 700);
@@ -90,7 +103,16 @@ class SpiceButton extends Button {
 	AccessController.doPrivileged(new PrivilegedAction() {
 		public Object run() {
 		    String defaultpdb = spice.getParameter("PDB_CODE");
-		    spice.addMoreSpice(defaultpdb);
+		    String configurl  = spice.getParameter("CONFIG_XML");	
+
+		    URL url ;
+		    try {
+			url = new URL(configurl);
+		    } catch (MalformedURLException e) {
+			e.printStackTrace();
+			return null ;
+		    }
+		    spice.addMoreSpice(defaultpdb, url);
 		    return null ;
 		}
 	    });
