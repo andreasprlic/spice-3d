@@ -75,10 +75,12 @@ public class Spice extends Applet {
 
     // replace configurl as soon as registry server communication is working properly
     public static void addMoreSpice(String pdbcode,URL configfileurl, URL registryurl){
+	System.out.println("Welcome to the SPICE - DAS client!");
 	SpiceApplication appFrame = new SpiceApplication(pdbcode, configfileurl,registryurl) ;	
 	//System.out.println("init of SpiceApplication single structure mode");
 	appFrame.setTitle("SPICE") ;
 	appFrame.setSize(700, 700);
+	System.out.println("addMoreSpice calling show()");
 	appFrame.show();
 	
 	appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

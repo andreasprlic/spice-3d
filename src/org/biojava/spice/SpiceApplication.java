@@ -460,8 +460,8 @@ public class SpiceApplication
 	ImageIcon icon = createImageIcon("spice.jpg");
 	this.setIconImage(icon.getImage());
 	this.pack();
+	System.out.println("setting Visible true");
 	this.setVisible(true);
-
 
 	config =regi.getConfiguration();
 	if ( config == null ) {
@@ -472,6 +472,7 @@ public class SpiceApplication
 	    
 	}
 	
+
 
     }
 
@@ -503,11 +504,17 @@ public class SpiceApplication
 	return first_load;
     }
 
+
+   
+
     public void show(){
 	super.show();
-	//System.out.println("SHOW: getting Structure data from new thread");
+	//System.out.println("SpiceApplication show() : getting Structure data from new thread");
 	// and now load data ...
-
+	
+	if ( config == null ) {
+	    return ;
+	}
 	
 	if ( ! structureAlignmentMode ) {
 	    System.out.println("not in alignment mode");
@@ -520,172 +527,22 @@ public class SpiceApplication
 					     pdbcode,
 					     pdbcode2);
 	    thr.start();
-	    
-	    // get all data from thr
-	    //System.out.println("visualize data for ...");
-	    
+	    	    
 	}
-    }
-
-
-    /*
-    public void addComponent(Container container, Component component,
-			     int gridx, int gridy, int gridwidth, int gridheight,
-			     int anchor, int fill, double weightx, double weighty)
-    {
-	c.gridx=gridx; c.gridy=gridy; c.gridwidth=gridwidth;
-	c.gridheight=gridheight; c.anchor=anchor; c.fill=fill; 
-	c.weightx=weightx; c.weighty=weighty;
-	GridBagLayout gbl = (GridBagLayout) container.getLayout();
-	gbl.setConstraints(component, c);
 	
-	container.add(component);
     }
 
 
-
-    public void addComponent(Container container, Component component,
-			     int gridx, int gridy, int gridwidth, int gridheight,
-			     int anchor, int fill, double weightx, double weighty,
-			     int top, int left, int bottom, int right)
-    {
-	c.gridx=gridx; c.gridy=gridy; c.gridwidth=gridwidth;
-	c.gridheight=gridheight; c.anchor=anchor; c.fill=fill; 
-	c.weightx=weightx; c.weighty=weighty;
-	c.insets=new Insets(top, left, bottom, right);
-	GridBagLayout gbl = (GridBagLayout) container.getLayout();
-	gbl.setConstraints(component, c);
-	
-	container.add(component);
-    }
    
-    &/
     /** remember the previous color */
     public void setOldColor(Color c) {
 	oldColor = c ;
     }
 
-   
-
-   
-   
-    /* do the actual parsing of the config.xml file 
-    private HashMap parseConfigFile(InputSource is) 
-	throws Exception
-    {
-	HashMap   configr         = new HashMap();
-	ArrayList featservers     = new ArrayList() ;
-	HashMap   structureserver = new HashMap();
-	HashMap   sequenceserver  = new HashMap();
-	HashMap   alignmentserver = new HashMap();
-	
-	DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-	Element cfgDoc = parser.parse(is).getDocumentElement();
-	Node chld = cfgDoc.getFirstChild();
-	while (chld != null) {
-	    if (chld instanceof Element) {
-		Element echld = (Element) chld;
-		if (echld.getTagName().equals("featureserver")) {
-		    String url = echld.getAttribute("url");
-		    if (url == null) {
-			System.err.println("missing attribute >url< in featureserver");
-		    }
-
-		    String name = echld.getAttribute("name");
-		    if (name == null) {
-			System.err.println("missing attribute >name< in featureserver");
-		    }
-		    System.out.println("using featureserver: "+name+" "+url);
-		    HashMap server = new HashMap();
-		    server.put("name",name);
-		    server.put("url",url);
-		    featservers.add(server);
-		}
-		if(echld.getTagName().equals("structureserver")) {
-		     String url = echld.getAttribute("url");
-		    if (url == null) {
-			System.err.println("missing attribute >url< in structureserver");
-		    }
-
-		    String name = echld.getAttribute("name");
-		    if (name == null) {
-			System.err.println("missing attribute >name< in structureserver");
-		    }
-		    System.out.println("using structureserver: "+name+" "+url);
-		    
-		    structureserver.put("name",name);
-		    structureserver.put("url",url);
-		}
-		if(echld.getTagName().equals("sequenceserver")) {
-		     String url = echld.getAttribute("url");
-		    if (url == null) {
-			System.err.println("missing attribute >url< in sequenceserver");
-		    }
-
-		    String name = echld.getAttribute("name");
-		    if (name == null) {
-			System.err.println("missing attribute >name< in sequenceserver");
-		    }
-		    System.out.println("using sequenceserver: "+name+" "+url);
-		    
-		    sequenceserver.put("name",name);
-		    sequenceserver.put("url",url);
-		}
-		if(echld.getTagName().equals("alignmentserver")) {
-		     String url = echld.getAttribute("url");
-		    if (url == null) {
-			System.err.println("missing attribute >url< in alignmentserver");
-		    }
-
-		    String name = echld.getAttribute("name");
-		    if (name == null) {
-			System.err.println("missing attribute >name< in alignmentserver");
-		    }
-		    System.out.println("using alignmentserver: "+name+" "+url);
-		    
-		    alignmentserver.put("name",name);
-		    alignmentserver.put("url",url);
-		}
-
-	    }
-	    chld = chld.getNextSibling();
-	}
-	
-	configr.put("structureserver", structureserver);
-	configr.put("sequenceserver", sequenceserver);
-	configr.put("alignmentserver", alignmentserver);
-	configr.put("featureservers",featservers);
-    
-	return configr ;
-
-    }
-    */
-
+ 
     public RegistryConfiguration getConfiguration() {
 	return config ;
     }
-
-    /** return the urn of the structuresercer */
-    //public String getStructureServer() {
-    //	HashMap strucconfig = (HashMap) config.get("structureserver");
-    //	String u = (String) strucconfig.get("url");
-
-    //	return   u;
-    //}
-
-    /** return the urn of the structuresercer */
-    //public String getSequenceServer() {
-    //	HashMap h = (HashMap) config.get("sequenceserver");
-    //	String u = (String) h.get("url");
-    //	return   u;
-    //    }
-
-    /** return the urn of the structuresercer */
-    //public String getAlignmentServer() {
-    //	HashMap h = (HashMap) config.get("alignmentserver");
-    //	String u = (String) h.get("url");
-    //	return   u;
-    //}
 
 
     /** return the feature servers */
@@ -712,6 +569,7 @@ public class SpiceApplication
 	systemSettings.put("proxyPort", "3128");
 	System.setProperties(systemSettings);
 	*/
+	System.out.println("SpiceApplication: getStructure "+ pdbcod);
 	first_load = true ;
 	statusPanel.setLoading(true);
 	pdbcode = pdbcod ;
