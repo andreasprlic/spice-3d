@@ -172,7 +172,7 @@ public class SpiceApplication
     boolean first_load ;
 
     boolean structureAlignmentMode ;
-
+    /*
     JMenuBar  menu ;
     JMenuItem exit ;
     JMenuItem props ;
@@ -180,7 +180,7 @@ public class SpiceApplication
     JMenuItem aboutspice ;
     JMenuItem aboutdas   ;
     JMenuItem openpdb    ;
-
+    */
     //public static Logger logger = Logger.getLogger("org.biojava.spice");
 
 
@@ -280,45 +280,9 @@ public class SpiceApplication
 
 
 	// add the Menu
-	menu = new JMenuBar();
+	JMenuBar menu = initMenu();
 	this.setJMenuBar(menu);
-	
-	
 
-	JMenu file = new JMenu("File");
-	file.setMnemonic(KeyEvent.VK_F);
-	file.getAccessibleContext().setAccessibleDescription("the file menu");
-	JMenu help = new JMenu("Help");
-	help.setMnemonic(KeyEvent.VK_H);
-	help.getAccessibleContext().setAccessibleDescription("get help");
-	menu.add(file);
-	menu.add(help);
-
-	openpdb = new JMenuItem("open PDB");
-	exit    = new JMenuItem("Exit");
-	props   = new JMenuItem("Properties");
-	reset   = new JMenuItem("Reset");
-
-	SpiceMenuListener ml = new SpiceMenuListener(this) ;
-	openpdb.addActionListener( ml );
-	exit.addActionListener   ( ml );
-	props.addActionListener  ( ml );
-	reset.addActionListener  ( ml );
-
-	//exit.addActionListener(this);
-	file.add( openpdb );
-	file.add( reset   );
-	file.add( props   );
-	file.add( exit    );
-	
-	aboutspice = new JMenuItem("About SPICE");
-	aboutspice.addActionListener  ( ml );
-	//aboutdas = new MenuItem("About 3D-DAS");	
-	//aboutspice.addActionListener(this);
-	//aboutdas.addActionListener(this);
-	help.add(aboutspice);
-	//help.add(aboutdas);
-	
 	
 	statusPanel = new StatusPanel();
 	//this.getContentPane().add(statusPanel,BorderLayout.SOUTH);
@@ -424,7 +388,7 @@ public class SpiceApplication
                            chainPanel, dasPanel);
 	sharedPanel.setOneTouchExpandable(true);
 	//sharedPanel.setDividerLocation(150);
-	sharedPanel.setPreferredSize(new Dimension(200, 200));
+	sharedPanel.setPreferredSize(new Dimension(300, 300));
 	//sharedPanel.setOpaque(true);
 	//sharedPanel.setResizeWeight(0);	
 	sharedPanel.setBackground(Color.black);
@@ -451,6 +415,8 @@ public class SpiceApplication
 	//seqSplitPane.setOpaque(true);
 	seqSplitPane.setResizeWeight(0.6);
 	seqSplitPane.setBackground(Color.black);
+	seqSplitPane.setPreferredSize(new Dimension(300,300));
+
 	//seqSplitPane.setDividerLocation(600);
 	
 	//sharedPanel.setLayout(new BoxLayout(sharedPanel, BoxLayout.X_AXIS));
@@ -464,7 +430,7 @@ public class SpiceApplication
 	mainsharedPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
 					  structurePanel,seqSplitPane);
 	mainsharedPanel.setOneTouchExpandable(true);
-	//mainsharedPanel.setResizeWeight(0.9);
+	mainsharedPanel.setResizeWeight(0.6);
 	//mainsharedPanel.setDividerLocation(150);
 	//mainsharedPanel.setPreferredSize(new Dimension(200, 200));
 	//mainsharedPanel.setOpaque(true);
@@ -548,6 +514,99 @@ public class SpiceApplication
 	logger.finest("finished init of structure alignment");
 		
     }
+
+
+    private JMenuBar initMenu() {
+
+	JMenuBar menu = new JMenuBar();
+
+	// the three menus
+	JMenu file = new JMenu("File");
+	file.setMnemonic(KeyEvent.VK_F);
+	file.getAccessibleContext().setAccessibleDescription("the file menu");
+	
+	menu.add(file);
+
+
+	JMenuItem openpdb = new JMenuItem("open PDB");
+	openpdb.setMnemonic(KeyEvent.VK_O);
+	JMenuItem exit    = new JMenuItem("Exit");
+	exit.setMnemonic(KeyEvent.VK_X);
+	JMenuItem props   = new JMenuItem("Properties");
+	props.setMnemonic(KeyEvent.VK_P);
+
+	SpiceMenuListener ml = new SpiceMenuListener(this) ;
+	openpdb.addActionListener( ml );
+	exit.addActionListener   ( ml );
+	props.addActionListener  ( ml );
+
+
+	file.add( openpdb );
+	file.add( props   );
+	file.add( exit    );
+	
+	// DIsplay submenu
+	
+	JMenu display = new JMenu("Display");
+	display.setMnemonic(KeyEvent.VK_D);
+	display.getAccessibleContext().setAccessibleDescription("change display");
+
+	menu.add(display);
+
+	JMenuItem reset   = new JMenuItem("Reset");
+	reset.setMnemonic(KeyEvent.VK_R);
+
+	JMenuItem backbone   = new JMenuItem("Backbone");
+	JMenuItem wireframe  = new JMenuItem("Wireframe");
+	JMenuItem cartoon    = new JMenuItem("Cartoon");
+	JMenuItem ballnstick = new JMenuItem("Ball and Stick");
+	JMenuItem spacefill  = new JMenuItem("Spacefill");
+
+	JMenuItem colorchain = new JMenuItem("Color - chain");
+	JMenuItem colorsec   = new JMenuItem("Color - secondary");
+	JMenuItem colorcpk   = new JMenuItem("Color - cpk");
+
+	reset.addActionListener     ( ml );
+	backbone.addActionListener  ( ml );
+	wireframe.addActionListener ( ml );	
+	cartoon.addActionListener   ( ml );
+	ballnstick.addActionListener( ml );
+	spacefill.addActionListener ( ml );		
+	colorchain.addActionListener( ml );
+	colorsec.addActionListener  ( ml );
+	colorcpk.addActionListener  ( ml );
+	
+
+	display.add( reset   );
+	display.addSeparator();
+	
+	display.add( backbone   );
+	display.add( wireframe  );
+	display.add( cartoon    );
+	display.add( ballnstick );
+	display.add( spacefill  );
+	display.addSeparator();
+	
+	display.add(colorchain);
+	display.add(colorsec)   ;
+	display.add(colorcpk)  ;
+
+
+	// Help submenu
+	JMenu help = new JMenu("Help");
+	help.setMnemonic(KeyEvent.VK_H);
+	help.getAccessibleContext().setAccessibleDescription("get help");
+	menu.add(help);
+
+	JMenuItem aboutspice = new JMenuItem("About SPICE");
+	aboutspice.addActionListener  ( ml );
+	help.add(aboutspice);
+
+	return menu ;
+
+}
+
+
 
     /** Returns an ImageIcon, or null if the path was invalid. */
     protected static ImageIcon createImageIcon(String path) {
@@ -1327,6 +1386,9 @@ class SpiceMenuListener
     implements ActionListener
 {
     SPICEFrame parent ;
+
+    static String reset = "select all; cpk off ; wireframe off ; backbone off; cartoon off ; ribbons off; " ;
+
     public SpiceMenuListener (SPICEFrame spice) {
 	parent = spice ;
     }
@@ -1352,9 +1414,33 @@ class SpiceMenuListener
 	} else if (cmd.equals("About SPICE")) {
 	    AboutDialog asd = new AboutDialog((JFrame)parent);
 	    
-	    asd.setText("The SPICE Applet. V 0.5 (C) Andreas Prlic, Tim Hubbard\n The Wellcome Trust Sanger Institute 2004 mailto:ap3@sanger.ac.uk") ;
+	    asd.setText("The SPICE Applet. V 0.51(C) Andreas Prlic, Tim Hubbard\n The Wellcome Trust Sanger Institute 2004 mailto:ap3@sanger.ac.uk") ;
 	    
 	    asd.show();	    
+	} else if ( cmd.equals("Backbone") ){
+	    String dcmd  = reset + "backbone on; ";
+	    parent.executeCmd(dcmd);
+	} else if ( cmd.equals("Wireframe") ){
+	    String dcmd  = reset + "wireframe on; ";
+	    parent.executeCmd(dcmd);
+	} else if ( cmd.equals("Cartoon") ){
+	    String dcmd  = reset + "cartoon on; ";
+	    parent.executeCmd(dcmd);
+	} else if ( cmd.equals("Ball and Stick") ){
+	    String dcmd  = reset + "wireframe 0.3; spacefill 0.5; ";
+	    parent.executeCmd(dcmd);
+	} else if ( cmd.equals("Spacefill") ){
+	    String dcmd  = reset + "spacefill on; ";
+	    parent.executeCmd(dcmd);
+	} else if ( cmd.equals("Color - chain")) {
+	    String dcmd = "select all; color chain;" ;
+	    parent.executeCmd(dcmd);
+	} else if ( cmd.equals("Color - secondary")) {
+	    String dcmd = "select all; color structure;" ;
+	    parent.executeCmd(dcmd);
+	} else if ( cmd.equals("Color - cpk")) {
+	    String dcmd = "select all; color cpk;" ;
+	    parent.executeCmd(dcmd);
 	}
     }
 }
