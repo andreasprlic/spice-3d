@@ -26,6 +26,9 @@ package org.biojava.spice.Panel;
 import org.biojava.spice.SPICEFrame  	   	;
 
 
+import org.biojava.spice.GUI.SelectionLockMenuListener;
+import org.biojava.spice.GUI.SelectionLockPopupListener;
+
 import org.biojava.spice.Feature.*     	;
 import org.biojava.spice.Panel.SeqPanel	;
 import org.biojava.bio.structure.Chain 	;
@@ -37,9 +40,7 @@ import java.awt.Graphics                  ;
 import java.awt.image.BufferedImage       ;
 import java.awt.Font                      ;
 import java.awt.Dimension                 ;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
+
 import java.awt.event.MouseListener       ; 
 import java.awt.event.MouseMotionListener ;
 import java.awt.event.MouseEvent          ;
@@ -55,7 +56,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel    ;
 import javax.swing.JPopupMenu;
 import javax.swing.MenuElement;
-import javax.swing.JMenuItem;
 
 
 
@@ -106,7 +106,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
     
     Chain chain      ;
     int current_chainnumber;
-    boolean selectionLocked;
+
     //int chainlength ;
     //int seqPosOld, strucPosOld ;
     
@@ -144,22 +144,20 @@ implements SeqPanel, MouseListener, MouseMotionListener
         //features = new ArrayList();
         drawLines = new ArrayList();
         chain = null ;
-        
-        
+                
         lastHighlight = new Date();
         
         current_chainnumber = -1 ;
         
         setOpaque(true);
-        
-        
+                
         selectStart    = -1 ;
         selectEnd      =  1 ;
         mouseDragStart = -1 ;
         
         popupMenu = new JPopupMenu();
         
-        MenuListener ml = new MenuListener(this);
+        SelectionLockMenuListener ml = new SelectionLockMenuListener(spice);
         
         JMenuItem menuItem = new JMenuItem("lock selection");
         menuItem.addActionListener(ml);
@@ -169,22 +167,20 @@ implements SeqPanel, MouseListener, MouseMotionListener
         //tablePopup.add(menuItem);
         
         
-        MouseListener popupListener = new PopupListener(popupMenu,this);
+        MouseListener popupListener = new SelectionLockPopupListener(popupMenu,spice);
         this.addMouseListener(popupListener);
-        selectionLocked = false;	
+      
         
     }
     
     public void lockSelection(){
-        selectionLocked = true;
+        spice.setSelectionLocked(true);
     }
     public void unlockSelection(){
-        selectionLocked = false;
+        spice.setSelectionLocked(false);
     }
     
-    public boolean selectionLocked(){
-        return selectionLocked;
-    }
+    
     
     public void paintComponent( Graphics g) {
         //logger.entering(this.getClass().getName(),"paintComponent");
@@ -648,6 +644,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         //logger.finest("highlite feature " + feature);
         //Feature feature = (Feature) features.get(featurenr) ;
         //logger.finest("highlite feature " + feature);
+      
         
         List segments = feature.getSegments() ;
         String cmd = "" ;
@@ -697,14 +694,15 @@ implements SeqPanel, MouseListener, MouseMotionListener
      select a position
      */
     public void select(int seqpos){	
-        if ( selectionLocked ) return;
+        // should be done at spice level
+        //if ( spice.isSelectionLocked() ) return;
         highlite(seqpos);
         
     }
     
     /** select range */
     public void select(int start, int end) {
-        if ( selectionLocked ) return;
+        //if ( spice.isSelectionLocked() ) return;
         highlite(start,end);
     }
     
@@ -714,7 +712,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
      */
     public void highlite( int seqpos){
         if  ( chain == null   ) return ;
-        if 	(selectionLocked) return;
+        //if 	(selectionLocked) return;
         
         if ( seqpos > chain.getLength()) 
             return ;
@@ -728,7 +726,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
     /** highlite a region */
     public void highlite( int start , int end){
         if  ( chain == null   ) return ;
-        if (selectionLocked) return ;
+        //if (selectionLocked) return ;
         if ( (start > chain.getLength()) || 
                 (end   > chain.getLength())
         ) 	      
@@ -888,7 +886,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
             
         }
                
-        if ( selectionLocked) 
+        if ( spice.isSelectionLocked()) 
             return;
         
         // disabled Jmol - slows down things a lot...
@@ -899,36 +897,17 @@ implements SeqPanel, MouseListener, MouseMotionListener
     
     public void mouseClicked(MouseEvent e)
     {
-     
+        int b = e.getButton();
+        if ( b == MouseEvent.BUTTON3) return;
+        
         int seqpos = getSeqPos(e);
         int lineNr = getLineNr(e);
         if ( seqpos    > chain.getLength()) return ;
         
-        int b = e.getButton();
-        /*
-        if ( b == MouseEvent.BUTTON1 )
-            System.out.println("button1");
         
-        if ( b == MouseEvent.BUTTON2 )
-            System.out.println("button2");
         
-        if ( b == MouseEvent.BUTTON3 ){
-            System.out.println("button3");
-            // check if popupmenu is there
-            // if not display it,
-            // else hide it
-            
-        }
-        */
-        if ( b == MouseEvent.BUTTON1 && ( ! selectionLocked))
+        if ( b == MouseEvent.BUTTON1 && ( ! spice.isSelectionLocked()))
         {
-            
-            //logger.finest("CLICK");
-            
-            
-            //int featurenr = get_featurenr(y) ;
-            //logger.finest("CLICK! "+seqpos + " " +lineNr+ " " + chain.getLength());
-            
             if ( lineNr < 0 ) return ;
             if ( seqpos < 0 ) {
                 // check if the name was clicked
@@ -954,7 +933,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         Segment segment = getSegmentUnder(seqpos,lineNr);
         //logger.finest(segment);
         if (segment != null ) {
-            
+            if (! spice.isSelectionLocked() )
             highliteSegment(segment);
             
             
@@ -964,15 +943,11 @@ implements SeqPanel, MouseListener, MouseMotionListener
             
             
         } else {
-            if ( ! selectionLocked())
+            if ( ! spice.isSelectionLocked())
                 spice.highlite(current_chainnumber,seqpos);
             this.setToolTipText(null);
         }
-        
-        //this.repaint();
-        //Color col = entColors[featurenr%entColors.length] ;
-        
-        //logger.finest("clicked outa space");
+       
         return  ;
     }	
     
@@ -995,7 +970,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         //System.out.println("dragging mouse "+e);
         if ( mouseDragStart < 0 )
             return ;
-        if (selectionLocked)
+        if (spice.isSelectionLocked())
             return;
         int selEnd =  getSeqPos(e);
         int start = mouseDragStart ;
@@ -1007,74 +982,11 @@ implements SeqPanel, MouseListener, MouseMotionListener
         }
         spice.highlite(current_chainnumber,start,end);
     }
-    
-    
-    
-}
-
-class MenuListener 
-implements ActionListener {
-    
-    SeqFeaturePanel parent;
-    
-    
-    public MenuListener(SeqFeaturePanel parent_){
-        parent=parent_;
-    }
-    
-    public void actionPerformed(ActionEvent e){
-        JMenuItem source = (JMenuItem)(e.getSource());
-        System.out.println(source);
-        
-        boolean locked = parent.selectionLocked();
-        if ( locked )
-            parent.unlockSelection();
-        else
-            parent.lockSelection();
-    }
+  
 }
 
 
-class PopupListener extends MouseAdapter {
-    JPopupMenu popup;
-    SeqFeaturePanel parent;
-    PopupListener(JPopupMenu popupMenu,SeqFeaturePanel parent_) {
-        parent = parent_;
-        popup  = popupMenu;
-    }
-    
-    public void mousePressed(MouseEvent e) {
-        //System.out.println(e);
-        maybeShowPopup(e);
-    }
-    
-    public void mouseReleased(MouseEvent e) {
-        maybeShowPopup(e);
-    }
-    
-    private void maybeShowPopup(MouseEvent e) {
-        if (e.isPopupTrigger()) {
-            
-            // get the menu items
-            MenuElement[] m =	popup.getSubElements() ;
-            JMenuItem m0 = (JMenuItem)m[0].getComponent();
-            //JMenuItem m1 = (JMenuItem)m[1].getComponent();
-            
-            // adapt the display of the MenuItems
-            if ( parent.selectionLocked()) 
-                m0.setText("unlock selection") ;
-            else 
-                m0.setText("lock selection");
-            
-            //if (ds.getRegistered())
-            //m1.setEnabled(false);
-            //else
-            //m1.setEnabled(true);
-            
-            popup.show(e.getComponent(),		       
-                    e.getX(), e.getY());
-        }
-    }
-}
+
+
 
 

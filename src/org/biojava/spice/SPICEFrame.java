@@ -172,4 +172,23 @@ public interface SPICEFrame  {
     /** specify from outside whether spice should display that it is 
      * loading data */
     public void setLoading(boolean status);
+    
+    /** if set to true, the selection is locked and 
+     * can not be changed, until released again */
+    public void setSelectionLocked(boolean status);
+    
+    /** allows to query if selecting is possible
+     * 
+     * @return boolean value if selection  is locked .
+     */
+    public boolean isSelectionLocked();
+    
+    
+    /** open a web page in the browser 
+     * returns true if the request succeeds, otherwise false
+     * */
+    public boolean showDocument(URL url);
+        
+    
+    
 }

@@ -125,17 +125,17 @@ implements SPICEFrame
     JScrollPane seqScrollPane ;
     JSplitPane  seqSplitPane  ;
     SeqTextPane seqField      ;
-    
+    JMenuItem unlock;
     //JMenuBar menuBar ;
     JTextField getCom ;
     
-    JTextField  strucommand  ; 
+    StructureCommandPanel  strucommand; 
     StatusPanel statusPanel ;
     String[] txtColor     ;
     Color[] entColors ;
     Color oldColor ; 
     boolean first_load ;
-    
+    boolean selectionLocked ;
     boolean structureAlignmentMode ;
     
     //public static Logger logger = Logger.getLogger("org.biojava.spice");
@@ -148,6 +148,10 @@ implements SPICEFrame
      */
     SpiceApplication( URL registry_url) {
         super();
+        
+        // selection is possible at the start ;
+        selectionLocked = false ;
+        
         
         currentChainNumber = -1 ;
         currentChain = null;
@@ -241,11 +245,12 @@ implements SPICEFrame
         this.setJMenuBar(menu);
         
         // init all panels, etc..
-        statusPanel    = new StatusPanel();
+        statusPanel    = new StatusPanel(this);
         seq_pos        = new JTextField();
         structurePanel = new StructurePanel(this);	
         dascanv        = new SeqFeaturePanel(this);
-        strucommand    = new JTextField()  ;
+        strucommand    = new StructureCommandPanel(this);
+        //strucommand    = new JTextField()  ;
         
         Box vBox = arrangePanels(statusPanel,seq_pos,structurePanel,dascanv,strucommand,"left"); 
         
@@ -302,7 +307,7 @@ implements SPICEFrame
      * seq_pos        = new JTextField();
      * structurePanel = new StructurePanel(this);	
      * dascanv        = new SeqFeatureCanvas(this);
-     * strucommand    = new JTextField()  ;
+     * strucommand    = new StructureCommandPanel()  ;
      * structureLocation location of structure, either "top", left, right or bottom
      
      
@@ -312,7 +317,7 @@ implements SPICEFrame
             JTextField seq_pos,
             StructurePanel structurePanel,
             SeqFeaturePanel dascanv, 
-            JTextField strucommand,
+            StructureCommandPanel strucommand,
             String structureLocation){
         
         Box vBox = Box.createVerticalBox();
@@ -450,13 +455,6 @@ implements SPICEFrame
         mainsharedPanel.setBorder(BorderFactory.createEmptyBorder());
         vBox.add(mainsharedPanel,BorderLayout.CENTER);
         
-        
-        
-        
-        
-        strucommand.setText("enter RASMOL like command...");
-        ActionListener listener = new StructureCommandListener(this,strucommand) ;
-        strucommand.addActionListener(listener);
         strucommand.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
         //this.getContentPane().add(strucommand,BorderLayout.SOUTH);
         //this.getContentPane().add(strucommand);
@@ -541,6 +539,9 @@ implements SPICEFrame
         
         JMenuItem reset   = new JMenuItem("Reset");
         reset.setMnemonic(KeyEvent.VK_R);
+        unlock = new JMenuItem("Unlock Selection");
+        unlock.setMnemonic(KeyEvent.VK_U);
+        unlock.setEnabled(selectionLocked);
         
         JMenuItem backbone   = new JMenuItem("Backbone");
         JMenuItem wireframe  = new JMenuItem("Wireframe");
@@ -553,6 +554,7 @@ implements SPICEFrame
         JMenuItem colorcpk   = new JMenuItem("Color - cpk");
         
         reset.addActionListener     ( ml );
+        unlock.addActionListener    ( ml );
         backbone.addActionListener  ( ml );
         wireframe.addActionListener ( ml );	
         cartoon.addActionListener   ( ml );
@@ -564,6 +566,7 @@ implements SPICEFrame
         
         
         display.add( reset   );
+        display.add( unlock  );
         display.addSeparator();
         
         display.add( backbone   );
@@ -723,8 +726,8 @@ implements SPICEFrame
     
     
     public String getToolString(int chainnumber,int seqpos) {
-        return "tmp in getToolString";
-        /*
+        //return "tmp in getToolString";
+        
         Chain chain = getChain(chainnumber);
         if ( chain == null) return "" ;
         
@@ -749,7 +752,7 @@ implements SPICEFrame
         
         String drstr = "Seq pos "+ seqpos + "("+amino1+","+name+")" + " PDB ("+ pdbstr +")";  	
         return drstr ;
-        */
+        
     }
     
     public void showSeqPos(int chainnumber, int seqpos){
@@ -982,6 +985,15 @@ implements SPICEFrame
         updateDisplays();
     }
     
+    public void setSelectionLocked(boolean status) {
+        selectionLocked = status ;
+        unlock.setEnabled(selectionLocked);     
+    }
+    
+    public boolean isSelectionLocked() {
+        return selectionLocked ;
+    }
+    
     // store all features in memory -> speed up
     private ArrayList getFeaturesFromMemory(String sp_id) {
         logger.entering(this.getClass().getName(), "getFeaturesFromMemory()",  new Object[]{sp_id});
@@ -1114,7 +1126,7 @@ implements SPICEFrame
         if ( first_load)       return ;		
         if ( start       < 0 ) return ;
         if ( chainNumber < 0 ) return ;
-        
+        if ( selectionLocked ) return ;
         
         // highlite structure
         String cmd = getSelectStr( chainNumber,  start,  end);
@@ -1145,7 +1157,7 @@ implements SPICEFrame
         if (first_load)       return ;		
         if ( seqpos     < 0 ) return ;
         if (chainNumber < 0 ) return ;
-        
+        if ( selectionLocked ) return ;
         
         
         String cmd = getSelectStr( chainNumber,  seqpos);
@@ -1286,6 +1298,7 @@ implements SPICEFrame
     /** select a range of  residue */
     public void select(int chain_number, int start, int end) {
         //logger.finest("select start end" + start + " " + end);
+        if ( selectionLocked ) return ;
         
         if ( chain_number == currentChainNumber ) {
             seqField.select(start,end);		
@@ -1306,6 +1319,7 @@ implements SPICEFrame
     /** select a single residue */
     public void select(int chain_number,int seqpos){
         //logger.finest("select seqpos" + seqpos);
+        if ( selectionLocked ) return ;
         
         if ( chain_number == currentChainNumber ){
             seqField.select(seqpos);
@@ -1418,6 +1432,20 @@ implements SPICEFrame
         
         return true ;
         
+    }    
+    
+    public boolean showDocument(URL url) 
+    {
+        try
+        {
+           return JNLPProxy.showDocument(url);
+        }
+        catch ( Exception  ex )
+        {
+            //ex.printStackTrace ( );
+            logger.warning(ex.getMessage());            
+        }
+        return false;
     }
     
 }
@@ -1462,31 +1490,5 @@ class EntListCommandListener implements ListSelectionListener {
 
 
 
-class StructureCommandListener 
-implements ActionListener {
-    JTextField textfield ;
-    SPICEFrame spice    ;
-    static Logger logger      = Logger.getLogger("org.biojava.spice");
-    
-    public StructureCommandListener (SPICEFrame spice_, JTextField textfield_) {
-        super();
-        spice = spice_ ;
-        textfield = textfield_ ;
-        
-    }
-    public void actionPerformed(ActionEvent event) {
-        
-        if ( spice.isLoading() ) {
-            logger.finest("loading data, please be patient");
-            return ;
-        }
-        String cmd = textfield.getText();
-        spice.executeCmd(cmd);
-        textfield.setText("");
-        
-        
-    }
-    
-    
-}
+
 
