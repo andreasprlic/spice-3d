@@ -1226,7 +1226,8 @@ public class SpiceApplication
 	if ( event.target == props) {
 	    //System.out.println("modify properties");
 	    RegistryConfigIO regi = new RegistryConfigIO(this,REGISTRY_URL) ;
-	    regi.run();
+	    //regi.run();
+	    regi.setConfiguration(config);
 	    regi.showConfigFrame();
 		
 	    return true;

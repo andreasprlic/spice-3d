@@ -23,49 +23,53 @@
  */
 
 
-package org.biojava.spice ;
+package org.biojava.spice                  ;
 
 // to get config file via http
-import java.net.HttpURLConnection ;
-import java.net.URL;
-import java.io.IOException ;
+import java.net.HttpURLConnection          ;
+import java.net.URL                        ;
+import java.io.IOException                 ;
 
-import java.util.HashMap   ;
-import java.util.ArrayList ;
-import java.util.Map ;
-import java.util.List ;
+import java.util.HashMap                   ;
+import java.util.ArrayList                 ;
+import java.util.Map                       ;
+import java.util.List                      ;
 // for DAS registration server:
-import org.biojava.services.das.registry.*;
+import org.biojava.services.das.registry.* ;
 
 
 // for GUI;
 
-import java.awt.Frame ;
-import java.awt.event.*    ;
-import javax.swing.Box ;
-import javax.swing.border.TitledBorder ;
-import javax.swing.JTextField  ;
-import javax.swing.JButton ;
-import javax.swing.JTabbedPane;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-import javax.swing.JLabel;
-import javax.swing.BoxLayout;
-import javax.swing.JComponent;
-import javax.swing.JTable;
-import javax.swing.JProgressBar;
+import java.awt.Frame                      ;
+import java.awt.event.*                    ;
+import javax.swing.Box                     ;
+import javax.swing.border.TitledBorder     ;
+import javax.swing.JTextField              ;
+import javax.swing.JButton                 ;
+import javax.swing.JTabbedPane             ;
+import javax.swing.ImageIcon               ;
+import javax.swing.JLabel                  ;
+import javax.swing.JPanel                  ;
+import javax.swing.JFrame                  ;
+import javax.swing.JScrollPane             ;
+import javax.swing.JLabel                  ;
+import javax.swing.BoxLayout               ;
+import javax.swing.JComponent              ;
+import javax.swing.JTable                  ;
+import javax.swing.JProgressBar            ;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.event.TableModelEvent;
-import javax.swing.BorderFactory;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.event.KeyEvent;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import javax.swing.event.TableModelEvent   ;
+import javax.swing.BorderFactory           ;
+import javax.swing.JComboBox               ;
+import javax.swing.JList                   ;
+import javax.swing.ListSelectionModel      ;
+
+import java.awt.BorderLayout               ;
+import java.awt.Dimension                  ;
+import java.awt.GridLayout                 ;
+import java.awt.event.KeyEvent             ;
+import java.awt.event.ActionEvent          ;
+import java.awt.event.ActionListener       ;
 
 
 /** a class to contact and retreive the configuration from a DAS
@@ -92,6 +96,7 @@ public class RegistryConfigIO
 	REGISTRY = registryurl ;
 	done = false ;
     }
+
     public boolean isDone(){
 	return done ;
     }
@@ -115,8 +120,14 @@ public class RegistryConfigIO
 	System.out.println("DAS Registry server config thread loadData");
 	done = false ;
 	System.out.println("contacting DAS registry server at: " +REGISTRY);
+
+	config = new RegistryConfiguration();
+
 	DasRegistryAxisClient rclient = new DasRegistryAxisClient(REGISTRY);
 	
+	String[] capabs = rclient.getAllCapabilities();
+	config.setCapabilities(capabs);
+
 	DasSource[] sources = rclient.listServices();
 	
 	if ( sources==null) {
@@ -125,7 +136,7 @@ public class RegistryConfigIO
 	}
 	System.out.println("found "+sources.length+" servers"); 
 	//config = getDasServers(sources); 
-	config = new RegistryConfiguration();
+	
 	ArrayList servers = new ArrayList();
 	
 	for (int i = 0 ; i < sources.length; i++) {
@@ -187,6 +198,7 @@ public class RegistryConfigIO
 	
     }
     private void disposeProgressBar(){
+	progressFrame.setVisible(false);
 	progressFrame.dispose();
     }
 
@@ -208,8 +220,10 @@ public class RegistryConfigIO
 	return config ; 
     }
 
-
-    
+    /** set config fromoutside */
+    public void setConfiguration(RegistryConfiguration regi) {
+	config = regi;	
+    }
     
    
 
@@ -228,6 +242,7 @@ public class RegistryConfigIO
 
         //Create and set up the window.
         JFrame frame = new JFrame("SPICE configuration window");
+	frame.setVisible(false);
 	frame.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 	//Make sure we have the standard desktop window decorations.
         JFrame.setDefaultLookAndFeelDecorated(false);
@@ -318,10 +333,12 @@ class ButtonListener
 class TabbedPaneDemo extends JPanel {
     static String[] colNames= new String [] {"url","coordinateSystems","adminemail","capabilities","description"};
 
-    RegistryConfiguration config ;
-    RegistryConfigIO registryIO  ;
-    JTabbedPane tabbedPane       ;
-    List        entryFormFields  ;
+    RegistryConfiguration config       ;
+    RegistryConfigIO registryIO        ;
+    JTabbedPane tabbedPane             ;
+    List        entryFormFields        ;
+    MyTableModel dasSourceTableModel   ;
+    JTable       dasSourceTable        ;
 
     public TabbedPaneDemo(RegistryConfigIO registryparent, RegistryConfiguration config_) {
         super(new GridLayout(1, 1));
@@ -337,27 +354,27 @@ class TabbedPaneDemo extends JPanel {
 	// Make sequence and structure Panel
 	JPanel seqstrucpanel = new JPanel();
 	seqstrucpanel.setLayout(new BoxLayout(seqstrucpanel, BoxLayout.Y_AXIS));	
-	List sequenceservers = config.getServers() ;
+	//List sequenceservers = config.getServers() ;
 	
-	
+
 	String seqdata[][] = getTabData();
 
 	//System.out.println(seqdata);
 	//JTable table= new JTable(seqdata,colNames);
-	MyTableModel mtm = new MyTableModel(this,seqdata,colNames);
+	dasSourceTableModel = new MyTableModel(this,seqdata,colNames);
 	//mtm.getModel().addTableModelListener(this);
 
-	JTable table  = new JTable(mtm);
+	dasSourceTable  = new JTable(dasSourceTableModel);
 
 	
 
 	// Configure some of JTable's paramters
-	table.setShowHorizontalLines( false );
-	table.setRowSelectionAllowed( true );
-	table.setColumnSelectionAllowed( true );
+	dasSourceTable.setShowHorizontalLines( false );
+	dasSourceTable.setRowSelectionAllowed( true );
+	dasSourceTable.setColumnSelectionAllowed( true );
 		
 	// Add the table to a scrolling pane
-	JScrollPane seqscrollPane = table.createScrollPaneForTable( table );
+	JScrollPane seqscrollPane = dasSourceTable.createScrollPaneForTable( dasSourceTable );
 
 	seqscrollPane.setBorder(dasborder1);
 
@@ -384,22 +401,57 @@ class TabbedPaneDemo extends JPanel {
 	entryForm.setLayout(new BoxLayout(entryForm, BoxLayout.LINE_AXIS));
 
 	Box vBoxRight =  Box.createVerticalBox();
-	Box vBoxLeft =  Box.createVerticalBox();
+	Box vBoxLeft  =  Box.createVerticalBox();
 
 	entryFormFields = new ArrayList();
 
+	
 	for ( int i = 0 ; i < colNames.length; i++) {
 	    String col = colNames[i];
-	   
+
 	    JTextField txt1 = new JTextField(col);
 	    txt1.setEditable(false);
 	    txt1.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
 	    vBoxLeft.add(txt1);
 
-	    JTextField txt2 = new JTextField("    ");
-	    txt2.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
-	    vBoxRight.add(txt2);
-	    entryFormFields.add(txt2);
+	    if (col.equals("coordinateSystems")) {
+		// display coordinateSystems box
+		String[] coords = { "UniProt","PDBresnum"};
+		JComboBox list = new JComboBox(coords) ;		
+		list.setEditable(false);
+		list.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
+		list.setSelectedIndex(0);
+		vBoxRight.add(list);	
+		entryFormFields.add(list);
+		
+	    } else if ( col.equals("capabilities")) {
+		JList list = new JList(config.getCapabilities());
+		list.setVisibleRowCount(1);
+		//list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		list.setSelectedIndex(4);
+		list.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
+		JScrollPane jsp = new JScrollPane(list);
+		jsp.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
+		vBoxRight.add(jsp);
+		entryFormFields.add(list);
+
+		/**
+		JComboBox comboBox = new JComboBox(config.getCapabilities());
+		comboBox.setEditable(false);
+		comboBox.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
+		comboBox.setSelectedIndex(4);
+		vBoxRight.add(comboBox);
+		
+		entryFormFields.add(comboBox);
+		*/
+	
+	    } else {
+
+		JTextField txt2 = new JTextField("");
+		txt2.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
+		vBoxRight.add(txt2);
+		entryFormFields.add(txt2);
+	    }
 	}
 
 
@@ -503,17 +555,49 @@ class TabbedPaneDemo extends JPanel {
 	    HashMap formdata = new HashMap();
 	    for ( int i = 0 ; i < colNames.length; i++) {
 		String col = colNames[i];
-		JTextField txt = (JTextField)entryFormFields.get(i);
-		String data = txt.getText();
-		System.out.println(col + " " + data);
-		formdata.put(col,data);
+		
+		Object o = entryFormFields.get(i);
+
+		if ( o.getClass().getName().equals("javax.swing.JTextField")) {
+		//JTextField txt = (JTextField)entryFormFields.get(i);
+		    JTextField txt = (JTextField)o;
+		    String data = txt.getText();
+		    System.out.println(col + " " + data);
+		    formdata.put(col,data);
+		} else if ( o.getClass().getName().equals("javax.swing.JList")) {
+		    JList l = (JList) o ;
+		    String[] data = (String[])l.getSelectedValues();
+		    formdata.put(col,data);		    
+		} else if ( o.getClass().getName().equals("javax.swing.JComboBox")) {
+		    JComboBox j = (JComboBox) o ;
+		    String data = (String)j.getSelectedItem();
+		    formdata.put(col,data);
+		}
 	    }
 	    SpiceDasSource sds = new SpiceDasSource();
+	    sds.setRegistered(false);
 	    sds.setUrl(              (String) formdata.get("url"));
 	    sds.setAdminemail(       (String) formdata.get("adminemail"));
 	    sds.setDescription(      (String) formdata.get("description"));
-	    sds.setCoordinateSystem( (String) formdata.get("coordinateSystem"));
-	    sds.setRegistered(false);
+
+	    
+	    String [] coordSys = (String[]) formdata.get("coordinateSystems");
+	    sds.setCoordinateSystem(coordSys);
+
+	    String[] capabs =  (String[]) formdata.get("capabilities") ;	    
+	    //String[] split = capabs.split(" ");
+	    sds.setCapabilities(capabs);
+
+
+	    config.addServer(sds,true);
+
+	    String seqdata[][] = getTabData();
+	    dasSourceTableModel = new MyTableModel(this,seqdata,colNames);
+
+	    this.repaint();
+	    tabbedPane.setSelectedIndex(0);
+	    dasSourceTable.setModel(dasSourceTableModel);
+	    //registryIO.saveConfiguration();
 	}
     }
 }

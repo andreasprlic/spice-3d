@@ -73,12 +73,14 @@ public class RegistryConfiguration
     
     List allservers    ;
     List activeservers ;
+    String[] capabilities ;
 
     public RegistryConfiguration () {
 	super();
 	//serverdata = new ArrayList();
 	allservers    = new ArrayList();
 	activeservers = new ArrayList();
+	capabilities  = null ;
     }
 
    
@@ -118,6 +120,9 @@ public class RegistryConfiguration
 	}
     }
 
+
+    public String[] getCapabilities() { return capabilities ; }
+    public void setCapabilities(String[] capabs){capabilities = capabs ; }
 
     public void setStatus(String url, boolean status) {
 	for ( int i = 0 ; i < allservers.size() ; i++ ) {

@@ -128,6 +128,7 @@ public class FeatureFetcher extends Thread
 		e.printStackTrace();
 		ArrayList empty = new ArrayList();
 		setFinished(responsecounter,empty);
+		responsecounter++;
 		continue ;
 	    }
 	    System.out.println("starting thread");
@@ -151,6 +152,7 @@ public class FeatureFetcher extends Thread
 		e.printStackTrace();
 		ArrayList empty = new ArrayList();
 		setFinished(responsecounter,empty);
+		responsecounter++;
 		continue ;
 	    }
 	    System.out.println("starting thread");
@@ -430,6 +432,7 @@ class DasResponse{
     public synchronized void setFeatures(List feats) {
 	//System.out.println(feats);
 	// sort features ...
+	finished = true ;
 	Map[] featarr = (Map[]) feats.toArray(new Map[feats.size()]);
 	FeatureMapComparator comp = new FeatureMapComparator();
 	java.util.Arrays.sort(featarr,comp) ; 
@@ -439,7 +442,7 @@ class DasResponse{
 	features = sortfeats; 
 	
 	//features = feats;
-	finished = true ;
+
 	notifyAll();
     }
     public List getFeatures() {
