@@ -1,8 +1,10 @@
 <?xml version="1.0"?>
 
 <!--
+	
 		
 	this file requires quite some cleanup ... :-/
+	a couple of the target below are not used
 
   Ant build file for the entire spice tree
 
