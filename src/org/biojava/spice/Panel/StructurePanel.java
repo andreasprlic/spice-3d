@@ -47,14 +47,8 @@ class StructurePanel extends JPanel {
      * @param command - a String containing a RASMOL like command. e.g. "select protein; cartoon on;"
      */
     public void executeCmd(String command) {
-	//command += ";refresh;";
-	//System.out.println("sending Jmol command: " +command);
-	
+	//System.out.println("sending Jmol command: " +command);	
 	viewer.evalString(command);
-	
-
-	//System.out.println("update paint...");
-	//this.paint(this.getGraphics());
     }
 
     /** display a new PDB structure in Jmol 
