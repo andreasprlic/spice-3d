@@ -75,8 +75,7 @@ public class SeqFeatureCanvas
     public static final int    DEFAULT_Y_BOTTOM  = 16 ;
     public static final int    TIMEDELAY        = 0 ;
 
-    // Alpha value for the image
-    AlphaComposite composite ;
+
 
     int selectStart ;
     int selectEnd      ;
@@ -159,7 +158,6 @@ public class SeqFeatureCanvas
 	current_chainnumber = -1 ;
 
 	plainFont = new Font("SansSerif", Font.PLAIN, 10);
-	composite =  makeComposite(0.5f);
 	setOpaque(true);
 
 	//this.paintComponent(this.getGraphics());
@@ -167,13 +165,172 @@ public class SeqFeatureCanvas
 	//setIcon(icon);
 	//this.repaint();
 	selectStart    = -1 ;
-	selectEnd      = 1 ;
+	selectEnd      =  1 ;
 	mouseDragStart = -1 ;
     }
-    private AlphaComposite makeComposite(float alpha) {
-	int type = AlphaComposite.SRC_OVER ;
-	return(AlphaComposite.getInstance(type, alpha));
+  
+
+
+    public void paintComponent( Graphics g) {
+	super.paintComponent(g); 	
+
+	
+	//logger.finest("DasCanv - paintComponent");
+
+
+
+	if ( chain == null   ) return ;
+
+	Dimension dstruc=this.getSize();
+	BufferedImage imbuf = (BufferedImage)this.createImage(dstruc.width,dstruc.height);
+	
+
+	Graphics2D g2D = (Graphics2D)g ;
+
+	// Set current alpha
+	Composite oldComposite = g2D.getComposite();
+
+	g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,1.0f));                 
+	g2D.setFont(plainFont);
+
+       
+
+	float chainlength =  chain.getLength() ;
+		
+	// scale should span the whole length ...
+	scale = (dstruc.width ) / (DEFAULT_X_START + chainlength + DEFAULT_X_RIGHT_BORDER  ) ; 
+
+	//logger.finest("scale:" +scale+ " width: "+dstruc.width + " chainlength: "+chainlength );
+	
+
+
+
+	// draw scale
+	g2D.setColor(Color.GRAY);
+	//gstruc.fillRect(0, 0, seqx, 1);
+	
+	for (int i =0 ; i< chainlength ; i++){
+	    if ( (i%100) == 0 ) {
+		int xpos = Math.round(i*scale)+DEFAULT_X_START ;
+		g2D.fillRect(xpos, 0, 1, 8);
+	    }else if  ( (i%50) == 0 ) {
+		int xpos = Math.round(i*scale)+DEFAULT_X_START ;
+		g2D.fillRect(xpos, 0, 1, 6);
+	    } else if  ( (i%10) == 0 ) {
+		int xpos = Math.round(i*scale)+DEFAULT_X_START ;
+		g2D.fillRect(xpos, 0, 1, 4);
+	    }
+	}
+		
+				
+	// draw sequence
+	g2D.setColor(Color.white);
+	int seqx = java.lang.Math.round(chainlength * scale) ;
+
+
+	g2D.fillRect(0+DEFAULT_X_START, 10, seqx, 6);
+
+	int y = DEFAULT_Y_START ;
+	// draw features
+		
+	//logger.finest("number features: "+features.size());
+
+	int aminosize = Math.round(1 * scale) ;
+
+	boolean secstruc = false ;
+
+
+	for (int i = 0 ; i< drawLines.size();i++) {
+	    //logger.finest(i%entColors.length);
+	    //g2D.setColor(entColors[i%entColors.length]);
+
+	    y = y + DEFAULT_Y_STEP ;
+
+	    List features = (List) drawLines.get(i) ;
+
+	    for ( int f =0 ; f< features.size();f++) {
+
+		Feature feature = (Feature) features.get(f);
+	
+		// line separator
+
+		if ( feature.getMethod().equals("_SPICE_LINESEPARATOR")) {
+		    //logger.finest("_SPICE_LINESEPARATOR");
+		    String ds = feature.getSource();
+		    g2D.setColor(Color.white);
+		    g2D.drawString(ds,DEFAULT_X_START,y+DEFAULT_Y_HEIGHT);
+		    continue ;
+		}
+		
+		
+		List segments = feature.getSegments() ;
+	    
+		// draw text
+		if ( segments.size() < 1) {
+		    //logger.finest(feature.getMethod());
+		    continue ;
+		}
+		Segment seg0 = (Segment) segments.get(0) ;
+		Color col =  seg0.getColor();	
+		g2D.setColor(col);
+		
+		g2D.drawString(feature.getName(), 1,y+DEFAULT_Y_HEIGHT);
+		
+		for (int s=0; s<segments.size();s++){
+		    Segment segment=(Segment) segments.get(s);
+		    
+		    int start     = segment.getStart()-1 ;
+		    int end       = segment.getEnd()  -1 ;
+		    
+		    col = segment.getColor();
+		    g2D.setColor(col);
+		    
+		    int xstart =  java.lang.Math.round(start * scale) + DEFAULT_X_START;
+		    int width   = java.lang.Math.round(end * scale) - xstart +  DEFAULT_X_START+aminosize ;
+		    
+		    int height = DEFAULT_Y_HEIGHT ;
+		    //logger.finest(feature+ " " + end +" " + width);
+		    //logger.finest("color"+entColors[i%entColors.length]);
+		    //logger.finest("new feature  ("+i+"): x1:"+ xstart+" y1:"+y+" width:"+width+" height:"+height);
+		    String type = feature.getType() ;
+		    if (  type.equals("DISULFID")){
+		
+			g2D.fillRect(xstart,y,aminosize,height);
+			g2D.fillRect(xstart,y+(height/2),width,1);
+			g2D.fillRect(xstart+width-aminosize,y,aminosize,height);
+		    } else {
+			g2D.fillRect(xstart,y,width,height);
+		    }
+		}
+	    }
+	}
+	
+	//int seqpos =  java.lang.Math.round(x/scale) ;
+	if ( selectStart > -1 ) {
+
+	    g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));        
+
+	    g2D.setColor(cursorColor);
+	    seqx = java.lang.Math.round(selectStart*scale)+DEFAULT_X_START ;
+	   	 
+	    int selectEndX = java.lang.Math.round(selectEnd * scale)-seqx + DEFAULT_X_START +aminosize; 
+	    if ( selectEndX < aminosize) 
+		selectEndX = aminosize ;
+	    
+	    if ( selectEndX  < 1 )
+		selectEndX = 1 ;
+	    
+	    Rectangle selection = new Rectangle(seqx , 0, selectEndX, dstruc.height);
+	    g2D.fill(selection);
+		
+	    //g2D.setComposite(originalComposite);
+	}
+	g2D.setComposite(oldComposite);
+
+	//	g.drawImage(imbuf,0,0,this.getBackground(),this);
+	
     }
+
 
 
 
@@ -470,179 +627,7 @@ public class SeqFeatureCanvas
     }
 
 
-    public void paintComponent( Graphics g) {
-	super.paintComponent(g); 	
-
-	//logger.finest("PAINTINGDAS!!!") ;	
-	//logger.finest("DasCanv - paintComponent");
-	//logger.finest(this.getBackground());
-
-
-	if ( chain == null   ) return ;
-
-	Dimension dstruc=this.getSize();
-	Image imbuf = this.createImage(dstruc.width,dstruc.height);
-	
-	Graphics gstruc = g ;
-	//Graphics gstruc = imbuf.getGraphics();
-
-	gstruc.setFont(plainFont);
-
-	//gstruc.setBackground(this.getBackground());
-	//gstruc.setColor(this.getBackground());
-	//gstruc.fillRect(0 , 0, dstruc.width, dstruc.height);
-	//g.clearRect(0 , 0, dstruc.width, dstruc.height);
-	
-
-	float chainlength =  chain.getLength() ;
-		
-	// scale should span the whole length ...
-	scale = (dstruc.width ) / (DEFAULT_X_START + chainlength + DEFAULT_X_RIGHT_BORDER  ) ; 
-	//logger.finest("scale:" +scale+ " width: "+dstruc.width + " chainlength: "+chainlength );
-	
-
-	// reset image
-	//gstruc.setColor(this.getBackground());
-	//gstruc.fillRect(0 , 0, dstruc.width, dstruc.height);
-
-
-	// draw scale
-	gstruc.setColor(Color.GRAY);
-	//gstruc.fillRect(0, 0, seqx, 1);
-		
-	for (int i =0 ; i< chainlength ; i++){
-	    if ( (i%100) == 0 ) {
-		int xpos = Math.round(i*scale)+DEFAULT_X_START ;
-		gstruc.fillRect(xpos, 0, 1, 8);
-	    }else if  ( (i%50) == 0 ) {
-		int xpos = Math.round(i*scale)+DEFAULT_X_START ;
-		gstruc.fillRect(xpos, 0, 1, 6);
-	    } else if  ( (i%10) == 0 ) {
-		int xpos = Math.round(i*scale)+DEFAULT_X_START ;
-		gstruc.fillRect(xpos, 0, 1, 4);
-	    }
-	}
-		
-				
-	// draw sequence
-	gstruc.setColor(Color.white);
-	int seqx = java.lang.Math.round(chainlength * scale) ;
-
-
-	gstruc.fillRect(0+DEFAULT_X_START, 10, seqx, 6);
-
-	int y = DEFAULT_Y_START ;
-	// draw features
-		
-	//logger.finest("number features: "+features.size());
-
-	int aminosize = Math.round(1 * scale) ;
-
-	boolean secstruc = false ;
-
-
-	for (int i = 0 ; i< drawLines.size();i++) {
-	    //logger.finest(i%entColors.length);
-	    //gstruc.setColor(entColors[i%entColors.length]);
-
-	    y = y + DEFAULT_Y_STEP ;
-
-	    List features = (List) drawLines.get(i) ;
-
-	    for ( int f =0 ; f< features.size();f++) {
-
-		Feature feature = (Feature) features.get(f);
-	
-		// line separator
-
-		if ( feature.getMethod().equals("_SPICE_LINESEPARATOR")) {
-		    //logger.finest("_SPICE_LINESEPARATOR");
-		    String ds = feature.getSource();
-		    gstruc.setColor(Color.white);
-		    gstruc.drawString(ds,DEFAULT_X_START,y+DEFAULT_Y_HEIGHT);
-		    continue ;
-		}
-		
-		
-		List segments = feature.getSegments() ;
-	    
-		// draw text
-		if ( segments.size() < 1) {
-		    //logger.finest(feature.getMethod());
-		    continue ;
-		}
-		Segment seg0 = (Segment) segments.get(0) ;
-		Color col =  seg0.getColor();	
-		gstruc.setColor(col);
-		
-		gstruc.drawString(feature.getName(), 1,y+DEFAULT_Y_HEIGHT);
-		
-		for (int s=0; s<segments.size();s++){
-		    Segment segment=(Segment) segments.get(s);
-		    
-		    int start     = segment.getStart()-1 ;
-		    int end       = segment.getEnd()  -1 ;
-		    
-		    col = segment.getColor();
-		    gstruc.setColor(col);
-		    
-		    int xstart =  java.lang.Math.round(start * scale) + DEFAULT_X_START;
-		    int width   = java.lang.Math.round(end * scale) - xstart +  DEFAULT_X_START+aminosize ;
-		    
-		    int height = DEFAULT_Y_HEIGHT ;
-		    //logger.finest(feature+ " " + end +" " + width);
-		    //logger.finest("color"+entColors[i%entColors.length]);
-		    //logger.finest("new feature  ("+i+"): x1:"+ xstart+" y1:"+y+" width:"+width+" height:"+height);
-		    String type = feature.getType() ;
-		    if (  type.equals("DISULFID")){
-		
-			gstruc.fillRect(xstart,y,aminosize,height);
-			gstruc.fillRect(xstart,y+(height/2),width,1);
-			gstruc.fillRect(xstart+width-aminosize,y,aminosize,height);
-		    } else {
-			gstruc.fillRect(xstart,y,width,height);
-		    }
-		}
-	    }
-	    
-	    //int seqpos =  java.lang.Math.round(x/scale) ;
-	    if ( selectStart > -1 ) {
-		gstruc.setColor(cursorColor);
-		seqx = java.lang.Math.round(selectStart*scale)+DEFAULT_X_START ;
-		int paintlength = 1 ;
-		if  (selectEnd > 1 )
-		    paintlength = selectEnd  - selectStart;
-		//logger.finest("selectStart " + selectStart + " selectEnd " + selectEnd + " paintlength:" +paintlength);
-		//int tmpfill ;	       		
-		//if (aminosize <1) tmpfill = 1;
-		//else tmpfill = aminosize ;
-
-		int selectEndX = aminosize * paintlength ; 
-		if ( selectEndX  < 1 )
-		    selectEndX = 1 ;
-		
-		//logger.finest("draw rec");
-
-		
-		Graphics2D g2D = (Graphics2D)gstruc;
-
-		//Composite originalComposite = g2D.getComposite();
-
-		g2D.setComposite(composite);                   // Set current alpha
-		Rectangle selection = new Rectangle(seqx , 0, selectEndX, dstruc.height);
-		//g2D.fillRect(seqx , 0, selectEndX, dstruc.height);
-		g2D.fill(selection);
-		
-		//g2D.setComposite(originalComposite);
-	    }
-
-	    //g.drawImage(imbuf,0,0,this.getBackground(),this);
-	}
-	
-
-	
-    }
-	
+   	
     /* check if the mouse is over a feature and if it is 
      * return the feature number 
      * @author andreas
@@ -782,8 +767,8 @@ public class SeqFeatureCanvas
 	}
 
 
-	spice.showSeqPos(current_chainnumber,seqpos);
-	spice.highlite(current_chainnumber,seqpos);
+	//spice.showSeqPos(current_chainnumber,seqpos);
+	spice.select(current_chainnumber,seqpos);
 	
 	return  ;
     }
