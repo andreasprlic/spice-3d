@@ -159,46 +159,10 @@ implements SPICEFrame
         loggingPanel.getHandler().setLevel(Level.FINEST);	
         loggingPanel.show(null);
         logger.setLevel(Level.FINEST);
-        //ConsoleHandler handler = new ConsoleHandler();
-        //handler.setLevel(Level.FINEST);
-        //logger.addHandler(loggingPanel.getHandler());
         
-        System.setProperty("XMLVALIDATION",XMLVALIDATION);
-        int timeout = 15000;
-        
-        if (logger.isLoggable(Level.FINEST)) {
-            logger.finest("setting timeouts to " + timeout);
-        }
-        
-        System.setProperty("sun.net.client.defaultConnectTimeout", ""+timeout);
-        System.setProperty("sun.net.client.defaultReadTimeout", ""+timeout);
+        setSystemProperties();
         
         
-        String proxyHost  = System.getProperty("proxyHost");
-        String proxyPort  = System.getProperty("proxyPort");
-        
-        if (logger.isLoggable(Level.FINEST)) {
-            logger.finest("proxyHost"         + proxyHost);
-            logger.finest("proxyPort"         + proxyPort);
-            logger.finest("http.proxyHost"    + System.getProperty("http.proxyHost"));
-            logger.finest("http.proxyPort"    + System.getProperty("http.proxyPort"));
-        }
-        // hack around some config problems ... argh!
-        if ( proxyHost != null ) {
-            System.setProperty("proxySet","true");
-            if ( System.getProperty("http.proxyHost") == null ){
-                System.setProperty("http.proxyHost",proxyHost) ;
-            }
-        }
-        
-        if ( proxyPort != null ) {
-            if ( System.getProperty("http.proxyPort") == null ){
-                System.setProperty("http.proxyPort",proxyPort);
-            }
-        }
-        if (logger.isLoggable(Level.FINEST)) {
-            logger.finest("using Proxy:" + System.getProperty("proxySet"));
-        }
         
         REGISTRY_URL = registry_url ;
         
@@ -288,6 +252,52 @@ implements SPICEFrame
         }
     }
     
+    /** set  a couple of System Properties */
+   
+    private void setSystemProperties(){
+//      on osx move menu to the top of the screen
+        System.setProperty("apple.laf.useScreenMenuBar", "true");
+        
+        // do xml validation when parsing DAS responses (true/false)
+        System.setProperty("XMLVALIDATION",XMLVALIDATION);
+        
+        int timeout = 15000;
+        
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest("setting timeouts to " + timeout);
+        }
+        
+        // timeouts when doing http connections
+        System.setProperty("sun.net.client.defaultConnectTimeout", ""+timeout);
+        System.setProperty("sun.net.client.defaultReadTimeout", ""+timeout);
+        
+        
+        String proxyHost  = System.getProperty("proxyHost");
+        String proxyPort  = System.getProperty("proxyPort");
+        
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest("proxyHost"         + proxyHost);
+            logger.finest("proxyPort"         + proxyPort);
+            logger.finest("http.proxyHost"    + System.getProperty("http.proxyHost"));
+            logger.finest("http.proxyPort"    + System.getProperty("http.proxyPort"));
+        }
+        // hack around some config problems ... argh!
+        if ( proxyHost != null ) {
+            System.setProperty("proxySet","true");
+            if ( System.getProperty("http.proxyHost") == null ){
+                System.setProperty("http.proxyHost",proxyHost) ;
+            }
+        }
+        
+        if ( proxyPort != null ) {
+            if ( System.getProperty("http.proxyPort") == null ){
+                System.setProperty("http.proxyPort",proxyPort);
+            }
+        }
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest("using Proxy:" + System.getProperty("proxySet"));
+        }  
+    }
     
     /** Constructor for structure alignment visualization 
      currently disabled
@@ -347,7 +357,7 @@ implements SPICEFrame
         /// init Structure Panel
         
         //structurePanel.setLayout(new BoxLayout(structurePanel, BoxLayout.X_AXIS));
-        structurePanel.setPreferredSize(new Dimension(700, 300));
+        structurePanel.setPreferredSize(new Dimension(500, 300));
         structurePanel.setMinimumSize(new Dimension(200,200));
         //structurePanel.addMouseMotionListener(structurePanel);
         //structurePanel.addMouseListener(      structurePanel);
@@ -410,8 +420,8 @@ implements SPICEFrame
         
         seqScrollPane = new JScrollPane(seqField) ;
         seqScrollPane.setSize( 700, 30);
-        seqScrollPane.setPreferredSize(new Dimension(700, 30));;
-        seqScrollPane.setMinimumSize(  new Dimension(700, 30));;
+        //seqScrollPane.setPreferredSize(new Dimension(700, 30));;
+        //seqScrollPane.setMinimumSize(  new Dimension(700, 30));;
         
         seqSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                 sharedPanel,seqScrollPane);
