@@ -168,7 +168,8 @@ public class DAS_FeatureRetreive {
 	
     /** returns a List of Features */
     public ArrayList get_features() {
-	//System.out.println("DAS_FeatureRetrieve: returning features");
+	logger.finest("DAS_FeatureRetrieve: returning features");
+	logger.finest(features.toString());
 	return features;
     }
 

@@ -169,6 +169,7 @@ public class SeqFeatureCanvas
 
 
     public void paintComponent( Graphics g) {
+	//logger.entering(this.getClass().getName(),"paintComponent");
 	super.paintComponent(g); 	
 
 	
@@ -325,7 +326,7 @@ public class SeqFeatureCanvas
 	g2D.setComposite(oldComposite);
 
 	//	g.drawImage(imbuf,0,0,this.getBackground(),this);
-	
+	//logger.exiting(this.getClass().getName(),"paintComponent");
     }
 
 
@@ -367,7 +368,7 @@ public class SeqFeatureCanvas
 
 
 	    // check for type
-	    //logger.finest(feat);
+	    //logger.finest(feat.toString());
 	    if (oldFeature.getType().equals(feat.getType())){
 		// see if they are overlapping
 		if ( overlap(oldFeature,feat)) {
@@ -668,7 +669,7 @@ public class SeqFeatureCanvas
 
     /** check if mouse is over a segment and if it is, return the segment */
     private Segment getSegmentUnder( int seqpos,int lineNr){
-
+	//logger.entering(this.getClass().getName(),"getSegmentUnder", new Object[]{new Integer(seqpos),new Integer(lineNr)});
 	if ( ( lineNr < 0) || ( lineNr >= drawLines.size() ) ){
 	    return null ;
 	}
@@ -685,10 +686,12 @@ public class SeqFeatureCanvas
 		int end   = segment.getEnd()   -1 ;
 		
 		if ( (start <= seqpos) && (end >= seqpos) ) {
+		    //logger.exiting(this.getClass().getName(),"getSegmentUnder", new Object[]{segment});
 		    return segment ;
 		}
 	    }
 	}
+	//logger.exiting(this.getClass().getName(),"getSegmentUnder", new Object[]{null});
 	return null ;
     }
     
@@ -742,9 +745,7 @@ public class SeqFeatureCanvas
 
     public void mouseMoved(MouseEvent e)
     {	
-
-	
-
+       
 	//, int x, int y
 	int seqpos = getSeqPos(e);
 	int linenr = getLineNr(e);
@@ -758,8 +759,6 @@ public class SeqFeatureCanvas
 	// and the feature display
 	
 	//Feature feature = getFeatureAt(seqpos,linenr);
-
-
 
 	Segment segment = getSegmentUnder(seqpos,linenr);
 	if ( segment != null) {

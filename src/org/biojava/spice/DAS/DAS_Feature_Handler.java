@@ -62,11 +62,12 @@ public class DAS_Feature_Handler  extends DefaultHandler{
 		return features ;
 	}
 	void start_feature(String uri, String name, String qName, Attributes atts) {
-		feature = new HashMap() ;
-		String id 	= atts.getValue("id");
-		feature.put("id",id);
-		feature.put("dassource",dasCommand);
-		characterdata = "";
+	    feature = new HashMap() ;
+	    String id 	= atts.getValue("id");
+	    feature.put("id",id);
+	    feature.put("dassource",dasCommand);
+	    characterdata = "";
+
 	}
 	
 	void add_featuredata(String uri, String name, String qName) {
@@ -79,21 +80,21 @@ public class DAS_Feature_Handler  extends DefaultHandler{
 	public void startElement (String uri, String name, String qName, Attributes atts){
 	    //System.out.println("new element "+qName);
 		
-		if (qName.equals("FEATURE")) 
-			start_feature(uri,  name,  qName,  atts);
-		else if ( qName.equals("METHOD") || 
-				qName.equals("TYPE") ||
-				qName.equals("START") ||
-				qName.equals("END") ||
-				qName.equals("NOTE") ||
-				qName.equals("LINK") 
-				){
-			characterdata ="";
-			featurefield = qName ;
-		}
-				
+	    if (qName.equals("FEATURE")) 
+		start_feature(uri,  name,  qName,  atts);
+	    else if ( qName.equals("METHOD") || 
+		      qName.equals("TYPE") ||
+		      qName.equals("START") ||
+		      qName.equals("END") ||
+		      qName.equals("NOTE") ||
+		      qName.equals("LINK") 
+		      ){
+		characterdata ="";
+		featurefield = qName ;
+	    }
+	    
 	}
-	
+    
 	public void startDocument() {
 	    //System.out.println("start document");
 	}
@@ -115,7 +116,7 @@ public class DAS_Feature_Handler  extends DefaultHandler{
 			    add_featuredata(uri,name,qName);
 			}
 			else if ( qName.equals("FEATURE")) {
-			    //System.out.println("adding ffeature " + feature);
+			    System.out.println("adding ffeature " + feature);
 			    features.add(feature);
 			}
 		}

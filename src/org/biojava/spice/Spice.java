@@ -82,7 +82,7 @@ public class Spice extends Applet {
 	SpiceApplication appFrame = new SpiceApplication(pdbcode, configfileurl,registryurl) ;	
 	//System.out.println("init of SpiceApplication single structure mode");
 	appFrame.setTitle("SPICE") ;
-	appFrame.setSize(700, 700);
+	//appFrame.setSize(700, 700);
 	System.out.println("addMoreSpice calling show()");
 	appFrame.show();
 	
@@ -97,7 +97,7 @@ public class Spice extends Applet {
 	SpiceApplication appFrame = new SpiceApplication(pdb1, pdb2, configfileurl,registryurl) ;	
 	//System.out.println("init of SpiceApplication structure alignment mode");
 	appFrame.setTitle("SPICE") ;
-	appFrame.setSize(700, 700);
+	//appFrame.setSize(700, 700);
 	appFrame.show();
 
 	appFrame.addWindowListener(new WindowAdapter() {

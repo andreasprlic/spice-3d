@@ -178,7 +178,7 @@ public class SpiceApplication
 	
 	
 	LoggingPanel loggingPanel = new LoggingPanel(logger);
-	loggingPanel.getHandler().setLevel(Level.FINE);
+	loggingPanel.getHandler().setLevel(Level.FINER);
 	loggingPanel.show(null);
 	//ConsoleHandler handler = new ConsoleHandler();
 	//handler.setLevel(Level.FINEST);
@@ -299,7 +299,7 @@ public class SpiceApplication
 	/// init Structure Panel
 	structurePanel        = new StructurePanel(this);
 	//structurePanel.setLayout(new BoxLayout(structurePanel, BoxLayout.X_AXIS));
-	structurePanel.setPreferredSize(new Dimension(700, 700));
+	structurePanel.setPreferredSize(new Dimension(700, 300));
 	structurePanel.setMinimumSize(new Dimension(200,200));
 	//structurePanel.addMouseMotionListener(structurePanel);
 	//structurePanel.addMouseListener(      structurePanel);
@@ -376,7 +376,7 @@ public class SpiceApplication
                            chainPanel, dasPanel);
 	sharedPanel.setOneTouchExpandable(true);
 	//sharedPanel.setDividerLocation(150);
-	sharedPanel.setPreferredSize(new Dimension(300, 300));
+	sharedPanel.setPreferredSize(new Dimension(400, 400));
 	//sharedPanel.setOpaque(true);
 	//sharedPanel.setResizeWeight(0);	
 	sharedPanel.setBackground(Color.black);
@@ -1261,13 +1261,13 @@ public class SpiceApplication
 	    dascanv.select(seqpos);
 	}
 
-
+	/*
 	String cmd = getSelectStr( chain_number, seqpos) ;
 	if (cmd.equals("")) { return ; } 
 	cmd += " set display selected;" ;
 	structurePanel.executeCmd(cmd);
 	//structurePanel.forceRepaint();
-
+	*/
 	
 
     }

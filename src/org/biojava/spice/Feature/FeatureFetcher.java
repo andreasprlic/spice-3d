@@ -196,38 +196,10 @@ public class FeatureFetcher extends Thread
 	// reset and re-paint all features 
 	allFeatures = new ArrayList();
 
-	// now: extract the features and convert them so they can be used for spice...
+	// extract ALL the features and convert them so they can be used for spice...
 	for ( int i = 0 ; i < subthreads.length; i++ ) {
-	    DasResponse d = subthreads[i] ;
-	    String coordSys = d.getCoordinateSystem();
-	    //logger.finest(d);
-	    List features   = d.getFeatures() ;
-	    if ( coordSys.equals("UniProt")) {
-		for (int j=0; j<features.size();j++){
-		    HashMap feat = (HashMap)features.get(j);			
-		    //Feature feat = (Feature)features.get(j);			
-		    //logger.finest("got feature: "+feat);
-		    allFeatures.add(feat) ;		
-		} 
-	    } else if ( coordSys.equals("PDBresnum")) {
-		// covnert PDB resnum coordinates to UniProt coordinates ;
-		for (int j=0; j<features.size();j++){
-		    HashMap feat = (HashMap)features.get(j);			
-		    //Feature feat = (Feature)features.get(j);			
-		    
-		    //allFeatures.add(feat) ;		
-		    String startOrig = (String)feat.get("START");
-		    String endOrig   = (String)feat.get("END");
-		    //logger.finest("pdbresnum feature: "+feat);
-		    String startNew  = getUniProtCoord(startOrig,chain);
-		    String endNew    = getUniProtCoord(endOrig,chain);
-		    feat.put("START",startNew);
-		    feat.put("END",endNew);
-		    //logger.finest("uniprot feature: "+feat);
-		    allFeatures.add(feat) ;
-		    
-		} 
-	    }
+	    DasResponse d = subthreads[i] ;	    
+	    addFeaturesFromDasResponse(d);	   
 	}
 
 	finished = true ;
@@ -256,31 +228,22 @@ public class FeatureFetcher extends Thread
 
     }
 
-    /** if a sub-thread has finished this procedure is called and the
-     * features for this thread are set */
-    public synchronized void setFinished(int threadId, List features) {
-	//logger.finest("Got "+ features.size()+ " features from " + threadId);
-	DasResponse d = subthreads[threadId] ;
-	d.setFeatures(features);
+
+    /** add all features from a DasResponse to the locally stored ones 
+	PDBresnum features are mapped to UniProt coordinate system.
+    */
+    private synchronized void addFeaturesFromDasResponse(DasResponse d) {
 
 	String coordSys = d.getCoordinateSystem();
-
-	// paint feature.
-	// feature is being repainted once all features are finished ...
-	if ( coordSys.equals("UniProt")) {
+	//logger.finest(d);
+	List features   = d.getFeatures() ;
+	
+	if ( coordSys.equals("PDBresnum")) {
+	    // convert PDB resnum coordinates to UniProt coordinates 
+	    
 	    for (int j=0; j<features.size();j++){
 		HashMap feat = (HashMap)features.get(j);			
-		//Feature feat = (Feature)features.get(j);			
-		//logger.finest("got feature: "+feat);
-		allFeatures.add(feat) ;		
-	    } 
-	} else if ( coordSys.equals("PDBresnum")) {
-	    // covnert PDB resnum coordinates to UniProt coordinates ;
-	    for (int j=0; j<features.size();j++){
-		HashMap feat = (HashMap)features.get(j);			
-		//Feature feat = (Feature)features.get(j);			
 		
-		//allFeatures.add(feat) ;		
 		String startOrig = (String)feat.get("START");
 		String endOrig   = (String)feat.get("END");
 		//logger.finest("pdbresnum feature: "+feat);
@@ -289,11 +252,32 @@ public class FeatureFetcher extends Thread
 		feat.put("START",startNew);
 		feat.put("END",endNew);
 		//logger.finest("uniprot feature: "+feat);
-		allFeatures.add(feat) ;
-		
+		allFeatures.add(feat) ;		    
 	    } 
 	    
-	}
+	    
+	} else if ( coordSys.equals("UniProt")) {
+	    // UniProt features can stay in their coordinate system
+	    
+	    for (int j=0; j<features.size();j++){
+		HashMap feat = (HashMap)features.get(j);			
+		//Feature feat = (Feature)features.get(j);			
+		//logger.finest("got feature: "+feat);
+		allFeatures.add(feat) ;		
+	    } 
+	} 
+	notifyAll();
+    }
+
+    /** if a sub-thread has finished this procedure is called and the
+     * features for this thread are set */
+    public synchronized void setFinished(int threadId, List features) {
+	//logger.finest("Got "+ features.size()+ " features from " + threadId);
+	DasResponse d = subthreads[threadId] ;
+	d.setFeatures(features);
+
+	addFeaturesFromDasResponse(d);
+	
 	updateDisplay = true ;
 	notifyAll();	
     }
