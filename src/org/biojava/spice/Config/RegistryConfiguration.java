@@ -138,6 +138,7 @@ public class RegistryConfiguration
     public String[] getPDBFileExtensions() { return pdbFileExtensions ;}
     public void setPDBFileExtensions(String[] exts) { pdbFileExtensions = exts ; } 
     
+    /** test if a server is a UniProt vs PDBresnum alignment server */
     public boolean isSeqStrucAlignmentServer(SpiceDasSource source) {
 	boolean msdmapping = false ;
 	String[] coordsys = source.getCoordinateSystem() ;

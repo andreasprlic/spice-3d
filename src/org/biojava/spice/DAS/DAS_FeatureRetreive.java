@@ -112,7 +112,7 @@ public class DAS_FeatureRetreive {
 			try {
 			    xmlreader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",validation);
 			} catch (SAXNotRecognizedException e){
-			    //e.printStackTrace();
+			    e.printStackTrace();
 			    logger.log(Level.WARNING,"Cannot set load-external-dtd "+validation); 
 			    
 			}
@@ -129,7 +129,7 @@ public class DAS_FeatureRetreive {
 			    features = cont_handle.get_features();
 			} 
 			catch ( Exception e){
-			    //e.printStackTrace();
+			    e.printStackTrace();
 			    logger.log(Level.WARNING,"error while parsing response from "+ url);
 			    
 			    features = new ArrayList();
@@ -156,7 +156,7 @@ public class DAS_FeatureRetreive {
 	
 	
 	logger.finest("got connection: "+huc.getResponseMessage());
-	String contentEncoding = huc.getContentEncoding();
+	//String contentEncoding = huc.getContentEncoding();
 	inStream = huc.getInputStream();		
 	return inStream;
     
@@ -164,8 +164,8 @@ public class DAS_FeatureRetreive {
 	
     /** returns a List of Features */
     public ArrayList get_features() {
-	logger.finest("DAS_FeatureRetrieve: returning features");
-	logger.finest(features.toString());
+	//logger.finest("DAS_FeatureRetrieve: returning features");
+	//logger.finest(features.toString());
 	return features;
     }
 

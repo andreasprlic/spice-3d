@@ -34,7 +34,8 @@ import javax.xml.parsers.*                 ;
 import java.util.List                      ;
 import java.util.Iterator                  ;
 import java.util.logging.*                 ;
-
+import java.util.ArrayList ;
+import java.util.HashMap ;
 /**
  * performs a DAS - sequence request.
  * @author Andreas Prlic
@@ -46,7 +47,9 @@ public class DAS_SequenceRetreive {
     //String connection ;
     RegistryConfiguration config ;
     List sequenceServers  ;
-    String sequences ;
+
+    ArrayList sequencelist ;
+
 
     /**
      *  retrieve sequence for this sp_accession e.g. P00280
@@ -61,29 +64,62 @@ public class DAS_SequenceRetreive {
 	config = configuration ;
 	sequenceServers = config.getServers("sequence","UniProt");
 	//logger.finest(sequenceServers);
-	
+	sequencelist = new ArrayList() ;
 		
     }
+
+    // enable some sort of caching ...
+    
+    private String getSequenceFromMemory(String swissp_id) {
+	String sequence = null ;
+	for ( int i = 0 ; i < sequencelist.size() ; i++) {
+	    HashMap seq = (HashMap) sequencelist.get(i) ;
+	    String sp = (String) seq.get("id");
+	    if ( sp.equals(swissp_id)) {
+		sequence = (String) seq.get("sequence");
+		return sequence ;
+	    }
+	}
+	return sequence ;
+    }
+
+    /** store sequences in memory speed up so we do not have to make
+     * so many DAS calls ... */
+    private void addSequenceToMemory(String sequence,String swissp_id) {
+	HashMap h = new HashMap() ;
+	h.put("id",swissp_id);
+	h.put("sequence",sequence);
+	sequencelist.add(h) ;
+    }
+
 
     public String get_sequence(String sp_accession)
 	throws ConfigurationException
     {
 	
-	String sequence = "" ;
+	String sequence ;
+	
+	sequence = getSequenceFromMemory(sp_accession) ;
+	
+	if ( sequence != null )
+	    return sequence ;
 
+	    
+	sequence = "" ;
+	
 	//logger.finest("sequenceServers size: " + sequenceServers.size());
 	if ( sequenceServers.size() == 0) {
 	    Exception ex = new ConfigurationException("no UniProt sequence DAS servers found!");
 	    logger.throwing(this.getClass().getName(), "get_seqeunce", ex);
 	    throw (ConfigurationException)ex ;
 	}
-
+	
 
 	
 	Iterator iter = sequenceServers.iterator();
 	boolean gotSequence = false ;
 	while (iter.hasNext()){
-	    
+		
 	    if ( gotSequence ) break ;
 	    
 	    SpiceDasSource ds = (SpiceDasSource) iter.next();
@@ -114,7 +150,7 @@ public class DAS_SequenceRetreive {
 	    
 	    }		
 	}
-		
+	addSequenceToMemory(sequence,sp_accession);	
 	return sequence ;
     }
     private String retreiveSequence( String connstr) 

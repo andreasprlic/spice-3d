@@ -179,15 +179,16 @@ public class SpiceApplication
 	
 	
 	LoggingPanel loggingPanel = new LoggingPanel(logger);
-	loggingPanel.getHandler().setLevel(Level.INFO);
+	loggingPanel.getHandler().setLevel(Level.FINEST);	
 	loggingPanel.show(null);
+	logger.setLevel(Level.FINEST);
 	//ConsoleHandler handler = new ConsoleHandler();
 	//handler.setLevel(Level.FINEST);
 	//logger.addHandler(loggingPanel.getHandler());
 
 	System.setProperty("XMLVALIDATION",XMLVALIDATION);
 	int timeout = 15000;
-	logger.setLevel(Level.FINEST);
+
 	if (logger.isLoggable(Level.FINEST)) {
 	    logger.finest("setting timeouts to " + timeout);
 	}
@@ -507,9 +508,9 @@ public class SpiceApplication
     		
     	}
     	else if (type.equals("UniProt")) {
-	    //logger.info("load UniProt not implemented, yet!");
+	    logger.info("got uniprot");
 	    // connect to Uniprot -pdb alignment service, get PDB code and load it ...
-	    this.getUniprot(code);
+	    getUniprot(code);
 		
     	}
     	else if (type.equals("ENSP")) {
@@ -694,6 +695,7 @@ public class SpiceApplication
 	protein structure
     */
     public void getUniprot(String uniprot) {
+	logger.info("SpiceApplication getUniprot " + uniprot);
 	statusPanel.setLoading(true);
 	LoadUniProtThread thr = new LoadUniProtThread(this,uniprot) ;
 	thr.start();
@@ -802,7 +804,7 @@ public class SpiceApplication
 
 
 	structure = structure_ ; 
-
+	pdbcode = structure.getPDBCode();
 	//if (logger.isLoggable(Level.FINEST)) {
 	//System.out.println(structure.toPDB());	    
 	//}

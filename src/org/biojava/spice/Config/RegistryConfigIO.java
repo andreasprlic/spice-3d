@@ -136,7 +136,8 @@ public class RegistryConfigIO
 	    persistentconfig = null ;
 	    
 	    persistentconfig  = persistentc.load();
-	} catch ( javax.jnlp.UnavailableServiceException e) {
+	    //} catch ( javax.jnlp.UnavailableServiceException e) {
+	} catch ( Exception e) {
 	    System.err.println("an error occured during loading of local config");
 	    e.printStackTrace();
 	    logger.log(Level.WARNING,e.getMessage() + "while loading of local config");
@@ -144,7 +145,7 @@ public class RegistryConfigIO
 	    done = true ; 
 	    notifyAll(); 
 	    return ;
-	}
+	} 
 	
 	if ( persistentconfig != null ) {
 	    config = persistentconfig ;
@@ -161,8 +162,9 @@ public class RegistryConfigIO
 		long timelast    = lastContact.getTime();
 
 		if (( timenow - timelast ) < TIME_BETWEEN_UPDATES ) {
-		    doRegistryUpdate();
-		} else {
+		    logger.finest( "timenow " + timenow + " timelast " + timelast + " < " + TIME_BETWEEN_UPDATES);
+		    doRegistryUpdate(); 
+		} else { 
 		    logger.finest("last update < 1 day, using saved config");
 		}
 

@@ -150,7 +150,7 @@ final class LoggingTableModel extends Handler implements TableModel {
      * Construct the handler.
      */
     public LoggingTableModel() {
-        setLevel(Level.CONFIG);
+        //setLevel(Level.CONFIG);
         setFormatter(new SimpleFormatter());
     }
 

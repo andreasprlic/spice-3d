@@ -23,20 +23,30 @@
  */
 package org.biojava.spice ;
 
+import org.biojava.spice.DAS.DAS_UniProtFeeder ;
+import org.biojava.bio.structure.Structure ;
+import java.util.logging.*                             ;
+
+
 public class LoadUniProtThread 
     extends Thread {
 
     SPICEFrame spiceframe ;
-    boolean finished ;
-    String uniprot   ;
+    boolean    finished   ;
+    String     uniprot    ;
+    Logger     logger     ;
+
     public LoadUniProtThread(SPICEFrame master,String code) {
 	finished = false ;
 	spiceframe = master ;
 	
 	uniprot=code ;
+	logger = Logger.getLogger("org.biojava.spice");
+	logger.finest("init uniprot thread");
     } 
 
     public void run () {
+	logger.finest("running UniProtThread");
 	loadCompound() ;
     }
 
@@ -46,12 +56,17 @@ public class LoadUniProtThread
     public synchronized void loadCompound() {
 	
 	try {
+	    logger.finest("loading uniprot " + uniprot);
 	    //spiceframe.showStatus("Loading...Wait...",Color.red);
 	    spiceframe.setLoading(true);
 	    
 	    // do something ...
+	    DAS_UniProtFeeder dasUp = new DAS_UniProtFeeder (spiceframe.getConfiguration());
+	    Structure struc = dasUp.loadUniProt(uniprot);
+	    spiceframe.setStructure(struc);
 
 	    finished = true ;
+
 	    spiceframe.setLoading(false);
 	    notifyAll();
 
