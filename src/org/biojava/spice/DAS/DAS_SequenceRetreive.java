@@ -34,6 +34,8 @@ import org.xml.sax.*                       ;
 import javax.xml.parsers.*                 ;
 import java.util.List                      ;
 import java.util.Iterator                  ;
+import java.util.logging.*                 ;
+
 /**
  * performs a DAS - sequence request.
  * @author Andreas Prlic
@@ -51,15 +53,15 @@ public class DAS_SequenceRetreive {
      *  retrieve sequence for this sp_accession e.g. P00280
      */
 
-    
+    Logger logger ;
     public DAS_SequenceRetreive(RegistryConfiguration configuration) {
 	super();
 	// TODO Auto-generated constructor stub
-	
+	logger = Logger.getLogger("org.biojava.spice");
 	//connection = conns ;
 	config = configuration ;
 	sequenceServers = config.getServers("sequence","UniProt");
-	//System.out.println(sequenceServers);
+	//logger.finest(sequenceServers);
 	
 		
     }
@@ -70,9 +72,11 @@ public class DAS_SequenceRetreive {
 	
 	String sequence = "" ;
 
-	//System.out.println("sequenceServers size: " + sequenceServers.size());
+	//logger.finest("sequenceServers size: " + sequenceServers.size());
 	if ( sequenceServers.size() == 0) {
-	    throw new ConfigurationException("no UniProt sequence DAS servers found!");
+	    Exception ex = new ConfigurationException("no UniProt sequence DAS servers found!");
+	    logger.throwing(this.getClass().getName(), "get_seqeunce", ex);
+	    throw (ConfigurationException)ex ;
 	}
 
 
@@ -94,11 +98,16 @@ public class DAS_SequenceRetreive {
 	    }
 	    catch (Exception ex) {
 		//ex.printStackTrace();		
-		System.out.println(ex.getMessage());
+		logger.log(Level.WARNING,ex.getMessage() + " while retreiving "+connstr);
 		if ( iter.hasNext()) {
-		    System.out.println("error while retreiving sequence, trying other server");
-		} else 
-		    throw new ConfigurationException("could not retreive UniProt sequence from any available DAS sequence server");
+		    logger.log(Level.INFO,"error while retreiving sequence, trying other server");
+		} else {
+		    logger.log(Level.SEVERE,"could not retreive UniProt sequence from any available DAS sequence server");
+		    
+		    Exception exc = new ConfigurationException("could not retreive UniProt sequence from any available DAS sequence server");
+		    logger.throwing(this.getClass().getName(), "get_seqeunce", exc);
+		    throw (ConfigurationException)exc ;
+		}
 	    
 	    }		
 	}
@@ -109,7 +118,7 @@ public class DAS_SequenceRetreive {
 	throws Exception 
     {
 
-	System.out.println("trying: " + connstr) ;
+	logger.finest("trying: " + connstr) ;
 	URL dasUrl = new URL(connstr);
 	//DAS_httpConnector dhtp = new DAS_httpConnector() ;
 	
@@ -131,7 +140,8 @@ public class DAS_SequenceRetreive {
 	    saxParser =
 		spfactory.newSAXParser();
 	} catch (ParserConfigurationException e) {
-	    e.printStackTrace();
+	    //e.printStackTrace();
+	    logger.log(Level.FINER,"Uncaught exception", e);
 	}
 	
 	XMLReader xmlreader = saxParser.getXMLReader();
@@ -139,14 +149,17 @@ public class DAS_SequenceRetreive {
 	try {
 	    xmlreader.setFeature("http://xml.org/sax/features/validation", validate);
 	} catch (SAXException e) {
-	    System.err.println("Cannot set validation to " + validate); 
+	    logger.finer("Cannot set validation to " + validate); 
+	    logger.log(Level.FINER,"Uncaught exception", e);
 	}
 	
 	try {
 	    xmlreader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",validate);
 	} catch (SAXNotRecognizedException e){
 	    //e.printStackTrace();
-	    System.err.println("Cannot set load-external-dtd to" + validate); 
+	    logger.finer("Cannot set load-external-dtd to" + validate); 
+	    logger.log(Level.FINER,"Uncaught exception", e);
+	    //System.err.println("Cannot set load-external-dtd to" + validate); 
 	}
 	
 	
@@ -159,7 +172,8 @@ public class DAS_SequenceRetreive {
 	
 	xmlreader.parse(insource);
 	sequence = cont_handle.get_sequence();
-	System.out.println("Got sequence from DAS: " +sequence);
+	//logger.finest("Got sequence from DAS: " +sequence);
+	logger.exiting(this.getClass().getName(), "retreiveSequence",  sequence);
 	return sequence ;
     }
 
@@ -184,24 +198,24 @@ public class DAS_SequenceRetreive {
 		
 		//huc = proxyUrl.openConnection();
 		
-		System.out.println("opening "+url);
+		logger.finest("opening "+url);
 		huc = (HttpURLConnection) url.openConnection();
 		
 		
-		System.out.println(huc.getResponseMessage());
+		logger.finest(huc.getResponseMessage());
 		String contentEncoding = huc.getContentEncoding();
-		//System.out.println("encoding: " + contentEncoding);
-		//System.out.println("code:" + huc.getResponseCode());
-		//System.out.println("message:" + huc.getResponseMessage());
+		//logger.finest("encoding: " + contentEncoding);
+		//logger.finest("code:" + huc.getResponseCode());
+		//logger.finest("message:" + huc.getResponseMessage());
 		inStream = huc.getInputStream();
-		//System.out.println(inStream);
+		//logger.finest(inStream);
 		
 		//in	= new BufferedReader(new InputStreamReader(inStream));
 		
 		//String inputLine ;
 		//while (null != (inputLine = in.readLine()) ) {
 		
-		//System.out.println(inputLine);
+		//logger.finest(inputLine);
 		//}
 		
 			
@@ -209,6 +223,7 @@ public class DAS_SequenceRetreive {
 		}
 		catch ( Exception ex){
 			ex.printStackTrace();
+			logger.log(Level.WARNING,"Uncaught exception", ex);
 		}
 			
 		return inStream;

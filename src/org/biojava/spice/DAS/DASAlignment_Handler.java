@@ -22,22 +22,23 @@
  *
  */
 
-package org.biojava.spice;
+package org.biojava.spice                              ;
 
-import org.biojava.bio.structure.*;
-import org.biojava.bio.structure.io.PDBParseException ;
-import org.biojava.bio.program.das.dasalignment.* ;
-import org.biojava.bio.seq.ProteinTools;
-import org.biojava.bio.seq.io.SymbolTokenization ;
-import org.biojava.bio.symbol.Alphabet;
-import org.biojava.bio.symbol.Symbol;
-import org.biojava.bio.symbol.IllegalSymbolException;
-import org.biojava.bio.* ;
+import org.biojava.bio.structure.*                     ;
+import org.biojava.bio.structure.io.PDBParseException  ;
+import org.biojava.bio.program.das.dasalignment.*      ;
+import org.biojava.bio.seq.ProteinTools                ;
+import org.biojava.bio.seq.io.SymbolTokenization       ;
+import org.biojava.bio.symbol.Alphabet                 ;
+import org.biojava.bio.symbol.Symbol                   ;
+import org.biojava.bio.symbol.IllegalSymbolException   ;
+import org.biojava.bio.*                               ;
 
-import java.util.* ;
+import java.util.*                                     ;
 
+import java.util.logging.*                             ;
 
-import java.io.*;
+import java.io.*                                       ;
 
 /** connects to a UniPro to PDB alignment service and
  * creates a structure object that corresponds to a UniProt +
@@ -80,8 +81,11 @@ public class DASAlignment_Handler extends Thread
 
     /** set the connection commands */
 
-
+    Logger logger        ;
     public DASAlignment_Handler(DAS_PDBFeeder parent, Structure pdbcontainer, RegistryConfiguration configuration,String alignmentserv,String pdbid) {
+
+	logger = Logger.getLogger("org.biojava.spice");
+	
 	master = parent ;
 	pdb_container =  pdbcontainer;
 	sequencelist = new ArrayList() ;
@@ -109,7 +113,7 @@ public class DASAlignment_Handler extends Thread
     }
 
     public synchronized boolean downloadFinished() {
-	//System.out.println("alignmenthandler finished: "+downloadFinished);
+	//logger.finest("alignmenthandler finished: "+downloadFinished);
 	return downloadFinished;
     }
 
@@ -131,7 +135,7 @@ public class DASAlignment_Handler extends Thread
 	}
 	
 	//String chainId = getChainFromPDBCode(pdb_code);	
-	System.out.println("searching for alignment containing chain " + chainId);
+	logger.finest("searching for alignment containing chain " + chainId);
 	*/
 	pdb_code = pdb_code.toLowerCase() ;
 	//pdb_container = new Simple_PDB_Container() ;
@@ -145,10 +149,10 @@ public class DASAlignment_Handler extends Thread
 	try{
 	    alignments = dasc.getAlignments(pdb_code);	 
 
-	    System.out.println("DASAlignmentHandler: got "+ alignments.length +" alignment(s):");
+	    logger.finest("DASAlignmentHandler: got "+ alignments.length +" alignment(s):");
 
 	    for ( int i=0;i<alignments.length;i++){
-		System.out.println("alignment "+i+" " + alignments[i]);
+		logger.finest("alignment "+i+" " + alignments[i]);
 		
 	    }
 
@@ -160,7 +164,7 @@ public class DASAlignment_Handler extends Thread
 	}
 	downloadFinished = true ;
 	master.setMappingDone(true) ;
-	//System.out.println("DASAlignmentHandler: notifyAll()");
+	//logger.finest("DASAlignmentHandler: notifyAll()");
 	
 	notifyAll();
 
@@ -183,12 +187,12 @@ public class DASAlignment_Handler extends Thread
 	//Simple_PDB_Container conti = new Simple_PDB_Container();
 	for (int i=0;i<alignments.length;i++) {
 	    Alignment ali = alignments[i] ;
-	    System.out.println(ali);
+	    logger.finest(ali.toString());
 	    Chain current_chain = initializeChain(ali);
 	    pdb_container.addChain(current_chain) ;
  
 	}
-	//System.out.println("DASAlignment_Handler: convertToPDB_Container end");
+	//logger.finest("DASAlignment_Handler: convertToPDB_Container end");
 
 
 
@@ -266,10 +270,10 @@ public class DASAlignment_Handler extends Thread
 		sequence              = seq_das.get_sequence(swissp_id);
 	    } catch ( ConfigurationException e) {
 		e.printStackTrace();
-		System.out.println("could not retreive any sequence from DAS servers");
+		logger.log(Level.SEVERE,"could not retreive any sequence from DAS servers");
 		return "";
 	    }
-	    //System.out.println("got sequence using DAS: " + sequence);
+	    //logger.finest("got sequence using DAS: " + sequence);
 	    addSequenceToMemory(sequence,swissp_id);
 	}
 
@@ -287,8 +291,8 @@ public class DASAlignment_Handler extends Thread
 	Annotation struobject = getAlignmentObject(ali,STRUCTUREDATABASE);
 	String swissp_id = (String) object.getProperty("dbAccessionId") ;
 	String sequence  = getDASSequence(swissp_id);
-	//System.out.println(swissp_id);
-	//System.out.println(sequence);
+	//logger.finest(swissp_id);
+	//logger.finest(sequence);
 	
 	Chain chain =  new ChainImpl();
 	String chainname = (String) struobject.getProperty("dbAccessionId");
@@ -318,9 +322,9 @@ public class DASAlignment_Handler extends Thread
 	    }
 	    chain.addGroup(s_amino) ;	    
 	} 
-	//System.out.println(chain);
+	//logger.finest(chain);
 	Chain retchain = addChainAlignment(chain,ali);
-	//System.out.println(retchain);
+	//logger.finest(retchain);
 	return retchain ;
 	
     }
@@ -341,10 +345,10 @@ public class DASAlignment_Handler extends Thread
 
 
     private String getChainFromPDBCode(String pdbcode) {
-	//System.out.println("DASAlignment_Handler: getChainFromPDBCode" + pdbcode);
+	//logger.finest("DASAlignment_Handler: getChainFromPDBCode" + pdbcode);
 	String[] spl = pdbcode.split("\\.");
 	String chain = spl[1] ;
-	//System.out.println("DASAlignment_Handler: getChainFromPDBCode chain:" + chain);
+	//logger.finest("DASAlignment_Handler: getChainFromPDBCode chain:" + chain);
 	return chain ;
     }
 
@@ -352,15 +356,15 @@ public class DASAlignment_Handler extends Thread
     private synchronized Chain addChainAlignment(Chain chain, Alignment ali) 
 	throws DASException
     {
-	//System.out.println("addChainAlignment");
+	//logger.finest("addChainAlignment");
 
 	// go over all blocks of alignment and join pdb info ...
 	Annotation seq_object   = getAlignmentObject(ali,SEQUENCEDATABASE );
 	
 	Annotation stru_object  = getAlignmentObject(ali,STRUCTUREDATABASE);
 	
-	//System.out.println(seq_object.get("id"));
-	//System.out.println(stru_object.get("id"));
+	//logger.finest(seq_object.get("id"));
+	//logger.finest(stru_object.get("id"));
 
 	//Simple_AminoAcid_Map current_amino = null ;
 	
@@ -383,7 +387,7 @@ public class DASAlignment_Handler extends Thread
 					  Annotation stru_obj) 
 	throws DASException
     {
-	//System.out.println("mapSegment");
+	//logger.finest("mapSegment");
 	// order segmetns
 	// HashMap 0 = refers to seq
 	// hashMap 1 = refers to struct
@@ -394,7 +398,7 @@ public class DASAlignment_Handler extends Thread
 	String stru_id = (String)stru_obj.getProperty("intObjectId");
 
 	if ( segments.size() <2) {
-	    System.out.println("<2 segments in block. skipping");
+	    logger.finest("<2 segments in block. skipping");
 	    return ;
 	}
 
@@ -430,7 +434,7 @@ public class DASAlignment_Handler extends Thread
 	
 	
 	for ( int i = 0 ; i < segsize ; i++) {
-	    //System.out.println("i "+i);
+	    //logger.finest("i "+i);
 	    aminosegment[i] = (AminoAcid) chain.getGroup(i+seqstart-1);
 	}
 	
@@ -441,7 +445,7 @@ public class DASAlignment_Handler extends Thread
 	try {
 	    strustart = Integer.parseInt((String)arr[1].getProperty("start"));
 	    struend   = Integer.parseInt((String)arr[1].getProperty("end"));
-	    //System.out.println(strustart + " " + struend);
+	    //logger.finest(strustart + " " + struend);
 	} catch (Exception e) {
 	    // if this does not work  there is an insertion code
 
@@ -449,7 +453,7 @@ public class DASAlignment_Handler extends Thread
 	    // -> segment must be of size one.
 	    //  alignment from seq to structure HAS TO BE provided as a one to one mapping
 	   
-	    //System.out.println("CAUGHT!!!!! conversion of >"+ (String)arr[1].get("start") + "<") ;
+	    //logger.finest("CAUGHT!!!!! conversion of >"+ (String)arr[1].get("start") + "<") ;
 	    //e.printStackTrace();
 
 	    if ( segsize != 1 ) {
@@ -459,21 +463,21 @@ public class DASAlignment_Handler extends Thread
 	    String pdbcode = (String)arr[1].getProperty("start") ;
 	    if ( pdbcode.equals("-")) {
 		// not mapped ...
-		//System.out.println("skipping char - at position " + pdbcode);
+		//logger.finest("skipping char - at position " + pdbcode);
 		return ;
 	    }
 
 	    //e.printStackTrace();
-	    System.out.println("Insertion Code ! setting new pdbcode "+pdbcode) ;
+	    logger.finest("Insertion Code ! setting new pdbcode "+pdbcode) ;
 	    aminosegment[0].setPDBCode(pdbcode);
 	    return ;
 	}
 	
-	//System.out.println("segsize " + segsize);
+	//logger.finest("segsize " + segsize);
 	for ( int i =0 ; i< segsize; i++) {
 	    
 	    String pdbcode = Integer.toString(strustart + i) ;
-	    //System.out.println(i + " " + pdbcode);
+	    //logger.finest(i + " " + pdbcode);
 	    aminosegment[i].setPDBCode(pdbcode) ;
 	}
        	

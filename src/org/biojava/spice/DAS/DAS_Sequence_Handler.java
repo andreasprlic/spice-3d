@@ -25,7 +25,8 @@ package org.biojava.spice;
 
 
 import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.Attributes;
+import org.xml.sax.Attributes            ;
+import java.util.logging.*                ;
 
 /**
  * a class that parses the XML response of a DAS - sequence command.
@@ -93,8 +94,10 @@ public class DAS_Sequence_Handler extends DefaultHandler {
 	}
 	
 	public String get_sequence() {
-		if ( length != sequence.length()) {		
-			System.err.println("Sequence does not match specified length!");
+		if ( length != sequence.length()) {	
+		    Logger logger  = Logger.getLogger("org.biojava.spice");
+		    logger.warning("Sequence does not match specified length!");
+			
 		}
 		
 		return sequence;

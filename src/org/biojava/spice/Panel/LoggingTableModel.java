@@ -234,13 +234,13 @@ final class LoggingTableModel extends Handler implements TableModel {
         fireTableChanged(new TableModelEvent(this, TableModelEvent.HEADER_ROW));
         assert isColumnVisible(index) == visible : visible;
     }
-
+    
     /**
      * Publish a {@link LogRecord}. If the maximal capacity has been reached,
      * the oldiest record will be discarted.
      */
     public synchronized void publish(final LogRecord record) {
-	System.out.println("LoggingTable publish");
+	//System.out.println("LoggingTable publish");
 	if (!isLoggable(record)) {
 	    return;
 	}
@@ -274,7 +274,7 @@ final class LoggingTableModel extends Handler implements TableModel {
      *            not the record number from the first record.
      */
     public synchronized LogRecord getLogRecord(int row) {
-	System.out.println("LoggingTableModel getLogRecord");
+	//System.out.println("LoggingTableModel getLogRecord");
         assert row < getRowCount();
         if (recordCount > capacity) {
             row += (recordCount % capacity);
@@ -324,7 +324,7 @@ final class LoggingTableModel extends Handler implements TableModel {
      * Returns the value for the cell at <code>columnIndex</code> and <code>rowIndex</code>.
      */ 
     public synchronized Object getValueAt(final int rowIndex, final int columnIndex) {
-	System.out.println("LoggingTableModel getValue at");
+	//System.out.println("LoggingTableModel getValue at");
         final LogRecord record = getLogRecord(rowIndex);
         String[] row = (String[]) cache.get(record);
         if (row == null) {

@@ -25,15 +25,15 @@
 
 package org.biojava.spice ;
 
-import java.util.Map ;
-import java.util.HashMap ;
-import java.util.List  ;
-import java.util.ArrayList ;
-import java.net.URL;
-import java.net.MalformedURLException;
+import java.util.Map                   ;
+import java.util.HashMap               ;
+import java.util.List                  ;
+import java.util.ArrayList             ;
+import java.net.URL                    ;
+import java.net.MalformedURLException  ;
 
-import java.awt.Color ;
-
+import java.awt.Color                  ;
+import java.util.logging.*             ;
 import org.biojava.bio.structure.Chain ;
 import org.biojava.bio.structure.Group ;
 
@@ -56,13 +56,14 @@ public class FeatureFetcher extends Thread
     
     String[] txtColors;
     Color [] entColors ;
-
+    Logger logger        ;
     /** @param config the SPICE config Map
      * @param sp_id SwissProt ID
      * @param pdb_id PDB ID
      * @param c Chain object to which these features should be linked
      */
     public FeatureFetcher(SPICEFrame spice, RegistryConfiguration config, String sp_id, String pdb_id, Chain c ) {
+	logger = Logger.getLogger("org.biojava.spice");
 	parent      = spice ;
 	finished    = false ;
 	spId        = sp_id ;
@@ -96,7 +97,7 @@ public class FeatureFetcher extends Thread
 	doDasCommunication() ;
 	
 	List l = getFeatures();
-	System.out.println("setting Features in spice");
+	logger.finest("setting Features in spice");
 	parent.setFeatures(spId,l);
     }
 
@@ -109,7 +110,7 @@ public class FeatureFetcher extends Thread
 	
 	
 	int nrservers = featservs.size() + pdbresservs.size();
-	System.out.println("total: " + nrservers + "feature servers");
+	logger.finest("total: " + nrservers + "feature servers");
 	subthreads = new DasResponse[nrservers];
 	
 	int responsecounter = 0 ;
@@ -131,7 +132,7 @@ public class FeatureFetcher extends Thread
 		responsecounter++;
 		continue ;
 	    }
-	    System.out.println("starting thread");
+	    logger.finest("starting thread");
 	    SingleFeatureThread sft = new SingleFeatureThread ( this ,spUrl,responsecounter);
 	    sft.run();
 	    responsecounter++;
@@ -155,7 +156,7 @@ public class FeatureFetcher extends Thread
 		responsecounter++;
 		continue ;
 	    }
-	    System.out.println("starting thread");
+	    logger.finest("starting thread");
 	    SingleFeatureThread sft = new SingleFeatureThread ( this ,spUrl,responsecounter);
 	    sft.run();
 	    responsecounter++;
@@ -165,15 +166,15 @@ public class FeatureFetcher extends Thread
 	boolean done = false ;
 	while ( ! done) {
 	    done = allFinished();
-	    System.out.println("FeatureFetcher waiting for features to be retreived: "+done);
+	    logger.finest("FeatureFetcher waiting for features to be retreived: "+done);
 	    try {
 		wait(300);
-		System.out.println("FeatureFetcher waiting "+done);
+		logger.finest("FeatureFetcher waiting "+done);
 	    } catch (InterruptedException e) {
 		e.printStackTrace();
 		done = true ;
 	    }
-	    //System.out.println("getNewFeatures :in waitloop");
+	    //logger.finest("getNewFeatures :in waitloop");
 	}
 
 
@@ -181,13 +182,13 @@ public class FeatureFetcher extends Thread
 	for ( int i = 0 ; i < subthreads.length; i++ ) {
 	    DasResponse d = subthreads[i] ;
 	    String coordSys = d.getCoordinateSystem();
-	    //System.out.println(d);
+	    //logger.finest(d);
 	    List features   = d.getFeatures() ;
 	    if ( coordSys.equals("UniProt")) {
 		for (int j=0; j<features.size();j++){
 		    HashMap feat = (HashMap)features.get(j);			
 		    //Feature feat = (Feature)features.get(j);			
-		    //System.out.println("got feature: "+feat);
+		    //logger.finest("got feature: "+feat);
 		    allFeatures.add(feat) ;		
 		} 
 	    } else if ( coordSys.equals("PDBresnum")) {
@@ -199,12 +200,12 @@ public class FeatureFetcher extends Thread
 		    //allFeatures.add(feat) ;		
 		    String startOrig = (String)feat.get("START");
 		    String endOrig   = (String)feat.get("END");
-		    //System.out.println("pdbresnum feature: "+feat);
+		    //logger.finest("pdbresnum feature: "+feat);
 		    String startNew  = getUniProtCoord(startOrig,chain);
 		    String endNew    = getUniProtCoord(endOrig,chain);
 		    feat.put("START",startNew);
 		    feat.put("END",endNew);
-		    //System.out.println("uniprot feature: "+feat);
+		    //logger.finest("uniprot feature: "+feat);
 		    allFeatures.add(feat) ;
 		    
 		} 
@@ -226,7 +227,7 @@ public class FeatureFetcher extends Thread
 
 	    String pdbCode = g.getPDBCode() ;
 	    if ( g.has3D()){
-		//System.out.println(g);
+		//logger.finest(g);
 		if ( pdbCode.equals(pdbResNumb)) {
 		    return "" + ( i+1);
 		}
@@ -240,7 +241,7 @@ public class FeatureFetcher extends Thread
     /** if a sub-thread has finished this procedure is called and the
      * features for this thread are set */
     public synchronized void setFinished(int threadId, List features) {
-	//System.out.println("Got "+ features.size()+ " features from " + threadId);
+	//logger.finest("Got "+ features.size()+ " features from " + threadId);
 	DasResponse d = subthreads[threadId] ;
 	d.setFeatures(features);
 	notifyAll();	
@@ -270,7 +271,7 @@ public class FeatureFetcher extends Thread
 
     private Feature getNewFeat(Map currentFeatureMap) {
 	Feature feat = new Feature();
-	//System.out.println(currentFeatureMap);
+	//logger.finest(currentFeatureMap);
 	feat.setSource((String)currentFeatureMap.get("dassource"));
 	feat.setName(  (String)currentFeatureMap.get("NAME"));
 	feat.setType(  (String)currentFeatureMap.get("TYPE"));
@@ -430,7 +431,7 @@ class DasResponse{
     }
 
     public synchronized void setFeatures(List feats) {
-	//System.out.println(feats);
+	//logger.finest(feats);
 	// sort features ...
 	finished = true ;
 	Map[] featarr = (Map[]) feats.toArray(new Map[feats.size()]);
@@ -438,7 +439,7 @@ class DasResponse{
 	java.util.Arrays.sort(featarr,comp) ; 
 	
 	List sortfeats = java.util.Arrays.asList(featarr);
-	//System.out.println(sortfeats); 
+	//logger.finest(sortfeats); 
 	features = sortfeats; 
 	
 	//features = feats;
@@ -469,7 +470,7 @@ class SingleFeatureThread
 	is told that threadid has finised
      */
     public SingleFeatureThread(FeatureFetcher parent, URL dascmd,int threadid) {
-	//System.out.println("init new thread " + threadid + " " + dascmd);
+	//logger.finest("init new thread " + threadid + " " + dascmd);
 	dascommand = dascmd ;
 	parentfetcher = parent ;
 	myId = threadid ;
@@ -483,15 +484,15 @@ class SingleFeatureThread
 	
 	DAS_FeatureRetreive ftmp = new DAS_FeatureRetreive(dascommand);
 	ArrayList features = ftmp.get_features();
-	//System.out.println("doDasConnection got " + features.size() + " features") ;
+	//logger.finest("doDasConnection got " + features.size() + " features") ;
 	//new ArrayList();
 	//ArrayList tmp = 
 	//for (int i=0; i<tmp.size();i++){
 	//   HashMap feat = (HashMap)tmp.get(i);			
-	    //System.out.println("got feature: "+feat);
+	    //logger.finest("got feature: "+feat);
 	//    features.add(feat) ;		
 	//} 
-	//System.out.println("done "+ dascommand);
+	//logger.finest("done "+ dascommand);
 	parentfetcher.setFinished(myId,features);
 	notifyAll();
     }

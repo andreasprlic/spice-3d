@@ -35,7 +35,7 @@ import org.xml.sax.helpers.*               ;
 import org.xml.sax.*                       ;
 import javax.xml.parsers.*                 ;
 
-
+import java.util.logging.*                 ;
 
 import org.biojava.utils.xml.*             ; 
 
@@ -47,10 +47,14 @@ public class PersistentConfig
 {
 
     PersistenceService ps; 
-    BasicService bs; 
-    
+    BasicService bs      ; 
+    Logger logger        ;
     public PersistentConfig(){
-	System.out.println("init PersistentConfig");
+
+	
+	logger = Logger.getLogger("org.biojava.spice");
+	
+	logger.finest("init PersistentConfig");
 	try { 
 	    ps = (PersistenceService)ServiceManager.lookup("javax.jnlp.PersistenceService"); 
 	    bs = (BasicService)ServiceManager.lookup("javax.jnlp.BasicService"); 
@@ -67,17 +71,19 @@ public class PersistentConfig
 	    // Persistent Service is available, running as javaws
 	    saveWebStart(config) ;
 	} else {
-	    System.out.println("can not save using persistentservice!");
+	    logger.log(Level.WARNING,"can not save using persistentservice!");
 	}
     }
     
     private void saveWebStart(RegistryConfiguration config ){
-	System.out.println("saving webstart");
+	//System.out.println("saving webstart");
+	logger.finest("saving using java webstart");
+	
 	try {
 	    
             // find all the muffins for our URL
             URL codebase = bs.getCodeBase(); 
-	    System.out.println("codebase" + codebase);
+	    logger.finest("codebase" + codebase);
 
 	    FileContents fc = null ;
 
@@ -86,12 +92,12 @@ public class PersistentConfig
 		// test if persistent storage already created
 
 		fc = ps.get(codebase);
-		System.out.println("deleting old muffin");
+		logger.finest("deleting old muffin");
 		ps.delete(codebase);
 		
 	    } catch (IOException e){
 	    }
-	    System.out.println("creating new muffin");
+	    logger.finest("creating new muffin");
 	    // seems not, create it first
 	    ps.create(codebase,3000000);
 	    fc = ps.get(codebase);
@@ -105,7 +111,7 @@ public class PersistentConfig
 	    XMLWriter xw = config.toXML(pw);
 	   
 	    //sw.flush();
-	    //System.out.println(sw.toString());
+	    //logger.finest(sw.toString());
 	    //sw.close();
 	    //xw.flush();
 	    pw.flush();
@@ -130,7 +136,7 @@ public class PersistentConfig
 	    // Persistent Service is available, running as javaws
 	    return loadWebStart() ;
 	} else {
-	    System.out.println("can not load from persistentservice!");
+	    logger.log(Level.WARNING,"can not load from persistentservice!");
 	}
 	return null ;
     }
@@ -143,12 +149,12 @@ public class PersistentConfig
 	RegistryConfiguration config = null;
 	try { 
 	    URL codebase = bs.getCodeBase(); 
-	    System.out.println("codebase" + codebase);
+	    logger.finest("codebase" + codebase);
 	    
 	    FileContents fc = null ;
 	    
 	    try {
-		System.out.println("trying to get old muffin");
+		logger.finest("trying to get old muffin");
 		fc = ps.get(codebase);
 	    } catch (IOException e){
 		// has not been created, so nothing can be loaded ...

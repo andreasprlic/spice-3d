@@ -37,16 +37,14 @@ import java.util.Iterator ;
 import java.util.ArrayList ;
 import java.util.List ;
 
+import org.xml.sax.*                           ;
+import org.xml.sax.helpers.XMLReaderFactory    ;
+import java.util.Calendar                      ;
 
 
-import org.xml.sax.*;
-import org.xml.sax.helpers.XMLReaderFactory;
-import java.util.Calendar;
-
-
-import org.xml.sax.XMLReader;
-
-import java.awt.Color;
+import org.xml.sax.XMLReader                   ;
+import java.util.logging.*                     ;
+import java.awt.Color                          ;
 
 
 
@@ -71,9 +69,10 @@ public class DAS_PDBFeeder
     boolean structureDone ;
     boolean mappingDone   ;
     RegistryConfiguration config ;
-
+    Logger logger        ;
     //public DAS_PDBFeeder( String struccommand,String seqcommand, String aligcommand) {
     public DAS_PDBFeeder( RegistryConfiguration configuration) {
+	logger = Logger.getLogger("org.biojava.spice");
 	structureDone = false ;
 	mappingDone   = false ;
 	config = configuration ;
@@ -96,7 +95,7 @@ public class DAS_PDBFeeder
 	    SpiceDasSource ads = (SpiceDasSource)aligservers.get(0);	    
 	    dasalignmentcommand  = ads.getUrl() +  "alignment?query=" ; 
 	} else {
-	    System.err.println("no alignment server found!, unable to map sequence to structure");
+	    logger.log(Level.SEVERE,"no alignment server found!, unable to map sequence to structure");
 	    dasalignmentcommand = "";
 	}
 
@@ -116,7 +115,7 @@ public class DAS_PDBFeeder
     }
 
     public synchronized void setMappingDone(boolean flag) {
-	System.out.println("setMappingDone " + flag);
+	logger.finest("setMappingDone " + flag);
 	mappingDone = flag ;
     }
 
@@ -160,13 +159,13 @@ public class DAS_PDBFeeder
 	    // then contact the alignment server to obtain the alignment
 	    // and find out to which UniProt sequence this chain mapps to ...
 
-	    System.out.println(getTimeStamp() );
+	    logger.finest(getTimeStamp() );
 	    DASAlignment_Handler dasali = new DASAlignment_Handler(this,pdb_container,config,dasalignmentcommand,pdb_id);
 	   
 	    dasali.start();
 	    
 	    
-	    System.out.println("contacting DAS servers, please be patient... " + getTimeStamp() );
+	    logger.finest("contacting DAS servers, please be patient... " + getTimeStamp() );
 
 	    
 	    //stru_finished    = structure_handler.downloadFinished();
@@ -177,8 +176,8 @@ public class DAS_PDBFeeder
 	
 		
 		try {
-		    //System.out.println("DAS_PDBFeeder :xin waitloop");
-		    //System.out.println(structureDone + " " + mappingDone);
+		    //logger.finest("DAS_PDBFeeder :xin waitloop");
+		    //logger.finest(structureDone + " " + mappingDone);
 		    //sleep(10);
 		    wait(30);
 		   
@@ -204,9 +203,9 @@ public class DAS_PDBFeeder
 	    //
 	    // 
 
-	    System.out.println("download finished " + getTimeStamp() );
-	    System.out.println("pdb_container:" + pdb_container);
-	    System.out.println("pdb_structure:" + pdb_structure);
+	    logger.finest("download finished " + getTimeStamp() );
+	    logger.finest("pdb_container:" + pdb_container.toString());
+	    logger.finest("pdb_structure:" + pdb_structure.toString());
 
 	    
 
@@ -215,14 +214,14 @@ public class DAS_PDBFeeder
 
 	    // and join everything into a combined datastructure ...
 	    joinWith(pdb_structure);
-	    System.out.println("joining of data finished " +getTimeStamp() );
-	    System.out.println(pdb_container);
+	    logger.finest("joining of data finished " +getTimeStamp() );
+	    logger.finest(pdb_container.toString());
 
 	    //java.util.List chains = pdb_container.getChains(0);
 	    //for ( int i =0;i<chains.size();i++){
-	    //System.out.println("Displaying chain: " + i);
+	    //logger.finest("Displaying chain: " + i);
 	    //Chain c = (Chain)chains.get(i);
-	    //System.out.println(c);
+	    //logger.finest(c);
 	    //}
 	    //pdb_container = dasali.getPDBContainer() ;
        
@@ -231,8 +230,8 @@ public class DAS_PDBFeeder
 
 	} 
 	catch (IOException e) {
-	    e.printStackTrace();
-	    System.err.println("I/O exception reading XML document");
+	    //e.printStackTrace();
+	    logger.log(Level.SEVERE,"I/O exception reading XML document",e);
 	} 
 	/*
 	catch (SAXException e) {
@@ -259,8 +258,8 @@ public class DAS_PDBFeeder
     public void joinWith( Structure pdb_data) 
 	throws IOException
     {
-	System.out.println("join With-----------------------------");
-	System.out.println("pdb_data size: " + pdb_data.size());
+	logger.finest("join With-----------------------------");
+	logger.finest("pdb_data size: " + pdb_data.size());
 	try {
 	    // for every chain ...
 	    for ( int i = 0 ; i< pdb_data.size() ; i++) {
@@ -268,7 +267,7 @@ public class DAS_PDBFeeder
 		String chainName = c.getName();
 		
 		Chain mapped_chain ;
-		System.out.println("trying to map chain " +i + " " + chainName);
+		logger.finest("trying to map chain " +i + " " + chainName);
 		try {
 		    mapped_chain = getMatchingChain(pdb_container, chainName);
 		} catch (DASException e) {
@@ -277,12 +276,12 @@ public class DAS_PDBFeeder
 		    pdb_container.addChain(c);
 		    continue ;
 		}
-		//System.out.println(c+" " +mapped_chain);
+		//logger.finest(c+" " +mapped_chain);
 		for (int j = 0 ; j < c.getLength(); j ++) {
 
 		    Group amino = c.getGroup(j);
 		    if ( amino == null ) {
-			System.err.println("why is amino ("+j+", chain "+c.getName()+")== null??");
+			logger.finer("why is amino ("+j+", chain "+c.getName()+")== null??");
 			continue ;
 		    }
 
@@ -295,12 +294,12 @@ public class DAS_PDBFeeder
 			try {
 			    mappedamino = getMatchingGroup (mapped_chain,amino.getPDBCode());
 			} catch ( DASException e) {
-			    System.out.println("could not find residue nr"  +amino.getPDBCode() + " in chain "  + mapped_chain.getName() );
+			    logger.finest("could not find residue nr"  +amino.getPDBCode() + " in chain "  + mapped_chain.getName() );
 			    continue ;
 			}
 		    
 			Iterator iter = amino.iterator() ;
-			//System.out.println("amino size" + amino + " " +amino.size());
+			//logger.finest("amino size" + amino + " " +amino.size());
 			while ( iter.hasNext() ) {
 			    Atom a = (Atom) iter.next() ;
 			    mappedamino.addAtom(a);
@@ -335,7 +334,7 @@ public class DAS_PDBFeeder
 
 	for ( int i = 0 ; i < pdbcontainer.size() ; i++) {
 	    Chain c = pdbcontainer.getChain(i) ;
-	    //System.out.println("get matching chain" + c.getName() + " " + chainID); 
+	    //logger.finest("get matching chain" + c.getName() + " " + chainID); 
 	    if ( c.getName().equals(chainID)) {
 		return c;
 	    }
@@ -350,11 +349,11 @@ public class DAS_PDBFeeder
 	throws DASException
     {
 
-	//System.out.println("getMatchingAmino: "+ pdbcode + "in chain:"+mapped_chain.getName());
+	//logger.finest("getMatchingAmino: "+ pdbcode + "in chain:"+mapped_chain.getName());
 
 	for (int j = 0 ; j < mapped_chain.getLength(); j ++) {
 	    Group amino = mapped_chain.getGroup(j);
-	    //System.out.println(j+ " " + amino) ;
+	    //logger.finest(j+ " " + amino) ;
 	    
 	    String pdbtmp = amino.getPDBCode();
 	    if (pdbtmp == null) continue ;

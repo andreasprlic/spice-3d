@@ -39,13 +39,13 @@ import java.util.List ;
 import java.util.ArrayList ;
 import java.util.HashMap ;
 
-import java.io.* ;
-import java.util.Iterator ;
-import java.util.Date ;
-import java.util.Calendar ;
- 
-import javax.swing.JPanel ;
-import javax.swing.JLabel ;
+import java.io.*             ;
+import java.util.Iterator    ;
+import java.util.Date        ;
+import java.util.Calendar    ;
+import java.util.logging.*   ;
+import javax.swing.JPanel    ;
+import javax.swing.JLabel    ;
 import javax.swing.ImageIcon ;
 
 
@@ -97,13 +97,13 @@ public class SeqFeatureCanvas
     // highliting
     int seqOldPos ;
     Font plainFont ;
-
+    Logger logger        ;
     /**
      * 
      */
     public SeqFeatureCanvas(SPICEFrame spicefr ) {
 	super();
-
+	logger = Logger.getLogger("org.biojava.spice");
 	// TODO Auto-generated constructor stub
 	Dimension dstruc=this.getSize();
 	//imbuf    = this.createImage(dstruc.width, dstruc.height);
@@ -145,7 +145,7 @@ public class SeqFeatureCanvas
 
 
     public void setFeatures( List feats) {
-	//System.out.println("DasCanv setFeatures");
+	//logger.finest("DasCanv setFeatures");
 	//features = feats ;
 	// check if features are overlapping, if yes, add to a new line 
 
@@ -161,7 +161,7 @@ public class SeqFeatureCanvas
 	    String ds =feat.getSource();
 	    // check if new feature source
 	    if ( ! featureSource.equals(ds) ) {
-		//System.out.println("new DAS source " + ds );
+		//logger.finest("new DAS source " + ds );
 		
 		if ( ! start) {
 		    drawLines.add(currentLine);
@@ -179,18 +179,18 @@ public class SeqFeatureCanvas
 
 
 	    // check for type
-	    //System.out.println(feat);
+	    //logger.finest(feat);
 	    if (oldFeature.getType().equals(feat.getType())){
 		// see if they are overlapping
 		if ( overlap(oldFeature,feat)) {
-		    //System.out.println("OVERLAP found!" + oldFeature+ " "+ feat);
+		    //logger.finest("OVERLAP found!" + oldFeature+ " "+ feat);
 		    drawLines.add(currentLine);
 		    currentLine = new ArrayList();
 		    currentLine.add(feat);
 		    oldFeature = feat ; 
 		} else {
 		    // not overlapping, they fit into the same line
-		    //System.out.println("same line" +  oldFeature+ " "+ feat);
+		    //logger.finest("same line" +  oldFeature+ " "+ feat);
 		    currentLine.add(feat);
 		    oldFeature = feat ;
 		}
@@ -225,7 +225,7 @@ public class SeqFeatureCanvas
     
     private int getImageHeight(){
 	int h = DEFAULT_Y_START + drawLines.size() * DEFAULT_Y_STEP + DEFAULT_Y_BOTTOM; 
-	//System.out.println("setting height " + h);
+	//logger.finest("setting height " + h);
 	return h ;
     }
 
@@ -269,7 +269,7 @@ public class SeqFeatureCanvas
 
     /** select a single segment */
     private void selectSegment (Segment segment) {
-	System.out.println("select Segment");
+	logger.finest("select Segment");
 	/*
 
 
@@ -283,7 +283,7 @@ public class SeqFeatureCanvas
 	
 	String type =  segment.getType() ;
 	if ( type.equals("DISULFID")){
-	    System.out.println("selectSegment DISULFID " + (start+1) + " " + (end+1));
+	    logger.finest("selectSegment DISULFID " + (start+1) + " " + (end+1));
 	    
 	    //String cmd = spice.getSelectStr(current_chainnumber,start+1);
 	    //cmd += spice.getSelectStr(current_chainnumber,end+1);
@@ -301,8 +301,8 @@ public class SeqFeatureCanvas
 
     /** highlite a single segment */
     private void highliteSegment (Segment segment) {
-	System.out.println("highlite Segment");
-	//System.out.println("segment");
+	logger.finest("highlite Segment");
+	//logger.finest("segment");
 	
 	// clicked on a segment!
 	String col =  segment.getTxtColor();
@@ -315,8 +315,8 @@ public class SeqFeatureCanvas
 	start = start -1 ;
 	end   = end   -1 ;
 	String type =  segment.getParent().getType() ;
-	//System.out.println(start+" " + end+" "+type);
-	//System.out.println(segment);
+	//logger.finest(start+" " + end+" "+type);
+	//logger.finest(segment);
 	if ( type.equals("DISULFID")){
 	    spice.highlite(current_chainnumber,start);
 	    spice.highlite(current_chainnumber,end);
@@ -342,9 +342,9 @@ public class SeqFeatureCanvas
 
     /** highlite all segments of a feature */
     private String highliteFeature(Feature feature){
-	System.out.println("highlite feature " + feature);
+	logger.finest("highlite feature " + feature);
 	//Feature feature = (Feature) features.get(featurenr) ;
-	//System.out.println("highlite feature " + feature);
+	//logger.finest("highlite feature " + feature);
 	
 	List segments = feature.getSegments() ;
 	String cmd = "" ;
@@ -355,7 +355,7 @@ public class SeqFeatureCanvas
 
 	    int start = segment.getStart();
 	    int end   = segment.getEnd();
-	    //System.out.println("highilte feature " +featurenr+" " + start + " " +end );
+	    //logger.finest("highilte feature " +featurenr+" " + start + " " +end );
 	    
 	    if ( feature.getType().equals("DISULFID")){
 		cmd += spice.getSelectStr(current_chainnumber,start-1);
@@ -379,7 +379,7 @@ public class SeqFeatureCanvas
 	    cmd += " spacefill on; " ;
 	}
 		    
-	//System.out.println("cmd: "+cmd); 
+	//logger.finest("cmd: "+cmd); 
 	return cmd ;
 
 	
@@ -434,7 +434,7 @@ public class SeqFeatureCanvas
 	    int tmpfill ;
 	    if (aminosize <1) tmpfill = 1;
 	    else tmpfill = aminosize ;
-	    //System.out.println("draw rec");
+	    //logger.finest("draw rec");
 	    gstruc.fillRect(seqx , 0, tmpfill, dstruc.height);
 	    
 	    seqOldPos = seqpos ;
@@ -445,13 +445,18 @@ public class SeqFeatureCanvas
 	// but we want to keep the rectangular selection ...
 
     }
-	
+    
+
+
     public void paintComponent( Graphics g) {
 	super.paintComponent(g); 
 
-	//System.out.println("PAINTINGDAS!!!") ;	
-	//System.out.println("DasCanv - paintComponent");
-	//System.out.println(this.getBackground());
+
+
+
+	//logger.finest("PAINTINGDAS!!!") ;	
+	//logger.finest("DasCanv - paintComponent");
+	//logger.finest(this.getBackground());
 	g.setFont(plainFont);
 
 	if ( chain == null   ) return ;
@@ -468,7 +473,7 @@ public class SeqFeatureCanvas
 		
 	// scale should span the whole length ...
 	scale = (dstruc.width ) / (DEFAULT_X_START + chainlength + DEFAULT_X_RIGHT_BORDER  ) ; 
-	//System.out.println("scale:" +scale+ " width: "+dstruc.width + " chainlength: "+chainlength );
+	//logger.finest("scale:" +scale+ " width: "+dstruc.width + " chainlength: "+chainlength );
 	
 
 	// reset image
@@ -504,7 +509,7 @@ public class SeqFeatureCanvas
 	int y = DEFAULT_Y_START ;
 	// draw features
 		
-	//System.out.println("number features: "+features.size());
+	//logger.finest("number features: "+features.size());
 
 	int aminosize = Math.round(1 * scale) ;
 
@@ -512,7 +517,7 @@ public class SeqFeatureCanvas
 
 
 	for (int i = 0 ; i< drawLines.size();i++) {
-	    //System.out.println(i%entColors.length);
+	    //logger.finest(i%entColors.length);
 	    //gstruc.setColor(entColors[i%entColors.length]);
 
 	    y = y + DEFAULT_Y_STEP ;
@@ -526,7 +531,7 @@ public class SeqFeatureCanvas
 		// line separator
 
 		if ( feature.getMethod().equals("_SPICE_LINESEPARATOR")) {
-		    //System.out.println("_SPICE_LINESEPARATOR");
+		    //logger.finest("_SPICE_LINESEPARATOR");
 		    String ds = feature.getSource();
 		    gstruc.setColor(Color.white);
 		    gstruc.drawString(ds,DEFAULT_X_START,y+DEFAULT_Y_HEIGHT);
@@ -538,7 +543,7 @@ public class SeqFeatureCanvas
 	    
 		// draw text
 		if ( segments.size() < 1) {
-		    //System.out.println(feature.getMethod());
+		    //logger.finest(feature.getMethod());
 		    continue ;
 		}
 		Segment seg0 = (Segment) segments.get(0) ;
@@ -560,9 +565,9 @@ public class SeqFeatureCanvas
 		    int width   = java.lang.Math.round(end * scale) - xstart +  DEFAULT_X_START+aminosize ;
 		    
 		    int height = DEFAULT_Y_HEIGHT ;
-		    //System.out.println(feature+ " " + end +" " + width);
-		    //System.out.println("color"+entColors[i%entColors.length]);
-		    //System.out.println("new feature  ("+i+"): x1:"+ xstart+" y1:"+y+" width:"+width+" height:"+height);
+		    //logger.finest(feature+ " " + end +" " + width);
+		    //logger.finest("color"+entColors[i%entColors.length]);
+		    //logger.finest("new feature  ("+i+"): x1:"+ xstart+" y1:"+y+" width:"+width+" height:"+height);
 		    String type = feature.getType() ;
 		    if (  type.equals("DISULFID")){
 		
@@ -594,7 +599,7 @@ public class SeqFeatureCanvas
 	float interval  = DEFAULT_Y_STEP  ;
 		
 	int linenr = java.lang.Math.round(top/interval) -1 ;
-	//System.out.println("top "+top+" interval "+ interval + " top/interval =" + (top/interval) );	
+	//logger.finest("top "+top+" interval "+ interval + " top/interval =" + (top/interval) );	
 	if ( linenr >= drawLines.size()){
 	    // can happen at bottom part
 	    // simply skip it ...
@@ -606,7 +611,7 @@ public class SeqFeatureCanvas
     }
 
     private Feature getFeatureAt(int seqpos, int lineNr){
-	//System.out.println("getFeatureAt " + seqpos + " " + lineNr);
+	//logger.finest("getFeatureAt " + seqpos + " " + lineNr);
 	Segment s = getSegmentUnder(seqpos,lineNr);
 	if (s == null ) 
 	    return null;
@@ -645,11 +650,11 @@ public class SeqFeatureCanvas
 
     /** create a tooltip string */
     private String getToolString(int seqpos, Segment segment){
-	//System.out.println("getToolString");
+	//logger.finest("getToolString");
 	// current position is seqpos
 	String toolstr = spice.getToolString(current_chainnumber,seqpos);
 	
-	//System.out.println("getToolString");
+	//logger.finest("getToolString");
 	
 	Feature parent = segment.getParent() ;
 	String method  = parent.getMethod() ;
@@ -660,7 +665,7 @@ public class SeqFeatureCanvas
 	int end   = segment.getEnd()   -1 ; 
 	
 	 toolstr += " " + type + " start " + start + " end " + end + " Note:" + note; 
-	//System.out.println(toolstr);
+	//logger.finest(toolstr);
 		
 	//new ToolTip(toolstr, this);
 	//this.repaint();
@@ -679,7 +684,7 @@ public class SeqFeatureCanvas
 
 
     public void mouseDragged(MouseEvent e) {
-	System.out.println("dragging mouse "+e);
+	logger.finest("dragging mouse "+e);
     }	
     
 
@@ -727,9 +732,9 @@ public class SeqFeatureCanvas
 	// add a time delay for repainting the bar
 	Date currentTime = new Date();
 	long timediff = currentTime.getTime() - lastHighlight.getTime() ;
-	//System.out.println("timediff:" + timediff);
+	//logger.finest("timediff:" + timediff);
 	if ( timediff  > TIMEDELAY) {
-	    //System.out.println("highliting "+current_chainnumber + " " + seqpos);
+	    //logger.finest("highliting "+current_chainnumber + " " + seqpos);
 	    //highlite(current_chainnumber,seqpos);	    
 	    spice.select(current_chainnumber,seqpos);
 	    lastHighlight = currentTime ;
@@ -742,7 +747,7 @@ public class SeqFeatureCanvas
     
     public void mouseClicked(MouseEvent e)
     {
-	//System.out.println("CLICK");
+	//logger.finest("CLICK");
 	int x = e.getX();
 	int y = e.getY();
 
@@ -750,7 +755,7 @@ public class SeqFeatureCanvas
 	int lineNr    = getLineNr(y);
 	
 	//int featurenr = get_featurenr(y) ;
-	//System.out.println("CLICK! "+seqpos + " " +lineNr+ " " + chain.getLength());
+	//logger.finest("CLICK! "+seqpos + " " +lineNr+ " " + chain.getLength());
 	
 	if ( lineNr < 0 ) return ;
 	if ( seqpos    < 0 ) {
@@ -764,7 +769,7 @@ public class SeqFeatureCanvas
 		    Feature feature = (Feature) features.get(i);
 		    cmd += highliteFeature(feature);		    
 		}
-		System.out.println(cmd);
+		logger.finest(cmd);
 		spice.executeCmd(cmd);
 		return  ;
 	    }
@@ -777,7 +782,7 @@ public class SeqFeatureCanvas
 
 	spice.showStatus(drstr);
 	Segment segment = getSegmentUnder(seqpos,lineNr);
-	//System.out.println(segment);
+	//logger.finest(segment);
 	if (segment != null ) {
 	
 	    highliteSegment(segment);
@@ -795,7 +800,7 @@ public class SeqFeatureCanvas
 	//this.repaint();
 	    //Color col = entColors[featurenr%entColors.length] ;
 	
-	//System.out.println("clicked outa space");
+	//logger.finest("clicked outa space");
 	return  ;
     }	
     

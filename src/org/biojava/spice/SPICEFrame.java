@@ -30,11 +30,16 @@ import java.awt.Color ;
 import java.util.Map ;
 import java.util.List ;
 
+// logging
+import java.util.logging.* ;
+
 /** an interface that defined methods that are required by sub frames
  * of SPICE to communicate with the master application 
  * @author Andreas Prlic
  */
 public interface SPICEFrame  {
+    /** the logger of spice */
+    public static Logger logger =  Logger.getLogger("org.biojava.spice");;
 
     /** returns a flag if data is being loaded using DAS. This is
      * needed for the differnt sub-frames to prevent them from having

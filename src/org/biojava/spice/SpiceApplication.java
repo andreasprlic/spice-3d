@@ -111,6 +111,9 @@ public class SpiceApplication
     implements SPICEFrame 
 {
     
+	
+
+   
 
     //public static final String CONFIG_FILE = "config.xml";
     URL CONFIG_URL      ; 
@@ -167,22 +170,24 @@ public class SpiceApplication
     MenuItem aboutdas   ;
     MenuItem openpdb    ;
 
-    static Logger logger = Logger.getLogger("org.biojava.spice");
+    //public static Logger logger = Logger.getLogger("org.biojava.spice");
 
 
     SpiceApplication(String pdbcode_, URL config_url, URL registry_url) {
 	super();
 
 	
+	
+	LoggingPanel loggingPanel = new LoggingPanel(logger);
+	loggingPanel.getHandler().setLevel(Level.FINEST);
+	loggingPanel.show(null);
+	//ConsoleHandler handler = new ConsoleHandler();
+	//handler.setLevel(Level.FINEST);
+	//logger.addHandler(loggingPanel.getHandler());
 
 	System.setProperty("XMLVALIDATION",XMLVALIDATION);
 	int timeout = 15000;
-
-	ConsoleHandler handler = new ConsoleHandler();
-	handler.setLevel(Level.FINEST);
-	logger.addHandler(handler);
-	
-
+	logger.setLevel(Level.FINEST);
 	if (logger.isLoggable(Level.FINEST)) {
 	    logger.finest("setting timeouts to " + timeout);
 	}
@@ -450,6 +455,8 @@ public class SpiceApplication
 	//this.getContentPane().add(strucommand);
 	vBox.add(strucommand);
 
+	//vBox.add(loggingPanel);
+
 
 	this.getContentPane().add(vBox);
 
@@ -529,7 +536,7 @@ public class SpiceApplication
 
     public void show(){
 	super.show();
-	//System.out.println("SpiceApplication show() : getting Structure data from new thread");
+	//logger.finest("SpiceApplication show() : getting Structure data from new thread");
 	// and now load data ...
 	
 	// need to call showduring init, to make sure das registry frame and threads can set status.
@@ -540,7 +547,7 @@ public class SpiceApplication
 	}
 	
 	if ( ! structureAlignmentMode ) {
-	    System.out.println("not in alignment mode");
+	    logger.finest("not in alignment mode");
 	    getStructure(pdbcode);
 	} else {
 	    showStatus("Loading...Wait...",Color.red);
@@ -596,8 +603,9 @@ public class SpiceApplication
 	if (logger.isLoggable(Level.FINER)) {
 	    logger.entering(this.getClass().getName(), "getStructure",  new Object[]{pdbcod});
 	}
-	
-	System.out.println("SpiceApplication: getStructure "+ pdbcod);
+	if (logger.isLoggable(Level.FINEST)) {
+	    logger.finest("SpiceApplication: getStructure "+ pdbcod);
+	}
 	first_load = true ;
 	statusPanel.setLoading(true);
 	pdbcode = pdbcod ;
@@ -665,16 +673,21 @@ public class SpiceApplication
      */
     
     public void setStructure(Structure structure_, String selectcmd ) {
+
+	if (logger.isLoggable(Level.FINER)) {
+	    logger.entering(this.getClass().getName(), "setStructure",  new Object[]{"got structure object"});
+	}
+
 	first_load = false ;
 	statusPanel.setLoading(false);
 	structure = structure_ ; 
 	
-	System.out.println("got final structure:"+structure);
+
 	    	
 	DefaultListModel model = (DefaultListModel) ent_list.getModel() ;
 	synchronized (model) {
 	    model.clear() ;
-	    //System.out.println(pdbstr);		
+	    //logger.finest(pdbstr);		
 	    ArrayList chains = (ArrayList) structure.getChains(0);
 	    for (int i=0; i< chains.size();i++) {
 		Chain ch = (Chain) chains.get(i);
@@ -712,7 +725,7 @@ public class SpiceApplication
      * @param structure_ a Biojava structure object
      */
     public void setStructure(Structure structure_ ) {
-	//System.out.println("setting structure");
+	//logger.finest("setting structure");
 	String cmd = INIT_SELECT;
 
 	setStructure(structure_,cmd);
@@ -721,7 +734,7 @@ public class SpiceApplication
 
     /** send a command to Jmol */
     public void executeCmd(String cmd) {
-	//System.out.println("executing Command "+ cmd);
+	//logger.finest("executing Command "+ cmd);
 	structurePanel.executeCmd(cmd);	
     }
 
@@ -731,7 +744,7 @@ public class SpiceApplication
 	List s = config.getServers();
 	for ( int i=0; i< s.size();i++){
 	    SpiceDasSource d = (SpiceDasSource)s.get(i);
-	    System.out.println(d.getUrl());
+	    logger.finest(d.getUrl());
 	}
 
 	Chain chain = getChain(currentChain) ;
@@ -744,13 +757,13 @@ public class SpiceApplication
     }
 
     public void setCurrentChain( int newCurrentChain) {
-	System.out.println("setCurrentChain " + newCurrentChain);
+	logger.finest("setCurrentChain " + newCurrentChain);
 	currentChain = newCurrentChain ;
 	
 	// update features to be displayed ...
 	Chain chain = getChain(currentChain) ;
 	String sp_id = chain.getSwissprotId() ;
-	System.out.println("SP_ID "+sp_id);
+	logger.finest("SP_ID "+sp_id);
 	
 	statusPanel.setSP(sp_id);
 
@@ -785,18 +798,18 @@ public class SpiceApplication
 	boolean done = false ;
 	while ( ! done) {
 	    done = ff.isDone();
-	    //System.out.println("waiting for features to be retreived: "+done);
+	    //logger.finest("waiting for features to be retreived: "+done);
 	    try {
 		wait(300);
 	    } catch (InterruptedException e) {
 		e.printStackTrace();
 		done = true ;
 	    }
-	    //System.out.println("getNewFeatures :in waitloop");
+	    //logger.finest("getNewFeatures :in waitloop");
 	}
 	
 	ArrayList tmpfeat = (ArrayList) ff.getFeatures();
-	//System.out.println("got new features: " + tmpfeat);
+	//logger.finest("got new features: " + tmpfeat);
 	memoryfeatures.put(sp_id,tmpfeat);
 	setNewFeatures(tmpfeat);	
 	//SeqFeatureCanvas dascanv = daspanel.getCanv();
@@ -817,13 +830,13 @@ public class SpiceApplication
 
     // store all features in memory -> speed up
     private ArrayList getFeaturesFromMemory(String sp_id) {
-	System.out.println("getFeaturesFromMemory");
+	logger.finest("getFeaturesFromMemory");
 	ArrayList arr = new ArrayList() ;
 	
 	for (Iterator ti = memoryfeatures.keySet().iterator(); ti.hasNext(); ) {
 	    String key = (String) ti.next() ;
 	    
-	    //System.out.println(key);
+	    //logger.finest(key);
 	    if ( key == null) { continue; }
 
 	    if (key.equals(sp_id)) {
@@ -841,8 +854,8 @@ public class SpiceApplication
 	// almost the same as Chain.clone(), here:
 	// browse through all groups and only keep those that are amino acids...
 	ChainImpl n = new ChainImpl() ;
-	//System.out.println(c.getName());
-	//System.out.println(c.getSwissprotId());
+	//logger.finest(c.getName());
+	//logger.finest(c.getSwissprotId());
 	n.setName(c.getName());
 	n.setSwissprotId(c.getSwissprotId());
 	
@@ -885,7 +898,7 @@ public class SpiceApplication
     }
 
     public void highlite(int chainNumber, int start, int end, String colour){
-	//System.out.println("highlite start end" + start + " " + end );
+	//logger.finest("highlite start end" + start + " " + end );
 	if (first_load)       return ;		
 	if ( start    < 0 ) return ;
 	if (chainNumber < 0 ) return ;
@@ -917,7 +930,7 @@ public class SpiceApplication
     }
 
     public void highlite(int chainNumber, int seqpos, String colour) {
-	//System.out.println("highlite " + seqpos);
+	//logger.finest("highlite " + seqpos);
 	if (first_load)       return ;		
 	if ( seqpos     < 0 ) return ;
 	if (chainNumber < 0 ) return ;
@@ -975,7 +988,7 @@ public class SpiceApplication
 	//Group gs = chain.getGroup(start-1);	
 	Group ge = getGroupNext( chain_number,(end-1),"decr");
 	//= chain.getGroup(end-1);	
-	//System.out.println("gs: "+gs+" ge: "+ge);
+	//logger.finest("gs: "+gs+" ge: "+ge);
 	if (( gs == null) && (ge == null) ) {
 	    return "" ;
 	}
@@ -1017,7 +1030,7 @@ public class SpiceApplication
 	Chain chain = getChain(chain_number) ;
 	
 	if ( ! ((seqpos >= 0) && (seqpos < chain.getLength()))) {
-	    System.out.println("seqpos " + seqpos + "chainlength:" + chain.getLength());
+	    logger.finest("seqpos " + seqpos + "chainlength:" + chain.getLength());
 	    return "" ;
 	}
 	//SeqFeatureCanvas dascanv = daspanel.getCanv();
@@ -1029,14 +1042,14 @@ public class SpiceApplication
 	String pdbcod = g.getPDBCode() ;
 	//String pdbname = g.getPDBName() ;
 	String chainid = chain.getName() ;
-	//System.out.println("selected "+pdbcod+" " +pdbname);
+	//logger.finest("selected "+pdbcod+" " +pdbname);
 	String cmd =  pdbcod+chainid ;
 	return cmd ;
     }
 
     /** select a range of  residue */
     public void select(int chain_number, int start, int end) {
-	//System.out.println("select start end" + start + " " + end);
+	//logger.finest("select start end" + start + " " + end);
 
 	seqField.select(start,end);
 
@@ -1053,7 +1066,7 @@ public class SpiceApplication
 
     /** select a single residue */
     public void select(int chain_number,int seqpos){
-	//System.out.println("select seqpos" + seqpos);
+	//logger.finest("select seqpos" + seqpos);
 	seqField.select(seqpos);
 
 	String cmd = getSelectStr( chain_number, seqpos) ;
@@ -1072,7 +1085,7 @@ public class SpiceApplication
     
     /** update the DIsplays of the subpanes */
     public void updateDisplays() {
-	//System.out.println("updateDisplays");
+	//logger.finest("updateDisplays");
 	//SeqFeatureCanvas dascanv = daspanel.getCanv();
 	dascanv.setFeatures(features);
 	//dascanv.paint(dascanv.getGraphics());
@@ -1098,9 +1111,9 @@ public class SpiceApplication
     /** Event handling */
     public boolean handleEvent(Event event) 
     {
-	//System.out.println("EVENT!");
-	//System.out.println(event.target);
-	//System.out.println(event.id);
+	//logger.finest("EVENT!");
+	//logger.finest(event.target);
+	//logger.finest(event.id);
 
 	
 	switch(event.id) 
@@ -1112,14 +1125,14 @@ public class SpiceApplication
 	    }
 
 	if ( event.target == reset) {
-	    //System.out.println("resetting display");
+	    //logger.finest("resetting display");
 	    String cmd = INIT_SELECT;
 	    executeCmd(cmd);
 	    return true;
 	}
 
 	if ( event.target == props) {
-	    //System.out.println("modify properties");
+	    //logger.finest("modify properties");
 	    RegistryConfigIO regi = new RegistryConfigIO(this,REGISTRY_URL) ;
 	    //regi.run();
 	    regi.setConfiguration(config);
@@ -1132,13 +1145,13 @@ public class SpiceApplication
 	    return true;
 	}
 	else if ( event.target == openpdb ) {
-	    //System.out.println("open DAS");
+	    //logger.finest("open DAS");
 	    OpenDialog op = new OpenDialog(this);
 	    op.show();
 	}
 
 	else if ( event.target == aboutdas ) {
-	    //System.out.println("about DAS");
+	    //logger.finest("about DAS");
 	    //AboutDialog asd = new AboutDialog(this);
 	    //asd.setText("DAS homepage: http://www.biodas.org") ;
 	    //asd.show();
@@ -1149,7 +1162,7 @@ public class SpiceApplication
 	    return true;
 	}
 	else if ( event.target ==  aboutspice ) {
-	    //System.out.println("about SPICE");
+	    //logger.finest("about SPICE");
 	    AboutDialog asd = new AboutDialog(this);
 
 	    asd.setText("The SPICE Applet. V 0.1 (C) Andreas Prlic, Tim Hubbard\n The Wellcome Trust Sanger Institute 2004 mailto:ap3@sanger.ac.uk") ;
@@ -1187,21 +1200,21 @@ class StructureCommandListener
 	
     }
     public void actionPerformed(ActionEvent event) {
-	//System.out.println("in TextField");
-	//System.out.println("EVENT!");
-	//System.out.println(event);
+	//logger.finest("in TextField");
+	//logger.finest("EVENT!");
+	//logger.finest(event);
 	if ( spice.isLoading() ) {
-	    System.out.println("loading data, please be patient");
+	    spice.logger.finest("loading data, please be patient");
 	    return ;
 	}
 	String cmd = textfield.getText();
 	spice.executeCmd(cmd);
 	textfield.setText("");
 	
-	//System.out.println(event.getActionCommand());
-	//System.out.println(event.getModifiers());
-	//System.out.println(event.paramString());
-	//System.out.println(event.id);
+	//logger.finest(event.getActionCommand());
+	//logger.finest(event.getModifiers());
+	//logger.finest(event.paramString());
+	//logger.finest(event.id);
     }
 
     
@@ -1218,23 +1231,23 @@ class TextFieldListener
 	textfield = textfield_ ;
     }
     public void actionPerformed(ActionEvent event) {
-	//System.out.println("in TextField");
-	//System.out.println("EVENT!");
-	//System.out.println(event);
+	//logger.finest("in TextField");
+	//logger.finest("EVENT!");
+	//logger.finest(event);
 
 	if ( spice.isLoading() ) {
-	    System.out.println("loading data, please be patient");
+	    spice.logger.finest("loading data, please be patient");
 	    return ;
 	}
 	String pdbcod = textfield.getText();
 	//spice.executeCmd(cmd);
 	spice.getStructure(pdbcod);
 	textfield.setText("");
-	//System.out.println(event.getActionCommand());
-	//System.out.println(event.getModifiers());
-	//System.out.println(event.paramString());
+	//logger.finest(event.getActionCommand());
+	//logger.finest(event.getModifiers());
+	//logger.finest(event.paramString());
     
-	//System.out.println(event.id);
+	//logger.finest(event.id);
     }
 }
 
@@ -1253,12 +1266,12 @@ class EntListCommandListener implements ListSelectionListener {
     public void valueChanged(ListSelectionEvent event) {
 	
 	if ( spice.isLoading() ) {
-	    System.out.println("loading data, please be patient");
+	    spice.logger.finest("loading data, please be patient");
 	    return ;
 	}
 
-	//System.out.println("EVENT!");
-	//System.out.println(event);
+	//logger.finest("EVENT!");
+	//logger.finest(event);
 	JList list = (JList)event.getSource();
 	
 	// Get all selected items
@@ -1267,12 +1280,12 @@ class EntListCommandListener implements ListSelectionListener {
 
 	if ( i < 0) return ; 
 	
-	//System.out.println("item:" + event.getItem());
-	//System.out.println("param:" + event.paramString());
+	//logger.finest("item:" + event.getItem());
+	//logger.finest("param:" + event.paramString());
 	//int i = ((Integer)event.getItem()).intValue();
 	spice.setCurrentChain(i);
-	//System.out.println(event.id);
-	//System.out.println(event.arg);
+	//logger.finest(event.id);
+	//logger.finest(event.arg);
 	
     }
 
@@ -1339,7 +1352,7 @@ class OpenDialog extends Dialog
 		    getCom.setText("please wait, already loading");
 		    return true ;
 		}
-		//System.out.println("open" + getCom.getText());
+		//logger.finest("open" + getCom.getText());
 		String pdbcod = getCom.getText();
 		if ( pdbcod.length() == 4 ) {
 		    spice.getStructure(pdbcod);

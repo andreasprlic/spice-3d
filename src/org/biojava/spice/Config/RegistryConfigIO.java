@@ -40,6 +40,9 @@ import java.util.List                      ;
 import org.biojava.services.das.registry.* ;
 
 
+//for logging
+import java.util.logging.*                 ;
+
 // for GUI;
 
 import java.awt.Frame                      ;
@@ -128,7 +131,7 @@ public class RegistryConfigIO
     private synchronized void getData()
 	throws ConfigurationException
     {
-	//System.out.println("DAS Registry server config thread loadData");
+	//spice.logger.finest("DAS Registry server config thread loadData");
 
 	PersistentConfig  persistentc = new PersistentConfig();
 	RegistryConfiguration persistentconfig = null ;
@@ -144,7 +147,7 @@ public class RegistryConfigIO
 	    config = persistentconfig ;
 
 	    String behave = config.getUpdateBehave();
-	    System.out.println("behave: " + behave);	    
+	    spice.logger.finest("behave: " + behave);	    
 	    //behave="always";
 	    if ( behave.equals("day")) {
 		// test if we did already an update today
@@ -157,13 +160,13 @@ public class RegistryConfigIO
 		if (( timenow - timelast ) < TIME_BETWEEN_UPDATES ) {
 		    doRegistryUpdate();
 		} else {
-		    System.out.println("last update < 1 day, using saved config");
+		    spice.logger.finest("last update < 1 day, using saved config");
 		}
 
 		// test if perhaps registry was changed in config file
 		String oldregistry = config.getRegistryUrl();
 		if (! oldregistry.equals(REGISTRY.toString())) {
-		    System.out.println("registry url was changed since last contact, contacting new registry service");
+		    spice.logger.finest("registry url was changed since last contact, contacting new registry service");
 		    doRegistryUpdate();
 		}
 		
@@ -190,7 +193,7 @@ public class RegistryConfigIO
 	showProgressBar();
 	
 	done = false ;
-	System.out.println("contacting DAS registry server at: " +REGISTRY);
+	spice.logger.log(Level.INFO,"contacting DAS registry server at: " +REGISTRY);
 
 	RegistryConfiguration oldconfig = config;
 
@@ -207,9 +210,10 @@ public class RegistryConfigIO
 	
 	if ( sources==null) {
 	    done = true ; 
+	    spice.logger.log(Level.SEVERE,"Could not connect to registration service at " + REGISTRY);
 	    throw new ConfigurationException("Could not connect to registration service at " + REGISTRY);
 	}
-	System.out.println("found "+sources.length+" servers"); 
+	spice.logger.log(Level.CONFIG,"found "+sources.length+" servers"); 
 	//config = getDasServers(sources); 
 	
 	ArrayList servers = new ArrayList();
@@ -231,7 +235,7 @@ public class RegistryConfigIO
 	    for ( int i = 0 ; i < localservers.size() ; i++ ) {
 
 		SpiceDasSource ds = (SpiceDasSource) localservers.get(i);
-		System.out.println("adding localserver to new config " + ds.getUrl());
+		spice.logger.finest("adding localserver to new config " + ds.getUrl());
 		config.addServer(ds,ds.getStatus());
 	    }
 	}
@@ -239,7 +243,7 @@ public class RegistryConfigIO
 	Date now = new Date();
 	config.setContactDate(now);
 
-	System.out.println("adding registry "+ REGISTRY.toString());
+	spice.logger.finest("adding registry "+ REGISTRY.toString());
 	config.setRegistryUrl(REGISTRY.toString());
 	disposeProgressBar();
 	
@@ -296,7 +300,7 @@ public class RegistryConfigIO
     /** write back the config to the SPICE application */
     public void saveConfiguration() {
 	
-	System.out.println("trying PersistentConfig");
+	spice.logger.finest("trying PersistentConfig");
 	PersistentConfig ps = new PersistentConfig();
 	ps.save(config);
 
@@ -354,7 +358,7 @@ public class RegistryConfigIO
 
         //frame.getContentPane().add(new TabbedPaneDemo(config),
 	//                       BorderLayout.CENTER);
-	TabbedPaneDemo tpd = new TabbedPaneDemo(this,config);
+	TabbedPaneDemo tpd = new TabbedPaneDemo(spice,this,config);
 	//frame.getContentPane().add(tpd);
 
 	Box vbox = Box.createVerticalBox();
@@ -401,15 +405,16 @@ public class RegistryConfigIO
 class MenuListener
     implements ActionListener
 {
-    JTable table ;
+    JTable table                 ;
     RegistryConfiguration config ;
-    TabbedPaneDemo parent ;
+    TabbedPaneDemo parent        ;
+    SPICEFrame spice             ;
 
-
-    public MenuListener( JTable tab,RegistryConfiguration conf,TabbedPaneDemo tabd ){
+    public MenuListener( SPICEFrame spice_, JTable tab,RegistryConfiguration conf,TabbedPaneDemo tabd ){
 	table  = tab  ;
 	config = conf ;
 	parent = tabd  ;
+	spice = spice_;
     }
 
     public void actionPerformed(ActionEvent e){
@@ -420,7 +425,7 @@ class MenuListener
 	int    pos = table.getSelectedRow();
 	if ( pos < 0) 
 	    return ;
-	//System.out.println("selected in row "+pos+" cmd "+cmd);
+	//spice.logger.finest("selected in row "+pos+" cmd "+cmd);
 	SpiceDasSource ds = config.getServer(pos);
 	String[] colNames = parent.getColNames();
 
@@ -433,7 +438,7 @@ class MenuListener
 	    table.setValueAt(new Boolean(false),pos,colNames.length-1);
 	}
 	else if ( cmd.equals("delete")) { 
-	    System.out.println("deleteting das source ..." +pos);
+	    spice.logger.finest("deleteting das source ..." +pos);
 	    config.deleteServer(pos);
 	}
 
@@ -493,9 +498,11 @@ class TabbedPaneDemo extends JPanel {
     JComboBox updateBehaveList         ;
 
     int selectMoveStartPosition        ;
-
-    public TabbedPaneDemo(RegistryConfigIO registryparent, RegistryConfiguration config_) {
+    SPICEFrame spice                   ;
+    
+    public TabbedPaneDemo(SPICEFrame spice_,RegistryConfigIO registryparent, RegistryConfiguration config_) {
         super(new GridLayout(1, 1));
+	spice = spice_;
 	registryIO = registryparent ;
 	config = config_;
 
@@ -877,7 +884,7 @@ class TabbedPaneDemo extends JPanel {
 		public void keyPressed(KeyEvent e){}
 		public void keyReleased(KeyEvent e){
 		    int code = e.getKeyCode();
-		    System.out.println(code + "" + e.getKeyText(code) + " "  );
+		    //System.out.println(code + "" + e.getKeyText(code) + " "  );
 
 		    // get selected DAS source 
 		    ListSelectionModel lsm = dasSourceTable.getSelectionModel();
@@ -885,7 +892,7 @@ class TabbedPaneDemo extends JPanel {
 		    //dasSourceTable.getSelectionModel()
 		    int minIndex = lsm.getMinSelectionIndex();
 		    int maxIndex = lsm.getMaxSelectionIndex();
-		    System.out.println(selectMoveStartPosition + " " + minIndex+" " + maxIndex);
+		    //System.out.println(selectMoveStartPosition + " " + minIndex+" " + maxIndex);
 		    
 		    if (selectMoveStartPosition == -1 ) {
 			return ;
@@ -904,7 +911,7 @@ class TabbedPaneDemo extends JPanel {
 			}
 
 		   
-		    System.out.println("keylistener settingMoveStartPos" + minIndex);
+		    //System.out.println("keylistener settingMoveStartPos" + minIndex);
 		    selectMoveStartPosition = minIndex ;
 		    
 		    
@@ -917,7 +924,7 @@ class TabbedPaneDemo extends JPanel {
 	tablePopup = new JPopupMenu();
 	
       
-	MenuListener ml = new MenuListener(dasSourceTable,config,this);
+	MenuListener ml = new MenuListener(spice,dasSourceTable,config,this);
 
 	JMenuItem menuItem = new JMenuItem("activate");
 	menuItem.addActionListener(ml);
@@ -971,12 +978,13 @@ class TabbedPaneDemo extends JPanel {
 
 
     /** Returns an ImageIcon, or null if the path was invalid. */
-    protected static ImageIcon createImageIcon(String path) {
+    protected ImageIcon createImageIcon(String path) {
         java.net.URL imgURL = TabbedPaneDemo.class.getResource(path);
         if (imgURL != null) {
             return new ImageIcon(imgURL);
         } else {
-            System.err.println("Couldn't find file: " + path);
+	    spice.logger.log(Level.WARNING,"Couldn't find file: " + path);
+            //System.err.println("Couldn't find file: " + path);
             return null;
         }
     }
@@ -1017,16 +1025,17 @@ class TabbedPaneDemo extends JPanel {
     }
 
     public void setServerStatus(String url, Boolean status){
-	System.out.print("Setting server status " + url + " " + status);
+	//System.out.print("Setting server status " + url + " " + status);
+	spice.logger.finer("setting server status " + url + " " + status);
 	boolean flag = status.booleanValue();
 	config.setStatus(url,flag);
     }
 
 
     public void saveConfiguration() {
-	System.out.println("saving config");
+	//System.out.println("saving config");
 	int pos = tabbedPane.getSelectedIndex();
-	System.out.println("active tab: " + pos);
+	//System.out.println("active tab: " + pos);
 
 	// save overall registry
 	if ( pos == 0 ) {
@@ -1037,7 +1046,8 @@ class TabbedPaneDemo extends JPanel {
 	// add a new local DAS source ...
 	else if ( pos == 1 ) {	    
 	
-	    System.out.println("adding new local DAS source");
+	    //System.out.println("adding new local DAS source");
+	    spice.logger.finest("adding new local DAS source");
 	    HashMap formdata = new HashMap();
 	    int formPos = -1 ;
 	    for ( int i = 0 ; i < colNames.length; i++) {
@@ -1051,7 +1061,7 @@ class TabbedPaneDemo extends JPanel {
 		//JTextField txt = (JTextField)entryFormFields.get(i);
 		    JTextField txt = (JTextField)o;
 		    String data = txt.getText();
-		    System.out.println(col + " " + data);
+		    //System.out.println(col + " " + data);
 		    formdata.put(col,data);
 		} else if ( o instanceof JList ) {
 		    JList l = (JList) o ;
@@ -1109,7 +1119,8 @@ class TabbedPaneDemo extends JPanel {
 	else if ( pos == 3 ) {
 	    String behave = (String)updateBehaveList.getSelectedItem();
 	    
-	    System.out.println("setting update behaviour to " + behave);
+	    //System.out.println("setting update behaviour to " + behave);
+	    spice.logger.finest("setting update behaviour to " + behave);
 	    if ( behave.equals("once per day"))
 		behave = "day" ;
 	    config.setUpdateBehave(behave);
@@ -1153,7 +1164,7 @@ class PopupListener extends MouseAdapter {
 	    int pos = table.getSelectedRow();
 	    if ( pos < 0) 
 		return ;
-	    System.out.println("seleceted pos " + pos);
+	    //System.out.println("seleceted pos " + pos);
 	    
 	    SpiceDasSource ds = config.getServer(pos);
 	    
@@ -1227,7 +1238,7 @@ class MyTableModel extends AbstractTableModel {
 	//System.out.println("getValueAt");
 	if ((row > data.length) || ( col > columnNames.length))
 	    {
-		System.out.println("out of range");
+		//System.out.println("out of range");
 		return null ;
 	    }
 	return data[row][col];
@@ -1264,12 +1275,13 @@ class MyTableModel extends AbstractTableModel {
      */
     public void setValueAt(Object value, int row, int col) {
 	
+	/*
 	System.out.println("Setting value at " + row + "," + col
 			   + " to " + value
 			   + " (an instance of "
 			   + value.getClass() + ")");
 	
-	
+	*/
 	data[row][col] = value;
 
 

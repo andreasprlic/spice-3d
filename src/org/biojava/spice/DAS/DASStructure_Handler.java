@@ -30,8 +30,10 @@ import org.biojava.bio.structure.*                     ;
 import org.biojava.bio.structure.io.DASStructureClient ;
 import org.biojava.bio.structure.io.PDBFileReader      ;
 
-import java.util.* ;
-import java.io.IOException ;
+import java.util.*                                     ;
+import java.util.logging.*                             ;
+import java.io.IOException                             ;
+
 /** a wrapper class that uses the DAS CLient to connect to a DAS
  * Structure services, and retreive a biojava Structure objects.
  * this structure is then converted into a Simple_PDB_Container
@@ -44,19 +46,23 @@ public class DASStructure_Handler
     //String DASSTRUCTURECOMMAND = "http://dbdeskpro211.internal.sanger.ac.uk:8080/dazzle/mystruc/structure?query=" ;
     //String DASSTRUCTURECOMMAND = "http://protodas.derkholm.net/dazzle/mystruc/structure?query=" ;
     
-    boolean finished ;
-    DAS_PDBFeeder master ;
+    boolean finished            ;
+    DAS_PDBFeeder master        ;
     
-    Structure structure ;
+    Structure structure         ; 
     RegistryConfiguration config;
-    List structureservers ;
-    String pdbCode ;
+    List   structureservers     ;
+    String pdbCode              ;
+    Logger logger               ;             
 
     public DASStructure_Handler(RegistryConfiguration configuration, String pdbcode) {
 	super () ;
+
+	logger = Logger.getLogger("org.biojava.spice");
+
 	pdbCode = pdbcode ;
 	finished = false ;
-	//master = parent 
+	//mastqueryer = parent 
 	structure = null ;;
 	config = configuration ;
 
@@ -69,7 +75,6 @@ public class DASStructure_Handler
 	    SpiceDasSource ds = (SpiceDasSource)iter.next();
 	    String url = ds.getUrl();
 	    if ( url.substring(0,7).equals("file://") ) {
-		//System.out.println("url " + url + " is local!");
 		// move to first position		
 		structureservers.add(0,ds);
 	    } else {
@@ -108,17 +113,16 @@ public class DASStructure_Handler
 	    Iterator iter = structureservers.iterator();
 	    while (iter.hasNext()){
 		SpiceDasSource ds = (SpiceDasSource)iter.next();
-		//System.out.println(ds);
 		String url = ds.getUrl();
-		System.out.println(url);
+		logger.finest(url);
 		
 		if ( url.substring(0,7).equals("file://") ) {
 		    // load local PDB file
 		    String dir  = url.substring(7);
-		    System.out.println("trying to get PDB file from " + dir);
+		    logger.finest("trying to get PDB file from " + dir);
 		    structure = getLocalPDB(dir,pdb_id);
 		    if ( structure != null) {
-			System.out.println(" got structure");
+			logger.exiting(this.getClass().getName(), "loadStructure");
 			finished=true;
 			notifyAll();
 			return ;
@@ -130,12 +134,12 @@ public class DASStructure_Handler
 	    
 
 		    DASStructureClient dasc= new DASStructureClient(dasstructurecommand);
-		    System.out.println(getTimeStamp() );
-		    System.out.println("getting structure "+pdb_id);	    
+		    logger.finest(getTimeStamp() );
+		    logger.finest("getting structure "+pdb_id);	    
 		    structure = dasc.getStructureById(pdb_id);	    
-		    System.out.println("DASStructure_Handler: got structure:");
-		    System.out.println(getTimeStamp() );
-		    //System.out.println(structure);
+		    logger.finest("DASStructure_Handler: got structure:");
+		    logger.finest(getTimeStamp() );
+		    //logger.finest(structure);
 		    //convertStructureContainer(container,structure);
 		    //container = structure  ;
 		   
@@ -175,7 +179,7 @@ public class DASStructure_Handler
 	try {
 	    struc = parser.getStructureById(pdbcode);
 	}  catch ( IOException e) {
-	    System.out.println("local structure "+pdbcode+" not found, trying somewhere else");
+	    logger.log(Level.INFO,"local structure "+pdbcode+" not found, trying somewhere else");
 	    //e.printStackTrace();
 	    return null ;
 	}

@@ -403,8 +403,9 @@ public class LoggingPanel extends JPanel {
      *         a {@link JDialog} or a {@link JFrame}.
      */
     public Component show(final Component owner) { 
-	System.out.println("LoggingPanel show!!!!!!!");
+	//System.out.println("LoggingPanel show!!!!!!!");
 	JFrame frame = new JFrame();
+	frame.setTitle("SPICE - log");
 	frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.addWindowListener(new WindowAdapter()
         {
@@ -503,7 +504,7 @@ public class LoggingPanel extends JPanel {
                                                        final int     rowIndex,
                                                        final int     columnIndex)
         {
-	    System.out.println("LoggingPanel getTableCellrendererComponent");
+	    //System.out.println("LoggingPanel getTableCellrendererComponent");
             Color foreground = this.foreground;
             Color background = this.background;
             final boolean isMessage = (columnIndex == messageColumn);
