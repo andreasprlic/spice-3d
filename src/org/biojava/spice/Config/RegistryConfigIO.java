@@ -306,7 +306,7 @@ class ButtonListener
 
 
 class TabbedPaneDemo extends JPanel {
-    static String[] colNames= new String [] {"name","url","coordinateSystems","adminemail","capabilities","description"};
+    static String[] colNames= new String [] {"url","coordinateSystems","adminemail","capabilities","description"};
 
     RegistryConfiguration config ;
     RegistryConfigIO registryIO;
@@ -330,7 +330,7 @@ class TabbedPaneDemo extends JPanel {
 
 	//System.out.println(seqdata);
 	//JTable table= new JTable(seqdata,colNames);
-	MyTableModel mtm = new MyTableModel(this,seqdata);
+	MyTableModel mtm = new MyTableModel(this,seqdata,colNames);
 	//mtm.getModel().addTableModelListener(this);
 	JTable table  = new JTable(mtm);
 	// Configure some of JTable's paramters
@@ -442,22 +442,28 @@ class MyTableModel extends AbstractTableModel {
 
    TabbedPaneDemo parent ;
 
-    public MyTableModel(TabbedPaneDemo parent_,String[][]seqdata){
+    private Object[][] data ;
+    private String[]   columnNames  ;
+				    
+    public MyTableModel(TabbedPaneDemo parent_,String[][]seqdata, String[] columnNames_){
 	super();
-	parent = parent_;
+	parent = parent_ ;
+	columnNames = columnNames_;
+
 	setData(seqdata);
-	//table.getModel().addTableModelListener(this);
-	//this.addTableModelListener(this);
+
     }
 
-    private Object[][] data ;
-    private String[]   columnNames = {"URL",
-				    "capabilities",
-				    "coordinate system",
-				    "admin email",
-				    "description",				   
-				    "active"
-    };
+				      
+    /*private String[]   columnNames = {"URL",
+      "capabilities",
+      "coordinate system",
+      "admin email",
+      "description",				   
+      "active"
+      };
+    */
+   
 
 
     private void setData(String[][]seqdata) {

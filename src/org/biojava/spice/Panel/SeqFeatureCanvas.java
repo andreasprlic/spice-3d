@@ -29,7 +29,7 @@ import java.awt.Graphics;
 import java.awt.Canvas;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
-
+import java.awt.Font ;
 import java.awt.Dimension;
 import java.awt.Event;
 import java.awt.event.MouseListener;
@@ -73,8 +73,8 @@ public class SeqFeatureCanvas
     // the master application
     SPICEFrame spice ;
 
-    Image imbuf;
-    Dimension imbufDim;
+    //Image imbuf;
+    //Dimension imbufDim;
     Color[] entColors ;
 	
     Color seqColorOld ;
@@ -95,7 +95,7 @@ public class SeqFeatureCanvas
     Date lastHighlight ;
     // highliting
     int seqOldPos ;
-    
+    Font plainFont ;
 
     /**
      * 
@@ -106,9 +106,9 @@ public class SeqFeatureCanvas
 	// TODO Auto-generated constructor stub
 	Dimension dstruc=this.getSize();
 	//imbuf    = this.createImage(dstruc.width, dstruc.height);
-	imbuf = null ;
+	//imbuf = null ;
 	
-	imbufDim = dstruc;
+	//imbufDim = dstruc;
 	//Graphics gstruc=imbuf.getGraphics();
 	//gstruc.drawImage(imbuf, 0, 0, this);
 
@@ -125,18 +125,21 @@ public class SeqFeatureCanvas
 	entColors[4] = Color.orange;
 	entColors[5] = Color.pink;
 	entColors[6] = Color.cyan;
-	setBackground(Color.black) ;
+	//this.setBackground(Color.black) ;
+	//super.setBackground(Color.black) ;
 
 	lastHighlight = new Date();
 				
 	current_chainnumber = -1 ;
 	seqOldPos = -1 ;
-	
+	plainFont = new Font("SansSerif", Font.PLAIN, 10);
 	//setOpaque(true);
 
-	this.paintComponent(this.getGraphics());
+	//this.paintComponent(this.getGraphics());
 	//ImageIcon icon = new ImageIcon(imbuf);
 	//setIcon(icon);
+	//this.repaint();
+	
     }
 
 
@@ -205,13 +208,15 @@ public class SeqFeatureCanvas
 
 	drawLines.add(currentLine);
 
-	//Dimension dstruc=this.getSize();
-	//int imageheight = getImageHeight();
-	//imbuf=this.createImage(dstruc.width, imageheight)
-	//imbuf=this.createImage(dstruc.width, dstruc.height);
-	//imbuf = new BufferedImage(dstruc.width, dstruc.height,BufferedImage.TYPE_INT_RGB);
-	//imbufDim = dstruc;
-	this.paintComponent(this.getGraphics());
+	int height = getImageHeight();
+	Dimension dstruc=this.getSize();
+
+
+	int width  =  dstruc.width ;
+	this.setPreferredSize(new Dimension(width,height)) ;
+	this.setMaximumSize(new Dimension(width,height));
+	
+	this.repaint();
 
     }
     
@@ -223,6 +228,7 @@ public class SeqFeatureCanvas
 	return h ;
     }
 
+   
     // an overlap occurs if any of the segments overlap ...
 
     private boolean overlap (Feature a, Feature b) {
@@ -255,7 +261,8 @@ public class SeqFeatureCanvas
     public void setChain(Chain c,int chainnumber) {
 	chain = c;
 	current_chainnumber = chainnumber ;
-	this.paintComponent(this.getGraphics());
+	//this.paintComponent(this.getGraphics());
+	this.repaint();
     }
     
 
@@ -406,15 +413,18 @@ public class SeqFeatureCanvas
 				
 	Dimension dstruc=this.getSize();
 
-	Graphics gstruc=imbuf.getGraphics();
+	Graphics gstruc=this.getGraphics();
 		
-	if (seqOldPos != -1) {
+	/*if (seqOldPos != -1) {
 	    // clean old highlited region
 	    gstruc.setColor(this.getBackground());
 	    gstruc.fillRect(0 , 0, dstruc.width, dstruc.height);
+	    //gstruc.clearRect(0 , 0, dstruc.width, dstruc.height);
+	    
 	}
-		
-				
+	*/
+	this.paintComponent(gstruc);
+	
 	if (chain_number == current_chainnumber) {
 	    //int seqpos =  java.lang.Math.round(x/scale) ;
 	    gstruc.setColor(Color.darkGray);
@@ -428,43 +438,42 @@ public class SeqFeatureCanvas
 	    
 	    seqOldPos = seqpos ;
 	}
-	
-	ImageIcon icon = new ImageIcon(imbuf);
-	setIcon(icon);
-	
+
+	// this.repaint();
+	// repaint does not work here! -> will create a new Graphics object,
+	// but we want to keep the rectangular selection ...
+
     }
 	
     public void paintComponent( Graphics g) {
-	//paint(g);
-	//}
+	//super.paintComponent(g); not needed here, since we fill all of the space
 
-	//public void paint(Graphics g){
+	//System.out.println("PAINTINGDAS!!!") ;	
+	//System.out.println("DasCanv - paintComponent");
+	//System.out.println(this.getBackground());
+	g.setFont(plainFont);
 
 	if ( chain == null   ) return ;
-	//System.out.println("PAINTINGDAS!!!") ;
-		
-	//System.out.println("DasCanv - paintComponent");
+
 	Dimension dstruc=this.getSize();
+	Graphics gstruc = g ;
 
-	if(!imbufDim.equals(dstruc)) spice.scale();
-		
-	if(imbuf == null || !imbufDim.equals(dstruc)) {
-	    //int imageheight = getImageHeight();
-	    imbuf=this.createImage(dstruc.width, dstruc.height);
+	gstruc.setColor(this.getBackground());
+	gstruc.fillRect(0 , 0, dstruc.width, dstruc.height);
+	//g.clearRect(0 , 0, dstruc.width, dstruc.height);
+	
 
-	    //imbuf = new BufferedImage(dstruc.width, dstruc.height,BufferedImage.TYPE_INT_RGB);
-	    imbufDim = dstruc;
-	}
-	
-	Graphics gstruc=imbuf.getGraphics();
-	
-	Color bg=this.getBackground();
-		
 	float chainlength =  chain.getLength() ;
 		
 	// scale should span the whole length ...
 	scale = (dstruc.width ) / (DEFAULT_X_START + chainlength + DEFAULT_X_RIGHT_BORDER  ) ; 
 	//System.out.println("scale:" +scale+ " width: "+dstruc.width + " chainlength: "+chainlength );
+	
+
+	// reset image
+	//gstruc.setColor(this.getBackground());
+	//gstruc.fillRect(0 , 0, dstruc.width, dstruc.height);
+
 
 	// draw scale
 	gstruc.setColor(Color.GRAY);
@@ -487,7 +496,7 @@ public class SeqFeatureCanvas
 	// draw sequence
 	gstruc.setColor(Color.white);
 	int seqx = java.lang.Math.round(chainlength * scale) ;
-	//System.out.println(seqx);
+
 
 	gstruc.fillRect(0+DEFAULT_X_START, 10, seqx, 6);
 
@@ -554,23 +563,19 @@ public class SeqFeatureCanvas
 		    //System.out.println("color"+entColors[i%entColors.length]);
 		    //System.out.println("new feature  ("+i+"): x1:"+ xstart+" y1:"+y+" width:"+width+" height:"+height);
 		    String type = feature.getType() ;
-		    if ( ! type.equals("DISULFID")){
-			gstruc.fillRect(xstart,y,width,height);
-		    } else {
+		    if (  type.equals("DISULFID")){
+		
 			gstruc.fillRect(xstart,y,aminosize,height);
 			gstruc.fillRect(xstart,y+(height/2),width,1);
-		    gstruc.fillRect(xstart+width-aminosize,y,aminosize,height);
+			gstruc.fillRect(xstart+width-aminosize,y,aminosize,height);
+		    } else {
+			gstruc.fillRect(xstart,y,width,height);
 		    }
 		}
 	    }
 	}
 	
-	//ImageIcon ico = new ImageIcon(imbuf);
-	//setIcon(ico);
-	//ImageIcon icon = new ImageIcon(imbuf);
-	//setIcon(icon);
-	g.drawImage(imbuf, 0, 0, this);
-	//this.repaint();
+
 	
     }
 	

@@ -111,7 +111,7 @@ public class SpiceApplication
     URL REGISTRY_URL    ;
 
     static String XMLVALIDATION = "false" ;   
-    static String INIT_SELECT = "select all; cpk off ; wireframe off ; backbone on ; colour chain;select not protein and not solvent;spacefill 2.0;";
+    static String INIT_SELECT = "select all; cpk off ; wireframe off ; backbone off; cartoon on; colour chain;select not protein and not solvent;spacefill 2.0;";
     RegistryConfiguration config      ;
     Structure structure ; 
     String pdbcode      ;
@@ -236,7 +236,7 @@ public class SpiceApplication
 	first_load = true ;
 
 	structureAlignmentMode = false ;
-
+	      
 	this.getContentPane().setLayout(new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
 
 
@@ -330,7 +330,7 @@ public class SpiceApplication
 	
 	// init dascanv
 	dascanv=new SeqFeatureCanvas(this);       
-	dascanv.setForeground(Color.blue);
+	dascanv.setForeground(Color.black);
 	dascanv.setBackground(Color.black);
 	dascanv.addMouseMotionListener(dascanv);
 	dascanv.addMouseListener(dascanv);
@@ -339,7 +339,7 @@ public class SpiceApplication
 	//dascanv.setSize(700,300);
 	
 	dasPanel = new JScrollPane(dascanv);
-	dasPanel.setOpaque(true);
+	//dasPanel.setOpaque(true);
 	dasPanel.setBackground(Color.black);
 	//scroll.add(dascanv);
 
@@ -352,8 +352,9 @@ public class SpiceApplication
 	sharedPanel.setOneTouchExpandable(true);
 	//sharedPanel.setDividerLocation(150);
 	sharedPanel.setPreferredSize(new Dimension(200, 200));
-	sharedPanel.setOpaque(true);
+	//sharedPanel.setOpaque(true);
 	sharedPanel.setResizeWeight(0);	
+	sharedPanel.setBackground(Color.black);
 
 	seqField      = new SeqTextPane(this);
 	seqField.setSize( 700, 30);
@@ -374,8 +375,9 @@ public class SpiceApplication
 				      sharedPanel,seqScrollPane);
 	
 	seqSplitPane.setOneTouchExpandable(true);
-	seqSplitPane.setOpaque(true);
+	//seqSplitPane.setOpaque(true);
 	seqSplitPane.setResizeWeight(0.9);
+	seqSplitPane.setBackground(Color.black);
 	//seqSplitPane.setDividerLocation(600);
 	
 	//sharedPanel.setLayout(new BoxLayout(sharedPanel, BoxLayout.X_AXIS));
@@ -391,7 +393,8 @@ public class SpiceApplication
 	mainsharedPanel.setOneTouchExpandable(true);
 	//mainsharedPanel.setDividerLocation(150);
 	//mainsharedPanel.setPreferredSize(new Dimension(200, 200));
-	mainsharedPanel.setOpaque(true);
+	//mainsharedPanel.setOpaque(true);
+	mainsharedPanel.setBackground(Color.black);
 	//mainsharedPanel.setResizeWeight(0.7);
 	this.getContentPane().add(mainsharedPanel,BorderLayout.NORTH);
 
@@ -813,7 +816,7 @@ public class SpiceApplication
 	Chain chain = getChain(currentChain) ;
 	String sp_id = chain.getSwissprotId() ;
 	getNewFeatures(sp_id) ;
-	updateDisplays();
+	//updateDisplays();
 	
     }
 
@@ -842,7 +845,7 @@ public class SpiceApplication
 
     }
 
-    private synchronized void getNewFeatures(String sp_id) {
+    private  void getNewFeatures(String sp_id) {
 	//ArrayList featureservers = getFeatureServers() ;
 	Chain chain = getChain(currentChain) ;
 	
@@ -877,14 +880,14 @@ public class SpiceApplication
 
     /**  update the currently displayed features */
     public  void setFeatures(String sp_id, List tmpfeat) {
+	// todo create Feature for structure mapping
+
 	memoryfeatures.put(sp_id,tmpfeat);
 
 	features.clear();
 	features = tmpfeat ;
-	this.paint(this.getGraphics());
+	//this.paint(this.getGraphics());
 	updateDisplays();
-
-
     }
 
     // store all features in memory -> speed up
@@ -1146,8 +1149,7 @@ public class SpiceApplication
 	//System.out.println("updateDisplays");
 	//SeqFeatureCanvas dascanv = daspanel.getCanv();
 	dascanv.setFeatures(features);
-	dascanv.paint(dascanv.getGraphics());
-	
+	//dascanv.paint(dascanv.getGraphics());
 	
 	sharedPanel.paint(sharedPanel.getGraphics());
 	//leftPanel.paint(leftPanel.getGraphics());
@@ -1157,6 +1159,10 @@ public class SpiceApplication
 	//ListCellRenderer lcr = ent_list.getCellRenderer();
 	//ent_list.paint() ;
 	sharedPanel.show();
+	//dasPanel.updateUI();
+	//dasPanel.revalidate();
+	//dasPanel.repaint();
+
 	this.repaint();
     }
 
@@ -1433,7 +1439,7 @@ class AboutDialog extends Dialog
 	// Calls the parent telling it this
 	// dialog is modal(i.e true)
 	super(parent, true);         
-	setBackground(Color.gray);
+	//setBackground(Color.gray);
 	setLayout(new BorderLayout());
 	
 	displayText="" ;

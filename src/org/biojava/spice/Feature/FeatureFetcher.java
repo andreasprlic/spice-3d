@@ -95,17 +95,8 @@ public class FeatureFetcher extends Thread
 
 	doDasCommunication() ;
 	
-	while ( ! finished) {	    
-	    //System.out.println("waiting for features to be retreived: "+done);
-	    try {
-		wait(300);
-	    } catch (InterruptedException e) {
-		e.printStackTrace();
-		finished = true ;
-	    }
-	    System.out.println("FeatureFetcher :in waitloop");
-	}
 	List l = getFeatures();
+	System.out.println("setting Features in spice");
 	parent.setFeatures(spId,l);
     }
 
@@ -175,6 +166,7 @@ public class FeatureFetcher extends Thread
 	    System.out.println("FeatureFetcher waiting for features to be retreived: "+done);
 	    try {
 		wait(300);
+		System.out.println("FeatureFetcher waiting "+done);
 	    } catch (InterruptedException e) {
 		e.printStackTrace();
 		done = true ;
