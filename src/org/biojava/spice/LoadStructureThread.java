@@ -1,0 +1,75 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ * Created on 20.03.2004
+ * @author Andreas Prlic
+ *
+ */
+package org.biojava.spice ;
+
+import java.awt.Color ;
+import org.biojava.bio.structure.Structure ;
+
+
+public class LoadStructureThread 
+    extends Thread {
+
+    SPICEFrame spiceframe ;
+    double cc[][];
+    String pdb_file ;
+    public LoadStructureThread(SPICEFrame master,String pdbfile) {
+	spiceframe = master ;
+	pdb_file = pdbfile ;
+    }
+
+
+    public void run () {
+	loadCompound() ;
+    }
+    
+    public synchronized void loadCompound() {
+	
+	try {
+	
+	    spiceframe.showStatus("Loading...Wait...",Color.red);
+	    
+	    String dasstructurecommand = spiceframe.getStructureServer() + "structure?model=1&query=";
+	    String dassequencecommand  = spiceframe.getSequenceServer()  + "dna?segment=";
+	    //String dassequencecommand  = spiceframe.getSequenceServer()  + "sequence?segment=";
+	    String dasalignmentcommand = spiceframe.getAlignmentServer() + "alignment?query=" ;
+	    
+	    DAS_PDBFeeder pdb_f =  new DAS_PDBFeeder(dasstructurecommand,dassequencecommand,dasalignmentcommand) ;
+	    System.out.println("pdb_f.loadPDB");
+	    pdb_f.loadPDB(pdb_file);
+	    System.out.println("pdb_f.getStructure");
+	    Structure struc = pdb_f.getStructure() ;
+	    System.out.println("set Structure");
+	    spiceframe.setStructure(struc);
+	    spiceframe.showStatus(pdb_file +" loaded");
+	    System.out.println("LoadStructureThread finished");
+	    notifyAll();
+	    }
+catch (Exception e){ 
+	    // at some point raise some IO exception, which should be defined by the Inferface
+	    e.printStackTrace();
+			
+	}
+
+    }
+}
