@@ -81,10 +81,13 @@ import javax.swing.ListCellRenderer             ;
 import javax.swing.JScrollPane                  ;
 import javax.swing.DefaultListModel             ;
 import javax.swing.JTextField                   ;
+import javax.swing.JTextArea                    ;
+import javax.swing.JEditorPane                  ;
 import javax.swing.event.ListSelectionListener  ;
 import javax.swing.event.ListSelectionEvent     ;  
 import javax.swing.ImageIcon                    ;
 import javax.swing.BorderFactory                ;
+import javax.swing.JDialog                      ;
 //import javax.swing.event.CaretEvent;
 //import javax.swing.event.CaretListener;
 
@@ -287,12 +290,12 @@ public class SpiceApplication
 	file.add(exit);
 	
 	aboutspice = new MenuItem("About SPICE");
-	aboutdas = new MenuItem("About 3D-DAS");
+	//aboutdas = new MenuItem("About 3D-DAS");
 
 	//aboutspice.addActionListener(this);
 	//aboutdas.addActionListener(this);
 	help.add(aboutspice);
-	help.add(aboutdas);
+	//help.add(aboutdas);
 	
 	
 	statusPanel = new StatusPanel();
@@ -1198,7 +1201,7 @@ public class SpiceApplication
 	    op.show();
 	}
 
-	else if ( event.target == aboutdas ) {
+	/*else if ( event.target == aboutdas ) {
 	    //logger.finest("about DAS");
 	    //AboutDialog asd = new AboutDialog(this);
 	    //asd.setText("DAS homepage: http://www.biodas.org") ;
@@ -1208,7 +1211,7 @@ public class SpiceApplication
 	     asd.show();
 	    
 	    return true;
-	}
+	    }*/
 	else if ( event.target ==  aboutspice ) {
 	    //logger.finest("about SPICE");
 	    AboutDialog asd = new AboutDialog(this);
@@ -1415,33 +1418,43 @@ class OpenDialog extends Dialog
 }
 
 
-class AboutDialog extends Dialog
+class AboutDialog extends JDialog
 {
-    static int H_SIZE = 600;
-    static int V_SIZE = 200;
+    static int H_SIZE = 200;
+    static int V_SIZE = 400;
     //JTextField txt ;
-    String displayText ;
-
-    public AboutDialog(Frame parent)
+    String displayText     ;
+    JTextPane txt         ;
+    public AboutDialog(JFrame parent)
     {
 	// Calls the parent telling it this
 	// dialog is modal(i.e true)
 	super(parent, true);         
 	//setBackground(Color.gray);
-	setLayout(new BorderLayout());
+	//setLayout(new BorderLayout());
+	this.setSize(new Dimension(H_SIZE, V_SIZE)) ;
 	
 	displayText="" ;
+	txt = new JTextPane();
 
+	txt.setEditable(false);
 	// Two buttons "Close" and "Help"
 	//txt = new JTextField();
-	
-	Panel p = new Panel();
+	JScrollPane scroll = new JScrollPane(txt);
+	//scroll.setPreferredSize(new Dimension(H_SIZE, V_SIZE-50)) ;
+	scroll.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+	JPanel p = new JPanel();
+	p.add("Center",scroll);
 	//p.add(txt);
-	p.add(new Button("Close"));
-	p.add(new Button("Help"));
+	p.add("Sourth",new Button("Close"));
+	//p.add(new Button("Help"));
 	
-	add("South", p);
-	resize(H_SIZE, V_SIZE);
+	//add("South", p);
+	this.getContentPane().add(p);
+	//this.getContentPane().add(new Button("Close"));
+	
+	//resize(H_SIZE, V_SIZE);
+
     }
 
     public boolean action(Event evt, Object arg)
@@ -1456,22 +1469,9 @@ class AboutDialog extends Dialog
 	return super.handleEvent(evt);
     }
 
-    public void setText(String txt) {
-	displayText = txt ;
-    }
-
-    public void paint(Graphics g)
-    {
-	
-	g.drawString(displayText, H_SIZE/7, V_SIZE/3);
-	//txt.setText(displayText) ;
-	/*g.setColor(Color.white);
-	g.drawString("The SPICE Applet"      , H_SIZE/4, V_SIZE/3);
-	g.drawString("Version 0.1"           , (H_SIZE/4)+20, V_SIZE/3+20);      
-	g.drawString("(C) Andreas Prlic 2004", (H_SIZE/4)+40, V_SIZE/3);      
-	g.drawString("to learn more about SPICE, please go to", (H_SIZE/4)+60, V_SIZE/3);      
-	g.drawString("http://www.sanger.ac.uk/Users/ap3/DAS/SPICE/stable/stable.html", (H_SIZE/4)+60, V_SIZE/3);      
-	*/
+    public void setText(String t) {
+	displayText = t ;
+	txt.setText(t);
     }
 
 }
