@@ -1630,8 +1630,12 @@ implements SPICEFrame
     
     public boolean showDocument(URL url) 
     {
-        if ( url != null )
-            return JNLPProxy.showDocument(url);
+        if ( url != null ){
+            boolean success = JNLPProxy.showDocument(url); 
+            if ( ! success)
+                logger.info("could not open URL "+url+" in browser. check your config or browser version.")
+        		return success;
+        }
         else
             return false;
     }
@@ -1639,6 +1643,7 @@ implements SPICEFrame
     public boolean showDocument(String urlstring){
         try{
             URL url = new URL(urlstring);
+            
             return showDocument(url);
         } catch (MalformedURLException e){
             logger.warning("malformed URL "+urlstring);
