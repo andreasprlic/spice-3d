@@ -24,10 +24,10 @@
 package org.biojava.spice ;
 
 // for Jmol stuff
-import org.jmol.api.ModelAdapter;
-import org.jmol.adapter.smarter.SmarterModelAdapter;
-import org.openscience.jmol.viewer.JmolViewer;
-import org.openscience.jmol.viewer.JmolStatusListener;
+import org.jmol.api.JmolAdapter;
+import org.jmol.adapter.smarter.SmarterJmolAdapter;
+import org.jmol.viewer.JmolViewer;
+import org.jmol.viewer.JmolStatusListener;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -47,12 +47,12 @@ import org.biojava.bio.structure.Structure ;
 class StructurePanel extends JPanel {
 
     JmolViewer viewer;
-    ModelAdapter adapter;
+    JmolAdapter adapter;
     TextField strucommand  ; 
 
     
     StructurePanel() {
-	adapter = new SmarterModelAdapter(null);
+	adapter = new SmarterJmolAdapter(null);
 	viewer = new JmolViewer(this, adapter);
     }
     
