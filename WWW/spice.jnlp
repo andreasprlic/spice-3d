@@ -2,7 +2,7 @@
 <!-- JNLP File for SwingSet2 Demo Application -->
 <jnlp
   spec="1.0+"
-  codebase="file:///nfs/team71/phd/ap3/WORK/DAS/JAVA/spice/WWW/"
+  codebase="file:///Users/ap3/WORK/DAS/JAVA/spice/WWW/"
   href="spice.jnlp"
  >
   <information>
@@ -32,8 +32,8 @@
   <!-- old 1q22 -->
   <argument>UniProt</argument>
   <argument>P00280</argument>
-  <argument>http://protodas.derkholm.net/axis/services/das_registry</argument>
-
+  <argument>http://servlet.sanger.ac.uk:8080/axis/services/das_registry</argument>
+*
  
 
   </application-desc>
