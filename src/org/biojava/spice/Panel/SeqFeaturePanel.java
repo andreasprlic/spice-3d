@@ -42,7 +42,6 @@ import java.awt.Font                      ;
 import java.awt.Dimension                 ;
 
 import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import java.awt.event.MouseListener       ; 
 import java.awt.event.MouseMotionListener ;
 import java.awt.event.MouseEvent          ;
@@ -907,7 +906,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         
         
         int b = e.getButton();
-        //System.out.println("mouseMoved button " +b);
+        System.out.println("mouseMoved button " +b);
         
         // do not change selection if we display the popup window
         if ( popupMenu.isVisible())
@@ -987,7 +986,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         if ( b != MouseEvent.BUTTON1)
             return;
                 
-        //System.out.println("mouseclicked " + b);
+        System.out.println("mouseclicked " + b);
         // only proceed here with left click
        
         String drstr = "x "+ seqpos + " y " + lineNr ;
@@ -1020,7 +1019,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
     
     public void mousePressed(MouseEvent e)  {
         	int b = e.getButton();
-        //System.out.println("mousePressed "+b);
+        System.out.println("mousePressed "+b);
         	if ( b == MouseEvent.BUTTON1 )
             mouseDragStart = getSeqPos(e);
         	
@@ -1037,7 +1036,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
           
             return;
         }           
-        //System.out.println("mouseReleased "+b);
+        System.out.println("mouseReleased "+b);
         
         if ( b == MouseEvent.BUTTON1 )
             mouseDragStart =  -1 ;
@@ -1076,7 +1075,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         int b = e.getButton();
         if ( b != MouseEvent.BUTTON1 ) 
             return;
-        //System.out.println("dragging mouse "+b);
+        System.out.println("dragging mouse "+b);
         
         // only do with left mouse click
         int seqpos = getSeqPos(e);
