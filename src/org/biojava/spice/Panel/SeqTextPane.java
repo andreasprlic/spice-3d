@@ -99,6 +99,7 @@ public class SeqTextPane
 	//int seqpos = getSeqpos(x,y);
 
 	//System.out.println("SeqTextPane mouseMoved " + x + " " + y + " " + seqpos);
+	spice.showSeqPos(current_chainnumber,seqpos);
 	spice.select(current_chainnumber,seqpos);
     }
 
@@ -140,11 +141,13 @@ public class SeqTextPane
     /** highighting of range of residues */
     public void highlite( int start, int end) {
 	System.out.println("SeqTExtPane highlite " + start + " " + end);
+	select(start,end);
     }
 
     /** highighting of single residue */    
     public void highlite( int seqpos) {
 	System.out.println("SeqTExtPane highlite " + seqpos);
+	select(seqpos);
     }
 
     /** select range of residues */

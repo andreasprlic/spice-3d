@@ -291,6 +291,8 @@ public class SeqFeatureCanvas
 	    String cmd = "select "+pdb1 +", " + pdb2 + "; spacefill on; colour cpk;" ;
 
 	    spice.executeCmd(cmd);
+	    spice.highlite(current_chainnumber,start);
+	    spice.highlite(current_chainnumber,end);
 	} else if (type.equals("METAL") ){
 	    spice.highlite(current_chainnumber,start+1,end+1  ,"cpk");
 	    

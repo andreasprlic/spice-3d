@@ -862,13 +862,14 @@ public class SpiceApplication
 	if ( start    < 0 ) return ;
 	if (chainNumber < 0 ) return ;
 
+	seqField.highlite(start-1,end-1);
 	
 	String cmd = getSelectStr( chainNumber,  start,  end);
 	
 	cmd += "colour "+ colour+";";
 	structurePanel.executeCmd(cmd);
 	structurePanel.forceRepaint();
-	
+
 	    
     }
 
@@ -891,7 +892,7 @@ public class SpiceApplication
 	if ( start    < 0 ) return ;
 	if (chainNumber < 0 ) return ;
 	
-	
+	seqField.highlite(start,end);
 	String cmd = getSelectStr( chainNumber,  start,  end);
 	cmd +=  " spacefill on; " ;
 	if ( colour  != "") {
@@ -923,6 +924,8 @@ public class SpiceApplication
 	if ( seqpos     < 0 ) return ;
 	if (chainNumber < 0 ) return ;
 	
+	seqField.highlite(seqpos);
+	
 	String cmd = getSelectStr( chainNumber,  seqpos);
 	cmd +=  " spacefill on ;" ;
 	structurePanel.executeCmd(cmd);
@@ -931,6 +934,8 @@ public class SpiceApplication
 	if ( colour  != "") {
 	    colour(chainNumber,seqpos,colour) ;
 	}
+
+
 	/*seqField.setSelectionStart(seqpos);
 	seqField.setSelectionEnd(seqpos);
 	seqField.setSelectionColor(Color.red);
@@ -940,6 +945,7 @@ public class SpiceApplication
 
     }
     public void highlite(int chain_number,int seqpos){
+	
 	highlite(chain_number,seqpos,"");
 
     }
@@ -1031,7 +1037,7 @@ public class SpiceApplication
 
     /** select a range of  residue */
     public void select(int chain_number, int start, int end) {
-	//System.out.println("select start end" + start + " " + end);
+	System.out.println("select start end" + start + " " + end);
 
 	seqField.select(start,end);
 
@@ -1040,7 +1046,7 @@ public class SpiceApplication
 	cmd += " set display selected;" ;
 	structurePanel.executeCmd(cmd);
 	structurePanel.forceRepaint();
-
+	
 		
 	
 
@@ -1048,7 +1054,7 @@ public class SpiceApplication
 
     /** select a single residue */
     public void select(int chain_number,int seqpos){
-	//System.out.println("select seqpos" + seqpos);
+	System.out.println("select seqpos" + seqpos);
 	seqField.select(seqpos);
 
 	String cmd = getSelectStr( chain_number, seqpos) ;
