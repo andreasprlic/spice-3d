@@ -40,17 +40,17 @@ import org.biojava.bio.program.das.dasalignment.Alignment;
  */
 public class AlignmentChooserThread extends Thread {
     String uniprot;
-    AlignmentPanel aligPanel;
+    AlignmentChooser aligChooser;
     JProgressBar progressBar;
     SPICEFrame spice;
     /**
      * 
      */
-    public AlignmentChooserThread(String up, SPICEFrame parent, AlignmentPanel aP, JProgressBar pB ) {
+    public AlignmentChooserThread(String up, SPICEFrame parent, AlignmentChooser aP, JProgressBar pB ) {
         super();
         spice = parent;
         uniprot = up;
-        aligPanel = aP;
+        aligChooser = aP;
         progressBar =pB;
         // TODO Auto-generated constructor stub
         
@@ -67,7 +67,7 @@ public class AlignmentChooserThread extends Thread {
             aligs = aligTools.getAlignments(uniprot);
             if ( aligs != null ) {
                 //System.out.println("got "+aligs.length+ " alignments");
-                aligPanel.setAlignments(aligs);
+                aligChooser.setAlignments(aligs);
                 
             }
            
@@ -84,7 +84,7 @@ public class AlignmentChooserThread extends Thread {
         //c.repaint();
         //aligPanel.paint(aligPanel.getGraphics());
         spice.setLoading(false);
-        aligPanel.repaint();
+        //aligPanel.repaint();
            
     }
     

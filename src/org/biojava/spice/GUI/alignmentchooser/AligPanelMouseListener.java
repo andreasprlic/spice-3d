@@ -25,6 +25,7 @@ package org.biojava.spice.GUI.alignmentchooser;
 import javax.swing.JToolTip;
 
 import org.biojava.bio.gui.sequence.SequencePanel;
+import org.biojava.bio.gui.sequence.SequencePanel;
 import org.biojava.bio.gui.sequence.SequenceViewerEvent;
 import org.biojava.bio.gui.sequence.SequenceViewerListener;
 import org.biojava.bio.gui.sequence.SequenceViewerMotionListener;
@@ -76,10 +77,6 @@ implements SequenceViewerListener,
                     SpiceApplication spiceapp = (SpiceApplication) spice;
                     spiceapp.requestFocus();
                 }
-                
-                    
-                    
-                
                 spice.load("PDB",pdbcode.substring(0,4));
                 return;
             }

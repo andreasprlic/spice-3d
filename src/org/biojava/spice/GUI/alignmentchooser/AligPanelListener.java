@@ -35,11 +35,11 @@ import org.biojava.bio.structure.Chain;
  */
 public class AligPanelListener implements ComponentListener {
     
-    AlignmentPanel aligPanel;
+    AlignmentChooser aligPanel;
     /**
      * 
      */
-    public AligPanelListener(AlignmentPanel panel) {
+    public AligPanelListener(AlignmentChooser panel) {
         super();
         aligPanel = panel;
         // TODO Auto-generated constructor stub
