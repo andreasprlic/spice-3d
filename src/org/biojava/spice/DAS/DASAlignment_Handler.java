@@ -106,7 +106,23 @@ public class DASAlignment_Handler extends Thread
     public synchronized void loadAlignments(String pdb_code) {
 	downloadFinished = false ;
 	master.setMappingDone(false) ;
+
+	/*
+	String[] spl     = pdb_code.split("\\.");
+	String   prot    = "";
+	String   chainId = "" ;
+
+	if (spl.length<2) {
+	    prot = query    ;
+	    chainId = " " ;
+	} else {
+	    prot    = spl[0]    ;
+	    chainId = spl[1] ;
+	}
 	
+	//String chainId = getChainFromPDBCode(pdb_code);	
+	System.out.println("searching for alignment containing chain " + chainId);
+	*/
 	pdb_code = pdb_code.toLowerCase() ;
 	//pdb_container = new Simple_PDB_Container() ;
 
@@ -114,10 +130,17 @@ public class DASAlignment_Handler extends Thread
 
 	DASAlignmentClient dasc= new DASAlignmentClient(server);
 	Alignment[] alignments = null ;
+
+	
 	try{
 	    alignments = dasc.getAlignments(pdb_code);	 
 
 	    System.out.println("DASAlignmentHandler: got "+ alignments.length +" alignment(s):");
+
+	    for ( int i=0;i<alignments.length;i++){
+		System.out.println("alignment "+i+" " + alignments[i]);
+		
+	    }
 
 	    convertToStructure(alignments);
 	    
@@ -302,8 +325,10 @@ public class DASAlignment_Handler extends Thread
 
 
     private String getChainFromPDBCode(String pdbcode) {
+	//System.out.println("DASAlignment_Handler: getChainFromPDBCode" + pdbcode);
 	String[] spl = pdbcode.split("\\.");
 	String chain = spl[1] ;
+	//System.out.println("DASAlignment_Handler: getChainFromPDBCode chain:" + chain);
 	return chain ;
     }
 

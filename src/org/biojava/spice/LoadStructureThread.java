@@ -31,18 +31,33 @@ public class LoadStructureThread
     extends Thread {
 
     SPICEFrame spiceframe ;
-    double cc[][];
     String pdb_file ;
+    
+    boolean finished ;
+    
+    Structure structure ;
+
     public LoadStructureThread(SPICEFrame master,String pdbfile) {
 	spiceframe = master ;
 	pdb_file = pdbfile ;
+	finished = false ;
+	structure = null ;
     }
+
 
 
     public void run () {
 	loadCompound() ;
     }
+
+    public boolean isDone() {
+	return finished ;
+    }
     
+    public Structure getStructure() {
+	return structure ;
+    }
+   
     public synchronized void loadCompound() {
 	
 	try {
@@ -58,14 +73,17 @@ public class LoadStructureThread
 	    System.out.println("pdb_f.loadPDB");
 	    pdb_f.loadPDB(pdb_file);
 	    System.out.println("pdb_f.getStructure");
-	    Structure struc = pdb_f.getStructure() ;
-	    System.out.println("set Structure");
-	    spiceframe.setStructure(struc);
+	    
+	    structure = pdb_f.getStructure() ;
+	    // System.out.println("set Structure");
+	    
+	    spiceframe.setStructure(structure);
 	    spiceframe.showStatus(pdb_file +" loaded");
 	    System.out.println("LoadStructureThread finished");
+	    finished = true ;
 	    notifyAll();
 	    }
-catch (Exception e){ 
+	catch (Exception e){ 
 	    // at some point raise some IO exception, which should be defined by the Inferface
 	    e.printStackTrace();
 			

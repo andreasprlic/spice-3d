@@ -148,7 +148,7 @@ public class SeqFeatureCanvas extends Canvas
 
     /** highlite a single segment */
     private void highliteSegment (HashMap segment) {
-	System.out.println("highlite Segment");
+	//System.out.println("highlite Segment");
 
 	// clicked on a segment!
 	String col = (String) segment.get("colorTxt");
@@ -157,18 +157,25 @@ public class SeqFeatureCanvas extends Canvas
 	
 	String fstart  = (String)segment.get("START") ;
 	String fend    = (String)segment.get("END") ;
-	int start = Integer.parseInt(fstart) -1 ;
-	int end   = Integer.parseInt(fend)-1 ;
-	
+	//System.out.println("fstart:"+fstart+" fend:"+fend);
+	int start = Integer.parseInt(fstart) ;
+	int end   = Integer.parseInt(fend) ;
+	start = start -1 ;
+	end   = end   -1 ;
 	String type = (String) segment.get("TYPE") ;
+	System.out.println(start+" " + end+" "+type);
+	System.out.println(segment);
 	if ( type.equals("DISULFID")){
-	    //System.out.println(segment);
+	    
 	    spice.highlite(current_chainnumber,start,start,"cpk");
 	    spice.highlite(current_chainnumber,end  ,end  ,"cpk"); 
 	} else if (type.equals("METAL") ){
 	    spice.highlite(current_chainnumber,start,end  ,"cpk");
+	} else if ( (end - start) == 0 ) {
+	    // feature of size 1
+	    spice.highlite(current_chainnumber,start,start  ,"cpk");	     
 	} else {
-	    spice.colour(current_chainnumber,start  ,end  ,col);	    
+	    spice.colour(current_chainnumber,start+1  ,end+1  ,col);	    
 	}
     }
 
@@ -461,12 +468,13 @@ public class SeqFeatureCanvas extends Canvas
     
     public boolean mouseUp(Event e, int x, int y)
     {
-	//System.out.println("CLICK!");
+
 	
 	
 	int seqpos =  java.lang.Math.round((x-DEFAULT_X_START)/scale)  ;
 		
 	int featurenr = get_featurenr(y) ;
+	System.out.println("CLICK! "+seqpos + " " +featurenr+ " " + chain.getLength());
 	if ( featurenr < 0 ) return true;
 	if ( seqpos    < 0 ) {
 	    // check if the name was clicked
@@ -486,7 +494,7 @@ public class SeqFeatureCanvas extends Canvas
 
 	
 	HashMap segment = getSegmentUnder(featurenr,seqpos);
-	
+	//System.out.println(segment);
 	if (segment != null ) {
 	
 	    highliteSegment(segment);

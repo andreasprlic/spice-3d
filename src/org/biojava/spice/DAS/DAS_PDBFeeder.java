@@ -115,10 +115,8 @@ public class DAS_PDBFeeder
 	throws FileNotFoundException, IOException {
 	try {
 	    
-	 
-
 	    // connect to structure service and retireve structure entry
-	    DASStructure_Handler structure_handler = new DASStructure_Handler(this,dasstructurecommand);
+	    DASStructure_Handler structure_handler = new DASStructure_Handler(dasstructurecommand);
 
 
 	    
@@ -130,9 +128,10 @@ public class DAS_PDBFeeder
 
 	    // and not incorporate the structure data ...
 	    String pdb_id = pdbcode.toUpperCase();
-	    structure_handler.set_id(pdb_id) ;
+	    //structure_handler.set_id(pdb_id) ;
 	    
 	    structure_handler.start();
+	    structure_handler.loadStructure(pdb_id);
 	    
 	   
 	    // if not found   -> add error message ...
@@ -167,7 +166,15 @@ public class DAS_PDBFeeder
 		} catch ( InterruptedException e) {		
 		    done = true ;
 		}
-		if ( structureDone && mappingDone) { done = true ; }
+
+		if ( structure_handler.isDone()){
+		    structureDone = true ;
+		    pdb_structure = structure_handler.getStructure();
+		}
+
+		if ( structureDone && mappingDone) { 
+		    done = true ; 
+		}
 
 		//wait(10);
 		//stru_finished    = structure_handler.downloadFinished();
@@ -182,6 +189,7 @@ public class DAS_PDBFeeder
 	    System.out.println("pdb_container:" + pdb_container);
 	    System.out.println("pdb_structure:" + pdb_structure);
 
+	    
 
 	    //pdb_data      = structure_handler.get_structure();
 	    //pdb_container = dasali.get_structure();
@@ -189,6 +197,14 @@ public class DAS_PDBFeeder
 	    // and join everything into a combined datastructure ...
 	    joinWith(pdb_structure);
 	    System.out.println("joining of data finished " +getTimeStamp() );
+	    System.out.println(pdb_container);
+
+	    //java.util.List chains = pdb_container.getChains(0);
+	    //for ( int i =0;i<chains.size();i++){
+	    //System.out.println("Displaying chain: " + i);
+	    //Chain c = (Chain)chains.get(i);
+	    //System.out.println(c);
+	    //}
 	    //pdb_container = dasali.getPDBContainer() ;
        
 

@@ -71,7 +71,7 @@ public class Spice extends Applet {
 
     public static void addMoreSpice(String pdbcode,URL configfileurl){
 	SpiceApplication appFrame = new SpiceApplication(pdbcode, configfileurl) ;	
-	System.out.println("back from init of SpiceApplication");
+	//System.out.println("init of SpiceApplication single structure mode");
 	appFrame.setTitle("SPICE") ;
 	appFrame.setSize(700, 700);
 	appFrame.show();
@@ -84,6 +84,24 @@ public class Spice extends Applet {
 		}
 	    });
 	
+    }
+
+
+    public static void displayStructureAlignment(String pdb1, String pdb2, URL configfileurl) {
+
+	SpiceApplication appFrame = new SpiceApplication(pdb1, pdb2, configfileurl) ;	
+	//System.out.println("init of SpiceApplication structure alignment mode");
+	appFrame.setTitle("SPICE") ;
+	appFrame.setSize(700, 700);
+	appFrame.show();
+
+	appFrame.addWindowListener(new WindowAdapter() {
+		public void windowClosing(WindowEvent evt) {
+		    Frame frame = (Frame) evt.getSource();
+		    frame.setVisible(false);
+		    frame.dispose();
+		}
+	    });
     }
 
 }
@@ -112,7 +130,25 @@ class SpiceButton extends Button {
 			e.printStackTrace();
 			return null ;
 		    }
-		    spice.addMoreSpice(defaultpdb, url);
+		 
+		    // check if structure alignment has been requested
+		    boolean structurealignment = false ;
+		    try {
+			String alignpdb = spice.getParameter("ALIGNWITH");
+			structurealignment = true ;
+			spice.displayStructureAlignment(defaultpdb,alignpdb,url);
+			
+		     } catch ( Exception e){
+			e.printStackTrace();
+			// do nothing if parameter not present
+			
+		    }
+		    if ( ! structurealignment ) {
+			//System.out.println("init single struc mode");
+			spice.addMoreSpice(defaultpdb, url);
+		    }
+
+		 
 		    return null ;
 		}
 	    });

@@ -79,6 +79,8 @@ public class SpiceApplication
     HashMap config      ;
     Structure structure ; 
     String pdbcode      ;
+    String pdbcode2     ; // only set if displaying structure alignments 
+
     int currentChain = -1 ;
     HashMap memoryfeatures; // all features in memory
     ArrayList features ;    // currently being displayed 
@@ -107,11 +109,15 @@ public class SpiceApplication
     Color oldColor ; 
     boolean first_load ;
 
+    boolean structureAlignmentMode ;
+
     MenuBar  menu ;
     MenuItem exit ;
     MenuItem props ;
     MenuItem aboutspice ;
     MenuItem aboutdas ;
+
+
     SpiceApplication(String pdbcode_, URL config_url) {
 	super();
 
@@ -119,7 +125,7 @@ public class SpiceApplication
 	
 	structure = null ;
 	pdbcode = pdbcode_ ;
-
+	pdbcode2 = null ;
 	txtColor = new String[7] ;
 	txtColor[0]="blue";
 	txtColor[1]="pink";
@@ -146,7 +152,7 @@ public class SpiceApplication
 
 	first_load = true ;
 
-
+	structureAlignmentMode = false ;
 
 	this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -257,9 +263,20 @@ public class SpiceApplication
 
 	memoryfeatures = new HashMap();
 	features = new ArrayList();
-	System.out.println("ENT_LIST 2" + ent_list);
-
+	
     }
+
+
+    /** Constructor for structure alignment visualization 
+     */
+    SpiceApplication(String pdb1, String pdb2, URL config_url) {
+	this(pdb1, config_url);
+	structureAlignmentMode = true ;
+	pdbcode2 = pdb2 ;
+	System.out.println("finished init of structure alignment");
+		
+    }
+
 
     public boolean isLoading() {
 	return first_load;
@@ -269,7 +286,24 @@ public class SpiceApplication
 	super.show();
 	//System.out.println("SHOW: getting Structure data from new thread");
 	// and now load data ...
-	getStructure(pdbcode);
+
+	
+	if ( ! structureAlignmentMode ) {
+	    System.out.println("not in alignment mode");
+	    getStructure(pdbcode);
+	} else {
+	    showStatus("Loading...Wait...",Color.red);
+	    
+	    LoadStructureAlignmentThread thr = new 
+		LoadStructureAlignmentThread(this,
+					     pdbcode,
+					     pdbcode2);
+	    thr.start();
+	    
+	    // get all data from thr
+	    //System.out.println("visualize data for ...");
+	    
+	}
     }
 
 
@@ -478,6 +512,9 @@ public class SpiceApplication
     public void getStructure(String pdbcod) {
 	//String server = "http://protodas.derkholm.net/dazzle/mystruc/structure?query=";
 	
+
+	// proxy should be set at startup ( if called from command line) otherwise the browsery proxy settings are being used ...
+
 	/*
 	Properties systemSettings = System.getProperties();
 	systemSettings.put("proxySet", "true");
@@ -487,34 +524,12 @@ public class SpiceApplication
 	*/
 	LoadStructureThread thr = new LoadStructureThread(this,pdbcod);
 	thr.start();
+	
 
-	/*
-	boolean done = false ;
-	while ( ! done) {
-	    try {
-		wait(300);
-	    } catch (InterruptedException e) {
-		e.printStackTrace();
-		if ( structure != null ) {
-		    done = true ;
-		}
-	    }
-	}
-	System.out.println("survived all loading");
-	structurePanel.forceRepaint();
-	*/
-	/*
-	DASStructureClient dasc= new DASStructureClient(server);
-	Structure struc = null ;
-	try{
-	    struc = dasc.getStructure(pdbcode);	    
-	    System.out.println("simpleDAS: got structure:");
-	    System.out.println(struc);
-	} catch (Exception e){
-	    e.printStackTrace();
-	}
-	return struc ;
-	*/
+
+	 
+
+	
     }
 
     
@@ -563,16 +578,18 @@ public class SpiceApplication
 	seq_pos.setText(status);
     }
     
-    /** proivde a biojava structure object to use in the master application */
-    public void setStructure(Structure structure_ ) {
-	//System.out.println("setting structure");
-	
+
+    /** set a structure to be displayed and sends a script command to
+     * color structure 
+     * @param structre_ a Biojava structure object
+     * @param selectcmd a rasmol like select command ( all commands in one line, spearated by ";"
+     */
+    
+    public void setStructure(Structure structure_, String selectcmd ) {
 	structure = structure_ ; 
 	
-	
 	System.out.println("got final structure:"+structure);
-	    
-	
+	    	
 	DefaultListModel model = (DefaultListModel) ent_list.getModel() ;
 	synchronized (model) {
 	    model.clear() ;
@@ -585,17 +602,27 @@ public class SpiceApplication
 	}
 	
 	structurePanel.setStructure(structure);
-	String cmd = "select all; cpk off ; wireframe off ; cartoon on ; colour chain;select not protein and not solvent;spacefill 2.0;";
-	structurePanel.executeCmd(cmd);
+
+	structurePanel.executeCmd(selectcmd);
 	
-	//cmd = "select not protein and not solvent;spacefill 2.0;" ;
-	//select not selected;cpk off;";
-	//structurePanel.executeCmd(cmd);
-    
 	first_load = false ;
 	setCurrentChain(0);
 	updateDisplays();
     
+
+    }
+
+
+    /** set a structure to be displayed. Use a default select command
+     * to color structure
+     * @param structre_ a Biojava structure object
+     */
+    public void setStructure(Structure structure_ ) {
+	//System.out.println("setting structure");
+	String cmd = "select all; cpk off ; wireframe off ; backbone on ; colour chain;select not protein and not solvent;spacefill 2.0;";
+
+	setStructure(structure_,cmd);
+
     }
 
     /** send a command to Jmol */
@@ -611,7 +638,7 @@ public class SpiceApplication
 	// update features to be displayed ...
 	Chain chain = getChain(currentChain) ;
 	String sp_id = chain.getSwissprotId() ;
-
+	System.out.println("SP_ID "+sp_id);
 	ArrayList tmpfeat = getFeaturesFromMemory(sp_id) ;
 	
 	if ( tmpfeat.size() == 0 ) {
@@ -781,12 +808,14 @@ public class SpiceApplication
     public Chain getChain(int chainnumber) {
 	Chain c = structure.getChain(chainnumber);
 
+	// almost the same as Chain.clone(), here:
 	// browse through all groups and only keep those that are amino acids...
 	ChainImpl n = new ChainImpl() ;
-
+	System.out.println(c.getName());
+	System.out.println(c.getSwissprotId());
 	n.setName(c.getName());
 	n.setSwissprotId(c.getSwissprotId());
-
+	
 	ArrayList groups = c.getGroups("amino");
 	for (int i = 0 ; i<groups.size();i++){
 	    Group group = (Group) groups.get(i);
@@ -1286,4 +1315,5 @@ class AboutDialog extends Dialog
 	g.drawString("http://www.sanger.ac.uk/Users/ap3/DAS/SPICE/stable/stable.html", (H_SIZE/4)+60, V_SIZE/3);      
 	*/
     }
+
 }
