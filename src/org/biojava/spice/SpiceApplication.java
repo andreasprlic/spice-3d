@@ -1210,7 +1210,7 @@ public class SpiceApplication
 	    //asd.setText("DAS homepage: http://www.biodas.org") ;
 	    //asd.show();
 	     AboutDialog asd = new AboutDialog(this);
-	     asd.setText("3D-DAS homepage: http://protodas.derkholm.net) ;
+	     asd.setText("3D-DAS homepage: http://protodas.derkholm.net") ;
 	     asd.show();
 	    
 	    return true;
