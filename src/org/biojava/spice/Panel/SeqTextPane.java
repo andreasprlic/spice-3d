@@ -186,6 +186,7 @@ public class SeqTextPane
 	//System.out.println("SeqTExtPane highlite " + start + " " + end);
 	//select(start,end);
 	StyledDocument doc = this.getStyledDocument();
+	doc.setCharacterAttributes(0,chain.getLength(), this.getStyle("black"),true);
 	doc.setCharacterAttributes(start,(end-start +1), this.getStyle("red"),true);
 	this.repaint();
     }
@@ -195,6 +196,7 @@ public class SeqTextPane
 	//System.out.println("SeqTExtPane highlite " + seqpos);
 	select(seqpos);
 	StyledDocument doc = this.getStyledDocument();
+	doc.setCharacterAttributes(0,chain.getLength(), this.getStyle("black"),true);
 	doc.setCharacterAttributes(seqpos,1, this.getStyle("red"),true);
 	this.repaint();
     }
@@ -206,7 +208,6 @@ public class SeqTextPane
 	StyledDocument doc = this.getStyledDocument();
 	doc.setCharacterAttributes(0,chain.getLength(), this.getStyle("black"),true);
 	doc.setCharacterAttributes(start,(end-start +1), this.getStyle("red"),true);
-
 	this.repaint();
     }
     
@@ -216,8 +217,7 @@ public class SeqTextPane
 	if ( chain == null ) { return ;}
 	StyledDocument doc = this.getStyledDocument();
 	doc.setCharacterAttributes(0,chain.getLength(), this.getStyle("black"),true);
-	doc.setCharacterAttributes(seqpos,1, this.getStyle("red"),true);
-	
+	doc.setCharacterAttributes(seqpos,1, this.getStyle("red"),true);	
 	this.repaint();
     }
  
@@ -263,12 +263,15 @@ class ISearchListener
 	    if (searchtext.length() > 0) {
 		searchtext = searchtext.substring(0,searchtext.length()-1);
 		logger.finest("new searchtext " + searchtext);
+		tooltip(searchtext);	
 	    }
 	} 
 	else if ( code == KeyEvent.VK_ENTER) {
 	    // if keyPressed = Enter, search from startpos +1
-	    startpos = lasthit + searchtext.length()-1;
+	    startpos = lasthit + searchtext.length() ;
 	    logger.finest("starting search from here " + searchtext);
+	    tooltip(searchtext);
+	   
 	}
 	else if ( code == KeyEvent.VK_HOME) {
 	    // if keyPressed = Home , move to first character.
@@ -276,14 +279,18 @@ class ISearchListener
 	    searchtext = "" ;
 	    startpos = 0 ;
 	    lasthit  = 0 ;
+	    tooltip(null);
+	   
 	} 
 	else if ( m.matches() ) {
 	    // this text can be added to searchtext varaiable
 	    searchtext += (s);
 	    logger.finest("new searchtext " + searchtext);
+	    tooltip(searchtext);
+	   
 	}
 	
-	
+
 	
 	// display popup with current searchtext.
 	// TODO ...
@@ -304,6 +311,14 @@ class ISearchListener
 	
     }
     
+    private void tooltip(String txt) {
+	String help =  "<ENTER> for next occurance, <HOME> to clear" ;
+	if (txt == null)  parent.setToolTipText("press key to search for pattern. "+help);
+	else 
+	    parent.setToolTipText("searching " +txt +" " + help);
+	
+    }
+
     private int getStartPos(){
 	String sequence = parent.getText();
 	return sequence.indexOf(searchtext,startpos);
