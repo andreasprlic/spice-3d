@@ -115,7 +115,7 @@ public class SeqTextPane
 	if ( seqpos > this.getText().length()) return ;
 	
 	spice.showSeqPos(current_chainnumber,seqpos);
-	spice.highlite(current_chainnumber,seqpos);
+	spice.select(current_chainnumber,seqpos);
 
     }
 

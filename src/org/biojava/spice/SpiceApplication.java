@@ -710,9 +710,9 @@ public class SpiceApplication
 
 	structure = structure_ ; 
 
-	//if (logger.isLoggable(Level.FINEST)) {
-	    //System.out.println(structure.toPDB());	    
-	//}
+	if (logger.isLoggable(Level.FINEST)) {
+	    System.out.println(structure.toPDB());	    
+	}
 
 
 	    	
@@ -957,8 +957,10 @@ public class SpiceApplication
 	cmd += "colour "+ colour+";";
 	structurePanel.executeCmd(cmd);
 	//structurePanel.forceRepaint();
-	//seqField.highlite(start-1,end-1);
-	    
+	if ( chainNumber == currentChain) {
+	    seqField.highlite(start-1,end-1);
+	    dascanv.highlite(start-1,end-1);
+	}
     }
 
     public void colour(int chainNumber, int seqpos, String colour) {
@@ -983,7 +985,7 @@ public class SpiceApplication
 
 	// highlite structure
 	String cmd = getSelectStr( chainNumber,  start,  end);
-	cmd +=  " spacefill on; " ;
+	//cmd +=  " spacefill on; " ;
 	if ( colour  != "") {
 	    cmd += "colour " +colour ;
 	    colour(chainNumber,start,end,colour) ;
@@ -1152,18 +1154,18 @@ public class SpiceApplication
     public void select(int chain_number, int start, int end) {
 	//logger.finest("select start end" + start + " " + end);
 
-
+	if ( chain_number == currentChain ) {
+	    seqField.select(start,end);		
+	    dascanv.select(start,end);
+	}
+	
 
 	String cmd = getSelectStr( chain_number,  start,  end);
 	if (cmd.equals("")) { return ; } 
 	cmd += " set display selected;" ;
 	structurePanel.executeCmd(cmd);
 	//structurePanel.forceRepaint();
-	if ( chain_number == currentChain ) {
-	    seqField.select(start,end);		
-	    dascanv.select(start,end);
-	}
-	
+
 
     }
 
@@ -1171,6 +1173,10 @@ public class SpiceApplication
     public void select(int chain_number,int seqpos){
 	//logger.finest("select seqpos" + seqpos);
 
+	if ( chain_number == currentChain ){
+	    seqField.select(seqpos);
+	    dascanv.select(seqpos);
+	}
 
 	String cmd = getSelectStr( chain_number, seqpos) ;
 	if (cmd.equals("")) { return ; } 
@@ -1178,10 +1184,7 @@ public class SpiceApplication
 	structurePanel.executeCmd(cmd);
 	//structurePanel.forceRepaint();
 	
-	if ( chain_number == currentChain ){
-	    seqField.select(seqpos);
-	    dascanv.select(seqpos);
-	}
+
     }
 
     public void scale() {
