@@ -43,6 +43,9 @@ import java.util.logging.*;
 /// accessing Jmol directly
 import org.jmol.viewer.datamodel.Atom ;
 
+import org.openscience.jmol.ui.JmolPopup;
+
+
 /** a Panel that provides a wrapper around the Jmol viewer. Code heavily
  * inspired by
  * http://cvs.sourceforge.net/viewcvs.py/jmol/Jmol/examples/Integration.java?view=markup
@@ -60,11 +63,15 @@ class StructurePanel extends JPanel
     TextField   strucommand  ; 
     
     SPICEFrame  spice ;
-
+    JmolPopup jmolpopup ;
+    
     StructurePanel(SPICEFrame parent) {
 	spice = parent ;
 	adapter = new SmarterJmolAdapter(null);
 	viewer = new JmolViewer(this, adapter);
+
+	jmolpopup = JmolPopup.newJmolPopup(viewer);
+	
     }
     
     /** returns the JmolViewer */
@@ -116,6 +123,8 @@ class StructurePanel extends JPanel
 		logger.severe("could not open PDB file in viewer "+ strError);
 	    }
 	}
+	jmolpopup.updateComputedMenus();
+
     }
 
  
@@ -166,8 +175,15 @@ class StructurePanel extends JPanel
     public void mouseClicked(MouseEvent e)
     {
 	logger.finest("mouseClick in structure Panel"+e);
+	
 
-	viewer.popupMenu(e.getX(),e.getY());
+	// if right mouse button 
+	if ( e.getButton() == MouseEvent.BUTTON3 ) {
+	    //viewer.popupMenu(e.getX(),e.getY());
+	    jmolpopup.show(e.getX(),e.getY());
+	}
+      
+	
 
 	int pos = viewer.findNearestAtomIndex(e.getX(),e.getY());
 	if ( pos == -1 ) { return ; }
