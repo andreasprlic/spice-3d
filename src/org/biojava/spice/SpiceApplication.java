@@ -168,7 +168,7 @@ public class SpiceApplication
 
 
 	System.setProperty("XMLVALIDATION",XMLVALIDATION);
-	int timeout = 10000;
+	int timeout = 15000;
 	System.out.println("setting timeouts to " + timeout) ;
 	System.setProperty("sun.net.client.defaultConnectTimeout", ""+timeout);
 	System.setProperty("sun.net.client.defaultReadTimeout", ""+timeout);
@@ -179,7 +179,9 @@ public class SpiceApplication
 	//sprops.put("proxyPort", "3128" );
 	//sprops.put("http.proxyHost", "wwwcache.sanger.ac.uk");
 	//sprops.put("http.proxyPort", "3128");
-
+	System.out.println("using Proxy:" + System.getProperty("proxySet"));
+	System.out.println("proxyHost"    + System.getProperty("proxyHost"));
+	System.out.println("proxyPort"    + System.getProperty("proxyPort"));
 
 
 
