@@ -194,7 +194,7 @@ public interface SPICEFrame  {
     
     /** returns currently displayed PDB code; null if none*/
     public String getPDBCode();
-    
+   
     /** returns currently displayed UniProt code; null if none*/
     public String getUniProtCode();
     
