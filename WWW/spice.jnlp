@@ -8,8 +8,8 @@
     <title>The SPICE Application</title>
     <vendor>Sanger Institute</vendor>
     <homepage href="http://www.sanger.ac.uk/Users/ap3/DAS/SPICE/stable/stable.html"/>
-    <description>Visualization of prtoein structures and their annotations.</description>
-    <description kind="short">Visualization of prtoein structures and their annotations.</description>
+    <description>Visualization of protein structures and their annotations.</description>
+    <description kind="short">Visualization of protein structures and their annotations.</description>
  
   </information>
   <security>
