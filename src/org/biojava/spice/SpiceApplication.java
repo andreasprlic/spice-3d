@@ -171,12 +171,12 @@ public class SpiceApplication
 	System.setProperty("sun.net.client.defaultConnectTimeout", ""+timeout);
 	System.setProperty("sun.net.client.defaultReadTimeout", ""+timeout);
 
-	Properties sprops = System.getProperties() ;
-	sprops.put("proxySet", "true" );
-	sprops.put("proxyHost", "wwwcache.sanger.ac.uk" );
-	sprops.put("proxyPort", "3128" );
-	sprops.put("http.proxyHost", "wwwcache.sanger.ac.uk");
-	sprops.put("http.proxyPort", "3128");
+	//Properties sprops = System.getProperties() ;
+	//sprops.put("proxySet", "true" );
+	//sprops.put("proxyHost", "wwwcache.sanger.ac.uk" );
+	//sprops.put("proxyPort", "3128" );
+	//sprops.put("http.proxyHost", "wwwcache.sanger.ac.uk");
+	//sprops.put("http.proxyPort", "3128");
 
 
 

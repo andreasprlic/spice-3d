@@ -74,7 +74,7 @@ public class Feature {
     public void setName(String nam) { name = nam; }
     public String getName() { return name; }
     
-    public void setMethod(String methd) { method = method ; }
+    public void setMethod(String methd) { method = methd ; }
     public String getMethod() { return method ; }
 
     public void setType(String typ) { type = typ ; }

@@ -149,9 +149,32 @@ public class SeqFeatureCanvas
 	List currentLine   = new ArrayList();
 	Feature oldFeature = new Feature();
 	boolean start      = true ;
+	String featureSource = "" ;
 	
 	for (int i=0; i< feats.size(); i++) {
 	    Feature feat = (Feature)feats.get(i);
+
+	    String ds =feat.getSource();
+	    // check if new feature source
+	    if ( ! featureSource.equals(ds) ) {
+		//System.out.println("new DAS source " + ds );
+		
+		if ( ! start) {
+		    drawLines.add(currentLine);
+		}
+		Feature tmpfeat = new Feature();
+		tmpfeat.setSource(ds);
+		tmpfeat.setMethod("_SPICE_LINESEPARATOR");		
+		currentLine = new ArrayList();
+		currentLine.add(tmpfeat);
+		drawLines.add(currentLine);
+		currentLine = new ArrayList();
+		
+	    }
+	    featureSource = ds ;
+
+
+	    // check for type
 	    //System.out.println(feat);
 	    if (oldFeature.getType().equals(feat.getType())){
 		// see if they are overlapping
@@ -182,12 +205,12 @@ public class SeqFeatureCanvas
 
 	drawLines.add(currentLine);
 
-	Dimension dstruc=this.getSize();
+	//Dimension dstruc=this.getSize();
 	//int imageheight = getImageHeight();
 	//imbuf=this.createImage(dstruc.width, imageheight)
-	imbuf=this.createImage(dstruc.width, dstruc.height);
+	//imbuf=this.createImage(dstruc.width, dstruc.height);
 	//imbuf = new BufferedImage(dstruc.width, dstruc.height,BufferedImage.TYPE_INT_RGB);
-	imbufDim = dstruc;
+	//imbufDim = dstruc;
 	this.paintComponent(this.getGraphics());
 
     }
@@ -284,8 +307,8 @@ public class SeqFeatureCanvas
 	start = start -1 ;
 	end   = end   -1 ;
 	String type =  segment.getParent().getType() ;
-	System.out.println(start+" " + end+" "+type);
-	System.out.println(segment);
+	//System.out.println(start+" " + end+" "+type);
+	//System.out.println(segment);
 	if ( type.equals("DISULFID")){
 
 	    String pdb1 = spice.getSelectStrSingle(current_chainnumber,start);
@@ -458,7 +481,7 @@ public class SeqFeatureCanvas
 	int aminosize = Math.round(1 * scale) ;
 
 	boolean secstruc = false ;
-	String featureSource = "" ;
+
 
 	for (int i = 0 ; i< drawLines.size();i++) {
 	    //System.out.println(i%entColors.length);
@@ -467,21 +490,29 @@ public class SeqFeatureCanvas
 	    y = y + DEFAULT_Y_STEP ;
 
 	    List features = (List) drawLines.get(i) ;
+
 	    for ( int f =0 ; f< features.size();f++) {
+
 		Feature feature = (Feature) features.get(f);
-		String ds =feature.getSource(); 
-		if ( featureSource != ds ) {
-		    //System.out.println("new DAS source " + ds );
+	
+		// line separator
+
+		if ( feature.getMethod().equals("_SPICE_LINESEPARATOR")) {
+		    //System.out.println("_SPICE_LINESEPARATOR");
+		    String ds = feature.getSource();
 		    gstruc.setColor(Color.white);
 		    gstruc.drawString(ds,DEFAULT_X_START,y+DEFAULT_Y_HEIGHT);
-		    y = y + DEFAULT_Y_STEP ;
-		    
+		    continue ;
 		}
-		featureSource = ds ;
-	    
+		
+		
 		List segments = feature.getSegments() ;
 	    
 		// draw text
+		if ( segments.size() < 1) {
+		    //System.out.println(feature.getMethod());
+		    continue ;
+		}
 		Segment seg0 = (Segment) segments.get(0) ;
 		Color col =  seg0.getColor();	
 		gstruc.setColor(col);
@@ -695,7 +726,7 @@ public class SeqFeatureCanvas
 	int lineNr    = getLineNr(y);
 	
 	//int featurenr = get_featurenr(y) ;
-	System.out.println("CLICK! "+seqpos + " " +lineNr+ " " + chain.getLength());
+	//System.out.println("CLICK! "+seqpos + " " +lineNr+ " " + chain.getLength());
 	
 	if ( lineNr < 0 ) return ;
 	if ( seqpos    < 0 ) {

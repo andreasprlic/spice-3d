@@ -276,7 +276,7 @@ public class FeatureFetcher extends Thread
 
     private Feature getNewFeat(Map currentFeatureMap) {
 	Feature feat = new Feature();
-	System.out.println(currentFeatureMap);
+	//System.out.println(currentFeatureMap);
 	feat.setSource((String)currentFeatureMap.get("dassource"));
 	feat.setName(  (String)currentFeatureMap.get("NAME"));
 	feat.setType(  (String)currentFeatureMap.get("TYPE"));
