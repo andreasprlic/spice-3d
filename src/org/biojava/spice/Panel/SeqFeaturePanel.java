@@ -125,10 +125,11 @@ implements SeqPanel, MouseListener, MouseMotionListener
     //mouse events
     Date lastHighlight ;
     // highliting
-    
+
+    boolean dragging;
     
     //Logger logger        ;
-    
+    static Logger logger      = Logger.getLogger("org.biojava.spice");
     
     /**
      * 
@@ -162,7 +163,9 @@ implements SeqPanel, MouseListener, MouseMotionListener
         selectStart    = -1 ;
         selectEnd      =  1 ;
         mouseDragStart = -1 ;
-        
+        dragging = false;
+
+
         popupMenu = new JPopupMenu();
         
         
@@ -977,39 +980,9 @@ implements SeqPanel, MouseListener, MouseMotionListener
     
     public void mouseClicked(MouseEvent e)
     {
+	// removed functionality, because of different behaviour of 
+	//implementations between OSX and Linux !!!!!! ARGH!!
 
-        int seqpos = getSeqPos(e);
-        int lineNr = getLineNr(e);
-        if ( seqpos    > chain.getLength()) return ;
-        
-        int b = e.getButton();
-        if ( b != MouseEvent.BUTTON1)
-            return;
-                
-        System.out.println("mouseclicked " + b);
-        // only proceed here with left click
-       
-        String drstr = "x "+ seqpos + " y " + lineNr ;
-        
-        spice.showStatus(drstr);
-        Segment segment = getSegmentUnder(seqpos,lineNr);
-        //logger.finest(segment);
-        if (segment != null ) {
-            if (! spice.isSelectionLocked() )
-            highliteSegment(segment);
-            
-            
-            String toolstr = getToolString(seqpos,segment);
-            spice.showStatus(drstr + " " + toolstr) ;
-            this.setToolTipText(toolstr);
-            
-            
-        } else {
-            if ( ! spice.isSelectionLocked())
-                spice.highlite(current_chainnumber,seqpos);
-            this.setToolTipText(null);
-        }
-       
         return  ;
     }	
     
@@ -1018,35 +991,43 @@ implements SeqPanel, MouseListener, MouseMotionListener
     
     
     public void mousePressed(MouseEvent e)  {
-        	int b = e.getButton();
-        System.out.println("mousePressed "+b);
+	int b = e.getButton();
+        logger.finest("mousePressed "+b);
         	if ( b == MouseEvent.BUTTON1 )
             mouseDragStart = getSeqPos(e);
         	
         
     }
     public void mouseReleased(MouseEvent e) {
+        int b = e.getButton();
+	logger.finest("mouseReleased "+b);       
+	if ( b == MouseEvent.BUTTON3) {          
+            return;
+        }           
+       
         
         int seqpos = getSeqPos(e);
         int lineNr = getLineNr(e);
-        if ( seqpos    > chain.getLength()) return ;
-        
-        int b = e.getButton();
-        if ( b == MouseEvent.BUTTON3) {
-          
-            return;
-        }           
-        System.out.println("mouseReleased "+b);
-        
-        if ( b == MouseEvent.BUTTON1 )
+	logger.finest("mouseReleased at " + seqpos + " line " + lineNr);
+	if ( seqpos    > chain.getLength()) return ;
+      
+	if ( b == MouseEvent.BUTTON1 )
             mouseDragStart =  -1 ;
+
+        if ( dragging ) {
+	    // we are stopping to drag...
+	    dragging = false;
+	    return;
+	}
                 
         if ( b == MouseEvent.BUTTON1 && ( ! spice.isSelectionLocked()))
         {
+	    //System.out.println("checking more");
             if ( lineNr < 0 ) return ;
             if ( seqpos < 0 ) {
                 // check if the name was clicked
                 if (nameClicked(e)){
+		    //System.out.println("nameclicked");
                     // highlight all features in the line
                     //Feature feature = getFeatureAt(seqpos,lineNr);
                     List features = (List) drawLines.get(lineNr);
@@ -1058,14 +1039,32 @@ implements SeqPanel, MouseListener, MouseMotionListener
                     //logger.finest(cmd);
                     spice.executeCmd(cmd);
                     return  ;
-                }
-            }            
-        }
-        
-        
+                } 
+	    } else {
+		//System.out.print("getSegmentUnder");
+		Segment segment = getSegmentUnder(seqpos,lineNr);
+		//logger.finest(segment.toString());
+		if (segment != null ) {
+		    highliteSegment(segment);
+		    
+		    //String drstr = "x "+ seqpos + " y " + lineNr ;
+		    String toolstr = getToolString(seqpos,segment);
+		    
+		    //spice.showStatus(drstr + " " + toolstr) ;
+		    this.setToolTipText(toolstr);
+		    
+		    
+		} else {
+		    if ( ! spice.isSelectionLocked())
+			spice.highlite(current_chainnumber,seqpos);
+		    this.setToolTipText(null);
+		}
+	    }
+	}            
     }
     public void mouseDragged(MouseEvent e) {
-        
+        dragging = true;
+
         if ( mouseDragStart < 0 )
             return ;        
         
@@ -1073,9 +1072,12 @@ implements SeqPanel, MouseListener, MouseMotionListener
             return;
         
         int b = e.getButton();
-        if ( b != MouseEvent.BUTTON1 ) 
-            return;
-        System.out.println("dragging mouse "+b);
+        logger.finest("dragging mouse "+b);
+        
+	// ARGH my linux java 142_05 does not show Button 1 when being dragged!
+	//if ( b != MouseEvent.BUTTON1 ) 
+	//  return;
+
         
         // only do with left mouse click
         int seqpos = getSeqPos(e);

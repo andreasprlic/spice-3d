@@ -63,11 +63,13 @@ implements SeqPanel, MouseListener, MouseMotionListener
     int selectionStart  ;
     ISearchListener isearchListener ;
     JPopupMenu popupMenu;
-    
+    boolean dragging ;
+    static Logger logger      = Logger.getLogger("org.biojava.spice");
     public SeqTextPane (SPICEFrame spicef) {
         super();
         spice = spicef;
         chain = null ;
+	dragging = false ;
         int current_chainnumber = -1;
         selectionStart = -1 ;
         //this.setBackground(Color.black);
@@ -144,26 +146,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         
     }
     
-    public void mouseClicked(MouseEvent e)
-    {
-        // do not change selection if  popupMenu is open
-        if ( popupMenu.isVisible())
-            return;
-        
-        int seqpos = getSeqPos(e);
-        if ( seqpos < 0 ) return ; 
-        
-        int b = e.getButton();
-        if ( b != MouseEvent.BUTTON1) return;
-        
-        spice.select(current_chainnumber,seqpos);
-        String pdb1 = spice.getSelectStrSingle(current_chainnumber,seqpos);
-        if ( ! pdb1.equals("")) {
-            String cmd = "select "+pdb1 +"; spacefill on; colour cpk;" ;
-            spice.executeCmd(cmd);
-        }
-        
-    }
+
     
     private int getSeqPos(MouseEvent e) {
         
@@ -174,27 +157,52 @@ implements SeqPanel, MouseListener, MouseMotionListener
         int seqpos = viewToModel(p);
         return seqpos  ;
     }
-    
+
+    public void mouseClicked(MouseEvent e)  { }
     public void mouseEntered(MouseEvent e)  {}
     public void mouseExited(MouseEvent e)   {}
     public void mousePressed(MouseEvent e)  {
         int b = e.getButton();
+        logger.finest("mousePressed " + b);
         if ( b == MouseEvent.BUTTON3) return;
         selectionStart = getSeqPos(e);
         
     }
     public void mouseReleased(MouseEvent e) {
         int b = e.getButton();
-        if ( b == MouseEvent.BUTTON3) return;
+	
+	logger.finest("mouseReleased " + b);
+        if ( b != MouseEvent.BUTTON1) return;
         selectionStart =  -1 ;
+
+        // do not change selection if  popupMenu is open
+        if ( popupMenu.isVisible())
+            return;
+        
+	if ( dragging) {
+	    dragging = false;
+	    return;
+	}
+        int seqpos = getSeqPos(e);
+        if ( seqpos < 0 ) return ; 
+        
+        
+        spice.select(current_chainnumber,seqpos);
+        String pdb1 = spice.getSelectStrSingle(current_chainnumber,seqpos);
+        if ( ! pdb1.equals("")) {
+            String cmd = "select "+pdb1 +"; spacefill on; colour cpk;" ;
+            spice.executeCmd(cmd);
+        }
+
     }
     public void mouseDragged(MouseEvent e) {
         //System.out.println("dragging mouse "+e);
+	dragging = true ;
         if ( selectionStart < 0 )
             return ;
         int b = e.getButton();
         if ( b == MouseEvent.BUTTON3) return;
-        
+        logger.finest("mouseDragged " + b);
         int selEnd =  getSeqPos(e);
         int start = selectionStart ;
         int end   = selEnd         ;
