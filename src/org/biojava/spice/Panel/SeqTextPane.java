@@ -128,6 +128,10 @@ implements SeqPanel, MouseListener, MouseMotionListener
     
     public void mouseMoved(MouseEvent e)
     {	
+        // do not change selection if  popupMenu is open
+        if ( popupMenu.isVisible())
+            return;
+        
         isearchListener.clear();
         
         int seqpos = getSeqPos(e);
@@ -142,8 +146,15 @@ implements SeqPanel, MouseListener, MouseMotionListener
     
     public void mouseClicked(MouseEvent e)
     {
+        // do not change selection if  popupMenu is open
+        if ( popupMenu.isVisible())
+            return;
+        
         int seqpos = getSeqPos(e);
         if ( seqpos < 0 ) return ; 
+        
+        int b = e.getButton();
+        if ( b != MouseEvent.BUTTON1) return;
         
         spice.select(current_chainnumber,seqpos);
         String pdb1 = spice.getSelectStrSingle(current_chainnumber,seqpos);

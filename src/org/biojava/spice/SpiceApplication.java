@@ -202,8 +202,9 @@ implements SPICEFrame
         memoryfeatures = new HashMap();
         features = new ArrayList();
                 
-        //this.setTitle("SPICE") ;
-        //this.setSize(700, 700);
+        this.setTitle("SPICE") ;
+        
+        
         //this.show();
         
         //this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -212,6 +213,7 @@ implements SPICEFrame
         this.setIconImage(icon.getImage());
         this.pack();
         
+        //this.setSize(800, 600);
         this.setVisible(true);
         
         logger.finest("getting config");
@@ -230,8 +232,8 @@ implements SPICEFrame
    
     private void initLoggingPanel(){
         LoggingPanel loggingPanel = new LoggingPanel(logger);
-        loggingPanel.getHandler().setLevel(Level.FINEST);	
-        logger.setLevel(Level.FINEST);
+        loggingPanel.getHandler().setLevel(Level.INFO);	
+        logger.setLevel(Level.INFO);
         loggingPanel.show(null);
     }
     
@@ -340,7 +342,7 @@ implements SPICEFrame
         /// init Structure Panel
         
         //structurePanel.setLayout(new BoxLayout(structurePanel, BoxLayout.X_AXIS));
-        //structurePanel.setPreferredSize(new Dimension(500, 300));
+        //structurePanel.setPreferredSize(new Dimension(400, 300));
         structurePanel.setMinimumSize(new Dimension(200,200));
         //structurePanel.addMouseMotionListener(structurePanel);
         //structurePanel.addMouseListener(      structurePanel);
@@ -435,7 +437,7 @@ implements SPICEFrame
         mainsharedPanel.setOneTouchExpandable(true);
         mainsharedPanel.setResizeWeight(0.5);
         //mainsharedPanel.setDividerLocation(150);
-        //mainsharedPanel.setPreferredSize(new Dimension(200, 200));
+        mainsharedPanel.setPreferredSize(new Dimension(790, 590));
         //mainsharedPanel.setOpaque(true);
         //mainsharedPanel.setBackground(Color.black);
         //mainsharedPanel.setPreferredSize(new Dimension(700,700));
@@ -675,7 +677,18 @@ implements SPICEFrame
         else
             aboutspice = new JMenuItem("About SPICE",helpIcon);
         aboutspice.addActionListener  ( ml );
+        aboutspice.setMnemonic(KeyEvent.VK_A);
         help.add(aboutspice);
+        
+        JMenuItem spicemanual;
+        ImageIcon manualIcon =  createImageIcon("toggle_log.png");
+        if ( manualIcon == null)
+            spicemanual = new JMenuItem("Manual");
+        else
+            spicemanual = new JMenuItem("Manual",manualIcon);
+        spicemanual.addActionListener(ml);
+        spicemanual.setMnemonic(KeyEvent.VK_M);
+        help.add(spicemanual);
         
         return menu ;
         
@@ -1043,7 +1056,7 @@ implements SPICEFrame
         statusPanel.setLoading(false);
         
         if ( structure_.size() < 1 ){
-            logger.log(Level.FINE,"got no structure");
+            logger.log(Level.INFO,"got no structure");
             return ;
         }
         
@@ -1077,20 +1090,6 @@ implements SPICEFrame
         
         structurePanel.executeCmd(selectcmd);
         
-        /* should be done by SeqTextPane ...
-         // get sequence
-          Chain c = structure.getChain(0);
-          List aminos = c.getGroups("amino");
-          StringBuffer sequence = new StringBuffer() ;
-          for ( int i=0 ; i< aminos.size(); i++){
-          AminoAcid a = (AminoAcid)aminos.get(i);
-          sequence.append( a.getAminoType());
-          }
-          
-          String s = sequence.toString();
-          */
-        //seqField.setText(s);
-        //Chain c = structure.getChain(0);
         
         setCurrentChainNumber(0);
         Chain chain = getChain(currentChainNumber) ;
@@ -1329,6 +1328,7 @@ implements SPICEFrame
             cmd += "colour " +colour ;
             colour(chainNumber,start,end,colour) ;
         }
+        
         structurePanel.executeCmd(cmd);
         //structurePanel.forceRepaint();
         

@@ -905,6 +905,18 @@ implements SeqPanel, MouseListener, MouseMotionListener
     public void mouseMoved(MouseEvent e)
     {	
         
+        
+        int b = e.getButton();
+        //System.out.println("mouseMoved button " +b);
+        
+        // do not change selection if we display the popup window
+        if ( popupMenu.isVisible())
+            return;
+        if (b != 0 )
+            if ( b != MouseEvent.BUTTON1 ) 
+                return;
+       
+        
         //, int x, int y
         int seqpos = getSeqPos(e);
         int linenr = getLineNr(e);
@@ -952,17 +964,11 @@ implements SeqPanel, MouseListener, MouseMotionListener
             spice.showSeqPos(current_chainnumber,seqpos);
             
         }
-          
-        
-        
-        // slowing down the whole thing?
-        
-        
-        
+                   
         if ( spice.isSelectionLocked()) 
             return;
         
-        // disabled Jmol - slows down things a lot...
+        
         spice.select(current_chainnumber,seqpos);
         return  ;
     }
@@ -978,31 +984,11 @@ implements SeqPanel, MouseListener, MouseMotionListener
         if ( seqpos    > chain.getLength()) return ;
         
         int b = e.getButton();
-        if ( b == MouseEvent.BUTTON3) {
-          
+        if ( b != MouseEvent.BUTTON1)
             return;
-        }           
-        
-        if ( b == MouseEvent.BUTTON1 && ( ! spice.isSelectionLocked()))
-        {
-            if ( lineNr < 0 ) return ;
-            if ( seqpos < 0 ) {
-                // check if the name was clicked
-                if (nameClicked(e)){
-                    // highlight all features in the line
-                    //Feature feature = getFeatureAt(seqpos,lineNr);
-                    List features = (List) drawLines.get(lineNr);
-                    String cmd = "";
-                    for ( int i=0; i<features.size(); i++) {
-                        Feature feature = (Feature) features.get(i);
-                        cmd += highliteFeature(feature);		    
-                    }
-                    //logger.finest(cmd);
-                    spice.executeCmd(cmd);
-                    return  ;
-                }
-            }            
-        }
+                
+        //System.out.println("mouseclicked " + b);
+        // only proceed here with left click
        
         String drstr = "x "+ seqpos + " y " + lineNr ;
         
@@ -1034,29 +1020,67 @@ implements SeqPanel, MouseListener, MouseMotionListener
     
     public void mousePressed(MouseEvent e)  {
         	int b = e.getButton();
+        //System.out.println("mousePressed "+b);
         	if ( b == MouseEvent.BUTTON1 )
             mouseDragStart = getSeqPos(e);
+        	
         
     }
     public void mouseReleased(MouseEvent e) {
+        
+        int seqpos = getSeqPos(e);
+        int lineNr = getLineNr(e);
+        if ( seqpos    > chain.getLength()) return ;
+        
         int b = e.getButton();
+        if ( b == MouseEvent.BUTTON3) {
+          
+            return;
+        }           
+        //System.out.println("mouseReleased "+b);
+        
         if ( b == MouseEvent.BUTTON1 )
             mouseDragStart =  -1 ;
+                
+        if ( b == MouseEvent.BUTTON1 && ( ! spice.isSelectionLocked()))
+        {
+            if ( lineNr < 0 ) return ;
+            if ( seqpos < 0 ) {
+                // check if the name was clicked
+                if (nameClicked(e)){
+                    // highlight all features in the line
+                    //Feature feature = getFeatureAt(seqpos,lineNr);
+                    List features = (List) drawLines.get(lineNr);
+                    String cmd = "";
+                    for ( int i=0; i<features.size(); i++) {
+                        Feature feature = (Feature) features.get(i);
+                        cmd += highliteFeature(feature);		    
+                    }
+                    //logger.finest(cmd);
+                    spice.executeCmd(cmd);
+                    return  ;
+                }
+            }            
+        }
         
-        // remove the link button from poopup
-        //if ( popupMenu.getComponentCount() > 1) {
-          //  removeLinkMenu();
-        //}
+        
     }
     public void mouseDragged(MouseEvent e) {
-        //System.out.println("dragging mouse "+e);
+        
         if ( mouseDragStart < 0 )
             return ;        
         
-        int seqpos = getSeqPos(e);
-       
         if (spice.isSelectionLocked())
             return;
+        
+        int b = e.getButton();
+        if ( b != MouseEvent.BUTTON1 ) 
+            return;
+        //System.out.println("dragging mouse "+b);
+        
+        // only do with left mouse click
+        int seqpos = getSeqPos(e);
+               
         int selEnd =  seqpos;
         int start = mouseDragStart ;
         int end   = selEnd         ;

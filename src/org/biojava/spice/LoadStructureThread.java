@@ -37,69 +37,69 @@ import org.biojava.bio.structure.StructureImpl ;
  */
 
 public class LoadStructureThread 
-    extends Thread {
-
+extends Thread {
+    
     SPICEFrame spiceframe ;
     String pdb_file ;
     
     boolean finished ;
     
     Structure structure ;
-
+    
     public LoadStructureThread(SPICEFrame master,String pdbfile) {
-	spiceframe = master ;
-	pdb_file = pdbfile ;
-	finished = false ;
-	structure = null ;
+        spiceframe = master ;
+        pdb_file = pdbfile ;
+        finished = false ;
+        structure = null ;
     }
-
-
+    
+    
     public void run () {
-	loadCompound() ;
+        loadCompound() ;
     }
-
+    
     public boolean isDone() {
-	return finished ;
+        return finished ;
     }
     
     public Structure getStructure() {
-	return structure ;
+        return structure ;
     }
-   
-
-
+    
+    
+    
     public synchronized void loadCompound() {
-	
-	try {
-	
-	    //String dassequencecommand  = spiceframe.getSequenceServer()  + "sequence?segment=";
-	    //String dasalignmentcommand = dasalignmentcommand = getAlignmentServer() + "alignment?query=" ;
-	   
-	    spiceframe.showStatus("Loading...Wait...",Color.red);
-	    //DAS_PDBFeeder pdb_f =  new DAS_PDBFeeder(structureURL,dassequencecommand,dasalignmentcommand) ;
-	    DAS_PDBFeeder pdb_f =  new DAS_PDBFeeder(spiceframe.getConfiguration()) ;
-	    //System.out.println("pdb_f.loadPDB");
-	    pdb_f.loadPDB(pdb_file);
-	    //System.out.println("pdb_f.getStructure");
-	    
-	    structure = pdb_f.getStructure() ;
-	    structure.setPDBCode(pdb_file);
-	    // System.out.println("set Structure");
-	    
-	    spiceframe.setStructure(structure);
-	    spiceframe.showStatus(pdb_file +" loaded");
-	    //System.out.println("LoadStructureThread finished");
-	    finished = true ;
-	    notifyAll();
-	    }
-	catch (Exception e){ 
-	    // at some point raise some IO exception, which should be defined by the Inferface
-	    e.printStackTrace();
-	    finished = true ;
-	    StructureImpl n = new StructureImpl();
-	    spiceframe.setStructure(n);
-			
-	}
-
+        
+        try {
+            
+            //String dassequencecommand  = spiceframe.getSequenceServer()  + "sequence?segment=";
+            //String dasalignmentcommand = dasalignmentcommand = getAlignmentServer() + "alignment?query=" ;
+            
+            spiceframe.showStatus("Loading...Wait...",Color.red);
+            //DAS_PDBFeeder pdb_f =  new DAS_PDBFeeder(structureURL,dassequencecommand,dasalignmentcommand) ;
+            DAS_PDBFeeder pdb_f =  new DAS_PDBFeeder(spiceframe.getConfiguration()) ;
+            //System.out.println("pdb_f.loadPDB");
+            pdb_f.loadPDB(pdb_file);
+            //System.out.println("pdb_f.getStructure");
+            
+            structure = pdb_f.getStructure() ;
+            structure.setPDBCode(pdb_file);
+            // System.out.println("set Structure");
+            
+            spiceframe.setStructure(structure);
+            spiceframe.showStatus(pdb_file +" loaded");
+            //System.out.println("LoadStructureThread finished");
+            finished = true ;
+            notifyAll();
+        }
+        catch (Exception e){ 
+            // at some point raise some IO exception, which should be defined by the Inferface
+            e.printStackTrace();
+            finished = true ;
+            StructureImpl n = new StructureImpl();
+            spiceframe.setStructure(n);
+            
+        }
+        
     }
 }

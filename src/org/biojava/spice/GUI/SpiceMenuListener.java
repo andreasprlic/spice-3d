@@ -47,6 +47,8 @@ implements ActionListener
     static String reset = "select all; " + alloff;
     static String noselect = "select none; ";
     
+    static String SPICEMANUAL = "http://www.sanger.ac.uk/Users/ap3/DAS/SPICE/SPICE_manual.pdf" ;
+    		
     SPICEFrame parent ;
     
     public SpiceMenuListener (SPICEFrame spice) {
@@ -72,10 +74,10 @@ implements ActionListener
             parent.resetDisplay();
         } else if (cmd.equals("About SPICE")) {
             AboutDialog asd = new AboutDialog(parent);
+            asd.show();
+        } else if (cmd.equals("Manual")) {
+            parent.showDocument(SPICEMANUAL);
             
-            //asd.setText(DESCRIPTION_TEXT) ;
-            
-            asd.show();	    
         } else if ( cmd.equals("Backbone") ){
             String dcmd;
             if ( parent.isSelectionLocked()) 
