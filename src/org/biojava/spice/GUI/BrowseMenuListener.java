@@ -42,6 +42,9 @@ public class BrowseMenuListener implements ActionListener {
     
     public static String UNIPROTLINK = "http://www.ebi.uniprot.org/uniprot-srv/uniProtView.do?proteinAc=" ;
     
+    // link to DASTY das client
+    
+    public static String DASTYLINK = "http://www.ebi.ac.uk/das-srv/uniprot/dasty/index.jsp?ID=";
     
     SPICEFrame spice;
     URL url;
@@ -66,6 +69,11 @@ public class BrowseMenuListener implements ActionListener {
           String u = UNIPROTLINK+spice.getUniProtCode();
           //System.out.println("opening url "+u );
           spice.showDocument(u);
+      } else if ( txt.equals("Dasty")){
+        
+          String d = DASTYLINK+spice.getUniProtCode();
+          spice.showDocument(d);
+          
       } else {
           //String url = txt.substring(16,txt.length());
           spice.showDocument(url);

@@ -128,6 +128,7 @@ implements SPICEFrame
     JMenu browseMenu;
     JMenuItem pdbMenu;
     JMenuItem upMenu;
+    JMenuItem dastyMenu;
     //JMenuBar menuBar ;
     JTextField getCom ;
     List knownFeatureLinks;
@@ -680,7 +681,15 @@ implements SPICEFrame
         upMenu.addActionListener(bl);
         browseMenu.add(upMenu);
         
+        JMenu dasclientsMenu = new JMenu("Other DAS clients");
+        dasclientsMenu.setMnemonic(KeyEvent.VK_O);
+        browseMenu.add(dasclientsMenu);
         
+        dastyMenu = new JMenuItem("Dasty");
+        dastyMenu.setMnemonic(KeyEvent.VK_D);
+        dastyMenu.addActionListener(bl);
+        dasclientsMenu.add(dastyMenu);
+        dastyMenu.setEnabled(false);
         
         // Alignment submenu
         JMenu align = new JMenu("Alignment");
@@ -802,6 +811,7 @@ implements SPICEFrame
         thr.start();
         pdbMenu.setEnabled(false);
         upMenu.setEnabled(false);
+        dastyMenu.setEnabled(false);
     }
     
     
@@ -877,7 +887,7 @@ implements SPICEFrame
     private void clearBrowsableButtons(){
         int nr = browseMenu.getItemCount();
         //System.out.println("cleaning "+nr+ " menus");
-        for ( int i = nr-1; i > 1; i--){
+        for ( int i = nr-2; i > 1; i--){
             browseMenu.remove(i);
         }
         knownFeatureLinks = new ArrayList();
@@ -911,7 +921,8 @@ implements SPICEFrame
                 }
                 ActionListener bl = new BrowseMenuListener(this,u);                    
                 item.addActionListener(bl);
-                browseMenu.add(item);
+                
+                browseMenu.add(item,(browseMenu.getItemCount()-1));
                 knownFeatureLinks.add(link);
             }
         }
@@ -1178,8 +1189,10 @@ implements SPICEFrame
         statusPanel.setSP(sp_id);
         if (sp_id != null){
             upMenu.setEnabled(true);
+            dastyMenu.setEnabled(true);
         } else {
             upMenu.setEnabled(false);
+            dastyMenu.setEnabled(false);
             logger.info("no UniProt sequence found for"+chain.getName());
         }
         
