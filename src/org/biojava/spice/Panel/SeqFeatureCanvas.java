@@ -67,13 +67,13 @@ public class SeqFeatureCanvas
 {
 
 
-    public static final int    DEFAULT_X_START  = 60  ;
+    public static final int    DEFAULT_X_START        = 60  ;
     public static final int    DEFAULT_X_RIGHT_BORDER = 20 ;
-    public static final int    DEFAULT_Y_START  = 16 ;
-    public static final int    DEFAULT_Y_STEP   = 10 ;
-    public static final int    DEFAULT_Y_HEIGHT = 4 ;
-    public static final int    DEFAULT_Y_BOTTOM  = 16 ;
-    public static final int    TIMEDELAY        = 0 ;
+    public static final int    DEFAULT_Y_START        = 16 ;
+    public static final int    DEFAULT_Y_STEP         = 10 ;
+    public static final int    DEFAULT_Y_HEIGHT       = 4 ;
+    public static final int    DEFAULT_Y_BOTTOM       = 16 ;
+    public static final int    TIMEDELAY              = 0 ;
 
 
 
@@ -522,7 +522,9 @@ public class SeqFeatureCanvas
 	} else if (type.equals("METAL") ){
 	    spice.highlite(current_chainnumber,start+1,end+1  ,"cpk");
 	    
-	} else if ( type.equals("MSD_SITE")) {
+	} else if ( type.equals("MSD_SITE") || 
+		    type.equals("snp")      		  
+		    ) {
 	    spice.highlite(current_chainnumber,start+1,end+1  ,"wireframe");	    
 	} else if ( (end - start) == 0 ) {
 	    // feature of size 1
@@ -570,7 +572,9 @@ public class SeqFeatureCanvas
 	     ( feature.getType().equals("ACT_SITE")) 	     
 	       ){
 	    cmd += " spacefill on; " ;
-	} else if ( feature.getType().equals("MSD_SITE") ) {
+	} else if ( feature.getType().equals("MSD_SITE")|| 
+		    feature.getType().equals("snp") 
+		    ) {
 	    cmd += " wireframe on; " ;
 	}
 		    
