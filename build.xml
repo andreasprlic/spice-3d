@@ -110,6 +110,7 @@
     <property name="reports.dir" value="./reports" />
     <property name="manifest.dir" value="./META-INF" />
     <property name="resources.dir" value="./resources" />
+    <property name="icons.dir" value="${resources.dir}/icons/nuvola"/>
     <property name="taglets.dir" value="./taglets" />
     
     <!-- Main build directory -->
@@ -191,6 +192,13 @@
 
     <copy todir="${build.classes.dir}/spice/org/biojava/spice/">
       <fileset dir="${resources.dir}">
+        <exclude name="**/CVS/**" />
+	<include name="*.png" />
+      </fileset>
+    </copy>
+
+    <copy todir="${build.classes.dir}/spice/org/biojava/spice/">
+      <fileset dir="${icons.dir}">
         <exclude name="**/CVS/**" />
 	<include name="*.png" />
       </fileset>
@@ -674,7 +682,7 @@
   description="Cleans everything">
     <delete dir="${build.dir}" />
     <!-- clean up thirdparty libs -->
-    <delete dir="${thirdparty.dir}/tmp/" />
+    <!--<delete dir="${thirdparty.dir}/tmp/" />-->
 
   </target>
 </project>
