@@ -1120,7 +1120,7 @@ public class SpiceApplication
 	}
 	
 	//SeqFeatureCanvas dascanv = daspanel.getCanv();
-	//dascanv.highlite(chain_number,seqpos);
+	dascanv.highlite(chain_number,seqpos);
 	
 	Group g = chain.getGroup(seqpos);
 	if (! g.has3D()){
