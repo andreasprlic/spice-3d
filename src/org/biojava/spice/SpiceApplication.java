@@ -25,29 +25,23 @@
 package org.biojava.spice ;
 
 
+import org.biojava.spice.Panel.*;
+import org.biojava.spice.Config.*;
+import org.biojava.spice.Feature.*;
 
 // for protein 3D stuff
 import org.biojava.bio.structure.*;
-import org.biojava.bio.structure.io.*;
 
-// xml file parsing
-import org.xml.sax.*;
-import javax.xml.parsers.*;
-import org.biojava.utils.xml.*;
-import org.w3c.dom.*;
 
 // some utils 
-import java.io.InputStream ;
-import java.util.Properties;
 import java.util.HashMap   ;
 import java.util.ArrayList ;
 import java.util.List ;
-import java.util.Map ;
+
 
 // to get config file via http
-import java.net.HttpURLConnection ;
 import java.net.URL;
-import java.io.IOException ;
+
 
 // logging
 import java.util.logging.* ;
@@ -56,33 +50,28 @@ import java.util.logging.* ;
 import java.awt.Dialog          ;
 import java.awt.Dimension          ;
 import java.awt.Color          ;
-import java.awt.MenuItem          ;
-import java.awt.Menu          ;
-import java.awt.MenuBar          ;
-import java.awt.Graphics          ;
 import java.awt.Frame          ;
 import java.awt.Button          ;
 import java.awt.Panel          ;
 import java.awt.BorderLayout       ;
-import java.awt.FlowLayout ;
 import java.awt.Event ;
-import java.awt.TextField ;
+//import java.awt.TextField ;
 import java.awt.event.*    ;
 
 import javax.swing.Box                          ;
-import javax.swing.text.Document                ;
-import javax.swing.text.Element                 ;
+//import javax.swing.text.Document                ;
+//import javax.swing.text.Element                 ;
 import javax.swing.JSplitPane                   ;
 import javax.swing.JFrame                       ;
 import javax.swing.JPanel                       ;
-import javax.swing.BoxLayout                    ;
+//import javax.swing.BoxLayout                    ;
 import javax.swing.JList                        ;
-import javax.swing.ListCellRenderer             ;
+//import javax.swing.ListCellRenderer             ;
 import javax.swing.JScrollPane                  ;
 import javax.swing.DefaultListModel             ;
 import javax.swing.JTextField                   ;
-import javax.swing.JTextArea                    ;
-import javax.swing.JEditorPane                  ;
+//import javax.swing.JTextArea                    ;
+//import javax.swing.JEditorPane                  ;
 import javax.swing.event.ListSelectionListener  ;
 import javax.swing.event.ListSelectionEvent     ;  
 import javax.swing.ImageIcon                    ;
@@ -97,12 +86,11 @@ import javax.swing.JMenu       ;
 import javax.swing.JMenuItem   ;
 
 // features
-import java.net.URL        ;
 import java.util.Iterator  ;
 
 // text coloring 
 import javax.swing.JTextPane   ;
-import javax.swing.text.*;
+
 
 // for DAS registration server:
 //import org.biojava.services.das.registry.*;
@@ -1420,7 +1408,7 @@ class SpiceMenuListener
 	} else if (cmd.equals("About SPICE")) {
 	    AboutDialog asd = new AboutDialog((JFrame)parent);
 	    
-	    asd.setText("The SPICE Applet. V 0.51(C) Andreas Prlic, Tim Hubbard\n The Wellcome Trust Sanger Institute 2004 mailto:ap3@sanger.ac.uk") ;
+	    asd.setText("The SPICE Applet. V 0.52(C) Andreas Prlic, Tim Hubbard\n The Wellcome Trust Sanger Institute 2004 mailto:ap3@sanger.ac.uk") ;
 	    
 	    asd.show();	    
 	} else if ( cmd.equals("Backbone") ){

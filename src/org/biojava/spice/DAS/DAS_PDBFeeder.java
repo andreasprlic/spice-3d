@@ -21,8 +21,10 @@
  * @author Andreas Prlic
  *
  */
-package org.biojava.spice;
+package org.biojava.spice.DAS;
 
+
+import org.biojava.spice.Config.*;
 import org.biojava.bio.program.das.dasalignment.DASException ;
 
 import org.biojava.bio.structure.Structure ;
@@ -31,20 +33,14 @@ import org.biojava.bio.structure.Chain ;
 import org.biojava.bio.structure.Group ;
 import org.biojava.bio.structure.Atom ;
 
-import java.awt.Color;
-import java.io.*;
-import java.util.Iterator ;
-import java.util.ArrayList ;
-import java.util.List ;
+import java.awt.Color							;
+import java.io.*								;
+import java.util.Iterator 						;
+import java.util.ArrayList 						;
+import java.util.List 							;
+import java.util.Calendar                      	;
+import java.util.logging.*                     	;
 
-import org.xml.sax.*                           ;
-import org.xml.sax.helpers.XMLReaderFactory    ;
-import java.util.Calendar                      ;
-
-
-import org.xml.sax.XMLReader                   ;
-import java.util.logging.*                     ;
-import java.awt.Color                          ;
 
 
 

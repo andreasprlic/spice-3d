@@ -23,7 +23,7 @@
  */
 
 
-package org.biojava.spice ;
+package org.biojava.spice.Config ;
 
 // to get config file via http
 import java.net.HttpURLConnection ;

@@ -22,7 +22,7 @@
  *
  */
 
-package org.biojava.spice ;
+package org.biojava.spice.Config ;
 
 import org.biojava.services.das.registry.*;
 import org.biojava.utils.xml.*            ; 

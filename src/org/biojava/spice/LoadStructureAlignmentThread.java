@@ -23,7 +23,6 @@
  */
 package org.biojava.spice ;
 
-import java.awt.Color ;
 import org.biojava.bio.structure.* ;
 import org.biojava.bio.program.das.dasalignment.* ;
 import java.util.List ;

@@ -21,7 +21,7 @@
  * @author Andreas Prlic
  *
  */
-package org.biojava.spice;
+package org.biojava.spice.Config;
 
 import java.util.*                        ;
 import java.text.DateFormat               ;

@@ -21,8 +21,9 @@
  * @author Andreas Prlic
  *
  */
-package org.biojava.spice                  ;
+package org.biojava.spice.DAS                  ;
 
+import org.biojava.spice.Config.*          ;
 import java.net.URL                        ;
 import java.io.InputStream                 ;
 import java.net.HttpURLConnection          ;

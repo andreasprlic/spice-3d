@@ -19,14 +19,14 @@
  *
  */
 
-package org.biojava.spice ;
+package org.biojava.spice.Config ;
 
 import org.biojava.bio.BioException;
 
 /**
  * An exception during the parsing of a PDB file.
  *
- * @author Andreas Prlic, Thomas Down, Benjamin Schuster-Böckler
+ * @author Andreas Prlic, Thomas Down, Benjamin Schuster-Bï¿½ckler
  */
 
 public class ConfigurationException extends BioException {

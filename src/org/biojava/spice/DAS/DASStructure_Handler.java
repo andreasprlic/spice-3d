@@ -21,10 +21,9 @@
  * @author Andreas Prlic
  *
  */
-package org.biojava.spice;
+package org.biojava.spice.DAS;
 
-
-import java.util.Calendar;
+import org.biojava.spice.Config.* ;
 
 import org.biojava.bio.structure.*                     ;
 import org.biojava.bio.structure.io.DASStructureClient ;

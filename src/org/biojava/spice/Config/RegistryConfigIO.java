@@ -23,7 +23,7 @@
  */
 
 
-package org.biojava.spice                  ;
+package org.biojava.spice.Config                  ;
 
 // to get config file via http
 import java.net.HttpURLConnection          ;
@@ -39,6 +39,8 @@ import java.util.List                      ;
 // for DAS registration server:
 import org.biojava.services.das.registry.* ;
 
+import org.biojava.spice.SPICEFrame   	   ;
+import org.biojava.spice.SpiceApplication  ;
 
 //for logging
 import java.util.logging.*                 ;

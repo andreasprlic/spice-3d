@@ -23,15 +23,15 @@
  */
 
 package org.biojava.spice;
+
+import org.biojava.spice.Config.*         ;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.Chain;
 
 import java.awt.Color ;
-import java.util.Map ;
 import java.util.List ;
 
-// logging
-import java.util.logging.* ;
+
 
 /** an interface that defined methods that are required by sub frames
  * of SPICE to communicate with the master application 

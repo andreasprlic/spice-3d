@@ -21,7 +21,7 @@
  * @author Andreas Prlic
  *
  */
-package org.biojava.spice;
+package org.biojava.spice.DAS;
 
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.Attributes;

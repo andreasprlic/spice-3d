@@ -22,7 +22,7 @@
  *
  */
 
-package org.biojava.spice;
+package org.biojava.spice.Config;
 
 import javax.jnlp.*                        ; 
 

@@ -23,10 +23,9 @@
  */
 package org.biojava.spice ;
 
+import org.biojava.spice.DAS.* ;
 import java.awt.Color ;
 
-import java.util.Map ;
-import java.util.List ;
 
 import org.biojava.bio.structure.Structure ;
 import org.biojava.bio.structure.StructureImpl ;
@@ -53,7 +52,6 @@ public class LoadStructureThread
 	finished = false ;
 	structure = null ;
     }
-
 
 
     public void run () {
