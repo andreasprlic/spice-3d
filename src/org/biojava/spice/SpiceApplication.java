@@ -26,7 +26,6 @@ package org.biojava.spice ;
 
 
 
-
 // for protein 3D stuff
 import org.biojava.bio.structure.*;
 import org.biojava.bio.structure.io.*;
@@ -87,6 +86,10 @@ import javax.swing.JMenuItem   ;
 import java.net.URL        ;
 import java.util.Iterator  ;
 
+// text coloring 
+import javax.swing.JTextPane   ;
+import javax.swing.text.*;
+
 // for DAS registration server:
 //import org.biojava.services.das.registry.*;
 
@@ -125,6 +128,11 @@ public class SpiceApplication
     JPanel leftPanel ;
     JSplitPane sharedPanel;
     JSplitPane mainsharedPanel;
+
+    JScrollPane seqScrollPane ;
+    JSplitPane  seqSplitPane  ;
+    SeqTextPane   seqField      ;
+    
     JMenuBar menuBar ;
     JTextField getCom ;
 
@@ -236,6 +244,7 @@ public class SpiceApplication
 	//structurePanel.setLayout(new BoxLayout(structurePanel, BoxLayout.X_AXIS));
 	structurePanel.setPreferredSize(new Dimension(700, 700));
 	structurePanel.setMinimumSize(new Dimension(200,200));
+
 	//this.add(structurePanel,BorderLayout.CENTER);
 
 
@@ -244,16 +253,19 @@ public class SpiceApplication
 	DefaultListModel model = new DefaultListModel();
 	model.add(0,"loading...");
 	ent_list=new JList(model);
+	EntListCommandListener entact = new EntListCommandListener(this);
+	ent_list.addListSelectionListener(entact);
+	ent_list.setPreferredSize(new Dimension(30,30));
+	ent_list.setSize(30,30);
+
 	//ent_list.setFixedCellWidth(20);
 	//JScrollPane scrollingList = new JScrollPane(ent_list);
-	EntListCommandListener entact = new EntListCommandListener(this);
 	//ent_list.setSize(30,180);
 	//ent_list.setFixedCellWidth(40);
 	//ent_list.setFixedCellHeight(18);
 	//ent_list.addItemListener(entact);
-	ent_list.addListSelectionListener(entact);
 			
-	getCom = new JTextField(1);
+	//getCom = new JTextField(1);
 	//TextFieldListener txtlisten = new TextFieldListener(this,getCom);
 	//getCom.addActionListener(txtlisten);
 	//getCom.setMinimumSize(new Dimension(Short.MIN_VALUE,10));
@@ -264,14 +276,16 @@ public class SpiceApplication
 
 	leftPanel.add(ent_list,BorderLayout.NORTH);
 	//leftPanel.add(getCom,BorderLayout.SOUTH);
-	leftPanel.setMinimumSize(new Dimension(30,30));
+	leftPanel.setMinimumSize(  new Dimension(30,30));
 	leftPanel.setPreferredSize(new Dimension(30,30));
+	leftPanel.setMaximumSize(  new Dimension(40,30));
+	leftPanel.setSize(30,30);
 	//ent_list.repaint();
 
 	
 	//ScrollPane scroll = new ScrollPane();
 
-
+	
 	// init dascanv
 	dascanv=new SeqFeatureCanvas(this);       
 	dascanv.setForeground(Color.blue);
@@ -279,10 +293,12 @@ public class SpiceApplication
 	dascanv.addMouseMotionListener(dascanv);
 	dascanv.addMouseListener(dascanv);
 	dascanv.setOpaque(true) ;
+	//dascanv.setPreferredSize(new Dimension(200, 200));
 	//dascanv.setSize(700,300);
 	
 	dasPanel = new JScrollPane(dascanv);
 	dasPanel.setOpaque(true);
+	dasPanel.setBackground(Color.black);
 	//scroll.add(dascanv);
 
 	//daspanel = new SeqPanel(this);
@@ -292,8 +308,32 @@ public class SpiceApplication
 	sharedPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                            leftPanel, dasPanel);
 	sharedPanel.setOneTouchExpandable(true);
-	sharedPanel.setDividerLocation(150);
+	//sharedPanel.setDividerLocation(150);
 	sharedPanel.setPreferredSize(new Dimension(200, 200));
+	sharedPanel.setOpaque(true);
+	sharedPanel.setResizeWeight(0);	
+
+	seqField      = new SeqTextPane(this);
+	seqField.setSize( 700, 30);
+	seqField.setPreferredSize(new Dimension(700, 30));
+	seqField.setMinimumSize(new Dimension(700, 30));
+	//seqField.addMouseMotionListener(seqField);
+	//seqField.addMouseListener(seqField);
+	// add onMouseOver action
+
+	seqScrollPane = new JScrollPane(seqField) ;
+	seqScrollPane.setSize( 700, 30);
+	seqScrollPane.setPreferredSize(new Dimension(700, 30));;
+	seqScrollPane.setMinimumSize(  new Dimension(700, 30));;
+
+	seqSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+				      sharedPanel,seqScrollPane);
+	
+	seqSplitPane.setOneTouchExpandable(true);
+	seqSplitPane.setOpaque(true);
+	seqSplitPane.setResizeWeight(0.9);
+	//seqSplitPane.setDividerLocation(600);
+	
 	//sharedPanel.setLayout(new BoxLayout(sharedPanel, BoxLayout.X_AXIS));
 	//sharedPanel.add(leftPanel,BorderLayout.EAST);
 	//sharedPanel.add(scroll,BorderLayout.WEST);
@@ -301,13 +341,14 @@ public class SpiceApplication
 	//sharedPanel.add(daspanel,BorderLayout.WEST);
 	//sharedPanel.setMaximumSize(new Dimension(Short.MAX_VALUE,300));
 	//this.add(sharedPanel,BorderLayout.SOUTH);
-	sharedPanel.setOpaque(true);
+
 	mainsharedPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-					  structurePanel,sharedPanel);
+					  structurePanel,seqSplitPane);
 	mainsharedPanel.setOneTouchExpandable(true);
-	mainsharedPanel.setDividerLocation(150);
-	mainsharedPanel.setPreferredSize(new Dimension(200, 200));
+	//mainsharedPanel.setDividerLocation(150);
+	//mainsharedPanel.setPreferredSize(new Dimension(200, 200));
 	mainsharedPanel.setOpaque(true);
+	//mainsharedPanel.setResizeWeight(0.7);
 	this.add(mainsharedPanel,BorderLayout.NORTH);
 
 
@@ -651,6 +692,17 @@ public class SpiceApplication
 
 	structurePanel.executeCmd(selectcmd);
 	
+	// get sequence
+	Chain c = structure.getChain(0);
+	List aminos = c.getGroups("amino");
+	StringBuffer sequence = new StringBuffer() ;
+	for ( int i=0 ; i< aminos.size(); i++){
+	    AminoAcid a = (AminoAcid)aminos.get(i);
+	    sequence.append( a.getAminoType());
+	}
+	
+	String s = sequence.toString();
+	seqField.setText(s);
 
 	setCurrentChain(0);
 	updateDisplays();
@@ -695,6 +747,8 @@ public class SpiceApplication
 	    setNewFeatures(tmpfeat);	    
 	    //SeqFeatureCanvas dascanv = daspanel.getCanv();
 	    dascanv.setChain(chain,currentChain);
+	    dascanv.setBackground(Color.black);
+	    seqField.setChain(chain,currentChain);
 	}
 	
 
@@ -726,6 +780,8 @@ public class SpiceApplication
 	setNewFeatures(tmpfeat);	
 	//SeqFeatureCanvas dascanv = daspanel.getCanv();
 	dascanv.setChain(chain,currentChain);
+	dascanv.setBackground(Color.black);
+	seqField.setChain(chain,currentChain);
     }
 
     /**  update the currently displayed features */
@@ -804,6 +860,7 @@ public class SpiceApplication
     }
 
     public void highlite(int chainNumber, int start, int end, String colour){
+	System.out.println("highlite start end" + start + " " + end );
 	if (first_load)       return ;		
 	if ( start    < 0 ) return ;
 	if (chainNumber < 0 ) return ;
@@ -818,6 +875,16 @@ public class SpiceApplication
 	structurePanel.executeCmd(cmd);
 	structurePanel.forceRepaint();
 	
+
+	/*seqField.setSelectionStart(start);
+	seqField.setSelectionEnd(end);
+	seqField.setSelectionColor(Color.red);
+	seqField.setSelectedTextColor(Color.red);
+	seqField.requestFocus();
+	seqField.repaint();
+	*/
+	
+	
     }
     public void highlite(int chainNumber, int start, int end) {
 	highlite(chainNumber, start, end, "");
@@ -825,7 +892,7 @@ public class SpiceApplication
     }
 
     public void highlite(int chainNumber, int seqpos, String colour) {
-	
+	System.out.println("highlite " + seqpos);
 	if (first_load)       return ;		
 	if ( seqpos     < 0 ) return ;
 	if (chainNumber < 0 ) return ;
@@ -838,9 +905,13 @@ public class SpiceApplication
 	if ( colour  != "") {
 	    colour(chainNumber,seqpos,colour) ;
 	}
+	/*seqField.setSelectionStart(seqpos);
+	seqField.setSelectionEnd(seqpos);
+	seqField.setSelectionColor(Color.red);
+	seqField.requestFocus();
+	seqField.repaint();	
+	*/
 
-	
-	
     }
     public void highlite(int chain_number,int seqpos){
 	highlite(chain_number,seqpos,"");
@@ -934,21 +1005,33 @@ public class SpiceApplication
 
     /** select a range of  residue */
     public void select(int chain_number, int start, int end) {
+	//System.out.println("select start end" + start + " " + end);
+
+	seqField.select(start,end);
+
 	String cmd = getSelectStr( chain_number,  start,  end);
 	if (cmd.equals("")) { return ; } 
 	cmd += " set display selected;" ;
 	structurePanel.executeCmd(cmd);
 	structurePanel.forceRepaint();
+
+		
+	
+
     }
 
     /** select a single residue */
     public void select(int chain_number,int seqpos){
+	//System.out.println("select seqpos" + seqpos);
+	seqField.select(seqpos);
+
 	String cmd = getSelectStr( chain_number, seqpos) ;
 	if (cmd.equals("")) { return ; } 
 	cmd += " set display selected;" ;
 	structurePanel.executeCmd(cmd);
 	structurePanel.forceRepaint();
 	
+
     }
 
     public void scale() {
@@ -962,7 +1045,7 @@ public class SpiceApplication
 	//SeqFeatureCanvas dascanv = daspanel.getCanv();
 	dascanv.setFeatures(features);
 	dascanv.paint(dascanv.getGraphics());
-
+	
 	
 	sharedPanel.paint(sharedPanel.getGraphics());
 	//leftPanel.paint(leftPanel.getGraphics());
@@ -1033,7 +1116,7 @@ public class SpiceApplication
 	else if ( event.target ==  aboutspice ) {
 	    System.out.println("about SPICE");
 	    AboutDialog asd = new AboutDialog(this);
-	    asd.setText("The SPICE Applet. V 0.1 (C) Andreas Prlic 2004 mailto:ap3@sanger.ac.uk") ;
+	    asd.setText("The SPICE Applet. V 0.1 (C) Andreas Prlic, Tim Hubbard\n The Wellcome Trust Sanger Institute 2004 mailto:ap3@sanger.ac.uk") ;
 	    asd.show();
 	    return true;
 	}
