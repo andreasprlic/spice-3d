@@ -93,6 +93,7 @@ import javax.swing.JDialog                      ;
 
 // menu
 import javax.swing.JMenuBar    ;
+import javax.swing.JMenu       ;
 import javax.swing.JMenuItem   ;
 
 // features
@@ -116,6 +117,7 @@ import javax.swing.text.*;
 public class SpiceApplication 
     extends  JFrame
     implements SPICEFrame 
+
 {
     
 	
@@ -159,7 +161,7 @@ public class SpiceApplication
     JSplitPane  seqSplitPane  ;
     SeqTextPane seqField      ;
     
-    JMenuBar menuBar ;
+    //JMenuBar menuBar ;
     JTextField getCom ;
 
     JTextField  strucommand  ; 
@@ -171,13 +173,13 @@ public class SpiceApplication
 
     boolean structureAlignmentMode ;
 
-    MenuBar  menu ;
-    MenuItem exit ;
-    MenuItem props ;
-    MenuItem reset ;
-    MenuItem aboutspice ;
-    MenuItem aboutdas   ;
-    MenuItem openpdb    ;
+    JMenuBar  menu ;
+    JMenuItem exit ;
+    JMenuItem props ;
+    JMenuItem reset ;
+    JMenuItem aboutspice ;
+    JMenuItem aboutdas   ;
+    JMenuItem openpdb    ;
 
     //public static Logger logger = Logger.getLogger("org.biojava.spice");
 
@@ -278,26 +280,40 @@ public class SpiceApplication
 
 
 	// add the Menu
-	menu = new MenuBar();
-	this.setMenuBar(menu);
-	Menu file = new Menu("File");
-	Menu help = new Menu("Help");
+	menu = new JMenuBar();
+	this.setJMenuBar(menu);
+	
+	
+
+	JMenu file = new JMenu("File");
+	file.setMnemonic(KeyEvent.VK_F);
+	file.getAccessibleContext().setAccessibleDescription("the file menu");
+	JMenu help = new JMenu("Help");
+	help.setMnemonic(KeyEvent.VK_H);
+	help.getAccessibleContext().setAccessibleDescription("get help");
 	menu.add(file);
 	menu.add(help);
 
-	openpdb = new MenuItem("open PDB");
-	exit  = new MenuItem("Exit");
-	props = new MenuItem("Properties");
-	reset = new MenuItem("Reset");
-	//exit.addActionListener(this);
-	file.add(openpdb);
-	file.add(reset);
-	file.add(props);
-	file.add(exit);
-	
-	aboutspice = new MenuItem("About SPICE");
-	//aboutdas = new MenuItem("About 3D-DAS");
+	openpdb = new JMenuItem("open PDB");
+	exit    = new JMenuItem("Exit");
+	props   = new JMenuItem("Properties");
+	reset   = new JMenuItem("Reset");
 
+	SpiceMenuListener ml = new SpiceMenuListener(this) ;
+	openpdb.addActionListener( ml );
+	exit.addActionListener   ( ml );
+	props.addActionListener  ( ml );
+	reset.addActionListener  ( ml );
+
+	//exit.addActionListener(this);
+	file.add( openpdb );
+	file.add( reset   );
+	file.add( props   );
+	file.add( exit    );
+	
+	aboutspice = new JMenuItem("About SPICE");
+	aboutspice.addActionListener  ( ml );
+	//aboutdas = new MenuItem("About 3D-DAS");	
 	//aboutspice.addActionListener(this);
 	//aboutdas.addActionListener(this);
 	help.add(aboutspice);
@@ -948,7 +964,19 @@ public class SpiceApplication
 	return n;
     }
 
+    /** reset the Jmol panel */
+    public void resetDisplay(){
+	String cmd = INIT_SELECT;
+	this.executeCmd(cmd);
+    }
 
+    
+    public void showConfig() {
+	RegistryConfigIO regi = new RegistryConfigIO(this,REGISTRY_URL);
+	regi.setConfiguration(config);
+	//regi.run();
+	regi.showConfigFrame();
+    }
     public void colour(int chainNumber, int start, int end, String colour) {
 	if (first_load)       return ;		
 	if ( start    < 0 ) return ;
@@ -1220,7 +1248,7 @@ public class SpiceApplication
 
     
 
-/** retreive the chainNumber by PDB character
+    /** retreive the chainNumber by PDB character
 	@param PDB code for chain
 	@return number of chain in current structure, or -1.
     */
@@ -1266,7 +1294,7 @@ public class SpiceApplication
 	return -1 ;
     }
     
-
+  
    
 
     /** Event handling */
@@ -1285,52 +1313,6 @@ public class SpiceApplication
 		//case Event.ACTION_EVENT:				
 	    }
 
-	if ( event.target == reset) {
-	    //logger.finest("resetting display");
-	    String cmd = INIT_SELECT;
-	    executeCmd(cmd);
-	    return true;
-	}
-
-	if ( event.target == props) {
-	    //logger.finest("modify properties");
-	    RegistryConfigIO regi = new RegistryConfigIO(this,REGISTRY_URL) ;
-	    //regi.run();
-	    regi.setConfiguration(config);
-	    regi.showConfigFrame();
-		
-	    return true;
-	}
-	else if ( event.target == exit) {
-	    System.exit(0);
-	    return true;
-	}
-	else if ( event.target == openpdb ) {
-	    //logger.finest("open DAS");
-	    OpenDialog op = new OpenDialog(this);
-	    op.show();
-	}
-
-	/*else if ( event.target == aboutdas ) {
-	    //logger.finest("about DAS");
-	    //AboutDialog asd = new AboutDialog(this);
-	    //asd.setText("DAS homepage: http://www.biodas.org") ;
-	    //asd.show();
-	     AboutDialog asd = new AboutDialog(this);
-	     asd.setText("3D-DAS homepage: http://protodas.derkholm.net") ;
-	     asd.show();
-	    
-	    return true;
-	    }*/
-	else if ( event.target ==  aboutspice ) {
-	    //logger.finest("about SPICE");
-	    AboutDialog asd = new AboutDialog(this);
-
-	    asd.setText("The SPICE Applet. V 0.5 (C) Andreas Prlic, Tim Hubbard\n The Wellcome Trust Sanger Institute 2004 mailto:ap3@sanger.ac.uk") ;
-
-	    asd.show();
-	    return true;
-	}
 
 	return true ;
 
@@ -1340,6 +1322,42 @@ public class SpiceApplication
 }
 
 
+
+class SpiceMenuListener 
+    implements ActionListener
+{
+    SPICEFrame parent ;
+    public SpiceMenuListener (SPICEFrame spice) {
+	parent = spice ;
+    }
+
+    public void actionPerformed(ActionEvent e) {
+	System.out.println(e);
+	System.out.println(e.getActionCommand());
+	
+	String cmd = e.getActionCommand();
+	if ( cmd.equals("open PDB") ) {
+	    OpenDialog op = new OpenDialog(parent);
+	    op.show();
+	    
+	} else if (cmd.equals("Exit")) {
+	    System.exit(0);
+	} else if (cmd.equals("Properties")) {
+	    parent.showConfig();
+	    //RegistryConfigIO regi = new RegistryConfigIO(parent,parent.REGISTRY_URL) ;	    
+	    //regi.setConfiguration(config);
+	    //regi.showConfigFrame();
+	} else if (cmd.equals("Reset")) {
+	    parent.resetDisplay();
+	} else if (cmd.equals("About SPICE")) {
+	    AboutDialog asd = new AboutDialog((JFrame)parent);
+	    
+	    asd.setText("The SPICE Applet. V 0.5 (C) Andreas Prlic, Tim Hubbard\n The Wellcome Trust Sanger Institute 2004 mailto:ap3@sanger.ac.uk") ;
+	    
+	    asd.show();	    
+	}
+    }
+}
 
 
 

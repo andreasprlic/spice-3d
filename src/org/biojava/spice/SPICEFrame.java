@@ -134,6 +134,12 @@ public interface SPICEFrame  {
     /** send a command to the Jmol panel*/
     public void executeCmd(String cmd);
     
+    /** reset the display, but do not change data */
+    public void resetDisplay();
+
+    /** show Config */
+    public void showConfig();
+
     // color management
     public void setOldColor(Color c) ;
 
