@@ -74,13 +74,9 @@ public class StructurePanel extends JPanel
 
 	adapter = new SmarterJmolAdapter(null);
 
-	viewer  = org.jmol.viewer.Viewer.allocateJmolViewer(this, adapter);
+	viewer  = org.jmol.viewer.Viewer.allocateViewer(this, adapter);
 	viewer.setJmolStatusListener(this);
 	jmolpopup = JmolPopup.newJmolPopup(viewer);
-	
-
-	
-
 	
     }
     
@@ -102,7 +98,19 @@ public class StructurePanel extends JPanel
 	viewer.homePosition();
 	
     }
+    public void notifyFileLoaded(String fullPathName, String fileName,
+            String modelName, Object clientFile,
+            String errorMessage){
+        logger.finest("StructurePanel notifyFileLosted ");
+        if (errorMessage != null){
+            logger.log(Level.SEVERE,errorMessage);
+        }
+    }
 
+    public void showConsole(boolean showConsole){
+        logger.finest("jmol: showConsole "+showConsole);
+    }
+    
     /** send a RASMOL like command to Jmol
      * @param command - a String containing a RASMOL like command. e.g. "select protein; cartoon on;"
      */
@@ -253,11 +261,11 @@ public class StructurePanel extends JPanel
     }
 
     public void scriptEcho(String strEcho){
-	logger.log(Level.INFO,strEcho);
+	logger.log(Level.INFO, "jmol scriptEcho: " + strEcho);
     }
 
     public void scriptStatus(String strStatus){
-	logger.log(Level.INFO,strStatus);
+	logger.log(Level.INFO,"jmol scriptStatus: " +strStatus);
     }
 
     public void notifyScriptTermination(String statusMessage, int msWalltime){
@@ -279,7 +287,9 @@ public class StructurePanel extends JPanel
 
     public void notifyFrameChanged(int frameNo){}
 
-
+    public void showUrl(String urlString) {
+        logger.finest("showUrl: " +urlString);
+    }
 
 }
 

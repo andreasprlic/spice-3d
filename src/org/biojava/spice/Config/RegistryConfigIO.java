@@ -26,9 +26,7 @@
 package org.biojava.spice.Config                  ;
 
 // to get config file via http
-import java.net.HttpURLConnection          ;
 import java.net.URL                        ;
-import java.io.IOException                 ;
 
 import java.util.Date                      ;
 import java.util.HashMap                   ;
@@ -47,7 +45,6 @@ import java.util.logging.*                 ;
 
 // for GUI;
 
-import java.awt.Frame                      ;
 import java.awt.event.*                    ;
 import javax.swing.Box                     ;
 import javax.swing.border.TitledBorder     ;
@@ -60,7 +57,6 @@ import javax.swing.JLabel                  ;
 import javax.swing.JPanel                  ;
 import javax.swing.JFrame                  ;
 import javax.swing.JScrollPane             ;
-import javax.swing.JLabel                  ;
 import javax.swing.BoxLayout               ;
 import javax.swing.JComponent              ;
 import javax.swing.JTable                  ;
@@ -79,7 +75,6 @@ import javax.swing.JPopupMenu                    ;
 import javax.swing.JMenuItem                     ;
 import javax.swing.MenuElement                   ;
 import javax.swing.JSplitPane                    ;
-import java.awt.BorderLayout                     ;
 import java.awt.Dimension                        ;
 import java.awt.GridLayout                       ;
 import java.awt.event.KeyEvent                   ;
@@ -589,6 +584,7 @@ class TabbedPaneDemo extends JPanel {
 	JPanel generalConfigPanel = getGeneralConfigPanel();
 	tabbedPane.addTab("general config", icon, generalConfigPanel,"general Spice config");
 
+
 	
 	////////////////////////////////////////////////////////
         //Add the tabbed pane to this panel.
@@ -601,6 +597,9 @@ class TabbedPaneDemo extends JPanel {
     public String[] getColNames(){
 	return colNames ;
     }
+    
+    
+    
     protected JPanel getGeneralConfigPanel(){
 	JPanel panel = new JPanel();
 	
@@ -653,6 +652,7 @@ class TabbedPaneDemo extends JPanel {
 	h.add(contactRegistryNow);
 	    
 	    
+	
 	v.add(h);
 
 
@@ -664,6 +664,18 @@ class TabbedPaneDemo extends JPanel {
 	JTextField registry = new JTextField(config.getRegistryUrl());
 	v.add(registry);
 
+	
+//	 configure window behaviour.
+	
+	JTextField jmoldesc  = new JTextField("position of Jmol - 3D structure window");
+	jmoldesc.setEditable(false);
+	jmoldesc.setBorder(BorderFactory.createEmptyBorder());
+	v.add(jmoldesc);
+	
+	String[] windowPosition = {"top", "right","left","bottom"};
+	JComboBox windowlayout = new JComboBox(windowPosition);
+	v.add(windowlayout);
+	
 	generalConfigForm.add(v);
 	//generalConfigForm.add(contactRegistryNow);
 

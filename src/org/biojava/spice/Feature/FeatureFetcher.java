@@ -98,12 +98,13 @@ public class FeatureFetcher extends Thread
     /** start one thread per server to fetch all the features!
      */
     public void run() {
-
-	doDasCommunication() ;
+        parent.setLoading(true);
+        doDasCommunication() ;
 	
-	List l = getFeatures();
-	logger.finest("setting Features in spice");
-	parent.setFeatures(spId,l);
+        List l = getFeatures();
+        logger.finest("setting Features in spice");
+        parent.setFeatures(spId,l);
+        parent.setLoading(false);
     }
 
     private synchronized void doDasCommunication() {

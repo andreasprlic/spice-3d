@@ -165,5 +165,7 @@ public interface SPICEFrame  {
     /** set the configuration from outside */
     public void setConfiguration(RegistryConfiguration conf);
 
-    
+    /** specify from outside whether spice should display that it is 
+     * loading data */
+    public void setLoading(boolean status);
 }

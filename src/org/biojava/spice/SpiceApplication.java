@@ -166,15 +166,7 @@ public class SpiceApplication
     boolean first_load ;
 
     boolean structureAlignmentMode ;
-    /*
-    JMenuBar  menu ;
-    JMenuItem exit ;
-    JMenuItem props ;
-    JMenuItem reset ;
-    JMenuItem aboutspice ;
-    JMenuItem aboutdas   ;
-    JMenuItem openpdb    ;
-    */
+   
     //public static Logger logger = Logger.getLogger("org.biojava.spice");
 
 
@@ -266,8 +258,7 @@ public class SpiceApplication
 	first_load = true ;
 	
 	structureAlignmentMode = false ;
-	      
-	Box vBox = Box.createVerticalBox();
+	     
 
 	//vBox.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 	//this.getContentPane().setLayout(new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
@@ -277,19 +268,92 @@ public class SpiceApplication
 	JMenuBar menu = initMenu();
 	this.setJMenuBar(menu);
 
+	// init all panels, etc..
+	statusPanel    = new StatusPanel();
+	seq_pos        = new JTextField();
+	structurePanel = new StructurePanel(this);	
+	dascanv        = new SeqFeatureCanvas(this);
+	strucommand    = new JTextField()  ;
+
+	Box vBox = arrangePanels(statusPanel,seq_pos,structurePanel,dascanv,strucommand,"left"); 
+
+	this.getContentPane().add(vBox);
+	this.setLoading(first_load);
 	
-	statusPanel = new StatusPanel();
+
+	memoryfeatures = new HashMap();
+	features = new ArrayList();
+
+
+
+	this.setTitle("SPICE") ;
+	this.setSize(700, 700);
+	//this.show();
+	
+	//this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	JFrame.setDefaultLookAndFeelDecorated(false);
+	ImageIcon icon = createImageIcon("spice.png");
+	this.setIconImage(icon.getImage());
+	this.pack();
+	
+	this.setVisible(true);
+
+	config =regi.getConfiguration();
+	if ( config == null ) {
+	    String msg = "Unable to contact DAS registration service, can not continue!" ;
+	    seq_pos.setText(msg);
+	    logger.log(Level.SEVERE,msg);
+	    System.err.println(msg);
+
+	    return ;
+	    
+	}
+    }
+
+
+    /** Constructor for structure alignment visualization 
+     */
+    SpiceApplication(String pdb1, String pdb2, URL config_url, URL registry_url) {
+	this(pdb1, config_url,registry_url);
+	structureAlignmentMode = true ;
+	pdbcode2 = pdb2 ;
+	logger.finest("finished init of structure alignment");
+		
+    }
+
+    
+    
+    /**
+     *  statusPanel   = StatusPanel(); 
+     * seq_pos        = new JTextField();
+     * structurePanel = new StructurePanel(this);	
+     * dascanv        = new SeqFeatureCanvas(this);
+     * strucommand    = new JTextField()  ;
+     * structureLocation location of structure, either "top", left, right or bottom
+     
+     
+     * @return a Box containing the Panels.
+     */
+    private Box arrangePanels(StatusPanel statusPanel,
+            JTextField seq_pos,
+            StructurePanel structurePanel,
+            SeqFeatureCanvas dascanv, 
+            JTextField strucommand,
+            String structureLocation){
+        
+        Box vBox = Box.createVerticalBox();
+        
+	
+	// move to submenu
 	//this.getContentPane().add(statusPanel,BorderLayout.SOUTH);
 	//this.getContentPane().add(statusPanel);
 	statusPanel.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
 	vBox.add(statusPanel);
-
-	statusPanel.setLoading(first_load);
-
 	
-	
+	//statusPanel.setLoading(first_load);
+
+		
 	// init Seqouece position
-	seq_pos = new JTextField();
 	seq_pos.setForeground(new Color(255, 255, 255));
 	seq_pos.setBackground(new Color(0, 0, 0));
 	seq_pos.setSize(700, 30);
@@ -299,11 +363,10 @@ public class SpiceApplication
 	//this.getContentPane().add(seq_pos);
 	vBox.add(seq_pos);
 
-
 	showStatus("contacting DAS registry");
 
 	/// init Structure Panel
-	structurePanel        = new StructurePanel(this);
+
 	//structurePanel.setLayout(new BoxLayout(structurePanel, BoxLayout.X_AXIS));
 	structurePanel.setPreferredSize(new Dimension(700, 300));
 	structurePanel.setMinimumSize(new Dimension(200,200));
@@ -325,40 +388,9 @@ public class SpiceApplication
 	JScrollPane chainPanel = new JScrollPane(ent_list);
 	chainPanel.setPreferredSize(new Dimension(30,30));
 	
-	//chainPanel.setSize(30,30);
-
-	//chainPanel.setMinimumSize(new Dimension(30,30));
-	//ent_list.setFixedCellWidth(20);
-	//JScrollPane scrollingList = new JScrollPane(ent_list);
-	//ent_list.setSize(30,180);
-	//ent_list.setFixedCellWidth(40);
-	//ent_list.setFixedCellHeight(18);
-	//ent_list.addItemListener(entact);
-			
-	//getCom = new JTextField(1);
-	//TextFieldListener txtlisten = new TextFieldListener(this,getCom);
-	//getCom.addActionListener(txtlisten);
-	//getCom.setMinimumSize(new Dimension(Short.MIN_VALUE,10));
-	//
-	
-	/*
-    	leftPanel = new JPanel() ;
-	leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
-
-	//leftPanel.add(ent_list);
-	//leftPanel.add(getCom,BorderLayout.SOUTH);
-	leftPanel.setMinimumSize(  new Dimension(30,30));
-	leftPanel.setPreferredSize(new Dimension(30,30));
-	leftPanel.setMaximumSize(  new Dimension(40,30));
-	leftPanel.setSize(30,30);
-	//ent_list.repaint();
-	*/
-	
-	//ScrollPane scroll = new ScrollPane();
-
 	
 	// init dascanv
-	dascanv=new SeqFeatureCanvas(this);       
+	       
 	dascanv.setForeground(Color.black);
 	dascanv.setBackground(Color.black);
 	dascanv.addMouseMotionListener(dascanv);
@@ -421,8 +453,15 @@ public class SpiceApplication
 	//sharedPanel.setMaximumSize(new Dimension(Short.MAX_VALUE,300));
 	//this.add(sharedPanel,BorderLayout.SOUTH);
 
-	mainsharedPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-					  structurePanel,seqSplitPane);
+	if (structureLocation.equals("top"))
+	    mainsharedPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, structurePanel,seqSplitPane);
+	else if  (structureLocation.equals("bottom"))
+	    mainsharedPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, seqSplitPane,structurePanel);
+	else if  (structureLocation.equals("left"))
+	    mainsharedPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, structurePanel,seqSplitPane);
+	else if  (structureLocation.equals("right"))
+	    mainsharedPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, seqSplitPane,structurePanel);
+	
 	mainsharedPanel.setOneTouchExpandable(true);
 	mainsharedPanel.setResizeWeight(0.6);
 	//mainsharedPanel.setDividerLocation(150);
@@ -439,7 +478,7 @@ public class SpiceApplication
 
 
 	
-	strucommand = new JTextField()  ;
+	
 	strucommand.setText("enter RASMOL like command...");
 	ActionListener listener = new StructureCommandListener(this,strucommand) ;
 	strucommand.addActionListener(listener);
@@ -449,67 +488,12 @@ public class SpiceApplication
 	vBox.add(strucommand);
 	
 	//vBox.add(loggingPanel);
-
-
-	this.getContentPane().add(vBox);
-
-	/*
-	// menu
-	 menuBar = new JMenuBar();
-	 this.setJMenuBar(menuBar);
-	 
-
-	 JMenu fileMenu = new JMenu("File");
-	 menuBar.add(fileMenu);
-	 JMenuItem configItem = new JMenuItem("Config");
-	 fileMenu.add(configItem);
-	 // add actionListeners
-	 */
-
-	memoryfeatures = new HashMap();
-	features = new ArrayList();
-
-
-
-	this.setTitle("SPICE") ;
-	this.setSize(700, 700);
-	//this.show();
-	
-	//this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-	JFrame.setDefaultLookAndFeelDecorated(false);
-	ImageIcon icon = createImageIcon("spice.png");
-	this.setIconImage(icon.getImage());
-	this.pack();
-	
-	this.setVisible(true);
-
-	config =regi.getConfiguration();
-	if ( config == null ) {
-	    String msg = "Unable to contact DAS registration service, can not continue!" ;
-	    seq_pos.setText(msg);
-	    logger.log(Level.SEVERE,msg);
-	    System.err.println(msg);
-
-	    return ;
-	    
-	}
-	
-
-
-    }
-
-
-    /** Constructor for structure alignment visualization 
-     */
-    SpiceApplication(String pdb1, String pdb2, URL config_url, URL registry_url) {
-	this(pdb1, config_url,registry_url);
-	structureAlignmentMode = true ;
-	pdbcode2 = pdb2 ;
-	logger.finest("finished init of structure alignment");
-		
-    }
-
-
+	return vBox;
+}
+    
+    
+    
+    
     /* (non-Javadoc)
      * @see org.biojava.spice.SPICEFrame#load(java.lang.String, java.lang.String)
      */
@@ -728,7 +712,8 @@ public class SpiceApplication
 	if (logger.isLoggable(Level.FINEST)) {
 	    logger.finest("SpiceApplication: getStructure "+ pdbcod);
 	}
-	first_load = true ;
+	this.setLoading(true);
+	//first_load = true ;
 	statusPanel.setLoading(true);
 	pdbcode = pdbcod ;
 	LoadStructureThread thr = new LoadStructureThread(this,pdbcod);
@@ -801,8 +786,8 @@ public class SpiceApplication
 	    logger.entering(this.getClass().getName(), "setStructure",  new Object[]{"got structure object"});
 	}
 	
-
-	first_load = false ;
+	this.setLoading(false);
+	//first_load = false ;
 	statusPanel.setLoading(false);
 
 	if ( structure_.size() < 1 ){
@@ -923,7 +908,7 @@ public class SpiceApplication
 	    getNewFeatures(sp_id) ;
 	} else {
 	    logger.finest("setting features for seq " + sp_id + " features size: " + tmpfeat.size());
-	    //setFeatures(sp_id,tmpfeat);	    
+	    //tures(sp_id,tmpfeat);	    
 	    //features.clear()                     ;
 	    features = tmpfeat                   ;
 	    //SeqFeatureCanvas dascanv = daspanel.getCanv();
@@ -941,7 +926,8 @@ public class SpiceApplication
 
 	Chain chain = getChain(currentChain) ;
 	if ( chain == null) return ;
-	first_load = true ;
+	//first_load = true ;
+	this.setLoading(true);
 	FeatureFetcher ff = new FeatureFetcher(this,config,sp_id,pdbcode,chain);	
 	ff.start() ;
 	statusPanel.setLoading(true);
@@ -972,12 +958,17 @@ public class SpiceApplication
 
     }
 
+    public synchronized void setLoading(boolean status){
+        first_load = status;
+        statusPanel.setLoading(status);
+    }
+    
     /**  update the currently displayed features */
     public   void setFeatures(String sp_id, List tmpfeat) {
 	// todo create Feature for structure mapping
-	first_load = false ;
+	//first_load = false ;
 	memoryfeatures.put(sp_id,tmpfeat);
-	statusPanel.setLoading(false);
+	//statusPanel.setLoading(false);
 	features.clear();
 	features = tmpfeat ;
 	//this.paint(this.getGraphics());
@@ -1412,7 +1403,7 @@ class SpiceMenuListener
     SPICEFrame parent ;
 
     static String reset = "select all; cpk off ; wireframe off ; backbone off; cartoon off ; ribbons off; " ;
-
+    static String noselect = "select none; ";
     public SpiceMenuListener (SPICEFrame spice) {
 	parent = spice ;
     }
@@ -1438,32 +1429,32 @@ class SpiceMenuListener
 	} else if (cmd.equals("About SPICE")) {
 	    AboutDialog asd = new AboutDialog((JFrame)parent);
 	    
-	    asd.setText("The SPICE Applet. V 0.52(C) Andreas Prlic, Tim Hubbard\n The Wellcome Trust Sanger Institute 2004 mailto:ap3@sanger.ac.uk") ;
+	    asd.setText("The SPICE Applet. V 0.53(C) Andreas Prlic, Tim Hubbard\n The Wellcome Trust Sanger Institute 2004 mailto:ap3@sanger.ac.uk") ;
 	    
 	    asd.show();	    
 	} else if ( cmd.equals("Backbone") ){
-	    String dcmd  = reset + "backbone on; ";
+	    String dcmd  = reset + "backbone 0.5;  " +noselect;
 	    parent.executeCmd(dcmd);
 	} else if ( cmd.equals("Wireframe") ){
-	    String dcmd  = reset + "wireframe on; ";
+	    String dcmd  = reset + "wireframe on; "+noselect;
 	    parent.executeCmd(dcmd);
 	} else if ( cmd.equals("Cartoon") ){
-	    String dcmd  = reset + "cartoon on; ";
+	    String dcmd  = reset + "cartoon on; "+noselect;
 	    parent.executeCmd(dcmd);
 	} else if ( cmd.equals("Ball and Stick") ){
-	    String dcmd  = reset + "wireframe 0.3; spacefill 0.5; ";
+	    String dcmd  = reset + "wireframe 0.3; spacefill 0.5; "+noselect;
 	    parent.executeCmd(dcmd);
 	} else if ( cmd.equals("Spacefill") ){
-	    String dcmd  = reset + "spacefill on; ";
+	    String dcmd  = reset + "spacefill on; "+noselect;
 	    parent.executeCmd(dcmd);
 	} else if ( cmd.equals("Color - chain")) {
-	    String dcmd = "select all; color chain;" ;
+	    String dcmd = "select all; color chain;" +noselect;
 	    parent.executeCmd(dcmd);
 	} else if ( cmd.equals("Color - secondary")) {
-	    String dcmd = "select all; color structure;" ;
+	    String dcmd = "select all; color structure;" +noselect;
 	    parent.executeCmd(dcmd);
 	} else if ( cmd.equals("Color - cpk")) {
-	    String dcmd = "select all; color cpk;" ;
+	    String dcmd = "select all; color cpk;" +noselect;
 	    parent.executeCmd(dcmd);
 	}
     }

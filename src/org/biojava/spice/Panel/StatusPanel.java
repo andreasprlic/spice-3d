@@ -25,17 +25,14 @@ package org.biojava.spice.Panel;
 
 import javax.swing.JPanel        ;
 import javax.swing.JTextField    ;
-import javax.swing.JLabel        ;
 import javax.swing.BoxLayout     ;
 import javax.swing.JProgressBar  ;
 import javax.swing.BorderFactory ;
 import javax.swing.Box           ;
-import javax.swing.border.* ;
 
 import java.awt.Dimension        ;
 import java.awt.BorderLayout     ;
-import java.awt.Color            ;
-import java.awt.Graphics;
+
 
 /** a class to display status information 
  * contains 
