@@ -310,14 +310,16 @@ public class SeqFeatureCanvas
 	//System.out.println(start+" " + end+" "+type);
 	//System.out.println(segment);
 	if ( type.equals("DISULFID")){
+	    spice.highlite(current_chainnumber,start);
+	    spice.highlite(current_chainnumber,end);
 
 	    String pdb1 = spice.getSelectStrSingle(current_chainnumber,start);
 	    String pdb2 = spice.getSelectStrSingle(current_chainnumber,end);
 	    String cmd = "select "+pdb1 +", " + pdb2 + "; spacefill on; colour cpk;" ;
 
 	    spice.executeCmd(cmd);
-	    spice.highlite(current_chainnumber,start);
-	    spice.highlite(current_chainnumber,end);
+
+
 	} else if (type.equals("METAL") ){
 	    spice.highlite(current_chainnumber,start+1,end+1  ,"cpk");
 	    
@@ -331,7 +333,7 @@ public class SeqFeatureCanvas
     }
 
     /** highlite all segments of a feature */
-    private void highliteFeature(Feature feature){
+    private String highliteFeature(Feature feature){
 	System.out.println("highlite feature " + feature);
 	//Feature feature = (Feature) features.get(featurenr) ;
 	//System.out.println("highlite feature " + feature);
@@ -347,15 +349,28 @@ public class SeqFeatureCanvas
 	    int end   = segment.getEnd();
 	    //System.out.println("highilte feature " +featurenr+" " + start + " " +end );
 	    
-	    cmd += spice.getSelectStr(current_chainnumber,start,end);
-	    String col = segment.getTxtColor();
-	    cmd += "color "+ col +";";
+	    if ( feature.getType().equals("DISULFID")){
+		cmd += spice.getSelectStr(current_chainnumber,start-1);
+		cmd += "colour cpk; spacefill on;";
+		cmd += spice.getSelectStr(current_chainnumber,end-1);
+		cmd += "colour cpk; spacefill on";
+		
+	    } else {
+		cmd += spice.getSelectStr(current_chainnumber,start,end);
+		String col = segment.getTxtColor();
+		cmd += "color "+ col +";";
+	    } 
 	    //if ( start == end ) {
 	    //cmd += " spacefill on;";
 	    //}
 	}
-	System.out.println("cmd: "+cmd);
-	spice.executeCmd(cmd);
+	if (feature.getType().equals("METAL")){
+	    cmd += " spacefill on; " ;
+	}
+		    
+	//System.out.println("cmd: "+cmd); 
+	return cmd ;
+
 	
     }
 
@@ -735,11 +750,12 @@ public class SeqFeatureCanvas
 		// highlight all features in the line
 		//Feature feature = getFeatureAt(seqpos,lineNr);
 		List features = (List) drawLines.get(lineNr);
+		String cmd = "";
 		for ( int i=0; i<features.size(); i++) {
 		    Feature feature = (Feature) features.get(i);
-		    highliteFeature(feature);
-		    
+		    cmd += highliteFeature(feature);		    
 		}
+		spice.executeCmd(cmd);
 		return  ;
 	    }
 	} 
