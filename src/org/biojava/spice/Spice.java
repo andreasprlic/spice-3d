@@ -82,13 +82,7 @@ public class Spice extends Applet {
 	appFrame.show();
 	
 	appFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-	//appFrame.addWindowListener(new WindowAdapter() {
-	//public void windowClosing(WindowEvent evt) {
-	//    Frame frame = (Frame) evt.getSource();
-	//    frame.setVisible(false);
-	//    frame.dispose();
-	//}
-	//  });
+
 	
     }
 

@@ -364,7 +364,9 @@ public class SeqFeatureCanvas
 	    //cmd += " spacefill on;";
 	    //}
 	}
-	if (feature.getType().equals("METAL")){
+	if ( ( feature.getType().equals("METAL")) ||
+	     ( feature.getType().equals("SITE"))
+	       ){
 	    cmd += " spacefill on; " ;
 	}
 		    

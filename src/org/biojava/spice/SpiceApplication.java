@@ -261,14 +261,7 @@ public class SpiceApplication
 
 
 	showStatus("contacting DAS registry");
-	config =regi.getConfiguration();
-	if ( config == null ) {
-	    String msg = "Unable to contact DAS registration service, can not continue!" ;
-	    seq_pos.setText(msg);
-	    System.err.println(msg);
-	    return ;
-	    
-	}
+
 	/// init Structure Panel
 	structurePanel        = new StructurePanel();
 	//structurePanel.setLayout(new BoxLayout(structurePanel, BoxLayout.X_AXIS));
@@ -421,6 +414,18 @@ public class SpiceApplication
 	this.setIconImage(icon.getImage());
 	this.pack();
 	this.setVisible(true);
+
+
+	config =regi.getConfiguration();
+	if ( config == null ) {
+	    String msg = "Unable to contact DAS registration service, can not continue!" ;
+	    seq_pos.setText(msg);
+	    System.err.println(msg);
+	    return ;
+	    
+	}
+	
+
     }
 
 
@@ -790,6 +795,7 @@ public class SpiceApplication
 	String sp_id = chain.getSwissprotId() ;
 	getNewFeatures(sp_id) ;
 	updateDisplays();
+	
     }
 
     public void setCurrentChain( int newCurrentChain) {

@@ -151,7 +151,8 @@ public class RegistryConfigIO
 		}
 	    });
 	*/
-	
+	ImageIcon icon = createImageIcon("spice.jpg");
+	progressFrame.setIconImage(icon.getImage());
 
 	progressFrame.setDefaultLookAndFeelDecorated(false);
 	//progressFrame.setUndecorated(true);
@@ -208,7 +209,16 @@ public class RegistryConfigIO
     
    
 
- 
+    /** Returns an ImageIcon, or null if the path was invalid. */
+    protected static ImageIcon createImageIcon(String path) {
+        java.net.URL imgURL = SpiceApplication.class.getResource(path);
+        if (imgURL != null) {
+            return new ImageIcon(imgURL);
+        } else {
+            System.err.println("Couldn't find file: " + path);
+            return null;
+        }
+    }
 
     public void showConfigFrame(){
 
@@ -217,8 +227,8 @@ public class RegistryConfigIO
 	frame.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 	//Make sure we have the standard desktop window decorations.
         JFrame.setDefaultLookAndFeelDecorated(false);
-	
-	
+	ImageIcon icon = createImageIcon("spice.jpg");
+	frame.setIconImage(icon.getImage());
 	
         //Create and set up the content pane.
         //JComponent newContentPane = new TabbedPaneDemo(config);
