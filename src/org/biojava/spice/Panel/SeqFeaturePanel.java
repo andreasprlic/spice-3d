@@ -911,9 +911,8 @@ implements SeqPanel, MouseListener, MouseMotionListener
     public void mouseMoved(MouseEvent e)
     {	
         
-        
         int b = e.getButton();
-        //logger.finest("mouseMoved button " +b);
+        logger.finest("mouseMoved button " +b);
         
         // do not change selection if we display the popup window
         if ( popupMenu.isVisible())
@@ -984,10 +983,11 @@ implements SeqPanel, MouseListener, MouseMotionListener
     
     public void mouseClicked(MouseEvent e)
     {  
-       dragging = false;
-       spice.setSelectionLocked(false);
-       //this.setToolTipText(null);
-       return  ;
+ 
+	logger.finest("mouseClicked");
+
+	//this.setToolTipText(null);
+	return  ;
     }	
     
     public void mouseEntered(MouseEvent e)  {}
@@ -1000,6 +1000,8 @@ implements SeqPanel, MouseListener, MouseMotionListener
         if ( b == MouseEvent.BUTTON1 )
             mouseDragStart = getSeqPos(e);
         
+	dragging = false;
+	spice.setSelectionLocked(false);
         
     }
     public void mouseReleased(MouseEvent e) {

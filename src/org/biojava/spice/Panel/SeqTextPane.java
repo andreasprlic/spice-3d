@@ -162,8 +162,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
     
     public void mouseClicked(MouseEvent e)  { 
     
-           	dragging = false;
-           	spice.setSelectionLocked(false);
+           
         
     
     }
@@ -175,6 +174,8 @@ implements SeqPanel, MouseListener, MouseMotionListener
         logger.finest("mousePressed " + b);
         if ( b == MouseEvent.BUTTON3) return;
         selectionStart = getSeqPos(e);
+	dragging = false;
+	spice.setSelectionLocked(false);
         
     }
     public void mouseReleased(MouseEvent e) {
