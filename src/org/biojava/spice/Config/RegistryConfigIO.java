@@ -71,6 +71,7 @@ import javax.swing.event.ListSelectionEvent      ;
 import javax.swing.JFileChooser            ;
 import javax.swing.JPopupMenu              ;
 import javax.swing.JMenuItem               ;
+import javax.swing.MenuElement             ;
 
 import java.awt.BorderLayout               ;
 import java.awt.Dimension                  ;
@@ -385,6 +386,49 @@ public class RegistryConfigIO
     }
 }
 
+
+class MenuListener
+    implements ActionListener
+{
+    JTable table ;
+    RegistryConfiguration config ;
+    TabbedPaneDemo parent ;
+    public MenuListener( JTable tab,RegistryConfiguration conf,TabbedPaneDemo tabd ){
+	table  = tab  ;
+	config = conf ;
+	parent = tabd  ;
+    }
+
+    public void actionPerformed(ActionEvent e){
+	JMenuItem source = (JMenuItem)(e.getSource());
+
+
+	String cmd =  source.getText();
+	int    pos = table.getSelectedRow();
+	if ( pos < 0) 
+	    return ;
+	//System.out.println("selected in row "+pos+" cmd "+cmd);
+	SpiceDasSource ds = config.getServer(pos);
+	String[] colNames = parent.getColNames();
+
+	if (cmd.equals("activate")) {
+	    ds.setStatus(true);
+	    table.setValueAt(new Boolean(true),pos,colNames.length-1);
+	}
+	else if ( cmd.equals("inactivate")) {
+	    ds.setStatus(false);
+	    table.setValueAt(new Boolean(false),pos,colNames.length-1);
+	}
+	else if ( cmd.equals("delete")) { 
+	    System.out.println("deleteting das source ..." +pos);
+	    config.deleteServer(pos);
+	}
+	
+	parent.updateDasSourceTable();
+
+    }
+}
+
 class ButtonListener
     implements ActionListener
 	       
@@ -399,7 +443,7 @@ class ButtonListener
 
     public void actionPerformed(ActionEvent e) {
 	String cmd = e.getActionCommand();
-	System.out.println("button pressed:" + cmd);
+	//System.out.println("button pressed:" + cmd);
 	if ( cmd.equals("Close")) {
 	    //System.out.println("closing..");
 	    parent.dispose();
@@ -495,7 +539,9 @@ class TabbedPaneDemo extends JPanel {
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
     }
 
-
+    public String[] getColNames(){
+	return colNames ;
+    }
     protected JPanel getGeneralConfigPanel(){
 	JPanel panel = new JPanel();
 	
@@ -721,7 +767,7 @@ class TabbedPaneDemo extends JPanel {
 	//List sequenceservers = config.getServers() ;
 	
 
-	String seqdata[][] = getTabData();
+	Object seqdata[][] = getTabData();
 
 	//System.out.println(seqdata);
 	//JTable table= new JTable(seqdata,colNames);
@@ -776,28 +822,16 @@ class TabbedPaneDemo extends JPanel {
 	//Create the popup menu.
 	tablePopup = new JPopupMenu();
 	JMenuItem menuItem = new JMenuItem("activate");
-	menuItem.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    JMenuItem source = (JMenuItem)(e.getSource());
-		    String s = "Action event detected."
-			+ "    Event source: " + source.getText() ;
-		    System.out.println(s);
-		}
-	    });
+
+	MenuListener ml = new MenuListener(dasSourceTable,config,this);
+	menuItem.addActionListener(ml);
 	tablePopup.add(menuItem);
 	menuItem = new JMenuItem("delete");
-	menuItem.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    JMenuItem source = (JMenuItem)(e.getSource());
-		    String s = "Action event detected."
-			+ "    Event source: " + source.getText();
-		    System.out.println(s);
-		}
-	    });
+	menuItem.addActionListener(ml);
 	tablePopup.add(menuItem);
 
 
-	MouseListener popupListener = new PopupListener(tablePopup);
+	MouseListener popupListener = new PopupListener(tablePopup,dasSourceTable,config);
 	
 
 	dasSourceTable.addMouseListener(popupListener);
@@ -835,6 +869,7 @@ class TabbedPaneDemo extends JPanel {
 	else 
 	    server.put("public","N");
 	server.put("capabilities",source.getCapabilities());
+	server.put("active",new Boolean(source.getStatus()));
 	return server ;
     }
 
@@ -851,10 +886,10 @@ class TabbedPaneDemo extends JPanel {
     }
 
 
-    public String[][] getTabData() {
+    public Object[][] getTabData() {
 	List servers = config.getAllServers();
 
-	String[][] data = new String[servers.size()][colNames.length+1];
+	Object[][] data = new Object[servers.size()][colNames.length+1];
 
 	for ( int i =0; i< servers.size(); i++ ) {
 	    SpiceDasSource ds = (SpiceDasSource) servers.get(i);
@@ -870,8 +905,12 @@ class TabbedPaneDemo extends JPanel {
 		    for ( int u = 0; u<stmp.length;u++){
 			s += stmp[u]+" ";
 		    }
-		    
-		} else {
+		} 
+		else if (colname.equals("active")) {
+		    data[i][j] = server.get(colname);
+		    continue;
+		}
+		else {
 		    s = (String)server.get(colname);
 		}
 		data[i][j] = s;
@@ -982,8 +1021,8 @@ class TabbedPaneDemo extends JPanel {
 	}
     }
 
-    private void updateDasSourceTable(){
-	String seqdata[][] = getTabData();
+    public void updateDasSourceTable(){
+	Object seqdata[][] = getTabData();
 	dasSourceTableModel = new MyTableModel(this,seqdata,colNames);
 	dasSourceTable.setModel(dasSourceTableModel);
 	this.repaint();
@@ -993,9 +1032,12 @@ class TabbedPaneDemo extends JPanel {
 
 class PopupListener extends MouseAdapter {
     JPopupMenu popup;
-
-    PopupListener(JPopupMenu popupMenu) {
-	popup = popupMenu;
+    JTable table    ;
+    RegistryConfiguration config ;
+    PopupListener(JPopupMenu popupMenu,JTable tab,RegistryConfiguration conf) {
+	popup  = popupMenu;
+	table  = tab     ;
+	config = conf    ;
     }
 
     public void mousePressed(MouseEvent e) {
@@ -1009,8 +1051,36 @@ class PopupListener extends MouseAdapter {
 
     private void maybeShowPopup(MouseEvent e) {
         if (e.isPopupTrigger()) {
-            popup.show(e.getComponent(),
-                       e.getX(), e.getY());
+	   
+
+	    
+	    int pos = table.getSelectedRow();
+	    if ( pos < 0) 
+		return ;
+	    System.out.println("seleceted pos " + pos);
+	    
+	    SpiceDasSource ds = config.getServer(pos);
+	    
+	    // get the menu items
+	    MenuElement[] m =	popup.getSubElements() ;
+	    JMenuItem m0 = (JMenuItem)m[0].getComponent();
+	    JMenuItem m1 = (JMenuItem)m[1].getComponent();
+		
+	    // adapt the display of the MenuItems
+	    if ( ds.getStatus()) 
+		m0.setText("inactivate") ;
+	    else 
+		m0.setText("activate");
+
+	    if (ds.getRegistered())
+		m1.setEnabled(false);
+	    else
+		m1.setEnabled(true);
+	    
+	    
+	    
+	    popup.show(e.getComponent(),		       
+		       e.getX(), e.getY());
         }
     }
 }
@@ -1024,7 +1094,7 @@ class MyTableModel extends AbstractTableModel {
     private Object[][] data ;
     private String[]   columnNames  ;
 				    
-    public MyTableModel(TabbedPaneDemo parent_,String[][]seqdata, String[] columnNames_){
+    public MyTableModel(TabbedPaneDemo parent_,Object[][]seqdata, String[] columnNames_){
 	super();
 	parent = parent_ ;
 	columnNames = columnNames_;
@@ -1033,18 +1103,14 @@ class MyTableModel extends AbstractTableModel {
 
     }
 
-				      
-  
-   
 
-
-    private void setData(String[][]seqdata) {
+    private void setData(Object[][]seqdata) {
 	Object[][] o = new Object[seqdata.length][columnNames.length];
 	for ( int i = 0 ; i < seqdata.length; i++){
-	    for ( int j =0 ; j < columnNames.length-1; j++){
+	    for ( int j =0 ; j < columnNames.length; j++){
 		o[i][j] = seqdata[i][j];
 	    }
-	    o[i][columnNames.length-1] = new Boolean(true);
+	    //o[i][columnNames.length-1] = new Boolean(true);
 	}
 	data = o ;
     }
@@ -1109,7 +1175,8 @@ class MyTableModel extends AbstractTableModel {
 	
 	
 	data[row][col] = value;
-	fireTableCellUpdated(row, col);
+
+
 
 	if ( col == ( columnNames.length - 1 )) {
 	   	
@@ -1119,6 +1186,8 @@ class MyTableModel extends AbstractTableModel {
 	    String url = (String)getValueAt(row,0);
 	    parent.setServerStatus(url,(Boolean)value) ;
 	}
+
+	fireTableCellUpdated(row, col);
     }
 
     public void tableChanged(TableModelEvent e) {
@@ -1137,9 +1206,7 @@ class MyTableModel extends AbstractTableModel {
 	    parent.setServerStatus(url,status) ;
 	}
     }
-    
-
-
+   
 }
 
 

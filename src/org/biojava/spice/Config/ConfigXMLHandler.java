@@ -133,7 +133,7 @@ public class ConfigXMLHandler extends DefaultHandler {
 	} else if ( qName.equals("coordinateSystems")){
 	    String[] coordSys = (String[])coords.toArray(new String[coords.size()]);
 	    source.setCoordinateSystem(coordSys);
-	    System.out.println("coords:" +coords);
+	    //System.out.println("coords:" +coords);
 	} else if ( qName.equals("capabilities")){
 	    String[] capabilities = (String[])capabs.toArray(new String[capabs.size()]);
 	    source.setCapabilities(capabilities);

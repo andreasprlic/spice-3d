@@ -285,6 +285,14 @@ public class RegistryConfiguration
     }
 
 
+
+    /** delete server. only possible for local servers */
+    public void deleteServer(int pos){
+	SpiceDasSource ds = (SpiceDasSource)allservers.get(pos);
+	if (!ds.getRegistered()) {
+	    allservers.remove(ds);
+	}
+    }
     /** remove a server from the list of active servers */
     private void removeFromActive(SpiceDasSource ds) {
 	String serverurl = ds.getUrl();
