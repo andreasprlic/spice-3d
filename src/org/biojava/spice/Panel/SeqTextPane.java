@@ -90,7 +90,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         
         popupMenu = new JPopupMenu();
         
-        SelectionLockMenuListener ml = new SelectionLockMenuListener(spice);
+        SelectionLockMenuListener ml = new SelectionLockMenuListener(spice, null);
         
         JMenuItem menuItem = new JMenuItem("lock selection");
         menuItem.addActionListener(ml);

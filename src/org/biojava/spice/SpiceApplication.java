@@ -87,8 +87,9 @@ implements SPICEFrame
 {
     
     
-    public static Logger logger =  Logger.getLogger("org.biojava.spice");;
+    public static Logger logger =  Logger.getLogger("org.biojava.spice");
     
+    public static ImageIcon firefoxIcon = createImageIcon("firefox.png");
     
     URL REGISTRY_URL    ; // the url to the registration server
     
@@ -662,13 +663,18 @@ implements SPICEFrame
         // unique action listener for the browse buttons
         ActionListener bl = new BrowseMenuListener(this);
         menu.add(browseMenu);
-        pdbMenu = new JMenuItem("PDB");
+        if (firefoxIcon == null )
+            pdbMenu = new JMenuItem("PDB");
+        else
+            pdbMenu = new JMenuItem("PDB",firefoxIcon);
         pdbMenu.setMnemonic(KeyEvent.VK_P);
         pdbMenu.setEnabled(false);
         pdbMenu.addActionListener(bl);
         browseMenu.add(pdbMenu);
-        
-        upMenu = new JMenuItem("UniProt");
+        if ( firefoxIcon == null )
+            upMenu = new JMenuItem("UniProt");
+        else 
+            upMenu = new JMenuItem("UniProt",firefoxIcon);
         upMenu.setMnemonic(KeyEvent.VK_U);
         upMenu.setEnabled(false);
         upMenu.addActionListener(bl);
@@ -682,7 +688,13 @@ implements SPICEFrame
         align.getAccessibleContext().setAccessibleDescription("show alignments");
         menu.add(align);
         
-        JMenuItem seqstrucalig = new JMenuItem("Choose");
+        ImageIcon chooseIcon = createImageIcon("view_choose.png");
+        
+        JMenuItem seqstrucalig;
+        if ( chooseIcon ==  null )
+            seqstrucalig = new JMenuItem("Choose");
+        else 
+            seqstrucalig = new JMenuItem("Choose",chooseIcon);
         seqstrucalig.addActionListener(ml);
         seqstrucalig.setMnemonic(KeyEvent.VK_C);
         align.add(seqstrucalig);
@@ -884,11 +896,14 @@ implements SPICEFrame
             if ( link != null){
                 if ( knownFeatureLinks.contains(link))
                     continue ;
-                
-                JMenuItem item = new JMenuItem("open in browser "+ f.getName());
+                JMenuItem item;
+                if ( firefoxIcon == null)
+                     item = new JMenuItem("open in browser "+ f.getName());
+                else
+                    item = new JMenuItem("open in browser "+ f.getName(), firefoxIcon);
                 URL u;
                 try {
-                    u = new URL(link)
+                    u = new URL(link);
                 } catch (MalformedURLException e){
                     // if somebody e.g. provides the accession code 
                     // instead of a proper url in the link field...
@@ -1252,6 +1267,8 @@ implements SPICEFrame
     public void resetDisplay(){
         String cmd = INIT_SELECT;
         this.executeCmd(cmd);
+        setSelectionLocked(false);
+        
     }
     
     /** display an URL in the browser that started SPICE */
@@ -1620,16 +1637,10 @@ implements SPICEFrame
     
     public boolean showDocument(URL url) 
     {
-        try
-        {
-           return JNLPProxy.showDocument(url);
-        }
-        catch ( Exception  ex )
-        {
-            //ex.printStackTrace ( );
-            logger.warning(ex.getMessage());            
-        }
-        return false;
+        if ( url != null )
+            return JNLPProxy.showDocument(url);
+        else
+            return false;
     }
     
     public boolean showDocument(String urlstring){
@@ -1637,7 +1648,7 @@ implements SPICEFrame
             URL url = new URL(urlstring);
             return showDocument(url);
         } catch (MalformedURLException e){
-            logger.warning(e.getMessage());
+            logger.warning("malformed URL "+urlstring);
             return false;
         }
     }

@@ -246,6 +246,8 @@ public class StructurePanel extends JPanel
     public void notifyAtomPicked(int atomIndex, String strInfo){
 	logger.finest("notifyAtomPicked "  + atomIndex + " " + strInfo);
 	logger.finest("atomName:" + viewer.getAtomName(atomIndex));
+	java.util.Properties props = viewer.getModelProperties(atomIndex);
+	logger.finest(props.toString());
     }
 
     public void notifyFileLoaded(String fullPathName, String fileName,
@@ -268,7 +270,7 @@ public class StructurePanel extends JPanel
     }
 
     public void notifyScriptTermination(String statusMessage, int msWalltime){
-
+        logger.fine("Script finished in " + msWalltime + "ms");
     }
 
     public void handlePopupMenu(int x, int y){

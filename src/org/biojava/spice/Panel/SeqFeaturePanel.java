@@ -60,7 +60,8 @@ import java.util.logging.Logger;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel    ;
 import javax.swing.JPopupMenu;
-
+import java.net.URL;
+import java.net.MalformedURLException;
 
 
 
@@ -165,7 +166,8 @@ implements SeqPanel, MouseListener, MouseMotionListener
         
         popupMenu = new JPopupMenu();
         
-        SelectionLockMenuListener ml = new SelectionLockMenuListener(spice);
+        
+        SelectionLockMenuListener ml = new SelectionLockMenuListener(spice,null);
         
         JMenuItem menuItem = new JMenuItem("lock selection");
         menuItem.addActionListener(ml);
@@ -465,7 +467,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
             // add link to popupmenu
             String link = feat.getLink();
             if ( link != null) {
-                registerLinkMenu(link);
+                registerLinkMenu(link,feat.getName() );
             }
             
             
@@ -532,15 +534,21 @@ implements SeqPanel, MouseListener, MouseMotionListener
         
     }
     
-    private void registerLinkMenu(String link){
+    private void registerLinkMenu(String link, String txt){
         
         //  add link to the menu
         //ActionListener ml = new LinkMenuListener(spice,link);
         if ( knownLinks.contains(link))
             return;
         //System.out.println("adding menu:" + link);
-        ActionListener ml = new SelectionLockMenuListener(spice);
-        JMenuItem menuItem = new JMenuItem("open in browser "+ link);
+        URL u ;
+        try {
+            u = new URL(link);
+        } catch ( MalformedURLException e){
+            return;
+        }
+        ActionListener ml = new SelectionLockMenuListener(spice,u);
+        JMenuItem menuItem = new JMenuItem("open in browser "+ txt);
         menuItem.addActionListener(ml);
         popupMenu.add(menuItem);
         knownLinks.add(link);

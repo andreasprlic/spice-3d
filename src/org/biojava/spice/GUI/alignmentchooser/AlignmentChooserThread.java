@@ -40,9 +40,9 @@ import org.biojava.bio.program.das.dasalignment.Alignment;
  */
 public class AlignmentChooserThread extends Thread {
     String uniprot;
-    	AlignmentPanel aligPanel;
-    	JProgressBar progressBar;
-    	SPICEFrame spice;
+    AlignmentPanel aligPanel;
+    JProgressBar progressBar;
+    SPICEFrame spice;
     /**
      * 
      */
@@ -51,46 +51,44 @@ public class AlignmentChooserThread extends Thread {
         spice = parent;
         uniprot = up;
         aligPanel = aP;
-        	progressBar =pB;
+        progressBar =pB;
         // TODO Auto-generated constructor stub
         
     }
-
-    	public void run() {
-    	    progressBar.setIndeterminate(true);
-           
-    	    Alignment[] aligs = null ;
-            
-            if (uniprot != null) { 
-                // get alternative alignments with structure for it
-                AlignmentTools aligTools = new AlignmentTools(spice.getConfiguration());
-                aligs = aligTools.getAlignments(uniprot);
-                if ( aligs != null ) {
-                    //System.out.println("got "+aligs.length+ " alignments");
-                    aligPanel.setAlignments(aligs);
-                    
-                }
-                //for ( int i=0;i<aligs.length;i++){
-                    //Alignment a = aligs[i];
-                    //System.out.println(a);    
-                //}
+    
+    public void run() {
+        progressBar.setIndeterminate(true);
+        spice.setLoading(true);   
+        Alignment[] aligs = null ;
+        
+        if (uniprot != null) { 
+            // get alternative alignments with structure for it
+            AlignmentTools aligTools = new AlignmentTools(spice.getConfiguration());
+            aligs = aligTools.getAlignments(uniprot);
+            if ( aligs != null ) {
+                //System.out.println("got "+aligs.length+ " alignments");
+                aligPanel.setAlignments(aligs);
                 
             }
+           
+        }
         
-    	    progressBar.setIndeterminate(false);
-    	    //Container c = aligPanel.getParent().getParent();
-    	    //System.out.println(c);
-    	    //if ( c instanceof JPanel ){
-    	    //    System.out.println("jpanel");
-    	    //}
-    	    //Dimension d = aligPanel.getSize();
-    	    //aligPanel.setSize(d);
-    	    //c.repaint();
-    	    //aligPanel.paint(aligPanel.getGraphics());
-    	    aligPanel.repaint();
-    	}
-   
-
-
-
+        progressBar.setIndeterminate(false);
+        //Container c = aligPanel.getParent().getParent();
+        //System.out.println(c);
+        //if ( c instanceof JPanel ){
+        //    System.out.println("jpanel");
+        //}
+        //Dimension d = aligPanel.getSize();
+        //aligPanel.setSize(d);
+        //c.repaint();
+        //aligPanel.paint(aligPanel.getGraphics());
+        spice.setLoading(false);
+        aligPanel.repaint();
+           
+    }
+    
+    
+    
+    
 }

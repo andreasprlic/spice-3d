@@ -28,7 +28,7 @@ import org.biojava.spice.SPICEFrame;
 
 import javax.swing.JMenuItem;
 
-
+import java.net.URL;
 
 /**
  * @author Andreas Prlic
@@ -39,16 +39,17 @@ public class BrowseMenuListener implements ActionListener {
     
     // see also  Panel.StatusPanel
     public static String PDBLINK = "http://www.rcsb.org/pdb/cgi/explore.cgi?pdbId=";
+    
     public static String UNIPROTLINK = "http://www.ebi.uniprot.org/uniprot-srv/uniProtView.do?proteinAc=" ;
     
     
     SPICEFrame spice;
-    String url;
+    URL url;
     public BrowseMenuListener(SPICEFrame parent){
-        url="";
+        url= null;
         spice = parent;
     }
-    public BrowseMenuListener(SPICEFrame parent,String link){
+    public BrowseMenuListener(SPICEFrame parent,URL link){
         url=link;
         spice = parent;
     }
@@ -59,10 +60,12 @@ public class BrowseMenuListener implements ActionListener {
       if (txt.equals("PDB")){
           // open PDB file
           String u = PDBLINK+spice.getPDBCode();
-          spice.showDocument(url);
+          //System.out.println("opening url "+u );
+          spice.showDocument(u);
       } else if ( txt.equals("UniProt")){
           String u = UNIPROTLINK+spice.getUniProtCode();
-          spice.showDocument(url);
+          //System.out.println("opening url "+u );
+          spice.showDocument(u);
       } else {
           //String url = txt.substring(16,txt.length());
           spice.showDocument(url);

@@ -27,6 +27,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JMenuItem;
 
 import org.biojava.spice.SPICEFrame;
+import java.net.URL;
 
 /**
  * @author Andreas Prlic
@@ -37,10 +38,13 @@ implements ActionListener {
     
     //SeqFeaturePanel parent;
     SPICEFrame spice;
-    
-    public SelectionLockMenuListener(SPICEFrame parent_){
+    URL url;
+    public SelectionLockMenuListener(SPICEFrame parent_, URL u){
         spice=parent_;
+        url = u;
     }
+    
+    
     
     public void actionPerformed(ActionEvent e){
         JMenuItem source = (JMenuItem)(e.getSource());
@@ -58,7 +62,7 @@ implements ActionListener {
         } else {
             //String start = txt.substring(0,15);
             //System.out.println(start);
-            String url = txt.substring(16,txt.length());
+            //String url = txt.substring(16,txt.length());
             //System.out.println(url);
             spice.showDocument(url);
                 
