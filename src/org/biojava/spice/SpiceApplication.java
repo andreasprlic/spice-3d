@@ -331,8 +331,8 @@ public class SpiceApplication
 	//structurePanel.setLayout(new BoxLayout(structurePanel, BoxLayout.X_AXIS));
 	structurePanel.setPreferredSize(new Dimension(700, 700));
 	structurePanel.setMinimumSize(new Dimension(200,200));
-	structurePanel.addMouseMotionListener(structurePanel);
-	structurePanel.addMouseListener(      structurePanel);
+	//structurePanel.addMouseMotionListener(structurePanel);
+	//structurePanel.addMouseListener(      structurePanel);
 	//this.add(structurePanel,BorderLayout.CENTER);
 
 
@@ -710,9 +710,9 @@ public class SpiceApplication
 
 	structure = structure_ ; 
 
-	if (logger.isLoggable(Level.FINEST)) {
-	    System.out.println(structure.toPDB());	    
-	}
+	//if (logger.isLoggable(Level.FINEST)) {
+	//  System.out.println(structure.toPDB());	    
+	//}
 
 
 	    	

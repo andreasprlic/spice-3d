@@ -23,15 +23,15 @@
 
 package org.biojava.spice ;
 
-// for Jmol stuff
-import org.jmol.api.JmolAdapter;
-import org.jmol.adapter.smarter.SmarterJmolAdapter;
-import org.jmol.viewer.JmolViewer;
-import org.jmol.viewer.JmolStatusListener;
-
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+
+// for Jmol stuff
+import org.jmol.api.*;
+import org.jmol.adapter.smarter.SmarterJmolAdapter;
+
+
 
 // biojava structure stuff
 import org.biojava.bio.structure.Structure ;
@@ -40,37 +40,37 @@ import org.biojava.bio.structure.Structure ;
 import java.util.logging.*;
 
 
-/// accessing Jmol directly
-import org.jmol.viewer.datamodel.Atom ;
 
-import org.openscience.jmol.ui.JmolPopup;
+//import org.openscience.jmol.ui.JmolPopup;
 
 
 /** a Panel that provides a wrapper around the Jmol viewer. Code heavily
  * inspired by
  * http://cvs.sourceforge.net/viewcvs.py/jmol/Jmol/examples/Integration.java?view=markup
  * - the Jmol example of how to integrate Jmol into an application.
+ * Here some mouse listeners are added that talk back to the main SPICE application.
  * 
  */
 class StructurePanel extends JPanel
-    implements MouseListener, MouseMotionListener {
+    implements JmolStatusListener {
     
     final  Dimension currentSize = new Dimension();
+    final Rectangle  rectClip    = new Rectangle();
+
     static Logger    logger      = Logger.getLogger("org.biojava.spice");
 
     JmolViewer  viewer;
     JmolAdapter adapter;
-    TextField   strucommand  ; 
     
     SPICEFrame  spice ;
-    JmolPopup jmolpopup ;
+    //JmolPopup jmolpopup ;
     
     StructurePanel(SPICEFrame parent) {
-	spice = parent ;
+	spice   = parent ;
 	adapter = new SmarterJmolAdapter(null);
-	viewer = new JmolViewer(this, adapter);
-
-	jmolpopup = JmolPopup.newJmolPopup(viewer);
+	viewer  = org.jmol.viewer.Viewer.allocateJmolViewer(this, adapter);
+	viewer.setJmolStatusListener(this);
+	//jmolpopup = JmolPopup.newJmolPopup(viewer);
 	
     }
     
@@ -81,11 +81,16 @@ class StructurePanel extends JPanel
 
     /** paint Jmol */
     public void paint(Graphics g) {
-
-	viewer.setScreenDimension(getSize(currentSize));
-	Rectangle rectClip = new Rectangle();
+	getSize(currentSize);
 	g.getClipBounds(rectClip);
 	viewer.renderScreenImage(g, currentSize, rectClip);
+
+    }
+
+    /** reset the Jmol display */
+    public void reset() {
+	viewer.homePosition();
+	
     }
 
     /** send a RASMOL like command to Jmol
@@ -113,8 +118,8 @@ class StructurePanel extends JPanel
 	    viewer.openStringInline(pdbstr);
 	}
 	
-	String cmd ="select all; cpk off; wireframe off;"  ;
-	executeCmd(cmd);
+	//String cmd ="select all; cpk off; wireframe off;"  ;
+	//executeCmd(cmd);
 	    
 	
 	String strError = viewer.getOpenFileError();
@@ -123,20 +128,24 @@ class StructurePanel extends JPanel
 		logger.severe("could not open PDB file in viewer "+ strError);
 	    }
 	}
-	jmolpopup.updateComputedMenus();
+	//jmolpopup.updateComputedMenus();
 
     }
 
  
 
+    /*
     public void mouseDragged(MouseEvent e) {
 	//logger.finest("dragging mouse "+e);
     }	
+    */
 
-    /** when the mouse is moved of the structure panel,
+    /* when the mouse is moved of the structure panel,
 	the corresponing position in the sequence is highlited
     */
     
+
+    /*
     public void mouseMoved(MouseEvent e) {
 	//logger.finest("moving mouse over StructurePanel "+e);    	
 	int pos = viewer.findNearestAtomIndex(e.getX(),e.getY());
@@ -172,15 +181,18 @@ class StructurePanel extends JPanel
 	//logger.finest("seqCode " + atom.getSeqcodeString());
 
     }
+
+    */
+    /*
     public void mouseClicked(MouseEvent e)
     {
-	logger.finest("mouseClick in structure Panel"+e);
+	//logger.finest("mouseClick in structure Panel"+e);
 	
 
 	// if right mouse button 
 	if ( e.getButton() == MouseEvent.BUTTON3 ) {
-	    //viewer.popupMenu(e.getX(),e.getY());
-	    jmolpopup.show(e.getX(),e.getY());
+	    viewer.popupMenu(e.getX(),e.getY());
+	    //jmolpopup.show(e.getX(),e.getY());
 	}
       
 	
@@ -212,13 +224,45 @@ class StructurePanel extends JPanel
 	spice.highlite(chainpos,residuepos);
 	spice.showSeqPos(chainpos,residuepos);	
 
-
-
     }
     public void mouseEntered(MouseEvent e)  {}
     public void mouseExited(MouseEvent e)   {}
     public void mousePressed(MouseEvent e)  {}
     public void mouseReleased(MouseEvent e) {}
+    */
+
+    public void notifyAtomPicked(int atomIndex, String strInfo){
+	logger.finest("notifyAtomPicked "  + atomIndex + " " + strInfo);
+	logger.finest("atomName:" + viewer.getAtomName(atomIndex));
+    }
+
+    public void notifyFileLoaded(String fullPathName, String fileName,
+				 String modelName, Object clientFile){}
+
+    public void notifyFileNotLoaded(String fullPathName, String errorMsg){}
     
+    public void setStatusMessage(String statusMessage){}
+
+    public void scriptEcho(String strEcho){
+	logger.log(Level.INFO,strEcho);
+    }
+
+    public void scriptStatus(String strStatus){}
+
+    public void notifyScriptTermination(String statusMessage, int msWalltime){
+
+    }
+
+    public void handlePopupMenu(int x, int y){
+	logger.finest("handlePopupMenu");
+    }
+
+    public void notifyMeasurementsChanged(){
+	logger.finest("nofiyMeasurementsChanged");
+    }
+
+    public void notifyFrameChanged(int frameNo){}
+
+
 
 }
