@@ -52,7 +52,8 @@ public class Spice extends Applet {
 	try {
 	    //System.out.println(argv[1]);
 	    url = new URL(argv[1]);
-	    registry_url = new URL("http://localhost:8080/axis/services/dasregistry/");
+	    //registry_url = new URL("http://localhost:8080/axis/services/dasregistry/");
+	    registry_url = new URL(argv[1]);
 	} catch (MalformedURLException e) {
 	    System.err.println(url+" " + registry_url);
 	    e.printStackTrace();

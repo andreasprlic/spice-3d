@@ -93,7 +93,7 @@ public class LoadStructureThread
 	
 	try {
 	
-	    spiceframe.showStatus("Loading...Wait...",Color.red);
+	   
 	    
 	    String dasstructurecommand = getStructureServer() + "structure?model=1&query=";
 	    String dassequencecommand  = getSequenceServer()  + "sequence?segment=";
@@ -104,7 +104,7 @@ public class LoadStructureThread
 	    } catch ( ConfigurationException e) {
 		e.printStackTrace();
 	    }
-	    
+	    spiceframe.showStatus("Loading...Wait...",Color.red);
 	    DAS_PDBFeeder pdb_f =  new DAS_PDBFeeder(dasstructurecommand,dassequencecommand,dasalignmentcommand) ;
 	    System.out.println("pdb_f.loadPDB");
 	    pdb_f.loadPDB(pdb_file);

@@ -576,6 +576,7 @@ public class SeqFeatureCanvas
 
     /** create a tooltip string */
     private String getToolString(int seqpos, Segment segment){
+	System.out.println("getToolString");
 	// current position is seqpos
 	String toolstr = spice.getToolString(current_chainnumber,seqpos);
 	
@@ -644,6 +645,10 @@ public class SeqFeatureCanvas
 	    String toolstr = getToolString(seqpos,segment);
 	    //gfeat.drawString(toolstr,5,13);
 	    spice.showStatus(toolstr) ;
+	    // display ToolTip
+	    this.setToolTipText(toolstr);
+	} else {
+	    this.setToolTipText(null);
 	}
 
 
@@ -711,10 +716,12 @@ public class SeqFeatureCanvas
 	    
 	    String toolstr = getToolString(seqpos,segment);
 	    spice.showStatus(drstr + " " + toolstr) ;
+	    this.setToolTipText(toolstr);
 
 	   	
 	} else {
 	    spice.highlite(current_chainnumber,seqpos);
+	    this.setToolTipText(null);
 	}
 	//this.repaint();
 	    //Color col = entColors[featurenr%entColors.length] ;

@@ -60,7 +60,7 @@ public class DAS_FeatureRetreive {
 		try {
 			
 		    //DAS_httpConnector dhtp = new DAS_httpConnector() ;
-			//System.out.println("DasFeatureRetureive"+url);
+		    //System.out.println("DasFeatureRetureive"+url);
 		    InputStream dasInStream = null;
 		    try {
 			dasInStream	= open(url); 

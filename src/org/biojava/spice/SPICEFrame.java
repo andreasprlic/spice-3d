@@ -26,8 +26,9 @@ package org.biojava.spice;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.Chain;
 
-import java.awt.*;
+import java.awt.Color ;
 import java.util.Map ;
+import java.util.List ;
 
 /** an interface that defined methods that are required by sub frames
  * of SPICE to communicate with the master application 
@@ -63,6 +64,9 @@ public interface SPICEFrame  {
      * @param structre_ a Biojava structure object
      */
     public void   setStructure(Structure structure );
+
+    /** set the new features to be displayed in sequence panels */
+    public void setFeatures(String sp_id, List features);
 
     /** set the chain nr chainnr as the active one */
     public void setCurrentChain(int chainnr);

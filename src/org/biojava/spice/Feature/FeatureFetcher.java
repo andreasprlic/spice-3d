@@ -43,7 +43,7 @@ import org.biojava.bio.structure.Group ;
   */
 public class FeatureFetcher extends Thread
 {
-
+    SPICEFrame parent ;
     boolean finished ;
     String spId ;
     String pdbId ;
@@ -60,7 +60,8 @@ public class FeatureFetcher extends Thread
      * @param pdb_id PDB ID
      * @param c Chain object to which these features should be linked
      */
-    public FeatureFetcher( Map config, String sp_id, String pdb_id, Chain c ) {
+    public FeatureFetcher(SPICEFrame spice, Map config, String sp_id, String pdb_id, Chain c ) {
+	parent      = spice ;
 	finished    = false ;
 	spId        = sp_id ;
 	pdbId       = pdb_id ;
@@ -91,6 +92,19 @@ public class FeatureFetcher extends Thread
     public void run() {
 
 	doDasCommunication() ;
+	
+	while ( ! finished) {	    
+	    //System.out.println("waiting for features to be retreived: "+done);
+	    try {
+		wait(300);
+	    } catch (InterruptedException e) {
+		e.printStackTrace();
+		finished = true ;
+	    }
+	    System.out.println("FeatureFetcher :in waitloop");
+	}
+	List l = getFeatures();
+	parent.setFeatures(spId,l);
     }
 
     private synchronized void doDasCommunication() {
@@ -122,6 +136,7 @@ public class FeatureFetcher extends Thread
 		setFinished(responsecounter,empty);
 		continue ;
 	    }
+	    System.out.println("starting thread");
 	    SingleFeatureThread sft = new SingleFeatureThread ( this ,spUrl,responsecounter);
 	    sft.run();
 	    responsecounter++;
@@ -144,6 +159,7 @@ public class FeatureFetcher extends Thread
 		setFinished(responsecounter,empty);
 		continue ;
 	    }
+	    System.out.println("starting thread");
 	    SingleFeatureThread sft = new SingleFeatureThread ( this ,spUrl,responsecounter);
 	    sft.run();
 	    responsecounter++;
@@ -153,7 +169,7 @@ public class FeatureFetcher extends Thread
 	boolean done = false ;
 	while ( ! done) {
 	    done = allFinished();
-	    //System.out.println("waiting for features to be retreived: "+done);
+	    System.out.println("FeatureFetcher waiting for features to be retreived: "+done);
 	    try {
 		wait(300);
 	    } catch (InterruptedException e) {

@@ -64,9 +64,12 @@ import java.awt.BorderLayout       ;
 import java.awt.FlowLayout ;
 import java.awt.Event ;
 import java.awt.TextField ;
-import javax.swing.JSplitPane ;
+
 
 import java.awt.event.*    ;
+import javax.swing.text.Document ;
+import javax.swing.text.Element ;
+import javax.swing.JSplitPane ;
 import javax.swing.JFrame  ;
 import javax.swing.JPanel  ;
 import javax.swing.BoxLayout;
@@ -77,6 +80,8 @@ import javax.swing.DefaultListModel   ;
 import javax.swing.JTextField   ;
 import javax.swing.event.ListSelectionListener  ;
 import javax.swing.event.ListSelectionEvent ;    
+//import javax.swing.event.CaretEvent;
+//import javax.swing.event.CaretListener;
 
 // menu
 import javax.swing.JMenuBar    ;
@@ -131,7 +136,7 @@ public class SpiceApplication
 
     JScrollPane seqScrollPane ;
     JSplitPane  seqSplitPane  ;
-    SeqTextPane   seqField      ;
+    SeqTextPane seqField      ;
     
     JMenuBar menuBar ;
     JTextField getCom ;
@@ -158,6 +163,11 @@ public class SpiceApplication
 	super();
 
 	System.setProperty("XMLVALIDATION",XMLVALIDATION);
+	int timeout = 10000;
+	System.out.println("setting timeouts to " + timeout) ;
+	System.setProperty("sun.net.client.defaultConnectTimeout", ""+timeout);
+	System.setProperty("sun.net.client.defaultReadTimeout", ""+timeout);
+
 
 	CONFIG_URL   = config_url ;
 	REGISTRY_URL = registry_url ;
@@ -238,7 +248,13 @@ public class SpiceApplication
 
 	showStatus("contacting DAS registry");
 	config =regi.getConfiguration();
-
+	if ( config == null ) {
+	    String msg = "Unable to contact DAS registration service, can not continue!" ;
+	    seq_pos.setText(msg);
+	    System.err.println(msg);
+	    return ;
+	    
+	}
 	/// init Structure Panel
 	structurePanel        = new StructurePanel();
 	//structurePanel.setLayout(new BoxLayout(structurePanel, BoxLayout.X_AXIS));
@@ -317,8 +333,10 @@ public class SpiceApplication
 	seqField.setSize( 700, 30);
 	seqField.setPreferredSize(new Dimension(700, 30));
 	seqField.setMinimumSize(new Dimension(700, 30));
-	//seqField.addMouseMotionListener(seqField);
-	//seqField.addMouseListener(seqField);
+	seqField.addMouseMotionListener(seqField);
+	seqField.addMouseListener(seqField);
+
+
 	// add onMouseOver action
 
 	seqScrollPane = new JScrollPane(seqField) ;
@@ -744,7 +762,7 @@ public class SpiceApplication
 	    getNewFeatures(sp_id) ;
 	} else {
 	    
-	    setNewFeatures(tmpfeat);	    
+	    setFeatures(sp_id,tmpfeat);	    
 	    //SeqFeatureCanvas dascanv = daspanel.getCanv();
 	    dascanv.setChain(chain,currentChain);
 	    dascanv.setBackground(Color.black);
@@ -758,9 +776,14 @@ public class SpiceApplication
 	//ArrayList featureservers = getFeatureServers() ;
 	Chain chain = getChain(currentChain) ;
 	
-	FeatureFetcher ff = new FeatureFetcher(config,sp_id,pdbcode,chain);
+	FeatureFetcher ff = new FeatureFetcher(this,config,sp_id,pdbcode,chain);
 	ff.start() ;
-	
+
+	dascanv.setChain(chain,currentChain);
+	dascanv.setBackground(Color.black);
+	seqField.setChain(chain,currentChain);
+
+	/**
 	boolean done = false ;
 	while ( ! done) {
 	    done = ff.isDone();
@@ -779,29 +802,32 @@ public class SpiceApplication
 	memoryfeatures.put(sp_id,tmpfeat);
 	setNewFeatures(tmpfeat);	
 	//SeqFeatureCanvas dascanv = daspanel.getCanv();
-	dascanv.setChain(chain,currentChain);
-	dascanv.setBackground(Color.black);
-	seqField.setChain(chain,currentChain);
+	*/
     }
 
     /**  update the currently displayed features */
-    private void setNewFeatures(ArrayList tmpfeat) {
+    public  void setFeatures(String sp_id, List tmpfeat) {
+	memoryfeatures.put(sp_id,tmpfeat);
 
 	features.clear();
 	features = tmpfeat ;
 	this.paint(this.getGraphics());
+	updateDisplays();
+
+
     }
 
     // store all features in memory -> speed up
     private ArrayList getFeaturesFromMemory(String sp_id) {
-
+	System.out.println("getFeaturesFromMemory");
 	ArrayList arr = new ArrayList() ;
 	
 	for (Iterator ti = memoryfeatures.keySet().iterator(); ti.hasNext(); ) {
 	    String key = (String) ti.next() ;
-	    if ( key == null) {
-		return arr ;
-	    }
+	    
+	    System.out.println(key);
+	    if ( key == null) { continue; }
+
 	    if (key.equals(sp_id)) {
 		arr = (ArrayList) memoryfeatures.get(sp_id) ;
 		return arr ;
@@ -1116,7 +1142,9 @@ public class SpiceApplication
 	else if ( event.target ==  aboutspice ) {
 	    System.out.println("about SPICE");
 	    AboutDialog asd = new AboutDialog(this);
+
 	    asd.setText("The SPICE Applet. V 0.1 (C) Andreas Prlic, Tim Hubbard\n The Wellcome Trust Sanger Institute 2004 mailto:ap3@sanger.ac.uk") ;
+
 	    asd.show();
 	    return true;
 	}

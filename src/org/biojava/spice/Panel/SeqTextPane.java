@@ -32,6 +32,9 @@ import javax.swing.text.*;
 import java.awt.Color          ;
 import org.biojava.bio.structure.Chain ;
 import java.awt.Graphics ;
+import javax.swing.text.Document ;
+import javax.swing.text.Element ;
+import java.awt.Point ; 
 
 public class SeqTextPane
     extends JTextPane
@@ -62,7 +65,7 @@ public class SeqTextPane
 	StyleConstants.setBackground(bstyle,Color.white);
 	//StyleConstants.setBold(bstyle,false);
 
-
+	this.setEditable(false);
     }
 
 
@@ -79,18 +82,41 @@ public class SeqTextPane
     public void mouseMoved(MouseEvent e)
     {	
 
-	//, int x, int y
+
+	//int dot = e.getDot();
 	int x = e.getX();
 	int y = e.getY();
-	int seqpos = getSeqpos(x,y);
+	Point p = new Point(x,y);
 
-	System.out.println("SeqTextPane mouseMoved " + x + " " + y + " " + seqpos);
+	int seqpos = viewToModel(p);
+
+	//caretPosLabel.setText( (line+1) + ":" + (col+1) );
+	//System.out.println("mouseMoved "+ pos);
+
+	//, int x, int y
+	//
+	//
+	//int seqpos = getSeqpos(x,y);
+
+	//System.out.println("SeqTextPane mouseMoved " + x + " " + y + " " + seqpos);
 	spice.select(current_chainnumber,seqpos);
     }
 
     public void mouseClicked(MouseEvent e)
     {
-	System.out.println("CLICK");
+	//System.out.println("CLICK");
+	int x = e.getX();
+	int y = e.getY();
+	Point p = new Point(x,y);
+
+	int seqpos = viewToModel(p);
+	spice.select(current_chainnumber,seqpos);
+	String pdb1 = spice.getSelectStrSingle(current_chainnumber,seqpos);
+	if ( ! pdb1.equals("")) {
+	    String cmd = "select "+pdb1 +"; spacefill on; colour cpk;" ;
+	    spice.executeCmd(cmd);
+	}
+
     }
 
     public void mouseEntered(MouseEvent e)  {}
@@ -99,7 +125,7 @@ public class SeqTextPane
     public void mouseReleased(MouseEvent e) {}
 
 
-
+    /*
     private int getSeqpos(int x,int y){
 	Dimension d = this.getSize();
 	double w = d.width ;
@@ -109,7 +135,7 @@ public class SeqTextPane
 	return Math.round (x/(long)w);
     }
        
-
+    */
 
     /** highighting of range of residues */
     public void highlite( int start, int end) {
