@@ -81,7 +81,7 @@ public class RegistryConfigIO
     boolean done ;
 
     JProgressBar progressBar ;
-    Frame progressFrame      ;
+    JFrame progressFrame      ;
 
     public RegistryConfigIO ( URL registryurl) {
 	REGISTRY = registryurl ;
@@ -138,15 +138,17 @@ public class RegistryConfigIO
     
 
     private void showProgressBar(){
-	progressFrame = new Frame("contacting DAS registration service");
-	progressFrame.addWindowListener(new WindowAdapter() {
+	progressFrame = new JFrame("contacting DAS registration service");
+	progressFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	/*progressFrame.addWindowListener(new WindowAdapter() {
 		public void windowClosing(WindowEvent evt) {
 		    Frame frame = (Frame) evt.getSource();
 		    frame.setVisible(false);
 		    frame.dispose();
 		}
 	    });
-
+	*/
+	progressFrame.setUndecorated(true);
 	JPanel panel = new JPanel();
 	JLabel txt = new JLabel("detecting available DAS servers", JLabel.RIGHT);
 	panel.add(txt);
@@ -161,7 +163,7 @@ public class RegistryConfigIO
 	
 	panel.add(progressBar);
 	panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-	progressFrame.add(panel);
+	progressFrame.getContentPane().add(panel);
 	progressFrame.pack();
 	progressFrame.setVisible(true);
     }
@@ -194,15 +196,9 @@ public class RegistryConfigIO
         JFrame.setDefaultLookAndFeelDecorated(true);
 
         //Create and set up the window.
-        Frame frame = new Frame("SPICE configuration window");
-	//frame.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-	frame.addWindowListener(new WindowAdapter() {
-		public void windowClosing(WindowEvent evt) {
-		    Frame frame = (Frame) evt.getSource();
-		    frame.setVisible(false);
-		    frame.dispose();
-		}
-	    });
+        JFrame frame = new JFrame("SPICE configuration window");
+	frame.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+	
 	
 	
         //Create and set up the content pane.
@@ -212,16 +208,16 @@ public class RegistryConfigIO
         //frame.getContentPane().add(new TabbedPaneDemo(config),
 	//                       BorderLayout.CENTER);
 	TabbedPaneDemo tpd = new TabbedPaneDemo(config);
-	frame.add(tpd);
+	frame.getContentPane().add(tpd);
 
 		
-	JButton saveb   = new JButton("Save");
-	JButton cancelb = new JButton("Cancel");
-	saveb.addActionListener(   new ButtonListener(frame, tpd) );
-	cancelb.addActionListener( new ButtonListener(frame, tpd) );
+	//JButton saveb   = new JButton("Save");
+	//JButton cancelb = new JButton("Cancel");
+	//saveb.addActionListener(   new ButtonListener(frame, tpd) );
+	//cancelb.addActionListener( new ButtonListener(frame, tpd) );
 	
-	frame.add(saveb);
-	frame.add(cancelb);
+	//frame.add(saveb);
+	//frame.add(cancelb);
         //Display the window.
         frame.pack();
         frame.setVisible(true);
@@ -243,6 +239,30 @@ public class RegistryConfigIO
     }
 }
 
+class ButtonListener
+    implements ActionListener
+	       
+{
+    JFrame parent ;
+    TabbedPaneDemo configpane ;
+
+    public ButtonListener( JFrame parent_,TabbedPaneDemo tpd) {
+	parent = parent_ ;
+	configpane = tpd ;
+    }
+
+    public void actionPerformed(ActionEvent e) {
+	String cmd = e.getActionCommand();
+	System.out.println("button pressed:" + cmd);
+	if ( cmd.equals("Close")) {
+	    parent.dispose();
+	} else  if (cmd.equals("Save")) {
+	    configpane.saveConfig();
+	}
+
+    
+    }
+}
 
 
 class TabbedPaneDemo extends JPanel {
@@ -283,8 +303,8 @@ class TabbedPaneDemo extends JPanel {
 	seqstrucpanel.add( seqscrollPane, BorderLayout.CENTER );
 
 	
-	//JButton saveb = new JButton("Save");
-	//JButton cancelb = new JButton("Cancel");
+	JButton saveb = new JButton("Save");
+	JButton cancelb = new JButton("Cancel");
 	//saveb.addActionListener(new ButtonListener(this ) );
 	//cancelb.addActionListener(new ButtonListener(this));
 	//seqstrucpanel.add(saveb);
@@ -511,26 +531,3 @@ class MyTableModel extends AbstractTableModel {
 }
 
 
-class ButtonListener
-    implements ActionListener
-	       
-{
-    Frame parent ;
-    TabbedPaneDemo configpane ;
-    void ButtonListener(Frame parent_,TabbedPaneDemo tpd) {
-	parent = parent_ ;
-	configpane = tpd ;
-    }
-
-    public void actionPerformed(ActionEvent e) {
-	String cmd = e.getActionCommand();
-	System.out.println("button pressed:" + cmd);
-	if ( cmd.equals("Close")) {
-	    parent.dispose();
-	} else  if (cmd.equals("Save")) {
-	    configpane.saveConfig();
-	}
-
-    
-    }
-}

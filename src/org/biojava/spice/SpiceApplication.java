@@ -99,7 +99,7 @@ import javax.swing.text.*;
 //import org.biojava.services.das.registry.*;
 
 public class SpiceApplication 
-    extends  Frame
+    extends  JFrame
     implements SPICEFrame 
 {
 
@@ -204,7 +204,7 @@ public class SpiceApplication
 
 	structureAlignmentMode = false ;
 
-	this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+	this.getContentPane().setLayout(new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
 
 
 	// add the Menu
@@ -243,7 +243,7 @@ public class SpiceApplication
 	seq_pos.setSize(700, 30);
 	seq_pos.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
 
-	this.add(seq_pos,BorderLayout.NORTH);
+	this.getContentPane().add(seq_pos,BorderLayout.NORTH);
 
 
 	showStatus("contacting DAS registry");
@@ -367,7 +367,7 @@ public class SpiceApplication
 	//mainsharedPanel.setPreferredSize(new Dimension(200, 200));
 	mainsharedPanel.setOpaque(true);
 	//mainsharedPanel.setResizeWeight(0.7);
-	this.add(mainsharedPanel,BorderLayout.NORTH);
+	this.getContentPane().add(mainsharedPanel,BorderLayout.NORTH);
 
 
 
@@ -377,7 +377,7 @@ public class SpiceApplication
 	ActionListener listener = new StructureCommandListener(this,strucommand) ;
 	strucommand.addActionListener(listener);
 	strucommand.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
-	this.add(strucommand,BorderLayout.SOUTH);
+	this.getContentPane().add(strucommand,BorderLayout.SOUTH);
 
 	/*
 	// menu
@@ -392,10 +392,19 @@ public class SpiceApplication
 	 // add actionListeners
 	 */
 
-
 	memoryfeatures = new HashMap();
 	features = new ArrayList();
 
+
+
+	this.setTitle("SPICE") ;
+	this.setSize(700, 700);
+	//this.show();
+	
+	this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	this.setDefaultLookAndFeelDecorated(false);
+	this.pack();
+	this.setVisible(true);
     }
 
 
