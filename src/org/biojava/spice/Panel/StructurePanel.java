@@ -39,13 +39,18 @@ import org.biojava.bio.structure.Structure ;
 // logging
 import java.util.logging.*;
 
+
+/// accessing Jmol directly
+import org.jmol.viewer.datamodel.Atom ;
+
 /** a Panel that provides a wrapper around the Jmol viewer. Code heavily
  * inspired by
  * http://cvs.sourceforge.net/viewcvs.py/jmol/Jmol/examples/Integration.java?view=markup
  * - the Jmol example of how to integrate Jmol into an application.
  * 
  */
-class StructurePanel extends JPanel {
+class StructurePanel extends JPanel
+    implements MouseListener, MouseMotionListener {
     
     final  Dimension currentSize = new Dimension();
     static Logger    logger      = Logger.getLogger("org.biojava.spice");
@@ -110,7 +115,36 @@ class StructurePanel extends JPanel {
 	    }
 	}
     }
-    
+    public void mouseDragged(MouseEvent e) {
+	//logger.finest("dragging mouse "+e);
+    }	
+    public void mouseMoved(MouseEvent e) {
+	//logger.finest("moving mouse over StructurePanel "+e);    	
+	int pos = viewer.findNearestAtomIndex(e.getX(),e.getY());
+	if ( pos == -1 ) { return ; }
+	Atom atom = viewer.getFrame().getAtomAt(pos);
+	if( atom.isHetero() ) { return ;} 
+	char chainId = atom.getChainID();
+	String seqcode = atom.getSeqcodeString();
+	    //logger.finest("chainid " + chainId);
+	    //logger.finest("atomIndex "+atom.getAtomIndex());
+	    //logger.finest(viewer.getElementNumber(pos));
+	    //logger.finest(viewer.getElementSymbol(pos));
+	    //logger.finest("atomName " + viewer.getAtomName(pos));
+	    //logger.finest("seqCode " + atom.getSeqcodeString());
 
+    }
+    public void mouseClicked(MouseEvent e)
+    {
+	//logger.finest("mouseClick in structure Panel"+e);
+	int x = e.getX();
+	int y = e.getY();
+	viewer.popupMenu(x,y);
+    }
+    public void mouseEntered(MouseEvent e)  {}
+    public void mouseExited(MouseEvent e)   {}
+    public void mousePressed(MouseEvent e)  {}
+    public void mouseReleased(MouseEvent e) {}
+    
 
 }
