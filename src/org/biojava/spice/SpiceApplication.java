@@ -139,14 +139,13 @@ implements SPICEFrame
     boolean structureAlignmentMode ;
     
     //public static Logger logger = Logger.getLogger("org.biojava.spice");
-    
-    
+  
     
     
     
     /** start the spice appplication
      */
-    SpiceApplication( URL registry_url) {
+    public SpiceApplication( URL registry_url) {
         super();
         
         // selection is possible at the start ;
@@ -157,9 +156,9 @@ implements SPICEFrame
         currentChain = null;
         
         LoggingPanel loggingPanel = new LoggingPanel(logger);
-        loggingPanel.getHandler().setLevel(Level.INFO);	
+        loggingPanel.getHandler().setLevel(Level.FINEST);	
         loggingPanel.show(null);
-        logger.setLevel(Level.INFO);
+        logger.setLevel(Level.FINEST);
         //ConsoleHandler handler = new ConsoleHandler();
         //handler.setLevel(Level.FINEST);
         //logger.addHandler(loggingPanel.getHandler());
@@ -474,6 +473,8 @@ implements SPICEFrame
         if (type.equals("PDB")){
             if ( code.length() == 4 ) 
                 this.getStructure(code);
+            else  
+                logger.info("please provide only 4 characters for the PDB code.");
             
         }
         else if (type.equals("UniProt")) {
@@ -722,6 +723,7 @@ implements SPICEFrame
      */
     public void getStructure(String pdbcod) {
         
+        
         currentChain = null ;
         
         if (logger.isLoggable(Level.FINER)) {
@@ -734,21 +736,163 @@ implements SPICEFrame
             logger.finest("SpiceApplication: getStructure "+ pdbcod);
         }
         this.setLoading(true);
+        pdbcode = pdbcod ;
         
         //first_load = true ;
         statusPanel.setLoading(true);
         statusPanel.setPDB(pdbcode);
         statusPanel.setSP("");
         
-        pdbcode = pdbcod ;
+        
         LoadStructureThread thr = new LoadStructureThread(this,pdbcod);
         thr.start();
         
         
         
     }
+
+    private String makeFeatureMemoryCode(String sp_id){
+        int i = getCurrentChainNumber();
+        
+        Chain c = getChain(i); 
+        String mem_id = sp_id +","+pdbcode + c.getName() ;
+        return mem_id;
+    }
+
+    /**  update the currently displayed features */
+    public void setFeatures(String sp_id, List tmpfeat) {
+        // todo create Feature for structure mapping
+        //first_load = false ;
+        String mem_id = makeFeatureMemoryCode(sp_id);
+        
+        
+
+        // TODO: need to move caching of features on a different level.
+        // We need to distinguish SP and PDB features...
+        // ev. better move cache to FeatureFetcher
+        memoryfeatures.put(mem_id,tmpfeat);
+        
+        
+        //statusPanel.setLoading(false);
+        features.clear();
+        features = tmpfeat ;
+        
+        // test if features have a LINK field
+        // if yes, add to browse menu
+        registerBrowsableFeatures(tmpfeat);
+        
+        //this.paint(this.getGraphics());
+        updateDisplays();
+    }
     
     
+    private void clearBrowsableButtons(){
+        int nr = browseMenu.getItemCount();
+        //System.out.println("cleaning "+nr+ " menus");
+        for ( int i = nr-1; i > 1; i--){
+            browseMenu.remove(i);
+        }
+        knownFeatureLinks = new ArrayList();
+    }
+
+
+    private void registerBrowsableFeatures(List feats){
+        Iterator iter = feats.iterator();
+        // add to menu
+        
+    
+        clearBrowsableButtons();
+        while (iter.hasNext()){
+            FeatureImpl f = (FeatureImpl)iter.next();
+            String link =f.getLink();
+            if ( link != null){
+                if ( knownFeatureLinks.contains(link))
+                    continue ;
+                
+                JMenuItem item = new JMenuItem("open in browser "+ f.getName());
+                ActionListener bl = new BrowseMenuListener(this,link);                    
+                item.addActionListener(bl);
+                browseMenu.add(item);
+                knownFeatureLinks.add(link);
+            }
+        }
+    }
+
+
+    private  void getNewFeatures(String sp_id) {
+        //ArrayList featureservers = getFeatureServers() ;
+        
+        Chain chain = getChain(currentChainNumber) ;
+        if ( chain == null) return ;
+        //first_load = true ;
+        this.setLoading(true);
+        features.clear();
+        FeatureFetcher ff = new FeatureFetcher(this,config,sp_id,pdbcode,chain);	
+        ff.start() ;
+        statusPanel.setLoading(true);
+        dascanv.setChain(chain,currentChainNumber);
+        //dascanv.setBackground(Color.);
+        seqField.setChain(chain,currentChainNumber);
+        
+        /**
+         boolean done = false ;
+         while ( ! done) {
+         done = ff.isDone();
+         //logger.finest("waiting for features to be retreived: "+done);
+          try {
+          wait(300);
+          } catch (InterruptedException e) {
+          e.printStackTrace();
+          done = true ;
+          }
+          //logger.finest("getNewFeatures :in waitloop");
+           }
+           
+           ArrayList tmpfeat = (ArrayList) ff.getFeatures();
+           //logger.finest("got new features: " + tmpfeat);
+            memoryfeatures.put(sp_id,tmpfeat);
+            setNewFeatures(tmpfeat);	
+            //SeqFeatureCanvas dascanv = daspanel.getCanv();
+             */
+        
+    }
+
+
+    // store all features in memory -> speed up
+    private ArrayList getFeaturesFromMemory(String mem_id) {
+        logger.entering(this.getClass().getName(), "getFeaturesFromMemory()",  new Object[]{mem_id});
+        //logger.finest("getFeaturesFromMemory");
+        ArrayList arr = new ArrayList() ;
+        
+        for (Iterator ti = memoryfeatures.keySet().iterator(); ti.hasNext(); ) {
+            String key = (String) ti.next() ;
+            logger.finest("in mem: " + key);
+            //logger.finest(key);
+            if ( key == null) { continue; }
+            
+            if (key.equals(mem_id)) {
+                logger.finest("found features in memory for spi_id " + mem_id);
+                
+                arr = (ArrayList) memoryfeatures.get(mem_id) ;
+                
+                for ( int i = 0 ; i < arr.size() ; i++ ) {
+                    FeatureImpl f = (FeatureImpl) arr.get(i);
+                    logger.finest(" got memory feature " + f.toString());
+                }
+                return arr ;
+            }
+        }
+        
+        return arr ;
+    }
+    
+    public void showSeqPos(int chainnumber, int seqpos){
+        String drstr = getToolString(chainnumber,seqpos);
+        showStatus(drstr);
+        
+    }
+
+
     public String getToolString(int chainnumber,int seqpos) {
         //return "tmp in getToolString";
         
@@ -776,12 +920,6 @@ implements SPICEFrame
         
         String drstr = "Seq pos "+ seqpos + "("+amino1+","+name+")" + " PDB ("+ pdbstr +")";  	
         return drstr ;
-        
-    }
-    
-    public void showSeqPos(int chainnumber, int seqpos){
-        String drstr = getToolString(chainnumber,seqpos);
-        showStatus(drstr);
         
     }
     
@@ -945,7 +1083,8 @@ implements SPICEFrame
             upMenu.setEnabled(false);
         }
         
-        ArrayList tmpfeat = getFeaturesFromMemory(sp_id) ;
+        String mem_id = makeFeatureMemoryCode(sp_id);
+        ArrayList tmpfeat = getFeaturesFromMemory(mem_id) ;
         
         if ( tmpfeat.size() == 0 ) {
             if ( isLoading()) {
@@ -968,95 +1107,9 @@ implements SPICEFrame
         
     }
     
-    private  void getNewFeatures(String sp_id) {
-        //ArrayList featureservers = getFeatureServers() ;
-        
-        Chain chain = getChain(currentChainNumber) ;
-        if ( chain == null) return ;
-        //first_load = true ;
-        this.setLoading(true);
-        FeatureFetcher ff = new FeatureFetcher(this,config,sp_id,pdbcode,chain);	
-        ff.start() ;
-        statusPanel.setLoading(true);
-        dascanv.setChain(chain,currentChainNumber);
-        //dascanv.setBackground(Color.);
-        seqField.setChain(chain,currentChainNumber);
-        
-        /**
-         boolean done = false ;
-         while ( ! done) {
-         done = ff.isDone();
-         //logger.finest("waiting for features to be retreived: "+done);
-          try {
-          wait(300);
-          } catch (InterruptedException e) {
-          e.printStackTrace();
-          done = true ;
-          }
-          //logger.finest("getNewFeatures :in waitloop");
-           }
-           
-           ArrayList tmpfeat = (ArrayList) ff.getFeatures();
-           //logger.finest("got new features: " + tmpfeat);
-            memoryfeatures.put(sp_id,tmpfeat);
-            setNewFeatures(tmpfeat);	
-            //SeqFeatureCanvas dascanv = daspanel.getCanv();
-             */
-        
-    }
-    
     public void setLoading(boolean status){
         first_load = status;
         statusPanel.setLoading(status);
-    }
-    
-    /**  update the currently displayed features */
-    public void setFeatures(String sp_id, List tmpfeat) {
-        // todo create Feature for structure mapping
-        //first_load = false ;
-        
-        memoryfeatures.put(sp_id,tmpfeat);
-        //statusPanel.setLoading(false);
-        features.clear();
-        features = tmpfeat ;
-        
-        // test if features have a LINK field
-        // if yes, add to browse menu
-        registerBrowsableFeatures(tmpfeat);
-        
-        //this.paint(this.getGraphics());
-        updateDisplays();
-    }
-    
-    private void clearBrowsableButtons(){
-        int nr = browseMenu.getItemCount();
-        //System.out.println("cleaning "+nr+ " menus");
-        for ( int i = nr-1; i > 1; i--){
-            browseMenu.remove(i);
-        }
-        knownFeatureLinks = new ArrayList();
-    }
-    
-    private void registerBrowsableFeatures(List feats){
-        Iterator iter = feats.iterator();
-        // add to menu
-        
-   
-        clearBrowsableButtons();
-        while (iter.hasNext()){
-            FeatureImpl f = (FeatureImpl)iter.next();
-            String link =f.getLink();
-            if ( link != null){
-                if ( knownFeatureLinks.contains(link))
-                    continue ;
-                
-                JMenuItem item = new JMenuItem("open in browser "+ f.getName());
-                ActionListener bl = new BrowseMenuListener(this,link);                    
-                item.addActionListener(bl);
-                browseMenu.add(item);
-                knownFeatureLinks.add(link);
-            }
-        }
     }
     
     public void setSelectionLocked(boolean status) {
@@ -1068,33 +1121,6 @@ implements SPICEFrame
         return selectionLocked ;
     }
     
-    // store all features in memory -> speed up
-    private ArrayList getFeaturesFromMemory(String sp_id) {
-        logger.entering(this.getClass().getName(), "getFeaturesFromMemory()",  new Object[]{sp_id});
-        //logger.finest("getFeaturesFromMemory");
-        ArrayList arr = new ArrayList() ;
-        
-        for (Iterator ti = memoryfeatures.keySet().iterator(); ti.hasNext(); ) {
-            String key = (String) ti.next() ;
-            logger.finest("in mem: " + key);
-            //logger.finest(key);
-            if ( key == null) { continue; }
-            
-            if (key.equals(sp_id)) {
-                logger.finest("found features in memory for spi_id " + sp_id);
-                
-                arr = (ArrayList) memoryfeatures.get(sp_id) ;
-                
-                for ( int i = 0 ; i < arr.size() ; i++ ) {
-                    FeatureImpl f = (FeatureImpl) arr.get(i);
-                    logger.finest(" got memory feature " + f.toString());
-                }
-                return arr ;
-            }
-        }
-        
-        return arr ;
-    }
     /** get Chain number X from structure 
      * @return a Chain object or null ;
      */

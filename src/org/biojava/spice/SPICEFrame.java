@@ -33,12 +33,13 @@ import java.util.List ;
 import java.net.URL  ;
 
 
-
 /** an interface that defined methods that are required by sub frames
  * of SPICE to communicate with the master application 
  * @author Andreas Prlic
  */
-public interface SPICEFrame  {
+public interface SPICEFrame 
+	
+{
 
 	
     /** starts a new thread and loads a new biological object into spice 

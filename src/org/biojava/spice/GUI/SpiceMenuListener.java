@@ -28,6 +28,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JFrame;
 
 import org.biojava.spice.SPICEFrame;
+import org.biojava.spice.GUI.alignmentchooser.AlignmentChooser;
 
 
 /**This class takes care of the events that are triggered 
@@ -139,7 +140,7 @@ implements ActionListener
         } else if (cmd.equals("Unlock Selection")){
             parent.setSelectionLocked(false);
         } else {
-            System.out.println("unknown menu comand " + cmd);
+            //System.out.println("unknown menu comand " + cmd);
         }
         
     }

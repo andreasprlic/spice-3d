@@ -20,7 +20,7 @@
  * Created on Feb 2, 2005
  *
  */
-package org.biojava.spice.GUI;
+package org.biojava.spice.GUI.alignmentchooser;
 
 import org.biojava.spice.SPICEFrame;
 import org.biojava.spice.SpiceApplication;
@@ -28,12 +28,16 @@ import org.biojava.bio.structure.Chain;
 import org.biojava.spice.DAS.AlignmentTools;
 import org.biojava.bio.program.das.dasalignment.*;
 
+import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Color;
 /**
@@ -46,6 +50,8 @@ import java.awt.Color;
 public class AlignmentChooser {
     
     SPICEFrame spice ;
+    JProgressBar progressBar;
+    AlignmentPanel aligPanel;
     
     /**
      * @param arg0
@@ -67,58 +73,75 @@ public class AlignmentChooser {
     }
     
     public void show(){
-        JFrame alignmentFrame = new JFrame();
-        
-        
-        
-        alignmentFrame.setTitle("Choose Sequence - Structure Alignment");
-        alignmentFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        alignmentFrame.setSize(700, 700);
-        JPanel panel = new JPanel();
-        panel.setPreferredSize(new Dimension(700,700));
-        //	JFrame.setDefaultLookAndFeelDecorated(false);
-        ImageIcon icon = createImageIcon("spice.png");
-        alignmentFrame.setIconImage(icon.getImage());
-        
+        System.out.println("starting to retreive Alignments");
         // get uniprot seq from spice.
         
         int currentChainNumber = spice.getCurrentChainNumber();
         Chain chain = spice.getChain(currentChainNumber);
         String uniprot = chain.getSwissprotId();
         Alignment[] aligs = null ;
-        if (uniprot != null) { 
-            // get alternative alignments with structure for it
-            AlignmentTools aligTools = new AlignmentTools(spice.getConfiguration());
-            aligs = aligTools.getAlignments(uniprot);
-            System.out.println("got "+aligs.length+ " alignments");
-            //for ( int i=0;i<aligs.length;i++){
-                //Alignment a = aligs[i];
-                //System.out.println(a);    
-            //}
-            
-        }
+       
+        	// display in a panel
+        
+        JFrame alignmentFrame = new JFrame();       
+        
+        alignmentFrame.setTitle("Choose Sequence - Structure Alignment");
+        alignmentFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        //alignmentFrame.setSize(700, 700);
+        JPanel panel = new JPanel();
+        panel.setPreferredSize(new Dimension(700,700));
+        //	JFrame.setDefaultLookAndFeelDecorated(false);
+        ImageIcon icon = createImageIcon("spice.png");
+        alignmentFrame.setIconImage(icon.getImage());
+       
+        Box vBox = Box.createVerticalBox();
+        Box hBox = Box.createHorizontalBox();
+        
         // visualize these.
         JTextField txt =new JTextField("UniProt - PDB Alignments for "+uniprot );
+        txt.setMaximumSize(new Dimension(400,20));
+        progressBar = new JProgressBar(0,100);
+    		progressBar.setValue(0);
+    		progressBar.setStringPainted(false);
+    		progressBar.setString(""); 
+    		progressBar.setMaximumSize(new Dimension(80,20));
+    		progressBar.setIndeterminate(true);
+    		progressBar.setBorder(BorderFactory.createEmptyBorder());
         
-        panel.add(txt);
+    		
+    		hBox.add(txt);
+    		hBox.add(progressBar,BorderLayout.EAST);
+    		
+    		vBox.add(hBox);
+    		//panel.add(hBox);
         
-        AlignmentPanel aligPanel = new AlignmentPanel(spice);
-        aligPanel.setBackground(Color.black);
+        aligPanel = new AlignmentPanel(spice);
+        aligPanel.setMinimumSize(new Dimension(30,30));
+        //aligPanel.setBackground(Color.black);
         aligPanel.setChain(chain,currentChainNumber);
         aligPanel.setAlignments(aligs);
         
         JScrollPane scroll = new JScrollPane(aligPanel) ;
-        scroll.setSize( 600, 600);
-        scroll.setPreferredSize(new Dimension(600, 600));;
+        scroll.setPreferredSize(new Dimension( 600, 600));
+        //scroll.setPreferredSize(new Dimension(600, 600));;
         scroll.setMinimumSize(  new Dimension(30, 30));;
-        panel.add(scroll);
+        
+        vBox.add(scroll);
+        panel.add(vBox);
+        //panel.add(scroll);
+        //panel.add(aligPanel);
+        
         //aligPanel.repaint();
         alignmentFrame.getContentPane().add(panel);
         alignmentFrame.pack();
         
         alignmentFrame.setVisible(true);
+        
+        AlignmentChooserThread act = new AlignmentChooserThread(uniprot,spice,aligPanel,progressBar);
+        act.start();
+        
+        AligPanelListener apl = new AligPanelListener(aligPanel);
+        alignmentFrame.addComponentListener(apl);
+        
     }
-    
-    
-    
 }

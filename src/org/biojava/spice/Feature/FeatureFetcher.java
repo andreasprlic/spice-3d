@@ -105,6 +105,7 @@ public class FeatureFetcher extends Thread
     /** start one thread per server to fetch all the features!
      */
     public void run() {
+        logger.finest("retreiving features for PDB " + pdbId + " UniProt " + spId);
         parent.setLoading(true);
         doDasCommunication() ;
 	
@@ -117,6 +118,7 @@ public class FeatureFetcher extends Thread
     private synchronized void doDasCommunication() {
 	
 	finished = false ;
+	allFeatures = new ArrayList();
 	// contact sequence feature servers
 	List featservs    =  spiceconfig.getServers("features","UniProt");
 	List pdbresservs  =  spiceconfig.getServers("features","PDBresnum");
