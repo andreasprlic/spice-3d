@@ -950,14 +950,14 @@ public class SpiceApplication
 	if ( start    < 0 ) return ;
 	if (chainNumber < 0 ) return ;
 
-	seqField.highlite(start-1,end-1);
+
 	
 	String cmd = getSelectStr( chainNumber,  start,  end);
 	
 	cmd += "colour "+ colour+";";
 	structurePanel.executeCmd(cmd);
 	//structurePanel.forceRepaint();
-
+	//seqField.highlite(start-1,end-1);
 	    
     }
 
@@ -976,11 +976,12 @@ public class SpiceApplication
 
     public void highlite(int chainNumber, int start, int end, String colour){
 	//logger.finest("highlite start end" + start + " " + end );
-	if (first_load)       return ;		
-	if ( start    < 0 ) return ;
-	if (chainNumber < 0 ) return ;
+	if ( first_load)       return ;		
+	if ( start       < 0 ) return ;
+	if ( chainNumber < 0 ) return ;
 	
-	seqField.highlite(start,end);
+
+	// highlite structure
 	String cmd = getSelectStr( chainNumber,  start,  end);
 	cmd +=  " spacefill on; " ;
 	if ( colour  != "") {
@@ -990,15 +991,13 @@ public class SpiceApplication
 	structurePanel.executeCmd(cmd);
 	//structurePanel.forceRepaint();
 	
+	// and now the SeqPanels ...
+	if ( chainNumber == currentChain) {
+	    dascanv.highlite(start,end);
+	    seqField.highlite(start,end);
+	}
 
-	/*seqField.setSelectionStart(start);
-	seqField.setSelectionEnd(end);
-	seqField.setSelectionColor(Color.red);
-	seqField.setSelectedTextColor(Color.red);
-	seqField.requestFocus();
-	seqField.repaint();
-	*/
-	
+	this.repaint();
 	
     }
     public void highlite(int chainNumber, int start, int end) {
@@ -1012,7 +1011,7 @@ public class SpiceApplication
 	if ( seqpos     < 0 ) return ;
 	if (chainNumber < 0 ) return ;
 	
-	seqField.highlite(seqpos);
+
 	
 	String cmd = getSelectStr( chainNumber,  seqpos);
 	cmd +=  " spacefill on ;" ;
@@ -1023,14 +1022,11 @@ public class SpiceApplication
 	    colour(chainNumber,seqpos,colour) ;
 	}
 
-
-	/*seqField.setSelectionStart(seqpos);
-	seqField.setSelectionEnd(seqpos);
-	seqField.setSelectionColor(Color.red);
-	seqField.requestFocus();
-	seqField.repaint();	
-	*/
-
+	if ( chainNumber == currentChain ) {
+	    dascanv.highlite(seqpos);
+	    seqField.highlite(seqpos);
+	}
+	this.repaint();
     }
     public void highlite(int chain_number,int seqpos){
 	
@@ -1128,7 +1124,8 @@ public class SpiceApplication
 	}
 	
 	//SeqFeatureCanvas dascanv = daspanel.getCanv();
-	dascanv.highlite(chain_number,seqpos);
+	//if ( chain_number == currentChain )
+	//  dascanv.highlite(seqpos);
 	
 	Group g = chain.getGroup(seqpos);
 	if (! g.has3D()){
@@ -1155,15 +1152,17 @@ public class SpiceApplication
     public void select(int chain_number, int start, int end) {
 	//logger.finest("select start end" + start + " " + end);
 
-	seqField.select(start,end);
+
 
 	String cmd = getSelectStr( chain_number,  start,  end);
 	if (cmd.equals("")) { return ; } 
 	cmd += " set display selected;" ;
 	structurePanel.executeCmd(cmd);
 	//structurePanel.forceRepaint();
-	
-		
+	if ( chain_number == currentChain ) {
+	    seqField.select(start,end);		
+	    dascanv.select(start,end);
+	}
 	
 
     }
@@ -1171,7 +1170,7 @@ public class SpiceApplication
     /** select a single residue */
     public void select(int chain_number,int seqpos){
 	//logger.finest("select seqpos" + seqpos);
-	seqField.select(seqpos);
+
 
 	String cmd = getSelectStr( chain_number, seqpos) ;
 	if (cmd.equals("")) { return ; } 
@@ -1179,7 +1178,10 @@ public class SpiceApplication
 	structurePanel.executeCmd(cmd);
 	//structurePanel.forceRepaint();
 	
-
+	if ( chain_number == currentChain ){
+	    seqField.select(seqpos);
+	    dascanv.select(seqpos);
+	}
     }
 
     public void scale() {

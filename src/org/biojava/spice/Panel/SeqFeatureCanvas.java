@@ -76,9 +76,11 @@ public class SeqFeatureCanvas
     public static final int    TIMEDELAY        = 0 ;
 
     // Alpha value for the image
-    static AlphaComposite composite = AlphaComposite.SrcOver;
+    AlphaComposite composite ;
 
-    int selectPosition = -1 ;
+    int selectStart ;
+    int selectEnd      ;
+    int mouseDragStart ;
     // the master application
     SPICEFrame spice ;
 
@@ -107,6 +109,8 @@ public class SeqFeatureCanvas
 
     Font plainFont ;
     Logger logger        ;
+
+   
     /**
      * 
      */
@@ -155,14 +159,22 @@ public class SeqFeatureCanvas
 	current_chainnumber = -1 ;
 
 	plainFont = new Font("SansSerif", Font.PLAIN, 10);
-	//setOpaque(true);
+	composite =  makeComposite(0.5f);
+	setOpaque(true);
 
 	//this.paintComponent(this.getGraphics());
 	//ImageIcon icon = new ImageIcon(imbuf);
 	//setIcon(icon);
 	//this.repaint();
-	
+	selectStart    = -1 ;
+	selectEnd      = 1 ;
+	mouseDragStart = -1 ;
     }
+    private AlphaComposite makeComposite(float alpha) {
+	int type = AlphaComposite.SRC_OVER ;
+	return(AlphaComposite.getInstance(type, alpha));
+    }
+
 
 
     public void setFeatures( List feats) {
@@ -416,43 +428,46 @@ public class SeqFeatureCanvas
        select a position
      */
     public void select(int seqpos){	
-	highlite(current_chainnumber,seqpos);
+	highlite(seqpos);
 
     }
     
     /** select range */
     public void select(int start, int end) {
-	// don't know what to do ...
-	return ;
+	highlite(start,end);
     }
 
     
-    /** same as select here */
-    public void highlite(int seqpos){	
-	highlite(current_chainnumber,seqpos);
-
-    }
-    
-    /* draw a line at current seqence position
+    /** same as select here. draw a line at current seqence position
      * only if chain_number is currently being displayed
      */
-    public void highlite(int chain_number, int seqpos){
+    public void highlite( int seqpos){
 	if  ( chain == null   ) return ;
-	
-	// ARGH
-	// WRONG chain_number should be START!!!!
-	if (chain_number == current_chainnumber) {
-	    if ( seqpos > chain.getLength()) 
-		return ;
-	    selectPosition = seqpos ;
-	}
-	else 
-	    selectPosition = -1 ;
+		
+	if ( seqpos > chain.getLength()) 
+	    return ;
+	selectStart  = seqpos ;
+	selectEnd    = 1     ;
 	
 	this.repaint();
 
     }
-    
+
+    /** highlite a region */
+    public void highlite( int start , int end){
+	if  ( chain == null   ) return ;
+		
+	if ( (start > chain.getLength()) || 
+	     (end   > chain.getLength())
+	     ) 	      
+	    return ;
+
+	selectStart = start  ;
+	selectEnd   = end    ;
+	
+	this.repaint();
+
+    }
 
 
     public void paintComponent( Graphics g) {
@@ -591,20 +606,34 @@ public class SeqFeatureCanvas
 	    }
 	    
 	    //int seqpos =  java.lang.Math.round(x/scale) ;
-	    if ( selectPosition > -1 ) {
+	    if ( selectStart > -1 ) {
 		gstruc.setColor(cursorColor);
-		seqx = java.lang.Math.round(selectPosition*scale)+DEFAULT_X_START ;
-		//aminosize = java.lang.Math.round(1*scale) ;
-		int tmpfill ;
-		if (aminosize <1) tmpfill = 1;
-		else tmpfill = aminosize ;
+		seqx = java.lang.Math.round(selectStart*scale)+DEFAULT_X_START ;
+		int paintlength = 1 ;
+		if  (selectEnd > 1 )
+		    paintlength = selectEnd  - selectStart;
+		//logger.finest("selectStart " + selectStart + " selectEnd " + selectEnd + " paintlength:" +paintlength);
+		//int tmpfill ;	       		
+		//if (aminosize <1) tmpfill = 1;
+		//else tmpfill = aminosize ;
+
+		int selectEndX = aminosize * paintlength ; 
+		if ( selectEndX  < 1 )
+		    selectEndX = 1 ;
+		
 		//logger.finest("draw rec");
 
 		
 		Graphics2D g2D = (Graphics2D)gstruc;
 
+		//Composite originalComposite = g2D.getComposite();
+
 		g2D.setComposite(composite);                   // Set current alpha
-		g2D.fillRect(seqx , 0, tmpfill, dstruc.height);
+		Rectangle selection = new Rectangle(seqx , 0, selectEndX, dstruc.height);
+		//g2D.fillRect(seqx , 0, selectEndX, dstruc.height);
+		g2D.fill(selection);
+		
+		//g2D.setComposite(originalComposite);
 	    }
 
 	    //g.drawImage(imbuf,0,0,this.getBackground(),this);
@@ -621,8 +650,9 @@ public class SeqFeatureCanvas
      * To change the template for this generated type comment go to
      * Window - Preferences - Java - Code Generation - Code and Comments
      */
-    private int getLineNr(int mouseY){
-		
+    private int getLineNr(MouseEvent e){
+	int mouseY = e.getY();
+	
 	float top = mouseY - DEFAULT_Y_START +1 ;
 	// java.lang.Math.round((y-DEFAULT_Y_START)/ (DEFAULT_Y_STEP + DEFAULT_Y_HEIGHT-1));
 	float interval  = DEFAULT_Y_STEP  ;
@@ -705,40 +735,36 @@ public class SeqFeatureCanvas
     }
 
     /** test if the click was on the name of the feature */
-    private boolean nameClicked(int x) {
+    private boolean nameClicked(MouseEvent e) {
+	int x = e.getX();
 	if (x <= DEFAULT_X_START) {
 	    return true ;
 	}
 	return false ;
     }
 
+    /** get the sequence position of the current mouse event */
+    private int getSeqPos(MouseEvent e) {
 
-    public void mouseDragged(MouseEvent e) {
-	logger.finest("dragging mouse "+e);
+	int x = e.getX();
+	int y = e.getY();
+
+	int seqpos =  java.lang.Math.round((x-DEFAULT_X_START)/scale) ;
+
+	return seqpos  ;
     }	
-    
 
     public void mouseMoved(MouseEvent e)
     {	
 	//, int x, int y
-	int x = e.getX();
-	int y = e.getY();
-	int seqpos =  java.lang.Math.round((x-DEFAULT_X_START)/scale) ;
-		
-	int linenr   = getLineNr(y);
+	int seqpos = getSeqPos(e);
+	int linenr = getLineNr(e);
 	
        
 	//int featurenr = get_featurenr(y); 
 
 	if ( linenr < 0 ) return ;
-	if ( seqpos    < 0 ) return ; 
-
-	//String drstr = "x "+ seqpos + " y " + featurenr ;
-
-	//g.drawString(drstr,5,13);
-	
-	spice.showSeqPos(current_chainnumber,seqpos);
-	//spice.showStatus(drstr);
+	if ( seqpos < 0 ) return ; 
 	
 	// and the feature display
 	
@@ -756,20 +782,8 @@ public class SeqFeatureCanvas
 	}
 
 
-	// add a new Thread that highlites the position of the mouse every two seconds.
-	
-	
-	// add a time delay for repainting the bar
-	Date currentTime = new Date();
-	long timediff = currentTime.getTime() - lastHighlight.getTime() ;
-	//logger.finest("timediff:" + timediff);
-	if ( timediff  > TIMEDELAY) {
-	    //logger.finest("highliting "+current_chainnumber + " " + seqpos);
-	    //highlite(current_chainnumber,seqpos);	    
-	    spice.select(current_chainnumber,seqpos);
-	    lastHighlight = currentTime ;
-	}
-
+	spice.showSeqPos(current_chainnumber,seqpos);
+	spice.highlite(current_chainnumber,seqpos);
 	
 	return  ;
     }
@@ -778,19 +792,16 @@ public class SeqFeatureCanvas
     public void mouseClicked(MouseEvent e)
     {
 	//logger.finest("CLICK");
-	int x = e.getX();
-	int y = e.getY();
-
-	int seqpos =  java.lang.Math.round((x-DEFAULT_X_START)/scale)  ;		
-	int lineNr    = getLineNr(y);
+	int seqpos = getSeqPos(e);
+	int lineNr = getLineNr(e);
 	
 	//int featurenr = get_featurenr(y) ;
 	//logger.finest("CLICK! "+seqpos + " " +lineNr+ " " + chain.getLength());
 	
 	if ( lineNr < 0 ) return ;
-	if ( seqpos    < 0 ) {
+	if ( seqpos < 0 ) {
 	    // check if the name was clicked
-	    if (nameClicked(x)){
+	    if (nameClicked(e)){
 		// highlight all features in the line
 		//Feature feature = getFeatureAt(seqpos,lineNr);
 		List features = (List) drawLines.get(lineNr);
@@ -799,7 +810,7 @@ public class SeqFeatureCanvas
 		    Feature feature = (Feature) features.get(i);
 		    cmd += highliteFeature(feature);		    
 		}
-		logger.finest(cmd);
+		//logger.finest(cmd);
 		spice.executeCmd(cmd);
 		return  ;
 	    }
@@ -836,10 +847,33 @@ public class SeqFeatureCanvas
     
     public void mouseEntered(MouseEvent e)  {}
     public void mouseExited(MouseEvent e)   {}
-    public void mousePressed(MouseEvent e)  {}
-    public void mouseReleased(MouseEvent e) {}
+   	
     
-    
+     public void mousePressed(MouseEvent e)  {
+	mouseDragStart = getSeqPos(e);
+
+    }
+    public void mouseReleased(MouseEvent e) {
+	mouseDragStart =  -1 ;
+    }
+    public void mouseDragged(MouseEvent e) {
+	//System.out.println("dragging mouse "+e);
+	if ( mouseDragStart < 0 )
+	    return ;
+
+	int selEnd =  getSeqPos(e);
+	int start = mouseDragStart ;
+	int end   = selEnd         ;
+
+	if ( selEnd < mouseDragStart ) {
+	    start = selEnd ;
+	    end = mouseDragStart ;
+	}
+	spice.highlite(current_chainnumber,start,end);
+    }
+
+   
+
 }
 
 

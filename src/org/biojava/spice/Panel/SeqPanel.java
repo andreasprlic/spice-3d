@@ -38,7 +38,10 @@ public interface SeqPanel {
     /** set a Chain, tells which chain number in spice master application */
     public void setChain(Chain c,int spice_chainnumber) ;   
 
-    /** highighting of range of residues */
+    /** highighting of range of residues
+	make sure that this is only called for the currently displayed chain fromthe outside!
+	
+    */
     public void highlite( int start, int end);
 
     /** highighting of single residue */    

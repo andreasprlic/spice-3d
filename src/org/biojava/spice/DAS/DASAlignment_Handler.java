@@ -61,7 +61,7 @@ public class DASAlignment_Handler extends Thread
     String alignmentserver ;
     //String sequenceserver  ;
     
-    // hard coded that refference is UniProt!!!
+    // hard coded - 
     // find a better solution ...
     static String SEQUENCEDATABASE  = "UniProt" ;
     static String STRUCTUREDATABASE = "PDBresnum" ;

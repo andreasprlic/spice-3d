@@ -58,12 +58,15 @@ public class SeqTextPane
     SPICEFrame spice ;
     Chain chain ;
     int current_chainnumber ;
+
+    int selectionStart  ;
+
     public SeqTextPane (SPICEFrame spicef) {
 	super();
 	spice = spicef;
 	chain = null ;
 	int current_chainnumber = -1;
-
+	selectionStart = -1 ;
 	//this.setBackground(Color.black);
 	
 	// add font styles to mark sequence position
@@ -102,44 +105,25 @@ public class SeqTextPane
 
     }
 
-    public void mouseDragged(MouseEvent e) {
-	System.out.println("dragging mouse "+e);
-    }	
 
     public void mouseMoved(MouseEvent e)
     {	
 
-
-	//int dot = e.getDot();
-	int x = e.getX();
-	int y = e.getY();
-	Point p = new Point(x,y);
-
-	int seqpos = viewToModel(p);
-
-	//caretPosLabel.setText( (line+1) + ":" + (col+1) );
-	//System.out.println("mouseMoved "+ pos);
-
-	//, int x, int y
-	//
-	//
-	//int seqpos = getSeqpos(x,y);
-
+	int seqpos = getSeqPos(e);
+	if ( seqpos < 0 ) return ; 
 	//System.out.println("SeqTextPane mouseMoved " + x + " " + y + " " + seqpos);
-	if ( seqpos < this.getText().length()) {
-	    spice.showSeqPos(current_chainnumber,seqpos);
-	    spice.select(current_chainnumber,seqpos);
-	}
+	if ( seqpos > this.getText().length()) return ;
+	
+	spice.showSeqPos(current_chainnumber,seqpos);
+	spice.highlite(current_chainnumber,seqpos);
+
     }
 
     public void mouseClicked(MouseEvent e)
     {
-	//System.out.println("CLICK");
-	int x = e.getX();
-	int y = e.getY();
-	Point p = new Point(x,y);
+	int seqpos = getSeqPos(e);
+	if ( seqpos < 0 ) return ; 
 
-	int seqpos = viewToModel(p);
 	spice.select(current_chainnumber,seqpos);
 	String pdb1 = spice.getSelectStrSingle(current_chainnumber,seqpos);
 	if ( ! pdb1.equals("")) {
@@ -149,10 +133,40 @@ public class SeqTextPane
 
     }
 
+    private int getSeqPos(MouseEvent e) {
+
+	int x = e.getX();
+	int y = e.getY();
+	Point p = new Point(x,y);
+
+	int seqpos = viewToModel(p);
+	return seqpos  ;
+    }
+
     public void mouseEntered(MouseEvent e)  {}
     public void mouseExited(MouseEvent e)   {}
-    public void mousePressed(MouseEvent e)  {}
-    public void mouseReleased(MouseEvent e) {}
+    public void mousePressed(MouseEvent e)  {
+	selectionStart = getSeqPos(e);
+
+    }
+    public void mouseReleased(MouseEvent e) {
+	selectionStart =  -1 ;
+    }
+    public void mouseDragged(MouseEvent e) {
+	//System.out.println("dragging mouse "+e);
+	if ( selectionStart < 0 )
+	    return ;
+
+	int selEnd =  getSeqPos(e);
+	int start = selectionStart ;
+	int end   = selEnd         ;
+
+	if ( selEnd < selectionStart ) {
+	    start = selEnd ;
+	    end = selectionStart ;
+	}
+	spice.highlite(current_chainnumber,start,end);
+    }	
 
 
     /*
@@ -173,7 +187,7 @@ public class SeqTextPane
 	//select(start,end);
 	StyledDocument doc = this.getStyledDocument();
 	doc.setCharacterAttributes(start,(end-start +1), this.getStyle("red"),true);
-    
+	this.repaint();
     }
 
     /** highighting of single residue */    
@@ -182,6 +196,7 @@ public class SeqTextPane
 	select(seqpos);
 	StyledDocument doc = this.getStyledDocument();
 	doc.setCharacterAttributes(seqpos,1, this.getStyle("red"),true);
+	this.repaint();
     }
 
     /** select range of residues */
@@ -192,6 +207,7 @@ public class SeqTextPane
 	doc.setCharacterAttributes(0,chain.getLength(), this.getStyle("black"),true);
 	doc.setCharacterAttributes(start,(end-start +1), this.getStyle("red"),true);
 
+	this.repaint();
     }
     
     /** select single residue */
@@ -202,7 +218,7 @@ public class SeqTextPane
 	doc.setCharacterAttributes(0,chain.getLength(), this.getStyle("black"),true);
 	doc.setCharacterAttributes(seqpos,1, this.getStyle("red"),true);
 	
-
+	this.repaint();
     }
  
 
