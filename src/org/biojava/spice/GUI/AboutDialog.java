@@ -24,14 +24,12 @@
 package org.biojava.spice.GUI;
 
 import java.awt.BorderLayout;
-import java.awt.Button;
 import java.awt.Dimension;
-import java.awt.Event;
+
 import java.awt.event.ActionEvent;
 import org.biojava.spice.SPICEFrame;
 import javax.swing.Box;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.JEditorPane;
@@ -47,15 +45,15 @@ import javax.swing.event.HyperlinkEvent;
  */
 public class AboutDialog
 	extends JDialog {
-    	static String VERSION = "0.6-pre2";
+    	static String VERSION = "0.6-pre3";
     static String DESCRIPTION_TEXT = "<html><body>"+
     "<b>The SPICE DAS client</b> V "+ VERSION +" <br>"+
     "(C) <a href=\"mailto:ap3@sanger.ac.uk\">Andreas Prlic</a>, Tim Hubbard <br>"+
     "The Wellcome Trust Sanger Institute 2005<p>"+
     
     " More Info about SPICE: <br>"+
-    " <a href=\"http://www.efamily.org.uk/software/dasclients/spice/\">homepage</a><br>"+
-    " <a href=\"http://www.efamily.org.uk/software/dasclients/spice/manual.shtml\">Manual</a><br>"+
+    " <a href=\"http://www.efamily.org.uk/software/dasclients/spice/\">Homepage</a><br>"+
+    " <a href=\"http://www.sanger.ac.uk/Users/ap3/DAS/SPICE/SPICE_manual.pdf\">Manual</a><br>"+
     " <a href=\"http://www.derkholm.net/svn/repos/spice/trunk/\">Source code</a><br>" +
     " <a href=\"http://www.gnu.org/copyleft/lesser.html\">License</a> (LGPL)<p>"+
     
@@ -83,7 +81,7 @@ public class AboutDialog
     "</body></html>";
     
     
-    static int H_SIZE = 700;
+    static int H_SIZE = 750;
     static int V_SIZE = 600;
     //JTextField txt ;
     String displayText     ;
