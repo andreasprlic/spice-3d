@@ -64,7 +64,7 @@ public class DAS_FeatureRetreive {
 			dasInStream	= open(url); 
 		    } catch (Exception e ){
 			
-			logger.log(Level.WARNING,"could not open connection to " + url,e);
+			logger.log(Level.FINE,"could not open connection to " + url,e);
 			return ;
 		    }
 			
@@ -106,14 +106,14 @@ public class DAS_FeatureRetreive {
 			try {
 			    xmlreader.setFeature("http://xml.org/sax/features/validation", validation);
 			} catch (SAXException e) {
-			    logger.log(Level.WARNING,"Cannot set validation " + validation); 
+			    logger.log(Level.FINE,"Cannot set validation " + validation); 
 			}
 			
 			try {
 			    xmlreader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",validation);
 			} catch (SAXNotRecognizedException e){
 			    e.printStackTrace();
-			    logger.log(Level.WARNING,"Cannot set load-external-dtd "+validation); 
+			    logger.log(Level.FINE,"Cannot set load-external-dtd "+validation); 
 			    
 			}
 			
@@ -130,19 +130,15 @@ public class DAS_FeatureRetreive {
 			} 
 			catch ( Exception e){
 			    e.printStackTrace();
-			    logger.log(Level.WARNING,"error while parsing response from "+ url);
+			    logger.log(Level.FINE,"error while parsing response from "+ url);
 			    
 			    features = new ArrayList();
 			}
-			
 		}
 		catch (Exception ex) {
 			ex.printStackTrace();
 		}
-		
-		
 	}
-
 
     private InputStream open(URL url)
 	throws java.io.IOException, java.net.ConnectException

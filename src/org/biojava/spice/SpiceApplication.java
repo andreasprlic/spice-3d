@@ -1057,7 +1057,7 @@ implements SPICEFrame
         statusPanel.setLoading(false);
         
         if ( structure_.size() < 1 ){
-            logger.log(Level.WARNING,"got no structure");
+            logger.log(Level.FINE,"got no structure");
             return ;
         }
         
@@ -1180,6 +1180,7 @@ implements SPICEFrame
             upMenu.setEnabled(true);
         } else {
             upMenu.setEnabled(false);
+            logger.info("no UniProt sequence found for"+chain.getName());
         }
         
         String mem_id = makeFeatureMemoryCode(sp_id);

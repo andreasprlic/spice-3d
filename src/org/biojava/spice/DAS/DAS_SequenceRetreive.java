@@ -137,11 +137,11 @@ public class DAS_SequenceRetreive {
 	    }
 	    catch (Exception ex) {
 		//ex.printStackTrace();		
-		logger.log(Level.WARNING,ex.getMessage() + " while retreiving "+connstr);
+		logger.log(Level.FINE,ex.getMessage() + " while retreiving "+connstr);
 		if ( iter.hasNext()) {
-		    logger.log(Level.INFO,"error while retreiving sequence, trying other server");
+		    logger.log(Level.FINE,"error while retreiving sequence, trying other server");
 		} else {
-		    logger.log(Level.SEVERE,"could not retreive UniProt sequence from any available DAS sequence server");
+		    logger.log(Level.WARNING,"could not retreive UniProt sequence from any available DAS sequence server");
 		    
 		    Exception exc = new ConfigurationException("could not retreive UniProt sequence from any available DAS sequence server");
 		    logger.throwing(this.getClass().getName(), "get_seqeunce", exc);
