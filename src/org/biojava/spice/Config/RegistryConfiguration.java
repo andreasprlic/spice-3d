@@ -133,6 +133,10 @@ public class RegistryConfiguration
 	    //SpiceDasSource ds = (SpiceDasSource)m.get();
 	    if ( ds.getUrl().equals(url)) {
 		setStatus(i,status);
+		// test if server in active list, if not, add
+		if ( status) {
+		    activeservers.add(ds);
+		}
 		return ;
 	    }
 	}

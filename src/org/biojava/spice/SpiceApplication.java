@@ -703,6 +703,12 @@ public class SpiceApplication
 
     public void setConfiguration(RegistryConfiguration reg) {
 	config = reg;
+	List s = config.getServers();
+	for ( int i=0; i< s.size();i++){
+	    SpiceDasSource d = (SpiceDasSource)s.get(i);
+	    System.out.println(d.getUrl());
+	}
+
 	Chain chain = getChain(currentChain) ;
 	if ( chain != null) {
 	    String sp_id = chain.getSwissprotId() ;
