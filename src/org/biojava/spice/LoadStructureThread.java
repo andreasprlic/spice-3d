@@ -75,9 +75,16 @@ public class LoadStructureThread
     }
 
     
-    public String getAlignmentServer() {
+    public String getAlignmentServer() 
+	throws ConfigurationException
+    {
 	Map config = spiceframe.getConfiguration();
     	Map h = (Map) config.get("alignmentserver");
+	if ( h == null) {
+	    String msg = "No Alignment Server configured! unable to provide alignment";
+	    throw new ConfigurationException(msg);
+	    
+	}
     	String u = (String) h.get("url");
     	return   u;
     }
@@ -91,7 +98,12 @@ public class LoadStructureThread
 	    String dasstructurecommand = getStructureServer() + "structure?model=1&query=";
 	    String dassequencecommand  = getSequenceServer()  + "sequence?segment=";
 	    //String dassequencecommand  = spiceframe.getSequenceServer()  + "sequence?segment=";
-	    String dasalignmentcommand = getAlignmentServer() + "alignment?query=" ;
+	    String dasalignmentcommand = "" ;
+	    try {
+		dasalignmentcommand = getAlignmentServer() + "alignment?query=" ;
+	    } catch ( ConfigurationException e) {
+		e.printStackTrace();
+	    }
 	    
 	    DAS_PDBFeeder pdb_f =  new DAS_PDBFeeder(dasstructurecommand,dassequencecommand,dasalignmentcommand) ;
 	    System.out.println("pdb_f.loadPDB");

@@ -65,7 +65,7 @@ import java.awt.BorderLayout       ;
 import java.awt.FlowLayout ;
 import java.awt.Event ;
 import java.awt.TextField ;
-import java.awt.ScrollPane ;
+import javax.swing.JSplitPane ;
 
 import java.awt.event.*    ;
 import javax.swing.JFrame  ;
@@ -121,9 +121,10 @@ public class SpiceApplication
     JTextField seq_pos ;
     JList ent_list;   // list available chains
     SeqFeatureCanvas dascanv ;
-
+    JScrollPane dasPanel ;
     JPanel leftPanel ;
-    JPanel sharedPanel;
+    JSplitPane sharedPanel;
+    JSplitPane mainsharedPanel;
     JMenuBar menuBar ;
     JTextField getCom ;
 
@@ -230,13 +231,12 @@ public class SpiceApplication
 	/// init Structure Panel
 	structurePanel        = new StructurePanel();
 	//structurePanel.setLayout(new BoxLayout(structurePanel, BoxLayout.X_AXIS));
-	structurePanel.setSize(700, 700);
-	structurePanel.setMinimumSize(new Dimension(400,400));
-	this.add(structurePanel,BorderLayout.CENTER);
+	structurePanel.setPreferredSize(new Dimension(700, 700));
+	structurePanel.setMinimumSize(new Dimension(200,100));
+	//this.add(structurePanel,BorderLayout.CENTER);
 
 
-    	leftPanel = new JPanel() ;
-	leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
+
 
 	DefaultListModel model = new DefaultListModel();
 	model.add(0,"loading...");
@@ -249,35 +249,64 @@ public class SpiceApplication
 	//ent_list.setFixedCellHeight(18);
 	//ent_list.addItemListener(entact);
 	ent_list.addListSelectionListener(entact);
-	System.out.println("ENT_LIST " + ent_list);
-		
+			
 	getCom = new JTextField(1);
 	TextFieldListener txtlisten = new TextFieldListener(this,getCom);
 	getCom.addActionListener(txtlisten);
-	getCom.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
+	//getCom.setMinimumSize(new Dimension(Short.MIN_VALUE,10));
+	//
+
+    	leftPanel = new JPanel() ;
+	leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
+
 	leftPanel.add(ent_list,BorderLayout.NORTH);
 	leftPanel.add(getCom,BorderLayout.SOUTH);
-	
-	ent_list.repaint();
+	leftPanel.setMinimumSize(new Dimension(100,30));
+	//ent_list.repaint();
 
 	
 	//ScrollPane scroll = new ScrollPane();
 
+
+	// init dascanv
 	dascanv=new SeqFeatureCanvas(this);       
-	dascanv.setForeground(new Color(255, 255, 255));
-	dascanv.setBackground(new Color(0, 0, 0));
-	dascanv.setSize(700,300);
+	dascanv.setForeground(Color.blue);
+	dascanv.setBackground(Color.black);
+	dascanv.addMouseMotionListener(dascanv);
+	dascanv.addMouseListener(dascanv);
+	dascanv.setOpaque(true) ;
+	//dascanv.setSize(700,300);
 	
+	dasPanel = new JScrollPane(dascanv);
+	dasPanel.setOpaque(true);
 	//scroll.add(dascanv);
 
-	sharedPanel = new JPanel();
-	sharedPanel.setLayout(new BoxLayout(sharedPanel, BoxLayout.X_AXIS));
-	sharedPanel.add(leftPanel,BorderLayout.EAST);
-	//sharedPanel.add(scroll,BorderLayout.WEST);
-	sharedPanel.add(dascanv,BorderLayout.WEST);
-	sharedPanel.setMaximumSize(new Dimension(Short.MAX_VALUE,300));
-	this.add(sharedPanel,BorderLayout.SOUTH);
+	//daspanel = new SeqPanel(this);
+	//daspanel.setMinimumSize(new Dimension(100,100));
+
 	
+	sharedPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+                           leftPanel, dasPanel);
+	sharedPanel.setOneTouchExpandable(true);
+	sharedPanel.setDividerLocation(150);
+
+	//sharedPanel.setLayout(new BoxLayout(sharedPanel, BoxLayout.X_AXIS));
+	//sharedPanel.add(leftPanel,BorderLayout.EAST);
+	//sharedPanel.add(scroll,BorderLayout.WEST);
+	//sharedPanel.add(dascanv,BorderLayout.WEST);
+	//sharedPanel.add(daspanel,BorderLayout.WEST);
+	//sharedPanel.setMaximumSize(new Dimension(Short.MAX_VALUE,300));
+	//this.add(sharedPanel,BorderLayout.SOUTH);
+	
+	mainsharedPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+					  structurePanel,sharedPanel);
+	mainsharedPanel.setOneTouchExpandable(true);
+	mainsharedPanel.setDividerLocation(150);
+	this.add(mainsharedPanel,BorderLayout.NORTH);
+
+
+
+
 	strucommand = new JTextField()  ;
 	strucommand.setText("enter command...");
 	ActionListener listener = new StructureCommandListener(this,strucommand) ;
@@ -655,6 +684,7 @@ public class SpiceApplication
 	} else {
 	    
 	    setNewFeatures(tmpfeat);	    
+	    //SeqFeatureCanvas dascanv = daspanel.getCanv();
 	    dascanv.setChain(chain,currentChain);
 	}
 	
@@ -682,9 +712,10 @@ public class SpiceApplication
 	}
 	
 	ArrayList tmpfeat = (ArrayList) ff.getFeatures();
-	System.out.println("got new features: " + tmpfeat);
+	//System.out.println("got new features: " + tmpfeat);
 	memoryfeatures.put(sp_id,tmpfeat);
 	setNewFeatures(tmpfeat);	
+	//SeqFeatureCanvas dascanv = daspanel.getCanv();
 	dascanv.setChain(chain,currentChain);
     }
 
@@ -875,7 +906,7 @@ public class SpiceApplication
 	if ( ! ((seqpos >= 0) && (seqpos < chain.getLength()))) {
 	   return "" ;
 	}
-	
+	//SeqFeatureCanvas dascanv = daspanel.getCanv();
 	dascanv.highlite(chain_number,seqpos);
 	Group g = chain.getGroup(seqpos);
 	if (! g.has3D()){
@@ -916,6 +947,7 @@ public class SpiceApplication
     /** update the DIsplays of the subpanes */
     public void updateDisplays() {
 	//System.out.println("updateDisplays");
+	//SeqFeatureCanvas dascanv = daspanel.getCanv();
 	dascanv.setFeatures(features);
 	dascanv.paint(dascanv.getGraphics());
 	
@@ -974,32 +1006,16 @@ public class SpiceApplication
 	    //AboutDialog asd = new AboutDialog(this);
 	    //asd.setText("DAS homepage: http://www.biodas.org") ;
 	    //asd.show();
+	     AboutDialog asd = new AboutDialog(this);
+	     asd.setText("DAS homepage: http://www.biodas.org") ;
+	     asd.show();
 	    
-	    Dialog dialog = new Dialog(this, "About DAS", true);
-
-	    FlowLayout layout = new FlowLayout();
-	    
-	    dialog.setLayout(layout);
-
-	    TextField textField = new TextField("DAS homepage: http://www.biodas.org", 20);
-	    
-	    Button button = new Button("OK");
-	    
-	    dialog.add(button);
-	    
-	    dialog.add(textField);
-	    dialog.resize(200, 200);
-	    dialog.show();
-
-
-
-
 	    return true;
 	}
 	else if ( event.target ==  aboutspice ) {
 	    System.out.println("about SPICE");
 	    AboutDialog asd = new AboutDialog(this);
-	    asd.setText("The SPICE Applet. V 0.1 (C) Andreas Prlic 2004") ;
+	    asd.setText("The SPICE Applet. V 0.1 (C) Andreas Prlic 2004 mailto:ap3@sanger.ac.uk") ;
 	    asd.show();
 	    return true;
 	}
@@ -1127,7 +1143,7 @@ class EntListCommandListener implements ListSelectionListener {
 
 class AboutDialog extends Dialog
 {
-    static int H_SIZE = 200;
+    static int H_SIZE = 600;
     static int V_SIZE = 200;
     //JTextField txt ;
     String displayText ;

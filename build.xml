@@ -105,7 +105,7 @@
     <property name="manifest.dir" value="./META-INF" />
     <property name="resources.dir" value="./resources" />
     <property name="taglets.dir" value="./taglets" />
-
+    
     <!-- Main build directory -->
     <property name="build.dir" value="./ant-build" />
     <property name="www.dir" value="./WWW" />

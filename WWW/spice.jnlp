@@ -2,7 +2,7 @@
 <!-- JNLP File for SwingSet2 Demo Application -->
 <jnlp
   spec="1.0+"
-  codebase="file:///nfs/team71/phd/ap3/WORK/DAS/JAVA/spice/WWW/"
+  codebase="file:///home/andreas/WORK/DAS/JAVA/spice/WWW/"
   href="spice.jnlp">
   <information>
     <title>The SPICE Application</title>
@@ -17,23 +17,18 @@
   </security>
   <resources>
     <j2se version="1.4"/>
-    <jar href="spice.jar"/>
-    <jar href="biojava.jar" download="lazy"/>
-    <jar href="xercesImpl.jar" download="lazy"/>
-    <jar href="xmlParserAPIs.jar" download="lazy"/>
-    <jar href="JmolApplet.jar" download="lazy"/>
-  <jar href="org.biojava.das.registry.jar" download="lazy"/>
-  <jar href="axis.jar" download="lazy"/>
-  <jar href="jaxrpc.jar" download="lazy"/>
-  <jar href="commons-logging.jar" download="lazy"/>
-  <jar href="commons-discovery.jar" download="lazy"/>
-  <jar href="jaxrpc.jar" download="lazy"/>
-  <jar href="saaj.jar" download="lazy"/>
-  <jar href="wsdl4j.jar" download="lazy"/>
-  <jar href="log4j-1.2.8.jar" download="lazy"/>
+    <jar href="spice.jar"                    download="lazy"/>
+    <jar href="biojava.jar"                  download="lazy"/>
+    <jar href="JmolApplet.jar"               download="lazy"/>
+    <jar href="org.biojava.das.registry.jar" download="lazy"/> 
+
+    <extension name="axis stuff" href="axis.jnlp"/> 
+    <extension name="xerces stuff" href="xerces.jnlp"/> 
+
+
   </resources>
   <application-desc main-class="org.biojava.spice.Spice">
-  <argument>1a4a</argument>
+  <argument>1h4w</argument>
   <argument>http://localhost:8080/axis/services/dasregistry/</argument>
   </application-desc>
  

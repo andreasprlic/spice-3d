@@ -28,9 +28,13 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Canvas;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
+
 import java.awt.Dimension;
 import java.awt.Event;
-
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseEvent;
 import java.util.List ;
 import java.util.ArrayList ;
 import java.util.HashMap ;
@@ -39,12 +43,23 @@ import java.io.* ;
 import java.util.Iterator ;
 import java.util.Date ;
 import java.util.Calendar ;
+ 
+
+import javax.swing.JLabel ;
+import javax.swing.ImageIcon ;
+
+
+
+
 //import ToolTip.* ;
 
 /**
  * requires an arraylist of featrures
  */
-public class SeqFeatureCanvas extends Canvas
+public class SeqFeatureCanvas 
+    extends JLabel 
+    implements MouseListener, MouseMotionListener
+				      
 {
 
     public static final int    DEFAULT_X_START  = 60  ;
@@ -88,10 +103,15 @@ public class SeqFeatureCanvas extends Canvas
     public SeqFeatureCanvas(SPICEFrame spicefr ) {
 	super();
 
-
 	// TODO Auto-generated constructor stub
-	imbuf=null; 
-	imbufDim = new Dimension(-1, -1);
+	Dimension dstruc=this.getSize();
+	//imbuf    = this.createImage(dstruc.width, dstruc.height);
+	imbuf = null ;
+	
+	imbufDim = dstruc;
+	//Graphics gstruc=imbuf.getGraphics();
+	//gstruc.drawImage(imbuf, 0, 0, this);
+
 	spice = spicefr;
 	//features = new ArrayList();
 	drawLines = new ArrayList();
@@ -105,12 +125,18 @@ public class SeqFeatureCanvas extends Canvas
 	entColors[4] = Color.orange;
 	entColors[5] = Color.pink;
 	entColors[6] = Color.cyan;
-	
+	//setBasckground(Color.black) ;
+
 	lastHighlight = new Date();
 				
 	current_chainnumber = -1 ;
 	seqOldPos = -1 ;
+	
+	//setOpaque(true);
 
+	this.paintComponent(this.getGraphics());
+	//ImageIcon icon = new ImageIcon(imbuf);
+	//setIcon(icon);
     }
 
 
@@ -126,18 +152,18 @@ public class SeqFeatureCanvas extends Canvas
 	
 	for (int i=0; i< feats.size(); i++) {
 	    Feature feat = (Feature)feats.get(i);
-	    System.out.println(feat);
+	    //System.out.println(feat);
 	    if (oldFeature.getType().equals(feat.getType())){
 		// see if they are overlapping
 		if ( overlap(oldFeature,feat)) {
-		    System.out.println("OVERLAP found!" + oldFeature+ " "+ feat);
+		    //System.out.println("OVERLAP found!" + oldFeature+ " "+ feat);
 		    drawLines.add(currentLine);
 		    currentLine = new ArrayList();
 		    currentLine.add(feat);
 		    oldFeature = feat ; 
 		} else {
 		    // not overlapping, they fit into the same line
-		    System.out.println("same line" +  oldFeature+ " "+ feat);
+		    //System.out.println("same line" +  oldFeature+ " "+ feat);
 		    currentLine.add(feat);
 		    oldFeature = feat ;
 		}
@@ -155,12 +181,24 @@ public class SeqFeatureCanvas extends Canvas
 	}
 
 	drawLines.add(currentLine);
-	
-	imbuf = null ;
-	this.paint(this.getGraphics());
+
+	Dimension dstruc=this.getSize();
+	int imageheight = getImageHeight();
+	imbuf=this.createImage(dstruc.width, imageheight);
+	//imbuf = new BufferedImage(dstruc.width, dstruc.height,BufferedImage.TYPE_INT_RGB);
+	imbufDim = dstruc;
+	this.paintComponent(this.getGraphics());
 
     }
     
+    /** return height of image. dpends on number of features! */
+    
+    private int getImageHeight(){
+	int h = drawLines.size() * DEFAULT_Y_STEP +200; 
+	System.out.println("setting height " + h);
+	return h ;
+    }
+
     // an overlap occurs if any of the segments overlap ...
 
     private boolean overlap (Feature a, Feature b) {
@@ -193,7 +231,7 @@ public class SeqFeatureCanvas extends Canvas
     public void setChain(Chain c,int chainnumber) {
 	chain = c;
 	current_chainnumber = chainnumber ;
-	this.paint(this.getGraphics());
+	this.paintComponent(this.getGraphics());
     }
     
 
@@ -301,7 +339,7 @@ public class SeqFeatureCanvas extends Canvas
     public void highlite(int chain_number, int seqpos){
 				
 	Dimension dstruc=this.getSize();
-		
+
 	Graphics gstruc=imbuf.getGraphics();
 		
 	if (seqOldPos != -1) {
@@ -319,25 +357,36 @@ public class SeqFeatureCanvas extends Canvas
 	    int tmpfill ;
 	    if (aminosize <1) tmpfill = 1;
 	    else tmpfill = aminosize ;
-				  
+	    System.out.println("draw rec");
 	    gstruc.fillRect(seqx , 0, tmpfill, dstruc.height);
-	    this.repaint();
+	    
 	    seqOldPos = seqpos ;
 	}
+	
+	ImageIcon icon = new ImageIcon(imbuf);
+	setIcon(icon);
+	
     }
 	
-    public void paint(Graphics g){
+    public void paintComponent( Graphics g) {
+	//paint(g);
+	//}
+
+	//public void paint(Graphics g){
 
 	if ( chain == null   ) return ;
 	//System.out.println("PAINTINGDAS!!!") ;
 		
-	System.out.println("DasCanv - paint");
+	System.out.println("DasCanv - paintComponent");
 	Dimension dstruc=this.getSize();
 
 	if(!imbufDim.equals(dstruc)) spice.scale();
 		
 	if(imbuf == null || !imbufDim.equals(dstruc)) {
-	    imbuf=this.createImage(dstruc.width, dstruc.height);
+	    int imageheight = getImageHeight();
+	    imbuf=this.createImage(dstruc.width, imageheight);
+
+	    //imbuf = new BufferedImage(dstruc.width, dstruc.height,BufferedImage.TYPE_INT_RGB);
 	    imbufDim = dstruc;
 	}
 	
@@ -432,7 +481,10 @@ public class SeqFeatureCanvas extends Canvas
 	    }
 	}
 	
-
+	//ImageIcon ico = new ImageIcon(imbuf);
+	//setIcon(ico);
+	//ImageIcon icon = new ImageIcon(imbuf);
+	//setIcon(icon);
 	g.drawImage(imbuf, 0, 0, this);
 	//this.repaint();
 	
@@ -534,9 +586,17 @@ public class SeqFeatureCanvas extends Canvas
 	return false ;
     }
 
-	
-    public boolean mouseMove(Event e, int x, int y)
+
+    public void mouseDragged(MouseEvent e) {
+	System.out.println("dragging mouse "+e);
+    }	
+    
+
+    public void mouseMoved(MouseEvent e)
     {	
+	//, int x, int y
+	int x = e.getX();
+	int y = e.getY();
 	int seqpos =  java.lang.Math.round((x-DEFAULT_X_START)/scale) ;
 		
 	int linenr   = getLineNr(y);
@@ -544,8 +604,8 @@ public class SeqFeatureCanvas extends Canvas
        
 	//int featurenr = get_featurenr(y); 
 
-	if ( linenr < 0 ) return true;
-	if ( seqpos    < 0 ) return true; 
+	if ( linenr < 0 ) return ;
+	if ( seqpos    < 0 ) return ; 
 
 	//String drstr = "x "+ seqpos + " y " + featurenr ;
 
@@ -553,9 +613,6 @@ public class SeqFeatureCanvas extends Canvas
 	
 	spice.showSeqPos(current_chainnumber,seqpos);
 	//spice.showStatus(drstr);
-	
-	
-
 	
 	// and the feature display
 	
@@ -577,19 +634,22 @@ public class SeqFeatureCanvas extends Canvas
 	long timediff = currentTime.getTime() - lastHighlight.getTime() ;
 	System.out.println("timediff:" + timediff);
 	if ( timediff  > TIMEDELAY) {
-	    System.out.println("highliting");
+	    System.out.println("highliting "+current_chainnumber + " " + seqpos);
 	    highlite(current_chainnumber,seqpos);	    
 	    spice.select(current_chainnumber,seqpos);
 	    lastHighlight = currentTime ;
 	}
 
 	
-	return true ;
+	return  ;
     }
 	
     
-    public boolean mouseUp(Event e, int x, int y)
+    public void mouseClicked(MouseEvent e)
     {
+	System.out.println("CLICK");
+	int x = e.getX();
+	int y = e.getY();
 
 	int seqpos =  java.lang.Math.round((x-DEFAULT_X_START)/scale)  ;		
 	int lineNr    = getLineNr(y);
@@ -597,7 +657,7 @@ public class SeqFeatureCanvas extends Canvas
 	//int featurenr = get_featurenr(y) ;
 	//System.out.println("CLICK! "+seqpos + " " +featurenr+ " " + chain.getLength());
 	
-	if ( lineNr < 0 ) return true;
+	if ( lineNr < 0 ) return ;
 	if ( seqpos    < 0 ) {
 	    // check if the name was clicked
 	    if (nameClicked(x)){
@@ -609,12 +669,12 @@ public class SeqFeatureCanvas extends Canvas
 		    highliteFeature(feature);
 		    
 		}
-		return true ;
+		return  ;
 	    }
 	} 
 
 	
-	if ( seqpos    > chain.getLength()) return true; 
+	if ( seqpos    > chain.getLength()) return ; 
 
 	String drstr = "x "+ seqpos + " y " + lineNr ;
 
@@ -639,8 +699,15 @@ public class SeqFeatureCanvas extends Canvas
 	    //Color col = entColors[featurenr%entColors.length] ;
 	
 	//System.out.println("clicked outa space");
-	return true ;
+	return  ;
     }	
+    
+    public void mouseEntered(MouseEvent e)  {}
+    public void mouseExited(MouseEvent e)   {}
+    public void mousePressed(MouseEvent e)  {}
+    public void mouseReleased(MouseEvent e) {}
+    
+    
 }
 
 

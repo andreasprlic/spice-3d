@@ -43,7 +43,7 @@ public class Spice extends Applet {
     public static void main(String[] argv) {
 
 	if ( argv.length != 2 ) {
-	    System.err.println(" wrong arguments: correct call: java -jar spice.jar PDBcode configfileUrl"+ System.getProperty("line.separator")+" example: java -jar spice.jar 5pti http://www.sanger.ac.uk/Users/ap3/DAS/SPICE/stable/config.xml");
+	    System.err.println(" wrong arguments: correct call: java -jar spice.jar PDBcode registryurl "+ System.getProperty("line.separator")+" example: java -jar spice.jar 5pti http://localhost:8080/axis/services/dasregistry/");
 	    return;
 	}
 	
@@ -52,7 +52,7 @@ public class Spice extends Applet {
 	try {
 	    //System.out.println(argv[1]);
 	    url = new URL(argv[1]);
-	    registry_url = new URL("http://localhost:8080/dasregistry/");
+	    registry_url = new URL("http://localhost:8080/axis/services/dasregistry/");
 	} catch (MalformedURLException e) {
 	    System.err.println(url+" " + registry_url);
 	    e.printStackTrace();

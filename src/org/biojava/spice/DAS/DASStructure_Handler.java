@@ -85,7 +85,7 @@ public class DASStructure_Handler
 
 	    DASStructureClient dasc= new DASStructureClient(dasstructurecommand);
 	    System.out.println(getTimeStamp() );
-	    System.out.println("getting structure "+pdb_id);
+	    System.out.println("getting structure "+pdb_id);	    
 	    structure = dasc.getStructureById(pdb_id);	    
 	    System.out.println("DASStructure_Handler: got structure:");
 	    System.out.println(getTimeStamp() );

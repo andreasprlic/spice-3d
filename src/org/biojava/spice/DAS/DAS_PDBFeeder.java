@@ -127,7 +127,8 @@ public class DAS_PDBFeeder
 	    
 
 	    // and not incorporate the structure data ...
-	    String pdb_id = pdbcode.toUpperCase();
+	    //String pdb_id = pdbcode.toUpperCase();
+	    String pdb_id = pdbcode ;
 	    //structure_handler.set_id(pdb_id) ;
 	    
 	    structure_handler.start();

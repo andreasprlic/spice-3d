@@ -227,7 +227,7 @@ public class FeatureFetcher extends Thread
     /** if a sub-thread has finished this procedure is called and the
      * features for this thread are set */
     public synchronized void setFinished(int threadId, List features) {
-	System.out.println("Got "+ features.size()+ " features from " + threadId);
+	//System.out.println("Got "+ features.size()+ " features from " + threadId);
 	DasResponse d = subthreads[threadId] ;
 	d.setFeatures(features);
 	notifyAll();	
@@ -282,7 +282,7 @@ public class FeatureFetcher extends Thread
 	    String type = (String) currentFeatureMap.get("TYPE") ;
 
 	    // we are skipping literature references for teh moment 
-	    if ( type.equals("reference")){
+	    if ( type.equals("reference") || type.equals("GOA")){
 		continue ;
 	    }
 	    
@@ -415,14 +415,14 @@ class DasResponse{
     }
 
     public synchronized void setFeatures(List feats) {
-	System.out.println(feats);
+	//System.out.println(feats);
 	// sort features ...
 	Map[] featarr = (Map[]) feats.toArray(new Map[feats.size()]);
 	FeatureMapComparator comp = new FeatureMapComparator();
 	java.util.Arrays.sort(featarr,comp) ; 
 	
 	List sortfeats = java.util.Arrays.asList(featarr);
-	System.out.println(sortfeats); 
+	//System.out.println(sortfeats); 
 	features = sortfeats; 
 	
 	//features = feats;
