@@ -61,9 +61,13 @@ public class DAS_FeatureRetreive {
 			
 		    //DAS_httpConnector dhtp = new DAS_httpConnector() ;
 			//System.out.println("DasFeatureRetureive"+url);
-			
-
-			InputStream dasInStream	= open(url); 
+		    InputStream dasInStream = null;
+		    try {
+			dasInStream	= open(url); 
+		    } catch (Exception e ){
+			System.err.println("could not open connection to " + url);
+			return ;
+		    }
 			
 			//SAXParserFactory spf = SAXParserFactory.newInstance();
 			//spf.setNamespaceAware(true);
@@ -115,10 +119,15 @@ public class DAS_FeatureRetreive {
 			xmlreader.setErrorHandler(new org.xml.sax.helpers.DefaultHandler());
 			InputSource insource = new InputSource() ;
 			insource.setByteStream(dasInStream);
-		
-			xmlreader.parse(insource);
 			
-			features = cont_handle.get_features();
+			try {
+			    xmlreader.parse(insource);			
+			    features = cont_handle.get_features();
+			} 
+			catch ( Exception e){
+			    System.err.println("error while parsing response from "+ url);
+			    features = new ArrayList();
+			}
 			
 		}
 		catch (Exception ex) {
@@ -129,24 +138,21 @@ public class DAS_FeatureRetreive {
 	}
 
 
-    private InputStream open(URL url){
+    private InputStream open(URL url)
+	throws java.io.IOException, java.net.ConnectException
+    {
 	InputStream inStream = null;
-	    try{
+
 				
-		HttpURLConnection huc = null;
-		System.out.println("opening "+url);
-		huc = (HttpURLConnection) url.openConnection();
+	HttpURLConnection huc = null;
+	System.out.println("opening "+url);
+	huc = (HttpURLConnection) url.openConnection();
+	
 		
-		
-		System.out.println(huc.getResponseMessage());
-		String contentEncoding = huc.getContentEncoding();
-		inStream = huc.getInputStream();		
-		}
-		catch ( Exception ex){
-			ex.printStackTrace();
-		}
-			
-		return inStream;
+	System.out.println("got connection: "+huc.getResponseMessage());
+	String contentEncoding = huc.getContentEncoding();
+	inStream = huc.getInputStream();		
+	return inStream;
     
     }
 	

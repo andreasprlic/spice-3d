@@ -67,7 +67,7 @@ public class SeqFeatureCanvas
     public static final int    DEFAULT_Y_START  = 16 ;
     public static final int    DEFAULT_Y_STEP   = 10 ;
     public static final int    DEFAULT_Y_HEIGHT = 4 ;
-
+    public static final int    DEFAULT_Y_BOTTOM  = 16 ;
     public static final int    TIMEDELAY        = 0 ;
     
     // the master application
@@ -132,7 +132,7 @@ public class SeqFeatureCanvas
 	current_chainnumber = -1 ;
 	seqOldPos = -1 ;
 	
-	//setOpaque(true);
+	setOpaque(true);
 
 	this.paintComponent(this.getGraphics());
 	//ImageIcon icon = new ImageIcon(imbuf);
@@ -194,8 +194,8 @@ public class SeqFeatureCanvas
     /** return height of image. dpends on number of features! */
     
     private int getImageHeight(){
-	int h = drawLines.size() * DEFAULT_Y_STEP +200; 
-	System.out.println("setting height " + h);
+	int h = DEFAULT_Y_START + drawLines.size() * DEFAULT_Y_STEP + DEFAULT_Y_BOTTOM; 
+	//System.out.println("setting height " + h);
 	return h ;
     }
 
@@ -357,7 +357,7 @@ public class SeqFeatureCanvas
 	    int tmpfill ;
 	    if (aminosize <1) tmpfill = 1;
 	    else tmpfill = aminosize ;
-	    System.out.println("draw rec");
+	    //System.out.println("draw rec");
 	    gstruc.fillRect(seqx , 0, tmpfill, dstruc.height);
 	    
 	    seqOldPos = seqpos ;
@@ -377,7 +377,7 @@ public class SeqFeatureCanvas
 	if ( chain == null   ) return ;
 	//System.out.println("PAINTINGDAS!!!") ;
 		
-	System.out.println("DasCanv - paintComponent");
+	//System.out.println("DasCanv - paintComponent");
 	Dimension dstruc=this.getSize();
 
 	if(!imbufDim.equals(dstruc)) spice.scale();
@@ -516,7 +516,7 @@ public class SeqFeatureCanvas
     }
 
     private Feature getFeatureAt(int seqpos, int lineNr){
-	System.out.println("getFeatureAt " + seqpos + " " + lineNr);
+	//System.out.println("getFeatureAt " + seqpos + " " + lineNr);
 	Segment s = getSegmentUnder(seqpos,lineNr);
 	if (s == null ) 
 	    return null;
@@ -558,7 +558,7 @@ public class SeqFeatureCanvas
 	// current position is seqpos
 	String toolstr = spice.getToolString(current_chainnumber,seqpos);
 	
-	System.out.println("getToolString");
+	//System.out.println("getToolString");
 	
 	Feature parent = segment.getParent() ;
 	String method  = parent.getMethod() ;
@@ -632,9 +632,9 @@ public class SeqFeatureCanvas
 	// add a time delay for repainting the bar
 	Date currentTime = new Date();
 	long timediff = currentTime.getTime() - lastHighlight.getTime() ;
-	System.out.println("timediff:" + timediff);
+	//System.out.println("timediff:" + timediff);
 	if ( timediff  > TIMEDELAY) {
-	    System.out.println("highliting "+current_chainnumber + " " + seqpos);
+	    //System.out.println("highliting "+current_chainnumber + " " + seqpos);
 	    highlite(current_chainnumber,seqpos);	    
 	    spice.select(current_chainnumber,seqpos);
 	    lastHighlight = currentTime ;

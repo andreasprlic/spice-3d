@@ -142,7 +142,8 @@ public class SpiceApplication
     MenuItem props ;
     MenuItem reset ;
     MenuItem aboutspice ;
-    MenuItem aboutdas ;
+    MenuItem aboutdas   ;
+    MenuItem openpdb    ;
 
 
     SpiceApplication(String pdbcode_, URL config_url, URL registry_url) {
@@ -195,17 +196,20 @@ public class SpiceApplication
 	Menu help = new Menu("Help");
 	menu.add(file);
 	menu.add(help);
-	
+
+	openpdb = new MenuItem("open PDB");
 	exit  = new MenuItem("Exit");
 	props = new MenuItem("Properties");
 	reset = new MenuItem("Reset");
 	//exit.addActionListener(this);
+	file.add(openpdb);
 	file.add(reset);
 	file.add(props);
 	file.add(exit);
 	
 	aboutspice = new MenuItem("About SPICE");
 	aboutdas = new MenuItem("About DAS");
+
 	//aboutspice.addActionListener(this);
 	//aboutdas.addActionListener(this);
 	help.add(aboutspice);
@@ -219,7 +223,6 @@ public class SpiceApplication
 	seq_pos.setForeground(new Color(255, 255, 255));
 	seq_pos.setBackground(new Color(0, 0, 0));
 	seq_pos.setSize(700, 30);
-	
 	seq_pos.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
 
 	this.add(seq_pos,BorderLayout.NORTH);
@@ -232,7 +235,7 @@ public class SpiceApplication
 	structurePanel        = new StructurePanel();
 	//structurePanel.setLayout(new BoxLayout(structurePanel, BoxLayout.X_AXIS));
 	structurePanel.setPreferredSize(new Dimension(700, 700));
-	structurePanel.setMinimumSize(new Dimension(200,100));
+	structurePanel.setMinimumSize(new Dimension(200,200));
 	//this.add(structurePanel,BorderLayout.CENTER);
 
 
@@ -251,8 +254,8 @@ public class SpiceApplication
 	ent_list.addListSelectionListener(entact);
 			
 	getCom = new JTextField(1);
-	TextFieldListener txtlisten = new TextFieldListener(this,getCom);
-	getCom.addActionListener(txtlisten);
+	//TextFieldListener txtlisten = new TextFieldListener(this,getCom);
+	//getCom.addActionListener(txtlisten);
 	//getCom.setMinimumSize(new Dimension(Short.MIN_VALUE,10));
 	//
 
@@ -260,8 +263,9 @@ public class SpiceApplication
 	leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
 
 	leftPanel.add(ent_list,BorderLayout.NORTH);
-	leftPanel.add(getCom,BorderLayout.SOUTH);
-	leftPanel.setMinimumSize(new Dimension(100,30));
+	//leftPanel.add(getCom,BorderLayout.SOUTH);
+	leftPanel.setMinimumSize(new Dimension(30,30));
+	leftPanel.setPreferredSize(new Dimension(30,30));
 	//ent_list.repaint();
 
 	
@@ -289,7 +293,7 @@ public class SpiceApplication
                            leftPanel, dasPanel);
 	sharedPanel.setOneTouchExpandable(true);
 	sharedPanel.setDividerLocation(150);
-
+	sharedPanel.setPreferredSize(new Dimension(200, 200));
 	//sharedPanel.setLayout(new BoxLayout(sharedPanel, BoxLayout.X_AXIS));
 	//sharedPanel.add(leftPanel,BorderLayout.EAST);
 	//sharedPanel.add(scroll,BorderLayout.WEST);
@@ -297,11 +301,13 @@ public class SpiceApplication
 	//sharedPanel.add(daspanel,BorderLayout.WEST);
 	//sharedPanel.setMaximumSize(new Dimension(Short.MAX_VALUE,300));
 	//this.add(sharedPanel,BorderLayout.SOUTH);
-	
+	sharedPanel.setOpaque(true);
 	mainsharedPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
 					  structurePanel,sharedPanel);
 	mainsharedPanel.setOneTouchExpandable(true);
 	mainsharedPanel.setDividerLocation(150);
+	mainsharedPanel.setPreferredSize(new Dimension(200, 200));
+	mainsharedPanel.setOpaque(true);
 	this.add(mainsharedPanel,BorderLayout.NORTH);
 
 
@@ -330,7 +336,7 @@ public class SpiceApplication
 
 	memoryfeatures = new HashMap();
 	features = new ArrayList();
-	
+
     }
 
 
@@ -559,6 +565,7 @@ public class SpiceApplication
 	systemSettings.put("proxyPort", "3128");
 	System.setProperties(systemSettings);
 	*/
+	first_load = true ;
 	pdbcode = pdbcod ;
 	LoadStructureThread thr = new LoadStructureThread(this,pdbcod);
 	thr.start();
@@ -624,8 +631,9 @@ public class SpiceApplication
      */
     
     public void setStructure(Structure structure_, String selectcmd ) {
+	first_load = false ;
 	structure = structure_ ; 
-	
+
 	System.out.println("got final structure:"+structure);
 	    	
 	DefaultListModel model = (DefaultListModel) ent_list.getModel() ;
@@ -643,7 +651,7 @@ public class SpiceApplication
 
 	structurePanel.executeCmd(selectcmd);
 	
-	first_load = false ;
+
 	setCurrentChain(0);
 	updateDisplays();
     
@@ -677,6 +685,7 @@ public class SpiceApplication
 	Chain chain = getChain(currentChain) ;
 	String sp_id = chain.getSwissprotId() ;
 	System.out.println("SP_ID "+sp_id);
+	
 	ArrayList tmpfeat = getFeaturesFromMemory(sp_id) ;
 	
 	if ( tmpfeat.size() == 0 ) {
@@ -734,6 +743,9 @@ public class SpiceApplication
 	
 	for (Iterator ti = memoryfeatures.keySet().iterator(); ti.hasNext(); ) {
 	    String key = (String) ti.next() ;
+	    if ( key == null) {
+		return arr ;
+	    }
 	    if (key.equals(sp_id)) {
 		arr = (ArrayList) memoryfeatures.get(sp_id) ;
 		return arr ;
@@ -950,7 +962,7 @@ public class SpiceApplication
 	//SeqFeatureCanvas dascanv = daspanel.getCanv();
 	dascanv.setFeatures(features);
 	dascanv.paint(dascanv.getGraphics());
-	
+
 	
 	sharedPanel.paint(sharedPanel.getGraphics());
 	//leftPanel.paint(leftPanel.getGraphics());
@@ -1001,6 +1013,12 @@ public class SpiceApplication
 	    dispose();
 	    return true;
 	}
+	else if ( event.target == openpdb ) {
+	    System.out.println("open DAS");
+	    OpenDialog op = new OpenDialog(this);
+	    op.show();
+	}
+
 	else if ( event.target == aboutdas ) {
 	    System.out.println("about DAS");
 	    //AboutDialog asd = new AboutDialog(this);
@@ -1092,9 +1110,9 @@ class TextFieldListener
 	//spice.executeCmd(cmd);
 	spice.getStructure(pdbcod);
 	textfield.setText("");
-	System.out.println(event.getActionCommand());
-	System.out.println(event.getModifiers());
-	System.out.println(event.paramString());
+	//System.out.println(event.getActionCommand());
+	//System.out.println(event.getModifiers());
+	//System.out.println(event.paramString());
     
 	//System.out.println(event.id);
     }
@@ -1136,6 +1154,71 @@ class EntListCommandListener implements ListSelectionListener {
 	//System.out.println(event.id);
 	//System.out.println(event.arg);
 	
+    }
+
+}
+
+
+class OpenDialog extends Dialog
+{
+    static int H_SIZE = 200;
+    static int V_SIZE = 90;
+    SPICEFrame spice ;
+    JTextField getCom ;
+    
+    public OpenDialog(SPICEFrame parent){
+	// Calls the parent telling it this
+	// dialog is modal(i.e true)	
+	super((Frame)parent, true); 
+
+	this.addWindowListener(new WindowAdapter() {
+		public void windowClosing(WindowEvent evt) {
+		    Frame frame = (Frame) evt.getSource();
+		    frame.setVisible(false);
+		    frame.dispose();
+		}
+	    });
+
+	spice = parent ;
+	Panel p = new Panel();
+	this.setTitle("enter PDBcode") ;
+	getCom = new JTextField(4);
+	//TextFieldListener txtlisten = new TextFieldListener(parent,getCom);
+	//getCom.addActionListener(txtlisten);
+
+	p.add(getCom);
+	p.add(new Button("Open"));
+	p.add(new Button("Cancel"));
+	add(p);
+	resize(H_SIZE, V_SIZE);
+
+
+    }
+    
+    public boolean action(Event evt, Object arg)
+    {
+	// If action label(i.e arg) equals 
+	// "Close" then dispose this dialog
+
+	if(arg.equals("Cancel"))
+	    {
+		dispose();
+		return true;
+	    }
+	else if ( arg.equals("Open"))
+	    {
+		if ( spice.isLoading() ) {
+		    getCom.setText("please wait, already loading");
+		    return true ;
+		}
+		//System.out.println("open" + getCom.getText());
+		String pdbcod = getCom.getText();
+		spice.getStructure(pdbcod);
+		dispose();
+		return true;	
+	    }
+
+	return super.handleEvent(evt);
     }
 
 }

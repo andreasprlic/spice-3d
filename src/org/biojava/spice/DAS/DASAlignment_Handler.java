@@ -444,8 +444,8 @@ public class DASAlignment_Handler extends Thread
 		return ;
 	    }
 
-	    e.printStackTrace();
-	    System.out.println("setting new pdbcode "+pdbcode) ;
+	    //e.printStackTrace();
+	    System.out.println("Insertion Code ! setting new pdbcode "+pdbcode) ;
 	    aminosegment[0].setPDBCode(pdbcode);
 	    return ;
 	}
