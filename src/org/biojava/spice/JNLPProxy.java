@@ -50,7 +50,8 @@ public static boolean  showDocument ( URL  url )
 {
   if ( basicServiceObject == null )
   {
-    return false;
+      System.out.println("basisServiceObject = null");
+      return false;
   }
 
   try
@@ -61,7 +62,10 @@ public static boolean  showDocument ( URL  url )
     Boolean  resultBoolean = ( Boolean )
       method.invoke ( basicServiceObject, new Object [ ] { url } );
 
-    return resultBoolean.booleanValue ( );
+    boolean success = resultBoolean.booleanValue ( );
+    if ( ! success ) 
+	System.out.println("invocation of method failed!");
+    return success;
   }
   catch ( Exception  ex )
   {

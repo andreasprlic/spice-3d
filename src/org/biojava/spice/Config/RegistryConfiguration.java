@@ -57,6 +57,12 @@ public class RegistryConfiguration
     Date   lastContact         ;
     String registryUrl         ;
 
+    static String PDBCOORDSYS     = "PDBresnum,Protein Structure";
+    static String UNIPROTCOORDSYS = "UniProt,Protein Sequence";
+
+    static String DEFAULTREGISTRY = "http://servlet.sanger.ac.uk:8080/axis/services/das_registry";
+    
+
     public RegistryConfiguration () {
 	super();
 
@@ -67,7 +73,7 @@ public class RegistryConfiguration
 	pdbFileExtensions = new String[] { ".pdb",".ent"};
 	updateBehave      = "always";
 	lastContact       = null ;
-	registryUrl       = "http://servlet.sanger.ac.uk:8080/axis/services/das_registry";
+	registryUrl       = DEFAULTREGISTRY;
     }
 
 
@@ -114,8 +120,8 @@ public class RegistryConfiguration
 	boolean uniprotflag = false ;
 	boolean pdbflag     = false ;
 	
-	pdbflag     =  hasCoordSys("PDBresnum",source) ;
-	uniprotflag =  hasCoordSys("UniProt",source)   ;
+	pdbflag     =  hasCoordSys(PDBCOORDSYS,source) ;
+	uniprotflag =  hasCoordSys(UNIPROTCOORDSYS,source)   ;
 	//System.out.println(pdbflag + " " + uniprotflag);
 	if (( uniprotflag == true) && ( pdbflag == true)) {
 	    msdmapping = true ;
@@ -127,8 +133,24 @@ public class RegistryConfiguration
 	String[] coordsys = source.getCoordinateSystem() ;
 	for ( int i = 0 ; i< coordsys.length; i++ ) {
 	    String c = coordsys[i];
+	    //System.out.println(">"+c+"< >"+coordSys+"<");
 	    if ( c.equals(coordSys) ) {
+		//System.out.println("match");
 		return true ;
+	    }
+
+
+	    /** TODO: fix this */
+	    // tmp until alginmnet server supports new coord sys:
+	    if ( coordSys.equals(PDBCOORDSYS)) {
+		if ( hasCoordSys("PDBresnum",source)){
+		    return true;
+		}
+	    }
+	    else if ( coordSys.equals(UNIPROTCOORDSYS)) {
+		if ( hasCoordSys("UniProt",source)){
+		    return true;
+		}
 	    }
 	}
 	return false ;
@@ -255,6 +277,20 @@ public class RegistryConfiguration
 		if ( hasCoordSys(coordSys,ds)) {
 		    retservers.add(ds);
 		}
+
+	    
+		/** TODO: fix this */
+		// tmp until alginmnet server supports new coord sys:
+		else if ( coordSys.equals(PDBCOORDSYS)) {
+		    if ( hasCoordSys("PDBresnum",ds)){
+			retservers.add(ds);
+		    }
+		}
+		else if ( coordSys.equals(UNIPROTCOORDSYS)) {
+		    if ( hasCoordSys("UniProt",ds)){
+			retservers.add(ds);
+		    }
+		}
 	    }
 	}
 	return retservers ;
@@ -287,6 +323,7 @@ public class RegistryConfiguration
 	    }
 	}
 
+      
 	return retservers ;
     }
 

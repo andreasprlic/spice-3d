@@ -54,7 +54,9 @@ public class DASStructure_Handler
     String pdbCode              ;
     Logger logger               ;             
     SpiceStructureFeeder parent ;
-
+    
+    static String STRUCTUREDATABASE = "PDBresnum,Protein Structure" ;
+    
     public DASStructure_Handler(RegistryConfiguration configuration, String pdbcode,SpiceStructureFeeder parent_) {
 	super () ;
 	
@@ -68,7 +70,7 @@ public class DASStructure_Handler
 	config = configuration ;
 
 	structureservers = new ArrayList();
-	List tmplist = config.getServers("structure","PDBresnum"); 
+	List tmplist = config.getServers("structure",STRUCTUREDATABASE); 
 	Iterator iter = tmplist.iterator();
 
 	// local structure server is always first

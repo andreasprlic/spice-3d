@@ -50,7 +50,7 @@ public class DAS_SequenceRetreive {
 
     ArrayList sequencelist ;
 
-
+    static String SEQUENCEDATABASE  = "UniProt,Protein Sequence" ;
     /**
      *  retrieve sequence for this sp_accession e.g. P00280
      */
@@ -62,7 +62,7 @@ public class DAS_SequenceRetreive {
 	logger = Logger.getLogger("org.biojava.spice");
 	//connection = conns ;
 	config = configuration ;
-	sequenceServers = config.getServers("sequence","UniProt");
+	sequenceServers = config.getServers("sequence",SEQUENCEDATABASE);
 	//logger.finest(sequenceServers);
 	sequencelist = new ArrayList() ;
 		

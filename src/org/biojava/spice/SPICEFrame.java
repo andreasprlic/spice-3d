@@ -201,6 +201,5 @@ public interface SPICEFrame
    
     /** returns currently displayed UniProt code; null if none*/
     public String getUniProtCode();
-    
-    
+
 }

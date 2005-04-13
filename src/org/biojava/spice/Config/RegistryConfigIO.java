@@ -35,7 +35,7 @@ import java.util.Map                       ;
 import java.util.List                      ;
 
 // for DAS registration server:
-import org.biojava.services.das.dasregistry.* ;
+import org.biojava.services.das.registry.* ;
 
 import org.biojava.spice.SPICEFrame   	   ;
 import org.biojava.spice.SpiceApplication  ;
@@ -547,6 +547,10 @@ class TabbedPaneDemo extends JPanel {
     SPICEFrame spice                   ;
     static Logger    logger      = Logger.getLogger("org.biojava.spice");
     
+    static String PDBCOORDSYS     = "PDBresnum,Protein Structure";
+    static String UNIPROTCOORDSYS = "UniProt,Protein Sequence";
+
+
     public TabbedPaneDemo(SPICEFrame spice_,RegistryConfigIO registryparent, RegistryConfiguration config_) {
         super(new GridLayout(1, 1));
         spice = spice_;
@@ -810,7 +814,7 @@ class TabbedPaneDemo extends JPanel {
             
             if (col.equals("coordinateSystems")) {
                 // display coordinateSystems box
-                String[] coords = { "UniProt","PDBresnum"};
+                String[] coords = { UNIPROTCOORDSYS, PDBCOORDSYS};
                 JComboBox list = new JComboBox(coords) ;		
                 list.setEditable(false);
                 list.setMaximumSize(new Dimension(Short.MAX_VALUE,30));

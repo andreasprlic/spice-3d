@@ -24,7 +24,8 @@
 
 package org.biojava.spice.Config ;
 
-import org.biojava.services.das.dasregistry.*;
+//import org.biojava.services.das.registry.*;
+import org.biojava.services.das.registry.DasSource;
 import org.biojava.utils.xml.*            ; 
 import java.io.IOException                ;
 import java.text.DateFormat               ;

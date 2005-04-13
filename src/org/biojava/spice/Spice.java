@@ -43,7 +43,7 @@ public class Spice extends Applet {
     
     public static void main(String[] argv) {
 
-	if ( argv.length != 3 ) {
+	if ( argv.length < 3 ) {
 	    System.err.println(" wrong arguments: correct call: java -jar spice.jar type code registryurl "+ System.getProperty("line.separator")+" example: java -jar spice.jar PDB 5pti http://servlet.sanger.ac.uk:8080/axis/services/das_registry/");
 	    return;
 	}

@@ -34,6 +34,7 @@ import org.biojava.bio.symbol.Alphabet                 ;
 import org.biojava.bio.symbol.Symbol                   ;
 import org.biojava.bio.symbol.IllegalSymbolException   ;
 import org.biojava.bio.*                               ;
+import org.biojava.spice.StructureBuilder;
 
 import java.util.*                                     ;
 import java.util.logging.*                             ;
@@ -63,8 +64,8 @@ public class DASAlignment_Handler extends Thread
     
     // hard coded - 
     // find a better solution ...
-    static String SEQUENCEDATABASE  = "UniProt" ;
-    static String STRUCTUREDATABASE = "PDBresnum" ;
+    static String SEQUENCEDATABASE  = "UniProt,Protein Sequence" ;
+    static String STRUCTUREDATABASE = "PDBresnum,Protein Structure" ;
 
     ArrayList sequencelist ;
 
@@ -208,24 +209,8 @@ public class DASAlignment_Handler extends Thread
     private Annotation getAlignmentObject (Alignment ali,String objecttype) 
 	throws DASException
     {
-	// go through objects and get sequence one ...
-	Annotation[] objects = ali.getObjects();
-	HashMap seq_obj = new HashMap() ;
-
-	for (int i =0 ; i<objects.length;i++) {
-	    Annotation object = objects[i];
-	    String dbCoordSys = (String)object.getProperty("dbCoordSys");
-	    
-
-
-	    if ( dbCoordSys.equals(objecttype) ) {		
-		return object ;
-	    }
-	}
-	
-
-	throw new DASException("no >" + objecttype + "< object found as dbSource in alignment!");
-	
+	StructureBuilder sb = new StructureBuilder();
+	return sb.getAlignmentObject(ali,objecttype);
     }
 
 

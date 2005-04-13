@@ -89,7 +89,7 @@ implements SPICEFrame
       
     public static Logger logger =  Logger.getLogger("org.biojava.spice");
     
-    public static ImageIcon firefoxIcon = createImageIcon("firefox.png");
+    
     
     URL REGISTRY_URL    ; // the url to the registration server
     
@@ -146,7 +146,7 @@ implements SPICEFrame
     
     //public static Logger logger = Logger.getLogger("org.biojava.spice");
   
-    
+    ImageIcon firefoxIcon ;
     
     
     /** start the spice appplication
@@ -212,6 +212,8 @@ implements SPICEFrame
         
         //this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         JFrame.setDefaultLookAndFeelDecorated(false);
+	
+	firefoxIcon = createImageIcon("firefox.png");
         ImageIcon icon = createImageIcon("spice.png");
         this.setIconImage(icon.getImage());
         this.pack();
@@ -620,6 +622,7 @@ implements SPICEFrame
         // unique action listener for the browse buttons
         ActionListener bl = new BrowseMenuListener(this);
         menu.add(browseMenu);
+
         if (firefoxIcon == null )
             pdbMenu = new JMenuItem("PDB");
         else
@@ -868,9 +871,9 @@ implements SPICEFrame
     public void setFeatures(String sp_id, List tmpfeat) {
         // todo create Feature for structure mapping
         //first_load = false ;
-        logger.info("SpiceAplication setting features for "+sp_id);
+        //logger.info("SpiceAplication setting features for "+sp_id);
         String mem_id = makeFeatureMemoryCode(sp_id);
-        System.out.println(mem_id);
+        //System.out.println(mem_id);
        
         // TODO: need to move caching of features on a different level.
         // We need to distinguish SP and PDB features...

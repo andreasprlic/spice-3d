@@ -43,8 +43,8 @@ public class StructureBuilder{
     
     // hard coded - 
     // find a better solution ...
-    static String SEQUENCEDATABASE  = "UniProt" ;
-    static String STRUCTUREDATABASE = "PDBresnum" ;
+    static String SEQUENCEDATABASE  = "UniProt,Protein Sequence" ;
+    static String STRUCTUREDATABASE = "PDBresnum,Protein Structure" ;
     
     
     
@@ -313,7 +313,7 @@ public class StructureBuilder{
     
     /** retrieve the HashMap for the sequence ... */
     
-    private Annotation getAlignmentObject (Alignment ali,String objecttype) 
+    public Annotation getAlignmentObject (Alignment ali,String objecttype) 
     throws DASException
     {
         // go through objects and get sequence one ...
@@ -325,10 +325,20 @@ public class StructureBuilder{
             String dbCoordSys = (String)object.getProperty("dbCoordSys");
             
             
-            
             if ( dbCoordSys.equals(objecttype) ) {		
                 return object ;
             }
+
+	    /** TODO: fix this */
+	    // tmp fix until Alignment server returns the same coordsystems as the registry contains ... :-/
+	    if ( objecttype.equals(SEQUENCEDATABASE)){
+		if ( dbCoordSys.equals("UniProt"))
+		    return object;
+	    }
+	    if ( objecttype.equals(STRUCTUREDATABASE)){
+		if ( dbCoordSys.equals("PDBresnum"))
+		    return object;
+	    }
         }
         
         

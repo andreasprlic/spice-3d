@@ -72,7 +72,8 @@ public class FeatureFetcher extends Thread
     
     String[] txtColors;
     
-    
+    static String PDBCOORDSYS     = "PDBresnum,Protein Structure";
+    static String UNIPROTCOORDSYS = "UniProt,Protein Sequence";
     
     Logger logger        ;
     
@@ -95,6 +96,7 @@ public class FeatureFetcher extends Thread
         
         txtColors   = new String[] { "blue","pink","green","magenta","orange","pink","cyan"};
         updateDisplay = false ;
+	
     }
     
     
@@ -120,8 +122,8 @@ public class FeatureFetcher extends Thread
         finished = false ;
         allFeatures = new ArrayList();
         // contact sequence feature servers
-        List featservs    =  spiceconfig.getServers("features","UniProt");
-        List pdbresservs  =  spiceconfig.getServers("features","PDBresnum");
+        List featservs    =  spiceconfig.getServers("features",UNIPROTCOORDSYS);
+        List pdbresservs  =  spiceconfig.getServers("features",PDBCOORDSYS);
         
         int nrservers =0;
         if (spId != null) 
@@ -143,7 +145,7 @@ public class FeatureFetcher extends Thread
                 continue ;
             
             
-            DasResponse d=new DasResponse("UniProt");
+            DasResponse d=new DasResponse(UNIPROTCOORDSYS);
             subthreads[responsecounter] = d; 
             
             SpiceDasSource featureserver = (SpiceDasSource) featservs.get(f) ;
@@ -177,7 +179,7 @@ public class FeatureFetcher extends Thread
                 continue ;
             
             
-            DasResponse d=new DasResponse("PDBresnum");
+            DasResponse d=new DasResponse(PDBCOORDSYS);
             subthreads[responsecounter] = d; 
             
             SpiceDasSource featureserver = (SpiceDasSource) pdbresservs.get(f) ;
@@ -211,6 +213,7 @@ public class FeatureFetcher extends Thread
                 //logger.finest("FeatureFetcher waiting "+done);
                 if ( updateDisplay ) {
                     List l = getFeatures();
+		    //System.out.println(l);
                     if ( l != null )
                         parent.setFeatures(spId,l);
                     updateDisplay = false ;
@@ -275,7 +278,7 @@ public class FeatureFetcher extends Thread
         //logger.finest(d);
         List features   = d.getFeatures() ;
         
-        if ( coordSys.equals("PDBresnum")) {
+        if ( coordSys.equals(PDBCOORDSYS)) {
             // convert PDB resnum coordinates to UniProt coordinates 
             
             for (int j=0; j<features.size();j++){
@@ -307,7 +310,7 @@ public class FeatureFetcher extends Thread
             } 
             
             
-        } else if ( coordSys.equals("UniProt")) {
+        } else if ( coordSys.equals(UNIPROTCOORDSYS)) {
             // UniProt features can stay in their coordinate system
             
             for (int j=0; j<features.size();j++){

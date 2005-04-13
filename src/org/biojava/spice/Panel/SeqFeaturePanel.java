@@ -751,10 +751,10 @@ implements SeqPanel, MouseListener, MouseMotionListener
     /** select single position
      select a position
      */
-    public void select(int seqpos){	
+    public void select(int seqp){	
         // should be done at spice level
         //if ( spice.isSelectionLocked() ) return;
-        highlite(seqpos);
+        highlite(seqp);
         
     }
     
@@ -1044,8 +1044,9 @@ implements SeqPanel, MouseListener, MouseMotionListener
         int seqpos = getSeqPos(e);
         int lineNr = getLineNr(e);
         //logger.finest("mouseReleased at " + seqpos + " line " + lineNr);
+
         if ( seqpos    > chain.getLength()) return ;
-        
+
         if ( b == MouseEvent.BUTTON1 ) {
             mouseDragStart =  -1 ;
         

@@ -44,6 +44,11 @@ public class AlignmentTools {
     Logger logger;
     RegistryConfiguration config;
     DASAlignmentCall dasalignmentCall;
+    static String SEQUENCEDATABASE  = "UniProt,Protein Sequence" ;
+    static String STRUCTUREDATABASE = "PDBresnum,Protein Structure" ;
+    
+    
+
     /**
      * 
      */
@@ -64,7 +69,7 @@ public class AlignmentTools {
     	List aligservers = config.getServers("alignment");
     	logger.finest("found " + aligservers.size() + " alignment servers");
 
-    String 	dasalignmentcommand = null  ;
+	String 	dasalignmentcommand = null  ;
     	
     	// loop over all available alignment servers 
     	for ( int i =0 ; i < aligservers.size() ; i++ ) {
@@ -116,9 +121,14 @@ public class AlignmentTools {
 	    Annotation object = objects[i];
 	    String dbCoordSys = (String)object.getProperty("dbCoordSys");
 
-	    if ( dbCoordSys.equals("PDBresnum") ) {		
+	    if ( dbCoordSys.equals(STRUCTUREDATABASE) ) {		
 		return (String)object.getProperty("dbAccessionId") ;
 	    }
+
+	    /** TODO: fix this */
+	    // tmp until alginmnet server supports new coord sys:
+	    if ( dbCoordSys.equals("PDBresnum"))
+		return (String)object.getProperty("dbAccessionId") ;
 	}
 	
 	return null ;
