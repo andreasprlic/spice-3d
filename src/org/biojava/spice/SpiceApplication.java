@@ -24,7 +24,6 @@
 
 package org.biojava.spice ;
 
-
 import org.biojava.spice.Panel.*;
 import org.biojava.spice.Config.*;
 import org.biojava.spice.Feature.*;
@@ -542,75 +541,8 @@ implements SPICEFrame
         
         // DIsplay submenu
         
-        JMenu display = new JMenu("Display");
-        display.setMnemonic(KeyEvent.VK_D);
-        display.getAccessibleContext().setAccessibleDescription("change display");
-        
+        JMenu display = StructurePanel.createMenu(ml);
         menu.add(display);
-        
-        ImageIcon resetIcon = createImageIcon("reload.png");
-        JMenuItem reset;
-        if ( resetIcon == null)
-            reset   = new JMenuItem("Reset");
-        else
-            reset   = new JMenuItem("Reset",resetIcon);
-        reset.setMnemonic(KeyEvent.VK_R);
-        
-        /*
-         * ImageIcon lockIcon = createImageIcon("lock.png");
-        
-        if (lockIcon != null)
-            lock = new JMenuItem("Lock Selection",lockIcon);
-        else
-            lock = new JMenuItem("Lock Selection");
-        
-        ImageIcon unlockIcon = createImageIcon("decrypted.png");
-        if ( unlockIcon == null)
-            unlock = new JMenuItem("Unlock Selection");
-        else
-            unlock = new JMenuItem("Unlock Selection", unlockIcon);
-        
-        lockMenu = unlock;
-        lockMenu.setMnemonic(KeyEvent.VK_U);
-        lockMenu.setEnabled(selectionLocked);
-        */
-        JMenuItem backbone   = new JMenuItem("Backbone");
-        JMenuItem wireframe  = new JMenuItem("Wireframe");
-        JMenuItem cartoon    = new JMenuItem("Cartoon");
-        JMenuItem ballnstick = new JMenuItem("Ball and Stick");
-        JMenuItem spacefill  = new JMenuItem("Spacefill");
-        
-        JMenuItem colorchain = new JMenuItem("Color - chain");
-        JMenuItem colorsec   = new JMenuItem("Color - secondary");
-        JMenuItem colorcpk   = new JMenuItem("Color - cpk");
-        
-        reset.addActionListener     ( ml );
-        //lockMenu.addActionListener    ( ml );
-        backbone.addActionListener  ( ml );
-        wireframe.addActionListener ( ml );	
-        cartoon.addActionListener   ( ml );
-        ballnstick.addActionListener( ml );
-        spacefill.addActionListener ( ml );		
-        colorchain.addActionListener( ml );
-        colorsec.addActionListener  ( ml );
-        colorcpk.addActionListener  ( ml );
-        
-        
-        display.add( reset   );
-        //display.add( lockMenu  );
-        display.addSeparator();
-        
-        display.add( backbone   );
-        display.add( wireframe  );
-        display.add( cartoon    );
-        display.add( ballnstick );
-        display.add( spacefill  );
-        display.addSeparator();
-        
-        display.add(colorchain);
-        display.add(colorsec)   ;
-        display.add(colorcpk)  ;
-        
         
         
         // Browse menu
@@ -709,7 +641,7 @@ implements SPICEFrame
     
     
     /** Returns an ImageIcon, or null if the path was invalid. */
-    protected static ImageIcon createImageIcon(String path) {
+    public static ImageIcon createImageIcon(String path) {
         java.net.URL imgURL = SpiceApplication.class.getResource(path);
         if (imgURL != null) {
             return new ImageIcon(imgURL);

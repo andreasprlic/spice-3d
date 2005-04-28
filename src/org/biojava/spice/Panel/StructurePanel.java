@@ -23,27 +23,20 @@
 
 package org.biojava.spice.Panel ;
 
+import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.SPICEFrame;
-
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import javax.swing.*;
-
 // for Jmol stuff
 import org.jmol.api.*;
 import org.jmol.adapter.smarter.SmarterJmolAdapter;
-
-
-
 // biojava structure stuff
 import org.biojava.bio.structure.Structure ;
-
 // logging
 import java.util.logging.*;
-
-
-
 import org.openscience.jmol.ui.JmolPopup;
-
+import java.awt.event.ActionListener;
 
 /** a Panel that provides a wrapper around the Jmol viewer. Code heavily
  * inspired by
@@ -68,8 +61,12 @@ implements JmolStatusListener {
     
     JTextField  strucommand  ; 
     
+    public StructurePanel(){
+        this(null);
+    }
     
     public StructurePanel(SPICEFrame parent) {
+        super();
         spice   = parent ;
         
         adapter = new SmarterJmolAdapter(null);
@@ -309,6 +306,79 @@ implements JmolStatusListener {
     
     public void showUrl(String urlString) {
         logger.finest("showUrl: " +urlString);
+    }
+    
+    /** create a JMenu to be used for interacting with the structure Panel.
+     * requires an ActionListener to be called when one of the Menus is being used. */
+    public static JMenu createMenu(ActionListener ml){
+        JMenu display = new JMenu("Display");
+        display.setMnemonic(KeyEvent.VK_D);
+        display.getAccessibleContext().setAccessibleDescription("change display");
+        
+        ImageIcon resetIcon = SpiceApplication.createImageIcon("reload.png");
+        JMenuItem reset;
+        if ( resetIcon == null)
+            reset   = new JMenuItem("Reset");
+        else
+            reset   = new JMenuItem("Reset",resetIcon);
+        reset.setMnemonic(KeyEvent.VK_R);
+        
+        /*
+         * ImageIcon lockIcon = createImageIcon("lock.png");
+        
+        if (lockIcon != null)
+            lock = new JMenuItem("Lock Selection",lockIcon);
+        else
+            lock = new JMenuItem("Lock Selection");
+        
+        ImageIcon unlockIcon = createImageIcon("decrypted.png");
+        if ( unlockIcon == null)
+            unlock = new JMenuItem("Unlock Selection");
+        else
+            unlock = new JMenuItem("Unlock Selection", unlockIcon);
+        
+        lockMenu = unlock;
+        lockMenu.setMnemonic(KeyEvent.VK_U);
+        lockMenu.setEnabled(selectionLocked);
+        */
+        JMenuItem backbone   = new JMenuItem("Backbone");
+        JMenuItem wireframe  = new JMenuItem("Wireframe");
+        JMenuItem cartoon    = new JMenuItem("Cartoon");
+        JMenuItem ballnstick = new JMenuItem("Ball and Stick");
+        JMenuItem spacefill  = new JMenuItem("Spacefill");
+        
+        JMenuItem colorchain = new JMenuItem("Color - chain");
+        JMenuItem colorsec   = new JMenuItem("Color - secondary");
+        JMenuItem colorcpk   = new JMenuItem("Color - cpk");
+        
+        reset.addActionListener     ( ml );
+        //lockMenu.addActionListener    ( ml );
+        backbone.addActionListener  ( ml );
+        wireframe.addActionListener ( ml );	
+        cartoon.addActionListener   ( ml );
+        ballnstick.addActionListener( ml );
+        spacefill.addActionListener ( ml );		
+        colorchain.addActionListener( ml );
+        colorsec.addActionListener  ( ml );
+        colorcpk.addActionListener  ( ml );
+        
+        
+        display.add( reset   );
+        //display.add( lockMenu  );
+        display.addSeparator();
+        
+        display.add( backbone   );
+        display.add( wireframe  );
+        display.add( cartoon    );
+        display.add( ballnstick );
+        display.add( spacefill  );
+        display.addSeparator();
+        
+        display.add(colorchain);
+        display.add(colorsec)   ;
+        display.add(colorcpk)  ;
+        
+        return display;
     }
     
 }

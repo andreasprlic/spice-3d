@@ -26,8 +26,6 @@ package org.biojava.spice.Panel;
 import org.biojava.spice.SPICEFrame ;
 import org.biojava.spice.GUI.SelectionLockMenuListener;
 import org.biojava.spice.GUI.SelectionLockPopupListener;
-
-import javax.swing.JMenuItem;
 import javax.swing.JTextPane;
 import javax.swing.JPopupMenu;
 import java.awt.event.MouseListener       ;

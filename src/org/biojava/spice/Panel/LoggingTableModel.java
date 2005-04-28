@@ -38,16 +38,12 @@
 package org.biojava.spice.Panel ;
 
 // Logging
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
 
 // Table model
 import javax.swing.table.TableModel;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.event.EventListenerList;
@@ -55,8 +51,6 @@ import java.awt.EventQueue;
 
 // Collections
 import java.util.Map;
-import java.util.List;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 // Formatting

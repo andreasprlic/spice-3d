@@ -42,7 +42,6 @@ import javax.swing.JTable;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
 import javax.swing.JDialog;
-import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
@@ -54,19 +53,14 @@ import javax.swing.event.TableColumnModelListener;
 import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ChangeEvent;
-
 import javax.swing.event.TableModelListener ;
 import javax.swing.event.TableModelEvent ;
-
-import javax.swing.DefaultCellEditor;
 import javax.swing.ListSelectionModel            ;
 
 import javax.swing.JButton;
 import javax.swing.Box;
 import java.awt.event.ActionEvent          ;
 import java.awt.event.ActionListener       ;
-
-
 
 // AWT
 import java.awt.Color;
@@ -77,7 +71,6 @@ import java.awt.BorderLayout;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
 
-import java.awt.BorderLayout       ;
 // Logging
 import java.util.logging.Level;
 import java.util.logging.Logger;
