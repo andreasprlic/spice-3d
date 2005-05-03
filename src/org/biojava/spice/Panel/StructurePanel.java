@@ -74,8 +74,6 @@ implements JmolStatusListener {
         viewer  = org.jmol.viewer.Viewer.allocateViewer(this, adapter);
         viewer.setJmolStatusListener(this);
         jmolpopup = JmolPopup.newJmolPopup(viewer);
-        
-        
     }
     
   

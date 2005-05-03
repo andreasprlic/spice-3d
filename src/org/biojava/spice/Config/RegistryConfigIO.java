@@ -238,8 +238,15 @@ extends Thread
         config.setCapabilities(capabs);
         //Date d = new Date();
         //config.setContactDate(d);
-        
-        DasSource[] sources = rclient.listServices();
+        DasSource[]sources = null;
+        try {
+            sources = rclient.listServices();
+        }
+        catch (Exception e){
+            logger.log(Level.SEVERE,e.getMessage());
+            config = oldconfig;
+            throw new ConfigurationException(e.getMessage());
+        }
         
         if ( sources==null) {
             done = true ; 

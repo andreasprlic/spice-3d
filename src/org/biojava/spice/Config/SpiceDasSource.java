@@ -62,6 +62,7 @@ public class SpiceDasSource
 	this.setCapabilities(ds.getCapabilities());
 	this.setRegisterDate(ds.getRegisterDate());
 	this.setLeaseDate(ds.getLeaseDate());
+	this.setNickname(ds.getNickname());
     }
 
 

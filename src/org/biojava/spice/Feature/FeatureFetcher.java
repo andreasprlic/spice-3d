@@ -150,7 +150,7 @@ public class FeatureFetcher extends Thread
             
             SpiceDasSource featureserver = (SpiceDasSource) featservs.get(f) ;
             String url = featureserver.getUrl();
-            
+            d.setDasSource(featureserver);
             char lastChar = url.charAt(url.length()-1);		 
             if ( ! (lastChar == '/') ) 
                 url +="/" ;
@@ -184,6 +184,7 @@ public class FeatureFetcher extends Thread
             
             SpiceDasSource featureserver = (SpiceDasSource) pdbresservs.get(f) ;
             String url = featureserver.getUrl();
+            d.setDasSource(featureserver);
             String queryString = url + "features?segment="+ pdbId+"."+chain.getName() ;
             URL spUrl = null ;
             try {
@@ -277,13 +278,16 @@ public class FeatureFetcher extends Thread
         String coordSys = d.getCoordinateSystem();
         //logger.finest(d);
         List features   = d.getFeatures() ;
+        SpiceDasSource dassource = d.getDasSource();
         
         if ( coordSys.equals(PDBCOORDSYS)) {
             // convert PDB resnum coordinates to UniProt coordinates 
             
             for (int j=0; j<features.size();j++){
-                HashMap feat = (HashMap)features.get(j);			
-                
+                HashMap feat = (HashMap)features.get(j);	
+                // overwrite the real DAS request...
+                // many uusers complained about it...
+                feat.put("dassource", dassource.getNickname());
                 String mappDone  = (String)feat.get("PDBmappingDone");
                 if ( mappDone == null) {
                     try {
@@ -317,6 +321,7 @@ public class FeatureFetcher extends Thread
                 HashMap feat = (HashMap)features.get(j);			
                 //Feature feat = (Feature)features.get(j);			
                 //logger.finest("uniprot feature: "+feat);
+                feat.put("dassource", dassource.getNickname());
                 allFeatures.add(feat) ;		
             } 
         } 
@@ -496,13 +501,13 @@ class DasResponse{
     List features ;
     String coordinateSystem;
     
-    
+    SpiceDasSource dassource ;
     
     public DasResponse(String coordSys) {
         finished = false ;
         features = new ArrayList();	
         coordinateSystem = coordSys ;
-        
+        dassource = null;
         
     }
     
@@ -511,7 +516,13 @@ class DasResponse{
         return str ;
     }
     
+    public void setDasSource(SpiceDasSource ds){
+        dassource = ds;
+    }
     
+    public SpiceDasSource getDasSource() {
+        return dassource;
+    }
     public String getCoordinateSystem() {
         return coordinateSystem ;
     }

@@ -394,9 +394,10 @@ implements SeqPanel, MouseListener, MouseMotionListener
                 
                 if ( feature.getMethod().equals("_SPICE_LINESEPARATOR")) {
                     //logger.finest("_SPICE_LINESEPARATOR");
-                    String ds = feature.getSource();
+                    String ds = "-- "+feature.getSource()+" --";
+                    
                     g2D.setColor(Color.white);
-                    g2D.drawString(ds,DEFAULT_X_START,y+DEFAULT_Y_HEIGHT);
+                    g2D.drawString(ds,0,y+DEFAULT_Y_HEIGHT);
                     continue ;
                 }
                 

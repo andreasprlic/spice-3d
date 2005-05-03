@@ -31,16 +31,13 @@ import org.biojava.bio.structure.Chain;
 import java.awt.Color;
 import java.util.List;
 import java.net.URL;
-import java.io.File;
 
 /** an interface that defined methods that are required by sub frames
  * of SPICE to communicate with the master application 
  * @author Andreas Prlic
  */
-public interface SPICEFrame 
-	
+public interface SPICEFrame 	
 {
-
 	
     /** starts a new thread and loads a new biological object into spice 
      * @param type the type of the code provided. currently supported: PDB, UniProt, ENSP
@@ -50,7 +47,6 @@ public interface SPICEFrame
 	
     /** retrieve configuration for DAS servers to use */    
     public RegistryConfiguration getConfiguration();
-
 
     /** returns a flag if data is being loaded using DAS. This is
      * needed for the differnt sub-frames to prevent them from having
