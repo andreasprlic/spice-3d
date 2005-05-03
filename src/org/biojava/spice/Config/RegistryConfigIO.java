@@ -221,6 +221,8 @@ extends Thread
             rclient = new DasRegistryAxisClient(REGISTRY);
         } catch (Exception e) {
             logger.log(Level.SEVERE,e.getMessage());
+            logger.finest("problem contacting registry, using old config");
+            config = oldconfig;
             throw new ConfigurationException("Could not init client to contact registration service " + e.getMessage());
         }
         
@@ -229,6 +231,8 @@ extends Thread
              capabs = rclient.getAllCapabilities();
         } catch (Exception e){
             logger.log(Level.SEVERE,e.getMessage());
+            logger.finest("problem contacting registry, using old config");
+            config = oldconfig;
             throw new ConfigurationException("Could not retreive all capabilities from registraion server");
         }
         config.setCapabilities(capabs);
@@ -240,6 +244,7 @@ extends Thread
         if ( sources==null) {
             done = true ; 
             logger.log(Level.SEVERE,"Could not connect to registration service at " + REGISTRY);
+            logger.finest("problem contacting registry, using old config");
             config = oldconfig;
             throw new ConfigurationException("Could not connect to registration service at " + REGISTRY);
         }
