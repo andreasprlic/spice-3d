@@ -72,7 +72,14 @@ public class DAS_Feature_Handler  extends DefaultHandler{
 	
 	void add_featuredata(String uri, String name, String qName) {
 		//System.out.println("featurefield "+featurefield+ " data "+characterdata);
-		feature.put(featurefield,characterdata);
+		// NOTE can have multiple lines ..
+	    
+	    String data = (String)feature.get(featurefield);
+	    if (data != null){
+	        characterdata = data + " " + characterdata;
+	    }
+	    
+	    feature.put(featurefield,characterdata);
 		featurefield = "";
 		characterdata = "";
 	}
