@@ -126,18 +126,26 @@ extends Thread
     } 
     
     
+    
+    private RegistryConfiguration loadLocalConfig() 
+    throws Exception
+    	{
+        PersistentConfig  persistentc = new PersistentConfig();
+        return persistentc.load();
+    }
+    
     /** contact the das registry service and retreive new Data */
     private synchronized void getData()
     throws ConfigurationException
     {
         //logger.finest("DAS Registry server config thread loadData");
-        PersistentConfig  persistentc = null ;
+        //PersistentConfig  persistentc = null ;
         RegistryConfiguration persistentconfig = null;
         try {
-            persistentc = new PersistentConfig();
+            //persistentc = new PersistentConfig();
             persistentconfig = null ;
             
-            persistentconfig  = persistentc.load();
+            persistentconfig  = loadLocalConfig();
             //} catch ( javax.jnlp.UnavailableServiceException e) {
         } catch ( Exception e) {
             System.err.println("an error occured during loading of local config");
@@ -180,7 +188,9 @@ extends Thread
                 
             } else {
                 // behave == always
+                
                 doRegistryUpdate();
+                
             }
         } else {
             // persistent config = null
@@ -230,6 +240,7 @@ extends Thread
         if ( sources==null) {
             done = true ; 
             logger.log(Level.SEVERE,"Could not connect to registration service at " + REGISTRY);
+            config = oldconfig;
             throw new ConfigurationException("Could not connect to registration service at " + REGISTRY);
         }
         logger.log(Level.CONFIG,"found "+sources.length+" servers"); 
