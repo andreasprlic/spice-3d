@@ -73,6 +73,7 @@ public class SpiceDasSource
 	System.out.println("writing XML of" + getUrl());
 	xw.openTag("SpiceDasSource");
 	xw.attribute("url",getUrl());
+	xw.attribute("nickname",getNickname());
 	xw.attribute("adminemail",getAdminemail());
 	//xw.attribute("description",getDescription());
 	xw.attribute("status",""+status);

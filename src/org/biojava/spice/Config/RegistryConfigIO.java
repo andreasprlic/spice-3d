@@ -81,7 +81,7 @@ import java.awt.event.KeyEvent                   ;
 import java.awt.event.ActionEvent                ;
 import java.awt.event.ActionListener             ;
 import java.awt.event.MouseAdapter               ;
-
+import java.util.*;
 
 /** a class to contact and retreive the configuration from a DAS
  * registry server.
@@ -104,16 +104,21 @@ extends Thread
     JFrame progressFrame      ;
     SPICEFrame spice  ;
     static Logger logger      = Logger.getLogger("org.biojava.spice");
-    
+    List configListeners ;
     public RegistryConfigIO ( SPICEFrame parent , URL[] registryurl) {
         
         spice = parent ;
         REGISTRY = registryurl ;
         done = false ;
+        configListeners = new ArrayList();
     }
     
     public boolean isDone(){
         return done ;
+    }
+    
+    public void addConfigListener(ConfigurationListener listener){
+        configListeners.add(listener);
     }
     
     public void run(){
@@ -135,7 +140,8 @@ extends Thread
     }
     
     /** contact the das registry service and retreive new Data */
-    private synchronized void getData()
+        
+    private  void getData()
     throws ConfigurationException
     {
         //logger.finest("DAS Registry server config thread loadData");
@@ -154,7 +160,7 @@ extends Thread
             //logger.log(Level.INFO,"contacting registration server");
             doRegistryUpdate();
             done = true ; 
-            notifyAll(); 
+             
             return ;
         } 
         
@@ -198,18 +204,19 @@ extends Thread
             doRegistryUpdate();
         }
         
-        done = true ; 
-        notifyAll(); 
-        
+        done = true ;         
     }
     
     
-    public synchronized  void doRegistryUpdate() 
+    public  void doRegistryUpdate() 
     	throws ConfigurationException{
         // show dialog
         showProgressBar();
         
         RegistryConfiguration oldconfig = config;
+        
+        // not finished flag for this thread..
+        done = false;
         
         boolean found = false;
         for ( int i =0 ; i < REGISTRY.length; i++){
@@ -219,16 +226,22 @@ extends Thread
             
             URL registryurl = REGISTRY[i];
             try {
-                doRegistryUpdate(registryurl);
+                config = doRegistryUpdate(registryurl);
+                config.setRegistryUrl(registryurl.toString());
+                Date now = new Date();
+                config.setContactDate(now);
+                
                 found = true;
             } catch (ConfigurationException e){
                 // there is a problem with this registry, try another one...
+                logger.info("a problem occured while contacting registry - using backup registry");
             }
         }
         
         if ( ! found ){
-            logger.finest("problem contacting registry, using old config");
+            logger.warning("problem contacting registry, using locally cached config");
             config = oldconfig;
+          //  notifyAll();
             throw new ConfigurationException("Could not contact any Registryation service!");
         }
         
@@ -244,25 +257,31 @@ extends Thread
                 logger.finest("adding localserver to new config " + ds.getUrl());
                 config.addServer(ds,ds.getStatus());
             }
+            //logger.finest("adding registry "+ REGISTRY.toString());
+            
         }
         
-        Date now = new Date();
-        config.setContactDate(now);
-        
-        logger.finest("adding registry "+ REGISTRY.toString());
-        config.setRegistryUrl(REGISTRY.toString());
         disposeProgressBar();
+        
+        // we are finished with loading data...
         done = true ; 
-        notifyAll();
+        //notifyAll();
+        
+        Iterator iter = configListeners.iterator();
+        while (iter.hasNext()){
+            ConfigurationListener listener = (ConfigurationListener)iter.next();
+            listener.newConfigRetrieved(config);
+            
+        }
         
     }
     
     /** contact DAS registry and update sources ... */
-    public synchronized RegistryConfiguration doRegistryUpdate(URL registryurl)
+    public  RegistryConfiguration doRegistryUpdate(URL registryurl)
     throws ConfigurationException
     {
            
-        done = false ;
+        
         logger.log(Level.INFO,"contacting DAS registry server at: " +registryurl);
         
         //RegistryConfiguration oldconfig = config;
@@ -310,10 +329,9 @@ extends Thread
             DasSource s = sources[i];	    
             SpiceDasSource sds = new SpiceDasSource();
             sds.fromDasSource(s);
+            //logger.info(" RegistryIO  go dassource " +sds.getNickname() );
             myconfig.addServer(sds,true);
         }
-        
-        
         return myconfig;
         
     }
@@ -404,6 +422,8 @@ extends Thread
     }
     
     /** returns the Config for SPICE */
+    // obsolete!
+    /*
     public RegistryConfiguration getConfiguration() {
         while (! isDone()) {	  
             try {
@@ -415,11 +435,14 @@ extends Thread
         }
         return config ; 
     }
-    
-    /** set config fromoutside */
+    */
+    /** set config fromoutside 
+     * 
+     */
     public void setConfiguration(RegistryConfiguration regi) {
         config = regi;	
     }
+    
     
     
     

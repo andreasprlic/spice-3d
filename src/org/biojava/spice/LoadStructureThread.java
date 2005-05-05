@@ -23,6 +23,7 @@
  */
 package org.biojava.spice ;
 
+import org.biojava.spice.Config.RegistryConfiguration;
 import org.biojava.spice.DAS.PDBload.* ;
 import java.awt.Color ;
 
@@ -77,7 +78,18 @@ extends Thread {
             
             spiceframe.showStatus("Loading...Wait...",Color.red);
             //DAS_PDBFeeder pdb_f =  new DAS_PDBFeeder(structureURL,dassequencecommand,dasalignmentcommand) ;
-            DAS_PDBFeeder pdb_f =  new DAS_PDBFeeder(spiceframe.getConfiguration()) ;
+            RegistryConfiguration config = spiceframe.getConfiguration();
+    	    	while ( config == null){
+    	        try {
+    	            wait(30);
+    	            config = spiceframe.getConfiguration();
+    	        } catch (InterruptedException e){
+    	            
+    	            return;
+    	        }
+    	        
+    	    	}
+            DAS_PDBFeeder pdb_f =  new DAS_PDBFeeder(config) ;
             //System.out.println("pdb_f.loadPDB");
             pdb_f.loadPDB(pdb_file);
             //System.out.println("pdb_f.getStructure");

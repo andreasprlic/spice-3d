@@ -60,7 +60,7 @@ public class RegistryConfiguration
     static String PDBCOORDSYS     = "PDBresnum,Protein Structure";
     static String UNIPROTCOORDSYS = "UniProt,Protein Sequence";
 
-    static String DEFAULTREGISTRY = "http://servlet.sanger.ac.uk:8080/axis/services/das_registry";
+    static String DEFAULTREGISTRY = "http://servlet.sanger.ac.uk/registry/services/das_registry";
     
 
     public RegistryConfiguration () {

@@ -27,7 +27,7 @@ import org.biojava.spice.DAS.DAS_UniProtFeeder ;
 import org.biojava.bio.structure.Structure ;
 import org.biojava.bio.structure.StructureImpl ;
 import java.util.logging.*                             ;
-
+import org.biojava.spice.Config.*;
 
 public class LoadUniProtThread 
     extends Thread {
@@ -62,7 +62,18 @@ public class LoadUniProtThread
 	    spiceframe.setLoading(true);
 	    
 	    // do something ...
-	    DAS_UniProtFeeder dasUp = new DAS_UniProtFeeder (spiceframe.getConfiguration());
+	    RegistryConfiguration config = spiceframe.getConfiguration();
+	    while ( config == null){
+	        try {
+	            wait(30);
+	            config = spiceframe.getConfiguration();
+	        } catch (InterruptedException e){
+	            logger.info("did not get configuration");
+	            return;
+	        }
+	        
+	    }
+	    DAS_UniProtFeeder dasUp = new DAS_UniProtFeeder (config);
 	    Structure struc = dasUp.loadUniProt(uniprot);
 	    spiceframe.setStructure(struc);
 

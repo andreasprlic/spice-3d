@@ -82,7 +82,8 @@ import javax.swing.JMenuItem                    ;
  */
 public class SpiceApplication 
 extends  JFrame
-implements SPICEFrame 
+implements SPICEFrame, 
+ConfigurationListener
 
 {
       
@@ -147,6 +148,7 @@ implements SPICEFrame
   
     ImageIcon firefoxIcon ;
     
+    boolean configLoaded ;
     
     /** start the spice appplication
      */
@@ -155,7 +157,7 @@ implements SPICEFrame
         
         // selection is possible at the start ;
         selectionLocked = false ;
-        
+        configLoaded = false;
         
         currentChainNumber = -1 ;
         currentChain = null;
@@ -173,6 +175,7 @@ implements SPICEFrame
         // first thing is to start communication
         
         RegistryConfigIO regi = new RegistryConfigIO (this,REGISTRY_URLS);
+        regi.addConfigListener(this);
         regi.run();
         
         structure = null ;
@@ -187,6 +190,7 @@ implements SPICEFrame
         JMenuBar menu = initMenu();
         this.setJMenuBar(menu);
         
+        
         // init all panels, etc..
         statusPanel    = new StatusPanel(this);
         seq_pos        = new JTextField();
@@ -200,7 +204,6 @@ implements SPICEFrame
         this.getContentPane().add(vBox);
         this.setLoading(false);
         
-        
         memoryfeatures = new HashMap();
         features = new ArrayList();
                 
@@ -212,7 +215,7 @@ implements SPICEFrame
         //this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         JFrame.setDefaultLookAndFeelDecorated(false);
 	
-	firefoxIcon = createImageIcon("firefox.png");
+        firefoxIcon = createImageIcon("firefox.png");
         ImageIcon icon = createImageIcon("spice.png");
         this.setIconImage(icon.getImage());
         this.pack();
@@ -220,19 +223,9 @@ implements SPICEFrame
         //this.setSize(800, 600);
         this.setVisible(true);
         
-        logger.finest("getting config");
-        config =regi.getConfiguration();
-        logger.finest("got config");
-        if ( config == null ) {
-            String msg = "Unable to contact DAS registration service, can not continue!" ;
-            seq_pos.setText(msg);
-            logger.log(Level.SEVERE,msg);
-            //System.err.println(msg);
-            
-            return ;
-            
-        }
     }
+    
+    
    
     private void initLoggingPanel(){
         LoggingPanel loggingPanel = new LoggingPanel(logger);
@@ -1227,6 +1220,13 @@ implements SPICEFrame
         return showDocument(url);
     }
     
+    
+    public synchronized void newConfigRetrieved(RegistryConfiguration conf){
+        logger.info("received new config");
+        config = conf;
+        configLoaded =true;
+        notifyAll();
+    }
     
     public void showConfig() {
         RegistryConfigIO regi = new RegistryConfigIO(this,REGISTRY_URLS);

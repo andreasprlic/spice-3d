@@ -70,6 +70,7 @@ public class ConfigXMLHandler extends DefaultHandler {
 	    
 	    source.setUrl(atts.getValue("url"));
 	    source.setAdminemail(atts.getValue("adminemail"));
+	    source.setNickname(atts.getValue("nickname"));
 	    String status = atts.getValue("status") ;
 	    boolean flag = false ;
 	    if (status.equals("true"))

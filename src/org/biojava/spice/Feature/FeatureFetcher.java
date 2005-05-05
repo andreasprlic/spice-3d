@@ -287,7 +287,13 @@ public class FeatureFetcher extends Thread
                 HashMap feat = (HashMap)features.get(j);	
                 // overwrite the real DAS request...
                 // many uusers complained about it...
-                feat.put("dassource", dassource.getNickname());
+                String nickname = dassource.getNickname();
+                //logger.info("FeatureFeatcher: got dassource "+ " " +dassource.getId() + " " + nickname);
+                if ( ! ((nickname == null) || ( nickname.equals("") )) ){
+                    feat.put("dassource", nickname);  
+                    
+                }
+                
                 String mappDone  = (String)feat.get("PDBmappingDone");
                 if ( mappDone == null) {
                     try {
@@ -321,7 +327,12 @@ public class FeatureFetcher extends Thread
                 HashMap feat = (HashMap)features.get(j);			
                 //Feature feat = (Feature)features.get(j);			
                 //logger.finest("uniprot feature: "+feat);
-                feat.put("dassource", dassource.getNickname());
+                String nickname = dassource.getNickname();
+                if ( ! ((nickname == null) || ( nickname.equals("") )) ){
+                    feat.put("dassource", nickname);  
+                    
+                }
+                
                 allFeatures.add(feat) ;		
             } 
         } 
