@@ -91,6 +91,9 @@ extends Thread {
     	    	}
             DAS_PDBFeeder pdb_f =  new DAS_PDBFeeder(config) ;
             //System.out.println("pdb_f.loadPDB");
+            if ( pdb_file == null){
+                return;
+            }
             pdb_f.loadPDB(pdb_file);
             //System.out.println("pdb_f.getStructure");
             

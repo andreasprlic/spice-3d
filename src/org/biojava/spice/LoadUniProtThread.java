@@ -73,6 +73,10 @@ public class LoadUniProtThread
 	        }
 	        
 	    }
+	     
+	    if (uniprot == null){
+	        logger.finest("got uniprot code null, returning");
+	    }
 	    DAS_UniProtFeeder dasUp = new DAS_UniProtFeeder (config);
 	    Structure struc = dasUp.loadUniProt(uniprot);
 	    spiceframe.setStructure(struc);
