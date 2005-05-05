@@ -45,6 +45,7 @@ public class DAS_Feature_Handler  extends DefaultHandler{
     String featurefield ;
     String characterdata ;
     String dasCommand ;
+    
 	public DAS_Feature_Handler() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -61,13 +62,13 @@ public class DAS_Feature_Handler  extends DefaultHandler{
 	public ArrayList get_features() {
 		return features ;
 	}
+	
 	void start_feature(String uri, String name, String qName, Attributes atts) {
 	    feature = new HashMap() ;
 	    String id 	= atts.getValue("id");
 	    feature.put("id",id);
 	    feature.put("dassource",dasCommand);
 	    characterdata = "";
-
 	}
 	
 	void add_featuredata(String uri, String name, String qName) {

@@ -33,7 +33,7 @@ import javax.swing.JFrame ;
 // for config file 
 import java.net.URL;
 import java.net.MalformedURLException ;
-
+import java.util.ArrayList;
 
 
 /** the startup class of SPICE */
@@ -44,24 +44,34 @@ public class Spice extends Applet {
     public static void main(String[] argv) {
 
 	if ( argv.length < 3 ) {
-	    System.err.println(" wrong arguments: correct call: java -jar spice.jar type code registryurl "+ System.getProperty("line.separator")+" example: java -jar spice.jar PDB 5pti http://servlet.sanger.ac.uk:8080/axis/services/das_registry/");
+	    System.err.println(" wrong arguments: correct call: java -jar spice.jar type code registryurl "+ System.getProperty("line.separator")+" example: java -jar spice.jar PDB 5pti http://servlet.sanger.ac.uk/dasregistry/services/das_registry/");
 	    return;
 	}
 	
-	URL url =null ;
+
 	URL registry_url=null ; 
-	try {
-	    //System.out.println(argv[1]);
-	    //url = new URL(argv[2]);
-	    //registry_url = new URL("http://localhost:8080/axis/services/dasregistry/");
-	    registry_url = new URL(argv[2]);
-	} catch (MalformedURLException e) {
-	    System.err.println(url+" " + registry_url);
-	    e.printStackTrace();
-	    return ;
+	ArrayList urls = new ArrayList();
+	for ( int i = 2 ; i < argv.length; i++ ){
+	    try {
+	        //System.out.println(argv[1]);
+	        //url = new URL(argv[2]);
+	        //registry_url = new URL("http://localhost:8080/axis/services/dasregistry/");
+	        registry_url = new URL(argv[i]);
+	        urls.add(registry_url);
+	    } catch (MalformedURLException e) {
+	        //System.err.println(url+" " + registry_url);
+	        e.printStackTrace();
+	    
+	    }
 	}
-		
-	addMoreSpice(argv[0],argv[1],registry_url);
+	if ( urls.size() < 1 ){
+	    System.err.println("no registration URL found...");
+	    
+	    return;
+	    	}
+	    
+	    	URL[] reg_urls = (URL[])urls.toArray(new URL[urls.size()]);
+	    	addMoreSpice(argv[0],argv[1],reg_urls);
 	
     }
 
@@ -75,10 +85,10 @@ public class Spice extends Applet {
     }
 
     // replace configurl as soon as registry server communication is working properly
-    public static void addMoreSpice(String codetype, String code, URL registryurl){
+    public static void addMoreSpice(String codetype, String code, URL[] registryurls){
 	System.out.println("Welcome to the SPICE - DAS client!");
 	System.out.println("displaying for you: " + codetype + " " + code);
-	SpiceApplication appFrame = new SpiceApplication(registryurl) ;	
+	SpiceApplication appFrame = new SpiceApplication(registryurls) ;	
 	//System.out.println("init of SpiceApplication single structure mode");
 	//appFrame.setTitle("SPICE") ;
 	//appFrame.setSize(800, 600);

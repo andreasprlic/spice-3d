@@ -95,7 +95,7 @@ extends Thread
     // 100 milliseconds * 60 seconds * 60 minutes * 24 hours = 1 day
     public static final long  TIME_BETWEEN_UPDATES = 10*60*60*24;
     
-    URL REGISTRY  ;
+    URL[] REGISTRY  ;
     
     RegistryConfiguration config    ;
     boolean done ;
@@ -105,7 +105,7 @@ extends Thread
     SPICEFrame spice  ;
     static Logger logger      = Logger.getLogger("org.biojava.spice");
     
-    public RegistryConfigIO ( SPICEFrame parent , URL registryurl) {
+    public RegistryConfigIO ( SPICEFrame parent , URL[] registryurl) {
         
         spice = parent ;
         REGISTRY = registryurl ;
@@ -203,72 +203,36 @@ extends Thread
         
     }
     
-    /** contact DAS registry and update sources ... */
-    public synchronized void doRegistryUpdate()
-    throws ConfigurationException
-    {
+    
+    public synchronized  void doRegistryUpdate() 
+    	throws ConfigurationException{
         // show dialog
         showProgressBar();
         
-        done = false ;
-        logger.log(Level.INFO,"contacting DAS registry server at: " +REGISTRY);
-        
         RegistryConfiguration oldconfig = config;
         
-        config = new RegistryConfiguration();
-        DasRegistryAxisClient rclient;
-        try {
-            rclient = new DasRegistryAxisClient(REGISTRY);
-        } catch (Exception e) {
-            logger.log(Level.SEVERE,e.getMessage());
+        boolean found = false;
+        for ( int i =0 ; i < REGISTRY.length; i++){
+            
+            // no need to contact a second registry, if the first one was successfull..
+            if (found) break ;
+            
+            URL registryurl = REGISTRY[i];
+            try {
+                doRegistryUpdate(registryurl);
+                found = true;
+            } catch (ConfigurationException e){
+                // there is a problem with this registry, try another one...
+            }
+        }
+        
+        if ( ! found ){
             logger.finest("problem contacting registry, using old config");
             config = oldconfig;
-            throw new ConfigurationException("Could not init client to contact registration service " + e.getMessage());
+            throw new ConfigurationException("Could not contact any Registryation service!");
         }
         
-        String[] capabs ;
-        try {
-             capabs = rclient.getAllCapabilities();
-        } catch (Exception e){
-            logger.log(Level.SEVERE,e.getMessage());
-            logger.finest("problem contacting registry, using old config");
-            config = oldconfig;
-            throw new ConfigurationException("Could not retreive all capabilities from registraion server");
-        }
-        config.setCapabilities(capabs);
-        //Date d = new Date();
-        //config.setContactDate(d);
-        DasSource[]sources = null;
-        try {
-            sources = rclient.listServices();
-        }
-        catch (Exception e){
-            logger.log(Level.SEVERE,e.getMessage());
-            config = oldconfig;
-            throw new ConfigurationException(e.getMessage());
-        }
-        
-        if ( sources==null) {
-            done = true ; 
-            logger.log(Level.SEVERE,"Could not connect to registration service at " + REGISTRY);
-            logger.finest("problem contacting registry, using old config");
-            config = oldconfig;
-            throw new ConfigurationException("Could not connect to registration service at " + REGISTRY);
-        }
-        logger.log(Level.CONFIG,"found "+sources.length+" servers"); 
-        //config = getDasServers(sources); 
-        
-        ArrayList servers = new ArrayList();
-        
-        for (int i = 0 ; i < sources.length; i++) {
-            DasSource s = sources[i];	    
-            SpiceDasSource sds = new SpiceDasSource();
-            sds.fromDasSource(s);
-            config.addServer(sds,true);
-        }
-        
-        
-        // copy old local servers to new config ...
+        //      copy old local servers to new config ...
         if ( oldconfig != null ) {
             config.setUpdateBehave(oldconfig.getUpdateBehave());
             config.setPDBFileExtensions(oldconfig.getPDBFileExtensions());
@@ -288,6 +252,69 @@ extends Thread
         logger.finest("adding registry "+ REGISTRY.toString());
         config.setRegistryUrl(REGISTRY.toString());
         disposeProgressBar();
+        done = true ; 
+        notifyAll();
+        
+    }
+    
+    /** contact DAS registry and update sources ... */
+    public synchronized RegistryConfiguration doRegistryUpdate(URL registryurl)
+    throws ConfigurationException
+    {
+           
+        done = false ;
+        logger.log(Level.INFO,"contacting DAS registry server at: " +registryurl);
+        
+        //RegistryConfiguration oldconfig = config;
+        
+        RegistryConfiguration myconfig = new RegistryConfiguration();
+        DasRegistryAxisClient rclient;
+        try {
+            rclient = new DasRegistryAxisClient(registryurl);
+        } catch (Exception e) {
+            logger.log(Level.WARNING,e.getMessage());   
+            throw new ConfigurationException("Could not init client to contact registration service " + e.getMessage());
+        }
+        
+        String[] capabs ;
+        try {
+             capabs = rclient.getAllCapabilities();
+        } catch (Exception e){
+            logger.log(Level.WARNING,e.getMessage());
+            throw new ConfigurationException("Could not retreive all capabilities from registraion server");
+        }
+        myconfig.setCapabilities(capabs);
+        //Date d = new Date();
+        //config.setContactDate(d);
+        DasSource[]sources = null;
+        try {
+            sources = rclient.listServices();
+        }
+        catch (Exception e){
+            logger.log(Level.WARNING,e.getMessage());          
+            throw new ConfigurationException(e.getMessage());
+        }
+        
+        if ( sources==null) {
+            
+            logger.log(Level.WARNING,"Could not connect to registration service at " + registryurl);
+           
+            throw new ConfigurationException("Could not connect to registration service at " + registryurl);
+        }
+        logger.log(Level.CONFIG,"found "+sources.length+" servers"); 
+        //config = getDasServers(sources); 
+        
+        ArrayList servers = new ArrayList();
+        
+        for (int i = 0 ; i < sources.length; i++) {
+            DasSource s = sources[i];	    
+            SpiceDasSource sds = new SpiceDasSource();
+            sds.fromDasSource(s);
+            myconfig.addServer(sds,true);
+        }
+        
+        
+        return myconfig;
         
     }
     

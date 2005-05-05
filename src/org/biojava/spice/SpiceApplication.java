@@ -90,7 +90,7 @@ implements SPICEFrame
     
     
     
-    URL REGISTRY_URL    ; // the url to the registration server
+    URL[] REGISTRY_URLS    ; // the url to the registration server
     
     static int    CONNECTION_TIMEOUT = 15000;// timeout for http connection = 15. sec
     static int    DEFAULT_Y_SCROLL = 50 ;
@@ -150,7 +150,7 @@ implements SPICEFrame
     
     /** start the spice appplication
      */
-    public SpiceApplication( URL registry_url) {
+    public SpiceApplication( URL[] registry_urls) {
         super();
         
         // selection is possible at the start ;
@@ -168,11 +168,11 @@ implements SPICEFrame
         // set some system properties
         setSystemProperties();
 
-        REGISTRY_URL = registry_url ;
+        REGISTRY_URLS = registry_urls ;
         
         // first thing is to start communication
         
-        RegistryConfigIO regi = new RegistryConfigIO (this,REGISTRY_URL);
+        RegistryConfigIO regi = new RegistryConfigIO (this,REGISTRY_URLS);
         regi.run();
         
         structure = null ;
@@ -1229,7 +1229,7 @@ implements SPICEFrame
     
     
     public void showConfig() {
-        RegistryConfigIO regi = new RegistryConfigIO(this,REGISTRY_URL);
+        RegistryConfigIO regi = new RegistryConfigIO(this,REGISTRY_URLS);
         regi.setConfiguration(config);
         //regi.run();
         regi.showConfigFrame();
