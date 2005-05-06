@@ -695,9 +695,11 @@ ConfigurationListener
         if ( config == null ) {
             return ;
         }
-        
+        if ( pdbcode == null){
+            return;
+        }
         if ( ! structureAlignmentMode ) {
-            logger.finest("not in alignment mode");
+            //logger.finest("not in alignment mode");
             loadStructure(pdbcode);
         } else {
             showStatus("Loading...Wait...",Color.red);

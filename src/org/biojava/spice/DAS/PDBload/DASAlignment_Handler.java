@@ -142,7 +142,7 @@ public class DASAlignment_Handler extends Thread
 	//pdb_container = new Simple_PDB_Container() ;
 
 	String server = alignmentserver ;
-	logger.info("requesting alignment from " + server+"/alignment?query="+pdb_code);
+	logger.info("requesting alignment from " + server+pdb_code);
 	//DASAlignmentClient dasc= new DASAlignmentClient(server);
 	Alignment[] alignments = null ;
 	AlignmentTools at = new AlignmentTools(config);
