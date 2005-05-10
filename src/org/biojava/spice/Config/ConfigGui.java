@@ -118,7 +118,7 @@ public class ConfigGui {
         
         //frame.getContentPane().add(new TabbedPaneDemo(config),
         //                       BorderLayout.CENTER);
-        TabbedPaneDemo tpd = new TabbedPaneDemo(spice,config);
+        ConfigPanel tpd = new ConfigPanel(spice,config);
         //frame.getContentPane().add(tpd);
         
         Box vbox = Box.createVerticalBox();
@@ -169,13 +169,13 @@ implements ActionListener
 {
     JTable table                 ;
     RegistryConfiguration config ;
-    TabbedPaneDemo parent        ;
+    ConfigPanel parent        ;
     SPICEFrame spice             ;
     static Logger    logger      = Logger.getLogger("org.biojava.spice");
     
     public MenuListener( SPICEFrame spice_, 
             JTable tab,RegistryConfiguration conf,
-            TabbedPaneDemo tabd ){
+            ConfigPanel tabd ){
         table  = tab  ;
         config = conf ;
         parent = tabd  ;
@@ -218,9 +218,9 @@ implements ActionListener
 
 {
     JFrame parent ;
-    TabbedPaneDemo configpane ;
+    ConfigPanel configpane ;
     
-    public ButtonListener( JFrame parent_,TabbedPaneDemo tpd) {
+    public ButtonListener( JFrame parent_,ConfigPanel tpd) {
         parent = parent_ ;
         configpane = tpd ;
     }
@@ -236,21 +236,17 @@ implements ActionListener
             configpane.saveConfiguration();
             
             
-        } 
-        
-        
-    }
-    
-    
+        }
+        }
 }
 
 
-class TabbedPaneDemo extends JPanel {
+class ConfigPanel extends JPanel implements ConfigurationListener {
     //static String[] colNames= new String [] {"url","coordinateSystems","adminemail","capabilities","description","public","active"};
     static String[] colNames= new String [] {"url","coordinateSystems","capabilities","public","active"};
     
     RegistryConfiguration config       ;
-    RegistryConfigIO registryIO        ;
+    //RegistryConfigIO registryIO        ;
     JTabbedPane tabbedPane             ;
     List        entryFormFields        ;
     MyTableModel dasSourceTableModel   ;
@@ -270,14 +266,14 @@ class TabbedPaneDemo extends JPanel {
     static String UNIPROTCOORDSYS = "UniProt,Protein Sequence";
 
 
-    public TabbedPaneDemo(SPICEFrame spice_,RegistryConfiguration conf) {
+    public ConfigPanel(SPICEFrame spice_,RegistryConfiguration conf) {
         super(new GridLayout(1, 1));
         spice = spice_;
         config = conf;
         URL registryurl = config.getRegistryUrl();
         URL[] uarr = new URL[1];
         uarr[0] = registryurl;
-        registryIO = new RegistryConfigIO(spice,uarr) ;
+        //registryIO = new RegistryConfigIO(spice,uarr) ;
         
         
         chooser = new JFileChooser();
@@ -343,7 +339,10 @@ class TabbedPaneDemo extends JPanel {
     }
     
     
-    
+    public void newConfigRetrieved (RegistryConfiguration cfg ) {
+        config = cfg;
+        updateDasSourceTable();
+    }
     protected JPanel getGeneralConfigPanel(){
         JPanel panel = new JPanel();
         
@@ -374,19 +373,9 @@ class TabbedPaneDemo extends JPanel {
         
         
         JButton contactRegistryNow = new JButton ("Now");
-        contactRegistryNow.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    registryIO.doRegistryUpdate(); 
-                    registryIO.saveConfiguration();
-                    updateDasSourceTable();
-                } catch (Exception ex) {
-                    //ex.printStackTrace();
-                    logger.log(Level.WARNING,ex.getMessage());
-                }
-            }	
-            
-        });
+        ConfigActionListener cal = new ConfigActionListener(spice,config,this);
+        contactRegistryNow.addActionListener(cal);
+     
         
         Box h = Box.createHorizontalBox();
         JTextField txt2 = new JTextField("detect available servers") ;
@@ -732,8 +721,8 @@ class TabbedPaneDemo extends JPanel {
         dasSourceTable.addMouseListener(popupListener);
         
         // Add the table to a scrolling pane
-        JScrollPane seqscrollPane = JTable.createScrollPaneForTable( dasSourceTable );
-        
+        //JScrollPane seqscrollPane = JTable.createScrollPaneForTable( dasSourceTable );
+        JScrollPane seqscrollPane = new JScrollPane(dasSourceTable) ;
         seqscrollPane.setBorder(dasborder1);
         
         sourceDescription = new JTextArea("");
@@ -778,7 +767,7 @@ class TabbedPaneDemo extends JPanel {
     
     /** Returns an ImageIcon, or null if the path was invalid. */
     protected ImageIcon createImageIcon(String path) {
-        java.net.URL imgURL = TabbedPaneDemo.class.getResource(path);
+        java.net.URL imgURL = ConfigPanel.class.getResource(path);
         if (imgURL != null) {
             return new ImageIcon(imgURL);
         } else {
@@ -836,14 +825,10 @@ class TabbedPaneDemo extends JPanel {
         int pos = tabbedPane.getSelectedIndex();
         //System.out.println("active tab: " + pos);
         
-        // save overall registry
-        if ( pos == 0 ) {
-            registryIO.setConfiguration(config);
-            registryIO.saveConfiguration();
             
-        } 
+        
         // add a new local DAS source ...
-        else if ( pos == 1 ) {	    
+        if ( pos == 1 ) {	    
             
             //System.out.println("adding new local DAS source");
             logger.finest("adding new local DAS source");
@@ -925,6 +910,15 @@ class TabbedPaneDemo extends JPanel {
             config.setUpdateBehave(behave);
             updateDasSourceTable();
         }
+        
+        // save overall registry
+        URL registryurl = config.getRegistryUrl();
+        URL[] uarr = new URL[1];
+        uarr[0] = registryurl;
+        RegistryConfigIO registryIO = new RegistryConfigIO(spice,uarr);
+        registryIO.setConfiguration(config);
+        registryIO.saveConfiguration();
+        
     }
     
     public void updateDasSourceTable(){
@@ -995,12 +989,12 @@ class PopupListener extends MouseAdapter {
 /** a table model twhere the last colun is a checkbox to deceide if true or false */
 class MyTableModel extends AbstractTableModel {
     
-    TabbedPaneDemo parent ;
+    ConfigPanel parent ;
     
     private Object[][] data ;
     private String[]   columnNames  ;
     
-    public MyTableModel(TabbedPaneDemo parent_,Object[][]seqdata, String[] columnNames_){
+    public MyTableModel(ConfigPanel parent_,Object[][]seqdata, String[] columnNames_){
         super();
         parent = parent_ ;
         columnNames = columnNames_;
@@ -1113,4 +1107,37 @@ class MyTableModel extends AbstractTableModel {
             parent.setServerStatus(url,status) ;
         }
     }
+}
+
+class ConfigActionListener implements ActionListener{
+    SPICEFrame spice ;
+    RegistryConfiguration config;
+    ConfigPanel parent;
+    static Logger    logger      = Logger.getLogger("org.biojava.spice");
+    
+    	public ConfigActionListener(SPICEFrame spice_, RegistryConfiguration config_, ConfigPanel tpd){
+    	    spice = spice_;
+    	    config = config_;
+    	    parent = tpd;
+    	}
+    
+    public void actionPerformed(ActionEvent e) {
+        try {
+            URL registryurl = config.getRegistryUrl();
+            URL[] uarr = new URL[1];
+            uarr[0] = registryurl;
+            RegistryConfigIO registryIO = new RegistryConfigIO(spice,uarr);
+            registryIO.setForceUpdate(true);
+            registryIO.addConfigListener(parent);
+            registryIO.run();
+            //registryIO = new RegistryConfigIO(spice,uarr) ;
+            //registryIO.doRegistryUpdate(); 
+            //registryIO.saveConfiguration();
+            
+        } catch (Exception ex) {
+            //ex.printStackTrace();
+            logger.log(Level.WARNING,ex.getMessage());
+        }
+    }	
+    
 }

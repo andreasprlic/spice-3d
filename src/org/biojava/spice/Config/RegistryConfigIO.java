@@ -73,6 +73,7 @@ extends Thread
     SPICEFrame spice  ;
     static Logger logger      = Logger.getLogger("org.biojava.spice");
     List configListeners ;
+    boolean forceUpdate;
     
     public RegistryConfigIO ( SPICEFrame parent , URL[] registryurl) {
         
@@ -80,12 +81,17 @@ extends Thread
         registryArray = registryurl ;
         done = false ;
         configListeners = new ArrayList();
+        forceUpdate= false;
     }
     
     public boolean isDone(){
         return done ;
     }
     
+    /** enforce connecting to the registry, default: false */
+    public void setForceUpdate(boolean flag){
+        forceUpdate = flag;
+    }
     public void addConfigListener(ConfigurationListener listener){
         configListeners.add(listener);
     }
@@ -180,6 +186,8 @@ extends Thread
             logger.finest("registry contact behave is " + behave + " doing update now");
             return true ;
         }
+        
+        if ( forceUpdate ) { return true; }
         
         Date now = new Date();
         Date lastContact = persistentconfig.getContactDate();
