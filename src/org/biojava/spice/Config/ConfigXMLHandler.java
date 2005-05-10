@@ -24,11 +24,12 @@
 package org.biojava.spice.Config;
 
 import java.util.*                        ;
-import java.text.DateFormat               ;
-import java.text.SimpleDateFormat         ;
-import org.xml.sax.helpers.DefaultHandler ;
-import org.xml.sax.Attributes             ;
-
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import org.xml.sax.helpers.DefaultHandler;
+import org.xml.sax.Attributes ;
+import java.net.URL;
+import java.net.MalformedURLException;
 /**
  * XML content handler for serialisation of RegistryConfiguration class
  */
@@ -114,7 +115,13 @@ public class ConfigXMLHandler extends DefaultHandler {
 	    possibleCapabs.add(atts.getValue("name"));
 	}
 	else if (qName.equals("registryUrl")) {
-	    config.setRegistryUrl(atts.getValue("url"));
+	    String ustr = atts.getValue("url");
+	    try {
+	        URL regiurl = new URL(ustr);
+	        config.setRegistryUrl(regiurl);
+	    } catch(MalformedURLException e){
+	        e.printStackTrace();
+	    }
 	}
     }
 	

@@ -37,8 +37,8 @@ import java.util.ArrayList ;
 import java.util.List ;
 
 import org.biojava.utils.xml.*            ; 
-
-
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /** Container class for configuration
  */
@@ -55,7 +55,7 @@ public class RegistryConfiguration
     String[] pdbFileExtensions ;
     String updateBehave        ;
     Date   lastContact         ;
-    String registryUrl         ;
+    URL registryUrl         ;
 
     static String PDBCOORDSYS     = "PDBresnum,Protein Structure";
     static String UNIPROTCOORDSYS = "UniProt,Protein Sequence";
@@ -73,16 +73,21 @@ public class RegistryConfiguration
 	pdbFileExtensions = new String[] { ".pdb",".ent"};
 	updateBehave      = "always";
 	lastContact       = null ;
-	registryUrl       = DEFAULTREGISTRY;
+	try {
+	    registryUrl       = new URL(DEFAULTREGISTRY);
+	} catch( MalformedURLException e ){
+	    e.printStackTrace();
+	    registryUrl = null;
+	}
     }
 
 
 
-    public void setRegistryUrl(String url) {
+    public void setRegistryUrl(URL url) {
 	registryUrl = url;
     }
 
-    public String getRegistryUrl() {
+    public URL getRegistryUrl() {
 	return registryUrl ;
     }
 
@@ -93,9 +98,6 @@ public class RegistryConfiguration
     public Date getContactDate() {
 	return lastContact;
     }
-
-
-
 
     /** set to "always", "day" */
     public void setUpdateBehave(String b) {
@@ -405,7 +407,7 @@ public class RegistryConfiguration
 
 
 	xw.openTag("registryUrl");
-	xw.attribute("url",registryUrl);
+	xw.attribute("url",registryUrl.toString());
 	xw.closeTag("registryUrl");
 
 	xw.closeTag("SpiceConfig");
