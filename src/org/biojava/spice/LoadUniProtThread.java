@@ -23,7 +23,7 @@
  */
 package org.biojava.spice ;
 
-import org.biojava.spice.DAS.DAS_UniProtFeeder ;
+import org.biojava.spice.DAS.DAS_Feeder ;
 import org.biojava.bio.structure.Structure ;
 import org.biojava.bio.structure.StructureImpl ;
 import java.util.logging.*                             ;
@@ -77,7 +77,7 @@ public class LoadUniProtThread
 	    if (uniprot == null){
 	        logger.finest("got uniprot code null, returning");
 	    }
-	    DAS_UniProtFeeder dasUp = new DAS_UniProtFeeder (config);
+	    DAS_Feeder dasUp = new DAS_Feeder (config);
 	    Structure struc = dasUp.loadUniProt(uniprot);
 	    spiceframe.setStructure(struc);
 

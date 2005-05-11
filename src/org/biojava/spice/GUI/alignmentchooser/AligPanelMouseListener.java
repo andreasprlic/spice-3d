@@ -25,14 +25,13 @@ package org.biojava.spice.GUI.alignmentchooser;
 import javax.swing.JToolTip;
 
 import org.biojava.bio.gui.sequence.SequencePanel;
-import org.biojava.bio.gui.sequence.SequencePanel;
 import org.biojava.bio.gui.sequence.SequenceViewerEvent;
 import org.biojava.bio.gui.sequence.SequenceViewerListener;
 import org.biojava.bio.gui.sequence.SequenceViewerMotionListener;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.spice.*;
-
+import org.biojava.bio.Annotation;
 /**
  * @author Andreas Prlic
  *
@@ -73,7 +72,7 @@ implements SequenceViewerListener,
                 System.out.println("loading PDB " + pdbcode.substring(0,4)); 
 //              set focus to spice
                 if ( spice instanceof SpiceApplication){
-                    System.out.println("requesting focus");
+                    //System.out.println("requesting focus");
                     SpiceApplication spiceapp = (SpiceApplication) spice;
                     spiceapp.requestFocus();
                 }
@@ -105,11 +104,15 @@ implements SequenceViewerListener,
             Feature f = null;
             while (iter.hasNext()){
                 f = (Feature)iter.next();
-                System.out.println(f);
+                //System.out.println(f);
                 String pdbcode = f.getSource();
                 //System.out.println("from PDB " + pdbcode);
-                
-                seqPanel.setToolTipText("load PDB " + pdbcode);                
+                Annotation anno = f.getAnnotation();
+                String description = "";
+                if ( anno.containsProperty("description")){
+                    description = (String) anno.getProperty("description");
+                }
+                seqPanel.setToolTipText("load PDB " + pdbcode  + description);                
             }
             if ( f == null){
                 seqPanel.setToolTipText(null);

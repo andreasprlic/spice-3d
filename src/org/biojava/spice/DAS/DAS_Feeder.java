@@ -21,37 +21,37 @@
  * @author Andreas Prlic
  *
  */
-package org.biojava.spice.DAS.PDBload;
+package org.biojava.spice.DAS;
 
 
 import org.biojava.spice.Config.*;
-import org.biojava.bio.program.das.dasalignment.Alignment;
-import org.biojava.bio.program.das.dasalignment.DASException ;
+import org.biojava.spice.*       ;
 
+import org.biojava.bio.program.das.dasalignment.DASException ;
+import org.biojava.bio.program.das.dasalignment.*      ;
 import org.biojava.bio.structure.Structure ;
 import org.biojava.bio.structure.StructureImpl ;
 import org.biojava.bio.structure.Chain ;
 import org.biojava.bio.structure.Group ;
 import org.biojava.bio.structure.Atom ;
 
-import java.awt.Color							;
+
+
 import java.io.*								;
 import java.util.Iterator 						;
 import java.util.ArrayList 						;
-import java.util.List 							;
 import java.util.Calendar                      	;
 import java.util.logging.*                     	;
 
-import org.biojava.spice.DAS.* ;
-import org.biojava.spice.StructureBuilder;
+
 
 
 /** a class that connects to a DAS structure service and retreives a
  * structure.
  * @author Andreas Prlic
  */
-public class DAS_PDBFeeder 
-implements SpiceStructureFeeder
+public class DAS_Feeder 
+implements SpiceStructureFeeder 
 {
     
     /* make connectin to a DAS structure service and 
@@ -60,78 +60,23 @@ implements SpiceStructureFeeder
     Structure pdb_container ; // used for alignment
     Structure pdb_structure ; // retreived from DAS structure requres
     
-    
-    Color currentColor, initColor, seColors[][], entColors[];
-    //String dassequencecommand ;
     String dasalignmentcommand ;
     
     boolean structureDone ;
-    boolean mappingDone   ;
     RegistryConfiguration config ;
     Logger logger        ;
     
-    //public DAS_PDBFeeder( String struccommand,String seqcommand, String aligcommand) {
-    public DAS_PDBFeeder( RegistryConfiguration configuration) {
+    
+    public DAS_Feeder( RegistryConfiguration configuration) {
         logger = Logger.getLogger("org.biojava.spice");
-        structureDone = false ;
-        mappingDone   = false ;
+        
         config = configuration ;
-        entColors = new Color [7];
-        entColors[0] = Color.blue;
-        entColors[1] = Color.red;
-        entColors[2] = Color.green;
-        entColors[3] = Color.magenta;
-        entColors[4] = Color.orange;
-        entColors[5] = Color.pink;
-        entColors[6] = Color.yellow;
         
-        //List seqservers = config.getServers("sequence","UniProt");
-        //SpiceDasSource ds = (SpiceDasSource)seqservers.get(0);
-        
-        //dassequencecommand  = ds.getUrl()  + "sequence?segment=";
-        
-        List aligservers = config.getServers("alignment");
-        dasalignmentcommand = null  ;
-        
-        for ( int i =0 ; i < aligservers.size() ; i++ ) {
-            SpiceDasSource sds= (SpiceDasSource)aligservers.get(i);
-            
-            if ( config.isSeqStrucAlignmentServer(sds) ) {
-                
-                //
-                String url = sds.getUrl() ;
-                char lastChar = url.charAt(url.length()-1);		 
-                if ( ! (lastChar == '/') ) 
-                    url +="/" ;
-                dasalignmentcommand  = url +  "alignment?query=" ;
-                break ;
-            }
-        }
-        
-        
-        if ( dasalignmentcommand == null ) {
-            logger.log(Level.SEVERE,"no UniProt - PDBresnum alignment server found!, unable to map sequence to structure");
-            dasalignmentcommand = "" ;
-        }
         
         pdb_container =  new StructureImpl();
         pdb_structure =  new StructureImpl();
         
         
-    }
-    
-    
-    public synchronized void setStructure(Structure struc) {
-        pdb_structure = struc ;
-    }
-    
-    public synchronized void setStructureDone(boolean flag) {
-        structureDone = flag ;
-    }
-    
-    public synchronized void setMappingDone(boolean flag) {
-        logger.finest("setMappingDone " + flag);
-        mappingDone = flag ;
     }
     
     protected String getTimeStamp(){
@@ -145,56 +90,158 @@ implements SpiceStructureFeeder
         return s ;
     }
     
-    public synchronized void loadPDB(String pdbcode)
+    
+    public synchronized Structure loadPDB(String pdbcode)
     throws FileNotFoundException, IOException {
+        Structure struc = new StructureImpl();
+        AlignmentTools aligTools = new AlignmentTools(config);
+        logger.finest (" in DAS_Feeder - loadPDB");
+        
+        DASStructure_Handler structure_handler = new DASStructure_Handler(config,pdbcode,this);
+        structure_handler.start();
+        
+        Alignment[] alignments = aligTools.getAlignments(pdbcode);
+        boolean noAlignmentFound = false;
+        if ( alignments == null ) {
+            // do rescue - return structure
+            noAlignmentFound = true;
+        }
+        
+        // o.k. we are here if we found alignments
+        boolean done = false;
+        while ( ! done ) {
+            
+            try {
+                wait(30);
+                
+            } catch ( InterruptedException e) {		
+                done = true ;
+            }
+            
+            if ( structure_handler.isDone()){
+                done = true ;
+                // structurehandler sets the structure in pdb_structure
+                
+                //pdb_structure = structure_handler.getStructure();
+            }
+        }
+        logger.finest("DAS_UniProtFeeder got sequence and structure");
+        logger.finest(pdb_container.toString());
+        pdb_structure.setPDBCode(pdbcode);
+        if ( noAlignmentFound )
+            return pdb_structure;
+        
+        
+        Structure emptyStruc = createEmptyStructure(alignments);
+        StructureBuilder sbuilder = new StructureBuilder();
+        struc = sbuilder.joinStructures(emptyStruc,pdb_structure);
+       
+        
+        
+        // build up an empty (=no 3d info) based on the sequences.
+        
+        return struc;
+    }
+    
+    /** create an "empty" = no 3D info from the sequences in the alignment*/
+    private Structure createEmptyStructure(Alignment[] alignments){
+        StructureImpl struc = new StructureImpl();
+        StructureBuilder sbuilder = new StructureBuilder();
+        
+        for ( int i = 0; i < alignments.length; i++){
+            Alignment ali = alignments[i];
+            // get uniprot code from a;ignment
+            String uniprotcode = AlignmentTools.getUniProtCodeFromAlignment(alignments[0]);
+       
+        
+            String sequence = getSequence(uniprotcode);
+            if (sequence == null ) {
+                continue;
+            }
+            try {
+                Chain c = sbuilder.createChain(ali,sequence);
+                struc.addChain(c);
+            } catch (DASException e){
+                e.printStackTrace();
+            }
+        }
+        return struc;
+    }
+    
+    public synchronized Structure loadUniProt(String uniprotcode)
+    throws FileNotFoundException, IOException {
+        Structure struc = new StructureImpl();
+        AlignmentTools aligTools = new AlignmentTools(config);
         try {
             
-            // connect to structure service and retireve structure entry
+            logger.finest("in DAS_Feeder UniProt...");
+            
+            // get matching pdb codes
+            // by making DAS_Alignment request
+            
+            Alignment[] alignments = aligTools.getAlignments(uniprotcode);
+            
+            if ( alignments == null ) {
+                // aargh catch exception ...	
+                logger.log(Level.SEVERE,"could not retreive any UniProt-PDB alignment from DAS servers");
+                String sequence = getSequence(uniprotcode);
+                if (sequence == null ) {
+                    return struc ;
+                }
+                struc = makeStructureFromSequence(uniprotcode,sequence);
+                return struc ;
+            }
+            
+            // we only take first PDB code we find ...
+            String pdbcode = null ;
+            Alignment ali  = null ;
+            
+            for ( int i = 0 ; i< alignments.length ; i++ ) {
+                
+                ali = alignments[i];
+                pdbcode = AlignmentTools.getPDBCodeFromAlignment(ali);
+                if ( pdbcode.equals("null"))
+                    continue ;
+                if ( pdbcode != null )
+                    break ;
+                
+            }
+            
+            if (pdbcode == null ) {
+                /// argh catch exception ...
+                logger.log(Level.SEVERE,"could not retreive any pdb code from Alignment");
+                // return "empty" structure...
+                // get sequence
+                String sequence = getSequence(uniprotcode);
+                if (sequence == null ) {
+                    return struc ;
+                }
+                struc = makeStructureFromSequence(uniprotcode,sequence);
+                return struc;
+            }
+            logger.finest("found alignment with " +pdbcode);
+            // remove chain from code :
+            String[] spl = pdbcode.split("\\.");
+            if ( spl.length > 1 ) 
+                pdbcode = spl[0];
+            logger.finest("pdbcode now " +pdbcode);
+            // get structure / sequence in parallel
+            
+            
             DASStructure_Handler structure_handler = new DASStructure_Handler(config,pdbcode,this);
+            structure_handler.start();
             
             // wait for threads to be finished ..
-            boolean done = false ;
-            boolean stru_finished  = false ;
-            boolean seqfeat_finished = false ;
+            boolean done           = false ;
             
-            
-            // and not incorporate the structure data ...
-            //String pdb_id = pdbcode.toUpperCase();
-            String pdb_id = pdbcode ;
-            //structure_handler.set_id(pdb_id) ;
-            
-            structure_handler.start();
-            //structure_handler.loadStructure();
-            
-            
-            // if not found   -> add error message ...
-            
-            // if entry found ->  good
-            
-            // then contact the alignment server to obtain the alignment
-            // and find out to which UniProt sequence this chain mapps to ...
-            
-            logger.finest(getTimeStamp() );
-            //DASAlignment_Handler dasali = new DASAlignment_Handler(this,pdb_container,config,dasalignmentcommand,pdb_id);
-            
-            //dasali.start();
-            logger.finest("contacting DAS servers, please be patient... " + getTimeStamp() );
-            
-            AlignmentTools aligtools = new AlignmentTools(config);
-            Alignment[] alignments = aligtools.getAlignments(pdbcode);
-            mappingDone = true;
-            
-            //stru_finished    = structure_handler.downloadFinished();
-            //seqfeat_finished = dasali.downloadFinished();
-            
+            String sequence = getSequence(uniprotcode);
+            if (sequence == null ) {
+                return struc ;
+            }
             
             while ( ! done ) {
                 
-                
                 try {
-                    //logger.finest("DAS_PDBFeeder :xin waitloop");
-                    //logger.finest(structureDone + " " + mappingDone);
-                    //sleep(10);
                     wait(30);
                     
                 } catch ( InterruptedException e) {		
@@ -202,32 +249,23 @@ implements SpiceStructureFeeder
                 }
                 
                 if ( structure_handler.isDone()){
-                    structureDone = true ;
-                    // structurehandler sets structure here.
+                    done = true ;
+                    // structurehandler sets the structure in pdb_structure
+                    
                     //pdb_structure = structure_handler.getStructure();
                 }
-                
-                if ( structureDone && mappingDone) { 
-                    done = true ; 
-                }
-                
-                
             }
-            //
-            // 
-            //StructureBuilder builder = new StructureBuilder();
-            //pdb_container = builder.createSpiceStructure(alignments,pdb_structure,sequence);
-            logger.finest("download finished " + getTimeStamp() );
-            logger.finest("pdb_container:" + pdb_container.toString());
-            logger.finest("pdb_structure:" + pdb_structure.toString());
+            logger.finest("DAS_UniProtFeeder got sequence and structure");
+            logger.finest(pdb_container.toString());
+            pdb_structure.setPDBCode(pdbcode);
             
+            // join the three bits 
+            StructureBuilder strucbuilder = new StructureBuilder();
+            //Alignment[] aliarr = new Alignment[1];
+            //aliarr[0] = ali;
+            struc = strucbuilder.createSpiceStructure(ali, pdb_structure, sequence);
+            struc.setPDBCode(pdbcode);
             
-            
-            //pdb_data      = structure_handler.get_structure();
-            //pdb_container = dasali.get_structure();
-            
-            // and join everything into a combined datastructure ...
-            joinWith(pdb_structure);
             logger.finest("joining of data finished " +getTimeStamp() );
             logger.finest(pdb_container.toString());
             
@@ -239,28 +277,43 @@ implements SpiceStructureFeeder
             //}
             //pdb_container = dasali.getPDBContainer() ;
             
-            
+            return struc ;
             
             
         } 
-        catch (IOException e) {
+        catch (Exception e) {
             //e.printStackTrace();
-            logger.log(Level.SEVERE,"I/O exception reading XML document",e);
+            logger.log(Level.SEVERE,"an exception occured",e);
         } 
         /*
          catch (SAXException e) {
          e.printStackTrace();
          System.err.println("XML exception reading document.");
          }
-         */ 
+         */
+        
+        return struc ;
+        
     }
+    
+    /** "emergency" procedure to create an "empty" Structure, which represents the sequence to be displayed in SPICE */
+    private Structure makeStructureFromSequence(String id,String sequence ) {
+        StructureBuilder sbuilder = new StructureBuilder();
+        Chain chain =  sbuilder.getChainFromSequence(sequence);
+        chain.setSwissprotId(id);
+        StructureImpl struc = new StructureImpl();
+        struc.addChain(chain);
+        //struc.setSwissProtID(id);
+        return struc;
+        
+    }
+    
     /** do DAS communication to get sequence */
-    // a copy from DAS_UniProtFeeder ...
     private String getSequence(String uniprotcode) {
         String sequence = null ;
         DAS_SequenceRetreive seq_das = new DAS_SequenceRetreive(config) ;
         try {
-            sequence = seq_das.get_sequence(uniprotcode);
+            sequence              = seq_das.get_sequence(uniprotcode);
         } catch ( ConfigurationException e) {
             
             // arggh.
@@ -270,6 +323,12 @@ implements SpiceStructureFeeder
         }
         return sequence ;
     }
+    
+    public synchronized void setStructure(Structure struc) {
+        logger.finest("setting structure in DAS_UniProtFeeder");
+        pdb_structure = struc ;
+    }
+    
     public Structure getStructure(){	
         return pdb_container ;
     }

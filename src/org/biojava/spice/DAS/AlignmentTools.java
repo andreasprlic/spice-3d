@@ -34,6 +34,7 @@ import org.biojava.spice.Config.SpiceDasSource;
 import java.net.*;
 import java.io.*;
 import java.util.zip.GZIPInputStream;
+import java.util.*;
 
 /**
  * @author Andreas Prlic
@@ -115,7 +116,42 @@ public class AlignmentTools {
     	return null ;
     }
     
-    public String getPDBCodeFromAlignment(Alignment ali) {
+    
+    /** get the data for an object from the alignment */
+    public static  Annotation getObject(String objectid, Alignment ali) throws NoSuchElementException{
+        Annotation[] objects = ali.getObjects();
+        
+        for (int i =0 ; i<objects.length;i++) {
+    	    		Annotation object = objects[i];
+    	    		String id = (String) object.getProperty("dbAccessionId");
+    	    		if ( id.equals(objectid)){
+    	    		    return object;
+    	    		}
+        }
+        throw new NoSuchElementException ("did not find object with id "+ objectid);
+    }
+    
+    public static String getUniProtCodeFromAlignment(Alignment ali) {
+        Annotation[] objects = ali.getObjects();
+    	for (int i =0 ; i<objects.length;i++) {
+    	    Annotation object = objects[i];
+    	    String dbCoordSys = (String)object.getProperty("dbCoordSys");
+
+    	    if ( dbCoordSys.equals(SEQUENCEDATABASE) ) {		
+    		return (String)object.getProperty("dbAccessionId") ;
+    	    }
+
+    	    /** TODO: fix this */
+    	    // tmp until alginmnet server supports new coord sys:
+    	    if ( dbCoordSys.equals("UniProt"))
+    		return (String)object.getProperty("dbAccessionId") ;
+    	}
+    	
+    	throw new NoSuchElementException("did not find a UniProt code in alignment") ;
+        
+    }
+    
+    public static String getPDBCodeFromAlignment(Alignment ali) {
 	Annotation[] objects = ali.getObjects();
 	for (int i =0 ; i<objects.length;i++) {
 	    Annotation object = objects[i];
@@ -131,7 +167,7 @@ public class AlignmentTools {
 		return (String)object.getProperty("dbAccessionId") ;
 	}
 	
-	return null ;
+	throw new NoSuchElementException("did not find a PDB code in alignment") ;
     }
 
     private Alignment[] retreiveAlignments(String url)

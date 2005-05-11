@@ -66,6 +66,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
 /**
  * A class to choose bewteen differen sequence and structure alignments.
  * The structure choosen here will be displayed as the main structure in SPICE.
@@ -323,7 +326,12 @@ public class AlignmentChooser {
         
         for ( int i=0 ; i < alignments.length; i++ ){
             org.biojava.bio.program.das.dasalignment.Alignment ali = alignments[i];
-            String PDBcode = aligTools.getPDBCodeFromAlignment(ali);
+            
+            
+            String PDBcode = AlignmentTools.getPDBCodeFromAlignment(ali);
+            logger.info("alignments for "+ PDBcode);
+           
+            
             Chain currentChain = null;
             try {
                 // project the alignment on the sequence...
@@ -347,12 +355,45 @@ public class AlignmentChooser {
             
             
             FilteringRenderer filtR = new FilteringRenderer();
+           
+            // build up label ...
+            String labelstring = PDBcode;
+            Annotation object = AlignmentTools.getObject(PDBcode,ali);
+            List details = new ArrayList();
+            
+            try {
+                details = (List) object.getProperty("details");
+            } catch (NoSuchElementException e){
+                // details are not provided
+                logger.info("alignment does not contain details");
+            }
+            Iterator iter = details.iterator();
+            while (iter.hasNext()){
+                Annotation detail = (Annotation) iter.next();
+                //logger.info(detail.get("property").toString() + " " + detail.get("detail").toString());
+                String property = (String) detail.getProperty("property");
+                String detailstr   = (String) detail.getProperty("detail");
+                
+                if ( property.equals("resolution")){
+                    if ( detailstr != null )
+                        labelstring += " " + detailstr + "" ; 
+                }
+                if ( property.equals("experiment_type")){
+                    labelstring += " " + detailstr ;
+                }
+                if ( property.equals("molecule description")){
+                    labelstring += " description: " + detailstr;
+                }
+            }
+            
+            
+            
             
             //filtR.setRenderer(bumpR);
             try {
-                LabelledSequenceRenderer labelsR = new LabelledSequenceRenderer(50,20);
+                LabelledSequenceRenderer labelsR = new LabelledSequenceRenderer(100,20);
                 labelsR.setFillColor(Color.white);
-                labelsR.addLabelString(PDBcode);
+                labelsR.addLabelString(labelstring);
                 labelsR.setRenderer(bumpR);
                 //multiLineRenderer.addRenderer(labelsR);
                 //labelsR.addLabelString(PDBcode);
@@ -388,6 +429,7 @@ public class AlignmentChooser {
                 Annotation anno = new SimpleAnnotation();
                 try {
                     anno.setProperty("name",feat.getName());
+                    anno.setProperty("description",labelstring);
                 } catch (Exception e){
                     logger.warning(e.getMessage());
                 }

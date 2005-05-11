@@ -24,7 +24,7 @@
 package org.biojava.spice ;
 
 import org.biojava.spice.Config.RegistryConfiguration;
-import org.biojava.spice.DAS.PDBload.* ;
+import org.biojava.spice.DAS.DAS_Feeder;
 import java.awt.Color ;
 
 
@@ -89,6 +89,11 @@ extends Thread {
     	        }
     	        
     	    	}
+    	    	
+    	    	  	DAS_Feeder dasPdb = new DAS_Feeder (config);
+    	  	    Structure struc = dasPdb.loadPDB(pdb_file);
+    	  	    spiceframe.setStructure(struc);
+    	    	/* old
             DAS_PDBFeeder pdb_f =  new DAS_PDBFeeder(config) ;
             //System.out.println("pdb_f.loadPDB");
             if ( pdb_file == null){
@@ -104,6 +109,7 @@ extends Thread {
             spiceframe.setStructure(structure);
             spiceframe.showStatus(pdb_file +" loaded");
             //System.out.println("LoadStructureThread finished");
+            */
             finished = true ;
             notifyAll();
         }

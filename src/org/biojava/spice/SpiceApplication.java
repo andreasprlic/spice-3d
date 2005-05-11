@@ -72,7 +72,7 @@ import javax.swing.BorderFactory                ;
 import javax.swing.JMenuBar                     ;
 import javax.swing.JMenu                        ;
 import javax.swing.JMenuItem                    ;
-
+import org.biojava.bio.Annotation               ;
 
 
 /** the main application layer of SPICE
@@ -229,8 +229,8 @@ ConfigurationListener
    
     private void initLoggingPanel(){
         LoggingPanel loggingPanel = new LoggingPanel(logger);
-        loggingPanel.getHandler().setLevel(Level.INFO);	
-        logger.setLevel(Level.INFO);
+        loggingPanel.getHandler().setLevel(Level.FINEST);	
+        logger.setLevel(Level.FINEST);
         loggingPanel.show(null);
     }
     
@@ -1114,6 +1114,24 @@ ConfigurationListener
         String sp_id = chain.getSwissprotId() ;
         logger.finest("SP_ID "+sp_id);
         
+        // display pdb annotation
+        Annotation anno = chain.getAnnotation();
+        boolean annotationFound = false ;
+        logger.info("chain annotation " + anno);
+        if (  ( anno != Annotation.EMPTY_ANNOTATION) && ( anno != null )){
+        
+            if ( anno.containsProperty("description")){
+                statusPanel.setPDBDescription((String)anno.getProperty("description"));
+                logger.info("PDB description of chain: "+(String)anno.getProperty("description") );
+                annotationFound = true ;
+            }
+        }
+        
+        if ( ! annotationFound ) {
+            statusPanel.setPDBDescription("no chain description found");
+            logger.info("not chain data found :-(");
+        }
+        
         statusPanel.setSP(sp_id);
         if (sp_id != null){
             upMenu.setEnabled(true);
@@ -1224,17 +1242,19 @@ ConfigurationListener
     
     
     public synchronized void newConfigRetrieved(RegistryConfiguration conf){
-        logger.info("received new config");
+        //logger.info("received new config");
         config = conf;
         configLoaded =true;
         notifyAll();
     }
     
     public void showConfig() {
-        RegistryConfigIO regi = new RegistryConfigIO(this,REGISTRY_URLS);
-        regi.setConfiguration(config);
+        //RegistryConfigIO regi = new RegistryConfigIO(this,REGISTRY_URLS);
+        //regi.setConfiguration(config);
         //regi.run();
-        regi.showConfigFrame();
+        //regi.showConfigFrame();
+        ConfigGui cfg = new ConfigGui(this);
+        cfg.showConfigFrame();
     }
     public void colour(int chainNumber, int start, int end, String colour) {
         if (first_load)       return ;		

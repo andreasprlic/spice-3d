@@ -37,7 +37,10 @@ import org.biojava.bio.*                               ;
 import java.util.*                                     ;
 import java.util.logging.*                             ;
 import java.io.*;
+import org.biojava.spice.DAS.AlignmentTools;
 
+import org.biojava.bio.program.ssbind.AnnotationFactory;
+import org.biojava.utils.ChangeVetoException;
 
 public class StructureBuilder{
     
@@ -45,8 +48,6 @@ public class StructureBuilder{
     // find a better solution ...
     static String SEQUENCEDATABASE  = "UniProt,Protein Sequence" ;
     static String STRUCTUREDATABASE = "PDBresnum,Protein Structure" ;
-    
-    
     
     // for conversion 3code 1code
     SymbolTokenization threeLetter ;
@@ -77,13 +78,11 @@ public class StructureBuilder{
     throws DASException
     {
         
-        // the master structure to be returned to SPICE
-        Structure spice_pdb = new StructureImpl() ;
-        
         // tmp test
         Alignment[] alignments = new Alignment[1];
         alignments[0] = alignment ;
-        //
+ 
+        Structure spice_pdb = new StructureImpl() ;
         
         // build up SPICE structure based on UniProt sequence and alignment
         for (int i=0;i<alignments.length;i++) {
@@ -100,6 +99,40 @@ public class StructureBuilder{
             logger.log(Level.SEVERE,"could not join UniProt sequence and PDB structure!",e);
         }
         
+        String pdbcode = AlignmentTools.getPDBCodeFromAlignment(alignments[0]);
+        Annotation object = AlignmentTools.getObject(pdbcode,alignments[0]);
+        List details = (List) object.getProperty("details");
+        //logger.info("displaying alignment details:");
+        
+        Iterator iter = details.iterator();
+        Map header = spice_pdb.getHeader();
+        while (iter.hasNext()){
+            Annotation detail = (Annotation) iter.next();
+            //logger.info(detail.toString());
+            String property = (String) detail.getProperty("property");
+            String detailstr   = (String) detail.getProperty("detail");
+            
+            if (  property.equals("molecule description")){
+                // molecule corresponds to chain...
+                // pdbcode is with chain 
+                	// this is dealt with in createChain method...
+            } else {
+                header.put(property,detailstr);
+            }
+        }
+        spice_pdb.setHeader(header);
+        
+        // debug:
+        /*List chains = spice_pdb.getChains(0);
+         
+         Iterator itera = chains.iterator();
+         while (itera.hasNext()){
+         Chain chain = (Chain) itera.next();
+         Annotation a = chain.getAnnotation();
+         logger.info(chain.toString());
+         logger.info("found annotation " + a);
+         }
+         */
         return spice_pdb ;
     }
     
@@ -233,9 +266,23 @@ public class StructureBuilder{
         return chain ;
     }
     
+    /** retrieve a chain with a particular chainid from the structure */
+    private static Chain findChain(Structure struc, String chainid) throws StructureException{
+        
+        List chains = struc.getChains(0);
+        
+        Iterator iter = chains.iterator();
+        while (iter.hasNext()){
+            Chain chain = (Chain) iter.next();
+            String tmpid = chain.getName();
+            if ( tmpid.equals(chainid)){
+                return chain;
+            }
+        }
+        throw new StructureException("no chain with chainid >" + chainid + "< found in structure");
+    }
     
-    
-    private String getChainFromPDBCode(String pdbcode) {
+    private String getChainIdFromPDBCode(String pdbcode) {
         //logger.finest("DASAlignment_Handler: getChainFromPDBCode" + pdbcode);
         String[] spl = pdbcode.split("\\.");
         String chain = spl[1] ;
@@ -244,10 +291,10 @@ public class StructureBuilder{
     }
     
     
-    public Chain getChainFromSequence(String id, String sequence){
+    public Chain getChainFromSequence(String sequence){
         
         Chain chain =  new ChainImpl();
-        chain.setSwissprotId(id);
+        //chain.setSwissprotId(id);
         
         for ( int pos = 0 ; pos < sequence.length() ; pos ++ ){
             AminoAcidImpl s_amino = new AminoAcidImpl();
@@ -286,14 +333,55 @@ public class StructureBuilder{
         //logger.finest(sequence);
         String chainname = (String) struobject.getProperty("dbAccessionId");
         
-        Chain chain = getChainFromSequence(swissp_id,sequence) ;
-        chain.setName(getChainFromPDBCode(chainname));
+        Chain chain = getChainFromSequence(sequence) ;
+        chain.setSwissprotId(swissp_id);
+        chain.setName(getChainIdFromPDBCode(chainname));
         
         //logger.finest(chain);
         Chain retchain = addChainAlignment(chain,ali);
         //logger.finest(retchain);
+        
+        //String pdbcode = AlignmentTools.getPDBCodeFromAlignment(ali);
+        //Annotation object = AlignmentTools.getObject(pdbcode,ali);
+        List details = (List) struobject.getProperty("details");
+        //logger.info("displaying alignment details:");
+        
+        Iterator iter = details.iterator();
+        
+        while (iter.hasNext()){
+            Annotation detail = (Annotation) iter.next();
+            //logger.info(detail.toString());
+            String property = (String) detail.getProperty("property");
+            String detailstr   = (String) detail.getProperty("detail");
+            
+            if (  property.equals("molecule description")){
+                // molecule corresponds to chain...
+                // pdbcode is with chain 
+                
+                Annotation anno = retchain.getAnnotation();
+                if (( anno == Annotation.EMPTY_ANNOTATION ) 
+                        || (anno == null )) {
+                    HashMap m = new HashMap();
+                    m.put("description",detailstr);
+                    
+                    anno = AnnotationFactory.makeAnnotation(m);
+                    
+                }  else {
+                    try {
+                        anno.setProperty("description",  detailstr);
+                    }
+                    catch (ChangeVetoException e){
+                        e.printStackTrace();
+                    }
+                }
+                retchain.setAnnotation(anno);
+                logger.info("StructureBuilder setting chain description "+ anno);
+                
+            } 
+        }
+        
         return retchain ;
-              
+        
     } 
     
     /** convert one character amino acid codes into three character
@@ -328,17 +416,17 @@ public class StructureBuilder{
             if ( dbCoordSys.equals(objecttype) ) {		
                 return object ;
             }
-
-	    /** TODO: fix this */
-	    // tmp fix until Alignment server returns the same coordsystems as the registry contains ... :-/
-	    if ( objecttype.equals(SEQUENCEDATABASE)){
-		if ( dbCoordSys.equals("UniProt"))
-		    return object;
-	    }
-	    if ( objecttype.equals(STRUCTUREDATABASE)){
-		if ( dbCoordSys.equals("PDBresnum"))
-		    return object;
-	    }
+            
+            /** TODO: fix this */
+            // tmp fix until Alignment server returns the same coordsystems as the registry contains ... :-/
+            if ( objecttype.equals(SEQUENCEDATABASE)){
+                if ( dbCoordSys.equals("UniProt"))
+                    return object;
+            }
+            if ( objecttype.equals(STRUCTUREDATABASE)){
+                if ( dbCoordSys.equals("PDBresnum"))
+                    return object;
+            }
         }
         
         
@@ -352,13 +440,11 @@ public class StructureBuilder{
     /////////////////////////////////////////////////////////////////
     
     
-    /** joins a 3D structure with the alignment. Also retrieves the
-     * sequence using DAS the spice_structure created with the
-     * alignment, does not contain any 3D information. this is coming
-     * from the pdb_structure provided as argument.     
+    /** joins the empty (= no 3D information) structure created from the uninprto sequences 
+     * with the structure retrieved from PDB. 
      */
     
-    private Structure joinStructures(Structure spice_structure, Structure pdb_structure) 
+    public Structure joinStructures(Structure spice_structure, Structure pdb_structure) 
     throws IOException
     
     {
