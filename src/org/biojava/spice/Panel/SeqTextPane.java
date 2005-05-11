@@ -318,7 +318,7 @@ extends KeyAdapter
     public void keyReleased(KeyEvent e){
         int code = e.getKeyCode();
         
-        String s = e.getKeyText(code);
+        String s = KeyEvent.getKeyText(code);
         logger.finest("SeqPanel pressed " + s);
         
         Matcher m = validText.matcher(s);
