@@ -27,6 +27,7 @@ package org.biojava.spice.DAS;
 import org.biojava.spice.Config.*;
 import org.biojava.spice.*       ;
 
+import org.biojava.bio.Annotation;
 import org.biojava.bio.program.das.dasalignment.DASException ;
 import org.biojava.bio.program.das.dasalignment.*      ;
 import org.biojava.bio.structure.Structure ;
@@ -41,6 +42,8 @@ import java.io.*								;
 import java.util.Iterator 						;
 import java.util.ArrayList 						;
 import java.util.Calendar                      	;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.*                     	;
 
 
@@ -135,7 +138,35 @@ implements SpiceStructureFeeder
         Structure emptyStruc = createEmptyStructure(alignments);
         StructureBuilder sbuilder = new StructureBuilder();
         struc = sbuilder.joinStructures(emptyStruc,pdb_structure);
-       
+        
+        // add alignment annotation data
+        if ( alignments.length > 0 ){
+            Alignment ali = alignments[0];
+            
+            String pdbchain = AlignmentTools.getPDBCodeFromAlignment(ali);
+            Annotation object = AlignmentTools.getObject(pdbchain,alignments[0]);
+            List details = (List) object.getProperty("details");
+            //logger.info("displaying alignment details:");
+            
+            Iterator iter = details.iterator();
+            Map header = struc.getHeader();
+            while (iter.hasNext()){
+                Annotation detail = (Annotation) iter.next();
+                //logger.info(detail.toString());
+                String property = (String) detail.getProperty("property");
+                String detailstr   = (String) detail.getProperty("detail");
+                
+                if (  property.equals("molecule description")){
+                    // molecule corresponds to chain...
+                    // pdbcode is with chain 
+                    // this is dealt with in createChain method...
+                } else {
+                    header.put(property,detailstr);
+                }
+            }
+            struc.setHeader(header);
+        }
+        
         
         
         // build up an empty (=no 3d info) based on the sequences.
@@ -152,8 +183,8 @@ implements SpiceStructureFeeder
             Alignment ali = alignments[i];
             // get uniprot code from a;ignment
             String uniprotcode = AlignmentTools.getUniProtCodeFromAlignment(alignments[0]);
-       
-        
+            
+            
             String sequence = getSequence(uniprotcode);
             if (sequence == null ) {
                 continue;
@@ -181,9 +212,11 @@ implements SpiceStructureFeeder
             
             Alignment[] alignments = aligTools.getAlignments(uniprotcode);
             
+            
+            // Problem: No alignment found
             if ( alignments == null ) {
                 // aargh catch exception ...	
-                logger.log(Level.SEVERE,"could not retreive any UniProt-PDB alignment from DAS servers");
+                logger.warning("could not retreive any UniProt-PDB alignment from DAS servers");
                 String sequence = getSequence(uniprotcode);
                 if (sequence == null ) {
                     return struc ;
@@ -207,9 +240,11 @@ implements SpiceStructureFeeder
                 
             }
             
+            
+            // Problem: no Structure found
             if (pdbcode == null ) {
                 /// argh catch exception ...
-                logger.log(Level.SEVERE,"could not retreive any pdb code from Alignment");
+                logger.warning("could not find pdb code in alignment");
                 // return "empty" structure...
                 // get sequence
                 String sequence = getSequence(uniprotcode);
@@ -219,6 +254,9 @@ implements SpiceStructureFeeder
                 struc = makeStructureFromSequence(uniprotcode,sequence);
                 return struc;
             }
+            
+            
+            
             logger.finest("found alignment with " +pdbcode);
             // remove chain from code :
             String[] spl = pdbcode.split("\\.");
@@ -235,9 +273,7 @@ implements SpiceStructureFeeder
             boolean done           = false ;
             
             String sequence = getSequence(uniprotcode);
-            if (sequence == null ) {
-                return struc ;
-            }
+            
             
             while ( ! done ) {
                 
@@ -258,6 +294,13 @@ implements SpiceStructureFeeder
             logger.finest("DAS_UniProtFeeder got sequence and structure");
             logger.finest(pdb_container.toString());
             pdb_structure.setPDBCode(pdbcode);
+            
+            // Problem, found structure and alignment, but no sequence
+            if (sequence == null ) {
+                logger.warning("no sequence found, using PDB structure");
+                return pdb_structure ;
+            }
+            
             
             // join the three bits 
             StructureBuilder strucbuilder = new StructureBuilder();
