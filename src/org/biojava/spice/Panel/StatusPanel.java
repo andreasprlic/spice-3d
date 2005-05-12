@@ -24,19 +24,22 @@
 package org.biojava.spice.Panel;
 
 import org.biojava.spice.SPICEFrame;
-import javax.swing.JPanel        ;
-import javax.swing.JTextField    ;
-import javax.swing.BoxLayout     ;
-import javax.swing.JProgressBar  ;
-import javax.swing.BorderFactory ;
-import javax.swing.Box           ;
-
-import java.awt.Dimension        ;
-import java.awt.BorderLayout     ;
-
-
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.JEditorPane;
+import javax.swing.BoxLayout;
+import javax.swing.JProgressBar;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import java.awt.Dimension;
+import java.awt.BorderLayout;
 import java.awt.event.*;
 import java.net.URL;
+import java.util.Map;
+import java.util.HashMap;
+import javax.swing.JFrame;
+import java.awt.Component;
+import java.util.*;
 
 /** a class to display status information 
  * contains 
@@ -51,6 +54,7 @@ extends JPanel
     public static String PDBLINK = "http://www.rcsb.org/pdb/cgi/explore.cgi?pdbId=";
     public static String UNIPROTLINK = "http://www.ebi.uniprot.org/uniprot-srv/uniProtView.do?proteinAc=" ;
     
+    Map pdbheader;
     
     JTextField pdbCode ;
     JTextField spCode  ;    
@@ -60,6 +64,8 @@ extends JPanel
     JProgressBar progressBar ;
     SPICEFrame spice ;
     
+    
+    PDBDescMouseListener pdbdescMouseListener;
     
     public StatusPanel(SPICEFrame parent){
         spice = parent;
@@ -78,7 +84,7 @@ extends JPanel
         
        
         MouseListener mousiPdb = new PanelMouseListener(spice,this,PDBLINK);
-        // mouse listener 
+        // mouse listener         
         pdbCode.addMouseListener(mousiPdb);
         
         
@@ -111,6 +117,13 @@ extends JPanel
         pdbDescription.setEditable(false);
         //pdbDescription.setMaximumSize(new Dimension(150,20));
         
+        
+        pdbdescMouseListener = new PDBDescMouseListener();
+        //pdbdescMouseListener.setPDBHeader(new HashMap());
+        pdbdescMouseListener.setPDBHeader(pdbheader);
+        pdbDescription.addMouseListener(pdbdescMouseListener);
+        pdbDescription.addMouseMotionListener(pdbdescMouseListener);
+        
         hBox.add(pdbDescription);
         
         progressBar = new JProgressBar(0,100);
@@ -128,7 +141,13 @@ extends JPanel
         
     }
     
-    
+    public void setPDBHeader(Map header){
+        pdbheader = header;
+        pdbdescMouseListener.setPDBHeader(header);
+    }
+    public Map getPDBHeader(){
+        return pdbheader;
+    }
     
     public void setStatus(String txt) { status.setText(txt); }
     
@@ -198,4 +217,139 @@ implements MouseListener
     }
     public void mouseReleased(MouseEvent e){}
     public void mousePressed(MouseEvent e){}
+}
+
+
+
+/** a class responsible of creating afloating frame
+ *  if the mouse is moved over the description of the PDB file */
+class PDBDescMouseListener implements MouseListener, MouseMotionListener {
+    Map pdbHeader ;
+    boolean frameshown ;
+    
+    JFrame floatingFrame;
+    public PDBDescMouseListener(){
+        super();
+        pdbHeader = new HashMap();
+        frameshown = false;
+    }
+    
+    private void displayFrame() {
+        if ( frameshown ) {
+            return;
+        }
+        
+        floatingFrame = new JFrame();
+        JFrame.setDefaultLookAndFeelDecorated(false);
+        floatingFrame.setUndecorated(true);
+        updateFrameContent(pdbHeader);
+        floatingFrame.setVisible(true);
+        
+        frameshown = true;
+        
+    }
+    
+    private void disposeFrame(){
+        if ( ! frameshown ){
+            return;
+        }
+        
+        floatingFrame.setVisible(false);
+        floatingFrame.dispose();
+        
+        frameshown = false;
+    }
+    
+    private void updateFrameContent(Map h){
+        
+        if ( h == null )h = new HashMap();
+        
+        String t = "<html><body><table>";
+        Set s = h.keySet();
+        Iterator iter = s.iterator();
+        while (iter.hasNext()){
+            String key = (String) iter.next();
+            String value = (String)h.get(key);
+            t+="<tr><td>"+key+"</td><td>"+value+"</td></tr>";
+        }
+        t+="</table></body></html>";
+        
+        JEditorPane txt = new JEditorPane("text/html",t);
+        txt.setEditable(false);
+        
+        floatingFrame.getContentPane().add(txt);
+        floatingFrame.pack();
+    }
+    
+    private void updateFramePosition(MouseEvent e){
+        if ( ! frameshown){
+            return;
+        }
+       int x = e.getX();
+       int y = e.getY();
+       // get parent components locations
+       Component compo = e.getComponent();
+       
+       int cx = compo.getX();
+       int cy = compo.getY();
+       //floatingFrame.setLocationRelativeTo(compo);
+        
+        // update the position of the frame, according to the mouse position
+       //System.out.println((cx+x)+" " + (cy+ y)+" " + x + " " + y + " " + cx + " " + cy  );
+        Dimension d = floatingFrame.getSize();
+        int dx = d.width;
+        int dy = d.height;
+        
+        int posx = cx - dx ;
+        int posy = cy - dy ;
+        
+        floatingFrame.setLocation(posx,posy);
+    }
+    
+    public void setPDBHeader(Map h ){
+        pdbHeader = h;
+        if ( frameshown){
+            updateFrameContent(h);
+        }
+    }
+    
+//  for mousemotion:
+    public void mouseDragged(MouseEvent e){
+        
+    }
+    
+    public void mouseMoved(MouseEvent e){
+        
+        if ( frameshown) {
+            updateFramePosition(e);
+        } else {
+            displayFrame();
+        }
+        
+    }
+    
+    // for mouselistener
+    
+    
+    public void mouseEntered(MouseEvent e){
+        displayFrame();
+        //System.out.println("mouse entered");
+    }
+    
+    public void mousePressed(MouseEvent e){
+        
+    }
+    public void mouseClicked(MouseEvent e){
+        
+    }
+    
+    public void mouseExited(MouseEvent e){
+        disposeFrame();
+        //System.out.println("mouse exited");
+    }
+    public void mouseReleased(MouseEvent e){
+        
+    }
+    
+    
 }
