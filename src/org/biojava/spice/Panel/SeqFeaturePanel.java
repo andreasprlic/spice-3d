@@ -406,8 +406,8 @@ implements SeqPanel, MouseListener, MouseMotionListener
                 
                 // draw text
                 //if ( segments.size() < 1) {
-                    //logger.finest(feature.getMethod());
-                  //  continue ;
+                //logger.finest(feature.getMethod());
+                //  continue ;
                 //}
                 Segment seg0 = (Segment) segments.get(0) ;
                 Color col =  seg0.getColor();	
@@ -651,7 +651,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
     
     /** highlite a single segment */
     private void highliteSegment (Segment segment) {
-        //logger.finest("highlite Segment");
+        logger.finest("highlite Segment");
         //logger.finest("segment");
         
         // clicked on a segment!
@@ -700,7 +700,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
     
     /** highlite all segments of a feature */
     private String highliteFeature(Feature feature){
-        //logger.finest("highlite feature " + feature);
+        logger.finest("highlite feature " + feature);
         //Feature feature = (Feature) features.get(featurenr) ;
         //logger.finest("highlite feature " + feature);
         
@@ -717,13 +717,22 @@ implements SeqPanel, MouseListener, MouseMotionListener
             //logger.finest("highilte feature " +featurenr+" " + start + " " +end );
             
             if ( feature.getType().equals("DISULFID")){
-                cmd += spice.getSelectStr(current_chainnumber,start-1);
-                cmd += "colour cpk; spacefill on;";
-                cmd += spice.getSelectStr(current_chainnumber,end-1);
-                cmd += "colour cpk; spacefill on;";
+                String c = spice.getSelectStr(current_chainnumber,start-1); 
+                 
+                if (! c.equals("")) {
+                    cmd += c ;
+                    cmd += "colour cpk; spacefill on;";
+                }
+                String c2 = spice.getSelectStr(current_chainnumber,end-1);
+                if ( ! c2.equals("")){
+                    cmd += c2;
+                    cmd += "colour cpk; spacefill on;";
+                }
                 
             } else {
-                cmd += spice.getSelectStr(current_chainnumber,start,end);
+                String c = spice.getSelectStr(current_chainnumber,start,end);
+                if (c.equals("")) continue;
+                cmd += c;
                 String col = segment.getTxtColor();
                 cmd += "color "+ col +";";
             } 
@@ -892,7 +901,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         // in SPICE they start with 0
         //start--;
         //end--;
-         
+        
         if ( method != null)
             toolstr += " Method: " + method;
         if ( type != null)
@@ -1012,11 +1021,11 @@ implements SeqPanel, MouseListener, MouseMotionListener
     
     public void mouseClicked(MouseEvent e)
     {  
- 
-	//logger.finest("mouseClicked");
-
-	//this.setToolTipText(null);
-	return  ;
+        
+        //logger.finest("mouseClicked");
+        
+        //this.setToolTipText(null);
+        return  ;
     }	
     
     public void mouseEntered(MouseEvent e)  {}
@@ -1029,8 +1038,8 @@ implements SeqPanel, MouseListener, MouseMotionListener
         if ( b == MouseEvent.BUTTON1 )
             mouseDragStart = getSeqPos(e);
         
-	dragging = false;
-	spice.setSelectionLocked(false);
+        dragging = false;
+        spice.setSelectionLocked(false);
         
     }
     public void mouseReleased(MouseEvent e) {
@@ -1039,18 +1048,18 @@ implements SeqPanel, MouseListener, MouseMotionListener
         if ( b != MouseEvent.BUTTON1) {          
             return;
         }           
-                
+        
         if ( popupMenu.isVisible()) return;
         
         int seqpos = getSeqPos(e);
         int lineNr = getLineNr(e);
         //logger.finest("mouseReleased at " + seqpos + " line " + lineNr);
-
+        
         if ( seqpos    > chain.getLength()) return ;
-
+        
         if ( b == MouseEvent.BUTTON1 ) {
             mouseDragStart =  -1 ;
-        
+            
             
         }
         if ( dragging ) {
@@ -1073,7 +1082,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
                         Feature feature = (Feature) features.get(i);
                         cmd += highliteFeature(feature);		    
                     }
-                    //logger.finest(cmd);
+                    logger.finest("sending cmd to jmol: " + cmd);
                     spice.executeCmd(cmd);
                     dragging=true;
                     spice.setSelectionLocked(true);
@@ -1111,7 +1120,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
             return ;        
         
         //if (spice.isSelectionLocked())
-          //  return;
+        //  return;
         
         int b = e.getButton();
         //logger.finest("dragging mouse "+b);

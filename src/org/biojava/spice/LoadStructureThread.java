@@ -30,6 +30,7 @@ import java.awt.Color ;
 
 import org.biojava.bio.structure.Structure ;
 import org.biojava.bio.structure.StructureImpl ;
+import java.util.logging.Logger;
 
 
 /** Loads a structure object in an independent Thread.  once loading
@@ -46,6 +47,7 @@ extends Thread {
     boolean finished ;
     
     Structure structure ;
+    static Logger logger = Logger.getLogger("org.biojava.spice");
     
     public LoadStructureThread(SPICEFrame master,String pdbfile) {
         spiceframe = master ;
@@ -67,49 +69,36 @@ extends Thread {
         return structure ;
     }
     
-    
-    
     public synchronized void loadCompound() {
         
         try {
-            
             //String dassequencecommand  = spiceframe.getSequenceServer()  + "sequence?segment=";
             //String dasalignmentcommand = dasalignmentcommand = getAlignmentServer() + "alignment?query=" ;
             
             spiceframe.showStatus("Loading...Wait...",Color.red);
             //DAS_PDBFeeder pdb_f =  new DAS_PDBFeeder(structureURL,dassequencecommand,dasalignmentcommand) ;
             RegistryConfiguration config = spiceframe.getConfiguration();
-    	    	while ( config == null){
-    	        try {
-    	            wait(30);
-    	            config = spiceframe.getConfiguration();
-    	        } catch (InterruptedException e){
-    	            
-    	            return;
-    	        }
-    	        
-    	    	}
-    	    	
-    	    	  	DAS_Feeder dasPdb = new DAS_Feeder (config);
-    	  	    Structure struc = dasPdb.loadPDB(pdb_file);
-    	  	    spiceframe.setStructure(struc);
-    	    	/* old
-            DAS_PDBFeeder pdb_f =  new DAS_PDBFeeder(config) ;
-            //System.out.println("pdb_f.loadPDB");
-            if ( pdb_file == null){
-                return;
+            while ( config == null){
+                try {
+                    wait(30);
+                    config = spiceframe.getConfiguration();
+                } catch (InterruptedException e){
+                    
+                    return;
+                }               
             }
-            pdb_f.loadPDB(pdb_file);
-            //System.out.println("pdb_f.getStructure");
             
-            structure = pdb_f.getStructure() ;
-            structure.setPDBCode(pdb_file);
-            // System.out.println("set Structure");
-            
-            spiceframe.setStructure(structure);
-            spiceframe.showStatus(pdb_file +" loaded");
-            //System.out.println("LoadStructureThread finished");
+            DAS_Feeder dasPdb = new DAS_Feeder (config);
+            Structure struc = dasPdb.loadPDB(pdb_file);
+            /*List chains = struc.getChains(0);
+            Iterator iter = chains.iterator();
+            while ( iter.hasNext()) {
+                Chain c = (Chain) iter.next();
+                Annotation anno = c.getAnnotation();
+                logger.info("loadStructureThread got chain anno " + anno);
+            }
             */
+            spiceframe.setStructure(struc);
             finished = true ;
             notifyAll();
         }

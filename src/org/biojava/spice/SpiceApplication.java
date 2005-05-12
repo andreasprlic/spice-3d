@@ -73,7 +73,7 @@ import javax.swing.JMenuBar                     ;
 import javax.swing.JMenu                        ;
 import javax.swing.JMenuItem                    ;
 import org.biojava.bio.Annotation               ;
-
+import java.util.Map;
 
 /** the main application layer of SPICE
  * do not interact with this class directly, but interact with SPICEFrame interface.
@@ -725,15 +725,25 @@ ConfigurationListener
         return config.getServers("feature");
     }
     
+    private void resetStatusPanel(){
+        statusPanel.setPDB("");
+        statusPanel.setSP("");
+        statusPanel.setLoading(false);
+        statusPanel.setPDBDescription("");
+        statusPanel.setPDBHeader(new HashMap());
+    }
+    
     /** start a new thead that retrieves uniprot sequence, and if available
      protein structure
      */
     public void loadUniprot(String uniprot) {
         logger.info("SpiceApplication getUniprot " + uniprot);
         currentChain = null;
+        resetStatusPanel();
+        statusPanel.setSP(uniprot);
         statusPanel.setLoading(true);
-        statusPanel.setPDB("");
-        statusPanel.setSP(uniprot);	
+        
+        
         LoadUniProtThread thr = new LoadUniProtThread(this,uniprot) ;
         thr.start();
         pdbMenu.setEnabled(false);
@@ -765,9 +775,10 @@ ConfigurationListener
         pdbcode = pdbcod ;
         
         //first_load = true ;
+        resetStatusPanel();
         statusPanel.setLoading(true);
         statusPanel.setPDB(pdbcode);
-        statusPanel.setSP("");
+        //statusPanel.setSP("");
         
         
         LoadStructureThread thr = new LoadStructureThread(this,pdbcod);
@@ -1034,9 +1045,21 @@ ConfigurationListener
             }
         }
         
+        /*List chains = structure.getChains(0);
+        Iterator iter = chains.iterator();
+        while ( iter.hasNext()) {
+            Chain c = (Chain) iter.next();
+            Annotation anno = c.getAnnotation();
+            logger.info("SpiceApplication got chain anno " + anno);
+        }
+        */
+        
         structurePanel.setStructure(structure);
         
+        Map header = structure.getHeader();
+        logger.info("structure header " + header);
         statusPanel.setPDB(structure.getPDBCode());
+        statusPanel.setPDBHeader(structure.getHeader());
         
         structurePanel.executeCmd(selectcmd);
         
@@ -1218,7 +1241,8 @@ ConfigurationListener
         //logger.finest(c.getSwissprotId());
         n.setName(c.getName());
         n.setSwissprotId(c.getSwissprotId());
-        
+        Annotation anno = c.getAnnotation();
+        n.setAnnotation(anno);
         ArrayList groups = c.getGroups("amino");
         for (int i = 0 ; i<groups.size();i++){
             Group group = (Group) groups.get(i);
@@ -1264,9 +1288,10 @@ ConfigurationListener
         
         
         String cmd = getSelectStr( chainNumber,  start,  end);
-        
-        cmd += "colour "+ colour+";";
-        structurePanel.executeCmd(cmd);
+        if ( ! cmd.equals("")){
+            cmd += "colour "+ colour+";";
+            structurePanel.executeCmd(cmd);
+        }
         //structurePanel.forceRepaint();
         if ( chainNumber == currentChainNumber) {
             seqField.highlite(start-1,end-1);
@@ -1279,9 +1304,10 @@ ConfigurationListener
         if ( seqpos    < 0 ) return ;
         if (chainNumber < 0 ) return ;
         String cmd = getSelectStr( chainNumber,  seqpos);
-        
-        cmd += "colour "+ colour+";";
-        structurePanel.executeCmd(cmd);
+        if (! cmd.equals("")){
+            cmd += "colour "+ colour+";";
+            structurePanel.executeCmd(cmd);
+        }
         //structurePanel.forceRepaint();
         
         
@@ -1298,9 +1324,11 @@ ConfigurationListener
         // highlite structure
         String cmd = getSelectStr( chainNumber,  start,  end);
         //cmd +=  " spacefill on; " ;
-        if ( colour  != "") {
-            cmd += "colour " +colour ;
-            colour(chainNumber,start,end,colour) ;
+        if (! cmd.equals("")){
+            if ( colour  != "") {
+                cmd += "colour " +colour ;
+                colour(chainNumber,start,end,colour) ;
+            }
         }
         
         structurePanel.executeCmd(cmd);
@@ -1329,8 +1357,10 @@ ConfigurationListener
         
         
         String cmd = getSelectStr( chainNumber,  seqpos);
-        cmd +=  " spacefill on ;" ;
-        structurePanel.executeCmd(cmd);
+        if ( ! cmd.equals("") ){
+            cmd +=  " spacefill on ;" ;
+            structurePanel.executeCmd(cmd);
+        }
         //structurePanel.forceRepaint();
         
         if ( colour  != "") {
@@ -1475,12 +1505,10 @@ ConfigurationListener
         
         
         String cmd = getSelectStr( chain_number,  start,  end);
-        if (cmd.equals("")) { return ; } 
+        if (cmd.equals("")) { cmd = "select none;"; } 
         cmd += " set display selected;" ;
         structurePanel.executeCmd(cmd);
         //structurePanel.forceRepaint();
-        
-        
         
     }
     
@@ -1496,7 +1524,7 @@ ConfigurationListener
         
         
         String cmd = getSelectStr( chain_number, seqpos) ;
-        if (cmd.equals("")) { return ; } 
+        if (cmd.equals("")) { cmd = "select none; "; } 
         cmd += " set display selected;" ;
         structurePanel.executeCmd(cmd);
         //structurePanel.forceRepaint();

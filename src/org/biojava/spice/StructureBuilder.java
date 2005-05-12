@@ -375,7 +375,7 @@ public class StructureBuilder{
                     }
                 }
                 retchain.setAnnotation(anno);
-                logger.info("StructureBuilder setting chain description "+ anno);
+                //logger.info("StructureBuilder createChain setting chain description "+ anno);
                 
             } 
         }
@@ -520,9 +520,31 @@ public class StructureBuilder{
         
         // return the newly joint structure.
         spice_structure.setPDBCode(pdb_structure.getPDBCode());
+        Map pdbheader = pdb_structure.getHeader();
+        Map sp_header = spice_structure.getHeader();
+        
+        // join the two maps...
+        Map newheader = new HashMap();
+        Set pdbset = pdbheader.keySet();
+        Iterator iter = pdbset.iterator();
+        while (iter.hasNext()){
+            String pdbkey = (String) iter.next();
+            newheader.put(pdbkey,pdbheader.get(pdbkey));
+        }
+        
+        Set spset = sp_header.keySet();
+        Iterator siter = spset.iterator();
+        while (siter.hasNext()){
+            String skey = (String) siter.next();
+            newheader.put(skey,sp_header.get(skey));
+        }
+        
+        spice_structure.setHeader(newheader);
         return spice_structure;
         
     }
+    
+    
     
     private Chain getMatchingChain(Structure pdbcontainer, String chainID) 
     throws DASException

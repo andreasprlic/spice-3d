@@ -228,7 +228,7 @@ extends Thread
     }
     
     
-    public  void doRegistryUpdate() 
+    private  void doRegistryUpdate() 
     	throws ConfigurationException{
         // show dialog
         showProgressBar();

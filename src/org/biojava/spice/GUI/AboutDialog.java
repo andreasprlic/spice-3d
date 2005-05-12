@@ -45,7 +45,7 @@ import javax.swing.event.HyperlinkEvent;
  */
 public class AboutDialog
 	extends JDialog {
-    	static String VERSION = "0.6.6";
+    	static String VERSION = "0.6.7";
 
     static String DESCRIPTION_TEXT = "<html><body>"+
     "<b>The SPICE DAS client</b> V "+ VERSION +" <br>"+
