@@ -59,7 +59,7 @@ public class AboutDialog
     " <a href=\"http://www.gnu.org/copyleft/lesser.html\">License</a> (LGPL)<p>"+
     
     " Thanks to the following Projects:<br>"+
-    " <b>Jmol</b> - <a href=\"http://www.jmol.org\">http://www.jmol.org</a> - for the great 3D visualization API. (LGPL)<br>"+
+    " <b>Jmol</b> - <a href=\"http://www.jmol.org\">http://www.jmol.org</a> - for the 3D visualization API. (LGPL)<br>"+
     " <b>BioJava</b> - <a href=\"http://www.biojava.org\">http://www.biojava.org</a> - for various libs. (LGPL)<br>"+
     " <b>Geotools</b> - <a href=\"http://modules.geotools.org/\">http://modules.geotools.org/</a> for the logging panel. (LGPL)<br>"+
     " <b>Nuvola</b> - <a href=\"http://www.icon-king.com\">http://www.icon-king.com</a> - for many of the icons used here. (LGPL) <br>"+

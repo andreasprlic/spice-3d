@@ -60,7 +60,7 @@ implements SpiceStructureFeeder
     /* make connectin to a DAS structure service and 
      get back structure
      */
-    Structure pdb_container ; // used for alignment
+    //Structure pdb_container ; // used for alignment
     Structure pdb_structure ; // retreived from DAS structure requres
     
     String dasalignmentcommand ;
@@ -76,7 +76,7 @@ implements SpiceStructureFeeder
         config = configuration ;
         
         
-        pdb_container =  new StructureImpl();
+        //pdb_container =  new StructureImpl();
         pdb_structure =  new StructureImpl();
         
         
@@ -128,14 +128,17 @@ implements SpiceStructureFeeder
                 //pdb_structure = structure_handler.getStructure();
             }
         }
-        logger.finest("DAS_UniProtFeeder got sequence and structure");
-        logger.finest(pdb_container.toString());
-        pdb_structure.setPDBCode(pdbcode);
-        if ( noAlignmentFound )
-            return pdb_structure;
         
+        logger.finest("DAS_Feeder (loadPDB) got sequence and structure");
+        logger.finest(pdb_structure.toString());
+        pdb_structure.setPDBCode(pdbcode);
+        if ( noAlignmentFound ) {
+            logger.finest("no alignment found - returning pdb structue");
+            return pdb_structure;
+        }
         
         Structure emptyStruc = createEmptyStructure(alignments);
+        logger.info("finished creating empty structure");
         StructureBuilder sbuilder = new StructureBuilder();
         struc = sbuilder.joinStructures(emptyStruc,pdb_structure);
         
@@ -182,9 +185,8 @@ implements SpiceStructureFeeder
         for ( int i = 0; i < alignments.length; i++){
             Alignment ali = alignments[i];
             // get uniprot code from a;ignment
-            String uniprotcode = AlignmentTools.getUniProtCodeFromAlignment(alignments[0]);
-            
-            
+            String uniprotcode = AlignmentTools.getUniProtCodeFromAlignment(ali);
+            logger.finest("creating empty chain for "+ uniprotcode);
             String sequence = getSequence(uniprotcode);
             if (sequence == null ) {
                 continue;
@@ -255,7 +257,7 @@ implements SpiceStructureFeeder
                 return struc;
             }
             
-            
+            // NEW: build chain for first PDB file...
             
             logger.finest("found alignment with " +pdbcode);
             // remove chain from code :
@@ -264,6 +266,9 @@ implements SpiceStructureFeeder
                 pdbcode = spl[0];
             logger.finest("pdbcode now " +pdbcode);
             // get structure / sequence in parallel
+            
+            // hm: that would be good, but we need to find a way to "enforce" this uniprot...
+            // return loadPDB(pdbcode);
             
             
             DASStructure_Handler structure_handler = new DASStructure_Handler(config,pdbcode,this);
@@ -291,8 +296,8 @@ implements SpiceStructureFeeder
                     //pdb_structure = structure_handler.getStructure();
                 }
             }
-            logger.finest("DAS_UniProtFeeder got sequence and structure");
-            logger.finest(pdb_container.toString());
+            logger.finest("DAS_Feeder got sequence and structure");
+            logger.finest(pdb_structure.toString());
             pdb_structure.setPDBCode(pdbcode);
             
             // Problem, found structure and alignment, but no sequence
@@ -310,7 +315,7 @@ implements SpiceStructureFeeder
             struc.setPDBCode(pdbcode);
             
             logger.finest("joining of data finished " +getTimeStamp() );
-            logger.finest(pdb_container.toString());
+            logger.finest(struc.toString());
             
             //java.util.List chains = pdb_container.getChains(0);
             //for ( int i =0;i<chains.size();i++){
@@ -320,7 +325,8 @@ implements SpiceStructureFeeder
             //}
             //pdb_container = dasali.getPDBContainer() ;
             
-            return struc ;
+            
+            //return struc ;
             
             
         } 
@@ -353,6 +359,7 @@ implements SpiceStructureFeeder
     
     /** do DAS communication to get sequence */
     private String getSequence(String uniprotcode) {
+        logger.finest("loading sequence " + uniprotcode);
         String sequence = null ;
         DAS_SequenceRetreive seq_das = new DAS_SequenceRetreive(config) ;
         try {
@@ -368,93 +375,15 @@ implements SpiceStructureFeeder
     }
     
     public synchronized void setStructure(Structure struc) {
-        logger.finest("setting structure in DAS_UniProtFeeder");
+        logger.finest("setting structure in DAS_Feeder");
         pdb_structure = struc ;
     }
     
-    public Structure getStructure(){	
-        return pdb_container ;
-    }
+    //public Structure getStructure(){	
+      //  return pdb_container ;
+    //}
     
     
-    /** joins a 3D structure with the alignment. Also retrieves the
-     * sequence using DAS the pdb_container created with the
-     * alignment, does not contain any 3D information. this is coming
-     * from the pdb_data provided as argument.     
-     */
-    
-    public void joinWith( Structure pdb_data) 
-    throws IOException
-    {
-        logger.finest("join With-----------------------------");
-        logger.finest("pdb_data size: " + pdb_data.size());
-        try {
-            // for every chain ...
-            for ( int i = 0 ; i< pdb_data.size() ; i++) {
-                Chain c = pdb_data.getChain(i);
-                String chainName = c.getName();
-                
-                Chain mapped_chain ;
-                logger.finest("trying to map chain " +i + " " + chainName);
-                try {
-                    mapped_chain = getMatchingChain(pdb_container, chainName);
-                } catch (DASException e) {
-                    // could be a chain that does not contain any amino acids ...
-                    // so the chain seems to be completely missing. Add it as a whole ...
-                    pdb_container.addChain(c);
-                    continue ;
-                }
-                //logger.finest(c+" " +mapped_chain);
-                for (int j = 0 ; j < c.getLength(); j ++) {
-                    
-                    Group amino = c.getGroup(j);
-                    if ( amino == null ) {
-                        logger.finer("why is amino ("+j+", chain "+c.getName()+")== null??");
-                        continue ;
-                    }
-                    
-                    // skip nucleotides and hetatoms ...
-                    if ( ! amino.getType().equals("amino")) {
-                        continue ;
-                    }
-                    if ( amino.has3D()){
-                        Group mappedamino = null ;
-                        try {
-                            mappedamino = getMatchingGroup (mapped_chain,amino.getPDBCode());
-                        } catch ( DASException e) {
-                            logger.finest("could not find residue nr"  +amino.getPDBCode() + " in chain "  + mapped_chain.getName() );
-                            continue ;
-                        }
-                        
-                        Iterator iter = amino.iterator() ;
-                        //logger.finest("amino size" + amino + " " +amino.size());
-                        while ( iter.hasNext() ) {
-                            Atom a = (Atom) iter.next() ;
-                            mappedamino.addAtom(a);
-                        }		   
-                    } 
-                }
-                
-                // add hetero atoms and nucleotides ...
-                // they are not matched ...
-                ArrayList groups = c.getGroups();
-                for (int gi=0;gi<groups.size();gi++){
-                    Group g = (Group)groups.get(gi);
-                    if (g.getType().equals("hetatm")
-                            ||g.getType().equals("nucleotide")
-                    ){
-                        mapped_chain.addGroup(g);
-                    }
-                }		
-                
-            }
-            
-        } catch ( Exception e) {
-            e.printStackTrace();
-            throw new IOException("could not join data...");
-        }
-        
-    }
     
     private Chain getMatchingChain(Structure pdbcontainer, String chainID) 
     throws DASException

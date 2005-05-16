@@ -81,7 +81,7 @@ public class StructureBuilder{
         // tmp test
         Alignment[] alignments = new Alignment[1];
         alignments[0] = alignment ;
- 
+        
         Structure spice_pdb = new StructureImpl() ;
         
         // build up SPICE structure based on UniProt sequence and alignment
@@ -115,7 +115,7 @@ public class StructureBuilder{
             if (  property.equals("molecule description")){
                 // molecule corresponds to chain...
                 // pdbcode is with chain 
-                	// this is dealt with in createChain method...
+                // this is dealt with in createChain method...
             } else {
                 header.put(property,detailstr);
             }
@@ -143,11 +143,13 @@ public class StructureBuilder{
             Annotation stru_obj) 
     throws DASException
     {
-        //logger.finest("mapSegment");
+        logger.finest("mapSegment");
+        logger.finest(block.toString());
         // order segmetns
         // HashMap 0 = refers to seq
         // hashMap 1 = refers to struct
         ArrayList segments = (ArrayList)block.getProperty("segments");
+        logger.finest("segments size: "+ segments.size());
         Annotation[] arr = new Annotation[segments.size()] ;
         
         String seq_id  = (String) seq_obj.getProperty("intObjectId");
@@ -158,39 +160,72 @@ public class StructureBuilder{
             return ;
         }
         
+        if ( ! seq_id.equals(chain.getSwissprotId() )){
+            logger.fine("chain - swissprot does not match Alignment swissprot! can not map segments");
+            return;
+        }
+        
+        boolean seqOK = false;
+        boolean strucOK = false;
         for ( int s =0; s< segments.size() ; s++) {
             Annotation segment = (Annotation) segments.get(s) ;
-            
+            logger.finest(" testing segment " +segment.toString());
             String obid = (String) segment.getProperty("intObjectId");
-            if ( obid.equals(seq_id)) {		    
-                arr[0] = segment;		
+            if ( obid.equals(seq_id)) {
+                logger.finest("got seq object in block");
+                arr[0] = segment;
+                seqOK = true;
             }
             if ( obid.equals(stru_id)) {		    
-                arr[1] = segment;		
+                logger.finest("got struc object in block");
+                arr[1] = segment;
+                strucOK = true;
             }
             
             // if there are other alignments, do not consider them ...
         }
         
         
+        if ( ! seqOK ){
+            logger.info("problem with alignment sequence " + seq_id + " not found in segments.");
+            return;
+            
+        }
+        if ( ! strucOK ){
+            logger.info("problem with alignment structure " + stru_id + " not found in segment.");
+            return;
+        }
+        
         // here is the location where the cigar string shouldbe parsed, if there is any
         // for the moment, nope..... !!!
         
         // coordinate system for sequence is always numeric and linear
         // -> phew!
+        
+        logger.finest(" seq segment: " + arr[0].toString());
         int seqstart = Integer.parseInt((String)arr[0].getProperty("start")); 
         int seqend   = Integer.parseInt((String)arr[0].getProperty("end"));
         
         // size of the segment
+        
         int segsize = seqend-seqstart + 1 ;
         
         
         // now build up a segment of aminoacids 
         AminoAcid[] aminosegment = new AminoAcid[segsize]  ;
-        
-        
+        int chainlength = chain.getLength();
+        //if ( seqend >= chainlength ){
+            //logger.warning("warning: potential version conflict: coordinate of alignment ("+seqend+") and sequence length ("+chain.getLength()+"( does not match!");
+            //return;
+        //}
         for ( int i = 0 ; i < segsize ; i++) {
-            //logger.finest("i "+i);
+
+            int pos = i+seqstart-1;
+            if ( pos >= chainlength){
+                logger.finest("i "+i + "chainlength "+ chainlength + " segsize " + segsize);
+                logger.finest("requesting wrong coordinate - " + pos + " is larger than chainlength " + chainlength);
+                break;
+            }
             aminosegment[i] = (AminoAcid) chain.getGroup(i+seqstart-1);
         }
         
@@ -244,15 +279,15 @@ public class StructureBuilder{
     private  Chain addChainAlignment(Chain chain, Alignment ali) 
     throws DASException
     {
-        //logger.finest("addChainAlignment");
+        logger.finest("addChainAlignment");
         
         // go over all blocks of alignment and join pdb info ...
         Annotation seq_object   = getAlignmentObject(ali,SEQUENCEDATABASE );
         
         Annotation stru_object  = getAlignmentObject(ali,STRUCTUREDATABASE);
         
-        //logger.finest(seq_object.get("id"));
-        //logger.finest(stru_object.get("id"));
+        logger.finest(seq_object.getProperty("intObjectId").toString());
+        logger.finest(stru_object.getProperty("intObjectId").toString());
         
         //Simple_AminoAcid_Map current_amino = null ;
         
@@ -341,11 +376,9 @@ public class StructureBuilder{
         Chain retchain = addChainAlignment(chain,ali);
         //logger.finest(retchain);
         
-        //String pdbcode = AlignmentTools.getPDBCodeFromAlignment(ali);
-        //Annotation object = AlignmentTools.getObject(pdbcode,ali);
-        List details = (List) struobject.getProperty("details");
-        //logger.info("displaying alignment details:");
         
+        // add annotation to new chain
+        List details = (List) struobject.getProperty("details");
         Iterator iter = details.iterator();
         
         while (iter.hasNext()){
@@ -461,9 +494,13 @@ public class StructureBuilder{
                 try {
                     // get chain from spice 
                     mapped_chain = getMatchingChain(spice_structure, chainName);
+                    logger.finest("found matching chain " + mapped_chain.getName() + 
+                            " " +  mapped_chain.getSwissprotId()+" " + chainName + " " + c.getSwissprotId());
+                    
                 } catch (DASException e) {
                     // could be a chain that does not contain any amino acids ...
                     // so the chain seems to be completely missing. Add it as a whole ...
+                    logger.finest("no matching chain found for chain: " + chainName);
                     spice_structure.addChain(c);
                     continue ;
                 }

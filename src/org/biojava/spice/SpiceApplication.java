@@ -315,7 +315,7 @@ ConfigurationListener
             String structureLocation){
         
         Box vBox = Box.createVerticalBox();
-                
+        //vBox.setBackground(Color.blue);
         // move to submenu
         //this.getContentPane().add(statusPanel,BorderLayout.SOUTH);
         //this.getContentPane().add(statusPanel);
@@ -336,7 +336,7 @@ ConfigurationListener
         //this.getContentPane().add(seq_pos);
         vBox.add(seq_pos);
         
-        showStatus("contacting DAS registry");
+        //showStatus("contacting DAS registry");
         
         /// init Structure Panel
         
@@ -358,7 +358,7 @@ ConfigurationListener
         
         JScrollPane chainPanel = new JScrollPane(ent_list);
         chainPanel.setPreferredSize(new Dimension(30,30));
-        
+        //chainPanel.setBorder(BorderFactory.createEmptyBorder());
         // init dascanv
         
         //dascanv.setForeground(Color.black);
@@ -375,7 +375,7 @@ ConfigurationListener
         dasPanel.getVerticalScrollBar().setUnitIncrement(DEFAULT_Y_SCROLL);
         dasPanel.getHorizontalScrollBar().setUnitIncrement(DEFAULT_Y_SCROLL);
         //scroll.add(dascanv);
-        
+        dasPanel.setBorder(BorderFactory.createEmptyBorder());
         //daspanel = new SeqPanel(this);
         //daspanel.setMinimumSize(new Dimension(100,100));
         
@@ -400,6 +400,7 @@ ConfigurationListener
         // add onMouseOver action
         
         seqScrollPane = new JScrollPane(seqField) ;
+        //seqScrollPane.setBorder(BorderFactory.createEmptyBorder());
         //seqScrollPane.setSize( 700, 30);
         //seqScrollPane.setPreferredSize(new Dimension(700, 30));;
         //seqScrollPane.setMinimumSize(  new Dimension(700, 30));;
@@ -412,7 +413,7 @@ ConfigurationListener
         seqSplitPane.setResizeWeight(0.7);
         //seqSplitPane.setBackground(Color.black);
         seqSplitPane.setPreferredSize(new Dimension(300,300));
-        
+        seqSplitPane.setBorder(BorderFactory.createEmptyBorder());
         //seqSplitPane.setDividerLocation(600);
         
         //sharedPanel.setLayout(new BoxLayout(sharedPanel, BoxLayout.X_AXIS));
@@ -444,6 +445,7 @@ ConfigurationListener
         //this.getContentPane().add(mainsharedPanel,BorderLayout.NORTH);
         //this.getContentPane().add(mainsharedPanel);
         mainsharedPanel.setBorder(BorderFactory.createEmptyBorder());
+                
         vBox.add(mainsharedPanel);
         
         strucommand.setMaximumSize(new Dimension(Short.MAX_VALUE,30));

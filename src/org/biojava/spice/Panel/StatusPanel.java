@@ -88,10 +88,23 @@ extends JPanel
         // mouse listener         
         pdbCode.addMouseListener(mousiPdb);
         
-        
-        
         hBox.add(pdbCode);
         hBox.add(pdbCode,BorderLayout.WEST);
+
+        // pdb description
+        pdbDescription = new JTextField("pdbDesc");
+        pdbDescription.setBorder(BorderFactory.createEmptyBorder());
+        pdbDescription.setEditable(false);
+        //pdbDescription.setMaximumSize(new Dimension(150,20));
+        
+        pdbdescMouseListener = new PDBDescMouseListener();
+        //pdbdescMouseListener.setPDBHeader(new HashMap());
+        pdbdescMouseListener.setPDBHeader(pdbheader);
+        pdbDescription.addMouseListener(pdbdescMouseListener);
+        pdbDescription.addMouseMotionListener(pdbdescMouseListener);
+        
+        hBox.add(pdbDescription);
+        
         
         
         JTextField sptxt  = new JTextField("UniProt code:");
@@ -112,20 +125,7 @@ extends JPanel
         hBox.add(spCode);
         
         
-        // pdb description
-        pdbDescription = new JTextField("pdbDesc");
-        pdbDescription.setBorder(BorderFactory.createEmptyBorder());
-        pdbDescription.setEditable(false);
-        //pdbDescription.setMaximumSize(new Dimension(150,20));
-        
-        
-        pdbdescMouseListener = new PDBDescMouseListener();
-        //pdbdescMouseListener.setPDBHeader(new HashMap());
-        pdbdescMouseListener.setPDBHeader(pdbheader);
-        pdbDescription.addMouseListener(pdbdescMouseListener);
-        pdbDescription.addMouseMotionListener(pdbdescMouseListener);
-        
-        hBox.add(pdbDescription);
+
         
         progressBar = new JProgressBar(0,100);
         progressBar.setValue(0);
@@ -243,9 +243,9 @@ class PDBDescMouseListener implements MouseListener, MouseMotionListener {
         floatingFrame = new JFrame();
         JFrame.setDefaultLookAndFeelDecorated(false);
         floatingFrame.setUndecorated(true);
-        updateFrameContent(pdbHeader);
-        floatingFrame.setVisible(true);
+        updateFrameContent(pdbHeader);       
         
+                
         frameshown = true;
         
     }
@@ -329,6 +329,8 @@ class PDBDescMouseListener implements MouseListener, MouseMotionListener {
             updateFramePosition(e);
         } else {
             displayFrame();
+            updateFramePosition(e);
+            floatingFrame.setVisible(true);
         }
         
     }
@@ -338,6 +340,8 @@ class PDBDescMouseListener implements MouseListener, MouseMotionListener {
     
     public void mouseEntered(MouseEvent e){
         displayFrame();
+        updateFramePosition(e);
+        floatingFrame.setVisible(true);
         //System.out.println("mouse entered");
     }
     

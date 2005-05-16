@@ -133,6 +133,8 @@ public class DAS_SequenceRetreive {
 	    try {
 		
 		sequence = retreiveSequence(connstr);
+		// bug in aristotle das source?
+		sequence.replaceAll(" ","");
 		gotSequence = true ;
 	    }
 	    catch (Exception ex) {
