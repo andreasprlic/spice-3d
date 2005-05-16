@@ -229,8 +229,8 @@ ConfigurationListener
    
     private void initLoggingPanel(){
         LoggingPanel loggingPanel = new LoggingPanel(logger);
-        loggingPanel.getHandler().setLevel(Level.FINEST);	
-        logger.setLevel(Level.FINEST);
+        loggingPanel.getHandler().setLevel(Level.INFO);	
+        logger.setLevel(Level.INFO);
         loggingPanel.show(null);
     }
     
@@ -1059,7 +1059,7 @@ ConfigurationListener
         structurePanel.setStructure(structure);
         
         Map header = structure.getHeader();
-        logger.info("structure header " + header);
+        //logger.info("structure header " + header);
         statusPanel.setPDB(structure.getPDBCode());
         statusPanel.setPDBHeader(structure.getHeader());
         
@@ -1142,18 +1142,18 @@ ConfigurationListener
         // display pdb annotation
         Annotation anno = chain.getAnnotation();
         boolean annotationFound = false ;
-        logger.info("chain annotation " + anno);
+        //logger.info("chain annotation " + anno);
         if (  ( anno != Annotation.EMPTY_ANNOTATION) && ( anno != null )){
         
             if ( anno.containsProperty("description")){
                 statusPanel.setPDBDescription((String)anno.getProperty("description"));
-                logger.info("PDB description of chain: "+(String)anno.getProperty("description") );
+                //logger.info("PDB description of chain: "+(String)anno.getProperty("description") );
                 annotationFound = true ;
             }
         }
         
         if ( ! annotationFound ) {
-            statusPanel.setPDBDescription("no chain description found");
+            statusPanel.setPDBDescription("no description");
             logger.info("not chain data found :-(");
         }
         

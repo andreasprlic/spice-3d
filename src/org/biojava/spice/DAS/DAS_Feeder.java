@@ -34,13 +34,11 @@ import org.biojava.bio.structure.Structure ;
 import org.biojava.bio.structure.StructureImpl ;
 import org.biojava.bio.structure.Chain ;
 import org.biojava.bio.structure.Group ;
-import org.biojava.bio.structure.Atom ;
 
 
 
 import java.io.*								;
 import java.util.Iterator 						;
-import java.util.ArrayList 						;
 import java.util.Calendar                      	;
 import java.util.List;
 import java.util.Map;
@@ -138,7 +136,7 @@ implements SpiceStructureFeeder
         }
         
         Structure emptyStruc = createEmptyStructure(alignments);
-        logger.info("finished creating empty structure");
+        //logger.info("finished creating empty structure");
         StructureBuilder sbuilder = new StructureBuilder();
         struc = sbuilder.joinStructures(emptyStruc,pdb_structure);
         
