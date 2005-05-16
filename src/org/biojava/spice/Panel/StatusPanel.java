@@ -40,6 +40,7 @@ import java.util.HashMap;
 import javax.swing.JFrame;
 import java.awt.Component;
 import java.util.*;
+import java.awt.Point;
 
 /** a class to display status information 
  * contains 
@@ -289,19 +290,23 @@ class PDBDescMouseListener implements MouseListener, MouseMotionListener {
        int y = e.getY();
        // get parent components locations
        Component compo = e.getComponent();
+       Point screenTopLeft = compo.getLocationOnScreen();
+       int cx = screenTopLeft.x;
+       int cy = screenTopLeft.y;
        
-       int cx = compo.getX();
-       int cy = compo.getY();
+       int compo_h = compo.getHeight();
        //floatingFrame.setLocationRelativeTo(compo);
         
         // update the position of the frame, according to the mouse position
-       //System.out.println((cx+x)+" " + (cy+ y)+" " + x + " " + y + " " + cx + " " + cy  );
+       //System.out.println((cx-x-5)+" " + (cy+ y+5)+" x:" + x + " y:" + y +
+         //      " cx:" + cx + " cy:" + cy + " c_h:"+ compo_h  );
+        
         Dimension d = floatingFrame.getSize();
         int dx = d.width;
         int dy = d.height;
         
-        int posx = cx - dx ;
-        int posy = cy - dy ;
+        int posx = cx + x  - ( dx/2)    ;
+        int posy = cy + y + compo_h + 5 ;
         
         floatingFrame.setLocation(posx,posy);
     }
