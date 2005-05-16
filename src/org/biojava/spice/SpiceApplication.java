@@ -1153,8 +1153,8 @@ ConfigurationListener
         }
         
         if ( ! annotationFound ) {
-            statusPanel.setPDBDescription("no description");
-            logger.info("not chain data found :-(");
+            statusPanel.setPDBDescription("no chain description");
+            //logger.info("not chain data found :-(");
         }
         
         statusPanel.setSP(sp_id);
