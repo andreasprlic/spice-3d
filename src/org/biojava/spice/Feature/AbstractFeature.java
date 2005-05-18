@@ -22,9 +22,7 @@
  */
 package org.biojava.spice.Feature;
 
-import java.awt.Graphics2D;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /** An Abstract class representing a Feature as being diplayed in the SeqFeaturePanel 

@@ -26,9 +26,6 @@ package org.biojava.spice.Feature ;
 
 import org.biojava.spice.DAS.*		   ;
 import java.util.logging.*             ;
-import java.util.Map                   ;
-import java.util.HashMap               ;
-import java.util.List                  ;
 import java.util.ArrayList             ;
 import java.net.URL                    ;
 
@@ -38,48 +35,48 @@ import java.net.URL                    ;
  */
 
 public class SingleFeatureThread
-    extends Thread 
+extends Thread 
 
 {
     URL dascommand ;
     FeatureFetcher parentfetcher ;
     int myId ;
     Logger logger        ;
-
-
+    
+    
     /** contact a single DAS feature server and retreive features 
-	@param parent a link to the parent class
-	@param urlstring string of server
-	@param threadid id for this thread, if job is finished parent
-	is told that threadid has finised
+     @param parent a link to the parent class
+     @param urlstring string of server
+     @param threadid id for this thread, if job is finished parent
+     is told that threadid has finised
      */
     public SingleFeatureThread(FeatureFetcher parent, URL dascmd,int threadid) {
-	logger = Logger.getLogger("org.biojava.spice");
-	logger.finest("init new thread " + threadid + " " + dascmd);
-	dascommand = dascmd ;
-	parentfetcher = parent ;
-	myId = threadid ;
+        logger = Logger.getLogger("org.biojava.spice");
+        logger.finest("init new thread " + threadid + " " + dascmd);
+        dascommand = dascmd ;
+        parentfetcher = parent ;
+        myId = threadid ;
     }
     /** start thread */
     public void run() {
-	doDasConnection();
+        doDasConnection();
     }
-
+    
     private synchronized void doDasConnection() {
-	logger.finer("opening " + dascommand);
-	DAS_FeatureRetreive ftmp = new DAS_FeatureRetreive(dascommand);
-	ArrayList features = ftmp.get_features();
-	//logger.finest("doDasConnection got " + features.size() + " features") ;
-	//new ArrayList();
-	//ArrayList tmp = 
-	//for (int i=0; i<tmp.size();i++){
-	//   HashMap feat = (HashMap)tmp.get(i);			
-	    //logger.finest("got feature: "+feat);
-	//    features.add(feat) ;		
-	//} 
-	//logger.finest("done "+ dascommand);
-	parentfetcher.setFinished(myId,features);
-	notifyAll();
+        logger.finer("opening " + dascommand);
+        DAS_FeatureRetreive ftmp = new DAS_FeatureRetreive(dascommand);
+        ArrayList features = ftmp.get_features();
+        //logger.finest("doDasConnection got " + features.size() + " features") ;
+        //new ArrayList();
+        //ArrayList tmp = 
+        //for (int i=0; i<tmp.size();i++){
+        //   HashMap feat = (HashMap)tmp.get(i);			
+        //logger.finest("got feature: "+feat);
+        //    features.add(feat) ;		
+        //} 
+        //logger.finest("done "+ dascommand);
+        parentfetcher.setFinished(myId,features);
+        notifyAll();
     }
-
+    
 }

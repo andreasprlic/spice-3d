@@ -299,7 +299,7 @@ public class FeatureFetcher extends Thread
                     try {
                         String startOrig = (String)feat.get("START");
                         String endOrig   = (String)feat.get("END");
-                        logger.finest("pdbresnum feature: "+feat);
+                        //logger.finest("pdbresnum feature: "+feat);
                         
                         
                         String startNew  = getUniProtCoord(startOrig,chain);
@@ -311,6 +311,7 @@ public class FeatureFetcher extends Thread
                         
                         mappDone = "true";
                     } catch (Exception e) {
+                        logger.finest(e.getMessage());
                         logger.finer("could not map feature to PDB chain " + feat);
                     }
                     //logger.finest("pdb feature: "+feat);
@@ -382,7 +383,9 @@ public class FeatureFetcher extends Thread
         feat.setType(  (String)currentFeatureMap.get("TYPE"));
         feat.setLink(  (String)currentFeatureMap.get("LINK"));
         feat.setNote(  (String)currentFeatureMap.get("NOTE"));
-        feat.setMethod((String)currentFeatureMap.get("METHOD"));
+        String method = (String)currentFeatureMap.get("METHOD");
+        if ( method == null) { method = "";}
+        feat.setMethod(method);
         feat.setScore( (String)currentFeatureMap.get("SCORE"));
         return feat ;
     }

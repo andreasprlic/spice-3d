@@ -28,8 +28,6 @@ package org.biojava.spice.Feature;
 
 
 import java.util.Iterator;
-import java.util.List  ;
-import java.util.ArrayList ;
 import java.awt.Graphics2D ;
 
 /** a class to store FeatureData and to visualize them
