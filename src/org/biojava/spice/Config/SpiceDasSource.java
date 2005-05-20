@@ -26,6 +26,7 @@ package org.biojava.spice.Config ;
 
 //import org.biojava.services.das.registry.*;
 import org.biojava.services.das.registry.DasSource;
+import org.biojava.services.das.registry.DasCoordinateSystem;
 import org.biojava.utils.xml.*            ; 
 import java.io.IOException                ;
 import java.text.DateFormat               ;
@@ -92,10 +93,11 @@ public class SpiceDasSource
 
 	// coordinateSystems
 	xw.openTag("coordinateSystems");
-	String[] coords = getCoordinateSystem();
+	DasCoordinateSystem[] coords = getCoordinateSystem();
 	for (int i = 0; i < coords.length; i++){
 	    xw.openTag("coordinateSystem");
-	    xw.attribute("name",coords[i]);
+	    xw.attribute("name",coords[i].toString());
+	    xw.attribute("uniqId",coords[i].getUniqueId());
 	    xw.closeTag("coordinateSystem");
 	} 
 	xw.closeTag("coordinateSystems");

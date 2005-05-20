@@ -39,6 +39,7 @@ import java.util.List ;
 import org.biojava.utils.xml.*            ; 
 import java.net.MalformedURLException;
 import java.net.URL;
+import org.biojava.services.das.registry.*;
 
 /** Container class for configuration
  */
@@ -117,7 +118,7 @@ public class RegistryConfiguration
     /** test if a server is a UniProt vs PDBresnum alignment server */
     public boolean isSeqStrucAlignmentServer(SpiceDasSource source) {
 	boolean msdmapping = false ;
-	String[] coordsys = source.getCoordinateSystem() ;
+	//DasCoordinateSystem[] coordsys = source.getCoordinateSystem() ;
 	
 	boolean uniprotflag = false ;
 	boolean pdbflag     = false ;
@@ -132,9 +133,9 @@ public class RegistryConfiguration
     }
     
     private boolean hasCoordSys(String coordSys,SpiceDasSource source ) {
-	String[] coordsys = source.getCoordinateSystem() ;
+	DasCoordinateSystem[] coordsys = source.getCoordinateSystem() ;
 	for ( int i = 0 ; i< coordsys.length; i++ ) {
-	    String c = coordsys[i];
+	    String c = coordsys[i].toString();
 	    //System.out.println(">"+c+"< >"+coordSys+"<");
 	    if ( c.equals(coordSys) ) {
 		//System.out.println("match");

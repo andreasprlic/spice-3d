@@ -30,6 +30,8 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.Attributes ;
 import java.net.URL;
 import java.net.MalformedURLException;
+import org.biojava.services.das.registry.*;
+
 /**
  * XML content handler for serialisation of RegistryConfiguration class
  */
@@ -137,13 +139,21 @@ public class ConfigXMLHandler extends DefaultHandler {
 	return myDate ;
     }
     
+   
+
     public void endElement(String uri,String name, String qName){
 	//System.out.println("end element >" + name + "< >" + qName+"<" + uri);
 	if ( qName.equals("SpiceDasSource")){
 	    config.addServer(source,source.getStatus());
 	} else if ( qName.equals("coordinateSystems")){
 	    String[] coordSys = (String[])coords.toArray(new String[coords.size()]);
-	    source.setCoordinateSystem(coordSys);
+
+	    DasCoordinateSystem[] dcss = new DasCoordinateSystem[coordSys.length];
+	    for ( int i= 0 ; i< coordSys.length;i++) {
+		DasCoordinateSystem dcs = DasCoordinateSystem.fromString(coordSys[i]);
+		dcss[i] = dcs;
+	    }
+	    source.setCoordinateSystem(dcss);
 	    //System.out.println("coords:" +coords);
 	} else if ( qName.equals("capabilities")){
 	    String[] capabilities = (String[])capabs.toArray(new String[capabs.size()]);

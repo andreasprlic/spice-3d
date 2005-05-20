@@ -69,7 +69,7 @@ import javax.swing.table.TableColumn;
 
 import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.SPICEFrame;
-
+import org.biojava.services.das.registry.DasCoordinateSystem;
 import java.net.URL;
 
 /**
@@ -868,7 +868,12 @@ class ConfigPanel extends JPanel implements ConfigurationListener {
             
             
             String [] coordSys = (String[]) formdata.get("coordinateSystems");
-            sds.setCoordinateSystem(coordSys);
+	    DasCoordinateSystem[] dcss = new DasCoordinateSystem[coordSys.length];
+	    for ( int i = 0 ; i< coordSys.length;i++) {
+		DasCoordinateSystem dcs = DasCoordinateSystem.fromString(coordSys[i]);
+		dcss[i] = dcs;
+	    }
+            sds.setCoordinateSystem(dcss);
             
             String[] capabs =  (String[]) formdata.get("capabilities") ;	    
             //String[] split = capabs.split(" ");
@@ -893,9 +898,13 @@ class ConfigPanel extends JPanel implements ConfigurationListener {
             sds.setUrl("file://"+pdbDirectory.getText());
             sds.setAdminemail("unknown@localhost.org");
             sds.setDescription("Access PDB files from local installation. If file not found, retreive from public DAS server");
-            String[] coordSys = new String[] { "PDBresnum", };
+            //String[] coordSys = new String[] { "PDBresnum", };
             String[] capabs   = new String[] { "structure", };
-            sds.setCoordinateSystem(coordSys);
+
+	    DasCoordinateSystem dcs = DasCoordinateSystem.fromString(PDBCOORDSYS);
+	    DasCoordinateSystem[] dcss = new DasCoordinateSystem[1];
+	    dcss[0] = dcs;
+            sds.setCoordinateSystem(dcss);
             sds.setCapabilities(capabs);
             config.addServer(sds,true);
             updateDasSourceTable();
