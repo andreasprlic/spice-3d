@@ -391,7 +391,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
                 Feature feature = (Feature) features.get(f);
                 
                 // line separator
-                
+                logger.finest("drawing feature "+ feature);
                 if ( feature.getMethod().equals("_SPICE_LINESEPARATOR")) {
                     //logger.finest("_SPICE_LINESEPARATOR");
                     String ds = "-- "+feature.getSource()+" --";

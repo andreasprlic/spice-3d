@@ -790,14 +790,21 @@ class ConfigPanel extends JPanel implements ConfigurationListener {
                 String colname = colNames[j];
                 //System.out.println(colname);
                 String s = "" ;
-                if (( colname.equals("coordinateSystems")) || 
-                        (colname.equals("capabilities"))) {
+                if (colname.equals("capabilities")) {
                     String[] stmp = (String[])server.get(colname);
                     s = "" ;
                     for ( int u = 0; u<stmp.length;u++){
                         s += stmp[u]+" ";
                     }
                 } 
+                else if ( colname.equals("coordinateSystems")) {
+                    DasCoordinateSystem[] dcss = (DasCoordinateSystem[])server.get(colname);
+                    s = "";
+                    for ( int u = 0 ; u < dcss.length;u++){
+                        DasCoordinateSystem dcs = dcss[u];
+                        s+= dcs.toString() + " ";
+                    }
+                }
                 else if (colname.equals("active")) {
                     data[i][j] = server.get(colname);
                     continue;
