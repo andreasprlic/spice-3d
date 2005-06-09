@@ -31,7 +31,7 @@ import java.awt.Graphics2D;
  */
 public class Dassource {
 
-    	Line[] lines;
+    	org.biojava.spice.Panel.seqfeat.Line[] lines;
     	int default_Y_separation;
     	
     	/** 

@@ -88,7 +88,6 @@ implements SeqPanel, MouseListener, MouseMotionListener
     // the line where to draw the structure
     public static final int    DEFAULT_STRUCTURE_Y    = 20 ;
     public static final int    TIMEDELAY              = 300 ;
-    
     public static final Color SELECTION_COLOR         = Color.lightGray;
     public static final Color STRUCTURE_COLOR         = Color.red;
     public static final Color STRUCTURE_BACKGROUND_COLOR = new Color(0.5f, 0.1f, 0.5f, 0.5f);
@@ -141,7 +140,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         setDoubleBuffered(true) ;
         
         // TODO Auto-generated constructor stub
-        Dimension dstruc=this.getSize();
+        //Dimension dstruc=this.getSize();
         //imbuf    = this.createImage(dstruc.width, dstruc.height);
         //imbuf = null ;
         
