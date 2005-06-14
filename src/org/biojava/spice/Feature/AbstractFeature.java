@@ -104,5 +104,30 @@ public abstract class AbstractFeature implements Feature {
     public List getSegments() { return segments ;}
   
     
+    /** test if two features are equivalent 
+     * important: only comares type,method and source.
+     * The individual segments are not compared!
+     * 
+     * */
+    public  boolean equals(Feature feat) {
+        
+        if ( this.type.equals(feat.getType())){
+            if ( this.method.equals(feat.getMethod())){
+                if ( this.source.equals(feat.getSource())){
+                    if ( note == null) {
+                        if (( feat.getNote() == null ) || 
+                         ( feat.getNote().equals(""))) {
+                            return true;
+                        }
+                    } else if ( this.note.equals(feat.getNote())){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+        
+    }
+    
 
 }

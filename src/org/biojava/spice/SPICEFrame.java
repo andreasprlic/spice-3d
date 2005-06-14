@@ -31,6 +31,7 @@ import org.biojava.bio.structure.Chain;
 import java.awt.Color;
 import java.util.List;
 import java.net.URL;
+import org.biojava.spice.Panel.seqfeat.SpiceFeatureViewer;
 
 /** an interface that defined methods that are required by sub frames
  * of SPICE to communicate with the master application 
@@ -198,4 +199,7 @@ public interface SPICEFrame
     /** returns currently displayed UniProt code; null if none*/
     public String getUniProtCode();
 
+    /** return the DAS - feature viewer panel */
+    public SpiceFeatureViewer getFeatureViewer();
+    
 }

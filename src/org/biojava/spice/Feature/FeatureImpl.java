@@ -48,7 +48,7 @@ implements Feature
     /** draw this feature at graphics g, at a given Y coordinate 
      * the scaling is done at the segment level. Segments know about scaling
      * 
-     * */
+     */
     public void draw ( Graphics2D g, int y) {
         Iterator iter = segments.iterator();
         
@@ -57,6 +57,7 @@ implements Feature
             s.paint(g,y);
         }
     }
+    
 
 }
 

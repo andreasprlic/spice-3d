@@ -24,164 +24,147 @@
 
 package org.biojava.spice ;
 
-// for applet
-import java.awt.*;
+import org.biojava.spice.utils.CliTools;
 import java.applet.Applet;
-import java.security.*;
-import javax.swing.JFrame ;
-
-// for config file 
+import org.biojava.spice.Config.ConfigurationException;
 import java.net.URL;
 import java.net.MalformedURLException ;
 import java.util.ArrayList;
+import javax.swing.JFrame;
 
-
-/** the startup class of SPICE */
+/** the startup class of SPICE 
+ * 
+ * @author Andreas Prlic
+ * 
+ * */
 public class Spice extends Applet {
-
-    SpiceButton spicebutton ;
+    private URL primaryRegistry ;
+    private URL[] registryurls;
+    private String code;
+    private String codetype;
+    private String displayLabel = "all";
+    private String display = "all";
     
     public static void main(String[] argv) {
-
-	if ( argv.length < 3 ) {
-	    System.err.println(" wrong arguments: correct call: java -jar spice.jar type code registryurl "+ System.getProperty("line.separator")+" example: java -jar spice.jar PDB 5pti http://servlet.sanger.ac.uk/dasregistry/services/das_registry/");
-	    return;
-	}
-	
-
-	URL registry_url=null ; 
-	ArrayList urls = new ArrayList();
-	for ( int i = 2 ; i < argv.length; i++ ){
-	    try {
-	        //System.out.println(argv[1]);
-	        //url = new URL(argv[2]);
-	        //registry_url = new URL("http://localhost:8080/axis/services/dasregistry/");
-	        registry_url = new URL(argv[i]);
-	        urls.add(registry_url);
-	    } catch (MalformedURLException e) {
-	        //System.err.println(url+" " + registry_url);
-	        e.printStackTrace();
-	    
-	    }
-	}
-	if ( urls.size() < 1 ){
-	    System.err.println("no registration URL found...");
-	    
-	    return;
-	    	}
-	    
-	    	URL[] reg_urls = (URL[])urls.toArray(new URL[urls.size()]);
-	    	addMoreSpice(argv[0],argv[1],reg_urls);
-	
-    }
-
-    public void init() {
-	spicebutton=new SpiceButton(this);
-	add(spicebutton);
-	/*qpdbButton.show();*/
-	spicebutton.setVisible(true);
-	setBackground(Color.white);
-
-    }
-
-    // replace configurl as soon as registry server communication is working properly
-    public static void addMoreSpice(String codetype, String code, URL[] registryurls){
-	System.out.println("Welcome to the SPICE - DAS client!");
-	System.out.println("displaying for you: " + codetype + " " + code);
-	SpiceApplication appFrame = new SpiceApplication(registryurls) ;	
-	//System.out.println("init of SpiceApplication single structure mode");
-	//appFrame.setTitle("SPICE") ;
-	//appFrame.setSize(800, 600);
-	
-	//appFrame.show();
-	appFrame.load(codetype,code);
-	
-	appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-	
-    }
-
-
-    public static void displayStructureAlignment(String pdb1, String pdb2, URL configfileurl,URL registryurl) {
-
-	//SpiceApplication appFrame = new SpiceApplication(pdb1, pdb2, configfileurl,registryurl) ;	
-	//System.out.println("init of SpiceApplication structure alignment mode");
-	//appFrame.setTitle("SPICE") ;
-	//appFrame.setSize(700, 700);
-	//appFrame.show();
-	System.out.println("currently disabled");
-	/*
-	appFrame.addWindowListener(new WindowAdapter() {
-		public void windowClosing(WindowEvent evt) {
-		    Frame frame = (Frame) evt.getSource();
-		    frame.setVisible(false);
-		    frame.dispose();
-		}
-	    });
-	*/
-    }
-
-}
-
-class SpiceButton extends Button {
+        
+        Spice app = new Spice();
+        try {
+            // init the configuration
+            argv = CliTools.configureBean(app, argv);
+            app.run();
+        } catch(ConfigurationException e){
+            e.printStackTrace();
+        }
+        
+    } 
     
-    Spice spice ;
+    /** run spice */
+    public void run(){
+        
+        System.out.println("Welcome to the SPICE - DAS client!");
+        System.out.println("displaying for you: " + codetype + " " + code);
+        
+        //System.out.println(primaryRegistry);
+        //for ( int i =0;i<registryurls.length;i++) {
+            //System.out.println(registryurls[i]);
+        //}
+        
+        URL[] regis ;
+        if ( primaryRegistry != null ){
+            regis = new URL[registryurls.length+1];
+            regis[0] = primaryRegistry;
+            for ( int i =0;i<registryurls.length;i++) {
+                regis[i+1] = registryurls[i];
+            }
+        } else {
+            regis = registryurls;
+        }
+        
+        // start spice
+        SpiceApplication appFrame = new SpiceApplication(regis, display,displayLabel) ;	
+        appFrame.load(codetype,code);
+        appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+    }
     
-
-    SpiceButton(Spice spice_) {
-	super("start SPICE");
-	spice = spice_;
+    /** set a list of DAS - sources (by their unique Id from registry) to be highlited
+     * 
+     * @param dasSourceIds a ";" separated list of DAS source ids e.g. DS:101;DS:102;DS:110
+     */
+    public void setDisplay(String dasSourceIds){
+        display = dasSourceIds;
     }
-    public boolean action(Event e, Object w) {
-	//String defaultpdb = "1a4a" ;
-	
-	AccessController.doPrivileged(new PrivilegedAction() {
-		public Object run() {
-		    String defaultpdb = spice.getParameter("PDB_CODE");
-		    String configurl  = spice.getParameter("CONFIG_XML");	
-		    String registryserver  = spice.getParameter("DAS_REGISTRY");	
-		    URL url   =null   ;
-		    URL registryurl=null ;
-		    try {
-			url = new URL(configurl);
-			registryurl = new URL(registryserver);
-		    } catch (MalformedURLException e) {
-			System.err.println(configurl+" " + registryserver);
-			e.printStackTrace();
-			return null ;
-		    }
-		 
-		    // check if structure alignment has been requested
-		    boolean structurealignment = false ;
-		    try {
-			String alignpdb = spice.getParameter("ALIGNWITH");
-			//System.out.println("ALGINWITH: "+alignpdb);
-			if (alignpdb != null){
-			    structurealignment = true ;
-			    //spice.displayStructureAlignment(defaultpdb,alignpdb,url,registryurl);
-			    // CURRENTLY DISABLED!
-			    System.out.println("currently disabled");
-			}
-			
-		     } catch ( Exception e){
-			e.printStackTrace();
-			// do nothing if parameter not present
-			
-		    }
-		    if ( ! structurealignment ) {
-			//System.out.println("init single struc mode");
-			//spice.addMoreSpice(defaultpdb, url,registryurl);
-		    }
-
-		 
-		    return null ;
-		}
-	    });
-	
-	return true ;
+    
+    /** choose all das source belonging to a particular label to be highlited.
+     * 
+     * @param label a ";" separated list of labels e.f. biosapiens;efamily
+     */
+    public void setDisplayLabel(String label){
+        this.displayLabel = label;
     }
-
+    
+    /** set the accession code to be displayed in SPICE. eg. PDB - 5pti UniProt P00280
+     * 
+     * @param accessioncode the accession code to be displayed in SPICE. eg. PDB - 5pti UniProt P00280
+     */
+    public void setCode(String accessioncode){
+        code = accessioncode;
+    }
+    /**
+     * 
+     * @returns the accesion code
+     */
+    public String getCode(){ return code;}
+    
+    /** sets the type of the accession code being displayed.
+     * 
+     * @param codetype currently supported: PDB, UniProt
+     */
+    public void setCodetype(String codetype){
+        this.codetype = codetype;
+    }
+    /** 
+     * 
+     * @return the codetype
+     */
+    public String getCodetype() {
+        return codetype;
+    }
+    
+    /** set the primary registry.
+     * @param url  Usually this should be:
+     * http://servlet.sanger.ac.uk/dasregistry/services/das_registry
+     */
+    public void setRegistry(String url){
+        try {
+            primaryRegistry = new URL(url);
+            
+        } catch (MalformedURLException e){
+            e.printStackTrace();
+        } 
+    }
+    
+    /** set backup registry servers. These will be contacted 
+     * only if there is a problem occuring with the primary
+     * 
+     */
+    public void setBackupRegistry(String[] urls){
+        ArrayList regis = new ArrayList();
+        for ( int i = 0 ;i< urls.length;i++){
+            try {
+                URL u = new URL(urls[i]);
+                regis.add(u);
+                
+            } catch (MalformedURLException e){
+                e.printStackTrace();
+            }
+        }
+        registryurls = (URL[]) regis.toArray(new URL[regis.size()]);
+    }
     
 }
+
+
+
 
 

@@ -59,6 +59,9 @@ public interface Feature {
     public abstract void setScore(String score);
     
     public abstract String getScore();
+    
+    /** test if two features are equivalent */
+    public abstract boolean equals(Feature feat);
 
     /** add a segment to this feature */
     public abstract void addSegment(int start, int end, String name);

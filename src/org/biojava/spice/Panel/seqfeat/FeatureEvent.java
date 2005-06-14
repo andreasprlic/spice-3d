@@ -17,39 +17,32 @@
  *
  *      http://www.biojava.org/
  * 
- * Created on Feb 9, 2005
+ * Created on Jun 14, 2005
  *
  */
 package org.biojava.spice.Panel.seqfeat;
-import java.awt.Graphics2D;
 
 /**
- * a container for several lines and features
- * 
  * @author Andreas Prlic
  *
  */
-public class Dassource {
+public class FeatureEvent {
 
-    	org.biojava.spice.Panel.seqfeat.Line[] lines;
-    	int default_Y_separation;
-    	
-    	/** 
-    	 * 
-    	 * @param y_separation separation between lines
-    	 */
-    public Dassource(int y_separation){
-        default_Y_separation = y_separation;
+    FeatureView parent;
+    Object source;
+    /**
+     * 
+     */
+    public FeatureEvent(FeatureView parent, Object source) {
+        super();
+        this.parent = parent;
+        this.source = source;
+        // TODO Auto-generated constructor stub
     }
     
-    /** go over all lines belonging to this DAs source and paint them */
-    public int paint (Graphics2D g, int y){
-        for (int i=0; i<lines.length;i++){
-            Line line = lines[i];
-            line.paint(g,y);
-            y+= default_Y_separation;
-        }
-        return -1;
-        
-    }
+    /** the paretn FeatureView in which this event occured */
+    public FeatureView getParent(){ return parent ;}
+    
+    /** a Feature or aSegment object, that has triggered this event */
+    public Object getSource(){ return source; }
 }

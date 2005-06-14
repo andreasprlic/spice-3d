@@ -30,7 +30,7 @@ import org.biojava.spice.GUI.*;
 import java.lang.reflect.*;
 // for protein 3D stuff
 import org.biojava.bio.structure.*;
-
+import org.biojava.spice.Panel.seqfeat.SpiceFeatureViewer;
 
 // to get config file via http
 import java.net.URL;
@@ -105,13 +105,12 @@ ConfigurationListener
     int currentChainNumber  ;
     HashMap memoryfeatures; // all features in memory
     List features ;    // currently being displayed 
-    
-    
-    
+        
     StructurePanel structurePanel ;    
     JTextField seq_pos ;
     JList ent_list;   // list available chains
-    SeqFeaturePanel dascanv ;
+    //SeqFeaturePanel dascanv ;
+    SpiceFeatureViewer dascanv;
     JScrollPane dasPanel ;
     //JPanel leftPanel ;
     JSplitPane sharedPanel;
@@ -149,9 +148,16 @@ ConfigurationListener
     
     boolean configLoaded ;
     
-    /** start the spice appplication
+    /** 
+     * start the spice appplication
+     * 
+     * @param registry_urls an array of URLs that point to DAS - registration servers. only the first that can successfully be contacted will be used.
+     * @param dasServerList  ";" separated list of DAS source ids e.g. DS:101;DS:102;DS:110 to be highlited
+     * @param labelList ";" separated list of labels DAS sources belonging to the labels will be highlited.
+     *  
+     * 
      */
-    public SpiceApplication( URL[] registry_urls) {
+    public SpiceApplication( URL[] registry_urls, String dasServerList, String labelList) {
         super();
         
         // selection is possible at the start ;
@@ -194,7 +200,7 @@ ConfigurationListener
         statusPanel    = new StatusPanel(this);
         seq_pos        = new JTextField();
         structurePanel = new StructurePanel(this);	
-        dascanv        = new SeqFeaturePanel(this);
+        dascanv        = new SpiceFeatureViewer();
         strucommand    = new StructureCommandPanel(this);
         //strucommand    = new JTextField()  ;
         
@@ -309,7 +315,7 @@ ConfigurationListener
     private Box arrangePanels(StatusPanel statusPanel,
             JTextField seq_pos,
             StructurePanel structurePanel,
-            SeqFeaturePanel dascanv, 
+            SpiceFeatureViewer dascanv, 
             StructureCommandPanel strucommand,
             String structureLocation){
         
@@ -362,11 +368,7 @@ ConfigurationListener
         
         //dascanv.setForeground(Color.black);
         dascanv.setBackground(Color.black);
-        dascanv.addMouseMotionListener(dascanv);
-        dascanv.addMouseListener(      dascanv);
-        //dascanv.setOpaque(true) ;
-        //dascanv.setPreferredSize(new Dimension(200, 200));
-        //dascanv.setSize(700,300);
+        //TODO: add featureseleection listener to dascanv
         
         dasPanel = new JScrollPane(dascanv);
         //dasPanel.setOpaque(true);
@@ -890,7 +892,8 @@ ConfigurationListener
         FeatureFetcher ff = new FeatureFetcher(this,config,sp_id,pdbcode,chain);	
         ff.start() ;
         statusPanel.setLoading(true);
-        dascanv.setChain(chain,currentChainNumber);
+        //dascanv.setChain(chain,currentChainNumber);
+        dascanv.setSeqLength(chain.getLength());
         //dascanv.setBackground(Color.);
         seqField.setChain(chain,currentChainNumber);
         
@@ -1185,7 +1188,8 @@ ConfigurationListener
             //features.clear()                     ;
             features = tmpfeat                   ;
             //SeqFeatureCanvas dascanv = daspanel.getCanv();
-            dascanv.setChain(chain,currentChainNumber) ;
+            dascanv.setSeqLength(chain.getLength());
+            //dascanv.setChain(chain,currentChainNumber) ;
             //dascanv.setBackground(Color.black)   ;
             seqField.setChain(chain,currentChainNumber);
             //updateDisplays();
@@ -1265,6 +1269,9 @@ ConfigurationListener
         return showDocument(url);
     }
     
+    public SpiceFeatureViewer getFeatureViewer() {
+        return dascanv;
+    }
     
     public synchronized void newConfigRetrieved(RegistryConfiguration conf){
         //logger.info("received new config");
@@ -1296,7 +1303,8 @@ ConfigurationListener
         //structurePanel.forceRepaint();
         if ( chainNumber == currentChainNumber) {
             seqField.highlite(start-1,end-1);
-            dascanv.highlite(start-1,end-1);
+            //dascanv.highlite(start-1,end-1);
+            //TODO: add featureselectionlistener for dascanv
         }
     }
     
@@ -1337,7 +1345,8 @@ ConfigurationListener
         
         // and now the SeqPanels ...
         if ( chainNumber == currentChainNumber) {
-            dascanv.highlite(start,end);
+            //dascanv.highlite(start,end);
+            //TODO: add featureselectionlistener for dascanv
             seqField.highlite(start,end);
         }
         
@@ -1369,7 +1378,8 @@ ConfigurationListener
         }
         
         if ( chainNumber == currentChainNumber ) {
-            dascanv.highlite(seqpos);
+            //dascanv.highlite(seqpos);
+            // todo add featureselectionlistener for dascanv
             seqField.highlite(seqpos);
         }
         this.repaint();
@@ -1501,7 +1511,8 @@ ConfigurationListener
         
         if ( chain_number == currentChainNumber ) {
             seqField.select(start,end);		
-            dascanv.select(start,end);
+            //dascanv.select(start,end);
+            //TODO: add featureselectionlistener for dascanv
         }
         
         
@@ -1520,7 +1531,8 @@ ConfigurationListener
         
         if ( chain_number == currentChainNumber ){
             seqField.select(seqpos);
-            dascanv.select(seqpos);
+            //dascanv.select(seqpos);
+            //TODO: add selectionlistener for dascanv
         }
         
         
@@ -1543,7 +1555,9 @@ ConfigurationListener
     public void updateDisplays() {
         logger.finest("updateDisplays + features size: " + features.size());
         //SeqFeatureCanvas dascanv = daspanel.getCanv();
-        dascanv.setFeatures(features);
+        //dascanv.setFeatures(features);
+        //TODO: set features in dascanv
+        
         //dascanv.repaint();
         dascanv.paint(dascanv.getGraphics());
         
@@ -1731,6 +1745,7 @@ class EntListCommandListener implements ListSelectionListener {
         
     }
 
+   
    
     
 }

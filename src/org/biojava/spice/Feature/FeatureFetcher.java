@@ -27,6 +27,8 @@ package org.biojava.spice.Feature ;
 
 import org.biojava.spice.SPICEFrame    ;
 import org.biojava.spice.Config.*    ;
+
+import java.util.Iterator;
 import java.util.Map                   ;
 import java.util.HashMap               ;
 import java.util.List                  ;
@@ -38,6 +40,8 @@ import java.awt.Color                  ;
 import java.util.logging.*             ;
 import org.biojava.bio.structure.Chain ;
 import org.biojava.bio.structure.Group ;
+
+import org.biojava.spice.Panel.seqfeat.*;
 
 //import org.biojava.services.das.registry.DasSource;
 
@@ -68,6 +72,7 @@ public class FeatureFetcher extends Thread
     RegistryConfiguration spiceconfig ;
     List allFeatures ;
     DasResponse[] subthreads ;
+    FeatureView[] featureViews;
     Chain chain ;
     
     String[] txtColors;
@@ -111,10 +116,12 @@ public class FeatureFetcher extends Thread
         parent.setLoading(true);
         doDasCommunication() ;
         
-        List l = getFeatures();
+        //TODO: clean this up not needed any longer...
+        /*List l = getFeatures();
         logger.finest("finished loading Features");
         parent.setFeatures(spId,l);
-        parent.setLoading(false);
+        */
+        //parent.setLoading(false);
     }
     
     private synchronized void doDasCommunication() {
@@ -138,6 +145,9 @@ public class FeatureFetcher extends Thread
         
         subthreads = new DasResponse[nrservers];
         
+        // an array that stores all feature views...
+        featureViews = new FeatureView[nrservers];
+        
         int responsecounter = 0 ;
         // start all the sub -threads ;
         for ( int f =0;f<featservs.size();f++) {
@@ -147,8 +157,11 @@ public class FeatureFetcher extends Thread
             
             DasResponse d=new DasResponse(UNIPROTCOORDSYS);
             subthreads[responsecounter] = d; 
-            
             SpiceDasSource featureserver = (SpiceDasSource) featservs.get(f) ;
+            FeatureView fv = createNewFeatureView(featureserver);
+            featureViews[responsecounter] = fv;
+            
+            
             String url = featureserver.getUrl();
             d.setDasSource(featureserver);
             char lastChar = url.charAt(url.length()-1);		 
@@ -183,6 +196,10 @@ public class FeatureFetcher extends Thread
             subthreads[responsecounter] = d; 
             
             SpiceDasSource featureserver = (SpiceDasSource) pdbresservs.get(f) ;
+            
+            FeatureView fv = createNewFeatureView(featureserver);
+            featureViews[responsecounter] = fv;
+            
             String url = featureserver.getUrl();
             d.setDasSource(featureserver);
             String queryString = url + "features?segment="+ pdbId+"."+chain.getName() ;
@@ -205,6 +222,8 @@ public class FeatureFetcher extends Thread
         
         
         // wait for results to come back
+        // new by AP : no need for this! 
+        /*
         boolean done = false ;
         while ( ! done) {
             done = allFinished();
@@ -213,7 +232,9 @@ public class FeatureFetcher extends Thread
                 wait(300);
                 //logger.finest("FeatureFetcher waiting "+done);
                 if ( updateDisplay ) {
-                    List l = getFeatures();
+                    //TODO: clean this up. not needed any longer!
+                    List l = null;
+                    //List l = getFeatures();
 		    //System.out.println(l);
                     if ( l != null )
                         parent.setFeatures(spId,l);
@@ -225,20 +246,33 @@ public class FeatureFetcher extends Thread
             }
             //logger.finest("getNewFeatures :in waitloop");
         }
-        
+        */
         
         // finally all sub-threads are finished and we can sent all features back to the main application
         // reset and re-paint all features 
-        allFeatures = new ArrayList();
+        //allFeatures = new ArrayList();
         
         // extract ALL the features and convert them so they can be used for spice...
-        for ( int i = 0 ; i < subthreads.length; i++ ) {
-            DasResponse d = subthreads[i] ;	    
-            addFeaturesFromDasResponse(d);	   
-        }
+        //for ( int i = 0 ; i < subthreads.length; i++ ) {
+            //DasResponse d = subthreads[i] ;	    
+            //addFeaturesFromDasResponse(d,i);	   
+        //}
         
-        finished = true ;
+        //finished = true ;
         notifyAll();
+    }
+    
+    public FeatureView createNewFeatureView(SpiceDasSource featureserver){
+        FeatureView fv = new FeatureView();
+        fv.setSeqLength(chain.getLength());
+        fv.setLoading(true);
+        fv.setLabel(featureserver.getNickname());
+        // add fv to viewer ...
+        
+        SpiceFeatureViewer sfv = parent.getFeatureViewer();
+        sfv.addFeatureView(fv);
+        sfv.repaint();
+        return fv;
     }
     
     /** browse through chain and get UniProt position with pdbResNum 
@@ -273,7 +307,8 @@ public class FeatureFetcher extends Thread
     /** add all features from a DasResponse to the locally stored ones 
      PDBresnum features are mapped to UniProt coordinate system.
      */
-    private synchronized void addFeaturesFromDasResponse(DasResponse d) {
+    private synchronized void addFeaturesFromDasResponse(DasResponse d, int threadId) {
+        
         
         String coordSys = d.getCoordinateSystem();
         //logger.finest(d);
@@ -316,8 +351,10 @@ public class FeatureFetcher extends Thread
                     }
                     //logger.finest("pdb feature: "+feat);
                 }
-                if ( (mappDone != null ) && (mappDone.equals("true")))
-                    allFeatures.add(feat) ;		    
+
+                // by AP
+                //if ( (mappDone != null ) && (mappDone.equals("true")))
+                //    allFeatures.add(feat) ;		    
             } 
             
             
@@ -333,10 +370,15 @@ public class FeatureFetcher extends Thread
                     feat.put("dassource", nickname);  
                     
                 }
-                
-                allFeatures.add(feat) ;		
+                	// by AP
+                //allFeatures.add(feat) ;		
             } 
         } 
+        
+        Feature[] fets =convertMap2Features(features);
+        FeatureView fv = featureViews[threadId];
+        fv.setFeatures(fets);
+        fv.setLoading(false);
         notifyAll();
     }
     
@@ -347,7 +389,12 @@ public class FeatureFetcher extends Thread
         DasResponse d = subthreads[threadId] ;
         d.setFeatures(features);
         
-        addFeaturesFromDasResponse(d);
+               
+        addFeaturesFromDasResponse(d,threadId);
+        
+        if ( allFinished()){
+            parent.setLoading(true);
+        }
         
         updateDisplay = true ;
         notifyAll();	
@@ -365,10 +412,10 @@ public class FeatureFetcher extends Thread
         return true ;
     }
     
-    public List getFeatures() {
+    public Feature[] getFeatures() {
         // convert Map containing features into feature objects...
         
-        List spicefeatures = convertMap2Features(allFeatures);
+        Feature[] spicefeatures = convertMap2Features(allFeatures);
         
         return spicefeatures ;
         //return allFeatures;
@@ -391,7 +438,8 @@ public class FeatureFetcher extends Thread
     }
     
     /** returns a list of SPICE-Features objects */
-    public List convertMap2Features(List mapfeatures){
+    public Feature[] convertMap2Features(List mapfeatures){
+        
         List features = new ArrayList();
         
         boolean secstruc = false ;
@@ -401,12 +449,200 @@ public class FeatureFetcher extends Thread
         FeatureImpl feat    = null ;
         Segment segment = null ;
         
+        //boolean secstrucContained = false;
+        //Feature secstrucfeature = new FeatureImpl() ;
         
         for (int i = 0 ; i< mapfeatures.size();i++) {
             HashMap currentFeatureMap = (HashMap) mapfeatures.get(i);
             String type = (String) currentFeatureMap.get("TYPE") ;
             
-            // we are skipping literature references for teh moment 
+            // we are skipping literature references for the moment 
+            if ( type.equals("reference") || type.equals("GOA")){
+                continue ;
+            }
+            
+            if (! first) 
+            {
+                // if not first feature
+                
+                if ( ! secstruc ) 			    
+                    // if not secondary structure ...
+                    features = testAddFeatures(features,feat);
+                //features.add(feat);
+                
+                else if ( ! 
+                        (
+                                type.equals("HELIX")  || 
+                                type.equals("STRAND") || 
+                                type.equals("TURN")  
+                        ) 
+                )
+                {
+                    // end of secondary structure
+                    secstruc = false ;
+                    if ( ! (feat==null)) {
+                        features = testAddFeatures(features,feat);
+                        /*
+                        if ( ! secstrucContained) {
+                            secstrucfeature = feat;
+                            secstrucContained = true;
+                            
+                            //features.add(feat);
+                        } else {
+                            //add this feature data to the secstruc feature...
+                            // do NOT add this feature to features ...
+                            List segs = feat.getSegments();
+                            Iterator iter = segs.iterator();
+                            while (iter.hasNext()){
+                                Segment seg = (Segment)iter.next();
+                                secstrucfeature.addSegment(seg);
+                            }
+                        }
+                        */
+                    }
+                    
+                }
+            }
+            
+            first = false ;				
+            if ( ! secstruc) {
+                feat = getNewFeat(currentFeatureMap);		
+            }
+            
+            //}
+            
+            
+            if (type.equals("STRAND")){
+                secstruc = true ;
+                currentFeatureMap.put("color",STRAND_COLOR);
+                currentFeatureMap.put("colorTxt","yellow");
+                feat.setName("SECSTRUC");		
+            }
+            
+            else if (type.equals("HELIX")) {
+                secstruc = true ;
+                currentFeatureMap.put("color",HELIX_COLOR);
+                currentFeatureMap.put("colorTxt","red");
+                feat.setName("SECSTRUC");
+            }	
+            
+            else if (type.equals("TURN")) {
+                secstruc = true ;
+                currentFeatureMap.put("color",TURN_COLOR);
+                currentFeatureMap.put("colorTxt","white");
+                feat.setName("SECSTRUC");
+            } 	  
+            else {
+                secstruc = false ;
+                currentFeatureMap.put("color"   ,entColors[i%entColors.length]);
+                currentFeatureMap.put("colorTxt",txtColors[i%txtColors.length]);
+                try {
+                    feat.setName(type);
+                } catch ( NullPointerException e) {
+                    //e.printStackTrace();
+                    feat.setName("null");
+                }
+            }
+            
+            segment = getNewSegment(currentFeatureMap);
+            //Feature oldFeat = testIfFit
+            feat.addSegment(segment);	    
+            //feat.addSegment(currentFeatureMap);
+            prevtype = type;
+        }	
+        //if ( ! (feat==null))  features.add(feat);
+        if ( ! (feat==null))  
+            features =testAddFeatures(features,feat);
+        return (Feature[])features.toArray(new Feature[features.size()]) ;
+    }
+    
+    private boolean isSecondaryStructureFeat(Feature feat){
+        String type = feat.getType();
+        if (
+            type.equals("HELIX")  || 
+            type.equals("STRAND") || 
+            type.equals("TURN")
+            ) return true;
+        return false;
+    }
+    private List testAddFeatures(List features,Feature feat){
+        // test if this features is added as a new feature to the features list, or if it is joint with an already existing one...
+        //System.out.println("testing " + feat);   
+        Iterator iter = features.iterator();
+        
+        
+        while (iter.hasNext()){
+            Feature tmpfeat = (Feature) iter.next() ;
+            // this only compares method source and type ...
+            boolean sameFeat = false;
+            if ( tmpfeat.equals(feat))
+                sameFeat = true;
+            
+            if ( ( tmpfeat.getSource().equals(feat.getSource() )) &&
+                    ( tmpfeat.getMethod().equals(feat.getMethod())) &&
+                    isSecondaryStructureFeat(tmpfeat) && 
+                    isSecondaryStructureFeat(feat))
+                sameFeat =true;
+            
+            if ( sameFeat) {
+                
+                // seems to be of same type, method and source, so check if the segments can be joint
+                
+                List tmpsegs = tmpfeat.getSegments();
+                Iterator segiter = tmpsegs.iterator();
+                List newsegs = feat.getSegments();
+                Iterator newsegsiter = newsegs.iterator();
+                boolean overlap = false;
+                while (newsegsiter.hasNext()){
+                    Segment newseg = (Segment)newsegsiter.next();
+                    
+                    
+                    while (segiter.hasNext()){
+                        Segment tmpseg = (Segment) segiter.next();
+                        
+                        if (  tmpseg.overlaps(newseg))
+                            overlap = true;
+                    }
+                }
+                
+                if ( ! overlap){
+                    // add all new segments to old features...
+                    newsegsiter = newsegs.iterator();
+                    while (newsegsiter.hasNext()){
+                        Segment newseg = (Segment)newsegsiter.next();
+                        tmpfeat.addSegment(newseg);
+                    }
+                        
+                    return features;
+                } 
+            }
+            
+        }
+//      if we get here, the  features could not be joint with any other one, so there is always some overlap
+        // add to the list of known features
+        features.add(feat);
+        return features;
+    }
+    
+    /** returns a list of SPICE-Features objects 
+    public Feature[] convertMap2Features(List mapfeatures){
+        List features = new ArrayList();
+        
+        boolean secstruc = false ;
+        String prevtype = "@prevtype" ;
+        boolean first = true ;
+        
+        FeatureImpl feat    = null ;
+        Segment segment = null ;
+        
+        boolean secstrucContained = false;
+        Feature secstrucfeature = new FeatureImpl() ;
+        
+        for (int i = 0 ; i< mapfeatures.size();i++) {
+            HashMap currentFeatureMap = (HashMap) mapfeatures.get(i);
+            String type = (String) currentFeatureMap.get("TYPE") ;
+            
+            // we are skipping literature references for the moment 
             if ( type.equals("reference") || type.equals("GOA")){
                 continue ;
             }
@@ -430,12 +666,24 @@ public class FeatureFetcher extends Thread
                 {
                     // end of secondary structure
                     secstruc = false ;
-                    if ( ! (feat==null))  features.add(feat);
-                    
-                    //feat    = getNewFeat(currentFeatureMap);
-                    //segment = getNewSegment(currentFeatureMap);
-                    //feat.addSegment(segment);
-                    //features.add(feat);
+                    if ( ! (feat==null)) {
+                                                
+                        if ( ! secstrucContained) {
+                            secstrucfeature = feat;
+                            secstrucContained = true;
+                            features.add(feat);
+                        } else {
+                            //add this feature data to the secstruc feature...
+                            // do NOT add this feature to features ...
+                            	List segs = feat.getSegments();
+                            	Iterator iter = segs.iterator();
+                            	while (iter.hasNext()){
+                            	    Segment seg = (Segment)iter.next();
+                            	    secstrucfeature.addSegment(seg);
+                            	}
+                        }
+                    }
+
                 }
             }
             
@@ -486,8 +734,11 @@ public class FeatureFetcher extends Thread
         }	
         if ( ! (feat==null))  features.add(feat);
         
-        return features ;
+        return (Feature[])features.toArray(new Feature[features.size()]) ;
     }
+
+  */  
+    
     
     
     private Segment getNewSegment(Map featureMap) {

@@ -67,6 +67,29 @@ public class Segment {
     public void setTxtColor(String str) { txtColor = str; }
     public String getTxtColor() { return txtColor;}
     
+    /** tests if two segments are overlapping */
+    public boolean overlaps(Segment segment){
+        if (! (this.start <= this.end )) 
+            throw new IndexOutOfBoundsException("start > end for segment" + this);
+        
+        if ( ! (segment.getStart() <= segment.getEnd() ))
+                throw new IndexOutOfBoundsException("start > end for segment" + segment);
+        
+        // start must be in region of other
+        if ( this.start >= segment.getStart()){
+            if ( this.start <= segment.getEnd()){
+                return true;
+            }
+        }
+        // or end must be in region of other..
+        if ( this.end >= segment.getStart() ) {
+            if ( this.end <= segment.getEnd()){
+                return true;
+            }
+        }
+        return false;
+    }
+    
     /** paint this segment on a a graphics panel 
      * */
     public void paint(Graphics2D g, int y){
