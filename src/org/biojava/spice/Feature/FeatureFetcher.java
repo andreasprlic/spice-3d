@@ -115,13 +115,6 @@ public class FeatureFetcher extends Thread
         logger.finest("retreiving features for PDB " + pdbId + " UniProt " + spId);
         parent.setLoading(true);
         doDasCommunication() ;
-        
-        //TODO: clean this up not needed any longer...
-        /*List l = getFeatures();
-        logger.finest("finished loading Features");
-        parent.setFeatures(spId,l);
-        */
-        //parent.setLoading(false);
     }
     
     private synchronized void doDasCommunication() {
@@ -219,8 +212,21 @@ public class FeatureFetcher extends Thread
             responsecounter++;
         }
         
+        // if everything finished stop parent loading singn ...
+        boolean done = false ;
+        while ( ! done) {
+            done = allFinished();
+            try {
+                wait(300);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                done = true ;
+            }
+        }
+        parent.setLoading(false);
+        notifyAll();
         
-        
+        //TODO: clean this up. not needed any longer!
         // wait for results to come back
         // new by AP : no need for this! 
         /*
@@ -232,7 +238,7 @@ public class FeatureFetcher extends Thread
                 wait(300);
                 //logger.finest("FeatureFetcher waiting "+done);
                 if ( updateDisplay ) {
-                    //TODO: clean this up. not needed any longer!
+                   
                     List l = null;
                     //List l = getFeatures();
 		    //System.out.println(l);
@@ -259,10 +265,11 @@ public class FeatureFetcher extends Thread
         //}
         
         //finished = true ;
-        notifyAll();
+        
     }
     
     public FeatureView createNewFeatureView(SpiceDasSource featureserver){
+        
         FeatureView fv = new FeatureView();
         fv.setSeqLength(chain.getLength());
         fv.setLoading(true);

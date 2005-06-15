@@ -99,25 +99,15 @@ extends JPanel
         return d; 
     }
     
-    
+    /** the width is flexible, but the height is not ... */
     public Dimension getMinimumSize(){ 
         Dimension d;
         
-        if ( height == 0 || width == 0 ){
-            d = super.getPreferredSize();
-            
-            if ( height != 0 )
-                d.setSize( d.getWidth(), height );
-            
-            else
-                d.setSize( width, d.getHeight() );
-            
-        }
-        else
-            d = new Dimension( width, height );
-        
+        d = super.getPreferredSize();
+        if ( height != 0 )
+            d.setSize(d.getWidth(), height);
         
         return d; 
-    }  
+    }
    
 }

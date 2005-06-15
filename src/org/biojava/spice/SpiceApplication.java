@@ -30,6 +30,7 @@ import org.biojava.spice.GUI.*;
 import java.lang.reflect.*;
 // for protein 3D stuff
 import org.biojava.bio.structure.*;
+import org.biojava.spice.Panel.seqfeat.SpiceComponentListener;
 import org.biojava.spice.Panel.seqfeat.SpiceFeatureViewer;
 
 // to get config file via http
@@ -364,13 +365,18 @@ ConfigurationListener
         JScrollPane chainPanel = new JScrollPane(ent_list);
         chainPanel.setPreferredSize(new Dimension(30,30));
         //chainPanel.setBorder(BorderFactory.createEmptyBorder());
-        // init dascanv
         
-        //dascanv.setForeground(Color.black);
+        // init dascanv
         dascanv.setBackground(Color.black);
-        //TODO: add featureseleection listener to dascanv
+        
+        // add a listener that listens to all event in the Featurepanel
+        SpiceFeaturePanelListener  sfpl = new SpiceFeaturePanelListener(this);
+        dascanv.addFeatureViewListener(sfpl);
+        dascanv.addSelectedSeqPositionListener(sfpl);
         
         dasPanel = new JScrollPane(dascanv);
+        SpiceComponentListener mcl = new SpiceComponentListener(dascanv);
+        dasPanel.addComponentListener(mcl);
         //dasPanel.setOpaque(true);
         //dasPanel.setBackground(Color.black);
         dasPanel.getVerticalScrollBar().setUnitIncrement(DEFAULT_Y_SCROLL);
@@ -808,9 +814,12 @@ ConfigurationListener
         return features;
     }
     
+    
     /**  update the currently displayed features */
     public void setFeatures(String sp_id, List tmpfeat) {
-        // todo create Feature for structure mapping
+        //TODO: remove this! should not be needed any longer ...
+        logger.info("setting features");
+        //TODO: create Feature for structure mapping
         //first_load = false ;
         //logger.info("SpiceAplication setting features for "+sp_id);
         String mem_id = makeFeatureMemoryCode(sp_id);
@@ -889,34 +898,15 @@ ConfigurationListener
         //first_load = true ;
         this.setLoading(true);
         features.clear();
+        dascanv.clear();
+        dascanv.setSeqLength(chain.getLength());
         FeatureFetcher ff = new FeatureFetcher(this,config,sp_id,pdbcode,chain);	
         ff.start() ;
         statusPanel.setLoading(true);
         //dascanv.setChain(chain,currentChainNumber);
-        dascanv.setSeqLength(chain.getLength());
+        
         //dascanv.setBackground(Color.);
         seqField.setChain(chain,currentChainNumber);
-        
-        /**
-         boolean done = false ;
-         while ( ! done) {
-         done = ff.isDone();
-         //logger.finest("waiting for features to be retreived: "+done);
-          try {
-          wait(300);
-          } catch (InterruptedException e) {
-          e.printStackTrace();
-          done = true ;
-          }
-          //logger.finest("getNewFeatures :in waitloop");
-           }
-           
-           ArrayList tmpfeat = (ArrayList) ff.getFeatures();
-           //logger.finest("got new features: " + tmpfeat);
-            memoryfeatures.put(sp_id,tmpfeat);
-            setNewFeatures(tmpfeat);	
-            //SeqFeatureCanvas dascanv = daspanel.getCanv();
-             */
         
     }
 
@@ -1304,7 +1294,6 @@ ConfigurationListener
         if ( chainNumber == currentChainNumber) {
             seqField.highlite(start-1,end-1);
             //dascanv.highlite(start-1,end-1);
-            //TODO: add featureselectionlistener for dascanv
         }
     }
     
@@ -1346,7 +1335,6 @@ ConfigurationListener
         // and now the SeqPanels ...
         if ( chainNumber == currentChainNumber) {
             //dascanv.highlite(start,end);
-            //TODO: add featureselectionlistener for dascanv
             seqField.highlite(start,end);
         }
         
@@ -1512,7 +1500,7 @@ ConfigurationListener
         if ( chain_number == currentChainNumber ) {
             seqField.select(start,end);		
             //dascanv.select(start,end);
-            //TODO: add featureselectionlistener for dascanv
+            //TODO: move to  featureselectionlistener for dascanv
         }
         
         
