@@ -28,6 +28,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
+import javax.swing.JPopupMenu;
+
 import org.biojava.spice.Panel.seqfeat.FeatureView;
 import org.biojava.spice.Panel.seqfeat.LabelPane;
 import org.biojava.spice.Panel.seqfeat.SpiceFeatureViewer;
@@ -43,8 +45,10 @@ class LabelBoxListener implements MouseListener,MouseMotionListener{
     boolean moved;
     boolean isDragging ;
     FeatureView selectedFeatureView;
+    JPopupMenu popupMenu ;
     public LabelBoxListener(SpiceFeatureViewer parent) {
         this.parent = parent;
+        popupMenu = new JPopupMenu();
         prev_y = -1;
         moved = false;
         isDragging =  false;
@@ -120,6 +124,8 @@ class LabelBoxListener implements MouseListener,MouseMotionListener{
         //System.out.println("mouse Released" + e.getX()+" " + e.getY());
         moved = false;
         
+        int mouseButton = e.getButton();
+        if ( mouseButton == MouseEvent.BUTTON1 )  {
         //FeatureView fv = parent.getParentFeatureView(e) ;
         FeatureView fv = selectedFeatureView;
         if ( fv != null ){
@@ -136,6 +142,12 @@ class LabelBoxListener implements MouseListener,MouseMotionListener{
             
         } else {
             System.err.println("no parent found!");
+        }
+        
+        } else if( mouseButton == MouseEvent.BUTTON2 ) {
+            // open a popupMenu...
+            
+            
         }
     }
     public void mouseEntered(MouseEvent e) {}

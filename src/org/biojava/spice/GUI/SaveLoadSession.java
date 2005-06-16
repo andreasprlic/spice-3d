@@ -224,7 +224,6 @@ public class SaveLoadSession {
     		xw.closeTag("UniProtCode");
     		
     		
-    		
     		xw.openTag("CurrentChain");
     		xw.print(spice.getCurrentChainNumber()+"");
     		xw.closeTag("CurrentChain");

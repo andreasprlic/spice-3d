@@ -96,7 +96,7 @@ ConfigurationListener
     static int    CONNECTION_TIMEOUT = 15000;// timeout for http connection = 15. sec
     static int    DEFAULT_Y_SCROLL = 50 ;
     static String XMLVALIDATION = "false" ;   
-    static String INIT_SELECT = "select all; cpk off ; wireframe off ; backbone off; cartoon on; colour chain;select not protein and not solvent;spacefill 2.0;";    
+        
     RegistryConfiguration config      ;
     Structure structure ; 
     String pdbcode      ;
@@ -107,8 +107,9 @@ ConfigurationListener
     HashMap memoryfeatures; // all features in memory
     List features ;    // currently being displayed 
         
-    StructurePanel structurePanel ;    
-    JTextField seq_pos ;
+    //StructurePanel structurePanel ;  
+    StructurePanelListener structurePanelListener ;
+    //JTextField seq_pos ;
     JList ent_list;   // list available chains
     //SeqFeaturePanel dascanv ;
     SpiceFeatureViewer dascanv;
@@ -148,7 +149,7 @@ ConfigurationListener
     ImageIcon firefoxIcon ;
     
     boolean configLoaded ;
-    
+    SpiceMenuListener spiceMenuListener;
     /** 
      * start the spice appplication
      * 
@@ -191,6 +192,8 @@ ConfigurationListener
         //first_load = false ;
         
         structureAlignmentMode = false ;
+        StructurePanel structurePanel = new StructurePanel(this);	
+        structurePanelListener = new StructurePanelListener(structurePanel);
         
         // add the Menu
         JMenuBar menu = initMenu();
@@ -199,16 +202,21 @@ ConfigurationListener
         
         // init all panels, etc..
         statusPanel    = new StatusPanel(this);
-        seq_pos        = new JTextField();
-        structurePanel = new StructurePanel(this);	
+        //seq_pos        = new JTextField();
+        
         dascanv        = new SpiceFeatureViewer();
-        strucommand    = new StructureCommandPanel(this);
+        
+        strucommand    = new StructureCommandPanel(structurePanelListener);
         //strucommand    = new JTextField()  ;
         
-        Box vBox = arrangePanels(statusPanel,seq_pos,structurePanel,dascanv,strucommand,"left"); 
+        Box vBox = arrangePanels(statusPanel,structurePanel,dascanv,strucommand,"left"); 
         
+     
         this.getContentPane().add(vBox);
         this.setLoading(false);
+        spiceMenuListener = new SpiceMenuListener(this,structurePanelListener) ;
+        initListeners();
+        
         
         memoryfeatures = new HashMap();
         features = new ArrayList();
@@ -314,7 +322,6 @@ ConfigurationListener
      * @return a Box containing the Panels.
      */
     private Box arrangePanels(StatusPanel statusPanel,
-            JTextField seq_pos,
             StructurePanel structurePanel,
             SpiceFeatureViewer dascanv, 
             StructureCommandPanel strucommand,
@@ -332,15 +339,10 @@ ConfigurationListener
         //statusPanel.setLoading(first_load);
         
         
-        // init Seqouece position
-        seq_pos.setForeground(new Color(255, 255, 255));
-        seq_pos.setBackground(new Color(0, 0, 0));
-        //seq_pos.setSize(700, 30);
-        seq_pos.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
-        seq_pos.setBorder(BorderFactory.createEmptyBorder());
+        
         //this.getContentPane().add(seq_pos,BorderLayout.NORTH);
         //this.getContentPane().add(seq_pos);
-        vBox.add(seq_pos);
+        //vBox.add(seq_pos);
         
         //showStatus("contacting DAS registry");
         
@@ -370,9 +372,9 @@ ConfigurationListener
         dascanv.setBackground(Color.black);
         
         // add a listener that listens to all event in the Featurepanel
-        SpiceFeaturePanelListener  sfpl = new SpiceFeaturePanelListener(this);
-        dascanv.addFeatureViewListener(sfpl);
-        dascanv.addSelectedSeqPositionListener(sfpl);
+        //SpiceFeaturePanelListener  sfpl = new SpiceFeaturePanelListener(this);
+        //dascanv.addFeatureViewListener(sfpl);
+        //dascanv.addSelectedSeqPositionListener(sfpl);
         
         dasPanel = new JScrollPane(dascanv);
         SpiceComponentListener mcl = new SpiceComponentListener(dascanv);
@@ -403,9 +405,8 @@ ConfigurationListener
         seqField.addMouseMotionListener(seqField);
         seqField.addMouseListener(seqField);
         
-        
-        // add onMouseOver action
-        
+      
+              
         seqScrollPane = new JScrollPane(seqField) ;
         //seqScrollPane.setBorder(BorderFactory.createEmptyBorder());
         //seqScrollPane.setSize( 700, 30);
@@ -464,8 +465,25 @@ ConfigurationListener
         return vBox;
     }
     
-    
-    
+    /** initialize the listeners of the various componentns 
+     * 
+     *
+     */
+    private void initListeners(){
+        dascanv.addFeatureViewListener(seqField);
+        dascanv.addSelectedSeqPositionListener(seqField);
+        dascanv.addFeatureViewListener(structurePanelListener);
+        dascanv.addSelectedSeqPositionListener(structurePanelListener);
+        dascanv.addFeatureViewListener(statusPanel);
+        dascanv.addSelectedSeqPositionListener(statusPanel);
+        dascanv.addSelectedSeqPositionListener(spiceMenuListener);
+        
+        seqField.addSelectedSeqPositionListener(dascanv);
+        seqField.addSelectedSeqPositionListener(structurePanelListener);
+        seqField.addSelectedSeqPositionListener(statusPanel);
+        seqField.addSelectedSeqPositionListener(spiceMenuListener);
+        
+    }
     
     /**
      * @returns the Menu to be displayed on top of the application
@@ -523,7 +541,9 @@ ConfigurationListener
             props   = new JMenuItem("Properties");
         props.setMnemonic(KeyEvent.VK_P);
         
-        SpiceMenuListener ml = new SpiceMenuListener(this) ;
+        
+        SpiceMenuListener ml = spiceMenuListener;
+        
         
         openpdb.addActionListener( ml );
         save.addActionListener   ( ml );
@@ -711,7 +731,7 @@ ConfigurationListener
             //logger.finest("not in alignment mode");
             loadStructure(pdbcode);
         } else {
-            showStatus("Loading...Wait...",Color.red);
+            //showStatus("Loading...Wait...",Color.red);
             
             LoadStructureAlignmentThread thr = new 
             LoadStructureAlignmentThread(this,
@@ -811,13 +831,16 @@ ConfigurationListener
 
     /** return the features */
     public List getFeatures(){
+        //TODO: get the features from dascanv!
         return features;
+        //return dascanv.getFeatures();
     }
     
     
     /**  update the currently displayed features */
     public void setFeatures(String sp_id, List tmpfeat) {
-        //TODO: remove this! should not be needed any longer ...
+        //TODO: build up a new dascanv!
+        
         logger.info("setting features");
         //TODO: create Feature for structure mapping
         //first_load = false ;
@@ -939,51 +962,24 @@ ConfigurationListener
         return arr ;
     }
     
+    /*
     public void showSeqPos(int chainnumber, int seqpos){
         String drstr = getToolString(chainnumber,seqpos);
         showStatus(drstr);
         
     }
+*/
 
-
-    public String getToolString(int chainnumber,int seqpos) {
-        //return "tmp in getToolString";
-        
-        Chain chain = getChain(chainnumber);
-        if ( chain == null) return "" ;
-        
-        if ( ! ((seqpos >= 0) && (seqpos < chain.getLength()))) {
-            return "" ;
-        } 
-        
-        
-        
-        Group g = chain.getGroup(seqpos);	
-        Character amino1 = new Character(" ".charAt(0)) ;
-        if (g.getType() == "amino" ) {
-            AminoAcid a = (AminoAcid) g ;
-            amino1 = a.getAminoType();
-        }
-        String pdbstr = g.getPDBCode();	
-        String name   = g.getPDBName();
-        if (pdbstr == null ) {
-            pdbstr = "n.a." ;
-            
-        }
-        
-        String drstr = "Seq pos "+ (seqpos +1) + "("+amino1+","+name+")" + " PDB ("+ pdbstr +")";  	
-        return drstr ;
-        
-    }
     
     
-    /** show status notification in defaul color */
+    
+    /** show status notification in defaul color *
     public void showStatus(String status) {
         showStatus(status,Color.white);
         return ;
     }
     
-    /** show status notification in specified color */
+    /** show status notification in specified color *
     public void showStatus(String status,Color c) {	
         
         //seq_pos.setColor(c);
@@ -995,10 +991,9 @@ ConfigurationListener
     /** set a structure to be displayed and sends a script command to
      * color structure 
      * @param structure_ a Biojava structure object
-     * @param selectcmd a rasmol like select command ( all commands in one line, spearated by ";"
      */
     
-    public void setStructure(Structure structure_, String selectcmd ) {
+    public void setStructure(Structure structure_ ) {
         
         if (logger.isLoggable(Level.FINER)) {
             logger.entering(this.getClass().getName(), "setStructure",  new Object[]{"got structure object"});
@@ -1048,14 +1043,14 @@ ConfigurationListener
         }
         */
         
-        structurePanel.setStructure(structure);
+        structurePanelListener.setStructure(structure);
         
         Map header = structure.getHeader();
         //logger.info("structure header " + header);
         statusPanel.setPDB(structure.getPDBCode());
         statusPanel.setPDBHeader(structure.getHeader());
         
-        structurePanel.executeCmd(selectcmd);
+        //structurePanelListener.executeCmd(selectcmd);
         
         
         setCurrentChainNumber(0);
@@ -1068,28 +1063,17 @@ ConfigurationListener
     }
     
     
-    /** set a structure to be displayed. Use a default select command
-     * to color structure
-     * @param structure_ a Biojava structure object
-     */
-    public void setStructure(Structure structure_ ) {
-        //logger.finest("setting structure");
-        String cmd = INIT_SELECT;
-        
-        setStructure(structure_,cmd);
-        
-    }
     
     public Structure getStructure(){
         return structure;
     }
     
-    /** send a command to Jmol */
+    /** send a command to Jmol *
     public void executeCmd(String cmd) {
         //logger.finest("executing Command "+ cmd);
         structurePanel.executeCmd(cmd);	
     }
-    
+    */
     public String getPDBCode(){
         return structure.getPDBCode();
     }
@@ -1122,7 +1106,10 @@ ConfigurationListener
     public void setCurrentChainNumber( int newCurrentChain) {
         logger.finer("setCurrentChain " + newCurrentChain);
         
+        structurePanelListener.setCurrentChainNumber(newCurrentChain);
+        statusPanel.setCurrentChainNumber(newCurrentChain);
         
+        //TODO move this functionality into other class
         // update features to be displayed ...
         Chain chain = getChain(newCurrentChain) ;
         currentChain = chain;
@@ -1193,14 +1180,14 @@ ConfigurationListener
         statusPanel.setLoading(status);
     }
     
-    public void setSelectionLocked(boolean status) {
-        selectionLocked = status ;
+    //public void setSelectionLocked(boolean status) {
+    //    selectionLocked = status ;
         //lockMenu.setEnabled(selectionLocked);     
-    }
+    //}
     
-    public boolean isSelectionLocked() {
-        return selectionLocked ;
-    }
+    //public boolean isSelectionLocked() {
+    //    return selectionLocked ;
+    //}
     
     /** get Chain number X from structure 
      * @return a Chain object or null ;
@@ -1248,9 +1235,8 @@ ConfigurationListener
     
     /** reset the Jmol panel */
     public void resetDisplay(){
-        String cmd = INIT_SELECT;
-        this.executeCmd(cmd);
-        setSelectionLocked(false);
+        structurePanelListener.resetDisplay();
+        //setSelectionLocked(false);
         
     }
     
@@ -1278,24 +1264,9 @@ ConfigurationListener
         ConfigGui cfg = new ConfigGui(this);
         cfg.showConfigFrame();
     }
-    public void colour(int chainNumber, int start, int end, String colour) {
-        if (first_load)       return ;		
-        if ( start    < 0 ) return ;
-        if (chainNumber < 0 ) return ;
-        
-        
-        
-        String cmd = getSelectStr( chainNumber,  start,  end);
-        if ( ! cmd.equals("")){
-            cmd += "colour "+ colour+";";
-            structurePanel.executeCmd(cmd);
-        }
-        //structurePanel.forceRepaint();
-        if ( chainNumber == currentChainNumber) {
-            seqField.highlite(start-1,end-1);
-            //dascanv.highlite(start-1,end-1);
-        }
-    }
+    
+    /*
+   
     
     public void colour(int chainNumber, int seqpos, String colour) {
         if (first_load)       return ;		
@@ -1311,188 +1282,25 @@ ConfigurationListener
         
     }
     
-    public void highlite(int chainNumber, int start, int end, String colour){
-        //logger.finest("highlite start end" + start + " " + end );
-        //if ( first_load)       return ;		
-        if ( currentChain == null ) return ;
-        if ( start       < 0 ) return ;
-        if ( chainNumber < 0 ) return ;
-        //if ( selectionLocked ) return ;
-        
-        // highlite structure
-        String cmd = getSelectStr( chainNumber,  start,  end);
-        //cmd +=  " spacefill on; " ;
-        if (! cmd.equals("")){
-            if ( colour  != "") {
-                cmd += "colour " +colour ;
-                colour(chainNumber,start,end,colour) ;
-            }
-        }
-        
-        structurePanel.executeCmd(cmd);
-        //structurePanel.forceRepaint();
-        
-        // and now the SeqPanels ...
-        if ( chainNumber == currentChainNumber) {
-            //dascanv.highlite(start,end);
-            seqField.highlite(start,end);
-        }
-        
-        this.repaint();
-        
-    }
+   
     public void highlite(int chainNumber, int start, int end) {
         highlite(chainNumber, start, end, "");
         
     }
     
-    public void highlite(int chainNumber, int seqpos, String colour) {
-        //logger.finest("highlite " + seqpos);
-        if (currentChain == null)       return ;		
-        if ( seqpos     < 0 ) return ;
-        if (chainNumber < 0 ) return ;
-        //if ( selectionLocked ) return ;
-        
-        
-        String cmd = getSelectStr( chainNumber,  seqpos);
-        if ( ! cmd.equals("") ){
-            cmd +=  " spacefill on ;" ;
-            structurePanel.executeCmd(cmd);
-        }
-        //structurePanel.forceRepaint();
-        
-        if ( colour  != "") {
-            colour(chainNumber,seqpos,colour) ;
-        }
-        
-        if ( chainNumber == currentChainNumber ) {
-            //dascanv.highlite(seqpos);
-            // todo add featureselectionlistener for dascanv
-            seqField.highlite(seqpos);
-        }
-        this.repaint();
-    }
+    
     public void highlite(int chain_number,int seqpos){
         
         highlite(chain_number,seqpos,"");
         
     }
+    */
     
-    private Group getGroupNext(int chain_number,int startpos, String direction) {
-        Chain chain = getChain(chain_number) ;
-        if ( chain == null) return null ;
-        
-        while ( (startpos >= 0 ) && (startpos < chain.getLength())){
-            Group g = chain.getGroup(startpos);	
-            if (g.has3D()){
-                return g ;
-            }
-            if ( direction.equals("incr") ) {
-                startpos += 1;
-            } else {
-                startpos -= 1 ;
-            }
-        }
-        return null ;
-    }
-    
-    /** test if pdbserial has an insertion code */
-    private boolean hasInsertionCode(String pdbserial) {
-        try {
-            int pos = Integer.parseInt(pdbserial) ;
-        } catch (NumberFormatException e) {
-            return true ;
-        }
-        return false ;
-    }
+
     
     
-    /** return a select command that can be send to executeCmd*/
-    public String getSelectStr(int chain_number, int start, int end) {
-        Chain chain = getChain(chain_number) ;
-        if ( chain == null) return "" ;
-        String chainid = chain.getName() ;
-        
-        Group gs = getGroupNext( chain_number,(start-1),"incr");
-        //Group gs = chain.getGroup(start-1);	
-        Group ge = getGroupNext( chain_number,(end-1),"decr");
-        //= chain.getGroup(end-1);	
-        //logger.finest("gs: "+gs+" ge: "+ge);
-        if (( gs == null) && (ge == null) ) {
-            return "" ;
-        }
-        
-        if (gs == null) {
-            return getSelectStr( chain_number, end-1) ;
-        }
-        
-        if (ge == null) {
-            return getSelectStr( chain_number, start-1) ;
-        }
-        
-        
-        String startpdb = gs.getPDBCode() ;
-        String endpdb = ge.getPDBCode() ;
-        
-        String cmd =  "select "+startpdb+"-"+endpdb+"and **" +chainid+"; set display selected;" ;
-        return cmd ;
-    }
     
-    /** return a select command that can be send to executeCmd*/
-    public String getSelectStr(int chain_number,int seqpos) {
-        
-        String pdbdat = getSelectStrSingle(chain_number, seqpos);
-        
-        if (pdbdat.equals("")){
-            return "" ;
-        }
-        
-        
-        
-        String cmd = "select " + pdbdat + ";";
-        return cmd ;
-        
-    }
-    
-    /** return the pdbcode + chainid to select a single residue. This
-     * can be used to create longer select statements for individual
-     * amino acids. */
-    
-    public String getSelectStrSingle(int chain_number, int seqpos) {
-        Chain chain = getChain(chain_number) ;
-        if ( chain == null) return "" ;
-        
-        if ( ! ((seqpos >= 0) && (seqpos < chain.getLength()))) {
-            logger.finest("seqpos " + seqpos + "chainlength:" + chain.getLength());
-            return "" ;
-        }
-        
-        //SeqFeatureCanvas dascanv = daspanel.getCanv();
-        //if ( chain_number == currentChain )
-        //  dascanv.highlite(seqpos);
-        
-        Group g = chain.getGroup(seqpos);
-        if (! g.has3D()){
-            return "" ;
-        }
-        
-        String pdbcod = g.getPDBCode() ;
-        
-        if ( hasInsertionCode(pdbcod) ) {
-            String inscode = pdbcod.substring(pdbcod.length()-1,pdbcod.length());
-            String rawcode = pdbcod.substring(0,pdbcod.length()-1);
-            pdbcod = rawcode +"^" + inscode;
-        }
-        
-        
-        //String pdbname = g.getPDBName() ;
-        String chainid = chain.getName() ;
-        //logger.finest("selected "+pdbcod+" " +pdbname);
-        String cmd =  pdbcod+chainid ;
-        return cmd ;
-    }
-    
-    /** select a range of  residue */
+    /** select a range of  residue *
     public void select(int chain_number, int start, int end) {
         //logger.finest("select start end" + start + " " + end);
         //if ( selectionLocked ) return ;
@@ -1512,7 +1320,7 @@ ConfigurationListener
         
     }
     
-    /** select a single residue */
+    /** select a single residue *
     public void select(int chain_number,int seqpos){
         //logger.finest("select seqpos" + seqpos);
         //if ( selectionLocked ) return ;
@@ -1533,11 +1341,8 @@ ConfigurationListener
         
         
     }
+    */
     
-    public void scale() {
-        // reset the sizes of the sub canvases ..
-        
-    }
     
     /** update the DIsplays of the subpanes */
     public void updateDisplays() {

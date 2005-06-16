@@ -138,7 +138,7 @@ public class LoadStructureAlignmentThread
 			//could not find the correct chain!
 			// AARGH!
 			e.printStackTrace();
-			spiceframe.showStatus("a problem occured");
+			//spiceframe.showStatus("a problem occured");
 			    
 		    } 
 		   
@@ -183,9 +183,11 @@ public class LoadStructureAlignmentThread
 		    }
 
 		    System.out.println(scmd);
-		    spiceframe.setStructure(strucnew,scmd);
+		    spiceframe.setStructure(strucnew);
+		    //spiceframe.executeCmd(strucnew);
+		    //TODO : imlement how this command can be sent to Jmol ...
 		    //System.out.println(strucnew);
-		    spiceframe.showStatus("structure alignment loaded!!!");
+		    //spiceframe.showStatus("structure alignment loaded!!!");
 
 		    // and create the alignment command:
 

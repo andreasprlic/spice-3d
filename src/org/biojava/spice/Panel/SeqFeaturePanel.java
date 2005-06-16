@@ -139,7 +139,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         //logger = Logger.getLogger("org.biojava.spice");
         setDoubleBuffered(true) ;
         
-        // TODO Auto-generated constructor stub
+        // TODO REMOVE THIS CLASS - IT IS OBSOLETE
         //Dimension dstruc=this.getSize();
         //imbuf    = this.createImage(dstruc.width, dstruc.height);
         //imbuf = null ;
@@ -178,14 +178,10 @@ implements SeqPanel, MouseListener, MouseMotionListener
         //menuItem.addActionListener(ml);
         //tablePopup.add(menuItem);
         
-        
-        MouseListener popupListener = new SelectionLockPopupListener(popupMenu,spice);
-        this.addMouseListener(popupListener);
+        //MouseListener popupListener = new SelectionLockPopupListener(popupMenu,spice);
+        //this.addMouseListener(popupListener);
         
     }
-    
-    
-    
     
     
     public void paintComponent( Graphics g) {
@@ -648,113 +644,9 @@ implements SeqPanel, MouseListener, MouseMotionListener
               */
     }
     
-    /** highlite a single segment */
-    private void highliteSegment (Segment segment) {
-        logger.finest("highlite Segment");
-        //logger.finest("segment");
-        
-        // clicked on a segment!
-        String col =  segment.getTxtColor();
-        //seqColorOld = col ;
-        //spice.setOldColor(col) ;
-        
-        
-        int start = segment.getStart();
-        int end   = segment.getEnd()  ;
-        
-        // we assume that DAS features start with 1
-        // internal in SPICE they start with 0
-        start = start -1 ;
-        end   = end   -1 ;
-        
-        String type =  segment.getParent().getType() ;
-        //logger.finest(start+" " + end+" "+type);
-        //logger.finest(segment);
-        if ( type.equals("DISULFID")){
-            spice.highlite(current_chainnumber,start);
-            spice.highlite(current_chainnumber,end);
-            
-            String pdb1 = spice.getSelectStrSingle(current_chainnumber,start);
-            String pdb2 = spice.getSelectStrSingle(current_chainnumber,end);
-            String cmd = "select "+pdb1 +", " + pdb2 + "; spacefill on; colour cpk;" ;
-            
-            spice.executeCmd(cmd);
-            
-            
-        } else if (type.equals("METAL") ){
-            spice.highlite(current_chainnumber,start+1,end+1  ,"cpk");
-            
-        } else if ( type.equals("MSD_SITE") || 
-                type.equals("snp")      		  
-        ) {
-            spice.highlite(current_chainnumber,start+1,end+1  ,"wireframe");	    
-        } else if ( (end - start) == 0 ) {
-            // feature of size 1
-            spice.highlite(current_chainnumber,start+1,start+1  ,"cpk");	     
-        } else {
-            spice.colour(current_chainnumber,start+1  ,end+1  ,col);	    
-        }
-        
-    }
+    
     
     /** highlite all segments of a feature */
-    private String highliteFeature(Feature feature){
-        logger.finest("highlite feature " + feature);
-        //Feature feature = (Feature) features.get(featurenr) ;
-        //logger.finest("highlite feature " + feature);
-        
-        
-        List segments = feature.getSegments() ;
-        String cmd = "" ;
-        
-        for ( int i =0; i< segments.size() ; i++ ) {
-            Segment segment = (Segment) segments.get(i);
-            //highliteSegment(segment);
-            
-            int start = segment.getStart();
-            int end   = segment.getEnd();
-            //logger.finest("highilte feature " +featurenr+" " + start + " " +end );
-            
-            if ( feature.getType().equals("DISULFID")){
-                String c = spice.getSelectStr(current_chainnumber,start-1); 
-                 
-                if (! c.equals("")) {
-                    cmd += c ;
-                    cmd += "colour cpk; spacefill on;";
-                }
-                String c2 = spice.getSelectStr(current_chainnumber,end-1);
-                if ( ! c2.equals("")){
-                    cmd += c2;
-                    cmd += "colour cpk; spacefill on;";
-                }
-                
-            } else {
-                String c = spice.getSelectStr(current_chainnumber,start,end);
-                if (c.equals("")) continue;
-                cmd += c;
-                String col = segment.getTxtColor();
-                cmd += "color "+ col +";";
-            } 
-            //if ( start == end ) {
-            //cmd += " spacefill on;";
-            //}
-        }
-        if ( ( feature.getType().equals("METAL")) ||
-                ( feature.getType().equals("SITE"))  ||
-                ( feature.getType().equals("ACT_SITE")) 	     
-        ){
-            cmd += " spacefill on; " ;
-        } else if ( feature.getType().equals("MSD_SITE")|| 
-                feature.getType().equals("snp") 
-        ) {
-            cmd += " wireframe on; " ;
-        }
-        
-        //logger.finest("cmd: "+cmd); 
-        return cmd ;
-        
-        
-    }
     
     
     /** select single position
@@ -786,7 +678,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         selectStart  = seqpos ;
         selectEnd    = 1     ;
         dragging = false;
-        spice.setSelectionLocked(false);
+        //spice.setSelectionLocked(false);
         this.repaint();
         
     }
@@ -804,7 +696,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         selectStart = start  ;
         selectEnd   = end    ;
         dragging = true;
-        spice.setSelectionLocked(true);
+        //spice.setSelectionLocked(true);
         this.repaint();
         
     }
@@ -881,8 +773,8 @@ implements SeqPanel, MouseListener, MouseMotionListener
     private String getToolString(int seqpos, Segment segment){
         //logger.finest("getToolString");
         // current position is seqpos
-        String toolstr = spice.getToolString(current_chainnumber,seqpos);
-        
+        //String toolstr = spice.getToolString(current_chainnumber,seqpos);
+        String toolstr = "";
         //logger.finest("getToolString");
         
         Feature parent = segment.getParent() ;
@@ -978,7 +870,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         if ( segment != null) {
             String toolstr = getToolString(seqpos,segment);
             //gfeat.drawString(toolstr,5,13);
-            spice.showStatus(toolstr) ;
+            //spice.showStatus(toolstr) ;
             // display ToolTip
             this.setToolTipText(toolstr);
             
@@ -1003,7 +895,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         } else {
             this.setToolTipText(null);
             setCursor(defaultCursor);
-            spice.showSeqPos(current_chainnumber,seqpos);
+            //spice.showSeqPos(current_chainnumber,seqpos);
             
         }
         
@@ -1011,7 +903,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         //    return;
         
         if ( dragging) return;
-        spice.select(current_chainnumber,seqpos);
+        //spice.select(current_chainnumber,seqpos);
         return  ;
     }
     
@@ -1038,9 +930,12 @@ implements SeqPanel, MouseListener, MouseMotionListener
             mouseDragStart = getSeqPos(e);
         
         dragging = false;
-        spice.setSelectionLocked(false);
+        //spice.setSelectionLocked(false);
         
     }
+    
+    public void mouseReleased(MouseEvent e) {}
+    /*
     public void mouseReleased(MouseEvent e) {
         int b = e.getButton();
         //logger.finest("mouseReleased "+b);       
@@ -1079,10 +974,10 @@ implements SeqPanel, MouseListener, MouseMotionListener
                     String cmd = "";
                     for ( int i=0; i<features.size(); i++) {
                         Feature feature = (Feature) features.get(i);
-                        cmd += highliteFeature(feature);		    
+                        //cmd += highliteFeature(feature);		    
                     }
                     logger.finest("sending cmd to jmol: " + cmd);
-                    spice.executeCmd(cmd);
+                    //spice.executeCmd(cmd);
                     dragging=true;
                     spice.setSelectionLocked(true);
                     return  ;
@@ -1111,7 +1006,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
             }
         }            
     }
-    
+    */
     public void mouseDragged(MouseEvent e) {
         dragging = true;
         
@@ -1139,7 +1034,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
             start = selEnd ;
             end = mouseDragStart ;
         }
-        spice.highlite(current_chainnumber,start,end);
+        //spice.highlite(current_chainnumber,start,end);
     }
     
 }

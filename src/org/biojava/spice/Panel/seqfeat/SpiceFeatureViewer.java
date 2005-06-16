@@ -24,10 +24,8 @@ package org.biojava.spice.Panel.seqfeat;
 
 import javax.swing.*;
 
-import java.awt.Component;
+
 import java.awt.Point;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.util.*;
 import java.awt.Dimension;
@@ -97,6 +95,7 @@ FeatureViewListener
     List selectedSeqPositionListeners;
     int typePanelSize;
     int labelPanelSize;
+    boolean selectionIsLocked ;
     /**
      * 
      */
@@ -108,7 +107,7 @@ FeatureViewListener
         // also adapt our size since we are a SizeableJPanel
         //MyComponentShowListener mcsl = new MyComponentShowListener(this); 
         //this.addComponentListener(mcsl);
-        
+        selectionIsLocked = false;
         this.setBackground(Color.black);
         
         featureViews = new ArrayList();
@@ -169,10 +168,11 @@ FeatureViewListener
         seqScale.setFeatures(new FeatureImpl[0]);
         
         FeaturePanelMouseListener fpml = new FeaturePanelMouseListener(this,seqScale);
-        fpml.addSelectedSeqListener(this);
+        //fpml.addSelectedSeqListener(this);
         SeqScaleCanvas ssc = seqScale.getSeqScaleCanvas();
         ssc.addMouseListener(fpml);
         ssc.addMouseMotionListener(fpml);
+        ssc.setFeaturePanelMouseListener(fpml);
         
         initLabelPane();
         
@@ -186,7 +186,7 @@ FeatureViewListener
         
         typeSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,typeBox,featureScroll);
         typeSplit.setBorder(BorderFactory.createEmptyBorder());
-        typeSplit.setBackground(Color.black);
+        //typeSplit.setBackground(Color.black);
         typeSplit.addPropertyChangeListener("dividerLocation", 
                 new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
@@ -212,7 +212,7 @@ FeatureViewListener
         );        
         labelSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,labelBox,typeSplit);
         labelSplit.setBorder(BorderFactory.createEmptyBorder());
-        labelSplit.setBackground(Color.black);
+        //labelSplit.setBackground(Color.black);
         labelSplit.addPropertyChangeListener("dividerLocation", 
                 new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
@@ -244,6 +244,10 @@ FeatureViewListener
         //vBox.add(labelSplit);
         //this.add(labelSplit);
         this.add(vBox);
+        
+        // listening to events ( i.e. color selection );
+        //this.addFeatureViewListener(this);
+        //this.addSelectedSeqPositionListener(this);
         //vBox.add(seqScale);
         
         //float scale = calcScale(100);
@@ -271,33 +275,43 @@ FeatureViewListener
         return (FeatureViewListener[]) featureViewListeners.toArray(new FeatureViewListener[featureViewListeners.size()]);
     }
     
+    public SelectedSeqPositionListener[] getSelectedSeqPositionListeners() {
+        return (SelectedSeqPositionListener[]) selectedSeqPositionListeners.toArray(new SelectedSeqPositionListener[selectedSeqPositionListeners.size()]);
+    }
+    
 	public void mouseOverFeature(FeatureEvent e){ 
+	    /*
 	    Iterator iter = featureViewListeners.iterator();
 	    while (iter.hasNext()) {
 	        FeatureViewListener fvl = (FeatureViewListener) iter.next();
 	        fvl.mouseOverFeature(e);
 	    }
+	    */
 	}
 	public void mouseOverSegment(FeatureEvent e){
+	    /*
 	    Iterator iter = featureViewListeners.iterator();
 	    while (iter.hasNext()) {
 	        FeatureViewListener fvl = (FeatureViewListener) iter.next();
 	        fvl.mouseOverSegment(e);
 	    }
+	    */
 	}
 	public void featureSelected(FeatureEvent e) {
-	    Iterator iter = featureViewListeners.iterator();
+	    /*Iterator iter = featureViewListeners.iterator();
 	    while (iter.hasNext()) {
 	        FeatureViewListener fvl = (FeatureViewListener) iter.next();
 	        fvl.featureSelected(e);
-	    }
+	    }*/
 	}
 	public void segmentSelected(FeatureEvent e) {
+	    /*
 	    Iterator iter = featureViewListeners.iterator();
 	    while (iter.hasNext()) {
 	        FeatureViewListener fvl = (FeatureViewListener) iter.next();
 	        fvl.segmentSelected(e);
 	    }
+	    */
 	}
     
     /** sets the visible size of the feature panel 
@@ -451,11 +465,10 @@ FeatureViewListener
         //lab.addMouseListener(lpml);
         //lab.addMouseMotionListener(lpml);
         FeaturePanelMouseListener fpml = new FeaturePanelMouseListener(this,view);
-        fpml.addSelectedSeqListener(this);
-        fpml.addFeatureViewListener(this);
-        sub.addMouseMotionListener(fpml);
-        sub.addMouseListener(      fpml);
+        //fpml.addSelectedSeqListener(this);
+        //fpml.addFeatureViewListener(this);
         
+        sub.setFeaturePanelMouseListener(fpml);
         
         
         featureViews.add(view);
@@ -479,6 +492,7 @@ FeatureViewListener
     
     public void selectedSeqPosition(int position) {
         // highlite in FeaturePanels
+        if ( selectionIsLocked) return;
         seqScale.highlite(position);
         Iterator iter = featureViews.iterator();
         while (iter.hasNext()){
@@ -486,15 +500,18 @@ FeatureViewListener
             fv.highlite(position);
         }
         
+        /*
         iter = selectedSeqPositionListeners.iterator();
         while (iter.hasNext()){
             SelectedSeqPositionListener li = (SelectedSeqPositionListener)iter.next();
             li.selectedSeqPosition(position);
         }
+        */
         
     }
     public void selectedSeqRange(int start, int end){
 //      highlite in FeaturePanels
+        if ( selectionIsLocked) return;
         seqScale.highlite(start,end);
         Iterator iter = featureViews.iterator();
         while (iter.hasNext()){
@@ -502,12 +519,30 @@ FeatureViewListener
             fv.highlite(start,end);
         }
         
+        /*
         iter = selectedSeqPositionListeners.iterator();
         while (iter.hasNext()){
             SelectedSeqPositionListener li = (SelectedSeqPositionListener)iter.next();
             li.selectedSeqRange(start,end);
         }
+        */
         
+    }
+    
+    public void selectionLocked(boolean flag){
+        System.out.println("SpiceFeatureView selection locked " + flag);
+        selectionIsLocked = flag;
+        FeaturePanel fp = seqScale.getSeqScaleCanvas();
+        FeaturePanelMouseListener fpml = fp.getFeaturePanelMouseListener();
+        fpml.setSelectionLocked(flag);
+        Iterator iter = featureViews.iterator();
+        
+        while ( iter.hasNext()){
+            FeatureView fv = (FeatureView)iter.next();
+            FeaturePanel fpa = fv.getFeaturePanel();
+            fpml = fpa.getFeaturePanelMouseListener();
+            fpml.setSelectionLocked(flag);
+        }
     }
     
     

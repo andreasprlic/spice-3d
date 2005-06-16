@@ -27,8 +27,6 @@ package org.biojava.spice;
 import org.biojava.spice.Config.*;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.Chain;
-
-import java.awt.Color;
 import java.util.List;
 import java.net.URL;
 import org.biojava.spice.Panel.seqfeat.SpiceFeatureViewer;
@@ -57,20 +55,16 @@ public interface SPICEFrame
     /** starts a new thread that retreives protein structure using the
 	DAS structure command from some other server this thread will
 	call the setStructure method to set the protein structure.
+    *
+    public void getStructure(String pdbcode) ;
     */
-    //public void getStructure(String pdbcode) ;
-
-    /** show status notification in defaul color */
+    
+    /** show status notification in defaul color *
     public void   showStatus( String status ) ;
-    /** show status notification in specified color */
+    /** show status notification in specified color *
     public void   showStatus( String status,Color c ) ;
     
-    /** set a structure to be displayed and sends a script command to
-     * color structure 
-     * @param structure a Biojava structure object
-     * @param selectcmd a rasmol like select command ( all commands in one line, spearated by ";"
-     */
-    public void   setStructure(Structure structure, String selectcmd );
+
 
     /** set a structure to be displayed. Use a default select command
      * to color structure
@@ -78,6 +72,8 @@ public interface SPICEFrame
      */
     public void   setStructure(Structure structure );
 
+    
+    
     	/** retreive the internal Structure object */
     	public Structure getStructure();
     	
@@ -86,6 +82,7 @@ public interface SPICEFrame
 
     /** get the displayed features */
     	public List getFeatures();
+    
     
     /** set the chain nr chainnr as the active one */
     public void setCurrentChainNumber(int chainnr);
@@ -96,7 +93,7 @@ public interface SPICEFrame
     /** retreive the chainNumber by PDB character
 	@param PDB code for chain
 	@return number of chain in current structure, or -1.
-    */
+    *
     public int getChainPosByPDB(String chainPDBcode);
 
     /** retreive the sequence position for a residue by it's PDB code.
@@ -106,46 +103,47 @@ public interface SPICEFrame
 	getSeqPosByPDB("122A");
 	@param residuePDBcode PDB Code for residue. append insertion code if needed.
 	@return position of group in currently displayed chain or -1.
-    */
+    *
     public int getSeqPosByPDB(String residuePDBcode);
 
-    /** highighting of range of residues */
+    /** highighting of range of residues *
     public void highlite(int chainNumber, int start, int end, String colour);
 
-    /** highighting of range of residues */
+    /** highighting of range of residues *
     public void highlite(int chainNumber, int start, int end);
 
-    /** highighting of single residue */
+    /** highighting of single residue *
     public void highlite(int chainNumber, int seqpos, String colour);
 
-    /** highighting of single residue */    
+    /** highighting of single residue *    
     public void highlite(int chainNumber, int seqpos);
 
-    /** select range of residues */
+    /** select range of residues *
     public void select(int chainNumber, int start, int end);
     
-    /** select single residue */
+    /** select single residue *
     public void select(int chainNumber, int seqpos);
 
-    /** colour range of residues */
+    /** colour range of residues *
     public void colour(int chainNumber, int start, int end, String colour);
     
-    /** colour single residue */
+    /** colour single residue *
     public void colour (int chainNumber, int seqpos, String colour);
-
-    /** return command that can be send to executeCmd*/
+    
+    
+    /** return command that can be send to executeCmd*
     public String getSelectStr(int chain_number, int start, int end);
-    /** return command that can be send to executeCmd*/
+    /** return command that can be send to executeCmd*
     public String getSelectStr(int chain_number,int seqpos) ;
 
     /** return the pdbcode + chainid to select a single residue. This
      * can be used to create longer select statements for individual
-     * amino acids. */
+     * amino acids. *
     public String getSelectStrSingle(int chain_number, int seqpos) ;
     
-    /** send a command to the Jmol panel*/
+    /** send a command to the Jmol panel*
     public void executeCmd(String cmd);
-    
+    */
     /** reset the display, but do not change data */
     public void resetDisplay();
 
@@ -156,17 +154,17 @@ public interface SPICEFrame
     public boolean showURL(URL url);
    
     // rescale the windo size 
-    public void scale() ;
+    //public void scale() ;
     
     /** retreive info regarding structure */
     public Chain getChain(int chainnumber);
 
-    /** returns a string to display in the status window */
+    /** returns a string to display in the status window *
     public String getToolString(int chainnumber, int seqpos);
-
-    /** display status in status window */
+    */
+    /** display status in status window *
     public void showSeqPos(int chainnumber, int seqpos);
-
+    */
     /** set the configuration from outside */
     public void setConfiguration(RegistryConfiguration conf);
 
@@ -176,13 +174,13 @@ public interface SPICEFrame
     
     /** if set to true, the selection is locked and 
      * can not be changed, until released again */
-    public void setSelectionLocked(boolean status);
+    //public void setSelectionLocked(boolean status);
     
     /** allows to query if selecting is possible
      * 
      * @return boolean value if selection  is locked .
      */
-    public boolean isSelectionLocked();
+    //public boolean isSelectionLocked();
     
     
     /** open a web page in the browser 

@@ -24,11 +24,7 @@ package org.biojava.spice.GUI;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
 import javax.swing.JPopupMenu;
-
-
-import org.biojava.spice.SPICEFrame;
 
 /**
  * @author Andreas Prlic
@@ -37,9 +33,9 @@ import org.biojava.spice.SPICEFrame;
 public class SelectionLockPopupListener 
 extends MouseAdapter {
     JPopupMenu popup;
-    SPICEFrame spice;
-    public SelectionLockPopupListener(JPopupMenu popupMenu,SPICEFrame parent_) {
-        spice = parent_;
+    //SPICEFrame spice;
+    public SelectionLockPopupListener(JPopupMenu popupMenu) {
+        //spice = parent_;
         popup  = popupMenu;
     }
     

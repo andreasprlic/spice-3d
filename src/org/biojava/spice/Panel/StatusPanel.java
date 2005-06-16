@@ -23,7 +23,17 @@
  */
 package org.biojava.spice.Panel;
 
+import org.biojava.bio.structure.AminoAcid;
+import org.biojava.bio.structure.Chain;
+import org.biojava.bio.structure.Group;
+import org.biojava.bio.structure.Structure;
 import org.biojava.spice.SPICEFrame;
+import org.biojava.spice.Feature.Feature;
+import org.biojava.spice.Feature.Segment;
+import org.biojava.spice.Panel.seqfeat.FeatureEvent;
+import org.biojava.spice.Panel.seqfeat.FeatureViewListener;
+import org.biojava.spice.Panel.seqfeat.SelectedSeqPositionListener;
+
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JEditorPane;
@@ -31,6 +41,8 @@ import javax.swing.BoxLayout;
 import javax.swing.JProgressBar;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.BorderLayout;
 import java.awt.event.*;
@@ -51,6 +63,7 @@ import java.awt.Point;
  */
 public class StatusPanel
 extends JPanel
+implements FeatureViewListener, SelectedSeqPositionListener
 {
     public static String PDBLINK = "http://www.rcsb.org/pdb/cgi/explore.cgi?pdbId=";
     public static String UNIPROTLINK = "http://www.ebi.uniprot.org/uniprot-srv/uniProtView.do?proteinAc=" ;
@@ -61,15 +74,16 @@ extends JPanel
     JTextField spCode  ;    
     JTextField status ;
     JTextField pdbDescription;
-    
+    JTextField seq_pos ;
     JProgressBar progressBar ;
     SPICEFrame spice ;
-    
-    
+    //Structure structure;
+    int currentChainNumber;
     PDBDescMouseListener pdbdescMouseListener;
     
     public StatusPanel(SPICEFrame parent){
         spice = parent;
+        currentChainNumber = -1;
         this.setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
         this.setBorder(BorderFactory.createEmptyBorder());
         Box hBox =  Box.createHorizontalBox();
@@ -136,12 +150,24 @@ extends JPanel
         progressBar.setBorder(BorderFactory.createEmptyBorder());
         hBox.add(progressBar,BorderLayout.EAST);
         
+        seq_pos        = new JTextField();
+        // init Seqouece position
+        seq_pos.setForeground(new Color(255, 255, 255));
+        seq_pos.setBackground(new Color(0, 0, 0));
+        //seq_pos.setSize(700, 30);
+        seq_pos.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
+        seq_pos.setBorder(BorderFactory.createEmptyBorder());
         
+        Box vBox = Box.createVerticalBox();
+        vBox.add(hBox);
         
-        this.add(hBox);	
+        vBox.add(seq_pos);
+        this.add(vBox);	
         
     }
-    
+    public void setCurrentChainNumber(int number){
+        currentChainNumber = number;
+    }
     public void setPDBHeader(Map header){
         pdbheader = header;
         pdbdescMouseListener.setPDBHeader(header);
@@ -176,6 +202,132 @@ extends JPanel
         pdbDescription.setText(desc);
     }
     
+    
+    /** get Chain number X from structure 
+     * @return a Chain object or null ;
+     */
+    private Chain getChain(int chainnumber) {
+        if ( chainnumber < 0){
+            return null;
+        }
+        Structure structure = spice.getStructure();
+      
+        
+        if ( structure == null ) {
+            //logger.log(Level.WARNING,"no structure loaded, yet");
+            return null ;
+        }
+        
+        if ( structure.size() < 1 ) {
+            //logger.log(Level.WARNING,"structure object is empty, please load new structure");
+            return null ;
+        }
+        
+        if ( chainnumber > structure.size()) {
+            //logger.log(Level.WARNING,"requested chain number "+chainnumber+" but structure has size " + structure.size());
+            return null ;
+        }
+        
+        Chain c = structure.getChain(chainnumber);
+        return c;
+    }
+    
+    private String getToolString(int chainnumber,int seqpos) {
+        //return "tmp in getToolString";
+        
+        Chain chain = getChain(chainnumber);
+        if ( chain == null) return "" ;
+        
+        if ( ! ((seqpos >= 0) && (seqpos < chain.getLength()))) {
+            return "" ;
+        } 
+        
+        
+        
+        Group g = chain.getGroup(seqpos);	
+        Character amino1 = new Character(" ".charAt(0)) ;
+        if (g.getType() == "amino" ) {
+            AminoAcid a = (AminoAcid) g ;
+            amino1 = a.getAminoType();
+        }
+        String pdbstr = g.getPDBCode();	
+        String name   = g.getPDBName();
+        if (pdbstr == null ) {
+            pdbstr = "n.a." ;
+            
+        }
+        
+        String drstr = "Seq pos "+ (seqpos +1) + "("+amino1+","+name+")" + " PDB ("+ pdbstr +")";  	
+        return drstr ;
+        
+    }
+    
+    public String getPDBPos( int chainnumber, int seqpos){
+        
+        if ( seqpos < 0 ) return "n.a.";
+        Chain chain = getChain(chainnumber);
+        if ( chain == null) return "n.a." ;
+        if ( seqpos >= chain.getLength()) return "n.a.";
+        
+        Group g = chain.getGroup(seqpos);	
+        Character amino1 = new Character(" ".charAt(0)) ;
+        if (g.getType() == "amino" ) {
+            AminoAcid a = (AminoAcid) g ;
+            amino1 = a.getAminoType();
+        }
+        String pdbstr = g.getPDBCode();	
+        
+        if (pdbstr == null ) {
+            pdbstr = "n.a." ;
+            
+        }
+        return pdbstr;
+    }
+    public void selectedSeqRange(int start, int end) {
+        
+        //System.out.println("selected " + start + " " + end);
+        String pdbstart = getPDBPos(currentChainNumber,start);
+        String pdbend = getPDBPos(currentChainNumber,end);
+        String txt = "selected seq: " + start + " - " + end + " pdb: " +pdbstart +"-" +pdbend;
+        seq_pos.setText(txt);
+        seq_pos.repaint();
+    }
+    
+    public void selectionLocked(boolean flag){
+        // ignore
+    }
+    
+    public void selectedSeqPosition(int seqpos){
+        //System.out.println("selected seqpos " + seqpos );
+        String str = getToolString(currentChainNumber, seqpos);
+        seq_pos.setText(str);
+    }
+	public void mouseOverFeature(FeatureEvent e){
+	    
+	    Feature feat = (Feature) e.getSource();
+	    //System.out.println("mouse over feature " + feat);
+	    String txt= feat.toString();
+	    seq_pos.setText(txt);
+	}
+	
+	public void mouseOverSegment(FeatureEvent e){
+	    Segment seg = (Segment)e.getSource();
+	    //System.out.println("mouse over segment " + seg);
+	    String txt = seg.toString();
+	    seq_pos.setText(txt);
+	}
+	public void featureSelected(FeatureEvent e){
+	    Feature feat = (Feature) e.getSource();
+	    //System.out.println("selected feature " + feat);
+	    String txt= feat.toString();
+	    seq_pos.setText(txt);
+	}
+	public void segmentSelected(FeatureEvent e){
+	    Segment seg = (Segment)e.getSource();
+	    //System.out.println("selected segment " + seg);
+	    String txt = seg.toString();
+        seq_pos.setText(txt);
+	}
     
 }
 
@@ -360,5 +512,6 @@ class PDBDescMouseListener implements MouseListener, MouseMotionListener {
         
     }
     
+
     
 }

@@ -58,7 +58,7 @@ public class LoadUniProtThread
 	
 	try {
 	    logger.finest("loading uniprot " + uniprot);
-	    spiceframe.showStatus("Loading...Wait...");
+	    //spiceframe.showStatus("Loading...Wait...");
 	    spiceframe.setLoading(true);
 	    
 	    // do something ...
@@ -84,7 +84,7 @@ public class LoadUniProtThread
 	    finished = true ;
 
 	    spiceframe.setLoading(false);
-	    spiceframe.showStatus(uniprot +" loaded");
+	    //spiceframe.showStatus(uniprot +" loaded");
 	    notifyAll();
 
 	}catch (Exception e){ 

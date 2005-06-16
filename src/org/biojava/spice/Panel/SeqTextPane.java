@@ -24,8 +24,12 @@
 package org.biojava.spice.Panel;
 
 import org.biojava.spice.SPICEFrame ;
+import org.biojava.spice.Feature.Feature;
+import org.biojava.spice.Feature.Segment;
 import org.biojava.spice.GUI.SelectionLockMenuListener;
-import org.biojava.spice.GUI.SelectionLockPopupListener;
+import org.biojava.spice.Panel.seqfeat.FeatureEvent;
+import org.biojava.spice.Panel.seqfeat.SelectedSeqPositionListener;
+import org.biojava.spice.Panel.seqfeat.FeatureViewListener;
 import javax.swing.JTextPane;
 import javax.swing.JPopupMenu;
 import java.awt.event.MouseListener       ;
@@ -40,7 +44,8 @@ import java.awt.event.KeyAdapter          ;
 import java.util.logging.*                ;
 import java.util.List                     ;
 import java.util.regex.*                  ;
-
+import java.util.ArrayList;
+import java.util.Iterator;
 import org.biojava.bio.structure.*        ;
 
 
@@ -51,7 +56,9 @@ import org.biojava.bio.structure.*        ;
 public class SeqTextPane
 extends JTextPane
 
-implements SeqPanel, MouseListener, MouseMotionListener
+implements FeatureViewListener, 
+SelectedSeqPositionListener,
+MouseListener, MouseMotionListener
 {
     
     SPICEFrame spice ;
@@ -62,15 +69,20 @@ implements SeqPanel, MouseListener, MouseMotionListener
     ISearchListener isearchListener ;
     JPopupMenu popupMenu;
     boolean dragging ;
+    boolean selectionIsLocked;
     static Logger logger      = Logger.getLogger("org.biojava.spice");
+    List selectedSeqPositionListeners;
     public SeqTextPane (SPICEFrame spicef) {
         super();
+        selectionIsLocked = false;
         spice = spicef;
         chain = null ;
         dragging = false ;
         int current_chainnumber = -1;
         selectionStart = -1 ;
         //this.setBackground(Color.black);
+        
+        selectedSeqPositionListeners = new ArrayList();
         
         // add font styles to mark sequence position
         //StyledDocument doc = this.getStyledDocument();
@@ -82,6 +94,15 @@ implements SeqPanel, MouseListener, MouseMotionListener
         Style bstyle = this.addStyle("black",null);
         StyleConstants.setForeground(bstyle,Color.black);
         StyleConstants.setBackground(bstyle,Color.white);
+        
+        Style ystyle = this.addStyle("yellow",null);
+        StyleConstants.setBackground(ystyle,Color.yellow);
+        StyleConstants.setForeground(ystyle,Color.black);
+        
+        Style gstyle = this.addStyle("grey",null);
+        StyleConstants.setBackground(gstyle,Color.gray );
+        StyleConstants.setForeground(gstyle,Color.black);
+        
         //StyleConstants.setBold(bstyle,false);
         
         this.setEditable(false);
@@ -100,12 +121,15 @@ implements SeqPanel, MouseListener, MouseMotionListener
         //tablePopup.add(menuItem);
         
         
-        MouseListener popupListener = new SelectionLockPopupListener(popupMenu,spice);
-        this.addMouseListener(popupListener);
+        //MouseListener popupListener = new SelectionLockPopupListener(popupMenu,spice);
+        //this.addMouseListener(popupListener);
         
     }
     
-    
+    public void addSelectedSeqPositionListener(SelectedSeqPositionListener listener){
+        selectedSeqPositionListeners.add(listener);
+        isearchListener.addSelectedSeqPositionListener(listener);
+    }
     
     public void setChain(Chain c,int chainnumber) {
         chain = c;
@@ -140,10 +164,14 @@ implements SeqPanel, MouseListener, MouseMotionListener
         //System.out.println("SeqTextPane mouseMoved " + x + " " + y + " " + seqpos);
         if ( seqpos > this.getText().length()) return ;
         
-        spice.showSeqPos(current_chainnumber,seqpos);
+        //spice.showSeqPos(current_chainnumber,seqpos);
         if ( dragging) return;
-        spice.select(current_chainnumber,seqpos);
-        
+        highlite(seqpos);
+        Iterator iter = selectedSeqPositionListeners.iterator();
+        while (iter.hasNext()){
+            SelectedSeqPositionListener li = (SelectedSeqPositionListener)iter.next();
+            li.selectedSeqPosition(seqpos);
+        }
     }
     
     
@@ -160,9 +188,6 @@ implements SeqPanel, MouseListener, MouseMotionListener
     
     public void mouseClicked(MouseEvent e)  { 
     
-           
-        
-    
     }
     public void mouseEntered(MouseEvent e)  {}
     public void mouseExited(MouseEvent e)   {}
@@ -172,8 +197,8 @@ implements SeqPanel, MouseListener, MouseMotionListener
         logger.finest("mousePressed " + b);
         if ( b == MouseEvent.BUTTON3) return;
         selectionStart = getSeqPos(e);
-	dragging = false;
-	spice.setSelectionLocked(false);
+        dragging = false;
+        setSelectionLocked(false);
         
     }
     public void mouseReleased(MouseEvent e) {
@@ -187,25 +212,51 @@ implements SeqPanel, MouseListener, MouseMotionListener
         if ( popupMenu.isVisible())
             return;
         
-        if ( dragging) return ;
-        if (  spice.isSelectionLocked())   return;
+        if ( dragging) {
+            int selEnd =  getSeqPos(e);
+            int start = selectionStart ;
+            int end   = selEnd         ;
+            
+            if ( selEnd < selectionStart ) {
+                start = selEnd ;
+                end = selectionStart ;
+            }
+            highlite(start,end);
+            Iterator iter = selectedSeqPositionListeners.iterator();
+            while (iter.hasNext()){
+                SelectedSeqPositionListener li = (SelectedSeqPositionListener)iter.next();
+                li.selectedSeqRange(start,end);
+            }
+            setSelectionLocked(true);
+            return ;
+        }
+        
+        // not dragging ... :
+        if (  selectionIsLocked)   return;
         
         int seqpos = getSeqPos(e);
         if ( seqpos < 0 ) return ; 
         
         
-        spice.select(current_chainnumber,seqpos);
-        String pdb1 = spice.getSelectStrSingle(current_chainnumber,seqpos);
+        //spice.select(current_chainnumber,seqpos);
+        /*String pdb1 = spice.getSelectStrSingle(current_chainnumber,seqpos);
         if ( ! pdb1.equals("")) {
             String cmd = "select "+pdb1 +"; spacefill on; colour cpk;" ;
             spice.executeCmd(cmd);
+        }*/
+        
+        Iterator iter = selectedSeqPositionListeners.iterator();
+        while (iter.hasNext()){
+            SelectedSeqPositionListener li = (SelectedSeqPositionListener)iter.next();
+            li.selectedSeqPosition(seqpos);
         }
+        
         
     }
     public void mouseDragged(MouseEvent e) {
         //System.out.println("dragging mouse "+e);
         dragging = true ;
-        spice.setSelectionLocked(true);
+        //setSelectionLocked(true);
         if ( selectionStart < 0 )
             return ;
         int b = e.getButton();
@@ -219,7 +270,12 @@ implements SeqPanel, MouseListener, MouseMotionListener
             start = selEnd ;
             end = selectionStart ;
         }
-        spice.highlite(current_chainnumber,start,end);
+        highlite(start,end);
+        Iterator iter = selectedSeqPositionListeners.iterator();
+        while (iter.hasNext()){
+            SelectedSeqPositionListener li = (SelectedSeqPositionListener)iter.next();
+            li.selectedSeqRange(start,end);
+        }
     }	
     
     
@@ -240,7 +296,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         //System.out.println("SeqTExtPane highlite " + start + " " + end);
         //select(start,end);
         dragging = true;
-        spice.setSelectionLocked(true);
+        setSelectionLocked(true);
         StyledDocument doc = this.getStyledDocument();
         doc.setCharacterAttributes(0,chain.getLength(), this.getStyle("black"),true);
         doc.setCharacterAttributes(start,(end-start +1), this.getStyle("red"),true);
@@ -250,9 +306,9 @@ implements SeqPanel, MouseListener, MouseMotionListener
     /** highighting of single residue */    
     public void highlite( int seqpos) {
         dragging = false ;
-        spice.setSelectionLocked(false);
+        setSelectionLocked(false);
         //System.out.println("SeqTExtPane highlite " + seqpos);
-        select(seqpos);
+        selectedSeqPosition(seqpos);
         StyledDocument doc = this.getStyledDocument();
         doc.setCharacterAttributes(0,chain.getLength(), this.getStyle("black"),true);
         doc.setCharacterAttributes(seqpos,1, this.getStyle("red"),true);
@@ -260,10 +316,21 @@ implements SeqPanel, MouseListener, MouseMotionListener
     }
     
     /** select range of residues */
-    public void select(int start, int end){
+    //public void select(int start, int end){
+      // selectedSeqRange(start,end);
+    //}
+    
+    /** select single residue */
+    //public void select( int seqpos) {
+        //System.out.println("SeqTExtPane select " + seqpos);
+       //selectedSeqPosition(seqpos);
+    //}
+    
+    public void selectedSeqRange(int start, int end) {
+        //System.out.println("selected " + start + " " + end);
         //System.out.println("SeqTExtPane select " + start + " "  + end);
         dragging = true ;
-        spice.setSelectionLocked(true);
+        //setSelectionLocked(true);
         if ( chain == null ) { return ;}
         StyledDocument doc = this.getStyledDocument();
         doc.setCharacterAttributes(0,chain.getLength(), this.getStyle("black"),true);
@@ -271,17 +338,86 @@ implements SeqPanel, MouseListener, MouseMotionListener
         this.repaint();
     }
     
-    /** select single residue */
-    public void select( int seqpos) {
-        //System.out.println("SeqTExtPane select " + seqpos);
+    public void selectedSeqPosition(int seqpos){
+       // System.out.println("selected seqpos " + seqpos );
         if ( chain == null ) { return ;}
         dragging = false;
-        spice.setSelectionLocked(false);
+        //setSelectionLocked(false);
+        selectionIsLocked = false;
         StyledDocument doc = this.getStyledDocument();
         doc.setCharacterAttributes(0,chain.getLength(), this.getStyle("black"),true);
         doc.setCharacterAttributes(seqpos,1, this.getStyle("red"),true);	
         this.repaint();
     }
+    
+    /** goes through all SeqPositionSelected listeners and locks/unlocks selection */
+    private void setSelectionLocked(boolean flag){
+        selectionIsLocked = flag;
+        Iterator iter = selectedSeqPositionListeners.iterator();
+        while (iter.hasNext()){
+            SelectedSeqPositionListener li = (SelectedSeqPositionListener)iter.next();
+            li.selectionLocked(flag);
+        }
+        
+    }
+    
+    public void selectionLocked(boolean flag){
+        selectionIsLocked = flag;
+    }
+    
+	public void mouseOverFeature(FeatureEvent e){
+	    
+	    
+	    Feature feat = (Feature) e.getSource();
+	    //System.out.println("selected feature " + feat);
+	    paintFeature(feat);
+	}
+	
+	public void mouseOverSegment(FeatureEvent e){
+	    Segment seg = (Segment)e.getSource();
+	    //System.out.println("mouse over segment " + seg);
+	    int start = seg.getStart();
+	    int end = seg.getEnd();
+	    highlite(start,end);
+	}
+	
+	private void paintFeature(Feature feat){
+	    StyledDocument doc = this.getStyledDocument();
+        doc.setCharacterAttributes(0,chain.getLength(), this.getStyle("black"),true);
+        List segments = feat.getSegments();
+        Iterator iter = segments.iterator();
+        while ( iter.hasNext()){
+            Segment s = (Segment) iter.next();
+            int start = s.getStart();
+            int end = s.getEnd();
+            String name = s.getName();
+            Style style =  this.getStyle("red");
+            if (name.equals("HELIX"))
+                    style = this.getStyle("red");
+            if (name.equals("STRAND"))
+                style = this.getStyle("yellow");
+            if (name.equals("COIL"))	
+                this.getStyle("grey")	;
+            doc.setCharacterAttributes(start,(end-start +1),style,true);
+        }
+        
+        this.repaint();
+	    
+	}
+	public void featureSelected(FeatureEvent e){
+	    Feature feat = (Feature) e.getSource();
+	    //System.out.println("selected feature " + feat);
+	    paintFeature(feat);
+	}
+	public void segmentSelected(FeatureEvent e){
+	    Segment seg = (Segment)e.getSource();
+	    //System.out.println("selected segment " + seg);
+	    int start = seg.getStart();
+	    int end = seg.getEnd();
+	    selectedSeqRange(start,end);
+	}
+
+    
     
     
 }
@@ -299,16 +435,22 @@ extends KeyAdapter
     int startpos       ;
     int lasthit        ;
     Pattern validText  ;
+    List selectedSeqPositionListeners;
+    
     public ISearchListener (SPICEFrame spiceparent, SeqTextPane textpane) {
         spice      = spiceparent ;
         parent     = textpane ;
         startpos   = 0 ;
         lasthit    = 0 ;
         searchtext = "" ;
-        
+        selectedSeqPositionListeners = new ArrayList();
         validText = Pattern.compile("[a-zA-Z]");
         
     }
+    public void addSelectedSeqPositionListener(SelectedSeqPositionListener listener){
+        selectedSeqPositionListeners.add(listener);
+    }
+    
     /** clear the current searchtext */
     public void clear(){
         searchtext ="" ;
@@ -356,17 +498,24 @@ extends KeyAdapter
         }
         
         
-        
+//      TODO 
         // display popup with current searchtext.
-        // TODO ...
+        
         
         
         int start = getStartPos();
         if ( start != -1 ) {
             lasthit = start ;
             // highlite text
-            int chainnr = spice.getCurrentChainNumber();
-            spice.highlite(chainnr,start,start+searchtext.length()-1);
+            //int chainnr = spice.getCurrentChainNumber();
+            //spice.highlite(chainnr,start,start+searchtext.length()-1);
+            Iterator iter = selectedSeqPositionListeners.iterator();
+            while (iter.hasNext()){
+                SelectedSeqPositionListener li = (SelectedSeqPositionListener)iter.next();
+                li.selectedSeqRange(start,start+searchtext.length()-1);
+            }
+            
+            
         } else {
             logger.finest("no substring " + searchtext + " found");
             startpos = 0 ;

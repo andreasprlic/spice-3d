@@ -25,6 +25,7 @@ package org.biojava.spice.Panel ;
 
 import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.SPICEFrame;
+
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import javax.swing.*;
@@ -35,6 +36,7 @@ import org.jmol.adapter.smarter.SmarterJmolAdapter;
 import org.biojava.bio.structure.Structure ;
 // logging
 import java.util.logging.*;
+
 import org.openscience.jmol.ui.JmolPopup;
 import java.awt.event.ActionListener;
 
@@ -45,8 +47,11 @@ import java.awt.event.ActionListener;
  * Here some mouse listeners are added that talk back to the main SPICE application.
  * 
  */
-public class StructurePanel extends JPanel
-implements JmolStatusListener {
+public class StructurePanel
+extends JPanel
+implements JmolStatusListener
+
+{
     
     final  Dimension currentSize = new Dimension();
     final Rectangle  rectClip    = new Rectangle();
@@ -60,7 +65,8 @@ implements JmolStatusListener {
     JmolPopup jmolpopup ;
     
     JTextField  strucommand  ; 
-    
+    int currentChainNumber;
+    Structure structure ;
     public StructurePanel(){
         this(null);
     }
@@ -76,7 +82,9 @@ implements JmolStatusListener {
         jmolpopup = JmolPopup.newJmolPopup(viewer);
     }
     
-  
+    
+    
+   
     
     /** returns the JmolViewer */
     public JmolViewer getViewer() {
@@ -130,22 +138,22 @@ implements JmolStatusListener {
      */
     public  void setStructure(Structure structure) {
         if ( structure == null ) {
-	    executeCmd(EMPTYCMD);
+            executeCmd(EMPTYCMD);
             return;
-	}
-        
+        }
+       
         String pdbstr = structure.toPDB();
-	//System.out.println(pdbstr);
+        //System.out.println(pdbstr);
         if ( (pdbstr == null) || 
-	     (pdbstr.equals("\n") )) {
-	    executeCmd(EMPTYCMD);
+                (pdbstr.equals("\n") )) {
+            executeCmd(EMPTYCMD);
             return;
-	}
-
+        }
+        
         synchronized ( viewer) {
             viewer.openStringInline(pdbstr);
         }
-
+        
         //String cmd ="select all; cpk off; wireframe off;"  ;
         //executeCmd(cmd);
         
@@ -157,9 +165,9 @@ implements JmolStatusListener {
             }
         }
         jmolpopup.updateComputedMenus();
-	if ( pdbstr.equals("")){
-	    executeCmd(EMPTYCMD);
-	}
+        if ( pdbstr.equals("")){
+            executeCmd(EMPTYCMD);
+        }
     }
     
     
@@ -323,22 +331,22 @@ implements JmolStatusListener {
         
         /*
          * ImageIcon lockIcon = createImageIcon("lock.png");
-        
-        if (lockIcon != null)
-            lock = new JMenuItem("Lock Selection",lockIcon);
-        else
-            lock = new JMenuItem("Lock Selection");
-        
-        ImageIcon unlockIcon = createImageIcon("decrypted.png");
-        if ( unlockIcon == null)
-            unlock = new JMenuItem("Unlock Selection");
-        else
-            unlock = new JMenuItem("Unlock Selection", unlockIcon);
-        
-        lockMenu = unlock;
-        lockMenu.setMnemonic(KeyEvent.VK_U);
-        lockMenu.setEnabled(selectionLocked);
-        */
+         
+         if (lockIcon != null)
+         lock = new JMenuItem("Lock Selection",lockIcon);
+         else
+         lock = new JMenuItem("Lock Selection");
+         
+         ImageIcon unlockIcon = createImageIcon("decrypted.png");
+         if ( unlockIcon == null)
+         unlock = new JMenuItem("Unlock Selection");
+         else
+         unlock = new JMenuItem("Unlock Selection", unlockIcon);
+         
+         lockMenu = unlock;
+         lockMenu.setMnemonic(KeyEvent.VK_U);
+         lockMenu.setEnabled(selectionLocked);
+         */
         JMenuItem backbone   = new JMenuItem("Backbone");
         JMenuItem wireframe  = new JMenuItem("Wireframe");
         JMenuItem cartoon    = new JMenuItem("Cartoon");
@@ -378,6 +386,10 @@ implements JmolStatusListener {
         
         return display;
     }
+    
+
+    
+    
     
 }
 

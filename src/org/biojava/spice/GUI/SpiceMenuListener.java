@@ -26,22 +26,22 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 
-
+import org.biojava.spice.Panel.StructurePanelListener;
 import org.biojava.spice.SPICEFrame;
 import org.biojava.spice.GUI.alignmentchooser.AlignmentChooser;
+import org.biojava.spice.Panel.seqfeat.*;
 
 
 /**This class takes care of the events that are triggered 
- * if a MenuItem is choosen froom the main spice menu.
+ * if a MenuItem is choosen from the main spice menu.
  * 
  * @author Andreas Prlic
  *
  */
 public class SpiceMenuListener   
-implements ActionListener
+implements ActionListener,
+SelectedSeqPositionListener
 {
-    
-    
     
     static String alloff = "cpk off ; wireframe off ; backbone off; cartoon off ; ribbons off; " ;
     static String reset = "select all; " + alloff;
@@ -50,9 +50,13 @@ implements ActionListener
     static String SPICEMANUAL = "http://www.sanger.ac.uk/Users/ap3/DAS/SPICE/SPICE_manual.pdf" ;
     		
     SPICEFrame parent ;
+    StructurePanelListener structurePanelListener;
+    boolean selectionIsLocked;
     
-    public SpiceMenuListener (SPICEFrame spice) {
+    public SpiceMenuListener (SPICEFrame spice, StructurePanelListener listen) {
+        selectionIsLocked = false;
         parent = spice ;
+        structurePanelListener = listen ;
     }
     
     public void actionPerformed(ActionEvent e) {
@@ -86,60 +90,60 @@ implements ActionListener
             
         } else if ( cmd.equals("Backbone") ){
             String dcmd;
-            if ( parent.isSelectionLocked()) 
+            if ( isSelectionLocked()) 
                 dcmd  = alloff + "backbone 0.5;  ";
             else 
                 dcmd  = reset + "backbone 0.5;  " +noselect;
-            parent.executeCmd(dcmd);
+            structurePanelListener.executeCmd(dcmd);
         } else if ( cmd.equals("Wireframe") ){
             String dcmd ;
-            if (parent.isSelectionLocked())
+            if (isSelectionLocked())
                 dcmd= alloff + "wireframe on; ";
             else
                 dcmd= reset + "wireframe on; "+noselect;
-            parent.executeCmd(dcmd);
+            structurePanelListener.executeCmd(dcmd);
         } else if ( cmd.equals("Cartoon") ){
             String dcmd ;
-            if (parent.isSelectionLocked())
+            if (isSelectionLocked())
                 dcmd  = alloff + "cartoon on; ";
             else
                 dcmd  = reset + "cartoon on; "+noselect;
-            parent.executeCmd(dcmd);
+            structurePanelListener.executeCmd(dcmd);
         } else if ( cmd.equals("Ball and Stick") ){
             String dcmd ;
-            if (parent.isSelectionLocked())
+            if (isSelectionLocked())
                 dcmd  = alloff + "wireframe 0.3; spacefill 0.5; ";
             else
                 dcmd  = reset + "wireframe 0.3; spacefill 0.5; "+noselect;
-            parent.executeCmd(dcmd);
+            structurePanelListener.executeCmd(dcmd);
         } else if ( cmd.equals("Spacefill") ){
             String dcmd ;
-            if (parent.isSelectionLocked())
+            if (isSelectionLocked())
                 dcmd  = alloff + "spacefill on; ";
             else
                 dcmd  = reset + "spacefill on; "+noselect;
-            parent.executeCmd(dcmd);
+            structurePanelListener.executeCmd(dcmd);
         } else if ( cmd.equals("Color - chain")) {
             String dcmd ;
-            if (parent.isSelectionLocked())
+            if (isSelectionLocked())
                 dcmd = "color chain;";
             else
                 dcmd = "select all; color chain;" +noselect;
-            parent.executeCmd(dcmd);
+            structurePanelListener.executeCmd(dcmd);
         } else if ( cmd.equals("Color - secondary")) {
             String dcmd ;
-            if (parent.isSelectionLocked())
+            if (isSelectionLocked())
                 dcmd = "color structure;";
             else
                 dcmd = "select all; color structure;" +noselect;
-            parent.executeCmd(dcmd);
+            structurePanelListener.executeCmd(dcmd);
         } else if ( cmd.equals("Color - cpk")) {
             String dcmd ;
-            if (parent.isSelectionLocked())
+            if (isSelectionLocked())
                 dcmd = "color cpk;";
             else
                 dcmd = "select all; color cpk;" +noselect;
-            parent.executeCmd(dcmd);
+            structurePanelListener.executeCmd(dcmd);
         } else if ( cmd.equals("Choose")){
             //System.out.println("pressed alig window open");
             AlignmentChooser aligc = new AlignmentChooser(parent);
@@ -149,5 +153,17 @@ implements ActionListener
         }
         
     }
+    
+    public void selectionLocked(boolean flag){
+        selectionIsLocked = flag;
+    }
+    
+    private boolean isSelectionLocked(){
+        return selectionIsLocked;
+    }
+    
+    
+    public void selectedSeqRange(int s,int e){}
+    public void selectedSeqPosition(int s){}
     
 }

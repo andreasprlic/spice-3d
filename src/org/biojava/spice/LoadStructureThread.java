@@ -25,9 +25,6 @@ package org.biojava.spice ;
 
 import org.biojava.spice.Config.RegistryConfiguration;
 import org.biojava.spice.DAS.DAS_Feeder;
-import java.awt.Color ;
-
-
 import org.biojava.bio.structure.Structure ;
 import org.biojava.bio.structure.StructureImpl ;
 import java.util.logging.Logger;
@@ -75,7 +72,7 @@ extends Thread {
             //String dassequencecommand  = spiceframe.getSequenceServer()  + "sequence?segment=";
             //String dasalignmentcommand = dasalignmentcommand = getAlignmentServer() + "alignment?query=" ;
             
-            spiceframe.showStatus("Loading...Wait...",Color.red);
+            //spiceframe.showStatus("Loading...Wait...",Color.red);
             //DAS_PDBFeeder pdb_f =  new DAS_PDBFeeder(structureURL,dassequencecommand,dasalignmentcommand) ;
             RegistryConfiguration config = spiceframe.getConfiguration();
             while ( config == null){

@@ -84,7 +84,7 @@ public class FeaturePanel
     float scale;
     BufferedImage imbuf;
     int canvasHeight;
-    
+    FeaturePanelMouseListener featurePanelMouseListener;
     /**
      * 
      */
@@ -103,7 +103,7 @@ public class FeaturePanel
         this.setHeight(MINIMUM_HEIGHT);
         
         popupMenu = new JPopupMenu();
-        
+        featurePanelMouseListener = null;
         int oldposition = 0;
         
         selectStart    = -1 ;
@@ -131,6 +131,17 @@ public class FeaturePanel
         this.add(progressBar);
     }
     
+    public void setFeaturePanelMouseListener(FeaturePanelMouseListener fpml){
+        featurePanelMouseListener = fpml;
+        this.addMouseMotionListener(fpml);
+        this.addMouseListener(      fpml);
+    }
+    
+    public FeaturePanelMouseListener getFeaturePanelMouseListener(){
+        return featurePanelMouseListener;
+    }
+    
+    
     public void setLoading(boolean flag){
         isLoading = flag;
         
@@ -155,18 +166,9 @@ public class FeaturePanel
     
     public int getCanvasHeight(){ return canvasHeight;}
     public void setFeatures(Feature[] features){
-        // do something with the features.
-        this.features = features;
-        //this.setPreferredSize(new Dimension(400,((features.length*DEFAULT_Y_STEP)+DEFAULT_Y_START+DEFAULT_Y_STEP)));
-        /*int height = getHeight() ;
        
-        if ( height < MINIMUM_HEIGHT ){
-            height = MINIMUM_HEIGHT;
-        }
-        */
-        //Dimension dim = this.getSize();
-        //this.setPreferredSize(new Dimension(dim.width,height));
-        //System.out.println("featurePane setting size " + height );
+        this.features = features;
+
     }
     
     public void setSeqLength(int seqLength){
@@ -226,7 +228,7 @@ public class FeaturePanel
         float scale = getScale();
         //	 minimum size of one aminoacid
         int aminosize =  Math.round(1 * scale) ;
-        Dimension dstruc=this.getSize();
+        Dimension dstruc=new Dimension ( getImgWidth(aminosize), getHeight());
         
         /////////////
         //      do the actual painting...

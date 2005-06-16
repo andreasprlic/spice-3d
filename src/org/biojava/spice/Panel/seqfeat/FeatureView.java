@@ -82,21 +82,15 @@ extends JPanel
         
         labelField = new LabelPane();
         labelField.setLabel(label);
-        labelField.setBorder(BorderFactory.createEtchedBorder());
-        //labelField.setEditable(false);
-        
-        //labelField.setPreferredSize(new Dimension(60,30));
-        
-        //labelField.setBounds(0,0,0,0);
+        labelField.setBorder(BorderFactory.createEmptyBorder());
         
         featureCanvas = new FeaturePanel();
         featureCanvas.setBorder(BorderFactory.createEmptyBorder());
-        //featureCanvas.setBounds(0,0,0,0);
         
         typeLabelPanel = new TypeLabelPanel();
         typeLabelPanel.addSelectedFeatureListener(featureCanvas);
         typeLabelPanel.setBorder(BorderFactory.createEmptyBorder());
-        //typeLabelPanel.setBounds(0,0,0,0);
+        
         
        isLoading = false;
     }
@@ -127,7 +121,13 @@ extends JPanel
         }
         if ( features.length == 0)
             return MINIMUM_HEIGHT;
-        return (features.length*DEFAULT_Y_STEP) + DEFAULT_Y_START+DEFAULT_Y_STEP ;
+        
+        int h = (features.length*DEFAULT_Y_STEP) + DEFAULT_Y_START+DEFAULT_Y_STEP ;
+        	if ( h > MINIMUM_HEIGHT )
+        	    return h;
+        	
+        	else return MINIMUM_HEIGHT;
+        
     }
     
     public void setCanvasHeight(int height) {
@@ -175,12 +175,6 @@ extends JPanel
     }
     
     private void updateDisplay(){
-        
-        /*int x = labelField.getWidth();
-        int y = typeLabelPanel.getHeight();
-        System.out.println("setting height " + y + " " + x);
-        labelField.setPreferredSize(new Dimension(y,x));
-        */
         
         labelField.repaint();
         typeLabelPanel.repaint();

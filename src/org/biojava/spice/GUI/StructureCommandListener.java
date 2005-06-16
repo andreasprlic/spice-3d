@@ -34,7 +34,7 @@ import java.util.List;
 
 import javax.swing.JTextField;
 
-import org.biojava.spice.SPICEFrame;
+import org.biojava.spice.Panel.StructurePanelListener;
 
 /** A class that listens to various events on the 
  * StructureCommand line ( where it is possible to 
@@ -55,28 +55,29 @@ MouseListener
 
 {
     JTextField textfield;
-    SPICEFrame spice;
+    StructurePanelListener structurePanelListener;
     
     List history;
     int historyPosition;
     
     static Logger logger      = Logger.getLogger("org.biojava.spice");
     
-    public StructureCommandListener (SPICEFrame spice_, JTextField textfield_) {
+    public StructureCommandListener (StructurePanelListener spl, JTextField textfield_) {
         super();
-        spice = spice_ ;
+        structurePanelListener = spl;
         textfield = textfield_ ;
         history = new ArrayList();
         historyPosition = -2; // -2 = history = empty;
     }
     public void actionPerformed(ActionEvent event) {
-        
+        /*
         if ( spice.isLoading() ) {
             logger.finest("loading data, please be patient");
             return ;
         }
+        */
         String cmd = textfield.getText();
-        spice.executeCmd(cmd);
+        structurePanelListener.executeCmd(cmd);
         textfield.setText("");
         
         // now comes history part:

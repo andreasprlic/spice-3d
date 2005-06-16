@@ -24,20 +24,21 @@ package org.biojava.spice.GUI;
 
 import javax.swing.JTextField;
 
-import org.biojava.spice.SPICEFrame;
+import org.biojava.spice.Panel.StructurePanelListener;
 /**
  * @author Andreas Prlic
  *
  */
 public class StructureCommandPanel 
 extends JTextField {
-    SPICEFrame spice;
+    //SPICEFrame spice;
+    StructurePanelListener structurePanelListener;
     
-    public StructureCommandPanel (SPICEFrame  parent){
-        spice = parent;
+    public StructureCommandPanel (StructurePanelListener  liste){
+        structurePanelListener = liste;
         
         this.setText("enter RASMOL like command...");
-        StructureCommandListener listener = new StructureCommandListener(spice,this) ;
+        StructureCommandListener listener = new StructureCommandListener(liste,this) ;
         this.addActionListener(listener);
         this.addMouseListener(listener);
         this.addKeyListener(listener);

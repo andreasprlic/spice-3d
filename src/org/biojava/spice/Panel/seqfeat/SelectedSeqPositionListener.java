@@ -28,6 +28,12 @@ package org.biojava.spice.Panel.seqfeat;
  */
 public interface SelectedSeqPositionListener {
     
+    /* select a certain sequence position */
     public void selectedSeqPosition(int position);
+    
+    /** select a certain range of a sequence */
     public void selectedSeqRange(int start, int end);
+    
+    /** the current selecetion is locked and can not be changed */
+    public void selectionLocked(boolean flag);
 }
