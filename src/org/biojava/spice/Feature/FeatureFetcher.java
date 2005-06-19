@@ -274,6 +274,7 @@ public class FeatureFetcher extends Thread
         fv.setSeqLength(chain.getLength());
         fv.setLoading(true);
         fv.setLabel(featureserver.getNickname());
+        fv.setDasSource(featureserver);
         // add fv to viewer ...
         
         SpiceFeatureViewer sfv = parent.getFeatureViewer();

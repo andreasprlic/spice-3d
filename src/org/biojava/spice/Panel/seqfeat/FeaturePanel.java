@@ -377,6 +377,7 @@ public class FeaturePanel
     /** a feature has been selected */
     public void selectedFeature(Feature feat){
         //System.out.println("selected feature " + feat);
+        
         if ( feat == null) { 
             featureSelected = false;
             selectedFeaturePos = -1;

@@ -37,16 +37,14 @@ import java.awt.event.ActionListener;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.HyperlinkEvent;
 
-/**
+/** A Dialog to show version and copyright information for SPICE.
  * @author Andreas Prlic
  *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 public class AboutDialog
-	extends JDialog {
-    	static String VERSION = "0.7.alpha-1";
-
+extends JDialog {
+    static String VERSION = "0.7.alpha-1";
+    
     static String DESCRIPTION_TEXT = "<html><body>"+
     "<b>The SPICE DAS client</b> V "+ VERSION +" <br>"+
     "(C) <a href=\"mailto:ap3@sanger.ac.uk\">Andreas Prlic</a>, Tim Hubbard <br>"+
@@ -85,83 +83,58 @@ public class AboutDialog
     static int H_SIZE = 750;
     static int V_SIZE = 600;
     //JTextField txt ;
-    String displayText     ;
+    
     SPICEFrame spice; 
     JEditorPane txt;
     
     public AboutDialog(SPICEFrame spice_)
     {
-	// Calls the parent telling it this
-	// dialog is modal(i.e true)
-        //super(spice_,true);
-        	spice = spice_;
-      
-        	
-	spice = spice_;
-	//setBackground(Color.gray);
-	//setLayout(new BorderLayout());
-	this.setSize(new Dimension(H_SIZE, V_SIZE)) ;
-	
-	displayText="" ;
-	txt = new JEditorPane("text/html", DESCRIPTION_TEXT);
-
-	txt.setEditable(false);
-
-	txt.addHyperlinkListener(new HyperlinkListener(){
-	    public void hyperlinkUpdate(HyperlinkEvent e) {
-	        //System.out.println(e);
-	        if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-	            String href = e.getDescription();
-	            spice.showDocument(href);
-	        }
-	    }
-	});
-	
-	// Two buttons "Close" and "Help"
-	//txt = new JTextField();
-	JScrollPane scroll = new JScrollPane(txt);
-	//scroll.setPreferredSize(new Dimension(H_SIZE, V_SIZE-50)) ;
-	//scroll.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-	//JPanel p = new JPanel();
-	//p.add("Center",scroll);
-	//p.add(txt);
-	//p.add("Sourth",new Button("Close"));
-	//p.add(new Button("Help"));
-	
-	 Box vBox = Box.createVerticalBox();
-	 vBox.add(scroll);
-	 
-	 
-	 JButton close = new JButton("Close");
-	 
-	 
-	 close.addActionListener(new ActionListener(){
-	     public void actionPerformed(ActionEvent event) {
-	         dispose();
-	     }
-	 });
-	 
-	
-	 Box hBoxb = Box.createHorizontalBox();
-	 hBoxb.add(Box.createGlue());
-	 hBoxb.add(close,BorderLayout.EAST);
-	 
-	 vBox.add(hBoxb);
-	 
-	//add("South", p);
-	this.getContentPane().add(vBox);
-	
-	//this.getContentPane().add(new Button("Close"));
-	
-	//resize(H_SIZE, V_SIZE);
-
+  
+        spice = spice_;
+        
+        this.setSize(new Dimension(H_SIZE, V_SIZE)) ;
+        
+        txt = new JEditorPane("text/html", DESCRIPTION_TEXT);
+        
+        txt.setEditable(false);
+        
+        txt.addHyperlinkListener(new HyperlinkListener(){
+            public void hyperlinkUpdate(HyperlinkEvent e) {
+                //System.out.println(e);
+                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                    String href = e.getDescription();
+                    spice.showDocument(href);
+                }
+            }
+        });
+        
+        JScrollPane scroll = new JScrollPane(txt);
+        
+        Box vBox = Box.createVerticalBox();
+        vBox.add(scroll);
+        
+        JButton close = new JButton("Close");
+        
+        close.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent event) {
+                dispose();
+            }
+        });
+        
+        Box hBoxb = Box.createHorizontalBox();
+        hBoxb.add(Box.createGlue());
+        hBoxb.add(close,BorderLayout.EAST);
+        
+        vBox.add(hBoxb);
+        
+        this.getContentPane().add(vBox);
+          
     }
     
     
-
+    
     public void setText(String t) {
-	displayText = t ;
-	txt.setText(t);
+        txt.setText(t);
     }
-
+    
 }

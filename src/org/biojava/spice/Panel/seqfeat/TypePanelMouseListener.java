@@ -51,8 +51,7 @@ implements MouseListener, MouseMotionListener {
         oldSelection = null;
         
     }
-    
-    
+      
     
     
     public void mouseMoved(MouseEvent e){

@@ -21,16 +21,19 @@
  *
  */
 package org.biojava.spice.Panel.seqfeat;
+
 import org.biojava.spice.Feature.*;
 import org.biojava.spice.Panel.seqfeat.FeaturePanel;
 import org.biojava.spice.Panel.seqfeat.LabelPane;
 import org.biojava.spice.Panel.seqfeat.TypeLabelPanel;
-
+import org.biojava.spice.Config.SpiceDasSource;
 import javax.swing.*;
 import java.util.logging.Logger;
 import java.util.NoSuchElementException;
 import java.util.List;
 import java.util.Iterator;
+
+
 
 /** A class that renders features. E.g. all the features retrieved from a DasSource.
  * It consists of a Label and the rendered features.
@@ -65,22 +68,26 @@ extends JPanel
     JSplitPane typeSplitPane;
     FeaturePanel featureCanvas;
     TypeLabelPanel typeLabelPanel;
-    
+    SpiceFeatureViewer parent;
     int seqLength ;
        boolean selected;
     boolean isLoading;
+    
+
+    SpiceDasSource dasSource;
+    
     /**
      * 
      */
     public FeatureView() {
         super();
-        // TODO Auto-generated constructor stub
-        this.label="";
-        features = null;
-        seqLength = 0;
-        labelWidth = 60;
         
-        labelField = new LabelPane();
+        this.label="";
+        features   = null;
+        seqLength  = 0;
+        labelWidth = 60;
+        dasSource  = new SpiceDasSource();
+        labelField = new LabelPane(this);
         labelField.setLabel(label);
         labelField.setBorder(BorderFactory.createEmptyBorder());
         
@@ -90,10 +97,19 @@ extends JPanel
         typeLabelPanel = new TypeLabelPanel();
         typeLabelPanel.addSelectedFeatureListener(featureCanvas);
         typeLabelPanel.setBorder(BorderFactory.createEmptyBorder());
-        
+       
         
        isLoading = false;
     }
+    
+    public void setSpiceFeatureViewer(SpiceFeatureViewer viewer){
+        this.parent = viewer;
+    }
+    public SpiceFeatureViewer getSpiceFeatureViewer() {
+        return parent ; 
+    }
+    public void setDasSource(SpiceDasSource ds){ dasSource = ds; }
+    public SpiceDasSource getDasSource(){ return dasSource; }
     
     public FeaturePanel getFeaturePanel() {
         return featureCanvas;

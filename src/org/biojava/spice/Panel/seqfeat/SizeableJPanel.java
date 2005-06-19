@@ -56,10 +56,13 @@ extends JPanel
     
     public void setHeight(int height){
         this.height = height;
+        this.revalidate();
     }
     
     public void setWidth(int width){
         this.width = width;
+        this.revalidate();
+        
     }
     public Dimension getMaximumSize(){ 
         Dimension d;

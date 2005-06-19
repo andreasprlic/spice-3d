@@ -24,17 +24,22 @@ package org.biojava.spice.Panel.seqfeat;
 
 import java.awt.Component;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-
+import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-
 import org.biojava.spice.Panel.seqfeat.FeatureView;
 import org.biojava.spice.Panel.seqfeat.LabelPane;
 import org.biojava.spice.Panel.seqfeat.SpiceFeatureViewer;
 
-/** a mouse listener class that acts on the labels in the spice feature view
+/* Displays the das -source name label in the spice feature view
+ * allows resorting the order of the das-sources in the feature view
+ * 
+ * TODO: enable / disable this dassource ...
+ *  
  * @author Andreas Prlic
  *
  */
@@ -46,20 +51,27 @@ class LabelBoxListener implements MouseListener,MouseMotionListener{
     boolean isDragging ;
     FeatureView selectedFeatureView;
     JPopupMenu popupMenu ;
+    
     public LabelBoxListener(SpiceFeatureViewer parent) {
         this.parent = parent;
-        popupMenu = new JPopupMenu();
+        //popupMenu = new JPopupMenu();
         prev_y = -1;
         moved = false;
         isDragging =  false;
         selectedFeatureView = null;
+        popupMenu = parent.getPopupMenu();
         
     }
+    
+    public void setPopupMenu(JPopupMenu menu){
+        popupMenu = menu;
+    }
+    
     public void mouseClicked(MouseEvent e) {
         //System.out.println("mouse clicked" + e.getX()+" " + e.getY());    
     }
     public void mousePressed(MouseEvent e) {
-       // System.out.println("mouse pressed" + e.getX()+" " + e.getY());
+        System.out.println("mouse pressed" + e.getX()+" " + e.getY());
         
         
         FeatureView fv = parent.getParentFeatureView(e, LabelPane.class) ;
@@ -69,85 +81,101 @@ class LabelBoxListener implements MouseListener,MouseMotionListener{
         } else {
             System.err.println("no parent found!");
         }
+        
+        int mouseButton = e.getButton();
+        if ( mouseButton == MouseEvent.BUTTON3 )  {
+            maybeShowPopup(e);
+        }
+    }
+    
+    public FeatureView getCurrentFeatureView(){
+        return selectedFeatureView;
     }
     
     
-   private void testMoveFV(MouseEvent e, FeatureView fv){
-
-       Component compo = e.getComponent();
-       
-       
-       //int compo_h = compo.getHeight();
-       LabelPane lab = fv.getLabel();
-       
-       //Point screenTopLeft = lab.getLocationOnScreen();
-       //int cx = screenTopLeft.x;
-       //int cy = screenTopLeft.y;
-       
-       Point relative_p = parent.getLocationOnLabelBox(fv);
-       int relative_y = relative_p.y;
-       
-       //System.out.println("y " + y + "prev_y" + prev_y + " cx:" + cx + " cy:" + cy + " compo_h " + compo_h );
-       
-       int compo_h = lab.getHeight();
-       int y = e.getY();
-       
-       //System.out.println("y " + y + " rel_y " + relative_y + " h " + compo_h );
-       
-       
-       // prevent big jumps 
-       if ( y== prev_y){
-           return;
-       }
-       prev_y = y ;
-       
-       // moving down one ...
-       if ( y > (compo_h+relative_y ) ){
-           // reorder FeatureView one down ...
-           //System.out.println("md " + y + " " + prev_y);
-           //FeatureView fv = parent.getParentFeatureView(lp,LabelPane.class);
-           parent.moveDown(fv);
-           moved = true;
-           
-       }
-       
-       if ( y < relative_y ) {
-           //System.out.println("mu"+ y + " " + prev_y);
-           //FeatureView fv = parent.getParentFeatureView(lp,LabelPane.class);
-           parent.moveUp(fv);
-           moved =true;
-       }
-       
-   }
     
-    public void mouseReleased(MouseEvent e) {
-        //System.out.println("mouse Released" + e.getX()+" " + e.getY());
-        moved = false;
+    
+    
+    private void testMoveFV(MouseEvent e, FeatureView fv){
         
-        int mouseButton = e.getButton();
-        if ( mouseButton == MouseEvent.BUTTON1 )  {
-        //FeatureView fv = parent.getParentFeatureView(e) ;
-        FeatureView fv = selectedFeatureView;
-        if ( fv != null ){
-            fv.setSelected(false);
-            selectedFeatureView = null;
-            	if (! isDragging) {
-            	    return;
-            	} 
-            //	System.out.println("isdragging: " + isDragging);
-            	isDragging = false;
-            	testMoveFV(e,fv);
-            	
+        Component compo = e.getComponent();
+        
+        
+        //int compo_h = compo.getHeight();
+        LabelPane lab = fv.getLabel();
+        
+        //Point screenTopLeft = lab.getLocationOnScreen();
+        //int cx = screenTopLeft.x;
+        //int cy = screenTopLeft.y;
+        
+        Point relative_p = parent.getLocationOnLabelBox(fv);
+        int relative_y = relative_p.y;
+        
+        //System.out.println("y " + y + "prev_y" + prev_y + " cx:" + cx + " cy:" + cy + " compo_h " + compo_h );
+        
+        int compo_h = lab.getHeight();
+        int y = e.getY();
+        
+        //System.out.println("y " + y + " rel_y " + relative_y + " h " + compo_h );
+        
+        
+        // prevent big jumps 
+        if ( y== prev_y){
+            return;
+        }
+        prev_y = y ;
+        
+        // moving down one ...
+        if ( y > (compo_h+relative_y ) ){
+            // reorder FeatureView one down ...
+            //System.out.println("md " + y + " " + prev_y);
+            //FeatureView fv = parent.getParentFeatureView(lp,LabelPane.class);
+            parent.moveDown(fv);
+            moved = true;
             
-            
-        } else {
-            System.err.println("no parent found!");
         }
         
-        } else if( mouseButton == MouseEvent.BUTTON2 ) {
+        if ( y < relative_y ) {
+            //System.out.println("mu"+ y + " " + prev_y);
+            //FeatureView fv = parent.getParentFeatureView(lp,LabelPane.class);
+            parent.moveUp(fv);
+            moved =true;
+        }
+        
+    }
+    
+    public void mouseReleased(MouseEvent e) {
+        System.out.println("mouse Released" + e.getX()+" " + e.getY() + " button " + e.getButton());
+        moved = false;
+        int mouseButton = e.getButton();
+        if ( mouseButton == MouseEvent.BUTTON1 )  {
+            //FeatureView fv = parent.getParentFeatureView(e) ;
+            FeatureView fv = selectedFeatureView;
+            if ( fv != null ){
+                fv.setSelected(false);
+                selectedFeatureView = null;
+                if (! isDragging) {
+                    return;
+                } 
+                //	System.out.println("isdragging: " + isDragging);
+                isDragging = false;
+                testMoveFV(e,fv);
+                
+                
+                
+            } else {
+                System.err.println("no parent found!");
+            }
+            
+        } else if( mouseButton == MouseEvent.BUTTON3 ) {
             // open a popupMenu...
+            //System.out.println("button 3 pressed");
+            maybeShowPopup(e);
             
             
+        }
+        else {
+            //System.out.println("other button pressed ...");
         }
     }
     public void mouseEntered(MouseEvent e) {}
@@ -166,4 +194,20 @@ class LabelBoxListener implements MouseListener,MouseMotionListener{
         
     }
     
+    
+    
+    
+    private void maybeShowPopup(MouseEvent e) {
+        System.out.println("showpopup?");
+        if (e.isPopupTrigger()) {
+            popupMenu.show(e.getComponent(),		       
+                    e.getX(), e.getY());
+        }
+    }
+    
 }
+
+
+
+
+

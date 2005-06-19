@@ -61,7 +61,7 @@ SelectedSeqPositionListener
     
     public void actionPerformed(ActionEvent e) {
         //System.out.println(e);
-        //System.out.println(">"+e.getActionCommand()+"<");
+        System.out.println(">"+e.getActionCommand()+"<");
         
         String cmd = e.getActionCommand();
         if ( cmd.equals("Open") ) {
@@ -83,6 +83,7 @@ SelectedSeqPositionListener
         } else if (cmd.equals("Reset")) {
             parent.resetDisplay();
         } else if (cmd.equals("About SPICE")) {
+            System.out.println("open about dialog");
             AboutDialog asd = new AboutDialog(parent);
             asd.show();
         } else if (cmd.equals("Manual")) {

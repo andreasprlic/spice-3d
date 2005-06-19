@@ -29,13 +29,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-
 import java.awt.image.BufferedImage;
-
 import java.util.logging.Logger;
-
-import javax.swing.JPopupMenu;
-
 import org.biojava.spice.Feature.Feature;
 
 
@@ -64,25 +59,21 @@ extends SizeableJPanel
     public static final Font plainFont = new Font("SansSerif", Font.PLAIN, 10);
     
     String label;
-    
-    
     int canvasHeight;
-    
-    JPopupMenu popupMenu;
     int oldposition;
     static Logger logger      = Logger.getLogger("org.biojava.spice");
     boolean dragging;
     //int height;
     BufferedImage imbuf;
     boolean selected;
-    
+    FeatureView parent;
     /**
      * 
      */
-    public LabelPane() {
+    public LabelPane(FeatureView parent) {
         super();
       
-        
+        this.parent = parent ;
         label="";
         
         this.setBackground(Color.black);
@@ -91,7 +82,7 @@ extends SizeableJPanel
         this.setWidth(MINIMUM_HEIGHT);
         this.setHeight(DEFAULT_X_SIZE);
         
-        popupMenu = new JPopupMenu();
+     
         
         int oldposition = 0;
         
@@ -99,8 +90,11 @@ extends SizeableJPanel
         selected =false;
         canvasHeight = MINIMUM_HEIGHT;
         initImgBuffer();
+      
         
     }
+
+    public FeatureView getParentFeatureView(){ return parent; }
     
     private void initImgBuffer(){
       
@@ -207,5 +201,6 @@ extends SizeableJPanel
         //System.out.println("labelPane " + label + " setting size " + height );
     }
 }
-    
+
+
     

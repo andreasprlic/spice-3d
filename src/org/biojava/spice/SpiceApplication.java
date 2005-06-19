@@ -27,11 +27,14 @@ import org.biojava.spice.Panel.*;
 import org.biojava.spice.Config.*;
 import org.biojava.spice.Feature.*;
 import org.biojava.spice.GUI.*;
+
 import java.lang.reflect.*;
 // for protein 3D stuff
 import org.biojava.bio.structure.*;
 import org.biojava.spice.Panel.seqfeat.SpiceComponentListener;
 import org.biojava.spice.Panel.seqfeat.SpiceFeatureViewer;
+import org.biojava.spice.Panel.seqfeat.DasSourceListener;
+
 
 // to get config file via http
 import java.net.URL;
@@ -196,8 +199,6 @@ ConfigurationListener
         structurePanelListener = new StructurePanelListener(structurePanel);
         
         // add the Menu
-        JMenuBar menu = initMenu();
-        this.setJMenuBar(menu);
         
         
         // init all panels, etc..
@@ -220,7 +221,10 @@ ConfigurationListener
         
         memoryfeatures = new HashMap();
         features = new ArrayList();
-                
+        
+        JMenuBar menu = initMenu();
+        this.setJMenuBar(menu);
+          
         this.setTitle("SPICE") ;
         
         
@@ -470,6 +474,11 @@ ConfigurationListener
      *
      */
     private void initListeners(){
+        
+        
+        MyDasSourceListener mdsl = new MyDasSourceListener(this);
+        dascanv.addDasSourceListener(mdsl);
+        
         dascanv.addFeatureViewListener(seqField);
         dascanv.addSelectedSeqPositionListener(seqField);
         dascanv.addFeatureViewListener(structurePanelListener);
@@ -544,15 +553,12 @@ ConfigurationListener
         
         SpiceMenuListener ml = spiceMenuListener;
         
-        
         openpdb.addActionListener( ml );
         save.addActionListener   ( ml );
         revert.addActionListener ( ml );
         exit.addActionListener   ( ml );
         props.addActionListener  ( ml );
-        
-        
-        
+
         file.add( openpdb );
         file.add( save    );
         file.add( revert  );
@@ -1502,6 +1508,16 @@ ConfigurationListener
   
 }
 
+class MyDasSourceListener implements DasSourceListener{
+    SPICEFrame parent;
+    public MyDasSourceListener(SPICEFrame parent){
+        this.parent=parent;
+    }
+    public void selectedDasSource(SpiceDasSource ds){
+        DasSourceDialog dsd = new DasSourceDialog(parent, ds);
+        dsd.show();
+    }
+}
 
 class EntListCommandListener implements ListSelectionListener {
     SPICEFrame spice ;

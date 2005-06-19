@@ -26,6 +26,8 @@ import javax.swing.*;
 
 
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.util.*;
 import java.awt.Dimension;
@@ -44,8 +46,11 @@ import org.biojava.spice.Panel.seqfeat.SeqScale;
 import org.biojava.spice.Panel.seqfeat.SeqScaleCanvas;
 import org.biojava.spice.Panel.seqfeat.TypeLabelPanel;
 import org.biojava.spice.Panel.seqfeat.TypePanelMouseListener;
+import org.biojava.spice.Panel.seqfeat.DasSourceListener;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
+import org.biojava.spice.Config.SpiceDasSource;
+import org.biojava.spice.GUI.SelectionLockPopupListener;
 
 
 /** A class that can display features (e.g. retrieved from different DAS sources).
@@ -93,16 +98,21 @@ FeatureViewListener
     
     List featureViewListeners;
     List selectedSeqPositionListeners;
+    List dasSourceListeners;
     int typePanelSize;
     int labelPanelSize;
     boolean selectionIsLocked ;
+    JPopupMenu popupMenu;
+    
+    LabelBoxListener lbml;
+    
     /**
      * 
      */
     public SpiceFeatureViewer() {
         super();
         
-        
+        dasSourceListeners = new ArrayList();
         // when we are shown, add a resize listener to the parent component to
         // also adapt our size since we are a SizeableJPanel
         //MyComponentShowListener mcsl = new MyComponentShowListener(this); 
@@ -176,10 +186,15 @@ FeatureViewListener
         
         initLabelPane();
         
-        LabelBoxListener lbml = new LabelBoxListener(this);
+        
+        
+        lbml = new LabelBoxListener(this);
+        popupMenu = createPopupMenu();
+        lbml.setPopupMenu(popupMenu);
         labelBox.addMouseListener(lbml);
         labelBox.addMouseMotionListener(lbml);
         
+        //labelBox.add(popupMenu);
         TypePanelMouseListener tpml = new TypePanelMouseListener(this);
         typeBox.addMouseListener(tpml);
         typeBox.addMouseMotionListener(tpml);
@@ -252,7 +267,10 @@ FeatureViewListener
         
         //float scale = calcScale(100);
         //setScale(scale);
+        
     }
+    
+
     
     /** remove the existing FeatureView objects to free the space for displaying e.g. the 
      * Annotations of a new sequence.
@@ -263,6 +281,22 @@ FeatureViewListener
         updateDisplay();
     }
     
+    public void addDasSourceListener(DasSourceListener dsl){
+        dasSourceListeners.add(dsl);
+    }
+    
+    public DasSourceListener[] getDasSourceListeners() {
+        return (DasSourceListener[]) dasSourceListeners.toArray(new DasSourceListener[dasSourceListeners.size()]);
+    }
+    
+    public void triggerSelectedDasSource(SpiceDasSource ds){
+        DasSourceListener[] dsls = getDasSourceListeners();
+        for (int i = 0 ; i < dsls.length;i++){
+            DasSourceListener dsl = dsls[i];
+            dsl.selectedDasSource(ds);
+            
+        }
+    }
     public void addSelectedSeqPositionListener(SelectedSeqPositionListener listener){
         selectedSeqPositionListeners.add(listener);
     }
@@ -370,6 +404,12 @@ FeatureViewListener
         TypeLabelPanel typL  = seqScale.getTypePanel();
         SeqScaleCanvas sscan = seqScale.getSeqScaleCanvas();
         
+        //JPopupMenu popupMenu = getPopupMenu(label);
+        
+        //SelectionLockPopupListener slpl = new SelectionLockPopupListener(popupMenu);
+        //label.addMouseListener(slpl);
+        
+        
         labelBox.add(label);
         typeBox.add(typL);
         featureBox.add(sscan);
@@ -456,11 +496,13 @@ FeatureViewListener
        
         view.setSeqLength(seqLength);
         view.setScale(calcScale(residueSize));
+        view.setSpiceFeatureViewer(this);
         
         LabelPane lab      = view.getLabel();
         TypeLabelPanel typ = view.getTypePanel();
         FeaturePanel sub   = view.getFeaturePanel();
         
+    
         //LabelPaneMouseListener lpml = new LabelPaneMouseListener(this); 
         //lab.addMouseListener(lpml);
         //lab.addMouseMotionListener(lpml);
@@ -469,7 +511,6 @@ FeatureViewListener
         //fpml.addFeatureViewListener(this);
         
         sub.setFeaturePanelMouseListener(fpml);
-        
         
         featureViews.add(view);
         labelBox.add(lab);
@@ -484,7 +525,20 @@ FeatureViewListener
             this.repaint();       
         }
     }
-
+    
+    public JPopupMenu getPopupMenu(){
+        return popupMenu;
+    }
+    private JPopupMenu createPopupMenu(){ 
+    
+        JPopupMenu popupMenu = new JPopupMenu();
+        JMenuItem menuItem = new JMenuItem("show DAS-source details");
+        ShowDasSourceListener sdsl = new ShowDasSourceListener(lbml);
+        menuItem.addActionListener(sdsl);
+        popupMenu.add(menuItem);
+        
+        return popupMenu;
+    }
 
     public FeatureView[] getFeatureViews(){
         return (FeatureView[])featureViews.toArray(new FeatureView[featureViews.size()]);
@@ -534,14 +588,14 @@ FeatureViewListener
         selectionIsLocked = flag;
         FeaturePanel fp = seqScale.getSeqScaleCanvas();
         FeaturePanelMouseListener fpml = fp.getFeaturePanelMouseListener();
-        fpml.setSelectionLocked(flag);
+        fpml.selectionLocked(flag);
         Iterator iter = featureViews.iterator();
         
         while ( iter.hasNext()){
             FeatureView fv = (FeatureView)iter.next();
             FeaturePanel fpa = fv.getFeaturePanel();
             fpml = fpa.getFeaturePanelMouseListener();
-            fpml.setSelectionLocked(flag);
+            fpml.selectionLocked(flag);
         }
     }
     
@@ -682,6 +736,7 @@ FeatureViewListener
         return null;
     }
     
+    
     /** rebuild the display after the order of featureviews has been changed ... */
     public void updateDisplay(){
         labelBox.removeAll();
@@ -730,10 +785,38 @@ FeatureViewListener
        // System.out.println("moved Up to" + (position -1));
     }
     
+
+    
 }
 
 
 
+class ShowDasSourceListener implements ActionListener {
+    
+    //SpiceFeatureViewer featureView ;
+    LabelBoxListener parent;
+    
+    public ShowDasSourceListener ( LabelBoxListener parent) {
+        //this.featureView = featureView;
+        this.parent = parent ;
+        
+    }
+    
+    public void actionPerformed(ActionEvent e){
+        // show the details of a DAS source ...
+        // open a new frame that does something
+        System.out.println("display DAS data!");
+        Object source = e.getSource();
+        
+        FeatureView fv = parent.getCurrentFeatureView();
+        SpiceFeatureViewer viewer = fv.getSpiceFeatureViewer();
+        //displayFeatureViewFrame(viewer,fv);
+        
+        System.out.println("trigger selectedDasSource");
+        viewer.triggerSelectedDasSource(fv.getDasSource());
+        
+    }
+}
 
 
 

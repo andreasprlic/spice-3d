@@ -156,7 +156,7 @@ MouseListener, MouseMotionListener
         if ( popupMenu.isVisible())
             return;
         
-        
+        if  ( selectionIsLocked ) return ;
         isearchListener.clear();
         
         int seqpos = getSeqPos(e);
@@ -167,11 +167,8 @@ MouseListener, MouseMotionListener
         //spice.showSeqPos(current_chainnumber,seqpos);
         if ( dragging) return;
         highlite(seqpos);
-        Iterator iter = selectedSeqPositionListeners.iterator();
-        while (iter.hasNext()){
-            SelectedSeqPositionListener li = (SelectedSeqPositionListener)iter.next();
-            li.selectedSeqPosition(seqpos);
-        }
+        triggerSelectedSeqPosition(seqpos);
+        
     }
     
     
@@ -186,27 +183,27 @@ MouseListener, MouseMotionListener
         return seqpos  ;
     }
     
-    public void mouseClicked(MouseEvent e)  { 
-    
-    }
+    public void mouseClicked(MouseEvent e)  {}
     public void mouseEntered(MouseEvent e)  {}
     public void mouseExited(MouseEvent e)   {}
     
     public void mousePressed(MouseEvent e)  {
         int b = e.getButton();
+        //System.out.println("SeqText Pane  mouse pressed, selection: "+ selectionIsLocked );
         logger.finest("mousePressed " + b);
+        triggerSelectionLocked(false);
         if ( b == MouseEvent.BUTTON3) return;
         selectionStart = getSeqPos(e);
         dragging = false;
-        setSelectionLocked(false);
+        
         
     }
     public void mouseReleased(MouseEvent e) {
         int b = e.getButton();
-        
+        //System.out.println("SeqText Pane mouse released, selection: "+ selectionIsLocked );
         //logger.finest("mouseReleased " + b);
         if ( b != MouseEvent.BUTTON1) return;
-        selectionStart =  -1 ;
+        
         
         // do not change selection if  popupMenu is open
         if ( popupMenu.isVisible())
@@ -222,16 +219,13 @@ MouseListener, MouseMotionListener
                 end = selectionStart ;
             }
             highlite(start,end);
-            Iterator iter = selectedSeqPositionListeners.iterator();
-            while (iter.hasNext()){
-                SelectedSeqPositionListener li = (SelectedSeqPositionListener)iter.next();
-                li.selectedSeqRange(start,end);
-            }
-            setSelectionLocked(true);
+            triggerSelectedSeqRange(start,end);
+            triggerSelectionLocked(true);
+            selectionStart =  -1 ;
             return ;
         }
         
-        // not dragging ... :
+        // not dragging ... : ???
         if (  selectionIsLocked)   return;
         
         int seqpos = getSeqPos(e);
@@ -244,17 +238,14 @@ MouseListener, MouseMotionListener
             String cmd = "select "+pdb1 +"; spacefill on; colour cpk;" ;
             spice.executeCmd(cmd);
         }*/
+        triggerSelectedSeqPosition(seqpos);
         
-        Iterator iter = selectedSeqPositionListeners.iterator();
-        while (iter.hasNext()){
-            SelectedSeqPositionListener li = (SelectedSeqPositionListener)iter.next();
-            li.selectedSeqPosition(seqpos);
-        }
-        
+        /*
+        */
         
     }
     public void mouseDragged(MouseEvent e) {
-        //System.out.println("dragging mouse "+e);
+        //System.out.println("SeqText Pane dragging mouse, selection: "+ selectionIsLocked );
         dragging = true ;
         //setSelectionLocked(true);
         if ( selectionStart < 0 )
@@ -271,32 +262,17 @@ MouseListener, MouseMotionListener
             end = selectionStart ;
         }
         highlite(start,end);
-        Iterator iter = selectedSeqPositionListeners.iterator();
-        while (iter.hasNext()){
-            SelectedSeqPositionListener li = (SelectedSeqPositionListener)iter.next();
-            li.selectedSeqRange(start,end);
-        }
+        triggerSelectedSeqRange(start,end);
+        
+        
     }	
-    
-    
-    /*
-     private int getSeqpos(int x,int y){
-     Dimension d = this.getSize();
-     double w = d.width ;
-     System.out.println("x y w" + x + " " + y + " " + w);
-     System.out.println(x /w);
-     System.out.println(w /x);
-     return Math.round (x/(long)w);
-     }
-     
-     */
-    
+                 
     /** highighting of range of residues */
     public void highlite( int start, int end) {
         //System.out.println("SeqTExtPane highlite " + start + " " + end);
         //select(start,end);
         dragging = true;
-        setSelectionLocked(true);
+        //triggerSelectionLocked(true);
         StyledDocument doc = this.getStyledDocument();
         doc.setCharacterAttributes(0,chain.getLength(), this.getStyle("black"),true);
         doc.setCharacterAttributes(start,(end-start +1), this.getStyle("red"),true);
@@ -306,8 +282,8 @@ MouseListener, MouseMotionListener
     /** highighting of single residue */    
     public void highlite( int seqpos) {
         dragging = false ;
-        setSelectionLocked(false);
-        //System.out.println("SeqTExtPane highlite " + seqpos);
+        triggerSelectionLocked(false);
+        System.out.println("SeqTExtPane highlite " + seqpos);
         selectedSeqPosition(seqpos);
         StyledDocument doc = this.getStyledDocument();
         doc.setCharacterAttributes(0,chain.getLength(), this.getStyle("black"),true);
@@ -329,7 +305,7 @@ MouseListener, MouseMotionListener
     public void selectedSeqRange(int start, int end) {
         //System.out.println("selected " + start + " " + end);
         //System.out.println("SeqTExtPane select " + start + " "  + end);
-        dragging = true ;
+        //dragging = true ;
         //setSelectionLocked(true);
         if ( chain == null ) { return ;}
         StyledDocument doc = this.getStyledDocument();
@@ -350,8 +326,25 @@ MouseListener, MouseMotionListener
         this.repaint();
     }
     
+    private void triggerSelectedSeqPosition(int seqpos){
+        Iterator iter = selectedSeqPositionListeners.iterator();
+        while (iter.hasNext()){
+            SelectedSeqPositionListener li = (SelectedSeqPositionListener)iter.next();
+            li.selectedSeqPosition(seqpos);
+        }
+    }
+    
+    private void triggerSelectedSeqRange(int start, int end){
+        Iterator iter = selectedSeqPositionListeners.iterator();
+        while (iter.hasNext()){
+            SelectedSeqPositionListener li = (SelectedSeqPositionListener)iter.next();
+            li.selectedSeqRange(start,end);
+        }
+    }
+    
     /** goes through all SeqPositionSelected listeners and locks/unlocks selection */
-    private void setSelectionLocked(boolean flag){
+    private void triggerSelectionLocked(boolean flag){
+        //System.out.println("SeqText Pane triggerSelectionLocked: "+ flag );
         selectionIsLocked = flag;
         Iterator iter = selectedSeqPositionListeners.iterator();
         while (iter.hasNext()){
@@ -362,11 +355,12 @@ MouseListener, MouseMotionListener
     }
     
     public void selectionLocked(boolean flag){
+        //System.out.println("SeqText Pane selectionLocked: "+ flag );
         selectionIsLocked = flag;
     }
     
 	public void mouseOverFeature(FeatureEvent e){
-	    
+	    if (selectionIsLocked) return;
 	    
 	    Feature feat = (Feature) e.getSource();
 	    //System.out.println("selected feature " + feat);
@@ -374,6 +368,7 @@ MouseListener, MouseMotionListener
 	}
 	
 	public void mouseOverSegment(FeatureEvent e){
+	    if (selectionIsLocked) return;
 	    Segment seg = (Segment)e.getSource();
 	    //System.out.println("mouse over segment " + seg);
 	    int start = seg.getStart();
@@ -405,11 +400,13 @@ MouseListener, MouseMotionListener
 	    
 	}
 	public void featureSelected(FeatureEvent e){
+	    if ( selectionIsLocked ) return;
 	    Feature feat = (Feature) e.getSource();
 	    //System.out.println("selected feature " + feat);
 	    paintFeature(feat);
 	}
 	public void segmentSelected(FeatureEvent e){
+	    if ( selectionIsLocked ) return;
 	    Segment seg = (Segment)e.getSource();
 	    //System.out.println("selected segment " + seg);
 	    int start = seg.getStart();
