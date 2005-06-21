@@ -123,7 +123,7 @@ ConfigurationListener
     
     JScrollPane seqScrollPane ;
     JSplitPane  seqSplitPane  ;
-    SeqTextPane seqField      ;
+    SeqTextPane seqTextPane      ;
     JMenuItem lock;
     JMenuItem unlock;
     JMenuItem lockMenu;
@@ -402,16 +402,16 @@ ConfigurationListener
         //sharedPanel.setResizeWeight(0);	
         //sharedPanel.setBackground(Color.black);
         
-        seqField = new SeqTextPane(this);
+        seqTextPane = new SeqTextPane(this);
         //seqField.setSize( 700, 30);
-        seqField.setPreferredSize(new Dimension(700, 30));
-        seqField.setMinimumSize(new Dimension(700, 30));
-        seqField.addMouseMotionListener(seqField);
-        seqField.addMouseListener(seqField);
+        seqTextPane.setPreferredSize(new Dimension(700, 30));
+        seqTextPane.setMinimumSize(new Dimension(700, 30));
+        seqTextPane.addMouseMotionListener(seqTextPane);
+        seqTextPane.addMouseListener(seqTextPane);
         
       
               
-        seqScrollPane = new JScrollPane(seqField) ;
+        seqScrollPane = new JScrollPane(seqTextPane) ;
         //seqScrollPane.setBorder(BorderFactory.createEmptyBorder());
         //seqScrollPane.setSize( 700, 30);
         //seqScrollPane.setPreferredSize(new Dimension(700, 30));;
@@ -479,18 +479,18 @@ ConfigurationListener
         MyDasSourceListener mdsl = new MyDasSourceListener(this);
         dascanv.addDasSourceListener(mdsl);
         
-        dascanv.addFeatureViewListener(seqField);
-        dascanv.addSelectedSeqPositionListener(seqField);
+        dascanv.addFeatureViewListener(seqTextPane);
+        dascanv.addSelectedSeqPositionListener(seqTextPane);
         dascanv.addFeatureViewListener(structurePanelListener);
         dascanv.addSelectedSeqPositionListener(structurePanelListener);
         dascanv.addFeatureViewListener(statusPanel);
         dascanv.addSelectedSeqPositionListener(statusPanel);
         dascanv.addSelectedSeqPositionListener(spiceMenuListener);
         
-        seqField.addSelectedSeqPositionListener(dascanv);
-        seqField.addSelectedSeqPositionListener(structurePanelListener);
-        seqField.addSelectedSeqPositionListener(statusPanel);
-        seqField.addSelectedSeqPositionListener(spiceMenuListener);
+        seqTextPane.addSelectedSeqPositionListener(dascanv);
+        seqTextPane.addSelectedSeqPositionListener(structurePanelListener);
+        seqTextPane.addSelectedSeqPositionListener(statusPanel);
+        seqTextPane.addSelectedSeqPositionListener(spiceMenuListener);
         
     }
     
@@ -935,7 +935,7 @@ ConfigurationListener
         //dascanv.setChain(chain,currentChainNumber);
         
         //dascanv.setBackground(Color.);
-        seqField.setChain(chain,currentChainNumber);
+        seqTextPane.setChain(chain,currentChainNumber);
         
     }
 
@@ -1062,8 +1062,9 @@ ConfigurationListener
         setCurrentChainNumber(0);
         Chain chain = getChain(currentChainNumber) ;
         currentChain = chain;
+        dascanv.setChain(chain);
         if ( chain != null) 
-            seqField.setChain(chain,0);
+            seqTextPane.setChain(chain,0);
         updateDisplays();
                 
     }
@@ -1172,9 +1173,10 @@ ConfigurationListener
             features = tmpfeat                   ;
             //SeqFeatureCanvas dascanv = daspanel.getCanv();
             dascanv.setSeqLength(chain.getLength());
+            dascanv.setChain(chain);
             //dascanv.setChain(chain,currentChainNumber) ;
             //dascanv.setBackground(Color.black)   ;
-            seqField.setChain(chain,currentChainNumber);
+            seqTextPane.setChain(chain,currentChainNumber);
             //updateDisplays();
         }
         
@@ -1306,56 +1308,10 @@ ConfigurationListener
     
     
     
-    /** select a range of  residue *
-    public void select(int chain_number, int start, int end) {
-        //logger.finest("select start end" + start + " " + end);
-        //if ( selectionLocked ) return ;
-        
-        if ( chain_number == currentChainNumber ) {
-            seqField.select(start,end);		
-            //dascanv.select(start,end);
-            //TODO: move to  featureselectionlistener for dascanv
-        }
-        
-        
-        String cmd = getSelectStr( chain_number,  start,  end);
-        if (cmd.equals("")) { cmd = "select none;"; } 
-        cmd += " set display selected;" ;
-        structurePanel.executeCmd(cmd);
-        //structurePanel.forceRepaint();
-        
-    }
-    
-    /** select a single residue *
-    public void select(int chain_number,int seqpos){
-        //logger.finest("select seqpos" + seqpos);
-        //if ( selectionLocked ) return ;
-        
-        if ( chain_number == currentChainNumber ){
-            seqField.select(seqpos);
-            //dascanv.select(seqpos);
-            //TODO: add selectionlistener for dascanv
-        }
-        
-        
-        String cmd = getSelectStr( chain_number, seqpos) ;
-        if (cmd.equals("")) { cmd = "select none; "; } 
-        cmd += " set display selected;" ;
-        structurePanel.executeCmd(cmd);
-        //structurePanel.forceRepaint();
-        
-        
-        
-    }
-    */
-    
-    
     /** update the DIsplays of the subpanes */
     public void updateDisplays() {
         logger.finest("updateDisplays + features size: " + features.size());
         //SeqFeatureCanvas dascanv = daspanel.getCanv();
-        //dascanv.setFeatures(features);
-        //TODO: set features in dascanv
         
         //dascanv.repaint();
         dascanv.paint(dascanv.getGraphics());

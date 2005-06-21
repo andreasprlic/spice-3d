@@ -48,12 +48,13 @@ implements MouseListener, MouseMotionListener {
     //List featureViewListeners;
     FeatureView featureView;
     boolean selectionIsLocked;
-    
+    Segment oldsegment ;
     /**
      * 
      */
     public FeaturePanelMouseListener(SpiceFeatureViewer parent, FeatureView featureView) {
         super();
+        oldsegment = null;
         this.parent = parent;
         //selectedSeqListeners = new ArrayList();
         //featureViewListeners = new ArrayList();
@@ -77,9 +78,10 @@ implements MouseListener, MouseMotionListener {
         // do not change selection if we display the popup window
         
         if (b != 0 )
-            if ( b != MouseEvent.BUTTON1 ) 
+            if ( b != MouseEvent.BUTTON1 ) {
+                oldsegment = null;
                 return;
-            
+            }
             // make sure the triggering class is a FeaturePanel
         Object c = e.getSource();
         //System.out.println(c);
@@ -105,35 +107,51 @@ implements MouseListener, MouseMotionListener {
         oldposition = seqpos;
         
         //int featurenr = get_featurenr(y); 
-        triggerSelectedSeqPosition(seqpos);
+        
         
         Feature feat ;
         try {
             feat = featureView.getFeatureAt(linenr);
         } catch (NoSuchElementException ex){
+            oldsegment = null;
             return;
         }
         Segment seg = null;
         try {
             seg = featureView.getSegmentAt(linenr, seqpos);
         } catch (NoSuchElementException ex) {
-            return;
+            oldsegment = null;
         }
         
-        
+        // trigger mouseOveerSegment, featureSelected...
+        boolean triggered = false;
         FeatureViewListener[] fvls = parent.getFeatureViewListeners();
-        for (int i = 0 ; i< fvls.length ; i++) {
+        if ( seg != null ) {
             
-            FeatureViewListener li = fvls[i];
-            FeatureEvent event = new FeatureEvent(featureView,feat);
+            if ( oldsegment != null ){
+                if ( seg.equals(oldsegment)) {
+                    // nothing to do here ...
+                    return;
+                }
+            }
+            oldsegment = seg;
+            for (int i = 0 ; i< fvls.length ; i++) {
             
-            if ( seg != null ) {
-                li.featureSelected(event);
+                FeatureViewListener li = fvls[i];
+                // do not trigger mouse over feature here ...
+                // this is done by TypeLabelpane...
+                //FeatureEvent event = new FeatureEvent(featureView,feat);
+                //li.mouseOverFeature(event);
                 FeatureEvent event2 = new FeatureEvent(featureView,seg);
                 li.mouseOverSegment(event2);
-                
+                triggered = true;
             }
+            int start = seg.getStart() -1 ;
+            int end   = seg.getEnd() -1 ;
+            parent.selectedSeqRange(start,end);
         }
+        if ( ! triggered )
+            triggerSelectedSeqPosition(seqpos);
     }
     
     
@@ -156,7 +174,7 @@ implements MouseListener, MouseMotionListener {
         int b = e.getButton();
         
         triggerSelectionLocked(false);
-        
+        oldsegment = null;
         
         // make sure the triggering class is a FeaturePanel
         Object c = e.getSource();

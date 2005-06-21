@@ -32,8 +32,11 @@ import java.awt.Rectangle;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
+import org.biojava.spice.Feature.Segment;
 import org.biojava.spice.Panel.seqfeat.FeaturePanel;
 import java.awt.event.MouseEvent;
+import java.util.Iterator;
+import java.util.List;
 /**
  * @author Andreas Prlic
  *
@@ -41,7 +44,9 @@ import java.awt.event.MouseEvent;
 public class SeqScaleCanvas 
 extends FeaturePanel 
 {
-     
+//  the line where to draw the structure
+    public static final int    DEFAULT_STRUCTURE_Y    = 20 ;
+    
     static final Color BACKGROUND_COLOR = Color.black;
      
     /**
@@ -99,6 +104,9 @@ extends FeaturePanel
         
         
         drawScale(g2D,scale,seqLength);
+        //      draw region covered with structure
+        drawStructureRegion(g2D,aminosize);
+        
         drawSelection(g2D,aminosize,scale);
         
         if ( selected ){
@@ -159,6 +167,49 @@ extends FeaturePanel
             
         }
     }
+    
+    /** draw structrure covered region as feature */
+    private void drawStructureRegion(Graphics2D g2D, int aminosize){
+        // data is coming from chain;
+      
+        //g2D.drawString("Structure",1,DEFAULT_STRUCTURE_Y+DEFAULT_Y_HEIGHT);
+        //System.out.println("draw structure " + chain.getLength());
+        
+        
+        List segments = structureFeature.getSegments();
+        Iterator iter = segments.iterator();
+        while (iter.hasNext()){
+            Segment s = (Segment) iter.next();
+            int start = s.getStart();
+            int end   = s.getEnd();
+            drawStruc(g2D,start,end,aminosize);
+        }
+        
+    }
+    private void drawStruc(Graphics2D g2D, int start, int end, int aminosize){
+        //System.out.println("Structure " + start + " " + end);
+        int y = DEFAULT_STRUCTURE_Y ;
+        
+        int xstart = java.lang.Math.round(start * scale) + DEFAULT_X_START;
+        int endx   = java.lang.Math.round(end * scale)-xstart + DEFAULT_X_START +aminosize;
+        int width  = aminosize ;
+        int height = DEFAULT_Y_HEIGHT ;
+        
+        // draw the red structure line
+        g2D.setColor(STRUCTURE_COLOR);	
+        g2D.fillRect(xstart,y,endx,height);
+        
+        // highlite the background
+        Composite origComposite = g2D.getComposite();
+        g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));
+        g2D.setColor(STRUCTURE_BACKGROUND_COLOR);
+        //Dimension dstruc=this.getSize();
+        Rectangle strucregion = new Rectangle(xstart , 0, endx, getHeight());
+        g2D.fill(strucregion);
+        g2D.setComposite(origComposite);
+    }
+    
+    
     
     public void setToolTip(String txt){
         this.setToolTipText(txt);

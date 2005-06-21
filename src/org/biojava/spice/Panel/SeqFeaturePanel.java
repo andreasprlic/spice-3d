@@ -281,16 +281,18 @@ implements SeqPanel, MouseListener, MouseMotionListener
     }
     private void drawStruc(Graphics2D g2D, int start, int end, int aminosize){
         //System.out.println("Structure " + start + " " + end);
-        int y = DEFAULT_STRUCTURE_Y ;
+        
+        //int y = DEFAULT_STRUCTURE_Y ;
         
         int xstart = java.lang.Math.round(start * scale) + DEFAULT_X_START;
         int endx   = java.lang.Math.round(end * scale)-xstart + DEFAULT_X_START +aminosize;
-        int width  = aminosize ;
-        int height = DEFAULT_Y_HEIGHT ;
+        //int width  = aminosize ;
+        //int height = DEFAULT_Y_HEIGHT ;
         
         // draw the red structure line
-        g2D.setColor(STRUCTURE_COLOR);	
-        g2D.fillRect(xstart,y,endx,height);
+        //g2D.setColor(STRUCTURE_COLOR);	
+        //g2D.fillRect(xstart,y,endx,height);
+        
         
         // highlite the background
         Composite origComposite = g2D.getComposite();

@@ -50,8 +50,8 @@ import org.biojava.spice.Panel.seqfeat.DasSourceListener;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
 import org.biojava.spice.Config.SpiceDasSource;
-import org.biojava.spice.GUI.SelectionLockPopupListener;
 
+import org.biojava.bio.structure.Chain;
 
 /** A class that can display features (e.g. retrieved from different DAS sources).
  * A SpiceFeatureView contains zero, one or multiple FeatureView objects, which do the actual rendering.
@@ -186,8 +186,6 @@ FeatureViewListener
         
         initLabelPane();
         
-        
-        
         lbml = new LabelBoxListener(this);
         popupMenu = createPopupMenu();
         lbml.setPopupMenu(popupMenu);
@@ -270,7 +268,7 @@ FeatureViewListener
         
     }
     
-
+    
     
     /** remove the existing FeatureView objects to free the space for displaying e.g. the 
      * Annotations of a new sequence.
@@ -450,6 +448,18 @@ FeatureViewListener
                 
             this.setScale(scale);
         }
+    }
+    
+    public void setChain(Chain chain){
+        if ( seqScale != null)
+            seqScale.setChain(chain);
+        Iterator iter = featureViews.iterator();
+        while (iter.hasNext()){
+            FeatureView fv = (FeatureView)iter.next();
+            fv.setChain(chain);
+        }
+        this.revalidate();
+        this.repaint();
     }
     
     public void setScale(float scale){

@@ -23,7 +23,6 @@
 package org.biojava.spice.Panel;
 
 import java.util.List;
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -96,6 +95,7 @@ SelectedSeqPositionListener
      * @param command - a String containing a RASMOL like command. e.g. "select protein; cartoon on;"
      */
     public void executeCmd(String command) {
+        //System.out.println("StructurePanel: " + command);
         structurePanel.executeCmd(command);
     }
     
@@ -128,7 +128,9 @@ SelectedSeqPositionListener
 
     /** return the pdbcode + chainid to select a single residue. This
      * can be used to create longer select statements for individual
-     * amino acids. */
+     * amino acids.
+     * seqpos is in UniProt coordinate system.
+     *  */
     
     private String getSelectStrSingle(int chain_number, int seqpos) {
         Chain chain = getChain(chain_number);
@@ -181,7 +183,9 @@ SelectedSeqPositionListener
         }
         return null ;
     }
-    /** return a select command that can be send to executeCmd*/
+    /** return a select command that can be send to executeCmd
+     * coordinates are uniprot position
+     * */
     private String getSelectStr(int chain_number, int start, int end) {
         Chain chain = getChain(chain_number) ;
         if ( chain == null) return "" ;
@@ -207,8 +211,10 @@ SelectedSeqPositionListener
         
         String startpdb = gs.getPDBCode() ;
         String endpdb = ge.getPDBCode() ;
-        
-        String cmd =  "select "+startpdb+"-"+endpdb+"and **" +chainid+"; set display selected;" ;
+        String cmd =  "select "+startpdb+"-"+endpdb;
+        if ( ! chainid.equals(" ")) 
+            cmd += ":" +chainid;
+        cmd +=";";
         return cmd ;
     }
     
@@ -228,6 +234,7 @@ SelectedSeqPositionListener
         //System.out.println("selected " + start + " " + end);
         //highlite(currentChainNumber,start,end,"");
         String cmd = getSelectStr(currentChainNumber,start,end);
+        cmd += " set display selected;";
         if ( ! cmd.equals(""))
             executeCmd(cmd);
     }
@@ -237,49 +244,53 @@ SelectedSeqPositionListener
     }
     
     public void selectedSeqPosition(int seqpos){
-        System.out.println("structurepanel selected seqpos " + seqpos );
+        
         //highlite(currentChainNumber,seqpos,"");
         if ( seqpos == oldpos ) return ;
         oldpos = seqpos ; 
+        //System.out.println("structurepanel selected seqpos " + seqpos );
         String cmd = getSelectStr(currentChainNumber,seqpos);
-        System.out.println(cmd);
+        
         if ( ! cmd.equals(""))
             executeCmd(cmd);
     }
     public void mouseOverFeature(FeatureEvent e){
-        
         Feature feat = (Feature) e.getSource();
-        //System.out.println("mouse over feature " + feat);
-        //highliteFeature(feat);
-        String cmd = "";
-        List segments = feat.getSegments();
-        Iterator iter = segments.iterator();
-        while (iter.hasNext()){
-            Segment s = (Segment) iter.next();
-            int start =s.getStart();
-            int end = s.getEnd();
-            cmd += getSelectStr(currentChainNumber,start,end);
-        }
-        //cmd += getSelectStr(currentChainNumber,start,end);
-        executeCmd(cmd);
+        //System.out.println("StructurePanel mouse over feature " + feat);
+        
+        highliteFeature(feat,false);
     }
     
     public void mouseOverSegment(FeatureEvent e){
         Segment s = (Segment)e.getSource();
+        //System.out.println("StructurePanel mouseOverSegment " + s);
         //highliteSegment(seg);
-        int start =s.getStart();
-        int end = s.getEnd();
-        String cmd = getSelectStr(currentChainNumber,start,end);
+        int start =s.getStart()-1;
+        int end = s.getEnd()-1;
+        String cmd = "";
+        if (  s.getName().equals("DISULFID")) {
+           
+            cmd += "select "+ getDisulfidSelect(start,end) + " ;";
+            
+            
+        }
+        else {
+            
+            cmd = getSelectStr(currentChainNumber,start,end);
+            
+        } 
+        cmd += " set display selected;  ";
         executeCmd(cmd);
     }
     public void featureSelected(FeatureEvent e){
+        
         Feature feat = (Feature) e.getSource();
-        //System.out.println("selected feature " + feat);
-        highliteFeature(feat);
+        //System.out.println("StructurePanel selected feature " + feat);
+        highliteFeature(feat,true);
     }
     public void segmentSelected(FeatureEvent e){
         Segment seg = (Segment)e.getSource();
-        //System.out.println("selected segment " + seg);
+        //System.out.println("StructurePanel: selected segment " + seg);
         highliteSegment(seg);
     }
     
@@ -293,49 +304,59 @@ SelectedSeqPositionListener
             return "" ;
         }
         
-        
-        
         String cmd = "select " + pdbdat + ";";
         return cmd ;
         
     }
     
-    private String highliteFeature(Feature feature){
-        logger.finest("highlite feature " + feature);
+    private void highliteFeature(Feature feature, boolean color ){
+        //logger.finest("highlite feature " + feature);
         //Feature feature = (Feature) features.get(featurenr) ;
         //logger.finest("highlite feature " + feature);
         
         
         List segments = feature.getSegments() ;
         String cmd = "" ;
-        
+        boolean addselect = false;
+        boolean first = true;
         for ( int i =0; i< segments.size() ; i++ ) {
             Segment segment = (Segment) segments.get(i);
             //highliteSegment(segment);
             
-            int start = segment.getStart();
-            int end   = segment.getEnd();
+            int start = segment.getStart()-1;
+            int end   = segment.getEnd()-1;
             //logger.finest("highilte feature " +featurenr+" " + start + " " +end );
             
             if ( feature.getType().equals("DISULFID")){
-                String c = getSelectStr(currentChainNumber,start-1); 
-                 
-                if (! c.equals("")) {
-                    cmd += c ;
-                    cmd += "colour cpk; spacefill on;";
-                }
-                String c2 = getSelectStr(currentChainNumber,end-1);
-                if ( ! c2.equals("")){
-                    cmd += c2;
-                    cmd += "colour cpk; spacefill on;";
-                }
+                addselect = true;
+            
+                String c = getDisulfidSelect(start,end);
+                cmd += c;
+
                 
             } else {
-                String c = getSelectStr(currentChainNumber,start,end);
-                if (c.equals("")) continue;
+                
+                Group gs = getGroupNext( currentChainNumber,(start-1),"incr");
+                //Group gs = chain.getGroup(start-1);	
+                Group ge = getGroupNext( currentChainNumber,(end-1),"decr");
+                //= chain.getGroup(end-1);	
+                //logger.finest("gs: "+gs+" ge: "+ge);
+                if (( gs == null) || (ge == null) ) {
+                    continue;
+                }
+                
+                addselect = true;
+                String startpdb = gs.getPDBCode() ;
+                String endpdb = ge.getPDBCode() ;
+                
+                //String c = getSelectStr(currentChainNumber,start,end);
+                String c = "" ;
+                if ( ! first)
+                    c+=", ";
+                first = false;
+                c += startpdb + " - " + endpdb ; 
                 cmd += c;
-                String col = segment.getTxtColor();
-                cmd += "color "+ col +";";
+                
             } 
             //if ( start == end ) {
             //cmd += " spacefill on;";
@@ -345,15 +366,23 @@ SelectedSeqPositionListener
                 ( feature.getType().equals("SITE"))  ||
                 ( feature.getType().equals("ACT_SITE")) 	     
         ){
-            cmd += " spacefill on; " ;
+            if ( color)
+                	cmd += "; spacefill on; " ;
         } else if ( feature.getType().equals("MSD_SITE")|| 
                 feature.getType().equals("snp") 
         ) {
-            cmd += " wireframe on; " ;
+            if ( color)
+                cmd += "; wireframe on; " ;
+        } else if ( feature.getType().equals("DISULFID")){
+            if ( color)
+                cmd += "colour cpk; spacefill on;";
         }
         
-        //logger.finest("cmd: "+cmd); 
-        return cmd ;
+        if ( addselect)	
+            	cmd = "select "+ cmd ; 
+        //logger.finest("cmd: "+cmd);
+        cmd += "; set display selected;";
+        executeCmd(cmd);
         
         
     }
@@ -399,9 +428,10 @@ SelectedSeqPositionListener
         
         String cmd = getSelectStr( chainNumber,  start,  end);
         if ( ! cmd.equals("")){
-            cmd += "colour "+ colour+";";
+            cmd += "colour "+ colour+"; set display selected;";
             structurePanel.executeCmd(cmd);
         }
+        //cmd += "set display selected;";
     }
     
     public void highlite(int chainNumber, int start, int end, String colour){
@@ -427,6 +457,44 @@ SelectedSeqPositionListener
         
     }
     
+    /** select the two residues of a disulfid bridge
+     * 
+     * @param c1 position of C in uniprot
+     * @param c2 position of C in uniprot
+     * @return rasmol - like select command
+     */
+    private String getDisulfidSelect(int c1,int c2){
+        String cmd = "";
+        
+        // a disulfid bridge...
+        String ss =getSelectStrSingle(currentChainNumber,c1);
+        String es =getSelectStrSingle(currentChainNumber,c2);
+        cmd += "select ";
+        if (! ss.equals("")) {
+            cmd += ss;
+            if (! es.equals( "")){
+                cmd += ", "+es;
+            }
+        } else {
+            if ( ! es.equals("")) {
+                cmd += es;
+            }
+        } 
+        
+        
+       
+        
+        String cs1 = getSelectStrSingle(currentChainNumber,c1);
+       if (! cs1.equals("")) {
+           cmd += cs1 ;
+       }
+       String cs2 = getSelectStr(currentChainNumber,c2);
+       if ( ! cs2.equals("")){
+           cmd += cs2;
+           
+       }
+       return cmd ;
+    }
     /** highlite a single segment */
     private void highliteSegment (Segment segment) {
         logger.finest("highlite Segment");
@@ -437,14 +505,13 @@ SelectedSeqPositionListener
         //seqColorOld = col ;
         //spice.setOldColor(col) ;
         
-        
-        int start = segment.getStart();
-        int end   = segment.getEnd()  ;
-        
         // we assume that DAS features start with 1
         // internal in SPICE they start with 0
-        start = start -1 ;
-        end   = end   -1 ;
+        
+        int start = segment.getStart() -1 ;
+        int end   = segment.getEnd()   -1 ;
+        
+        
         
         String type =  segment.getParent().getType() ;
         //logger.finest(start+" " + end+" "+type);
@@ -452,11 +519,7 @@ SelectedSeqPositionListener
         if ( type.equals("DISULFID")){
             //highlite(currentChainNumber,start);
             //highlite(currentChainNumber,end);
-            
-            String pdb1 = getSelectStrSingle(currentChainNumber,start);
-            String pdb2 = getSelectStrSingle(currentChainNumber,end);
-            String cmd = "select "+pdb1 +", " + pdb2 + "; spacefill on; colour cpk;" ;
-            
+            String cmd = "select " + getDisulfidSelect(start,end) + "; spacefill on; colour cpk;" ;
             executeCmd(cmd);
             
             

@@ -64,6 +64,10 @@ public class SpiceDasSource
 	this.setRegisterDate(ds.getRegisterDate());
 	this.setLeaseDate(ds.getLeaseDate());
 	this.setNickname(ds.getNickname());
+	this.setTestCode(ds.getTestCode());
+	this.setId(ds.getId());
+	this.setLabels(ds.getLabels());
+	this.setHelperurl(ds.getHelperurl());
     }
 
 

@@ -44,7 +44,7 @@ extends SizeableJPanel
 {
    
     public static final int    DEFAULT_X_SIZE         = 60;
-    public static final int    DEFAULT_X_START        = 20  ;
+    public static final int    DEFAULT_X_START        = 10  ;
     public static final int    DEFAULT_X_RIGHT_BORDER = 0 ;
     public static final int    DEFAULT_Y_START        = 0 ;
     public static final int    DEFAULT_Y_STEP         = 10 ;
@@ -81,8 +81,6 @@ extends SizeableJPanel
         //this.setPreferredSize(new Dimension(DEFAULT_X_SIZE,MINIMUM_HEIGHT));
         this.setWidth(MINIMUM_HEIGHT);
         this.setHeight(DEFAULT_X_SIZE);
-        
-     
         
         int oldposition = 0;
         
@@ -177,7 +175,7 @@ extends SizeableJPanel
         g2D.setFont(plainFont);
         
         g2D.setColor(Color.white);
-        g2D.drawString(this.label,1,DEFAULT_Y_STEP);
+        g2D.drawString(this.label,DEFAULT_X_START,DEFAULT_Y_STEP);
         return DEFAULT_Y_STEP;
     }
     

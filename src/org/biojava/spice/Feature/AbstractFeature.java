@@ -58,7 +58,7 @@ public abstract class AbstractFeature implements Feature {
     }
 
     public String toString() {
-	String str = "Feature: method: " + method +" type: " + type + " note: "+note + " link: "+ link;
+	String str = "Feature: method: " + method +" type: " + type + " note: "+note;
 	
 	str += segments ;
 	return str ;

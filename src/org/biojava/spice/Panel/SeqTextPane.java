@@ -70,8 +70,9 @@ MouseListener, MouseMotionListener
     JPopupMenu popupMenu;
     boolean dragging ;
     boolean selectionIsLocked;
-    static Logger logger      = Logger.getLogger("org.biojava.spice");
+    static Logger logger = Logger.getLogger("org.biojava.spice");
     List selectedSeqPositionListeners;
+    
     public SeqTextPane (SPICEFrame spicef) {
         super();
         selectionIsLocked = false;
@@ -274,7 +275,10 @@ MouseListener, MouseMotionListener
         dragging = true;
         //triggerSelectionLocked(true);
         StyledDocument doc = this.getStyledDocument();
-        doc.setCharacterAttributes(0,chain.getLength(), this.getStyle("black"),true);
+        int length = 0;
+        if ( chain != null) 
+            length = chain.getLength();
+        doc.setCharacterAttributes(0,length, this.getStyle("black"),true);
         doc.setCharacterAttributes(start,(end-start +1), this.getStyle("red"),true);
         this.repaint();
     }
@@ -286,7 +290,11 @@ MouseListener, MouseMotionListener
         System.out.println("SeqTExtPane highlite " + seqpos);
         selectedSeqPosition(seqpos);
         StyledDocument doc = this.getStyledDocument();
-        doc.setCharacterAttributes(0,chain.getLength(), this.getStyle("black"),true);
+        
+        int length = 0;
+        if ( chain != null) 
+            length = chain.getLength();
+        doc.setCharacterAttributes(0,length, this.getStyle("black"),true);
         doc.setCharacterAttributes(seqpos,1, this.getStyle("red"),true);
         this.repaint();
     }
@@ -309,7 +317,10 @@ MouseListener, MouseMotionListener
         //setSelectionLocked(true);
         if ( chain == null ) { return ;}
         StyledDocument doc = this.getStyledDocument();
-        doc.setCharacterAttributes(0,chain.getLength(), this.getStyle("black"),true);
+        int length = 0;
+        if ( chain != null) 
+            length = chain.getLength();
+        doc.setCharacterAttributes(0,length, this.getStyle("black"),true);
         doc.setCharacterAttributes(start,(end-start +1), this.getStyle("red"),true);
         this.repaint();
     }
@@ -321,7 +332,10 @@ MouseListener, MouseMotionListener
         //setSelectionLocked(false);
         selectionIsLocked = false;
         StyledDocument doc = this.getStyledDocument();
-        doc.setCharacterAttributes(0,chain.getLength(), this.getStyle("black"),true);
+        int length = 0;
+        if ( chain != null) 
+            length = chain.getLength();
+        doc.setCharacterAttributes(0,length, this.getStyle("black"),true);
         doc.setCharacterAttributes(seqpos,1, this.getStyle("red"),true);	
         this.repaint();
     }
@@ -371,20 +385,23 @@ MouseListener, MouseMotionListener
 	    if (selectionIsLocked) return;
 	    Segment seg = (Segment)e.getSource();
 	    //System.out.println("mouse over segment " + seg);
-	    int start = seg.getStart();
-	    int end = seg.getEnd();
+	    int start = seg.getStart()-1;
+	    int end = seg.getEnd()-1;
 	    highlite(start,end);
 	}
 	
 	private void paintFeature(Feature feat){
 	    StyledDocument doc = this.getStyledDocument();
-        doc.setCharacterAttributes(0,chain.getLength(), this.getStyle("black"),true);
+	    int length = 0;
+        if ( chain != null) 
+            length = chain.getLength();
+        doc.setCharacterAttributes(0,length, this.getStyle("black"),true);
         List segments = feat.getSegments();
         Iterator iter = segments.iterator();
         while ( iter.hasNext()){
             Segment s = (Segment) iter.next();
-            int start = s.getStart();
-            int end = s.getEnd();
+            int start = s.getStart()-1;
+            int end = s.getEnd()-1;
             String name = s.getName();
             Style style =  this.getStyle("red");
             if (name.equals("HELIX"))
@@ -409,8 +426,8 @@ MouseListener, MouseMotionListener
 	    if ( selectionIsLocked ) return;
 	    Segment seg = (Segment)e.getSource();
 	    //System.out.println("selected segment " + seg);
-	    int start = seg.getStart();
-	    int end = seg.getEnd();
+	    int start = seg.getStart()-1;
+	    int end = seg.getEnd()-1;
 	    selectedSeqRange(start,end);
 	}
 
@@ -511,6 +528,7 @@ extends KeyAdapter
                 SelectedSeqPositionListener li = (SelectedSeqPositionListener)iter.next();
                 li.selectedSeqRange(start,start+searchtext.length()-1);
             }
+            parent.selectedSeqRange(start,start+searchtext.length()-1);
             
             
         } else {

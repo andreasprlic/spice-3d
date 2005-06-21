@@ -32,7 +32,7 @@ import java.util.logging.Logger;
 import java.util.NoSuchElementException;
 import java.util.List;
 import java.util.Iterator;
-
+import org.biojava.bio.structure.*;
 
 
 /** A class that renders features. E.g. all the features retrieved from a DasSource.
@@ -75,6 +75,7 @@ extends JPanel
     
 
     SpiceDasSource dasSource;
+  //  Chain chain;
     
     /**
      * 
@@ -83,6 +84,7 @@ extends JPanel
         super();
         
         this.label="";
+        //chain = new ChainImpl();
         features   = null;
         seqLength  = 0;
         labelWidth = 60;
@@ -108,6 +110,12 @@ extends JPanel
     public SpiceFeatureViewer getSpiceFeatureViewer() {
         return parent ; 
     }
+    
+    public void setChain(Chain c){
+        //chain = c;
+        featureCanvas.setChain(c);
+    }
+    
     public void setDasSource(SpiceDasSource ds){ dasSource = ds; }
     public SpiceDasSource getDasSource(){ return dasSource; }
     

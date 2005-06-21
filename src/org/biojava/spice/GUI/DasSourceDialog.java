@@ -36,6 +36,7 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import org.biojava.spice.SPICEFrame;
 import org.biojava.spice.Config.SpiceDasSource;
+import org.biojava.services.das.registry.DasCoordinateSystem;
 
 /**
  * @author Andreas Prlic
@@ -114,14 +115,81 @@ extends JDialog{
         
         txt += "<html><body>";
         
+        txt += "<h2> DasSource " + ds.getNickname() +" details</h2>";
         txt += "<table>";
-        txt += "<tr><td>DasSource</td><td><b>"+ds.getNickname()+"</b></td></tr>";
-        txt += "<tr><td>"+ds.getUrl()+"</td></tr>";
+        txt += "<tr><td>nickname</td><td><b>"+ds.getNickname()+"</b></td></tr>";
+        txt += "<tr><td colspan=\"2\">"+ds.getUrl()+"</td></tr>";        
+        txt += "<tr><td>unique id</td><td>" + ds.getId()+"</td></tr>";
+        txt += "<tr><td> description</td><td>" + ds.getDescription()+"</td></tr>";
+        txt += "<tr><td>admin email</td><td><a href=\"mailto:"+ds.getAdminemail()+"\">"+ds.getAdminemail()+"</a></td></tr>";
+        txt += "<tr><td>helperurl</td><td>";
+        String helperurl = ds.getHelperurl();
+        if (( helperurl != null) && ( ! helperurl.equals(""))) {
+            txt += "<a href=\""+helperurl+"\">"+helperurl+"</a>";
+
+        }
+        txt += "</td></tr>";
+        
+        txt += "<tr><td>testcode</td><td>"+ds.getTestCode()+"</td></tr>";
+        
+        txt += "<tr><td>coordinate systems</td><td>";
+        // coordinate systems
+        DasCoordinateSystem[] coords = ds.getCoordinateSystem();
+        for (int i = 0 ; i< coords.length;i++){
+            txt += coords[i].toString();
+        }
+        txt+="</td></tr>";
+        
+        txt += "<tr<td>capabilities</td><td>";
+        
+        String testCode = ds.getTestCode();
+        
+        // capabilities;
+       
+        String[] caps = ds.getCapabilities();
+        for (int i = 0 ; i< caps.length;i++) {
+            if (( testCode == null) || ( testCode.equals(""))) {
+                txt += caps[i] + " ";
+                continue;
+            }
+            
+            String cmd = ds.getUrl();
+            String capability = caps[i];
+            if ( capability.equals("sequence") || 
+                    capability.equals("features")) {
+                cmd += capability +"?segment="+testCode;
+            } else if ( capability.equals("alignment") ||
+                    capability.equals("structure") ){
+                cmd += capability+"?query="+testCode;
+            }
+            
+            else {
+               txt+= caps[i] + " ";
+               continue;
+            }
+            txt+= "<a href=\""+cmd+"\">"+capability+"</a> ";
+        }
+        txt +="</td></tr>";
+        
+        txt += "<tr><td>registered at</td><td>"+ds.getRegisterDate()+"</td></tr>";
+        txt += "<tr><td>last tested successfully at</td><td>"+ds.getLeaseDate()+"</td></tr>";
+        txt += "<tr><td>labels</td>";
+        String[] labels = ds.getLabels();
+        for (int i=0;i< labels.length;i++ ){
+            txt += labels[i] + " ";
+        }
+        txt += "</td></tr>";
+            
         txt += "</table>";
+        txt += "<p>";
+        txt += "<a href=\"http://das.sanger.ac.uk/registry/validateServer.jsp?auto_id="+ds.getId()+"\">validate</a> this DasSource.";
+        txt += "</p>";
         txt += "</body></html>";
+        
+        
         return txt;
-        
-        
-        
+            
+            
+            
+        }
     }
-}
