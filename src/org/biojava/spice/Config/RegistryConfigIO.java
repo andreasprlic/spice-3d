@@ -337,7 +337,12 @@ extends Thread
         }
         logger.log(Level.CONFIG,"found "+sources.length+" servers"); 
         //config = getDasServers(sources); 
-        
+        if ( sources.length < 1){
+            logger.log(Level.WARNING,"Did not get any DasSource from registration service at " + registryurl);
+            
+             throw new ConfigurationException("Did not get any DasSource from registration service at " + registryurl);
+          
+        }
         ArrayList servers = new ArrayList();
         
         for (int i = 0 ; i < sources.length; i++) {
