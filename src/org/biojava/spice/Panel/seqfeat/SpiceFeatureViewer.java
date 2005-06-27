@@ -63,8 +63,7 @@ public class SpiceFeatureViewer
 
 extends SizeableJPanel
 implements SelectedSeqPositionListener,
-ChangeListener,
-FeatureViewListener
+ChangeListener
 
 {
     
@@ -327,28 +326,13 @@ FeatureViewListener
 	    }
 	    */
 	}
-	public void featureSelected(FeatureEvent e) {
-	    /*Iterator iter = featureViewListeners.iterator();
-	    while (iter.hasNext()) {
-	        FeatureViewListener fvl = (FeatureViewListener) iter.next();
-	        fvl.featureSelected(e);
-	    }*/
-	}
-	public void segmentSelected(FeatureEvent e) {
-	    /*
-	    Iterator iter = featureViewListeners.iterator();
-	    while (iter.hasNext()) {
-	        FeatureViewListener fvl = (FeatureViewListener) iter.next();
-	        fvl.segmentSelected(e);
-	    }
-	    */
-	}
+	
     
     /** sets the visible size of the feature panel 
      * If it is larger there will be a scrollpanel...
      * */
     public void setFeaturePaneVisibleSize(int x, int y){
-        System.out.println("setFeaturePaneVisibleSize " + x + " " + y);
+        //System.out.println("setFeaturePaneVisibleSize " + x + " " + y);
         
         //      THIS IS SETTING THE SIZE!!!
         preferredVisibleWidth = x ;
@@ -357,7 +341,7 @@ FeatureViewListener
         setScale(scale);
         
         // test the width of the underlying featurePanels ...
-        /*if ( seqScale != null) {
+        if ( seqScale != null) {
             SeqScaleCanvas sscan = seqScale.getSeqScaleCanvas();
             if ( sscan.getWidth() < x ){
                 sscan.setWidth(x);
@@ -369,9 +353,9 @@ FeatureViewListener
             FeaturePanel fp = fv.getFeaturePanel();
             if ( fp.getWidth()< x)
                 fp.setWidth(x);
-        }*/
+        }
         //this.validate();
-        featureScroll.setPreferredSize(new Dimension(x,y));
+        
         this.revalidate();
         this.repaint();
         
@@ -429,8 +413,9 @@ FeatureViewListener
         //float scale =  ( seqLength +DEFAULT_X_START + DEFAULT_X_END) / (residueSize);
         //float scale = 10 - residueSize ;
         //System.out.println("new scale: " + scale + "residueSize " + residueSize);
-        if ( scale < 0) 
-            	scale = 0;
+        float minscale = getMinimalScale();
+        if ( scale < minscale) 
+            	scale = minscale;
         if ( scale > MAX_SCALE)
             scale = MAX_SCALE;
         return scale;
@@ -461,7 +446,41 @@ FeatureViewListener
         this.repaint();
     }
     
+    /** the minimal scale is so that the whole sequence is visible on the screen */
+    private float getMinimalScale(){
+        
+        if ( seqScale == null)
+            return MAX_SCALE;
+        
+        if ( seqLength < 1)
+            return MAX_SCALE;
+        
+        //Dimension d = seqScale.getSeqScaleCanvas().getSize();
+        
+        int visibleWidth = featureScroll.getWidth()-DEFAULT_X_START - DEFAULT_X_END + 10; 
+        //System.out.println("width " + visibleWidth + " " + seqLength);
+        float size =visibleWidth / (float)seqLength;
+        //System.out.println("size " + size);
+        return size;
+        
+        /*
+        int aminosize =  Math.round(1 * size) ;
+        float minscale =  calcScale(aminosize);
+        System.out.println("minimal scale: " + minscale + " aminosize "+ aminosize);
+        return minscale ;
+        */
+    }
+    
     public void setScale(float scale){
+        float minscale = getMinimalScale();
+        if ( scale < minscale ) {
+            //System.out.println("Minscale > scale" + minscale + ">" + scale);
+            scale = minscale;
+        }
+        if ( scale > MAX_SCALE){
+            scale = MAX_SCALE;
+        }
+        
         if ( seqScale != null)
             seqScale.setScale(scale);
         if ( featureViews == null)
@@ -505,13 +524,13 @@ FeatureViewListener
     
     public void evaluateLayout(){
                 
-        Dimension d = this.getSize();        
-        System.out.println("evaluateLayout old size" + d.width + " " + d.height);
+               
+        //System.out.println("evaluateLayout old size" + d.width + " " + d.height);
         
-        int newHeight = getSubHeight() ;
-        setHeight(newHeight);
-        System.out.println("new height " + newHeight);
+        int newHeight = getSubHeight() +20;
         
+        //System.out.println("new height " + newHeight);
+        Dimension d = this.getSize(); 
         int newWidth = d.width  ;
         int stuffWidth = getLabelWidth() + getTypeWidth();
         newWidth = newWidth - stuffWidth;
@@ -519,10 +538,14 @@ FeatureViewListener
             newWidth = 1 ;
         }
         
-        
+        setHeight(newHeight);
         setFeaturePaneVisibleSize(newWidth, newHeight);
-        //parent.setPreferredSize(new Dimension(d.width,d.height));
         
+        featureScroll.setPreferredSize(new Dimension(newWidth,newHeight));
+        featureScroll.setSize(new Dimension(newWidth,newHeight));
+        //parent.setPreferredSize(new Dimension(d.width,d.height));
+        //featureScroll.setPreferredSize(new Dimension(newHeight, newWidth));
+        //featureScroll.revalidate();
         this.revalidate();
         this.repaint();
     }
@@ -557,9 +580,9 @@ FeatureViewListener
         //vBox.add(view);
         //vBox.add(Box.createHorizontalGlue());
         //updateDisplay();
-        
+        evaluateLayout();   
         if ( update){
-            evaluateLayout();    
+            
             this.repaint();       
         }
     }
@@ -701,7 +724,7 @@ FeatureViewListener
             while ( iter.hasNext()){
                 FeatureView fvtmp = (FeatureView)iter.next();
                 LabelPane lab = fvtmp.getLabel();
-                y+= lab.getCanvasHeight();
+                y+= lab.getHeight();
             } 
         }
         

@@ -93,7 +93,7 @@ implements MouseListener, MouseMotionListener {
             f = fv.getFeatureAt(line);
         } catch (java.util.NoSuchElementException ex){
             //System.out.println(ex.getMessage());
-            //typ.setToolTipText(null);
+            typ.setToolTipText(null);
             typ.setSelectedType(-1);
             return;
         }
@@ -103,9 +103,8 @@ implements MouseListener, MouseMotionListener {
             // test if a link is selected
             String link = f.getLink();
             if (( link != null) && (! link.equals(""))) {
-                System.out.println(link);
                 typ.setSelectedLink(line, true);
-                //typ.setToolTipText(link);
+                typ.setToolTipText(link);
                 return;
             }
         } else {
@@ -115,7 +114,7 @@ implements MouseListener, MouseMotionListener {
         }
         
         typ.setSelectedType(line);
-        //typ.setToolTipText(f.toString());
+        typ.setToolTipText(f.toString());
         SelectedFeatureListener[] featlisteners = typ.getSelectedFeatureListeners();
         for ( int i = 0 ; i< featlisteners.length ; i++ ){
             
@@ -134,7 +133,7 @@ implements MouseListener, MouseMotionListener {
     
     
     private void disableSelection(TypeLabelPanel typ){
-        //typ.setToolTipText(null);
+        typ.setToolTipText(null);
         typ.setSelectedType(-1);
         SelectedFeatureListener[] featlisteners = typ.getSelectedFeatureListeners();
         for ( int i = 0 ; i< featlisteners.length ; i++ ){
