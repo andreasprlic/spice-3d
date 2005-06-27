@@ -30,7 +30,13 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.awt.image.BufferedImage;
+
+import javax.swing.ImageIcon;
+
+import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.Feature.Feature;
 import org.biojava.spice.Feature.Segment;
 import org.biojava.spice.Panel.seqfeat.SelectedFeatureListener;
@@ -44,7 +50,7 @@ public class TypeLabelPanel extends SizeableJPanel {
     public static final Font plainFont = new Font("SansSerif", Font.PLAIN, 10);
     
     
-    public static final int    DEFAULT_X_START        = 0  ;
+    public static final int    DEFAULT_X_START        = 10  ;
     public static final int    DEFAULT_X_RIGHT_BORDER = 0 ;
     public static final int    DEFAULT_Y_START        = 0 ;
     public static final int    DEFAULT_Y_STEP         = 10 ;
@@ -65,12 +71,17 @@ public class TypeLabelPanel extends SizeableJPanel {
     int oldSelectedType;
     BufferedImage imbuf;
     int canvasHeight ;
+    boolean linkSelected;
+    public static Logger logger = Logger.getLogger("org.biojava.spice");
+
+    ImageIcon miniFirefox ;
+    
     /**
      * 
      */
     public TypeLabelPanel() {
         super();
-        // TODO Auto-generated constructor stub
+
         this.setBackground(Color.black);
         this.setDoubleBuffered(true);
         //this.setPreferredSize(new Dimension(DEFAULT_WIDTH,MINIMUM_HEIGHT));
@@ -85,8 +96,21 @@ public class TypeLabelPanel extends SizeableJPanel {
         oldSelectedType = -1;
         initImgBuffer();
         canvasHeight = MINIMUM_HEIGHT;
+        
+        miniFirefox = createImageIcon("firefox10x10.png");
+        
     }
     
+    /** Returns an ImageIcon, or null if the path was invalid. */
+    public static ImageIcon createImageIcon(String path) {
+        java.net.URL imgURL = SpiceApplication.class.getResource(path);
+        if (imgURL != null) {
+            return new ImageIcon(imgURL);
+        } else {
+            logger.log(Level.WARNING,"Couldn't find file: " + path);
+            return null;
+        }
+    }
 
     private void initImgBuffer(){
       
@@ -125,7 +149,8 @@ public class TypeLabelPanel extends SizeableJPanel {
             if ( selectedType != oldSelectedType){
                 this.repaint();
             } 
-            oldSelectedType = selectedType;            
+            oldSelectedType = selectedType;  
+            linkSelected = false;
             return;
         }
         selectedType = linenr;
@@ -135,6 +160,14 @@ public class TypeLabelPanel extends SizeableJPanel {
         } 
         oldSelectedType = selectedType;
     }
+    
+    public void setSelectedLink(int linenr, boolean flag) {
+        
+    		setSelectedType(linenr);
+    		linkSelected = flag; 
+    		this.repaint();
+    }
+
     
     public void setFeatures(Feature[] features){
         // do something with the features.
@@ -185,10 +218,12 @@ public class TypeLabelPanel extends SizeableJPanel {
         
         
         if ( selected ){
-            //if selected draw a white rectangle over everything
-            g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));
-            g2D.setColor(SELECTION_COLOR);
-            g2D.fillRect(0,0,dstruc.width,dstruc.height);
+            
+                //if selected draw a white rectangle over everything
+                g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));
+                g2D.setColor(SELECTION_COLOR);
+                g2D.fillRect(0,0,dstruc.width,dstruc.height);
+            
         }
         
         g2D.setComposite(oldComposite);
@@ -213,40 +248,47 @@ public class TypeLabelPanel extends SizeableJPanel {
             
             Feature feature = features[f];
             y+= DEFAULT_Y_STEP;
-            // line separator
-           // logger.info("drawing feature "+ feature);
-            if ( feature.getMethod().equals("_SPICE_LINESEPARATOR")) {
-                //logger.finest("_SPICE_LINESEPARATOR");
-                String ds = "-- "+feature.getSource()+" --";
-                
-                g2D.setColor(Color.white);
-                g2D.drawString(ds,0,y+DEFAULT_Y_HEIGHT);
-                continue ;
-            }
-            
+                        
             
             List segments = feature.getSegments() ;
             
+            // draw the firefox icon 
+            String link = feature.getLink();
+            if (( link != null) && (! link.equals(""))){
+                //g2D.drawString("L->", 1,y+DEFAULT_Y_HEIGHT);
+                if ( miniFirefox != null)
+                    miniFirefox.paintIcon(this, g2D, 1,y-DEFAULT_Y_HEIGHT);
+            }
+            
             // draw text
-            //if ( segments.size() < 1) {
-            //logger.finest(feature.getMethod());
-            //  continue ;
-            //}
+            if ( segments.size() < 1) {
+                logger.finest("can not find segments in " + feature.getMethod());
+                continue ;
+            }
             Segment seg0 = (Segment) segments.get(0) ;
             Color col =  seg0.getColor();	
             g2D.setColor(col);
             
-            g2D.drawString(feature.getName(), 1,y+DEFAULT_Y_HEIGHT);
+            g2D.drawString(feature.getName(), DEFAULT_X_START,y+DEFAULT_Y_HEIGHT);
             
             // draw selected type:
             if ( typeSelected ){
                 if (f == selectedType) {
-                    Dimension dstruc = this.getSize();
                     Graphics2D g2d = (Graphics2D)g2D ;
-                    g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));
-                    g2d.setColor(SELECTED_TYPE_COLOR);
-                    g2d.fillRect(0,y-(DEFAULT_Y_HEIGHT/2)-2,dstruc.width,DEFAULT_Y_STEP);
-                    g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,1.0f));
+                		g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));
+                    
+                		if ( linkSelected){
+                		    if (( link != null) && (! link.equals(""))){
+                		        g2D.setColor(SELECTED_TYPE_COLOR);
+                		        g2D.fillRect(0,y-(DEFAULT_Y_HEIGHT/2)-2,DEFAULT_X_START,DEFAULT_Y_STEP);
+                		    }
+                    } else {
+                    
+                        	Dimension dstruc = this.getSize();
+                    		g2d.setColor(SELECTED_TYPE_COLOR);
+                    		g2d.fillRect(DEFAULT_X_START,y-(DEFAULT_Y_HEIGHT/2)-2,dstruc.width,DEFAULT_Y_STEP);
+                    		g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,1.0f));
+                    }
                 }
             }
         }

@@ -50,7 +50,7 @@ import org.biojava.spice.Panel.seqfeat.DasSourceListener;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
 import org.biojava.spice.Config.SpiceDasSource;
-
+import org.biojava.bio.structure.ChainImpl;
 import org.biojava.bio.structure.Chain;
 
 /** A class that can display features (e.g. retrieved from different DAS sources).
@@ -75,8 +75,6 @@ FeatureViewListener
     static int DEFAULT_VISIBLE_HEIGHT = 100;
     static int DEFAULT_SEQSCROLL_WIDTH = 200;
     static int DEFAULT_SEQSCROLL_HEIGHT = 30;
-    
-    
     List featureViews;
     
     //int scale;
@@ -103,7 +101,7 @@ FeatureViewListener
     int labelPanelSize;
     boolean selectionIsLocked ;
     JPopupMenu popupMenu;
-    
+    Chain chain;
     LabelBoxListener lbml;
     
     /**
@@ -127,7 +125,7 @@ FeatureViewListener
         //scale = 1;
         seqLength = 0;
         residueSize = 100;
-        
+        chain = new ChainImpl();
         // the vertical Box contains the scroller + the featureview panels ...
         vBox = Box.createVerticalBox();
         vBox.setBorder(BorderFactory.createEmptyBorder());
@@ -350,7 +348,7 @@ FeatureViewListener
      * If it is larger there will be a scrollpanel...
      * */
     public void setFeaturePaneVisibleSize(int x, int y){
-        //System.out.println("setFeaturePaneVisibleSize " + x + " " + y);
+        System.out.println("setFeaturePaneVisibleSize " + x + " " + y);
         
         //      THIS IS SETTING THE SIZE!!!
         preferredVisibleWidth = x ;
@@ -451,6 +449,7 @@ FeatureViewListener
     }
     
     public void setChain(Chain chain){
+        this.chain = chain;
         if ( seqScale != null)
             seqScale.setChain(chain);
         Iterator iter = featureViews.iterator();
@@ -465,6 +464,8 @@ FeatureViewListener
     public void setScale(float scale){
         if ( seqScale != null)
             seqScale.setScale(scale);
+        if ( featureViews == null)
+            	return;
         Iterator iter = featureViews.iterator();
         while (iter.hasNext()){
             FeatureView fv = (FeatureView)iter.next();
@@ -502,11 +503,36 @@ FeatureViewListener
         addFeatureView(fv,true);
     }
     
+    public void evaluateLayout(){
+                
+        Dimension d = this.getSize();        
+        System.out.println("evaluateLayout old size" + d.width + " " + d.height);
+        
+        int newHeight = getSubHeight() ;
+        setHeight(newHeight);
+        System.out.println("new height " + newHeight);
+        
+        int newWidth = d.width  ;
+        int stuffWidth = getLabelWidth() + getTypeWidth();
+        newWidth = newWidth - stuffWidth;
+        if ( newWidth < 1 ) {
+            newWidth = 1 ;
+        }
+        
+        
+        setFeaturePaneVisibleSize(newWidth, newHeight);
+        //parent.setPreferredSize(new Dimension(d.width,d.height));
+        
+        this.revalidate();
+        this.repaint();
+    }
+    
     public void addFeatureView(FeatureView view, boolean update){
        
         view.setSeqLength(seqLength);
         view.setScale(calcScale(residueSize));
         view.setSpiceFeatureViewer(this);
+        view.setChain(chain);
         
         LabelPane lab      = view.getLabel();
         TypeLabelPanel typ = view.getTypePanel();
@@ -531,7 +557,9 @@ FeatureViewListener
         //vBox.add(view);
         //vBox.add(Box.createHorizontalGlue());
         //updateDisplay();
+        
         if ( update){
+            evaluateLayout();    
             this.repaint();       
         }
     }
@@ -563,15 +591,6 @@ FeatureViewListener
             FeatureView fv = (FeatureView)iter.next();
             fv.highlite(position);
         }
-        
-        /*
-        iter = selectedSeqPositionListeners.iterator();
-        while (iter.hasNext()){
-            SelectedSeqPositionListener li = (SelectedSeqPositionListener)iter.next();
-            li.selectedSeqPosition(position);
-        }
-        */
-        
     }
     public void selectedSeqRange(int start, int end){
 //      highlite in FeaturePanels
@@ -582,19 +601,10 @@ FeatureViewListener
             FeatureView fv = (FeatureView)iter.next();
             fv.highlite(start,end);
         }
-        
-        /*
-        iter = selectedSeqPositionListeners.iterator();
-        while (iter.hasNext()){
-            SelectedSeqPositionListener li = (SelectedSeqPositionListener)iter.next();
-            li.selectedSeqRange(start,end);
-        }
-        */
-        
     }
     
     public void selectionLocked(boolean flag){
-        System.out.println("SpiceFeatureView selection locked " + flag);
+        //System.out.println("SpiceFeatureView selection locked " + flag);
         selectionIsLocked = flag;
         FeaturePanel fp = seqScale.getSeqScaleCanvas();
         FeaturePanelMouseListener fpml = fp.getFeaturePanelMouseListener();
@@ -661,52 +671,40 @@ FeatureViewListener
         
         // out of range;
         return null;
-        
-        
     }
-    
-    /*
-    public FeatureView getParentFeatureView(Object obj, Class c) {
-        
-        Iterator iter = featureViews.iterator();
-        
-        while ( iter.hasNext()){
-            FeatureView fv = (FeatureView)iter.next();
-            if ( c.equals(LabelPane.class)){
-                LabelPane pane = fv.getLabel();
-                if ( obj.equals(pane)) {
-                    return fv;
-                }
-            }  
-        }
-        
-        
-        return null;
-        
-    }
-    */
     
     public int getLabelWidth() {
+        if ( seqScale == null) return 0;
+        
         LabelPane label      = seqScale.getLabel();
         return label.getWidth();
     }
     
     public int getTypeWidth() {
+        if ( seqScale == null) return 0;
+        
         TypeLabelPanel label      = seqScale.getTypePanel();
         return label.getWidth();
     }
     
-    /** returns the height of all sub-panels */
+    /** returns the total height of all sub-panels added together*/
     public int getSubHeight() {
         int y = 0;
-        LabelPane label      = seqScale.getLabel();
-        y += label.getHeight();
-        Iterator iter = featureViews.iterator();
-        while ( iter.hasNext()){
-            FeatureView fvtmp = (FeatureView)iter.next();
-            LabelPane lab = fvtmp.getLabel();
-            y+= lab.getHeight();
+        
+        if (seqScale != null) {
+            LabelPane label      = seqScale.getLabel();
+            y += label.getHeight();
         }
+        
+        if ( featureViews != null ) {
+            Iterator iter = featureViews.iterator();
+            while ( iter.hasNext()){
+                FeatureView fvtmp = (FeatureView)iter.next();
+                LabelPane lab = fvtmp.getLabel();
+                y+= lab.getCanvasHeight();
+            } 
+        }
+        
         return y;
     }
     
@@ -760,7 +758,7 @@ FeatureViewListener
             FeatureView fv = (FeatureView)iter.next();
             addFeatureView(fv, false);
         }
-        
+        evaluateLayout();   
         this.repaint();
         //labelSplit.repaint();
         //Component c = this.getParent().getParent();

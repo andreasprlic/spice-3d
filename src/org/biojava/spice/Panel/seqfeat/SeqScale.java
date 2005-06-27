@@ -25,7 +25,7 @@ package org.biojava.spice.Panel.seqfeat;
 import org.biojava.spice.Feature.*;
 import org.biojava.spice.Panel.seqfeat.FeatureView;
 import org.biojava.spice.Panel.seqfeat.SeqScaleCanvas;
-
+import org.biojava.bio.structure.Chain;
 
 /**
  * @author Andreas Prlic
@@ -41,8 +41,7 @@ public class SeqScale extends FeatureView
      */
     public SeqScale() {
         super();
-        // TODO Auto-generated constructor stub
-        seqScaleCanv  = new SeqScaleCanvas();
+       seqScaleCanv  = new SeqScaleCanvas();
       
     }
     
@@ -83,6 +82,11 @@ public class SeqScale extends FeatureView
         labelField.setFeatures(feats);
     }
     
+    
+    public void setChain(Chain chain){
+        super.setChain(chain);
+        seqScaleCanv.setChain(chain);
+    }
     public void setScale(float scale){
         super.setScale(scale);
         seqScaleCanv.setScale(scale);

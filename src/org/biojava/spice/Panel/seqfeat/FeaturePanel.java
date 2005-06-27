@@ -427,7 +427,7 @@ public class FeaturePanel
         // data is coming from chain;
       
         //g2D.drawString("Structure",1,DEFAULT_STRUCTURE_Y+DEFAULT_Y_HEIGHT);
-        //System.out.println("draw structure " + chain.getLength());
+        //System.out.println("draw structure " + structureFeature);
         
         List segments = structureFeature.getSegments();
         Iterator iter = segments.iterator();
@@ -437,7 +437,6 @@ public class FeaturePanel
             int end   = s.getEnd();
             drawStruc(g2D,start,end,aminosize);
         }
-        
     }
     private void drawStruc(Graphics2D g2D, int start, int end, int aminosize){
         //System.out.println("Structure " + start + " " + end);

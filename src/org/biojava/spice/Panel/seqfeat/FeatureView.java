@@ -66,7 +66,7 @@ extends JPanel
     JSplitPane splitPane;
     LabelPane labelField;
     JSplitPane typeSplitPane;
-    FeaturePanel featureCanvas;
+    FeaturePanel featurePanel;
     TypeLabelPanel typeLabelPanel;
     SpiceFeatureViewer parent;
     int seqLength ;
@@ -93,11 +93,11 @@ extends JPanel
         labelField.setLabel(label);
         labelField.setBorder(BorderFactory.createEmptyBorder());
         
-        featureCanvas = new FeaturePanel();
-        featureCanvas.setBorder(BorderFactory.createEmptyBorder());
+        featurePanel = new FeaturePanel();
+        featurePanel.setBorder(BorderFactory.createEmptyBorder());
         
         typeLabelPanel = new TypeLabelPanel();
-        typeLabelPanel.addSelectedFeatureListener(featureCanvas);
+        typeLabelPanel.addSelectedFeatureListener(featurePanel);
         typeLabelPanel.setBorder(BorderFactory.createEmptyBorder());
        
         
@@ -113,14 +113,14 @@ extends JPanel
     
     public void setChain(Chain c){
         //chain = c;
-        featureCanvas.setChain(c);
+        featurePanel.setChain(c);
     }
     
     public void setDasSource(SpiceDasSource ds){ dasSource = ds; }
     public SpiceDasSource getDasSource(){ return dasSource; }
     
     public FeaturePanel getFeaturePanel() {
-        return featureCanvas;
+        return featurePanel;
     }
     public LabelPane getLabel() {
         return labelField;
@@ -130,11 +130,11 @@ extends JPanel
     }
     
     public void setScale(float scale) {
-        featureCanvas.setScale(scale);
+        featurePanel.setScale(scale);
         
     }
     public float getScale(){
-        return featureCanvas.getScale();
+        return featurePanel.getScale();
     }
     
     public int getHeight() {
@@ -155,7 +155,7 @@ extends JPanel
     }
     
     public void setCanvasHeight(int height) {
-     featureCanvas.setCanvasHeight(height);
+     featurePanel.setCanvasHeight(height);
      typeLabelPanel.setCanvasHeight(height);
      labelField.setCanvasHeight(height);
      
@@ -164,7 +164,7 @@ extends JPanel
     /**  display a nice JSsscroller to display that data is being loaded ... */
     	public void setLoading(boolean flag){
     	    isLoading = flag;
-    	    featureCanvas.setLoading(flag);
+    	    featurePanel.setLoading(flag);
     	}
     
   /** set the length of the displayed sequence
@@ -174,7 +174,7 @@ extends JPanel
     public void setSeqLength(int seqLength){
         this.seqLength = seqLength;
         
-        featureCanvas.setSeqLength(seqLength);
+        featurePanel.setSeqLength(seqLength);
         
         //this.repaint();
     }
@@ -184,13 +184,13 @@ extends JPanel
     
     /** highlite a region */
     public void highlite( int start , int end){
-        featureCanvas.highlite(start,end);
+        featurePanel.highlite(start,end);
     }
     
 
     /** highlite a region */
     public void highlite( int pos ){
-        featureCanvas.highlite(pos);
+        featurePanel.highlite(pos);
     }
     
     public void setLabel(String label){
@@ -202,7 +202,7 @@ extends JPanel
         
         labelField.repaint();
         typeLabelPanel.repaint();
-        featureCanvas.repaint();
+        featurePanel.repaint();
         this.revalidate();
     }
     
@@ -210,7 +210,7 @@ extends JPanel
         // do something with the features.
         this.features = features;
         //System.out.println("setting " + features.length + " features");
-        featureCanvas.setFeatures(features);
+        featurePanel.setFeatures(features);
         typeLabelPanel.setFeatures(features);
         labelField.setFeatures(features);
         //int x = labelField.getWidth();
@@ -229,7 +229,7 @@ extends JPanel
         //.println("setting selected " + flag );
         selected = flag;
         typeLabelPanel.setSelected(flag);
-        featureCanvas.setSelected(flag);
+        featurePanel.setSelected(flag);
         labelField.setSelected(flag);
         updateDisplay();
         

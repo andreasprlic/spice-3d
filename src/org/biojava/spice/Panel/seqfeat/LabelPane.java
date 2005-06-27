@@ -120,6 +120,9 @@ extends SizeableJPanel
         //this.setPreferredSize(new Dimension(DEFAULT_X_SIZE,height));
         //this.height=height;
     }
+    
+    public int getCanvasHeight(){ return canvasHeight; }
+    
     public void setSelected(boolean flag){
         selected = flag;
     }

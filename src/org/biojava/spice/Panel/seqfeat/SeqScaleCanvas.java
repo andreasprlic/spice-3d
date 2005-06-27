@@ -45,7 +45,7 @@ public class SeqScaleCanvas
 extends FeaturePanel 
 {
 //  the line where to draw the structure
-    public static final int    DEFAULT_STRUCTURE_Y    = 20 ;
+    public static final int    DEFAULT_STRUCTURE_Y    = 15 ;
     
     static final Color BACKGROUND_COLOR = Color.black;
      
@@ -130,6 +130,11 @@ extends FeaturePanel
         //System.out.println("drawScale");
         g2D.setColor(Color.GRAY);
         
+        // the base line:
+        int l = Math.round(chainlength*scale)+DEFAULT_X_START ;
+        Rectangle seqline = new Rectangle(DEFAULT_X_START, 0, l, 2);
+        
+        g2D.fill(seqline);
         for (int i =0 ; i< chainlength ; i++){
             if ( (i%100) == 0 ) {
                 int xpos = Math.round(i*scale)+DEFAULT_X_START ;

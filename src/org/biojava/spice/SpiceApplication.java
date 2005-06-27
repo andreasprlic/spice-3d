@@ -88,11 +88,8 @@ extends  JFrame
 implements SPICEFrame, 
 ConfigurationListener
 
-{
-      
+{     
     public static Logger logger =  Logger.getLogger("org.biojava.spice");
-    
-    
     
     URL[] REGISTRY_URLS    ; // the url to the registration server
     
@@ -172,10 +169,8 @@ ConfigurationListener
         currentChainNumber = -1 ;
         currentChain = null;
         
-
         // init logging related stuff
         initLoggingPanel();
-
         
         // set some system properties
         setSystemProperties();

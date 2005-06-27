@@ -49,6 +49,10 @@ implements ComponentListener {
     public void componentResized(ComponentEvent e){
         Component c = e.getComponent();
         //System.out.println("component parent of spicefeauteview was resized " + c);
+        
+        parent.evaluateLayout();
+        
+        /*
         Dimension d = c.getSize();        
         
         int newWidth = d.width  ;
@@ -68,6 +72,8 @@ implements ComponentListener {
         }
         parent.setFeaturePaneVisibleSize(newWidth, subHeight);
         //parent.setPreferredSize(new Dimension(d.width,d.height));
+         * 
+         */
         parent.revalidate();
         parent.repaint();
         //c.invalidate();
@@ -77,6 +83,8 @@ implements ComponentListener {
             JScrollPane scroll = (JScrollPane)c;
             scroll.doLayout();
         }
+        c.invalidate();
+        c.validate();
         c.repaint();
     }
     public void componentShown(ComponentEvent e){}
