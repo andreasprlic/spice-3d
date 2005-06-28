@@ -52,7 +52,7 @@ import org.biojava.spice.Panel.seqfeat.*;
 public class FeatureFetcher extends Thread
 {
     
-    public static Color[] entColors = new Color []{
+    public static final  Color[] entColors = new Color []{
             new Color(153,153,255), 
             new Color(255,153,153), 
             new Color(153,255,153), 
@@ -61,6 +61,9 @@ public class FeatureFetcher extends Thread
             new Color(0,51,204),
             new Color(253,0,153)
     };
+    
+    
+    public static final String[] txtColors = new String[] { "blue","pink","green","yellow","red","cyan","pink"};
     
     public static final Color HELIX_COLOR  = new Color(255,51,51);
     public static final Color STRAND_COLOR = new Color(255,204,51);
@@ -75,7 +78,8 @@ public class FeatureFetcher extends Thread
     FeatureView[] featureViews;
     Chain chain ;
     
-    String[] txtColors;
+    String[] displayDASServers;
+    String[] displayLabels;
     
     static String PDBCOORDSYS     = "PDBresnum,Protein Structure";
     static String UNIPROTCOORDSYS = "UniProt,Protein Sequence";
@@ -99,7 +103,9 @@ public class FeatureFetcher extends Thread
         allFeatures = new ArrayList();
         chain       = c ;
         
-        txtColors   = new String[] { "blue","pink","green","magenta","orange","pink","cyan"};
+        displayDASServers = new String[0];
+        displayLabels = new String[0];
+        
         updateDisplay = false ;
 	
     }
@@ -107,6 +113,82 @@ public class FeatureFetcher extends Thread
     
     public boolean isDone() {
         return finished ;
+    }
+    
+    /** convert a ";" separated list of DAS source ids e.g. DS_101;DS_102;DS_110
+     * into the unique idds of DAS servers
+     * @param spiceargument
+     */
+    public void setDisplayServers(String spiceargument){
+        if ( spiceargument == null )
+            return;
+        if ( spiceargument.equals("all")) {
+            displayDASServers = new String[0];
+            return;
+        }
+        
+        String[] spl =  spiceargument.split(";");
+        if ( spl.length == 0)
+            return ;
+        
+        
+        List ds = new ArrayList();
+        // process the input ...
+        for ( int i = 0 ; i< spl.length ; i++){
+            
+            String code = spl[i];
+            
+            // each code must match to the following pattern:
+            // something + "_" + a number.
+            
+            String[] codespl = code.split("_");
+            if ( codespl.length != 2 ) {
+                logger.warning("DAS-source id does not contain one >_< character " + code);
+                return;
+            }
+            try {
+                int number = Integer.parseInt(codespl[1]);
+            } catch (Exception e){
+                logger.warning("DAS-source id does not contain a number after the >_< " + code);
+                return;
+            }
+            
+            if ( code.length() > 100){
+                logger.warning("DAS-source id is too long! ("+code.length()+" > 100 chars)");
+                return;
+            }
+            ds.add(code);
+        }
+        String[] ds_ids = (String[]) ds.toArray(new String[ds.size()]);
+        displayDASServers = ds_ids;
+    }
+    
+    public void setDisplayLabels(String spiceargument){
+        if ( spiceargument == null )
+            return;
+        
+        if ( spiceargument.equals("all")){
+            displayLabels = new String[0];
+            
+            return;
+        }
+        String[] spl =  spiceargument.split(";");
+        if ( spl.length == 0)
+            return ;
+        
+        List ds = new ArrayList();
+        // process the input ...
+        for ( int i = 0 ; i< spl.length ; i++){
+            String label = spl[i];
+            if ( label.length() > 40){
+                logger.warning("Label length is too long! (" + label.length() +">40)");
+                return;
+            }
+            ds.add(label);
+        }
+        String []label_ids = (String[])ds.toArray(new String[ds.size()]);
+        displayLabels = label_ids;
+        
     }
     
     /** start one thread per server to fetch all the features!
@@ -117,13 +199,84 @@ public class FeatureFetcher extends Thread
         doDasCommunication() ;
     }
     
+    
+    private boolean isInDisplayLabels(SpiceDasSource ds){
+        if ( displayLabels.length == 0 )
+            return true;
+        
+//      check if in labels;
+        String[] labels = ds.getLabels();
+        if ( labels != null){
+            for ( int i = 0 ; i< labels.length ; i++){
+                String label = labels[i];
+                
+                for ( int l = 0 ; l< displayLabels.length;l++){
+                    String dlabel = displayLabels[l];
+                    if ( label.equals(dlabel)){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false ;
+    }
+    
+    private boolean isInDisplayServers(SpiceDasSource ds){
+        if ( displayDASServers.length == 0)
+            return true ;
+        
+        // check if in ids
+        String id = ds.getId();
+        for ( int i=0; i< displayDASServers.length;i++){
+          String testid = displayDASServers[i];
+          if ( testid.equals(id)){
+              return true;
+          }
+        }
+        
+        return false;
+    }
+    
+    /** seleect only those servers, that the user wants to see.
+     * 
+     * @param servers
+     * @return list of requested servers.
+     */
+    private List getUserRequestedServers(List servers){
+        
+        /** if nothing provided return all */
+        if ( displayDASServers.length == 0 )
+            if ( displayLabels.length == 0)
+                return servers;
+            
+            // iterate over all servers and select only those that match
+        List retlst = new ArrayList();  
+        Iterator iter = servers.iterator();
+        while ( iter.hasNext()) {
+            SpiceDasSource ds = (SpiceDasSource) iter.next();
+            
+            if ( isInDisplayLabels(ds)) {
+                retlst.add(ds);
+                continue;
+            }
+            if( isInDisplayServers(ds)){
+                retlst.add(ds);
+            }
+        }
+        return retlst;
+    }
+    
     private synchronized void doDasCommunication() {
         
         finished = false ;
         allFeatures = new ArrayList();
         // contact sequence feature servers
-        List featservs    =  spiceconfig.getServers("features",UNIPROTCOORDSYS);
-        List pdbresservs  =  spiceconfig.getServers("features",PDBCOORDSYS);
+        List tmpfeatservs    =  spiceconfig.getServers("features",UNIPROTCOORDSYS);
+        List tmppdbresservs  =  spiceconfig.getServers("features",PDBCOORDSYS);
+        
+        List featservs = getUserRequestedServers(tmpfeatservs);
+        List pdbresservs = getUserRequestedServers(tmppdbresservs);
+        
         
         int nrservers =0;
         if (spId != null) 
@@ -225,46 +378,6 @@ public class FeatureFetcher extends Thread
         }
         parent.setLoading(false);
         notifyAll();
-        
-        //TODO: clean this up. not needed any longer!
-        // wait for results to come back
-        // new by AP : no need for this! 
-        /*
-        boolean done = false ;
-        while ( ! done) {
-            done = allFinished();
-            //logger.finest("FeatureFetcher waiting for features to be retreived: "+done);
-            try {
-                wait(300);
-                //logger.finest("FeatureFetcher waiting "+done);
-                if ( updateDisplay ) {
-                   
-                    List l = null;
-                    //List l = getFeatures();
-		    //System.out.println(l);
-                    if ( l != null )
-                        parent.setFeatures(spId,l);
-                    updateDisplay = false ;
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                done = true ;
-            }
-            //logger.finest("getNewFeatures :in waitloop");
-        }
-        */
-        
-        // finally all sub-threads are finished and we can sent all features back to the main application
-        // reset and re-paint all features 
-        //allFeatures = new ArrayList();
-        
-        // extract ALL the features and convert them so they can be used for spice...
-        //for ( int i = 0 ; i < subthreads.length; i++ ) {
-            //DasResponse d = subthreads[i] ;	    
-            //addFeaturesFromDasResponse(d,i);	   
-        //}
-        
-        //finished = true ;
         
     }
     

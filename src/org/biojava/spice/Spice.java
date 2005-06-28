@@ -31,6 +31,7 @@ import java.net.URL;
 import java.net.MalformedURLException ;
 import java.util.ArrayList;
 import javax.swing.JFrame;
+import org.biojava.spice.GUI.AboutDialog;
 
 /** the startup class of SPICE 
  * 
@@ -62,16 +63,17 @@ public class Spice extends Applet {
     public void run(){
         
         System.out.println("Welcome to the SPICE - DAS client!");
+        System.out.println("SPICE version: " + AboutDialog.VERSION);
         System.out.println("displaying for you: " + codetype + " " + code);
-        
-        //System.out.println(primaryRegistry);
-        //for ( int i =0;i<registryurls.length;i++) {
-            //System.out.println(registryurls[i]);
-        //}
+       
         
         URL[] regis ;
+        int numberregis = 1 ;
+        if (registryurls != null) {
+            numberregis += registryurls.length;
+        }
         if ( primaryRegistry != null ){
-            regis = new URL[registryurls.length+1];
+            regis = new URL[numberregis];
             regis[0] = primaryRegistry;
             for ( int i =0;i<registryurls.length;i++) {
                 regis[i+1] = registryurls[i];
@@ -89,7 +91,7 @@ public class Spice extends Applet {
     
     /** set a list of DAS - sources (by their unique Id from registry) to be highlited
      * 
-     * @param dasSourceIds a ";" separated list of DAS source ids e.g. DS:101;DS:102;DS:110
+     * @param dasSourceIds a ";" separated list of DAS source ids e.g. DS_101;DS_102;DS_110
      */
     public void setDisplay(String dasSourceIds){
         display = dasSourceIds;
@@ -110,20 +112,21 @@ public class Spice extends Applet {
     public void setCode(String accessioncode){
         code = accessioncode;
     }
-    /**
+    /** get the accession code
      * 
      * @returns the accesion code
      */
     public String getCode(){ return code;}
     
     /** sets the type of the accession code being displayed.
+     * Currently supported PDB, UniProt. 
      * 
      * @param codetype currently supported: PDB, UniProt
      */
     public void setCodetype(String codetype){
         this.codetype = codetype;
     }
-    /** 
+    /** returns the type of the accession code that is displayed. Currently supported PDB, UniProt. 
      * 
      * @return the codetype
      */

@@ -150,6 +150,9 @@ ConfigurationListener
     
     boolean configLoaded ;
     SpiceMenuListener spiceMenuListener;
+    String dasServerList;
+    String labelList;
+    
     /** 
      * start the spice appplication
      * 
@@ -161,6 +164,9 @@ ConfigurationListener
      */
     public SpiceApplication( URL[] registry_urls, String dasServerList, String labelList) {
         super();
+        
+        this.dasServerList = dasServerList;
+        this.labelList = labelList;
         
         // selection is possible at the start ;
         selectionLocked = false ;
@@ -242,8 +248,8 @@ ConfigurationListener
    
     private void initLoggingPanel(){
         LoggingPanel loggingPanel = new LoggingPanel(logger);
-        loggingPanel.getHandler().setLevel(Level.INFO);	
-        logger.setLevel(Level.INFO);
+        loggingPanel.getHandler().setLevel(Level.FINEST);	
+        logger.setLevel(Level.FINEST);
         loggingPanel.show(null);
     }
     
@@ -925,6 +931,9 @@ ConfigurationListener
         dascanv.clear();
         dascanv.setSeqLength(chain.getLength());
         FeatureFetcher ff = new FeatureFetcher(this,config,sp_id,pdbcode,chain);	
+        ff.setDisplayServers(this.dasServerList);
+        ff.setDisplayLabels(this.labelList);
+        
         ff.start() ;
         statusPanel.setLoading(true);
         //dascanv.setChain(chain,currentChainNumber);

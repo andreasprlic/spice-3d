@@ -368,27 +368,13 @@ ChangeListener
         setScale(scale);
     }
     public void initLabelPane(){
-        
-        
-        // add the seq. scroller
-        /*LabelPane l1 = seqScroller.getLabel();
-        TypeLabelPanel t1 = seqScroller.getTypePanel();
-        SeqScrollCanvas s1 = seqScroller.getSeqScroller();
-        labelBox.add(l1);
-        typeBox.add(t1);
-        featureBox.add(s1);
-        */
-        
+                
         // add the seq. position liner
         LabelPane label      = seqScale.getLabel();    
         TypeLabelPanel typL  = seqScale.getTypePanel();
         SeqScaleCanvas sscan = seqScale.getSeqScaleCanvas();
         
-        //JPopupMenu popupMenu = getPopupMenu(label);
-        
-        //SelectionLockPopupListener slpl = new SelectionLockPopupListener(popupMenu);
-        //label.addMouseListener(slpl);
-        
+               
         labelBox.add(label);
         typeBox.add(typL);
         featureBox.add(sscan);
