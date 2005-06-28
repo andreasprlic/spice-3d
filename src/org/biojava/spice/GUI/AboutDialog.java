@@ -43,41 +43,53 @@ import javax.swing.event.HyperlinkEvent;
  */
 public class AboutDialog
 extends JDialog {
-    static String VERSION = "0.7.alpha-1";
     
-    static String DESCRIPTION_TEXT = "<html><body>"+
-    "<b>The SPICE DAS client</b> V "+ VERSION +" <br>"+
-    "(C) <a href=\"mailto:ap3@sanger.ac.uk\">Andreas Prlic</a>, Tim Hubbard <br>"+
-    "The Wellcome Trust Sanger Institute 2005<p>"+
+    public static final String VERSION = 
+        "0.7.alpha-2";
     
-    " More Info about SPICE: <br>"+
-    " <a href=\"http://www.efamily.org.uk/software/dasclients/spice/\">Homepage</a><br>"+
-    " <a href=\"http://www.sanger.ac.uk/Users/ap3/DAS/SPICE/SPICE_manual.pdf\">Manual</a><br>"+
-    " <a href=\"http://www.derkholm.net/svn/repos/spice/trunk/\">Source code</a><br>" +
-    " <a href=\"http://www.gnu.org/copyleft/lesser.html\">License</a> (LGPL)<p>"+
+    static final String AUTHORS = 
+        " <a href=\"mailto:ap3@sanger.ac.uk\">Andreas Prlic</a>, Tim Hubbard <br>"+
+        "The Wellcome Trust Sanger Institute 2005<p>"; 
     
-    " Thanks to the following Projects:<br>"+
-    " <b>Jmol</b> - <a href=\"http://www.jmol.org\">http://www.jmol.org</a> - for the 3D visualization API. (LGPL)<br>"+
-    " <b>BioJava</b> - <a href=\"http://www.biojava.org\">http://www.biojava.org</a> - for various libs. (LGPL)<br>"+
-    " <b>Geotools</b> - <a href=\"http://modules.geotools.org/\">http://modules.geotools.org/</a> for the logging panel. (LGPL)<br>"+
-    " <b>Nuvola</b> - <a href=\"http://www.icon-king.com\">http://www.icon-king.com</a> - for many of the icons used here. (LGPL) <br>"+
-    " <b>Axis</b> - <a href=\"http://ws.apache.org/axis/\">http://ws.apache.org/axis/</a> - for the WebService (SOAP) library used for contacting the "+
-    " <a href=\"http://das.sanger.ac.uk/registry/\">DAS registration server</a> <p>"+
+    static final String SPICEINFO = 
+        " More Info about SPICE: <br>"+
+        " <a href=\"http://www.efamily.org.uk/software/dasclients/spice/\">Homepage</a><br>"+
+        " <a href=\"http://lists.sanger.ac.uk/mailman/listinfo/spice-das\">Mailing List</a><br>"+
+        " <a href=\"http://www.sanger.ac.uk/Users/ap3/DAS/SPICE/SPICE_manual.pdf\">Manual</a><br>"+
+        " <a href=\"http://www.derkholm.net/svn/repos/spice/trunk/\">Source code</a><br>" +
+        " <a href=\"http://www.gnu.org/copyleft/lesser.html\">License</a> (LGPL)<p/>";
     
-    " <pre>This library is free software; you can redistribute it and/or <br>"+
-    "modify it under the terms of the GNU Lesser General Public <br>"+
-    "License as published by the Free Software Foundation; either <br>"+
-    "version 2.1 of the License, or (at your option) any later version. <br>" +
-    "<br>"+
-    "This library is distributed in the hope that it will be useful,<br>"+
-    "but WITHOUT ANY WARRANTY; without even the implied warranty of<br>"+
-    "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU<br>"+
-    "Lesser General Public License for more details.<br>"+
-    ""+
-    "You should have received a copy of the GNU Lesser General Public<br>"+
-    "License along with this library; if not, write to the Free Software<br>" +
-    "Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA</pre><br>"+
-    "</body></html>";
+    static final String THANKS = 
+        " Thanks to the following Projects:<br>"+
+        " <b>Jmol</b> - <a href=\"http://www.jmol.org\">http://www.jmol.org</a> - for the 3D visualization API. (LGPL)<br>"+
+        " <b>BioJava</b> - <a href=\"http://www.biojava.org\">http://www.biojava.org</a> - for various libs. (LGPL)<br>"+
+        " <b>Geotools</b> - <a href=\"http://modules.geotools.org/\">http://modules.geotools.org/</a> for the logging panel. (LGPL)<br>"+
+        " <b>Nuvola</b> - <a href=\"http://www.icon-king.com\">http://www.icon-king.com</a> - for many of the icons used here. (LGPL) <br>"+
+        " <b>Axis</b> - <a href=\"http://ws.apache.org/axis/\">http://ws.apache.org/axis/</a> - for the WebService (SOAP) library used for contacting the "+
+        " <a href=\"http://das.sanger.ac.uk/registry/\">DAS registration server</a> <p>";
+    
+    static final String LICENSE = 
+        " <pre>This library is free software; you can redistribute it and/or <br>"+
+        "modify it under the terms of the GNU Lesser General Public <br>"+
+        "License as published by the Free Software Foundation; either <br>"+
+        "version 2.1 of the License, or (at your option) any later version. <br>" +
+        "<br>"+
+        "This library is distributed in the hope that it will be useful,<br>"+
+        "but WITHOUT ANY WARRANTY; without even the implied warranty of<br>"+
+        "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU<br>"+
+        "Lesser General Public License for more details.<br>"+
+        ""+
+        "You should have received a copy of the GNU Lesser General Public<br>"+
+        "License along with this library; if not, write to the Free Software<br>" +
+        "Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA</pre><br>" ;
+    
+    
+    static String DESCRIPTION_TEXT = 
+        "<html><body>"+
+        "<b>The SPICE DAS client</b> V "+ VERSION +" <br>"+
+        "(C)" + 
+        AUTHORS + SPICEINFO + THANKS + LICENSE +   
+        "</body></html>";
     
     
     static int H_SIZE = 750;
@@ -89,7 +101,7 @@ extends JDialog {
     
     public AboutDialog(SPICEFrame spice_)
     {
-  
+        
         spice = spice_;
         
         this.setSize(new Dimension(H_SIZE, V_SIZE)) ;
@@ -128,10 +140,13 @@ extends JDialog {
         vBox.add(hBoxb);
         
         this.getContentPane().add(vBox);
-          
+        
     }
     
-    
+    public static String getVersion() {
+        
+        return VERSION;
+    }
     
     public void setText(String t) {
         txt.setText(t);
