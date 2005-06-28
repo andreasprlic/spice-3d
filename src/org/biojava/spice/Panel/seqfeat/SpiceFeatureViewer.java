@@ -389,7 +389,6 @@ ChangeListener
         //SelectionLockPopupListener slpl = new SelectionLockPopupListener(popupMenu);
         //label.addMouseListener(slpl);
         
-        
         labelBox.add(label);
         typeBox.add(typL);
         featureBox.add(sscan);
@@ -457,7 +456,7 @@ ChangeListener
         
         //Dimension d = seqScale.getSeqScaleCanvas().getSize();
         
-        int visibleWidth = featureScroll.getWidth()-DEFAULT_X_START - DEFAULT_X_END + 10; 
+        int visibleWidth = featureScroll.getWidth()-DEFAULT_X_START - DEFAULT_X_END + 20; 
         //System.out.println("width " + visibleWidth + " " + seqLength);
         float size =visibleWidth / (float)seqLength;
         //System.out.println("size " + size);

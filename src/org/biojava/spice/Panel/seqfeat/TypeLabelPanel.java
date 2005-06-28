@@ -40,6 +40,10 @@ import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.Feature.Feature;
 import org.biojava.spice.Feature.Segment;
 import org.biojava.spice.Panel.seqfeat.SelectedFeatureListener;
+import java.net.URL;
+import java.net.MalformedURLException;
+
+
 /**
  * @author Andreas Prlic
  *
@@ -255,6 +259,12 @@ public class TypeLabelPanel extends SizeableJPanel {
             // draw the firefox icon 
             String link = feature.getLink();
             if (( link != null) && (! link.equals(""))){
+                URL url ;
+                try {
+                    url = new URL(link);
+                } catch (MalformedURLException e){
+                    continue ;
+                }
                 //g2D.drawString("L->", 1,y+DEFAULT_Y_HEIGHT);
                 if ( miniFirefox != null)
                     miniFirefox.paintIcon(this, g2D, 1,y-DEFAULT_Y_HEIGHT);

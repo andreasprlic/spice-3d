@@ -67,12 +67,13 @@ implements MouseListener, MouseMotionListener {
     
     public void mouseMoved(MouseEvent e)
     {	
-        //System.out.println("feature panel mouseMoved");
+        int b = e.getButton();
+        //System.out.println("feature panel mouseMoved " + b );
         if ( selectionIsLocked ) {
-            //System.out.println(" but selection locked");
+            //System.out.println(" FeaturePanelMouseMove selection locked");
             return ;
         }
-        int b = e.getButton();
+        
         //System.out.println("mouseMoved button " +b);
         
         // do not change selection if we display the popup window
@@ -88,6 +89,7 @@ implements MouseListener, MouseMotionListener {
         //System.out.println("mouse Moved, select locked");
         //if ( selectionIsLocked ) return ;
         if ( ! (c instanceof FeaturePanel) ){
+            oldsegment = null;
             return ;
         }
         FeaturePanel view = (FeaturePanel) c;
@@ -97,12 +99,18 @@ implements MouseListener, MouseMotionListener {
         int seqpos = view.getSeqPos(e);
         int linenr = view.getLineNr(e);
         
-        if ( linenr < 0 ) return ;
-        if ( seqpos < 0 ) return ;
+        if ( linenr < 0 ) {
+            oldsegment = null;
+            return ;
+        }
+        if ( seqpos < 0 ) {
+            oldsegment = null;
+            return ;
+        }
         
         if ( seqpos == oldposition)
             return;
-        //System.out.println("mouse moved " + seqpos + " ("+oldposition+") " + linenr);
+        //System.out.println("mouse moved " + seqpos + " ("+oldposition+") line" + linenr);
         
         oldposition = seqpos;
         
@@ -114,6 +122,7 @@ implements MouseListener, MouseMotionListener {
             feat = featureView.getFeatureAt(linenr);
         } catch (NoSuchElementException ex){
             oldsegment = null;
+            triggerSelectedSeqPosition(seqpos);
             return;
         }
         Segment seg = null;
@@ -150,8 +159,11 @@ implements MouseListener, MouseMotionListener {
             int end   = seg.getEnd() -1 ;
             parent.selectedSeqRange(start,end);
         }
-        if ( ! triggered )
+        
+        if ( ! triggered ) {
             triggerSelectedSeqPosition(seqpos);
+            //parent.selectedSeqPosition(seqpos);
+        }
     }
     
     

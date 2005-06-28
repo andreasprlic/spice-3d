@@ -48,7 +48,7 @@ implements MouseListener, MouseMotionListener {
     SpiceFeatureViewer parent;
     TypeLabelPanel oldSelection;
     
-    public static int DEFAULT_X_START = 10;
+    public static int DEFAULT_X_START = 11;
     public static Logger logger = Logger.getLogger("org.biojava.spice");
     /**
      * 
@@ -85,9 +85,9 @@ implements MouseListener, MouseMotionListener {
         
         int line = typ.getLineNr(y-p.y);
         //System.out.println("p " + p  +" " + x + " "+ y +" line "+ line);
-        if ( line < 0 ) { 
-            disableSelection(e);
-        }
+        //if ( line < 0 ) { 
+        //    disableSelection(e);
+        //}
         Feature f;
         try {
             f = fv.getFeatureAt(line);
@@ -163,6 +163,7 @@ implements MouseListener, MouseMotionListener {
     }
     public void mousePressed(MouseEvent e){}
     public void mouseReleased(MouseEvent e){
+        System.out.println("mouse released ");
         FeatureView fv = parent.getParentFeatureView(e,TypeLabelPanel.class) ;
         if ( fv == null ){
             System.err.println("no parent found!");
@@ -181,7 +182,10 @@ implements MouseListener, MouseMotionListener {
         int x = e.getX();
         int y = e.getY();
         int line = typ.getLineNr(y-p.y);
-        
+        System.out.println("TypePanelMouseListenere mouse released x " + x + " line " + line);
+        if ( x < DEFAULT_X_START) {
+            System.out.println("clicked link region line:" + line );
+        }
         
         if ( line < 0 )  
             return;
@@ -198,9 +202,10 @@ implements MouseListener, MouseMotionListener {
         }
         
         if ( x < DEFAULT_X_START) {
+            System.out.println("clicked link region 2");
             String link = f.getLink();
             if ( (link != null) && ( ! link.equals(""))){
-                //System.out.println("open link " + link);
+                System.out.println("open link " + link);
                 showDocument(link);
             }
         }
