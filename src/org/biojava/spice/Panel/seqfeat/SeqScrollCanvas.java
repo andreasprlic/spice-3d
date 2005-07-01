@@ -50,8 +50,8 @@ extends FeaturePanel
     /**
      * 
      */
-    public SeqScrollCanvas() {
-        super();
+    public SeqScrollCanvas(FeatureView parent) {
+        super(parent);
         changeListeners = new ArrayList();    
 
         residueSizeSlider = new JSlider(JSlider.HORIZONTAL,
@@ -61,7 +61,7 @@ extends FeaturePanel
         //residueSizeSlider.setMinorTickSpacing(2);
         residueSizeSlider.setPaintTicks(false);
         residueSizeSlider.setPaintLabels(false);
-        this.add(residueSizeSlider);
+        //this.add(residueSizeSlider);
     }
 
     public void addChangeListener(ChangeListener cl){

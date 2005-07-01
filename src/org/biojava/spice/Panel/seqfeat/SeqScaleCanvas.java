@@ -25,18 +25,12 @@ package org.biojava.spice.Panel.seqfeat;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Composite;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-
-import org.biojava.spice.Feature.Segment;
 import org.biojava.spice.Panel.seqfeat.FeaturePanel;
-import java.awt.event.MouseEvent;
-import java.util.Iterator;
-import java.util.List;
+
+
 /**
  * @author Andreas Prlic
  *
@@ -45,46 +39,46 @@ public class SeqScaleCanvas
 extends FeaturePanel 
 {
 //  the line where to draw the structure
-    public static final int    DEFAULT_STRUCTURE_Y    = 15 ;
+    
     
     static final Color BACKGROUND_COLOR = Color.black;
      
     /**
      * 
      */
-    public SeqScaleCanvas() {
-        super();
-        
-        this.setBackground(BACKGROUND_COLOR);
-        
-        ScaleMouseListener sl = new ScaleMouseListener(this); 
-        this.addMouseListener(sl);
-        this.addMouseMotionListener(sl);
-        
-        // set tooltip
-        
+    public SeqScaleCanvas(FeatureView parent) {
+        super(parent);
+     
     }
     
-    
-   
-    public void setSeqLength(int length){
-        //super.setScale(scale);
-        super.setSeqLength(length);
-        // move slider to 100% ...
+    public void setSeqLength(int seqL){
+        //System.out.println("SeqScaleCanv set SeqLength "+seqL + "seqlength" + seqLength + " scale:" + scale);
+        super.setSeqLength(seqL);
+        //this.seqLength = seqL;
+        //System.out.println("having value seqLength" + this.seqLength);
+    }
        
+    public void setScale(float scale){
+        
+        //super.setScale(scale);
+        this.scale = scale;
+        //System.out.println("SeqScaleCanv seqlength" + this.seqLength + " scale:" + this.scale);
     }
     
+    public float getScale(){ return scale;}
     public int getImageWidth(){
         return imbuf.getWidth();
     }
     
-    public void paintComponent(Graphics g){
-        super.paintComponent(g); 	
-        g.drawImage(imbuf, 0, 0, this);
+    
+    public int paintComponent(Graphics g,int width, int y){
         
-        Dimension dstruc=this.getSize();
+        //Dimension dstruc=this.getSize();
         float scale = getScale();
-      
+        //System.out.println("SeqScaleCanvas paintComponent at y" + y +
+          //      	" seqLength:" + this.seqLength + 
+            //    	" scale:" + this.scale);
+        
         int aminosize =  Math.round(1 * scale) ;  
         
         Graphics2D g2D = (Graphics2D)g ;
@@ -98,63 +92,65 @@ extends FeaturePanel
       
         /////////////
         //      do the actual painting...
-//      background ... :-/
-        g2D.setColor(BACKGROUND_COLOR);
-        g2D.fillRect(0,0,dstruc.width,dstruc.height);
         
-        
-        drawScale(g2D,scale,seqLength);
+        int newy = drawScale(g2D,scale,seqLength,y);
         //      draw region covered with structure
-        drawStructureRegion(g2D,aminosize);
+        //newy = drawStructureRegion(g2D,aminosize, newy);
         
-        drawSelection(g2D,aminosize,scale);
-        
+        //int height = this.canvasHeight;
+        int height = parent.getHeight();
         if ( selected ){
             // the whole featureview has been selected
             //if selected draw a rectangle over everything
             
             g2D.setColor(SELECTION_COLOR);
-            g2D.fillRect(0,0,dstruc.width,dstruc.height);
+            g2D.fillRect(0,y,width,height);
             
         }
         
         
         g2D.setComposite(oldComposite);
         //featureCanvas.repaint();
-        
+        return newy ;
     }
     
     
     /** draw the Scale */
-    public void drawScale(Graphics2D g2D, float scale, int chainlength){
-        //System.out.println("drawScale");
+    private int drawScale(Graphics2D g2D, float scale, int length, int y){
+        
         g2D.setColor(Color.GRAY);
         
         // the base line:
-        int l = Math.round(chainlength*scale)+DEFAULT_X_START ;
-        Rectangle seqline = new Rectangle(DEFAULT_X_START, 0, l, 2);
+        int l = Math.round(length*scale)+DEFAULT_X_START ;
+        
+        //System.out.println("drawScale at y" + y + " l:" + l + " seqLength " + length + " scale " + scale);
+        
+        Rectangle seqline = new Rectangle(DEFAULT_X_START, y, l, 2);
+        
         
         g2D.fill(seqline);
-        for (int i =0 ; i< chainlength ; i++){
+        for (int i =0 ; i<= length ; i++){
             if ( (i%100) == 0 ) {
                 int xpos = Math.round(i*scale)+DEFAULT_X_START ;
-                g2D.fillRect(xpos, 0, 1, 10);
+                g2D.fillRect(xpos, y, 1, 10);
             }else if  ( (i%50) == 0 ) {
                 int xpos = Math.round(i*scale)+DEFAULT_X_START ;
-                g2D.fillRect(xpos, 0, 1, 8);
+                g2D.fillRect(xpos, y, 1, 8);
             } else if  ( (i%10) == 0 ) {
                 int xpos = Math.round(i*scale)+DEFAULT_X_START ;
-                g2D.fillRect(xpos, 0, 1, 4);
+                g2D.fillRect(xpos, y, 1, 4);
             }
         }
+        
+        return y+ 15;
     }
     
     /** draw the selected region */
-    public void drawSelection(Graphics2D g2D, int aminosize, float scale){
+    public void drawSelection(Graphics2D g2D, int aminosize, float scale, int y){
         
         //System.out.println("draw selection " + selectStart + " end" + selectEnd);
         if ( selectStart > -1 ) {
-            Dimension dstruc=this.getSize();
+            //Dimension dstruc=this.getSize();
             g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));        
             
             g2D.setColor(SELECTION_COLOR);
@@ -167,14 +163,15 @@ extends FeaturePanel
             if ( selectEndX  < 1 )
                 selectEndX = 1 ;
             
-            Rectangle selection = new Rectangle(seqx , 0, selectEndX, dstruc.height);
+            Rectangle selection = new Rectangle(seqx , y, selectEndX, parent.getHeight());
             g2D.fill(selection);
             
         }
     }
     
-    /** draw structrure covered region as feature */
-    private void drawStructureRegion(Graphics2D g2D, int aminosize){
+    
+    /** draw structrure covered region as feature 
+    private int drawStructureRegion(Graphics2D g2D, int aminosize, int y){
         // data is coming from chain;
       
         //g2D.drawString("Structure",1,DEFAULT_STRUCTURE_Y+DEFAULT_Y_HEIGHT);
@@ -183,17 +180,20 @@ extends FeaturePanel
         
         List segments = structureFeature.getSegments();
         Iterator iter = segments.iterator();
+        
         while (iter.hasNext()){
             Segment s = (Segment) iter.next();
             int start = s.getStart();
             int end   = s.getEnd();
-            drawStruc(g2D,start,end,aminosize);
+            drawStruc(g2D,start,end,aminosize, y);
         }
+        y+= DEFAULT_Y_STEP;
+        return y;
         
     }
-    private void drawStruc(Graphics2D g2D, int start, int end, int aminosize){
+    private void drawStruc(Graphics2D g2D, int start, int end, int aminosize, int y){
         //System.out.println("Structure " + start + " " + end);
-        int y = DEFAULT_STRUCTURE_Y ;
+        //int y = DEFAULT_STRUCTURE_Y ;
         
         int xstart = java.lang.Math.round(start * scale) + DEFAULT_X_START;
         int endx   = java.lang.Math.round(end * scale)-xstart + DEFAULT_X_START +aminosize;
@@ -204,25 +204,29 @@ extends FeaturePanel
         g2D.setColor(STRUCTURE_COLOR);	
         g2D.fillRect(xstart,y,endx,height);
         
+        /*
         // highlite the background
         Composite origComposite = g2D.getComposite();
         g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));
         g2D.setColor(STRUCTURE_BACKGROUND_COLOR);
         //Dimension dstruc=this.getSize();
-        Rectangle strucregion = new Rectangle(xstart , 0, endx, getHeight());
+        Rectangle strucregion = new Rectangle(xstart , y, endx, parent.getHeight());
         g2D.fill(strucregion);
         g2D.setComposite(origComposite);
-    }
-    
-    
-    
-    public void setToolTip(String txt){
-        this.setToolTipText(txt);
         
     }
+    */
+    
+    
+    //public void setToolTip(String txt){
+      //  this.setToolTipText(txt);
+        
+    //}
     
 }
 
+//TODO re-enable Scale mouse listener
+/*
 class ScaleMouseListener
 implements MouseListener, MouseMotionListener
 {
@@ -250,3 +254,4 @@ implements MouseListener, MouseMotionListener
     public void mouseReleased(MouseEvent e){}
     
 }
+*/

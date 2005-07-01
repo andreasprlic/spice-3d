@@ -35,8 +35,6 @@ import java.util.List                      ;
 // for DAS registration server:
 import org.biojava.services.das.registry.* ;
 
-import org.biojava.spice.SPICEFrame   	   ;
-
 //for logging
 import java.util.logging.*                 ;
 
@@ -70,14 +68,14 @@ extends Thread
     
     JProgressBar progressBar ;
     JFrame progressFrame      ;
-    SPICEFrame spice  ;
+    //SPICEFrame spice  ;
     static Logger logger      = Logger.getLogger("org.biojava.spice");
     List configListeners ;
     boolean forceUpdate;
     
-    public RegistryConfigIO ( SPICEFrame parent , URL[] registryurl) {
+    public RegistryConfigIO ( URL[] registryurl) {
         
-        spice = parent ;
+        //spice = parent ;
         registryArray = registryurl ;
         done = false ;
         configListeners = new ArrayList();
@@ -437,7 +435,8 @@ extends Thread
             logger.log(Level.WARNING,e.getMessage() + "while saving config locally");
         }
         
-        spice.setConfiguration(config);    
+        notifyConfigListeners();
+        //spice.setConfiguration(config);    
         
     }
     

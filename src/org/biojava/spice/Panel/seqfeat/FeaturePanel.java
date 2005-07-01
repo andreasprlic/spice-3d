@@ -32,23 +32,18 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
-
 import java.util.List;
-import java.util.Iterator;
 import java.util.logging.Logger;
-
-import org.biojava.bio.structure.Group;
 import org.biojava.spice.Feature.Feature;
-import org.biojava.spice.Feature.FeatureImpl;
 import org.biojava.spice.Feature.Segment;
 import org.biojava.spice.Panel.seqfeat.SelectedFeatureListener;
-import org.biojava.bio.structure.*;
+
 /**
  * @author Andreas Prlic
  *
  */
 public class FeaturePanel 
-	extends SizeableJPanel
+	//extends SizeableJPanel
 	implements SelectedFeatureListener
 	{
    
@@ -65,14 +60,15 @@ public class FeaturePanel
     public static final Color BACKGROUND_COLOR        = Color.black;
     public static final Color SELECTION_COLOR         = Color.lightGray;
     public static final Color SELECTED_FEATURE_COLOR  = Color.yellow;
-    public static final Color STRUCTURE_COLOR         = Color.red;
-    public static final Color STRUCTURE_BACKGROUND_COLOR = new Color(0.5f, 0.1f, 0.5f, 0.5f);
     
     
     int mouseDragStart ;
     //int height;
+    
     Feature[] features;
     int seqLength;
+    float scale;
+    
     JPopupMenu popupMenu;
     int oldposition;
     static Logger logger      = Logger.getLogger("org.biojava.spice");
@@ -84,31 +80,27 @@ public class FeaturePanel
     boolean featureSelected;
     int selectedFeaturePos;
     //int oldSelectedFeaturePos;
+    
     boolean isLoading;
     JProgressBar progressBar;
-    float scale;
+    
     BufferedImage imbuf;
     int canvasHeight;
-    FeaturePanelMouseListener featurePanelMouseListener;
-    Feature structureFeature;
+  
+    
+    FeatureView parent;
     /**
      * 
      */
-    public FeaturePanel() {
+    public FeaturePanel(FeatureView parent) {
         super();
-        
+        this.parent=parent;
         scale = 2.0f;
         seqLength = 0;
         features = null;
-        this.setBackground(BACKGROUND_COLOR);
-        //this.setOpaque(true);
-        this.setDoubleBuffered(true);
-        //this.setPreferredSize(new Dimension(400,MINIMUM_HEIGHT));
-        this.setWidth(400);
-        this.setHeight(MINIMUM_HEIGHT);
         
         popupMenu = new JPopupMenu();
-        featurePanelMouseListener = null;
+        
         int oldposition = 0;
         
         selectStart    = -1 ;
@@ -131,61 +123,43 @@ public class FeaturePanel
         progressBar.setVisible(false);
         
         float scale = getScale();
-        initImgBuffer();
-        structureFeature = new FeatureImpl();
-        this.add(progressBar);
+        //initImgBuffer();
+        
+       // this.add(progressBar);
     }
-    
-    public void setFeaturePanelMouseListener(FeaturePanelMouseListener fpml){
-        featurePanelMouseListener = fpml;
-        this.addMouseMotionListener(fpml);
-        this.addMouseListener(      fpml);
-    }
-    
-    public FeaturePanelMouseListener getFeaturePanelMouseListener(){
-        return featurePanelMouseListener;
-    }
-    
+   
     
     public void setLoading(boolean flag){
         isLoading = flag;
         
         this.progressBar.setVisible(flag);
         if ( isLoading)
-            this.progressBar.setSize(this.getSize());
+            progressBar.setSize(new Dimension(100,30));
     }
     
     public void setSelected(boolean flag){
         selected = flag;
     }
     
-    /*public int getHeight(){
-        return height; 
-    }*/
-    public void setCanvasHeight(int height) {
-      //Dimension d = getSize();
-      //setPreferredSize(new Dimension(d.width, height));
-      canvasHeight = height;
-      this.setHeight(height);
-    }
     
-    public int getCanvasHeight(){ return canvasHeight;}
+    //public int getCanvasHeight(){ return canvasHeight;}
     public void setFeatures(Feature[] features){
        
         this.features = features;
 
     }
     
-    public void setSeqLength(int seqLength){
-        this.seqLength = seqLength;
-        initImgBuffer();
-        this.revalidate();
+    public void setSeqLength(int seqL){
+        //System.out.println("featurePanel setSeqLength " + seqL);
+        seqLength = seqL;
+        //initImgBuffer();
+        //this.revalidate();
     }
     
     public int getSeqLength(){
         return seqLength;
     }
-    
+    /*
     private void initImgBuffer(){
         int aminosize =  Math.round(1 * scale) ;
         Dimension dstruc = this.getSize();
@@ -205,7 +179,7 @@ public class FeaturePanel
         this.setWidth(width);
     }
     
-    
+    */
     
     private int getImgWidth(int aminosize){
         // 
@@ -218,22 +192,21 @@ public class FeaturePanel
             imgwidth = 1;
         return imgwidth;
     }
+    
+   
+    
     /** a FeatureView consists of a Label and the rendered features */
     
-    public void paintComponent( Graphics g) {
-        //System.out.println("paintComponent - featurePanel");
-        if( imbuf == null) initImgBuffer();
-      
-        super.paintComponent(g); 	
-        g.drawImage(imbuf, 0, 0, this);
-        
+    public int paintComponent( Graphics g, int width, int y) {
+        //System.out.println("FeaturePanel paintComponent - y" + y + " width:" + width + " seqLength:"+seqLength);
+          
         //logger.info("paintComponent "  + label);
 //      Graphics g2 = featureCanvas.getGraphics();
         Graphics2D g2D = (Graphics2D)g ;
         float scale = getScale();
         //	 minimum size of one aminoacid
         int aminosize =  Math.round(1 * scale) ;
-        Dimension dstruc=new Dimension ( getImgWidth(aminosize), getHeight());
+        //Dimension dstruc=new Dimension ( getImgWidth(aminosize), getHeight());
         
         /////////////
         //      do the actual painting...
@@ -246,29 +219,30 @@ public class FeaturePanel
          
         // background ... :-/ ???
         // seems that img does not have background ...
-        g2D.setColor(BACKGROUND_COLOR);
-        g2D.fillRect(0,0,dstruc.width,dstruc.height);
+        //g2D.setColor(BACKGROUND_COLOR);
+        //g2D.fillRect(0,0,dstruc.width,dstruc.height);
         
         if ( isLoading){
             //System.out.println("isLoading - return");
-            return;
+            return y;
         }
        
         // draw region covered with structure
-        drawStructureRegion(g2D,aminosize);
+        //TODO cleanup, move to spicefeaturepane
+        //drawStructureRegion(g2D,aminosize);
         
-        int y = drawFeatures(g2D,aminosize,DEFAULT_Y_START,seqLength,scale);
-     
-       
+        int newy = drawFeatures(g2D,aminosize,width,y,seqLength,scale);
         
-        drawSelection(g2D, aminosize, scale);
+        // TODO:
+        // cleanup, move to spice parent ...
+        //drawSelection(g2D, aminosize, scale);
         
         if ( selected ){
             // the whole featureview has been selected
             //if selected draw a rectangle over everything
             
             g2D.setColor(SELECTION_COLOR);
-            g2D.fillRect(0,0,dstruc.width,dstruc.height);
+            g2D.fillRect(0,y,width,parent.getHeight());
             
         }
         
@@ -277,16 +251,16 @@ public class FeaturePanel
         //this.setPreferredSize(new Dimension(y+DEFAULT_Y_STEP,dstruc.width));
         g2D.setComposite(oldComposite);
         //featureCanvas.repaint();
-        
+        return newy;
     }
     
     /** draw the features starting at position y
      * returns the y coordinate of the last feature ;
      * */
-    public int drawFeatures(Graphics g, int aminosize, int y, int chainlength,float scale){
+    private int drawFeatures(Graphics g, int aminosize, int fullwidth, int y, int chainlength,float scale){
         
         Graphics2D g2D =(Graphics2D) g;
-        //System.out.println("FeaturePanel drwaFeatures aminosize "+ aminosize);
+        //System.out.println("FeaturePanel drwaFeatures aminosize "+ aminosize + " y " + y);
         
         boolean secstruc = false ;
         
@@ -307,11 +281,11 @@ public class FeaturePanel
             
             if ( featureSelected){
                 if (f == selectedFeaturePos) {
-                    Dimension dstruc = this.getSize();
+                    //Dimension dstruc = this.getSize();
                     g2D.setColor(SELECTED_FEATURE_COLOR);
                     Composite oldComp = g2D.getComposite();
                     g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_IN ,0.6f));
-                    g2D.fillRect(0,y,dstruc.width,DEFAULT_Y_HEIGHT);
+                    g2D.fillRect(0,y,fullwidth,DEFAULT_Y_HEIGHT);
                     g2D.setComposite(oldComp);
                 }
             }
@@ -357,16 +331,16 @@ public class FeaturePanel
             
             
         }
-        
+        //y+= DEFAULT_Y_STEP;
         return y ;
     }
     
     /** draw the selected region */
-    public void drawSelection(Graphics2D g2D, int aminosize, float scale){
+    private void drawSelection(Graphics2D g2D, int aminosize, float scale){
         
         //System.out.println("draw selection " + selectStart + " end" + selectEnd);
         if ( selectStart > -1 ) {
-            Dimension dstruc=this.getSize();
+            //Dimension dstruc=this.getSize();
             Composite oldComp = g2D.getComposite();
             g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));        
          
@@ -380,86 +354,14 @@ public class FeaturePanel
             if ( selectEndX  < 1 )
                 selectEndX = 1 ;
             
-            Rectangle selection = new Rectangle(seqx , 0, selectEndX, dstruc.height);
+            Rectangle selection = new Rectangle(seqx , 0, selectEndX, parent.getHeight());
             g2D.fill(selection);
             g2D.setComposite(oldComp);
             
         }
     }
     
-    public void setChain(Chain chain){
-        structureFeature = new FeatureImpl();
-        int start = -1;
-        int end   = -1;
-       
-        for ( int i=0 ; i< chain.getLength() ; i++ ) {
-            Group g = chain.getGroup(i);
-            
-            if ( g.size() > 0 ){
-                if ( start == -1){
-                    start = i;
-                }
-                end = i;
-            } else {
-                if ( start > -1) {
-                    //drawStruc(g2D,start,end,aminosize);
-                    
-                    Segment s = new Segment();
-                    s.setStart(start);
-                    s.setEnd(end);
-                    structureFeature.addSegment(s);
-                    start = -1 ;
-                }
-            }
-        }
-        // finish
-        if ( start > -1) {
-            Segment s = new Segment();
-            s.setStart(start);
-            s.setEnd(end);
-            structureFeature.addSegment(s);
-        }
-        
-    }
     
-    /** draw structrure covered region as feature */
-    private void drawStructureRegion(Graphics2D g2D, int aminosize){
-        // data is coming from chain;
-      
-        //g2D.drawString("Structure",1,DEFAULT_STRUCTURE_Y+DEFAULT_Y_HEIGHT);
-        //System.out.println("draw structure " + structureFeature);
-        
-        List segments = structureFeature.getSegments();
-        Iterator iter = segments.iterator();
-        while (iter.hasNext()){
-            Segment s = (Segment) iter.next();
-            int start = s.getStart();
-            int end   = s.getEnd();
-            drawStruc(g2D,start,end,aminosize);
-        }
-    }
-    private void drawStruc(Graphics2D g2D, int start, int end, int aminosize){
-        //System.out.println("Structure " + start + " " + end);
-        //int y = DEFAULT_STRUCTURE_Y ;
-        
-        int xstart = java.lang.Math.round(start * scale) + DEFAULT_X_START;
-        int endx   = java.lang.Math.round(end * scale)-xstart + DEFAULT_X_START +aminosize;
-        int width  = aminosize ;
-        //int height = DEFAULT_Y_HEIGHT ;
-        
-        // draw the red structure line
-        //g2D.setColor(STRUCTURE_COLOR);	
-        //g2D.fillRect(xstart,y,endx,height);
-        
-        // highlite the background
-        Composite origComposite = g2D.getComposite();
-        g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));
-        g2D.setColor(STRUCTURE_BACKGROUND_COLOR);
-        //Dimension dstruc=this.getSize();
-        Rectangle strucregion = new Rectangle(xstart , 0, endx, getHeight());
-        g2D.fill(strucregion);
-        g2D.setComposite(origComposite);
-    }
     
     
     /** a feature has been selected */
@@ -469,7 +371,7 @@ public class FeaturePanel
         if ( feat == null) { 
             featureSelected = false;
             selectedFeaturePos = -1;
-        		this.repaint();
+        		//this.repaint();
         		return;
         }
         featureSelected = true;
@@ -491,31 +393,33 @@ public class FeaturePanel
         //if ( oldSelectedFeaturePos != selectedFeaturePos){
           //  this.repaint();
         //}
-        this.repaint();
+        //this.repaint();
         //oldSelectedFeaturePos = selectedFeaturePos;
     }
     
     public void setScale(float scale){
+        //System.out.println("FeaturePanel setScale " + scale);
         this.scale=scale;
-        initImgBuffer();
-        this.revalidate();
+        //initImgBuffer();
+        //this.revalidate();
     }
     
     public float getScale(){
+        
         return scale;
        
     }
     
-    /** get the sequence position of the current mouse event */
+    /** get the sequence position of the current mouse event 
     public int getSeqPos(MouseEvent e) {
-        
+        // get r
         int x = e.getX();
         int y = e.getY();
         float scale = getScale();
         int seqpos =  java.lang.Math.round((x-DEFAULT_X_START-2)/scale) ;
         
         return seqpos  ;
-    }	
+    }	*/
     
     /* check if the mouse is over a feature and if it is 
      * return the feature number 
@@ -524,8 +428,9 @@ public class FeaturePanel
      * To change the template for this generated type comment go to
      * Window - Preferences - Java - Code Generation - Code and Comments
      */
-    public int getLineNr(MouseEvent e){
-        int mouseY = e.getY();
+    public int getLineNr(int eventY){
+        //int mouseY = e.getY();
+        int mouseY = eventY;
         
         float top = mouseY - DEFAULT_Y_START +1 ;
         // java.lang.Math.round((y-DEFAULT_Y_START)/ (DEFAULT_Y_STEP + DEFAULT_Y_HEIGHT-1));
@@ -552,13 +457,12 @@ public class FeaturePanel
         selectEnd    = seqpos ;
         dragging = false;
       
-      this.repaint();
+//      this.repaint();
         
     }
     
     /** highlite a region */
     public void highlite( int start , int end){
-        
         
         //if (selectionLocked) return ;
         if ( (start > seqLength) || 
@@ -570,7 +474,7 @@ public class FeaturePanel
         selectEnd   = end    ;
         dragging = true;
         
-        this.repaint();
+        //this.repaint();
         
     }
     

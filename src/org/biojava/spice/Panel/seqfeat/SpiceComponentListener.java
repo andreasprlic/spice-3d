@@ -39,17 +39,19 @@ public class SpiceComponentListener
 implements ComponentListener {
     SpiceFeatureViewer parent;
     JScrollPane scroll;
-    public SpiceComponentListener(SpiceFeatureViewer fv){
+    public SpiceComponentListener(SpiceFeatureViewer fv, JScrollPane scroller){
         parent = fv;
+        scroll = scroller;
         
     }
     public void componentHidden(ComponentEvent e){}
     public void componentMoved(ComponentEvent e){}
     public void componentResized(ComponentEvent e){
         Component c = e.getComponent();
-        //System.out.println("component parent of spicefeauteview was resized " + c);
+        System.out.println("component parent of spicefeauteview was resized " + c);
         
-        parent.evaluateLayout();
+        parent.setPreferredSize(c.getSize());
+        //parent.evaluateLayout();
         
         /*
         Dimension d = c.getSize();        
@@ -77,6 +79,8 @@ implements ComponentListener {
         parent.repaint();
         //c.invalidate();
         
+        scroll.revalidate();
+        scroll.repaint();
         
         if  ( c instanceof JScrollPane ){
             JScrollPane scroll = (JScrollPane)c;

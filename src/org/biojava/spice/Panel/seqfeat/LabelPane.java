@@ -25,7 +25,6 @@ package org.biojava.spice.Panel.seqfeat;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Composite;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -39,8 +38,6 @@ import org.biojava.spice.Feature.Feature;
  *
  */
 public class LabelPane
-
-extends SizeableJPanel
 {
    
     public static final int    DEFAULT_X_SIZE         = 60;
@@ -60,6 +57,8 @@ extends SizeableJPanel
     
     String label;
     int canvasHeight;
+    int canvasWidth;
+    
     int oldposition;
     static Logger logger      = Logger.getLogger("org.biojava.spice");
     boolean dragging;
@@ -76,24 +75,26 @@ extends SizeableJPanel
         this.parent = parent ;
         label="";
         
-        this.setBackground(Color.black);
-        this.setDoubleBuffered(true);
+        //this.setBackground(Color.black);
+        //this.setDoubleBuffered(true);
         //this.setPreferredSize(new Dimension(DEFAULT_X_SIZE,MINIMUM_HEIGHT));
-        this.setWidth(MINIMUM_HEIGHT);
-        this.setHeight(DEFAULT_X_SIZE);
+        //this.setWidth(MINIMUM_HEIGHT);
+        //this.setHeight(DEFAULT_X_SIZE);
         
         int oldposition = 0;
         
         //height = MINIMUM_HEIGHT;
         selected =false;
         canvasHeight = MINIMUM_HEIGHT;
-        initImgBuffer();
+        canvasWidth = 1;
+        //initImgBuffer();
       
         
     }
 
     public FeatureView getParentFeatureView(){ return parent; }
     
+    /*
     private void initImgBuffer(){
       
         Dimension dstruc = this.getSize();
@@ -113,31 +114,43 @@ extends SizeableJPanel
         this.setHeight(height);
     }
     
-   
+   */
     public void setCanvasHeight(int height) {
         canvasHeight = height;
-        setHeight(height);
+        //setHeight(height);
         //this.setPreferredSize(new Dimension(DEFAULT_X_SIZE,height));
         //this.height=height;
     }
     
-    public int getCanvasHeight(){ return canvasHeight; }
+    
+    public int getCanvasHeight(){ 
+        return canvasHeight; 
+        
+    }
     
     public void setSelected(boolean flag){
         selected = flag;
     }
     
+    public int getCanvasWidth() { return canvasWidth;}
     
-    
+    public void setCanvasWidth(int width){
+        canvasWidth = width;
+    }
     /** a FeatureView consists of a Label and the rendered features */
-    
+    /*
     public void paintComponent( Graphics g) {
-        //logger.info("paintComponent "  + label);
         if( imbuf == null) initImgBuffer();
         super.paintComponent(g); 	
         g.drawImage(imbuf, 0, 0, this);
-        Dimension dstruc=this.getSize();
+        paintComponent(g,DEFAULT_Y_STEP);
+    }
+    */
+    public int paintComponent( Graphics g, int width,int y ) {
+        //System.out.println(" labelPane paintComponent y:"+y   );
+        //logger.info("paintComponent "  + label);
         
+        //Dimension dstruc=this.getSize();
         
         //Graphics g2 = featureCanvas.getGraphics();
         Graphics2D g2D = (Graphics2D)g ;
@@ -152,34 +165,40 @@ extends SizeableJPanel
         /////////////
         //      do the actual painting...
         // background ... :-/
-        g2D.setColor(BACKGROUND_COLOR);
-        g2D.fillRect(0,0,dstruc.width,dstruc.height);
+        //g2D.setColor(BACKGROUND_COLOR);
+        //g2D.fillRect(0,0,dstruc.width,dstruc.height);
         
-        drawLabel(g2D);
+        int newy = drawLabel(g2D,y);
+        
+        int height = parent.getHeight();
+        
         
         if ( selected ){
             //if selected draw a white rectangle over everything
             g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));
             g2D.setColor(SELECTION_COLOR);
-            g2D.fillRect(0,0,dstruc.width,dstruc.height);
+            g2D.fillRect(0,y,width,height);
         }
         //this.setPreferredSize(new Dimension(y+DEFAULT_Y_STEP,dstruc.width));
         g2D.setComposite(oldComposite);
         //featureCanvas.repaint();
         
+        return newy;
     }
     
     /** draw the features starting at position y
      * returns the y coordinate of the last feature ;
      * */
-    public int drawLabel(Graphics g2D){
+    private int drawLabel(Graphics g2D, int y){
         
-        //System.out.println("seqFeatCanvas aminosize "+ aminosize);
         g2D.setFont(plainFont);
         
         g2D.setColor(Color.white);
-        g2D.drawString(this.label,DEFAULT_X_START,DEFAULT_Y_STEP);
-        return DEFAULT_Y_STEP;
+        
+        g2D.drawString(this.label,DEFAULT_X_START,y+DEFAULT_Y_STEP);
+        //System.out.println("LabelPanel drawLabel "+ DEFAULT_X_START + " " + y);
+        y+= DEFAULT_Y_STEP;
+        return y;
     }
     
     public void setLabel(String label){

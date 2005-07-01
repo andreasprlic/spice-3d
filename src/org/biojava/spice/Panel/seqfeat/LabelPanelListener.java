@@ -41,7 +41,7 @@ import org.biojava.spice.Panel.seqfeat.SpiceFeatureViewer;
  *
  */
 
-class LabelBoxListener implements MouseListener,MouseMotionListener{
+class LabelPanelListener implements MouseListener,MouseMotionListener{
     SpiceFeatureViewer parent ;
     int prev_y ;
     boolean moved;
@@ -49,7 +49,7 @@ class LabelBoxListener implements MouseListener,MouseMotionListener{
     FeatureView selectedFeatureView;
     JPopupMenu popupMenu ;
     
-    public LabelBoxListener(SpiceFeatureViewer parent) {
+    public LabelPanelListener(SpiceFeatureViewer parent) {
         this.parent = parent;
         //popupMenu = new JPopupMenu();
         prev_y = -1;
@@ -71,10 +71,12 @@ class LabelBoxListener implements MouseListener,MouseMotionListener{
         System.out.println("mouse pressed" + e.getX()+" " + e.getY());
         
         
-        FeatureView fv = parent.getParentFeatureView(e, LabelPane.class) ;
+        FeatureView fv = parent.getParentFeatureView(e) ;
         if ( fv != null ){
             fv.setSelected(true);
             selectedFeatureView = fv;
+            
+            parent.repaint();
         } else {
             System.err.println("no parent found!");
         }
@@ -83,6 +85,8 @@ class LabelBoxListener implements MouseListener,MouseMotionListener{
         if ( mouseButton == MouseEvent.BUTTON3 )  {
             maybeShowPopup(e);
         }
+        
+        
     }
     
     public FeatureView getCurrentFeatureView(){
@@ -110,7 +114,7 @@ class LabelBoxListener implements MouseListener,MouseMotionListener{
         
         //System.out.println("y " + y + "prev_y" + prev_y + " cx:" + cx + " cy:" + cy + " compo_h " + compo_h );
         
-        int compo_h = lab.getHeight();
+        int compo_h = lab.getCanvasHeight();
         int y = e.getY();
         
         //System.out.println("y " + y + " rel_y " + relative_y + " h " + compo_h );
@@ -142,7 +146,7 @@ class LabelBoxListener implements MouseListener,MouseMotionListener{
     }
     
     public void mouseReleased(MouseEvent e) {
-        System.out.println("mouse Released" + e.getX()+" " + e.getY() + " button " + e.getButton());
+        //System.out.println("mouse Released" + e.getX()+" " + e.getY() + " button " + e.getButton());
         moved = false;
         int mouseButton = e.getButton();
         if ( mouseButton == MouseEvent.BUTTON1 )  {
@@ -151,9 +155,12 @@ class LabelBoxListener implements MouseListener,MouseMotionListener{
             if ( fv != null ){
                 fv.setSelected(false);
                 selectedFeatureView = null;
+                //Component c = e.getComponent();
+                parent.repaint();
                 if (! isDragging) {
                     return;
                 } 
+                
                 //	System.out.println("isdragging: " + isDragging);
                 isDragging = false;
                 testMoveFV(e,fv);
@@ -164,16 +171,13 @@ class LabelBoxListener implements MouseListener,MouseMotionListener{
                 System.err.println("no parent found!");
             }
             
-        } else if( mouseButton == MouseEvent.BUTTON3 ) {
+        } else  {
             // open a popupMenu...
             //System.out.println("button 3 pressed");
             maybeShowPopup(e);
             
-            
         }
-        else {
-            //System.out.println("other button pressed ...");
-        }
+        
     }
     public void mouseEntered(MouseEvent e) {}
     public void mouseExited(MouseEvent e) {}
@@ -195,7 +199,7 @@ class LabelBoxListener implements MouseListener,MouseMotionListener{
     
     
     private void maybeShowPopup(MouseEvent e) {
-        System.out.println("showpopup?");
+        //System.out.println("showpopup?");
         if (e.isPopupTrigger()) {
             popupMenu.show(e.getComponent(),		       
                     e.getX(), e.getY());

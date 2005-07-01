@@ -24,7 +24,6 @@ package org.biojava.spice.Panel.seqfeat;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Composite;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -48,7 +47,7 @@ import java.net.MalformedURLException;
  * @author Andreas Prlic
  *
  */
-public class TypeLabelPanel extends SizeableJPanel {
+public class TypeLabelPanel  {
 
     // use this font for the text
     public static final Font plainFont = new Font("SansSerif", Font.PLAIN, 10);
@@ -79,18 +78,18 @@ public class TypeLabelPanel extends SizeableJPanel {
     public static Logger logger = Logger.getLogger("org.biojava.spice");
 
     ImageIcon miniFirefox ;
-    
+    FeatureView parent;
     /**
      * 
      */
-    public TypeLabelPanel() {
+    public TypeLabelPanel(FeatureView parent) {
         super();
-
-        this.setBackground(Color.black);
-        this.setDoubleBuffered(true);
+        this.parent = parent;
+        //this.setBackground(Color.black);
+        //this.setDoubleBuffered(true);
         //this.setPreferredSize(new Dimension(DEFAULT_WIDTH,MINIMUM_HEIGHT));
-        this.setWidth(DEFAULT_WIDTH);
-        this.setHeight(MINIMUM_HEIGHT);
+        //this.setWidth(DEFAULT_WIDTH);
+        //this.setHeight(MINIMUM_HEIGHT);
         
         selected = false;
         selectedFeatureListeners = new ArrayList();
@@ -98,7 +97,7 @@ public class TypeLabelPanel extends SizeableJPanel {
         typeSelected =false;
         selectedType = -1 ;
         oldSelectedType = -1;
-        initImgBuffer();
+        //initImgBuffer();
         canvasHeight = MINIMUM_HEIGHT;
         
         miniFirefox = createImageIcon("firefox10x10.png");
@@ -116,31 +115,7 @@ public class TypeLabelPanel extends SizeableJPanel {
         }
     }
 
-    private void initImgBuffer(){
-      
-        Dimension dstruc = this.getSize();
-        int width = this.getWidth();
-        if ( width <=0 )
-            width = DEFAULT_WIDTH;
-        int height = canvasHeight;
-        //System.out.println(width);
-        if ( height <= MINIMUM_HEIGHT) 
-            height=MINIMUM_HEIGHT;
-        
-        
-        imbuf = (BufferedImage)this.createImage(width,height); 
-        //this.setSize(width,height);
-        //this.setPreferredSize(new Dimension(width,height));
-        this.setWidth(width);
-        this.setHeight(height);
-    }
-    
-    
-    public void setCanvasHeight(int height){
-        //this.setPreferredSize(new Dimension(DEFAULT_WIDTH, height));
-        canvasHeight = height;
-        setHeight(height);
-    }
+   
     
     public void setSelected(boolean flag){
         selected = flag;
@@ -150,18 +125,14 @@ public class TypeLabelPanel extends SizeableJPanel {
         if ( linenr < 0){
             selectedType = linenr;
             typeSelected = false;
-            if ( selectedType != oldSelectedType){
-                this.repaint();
-            } 
+             
             oldSelectedType = selectedType;  
             linkSelected = false;
             return;
         }
         selectedType = linenr;
         typeSelected = true;
-        if ( selectedType != oldSelectedType){
-            this.repaint();
-        } 
+        
         oldSelectedType = selectedType;
     }
     
@@ -169,7 +140,7 @@ public class TypeLabelPanel extends SizeableJPanel {
         
     		setSelectedType(linenr);
     		linkSelected = flag; 
-    		this.repaint();
+    		
     }
 
     
@@ -187,16 +158,12 @@ public class TypeLabelPanel extends SizeableJPanel {
                 	new SelectedFeatureListener[selectedFeatureListeners.size()]);
     }
     
-    public void paintComponent( Graphics g) {
+   
+   
+    public int paintComponent( Graphics g, int width, int y) {
         //logger.info("paintComponent "  + label);
         
-        if( imbuf == null) initImgBuffer();
-       
-        super.paintComponent(g); 	
-        g.drawImage(imbuf, 0, 0, this); 
-        
-        Dimension dstruc=this.getSize();
-        
+      
         
         //Graphics g2 = featureCanvas.getGraphics();
         Graphics2D g2D = (Graphics2D)g ;
@@ -211,34 +178,27 @@ public class TypeLabelPanel extends SizeableJPanel {
     
         /////////////
         //      do the actual painting...
-//      background ... :-/
-        g2D.setColor(BACKGROUND_COLOR);
-        g2D.fillRect(0,0,dstruc.width,dstruc.height);
-               
-        
-        int y = DEFAULT_Y_START;
-        drawFeatures(g2D,y);
-        
-        
+//      
+        int newy = drawFeatures(g2D,width,y);
         
         if ( selected ){
             
                 //if selected draw a white rectangle over everything
                 g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));
                 g2D.setColor(SELECTION_COLOR);
-                g2D.fillRect(0,0,dstruc.width,dstruc.height);
+                g2D.fillRect(0,y,width,parent.getHeight());
             
         }
         
         g2D.setComposite(oldComposite);
         //featureCanvas.repaint();
-        
+        return newy;
     }
     
     /** draw the features starting at position y
      * returns the y coordinate of the last feature ;
      * */
-    public int drawFeatures(Graphics g2D, int y){
+    private int drawFeatures(Graphics g2D,int width, int y){
         
         boolean secstruc = false ;
         
@@ -267,7 +227,7 @@ public class TypeLabelPanel extends SizeableJPanel {
                 }
                 //g2D.drawString("L->", 1,y+DEFAULT_Y_HEIGHT);
                 if ( miniFirefox != null)
-                    miniFirefox.paintIcon(this, g2D, 1,y-DEFAULT_Y_HEIGHT);
+                    miniFirefox.paintIcon(null, g2D, 1,y-DEFAULT_Y_HEIGHT);
             }
             
             // draw text
@@ -294,15 +254,15 @@ public class TypeLabelPanel extends SizeableJPanel {
                 		    }
                     } else {
                     
-                        	Dimension dstruc = this.getSize();
+                        	//Dimension dstruc = this.getSize();
                     		g2d.setColor(SELECTED_TYPE_COLOR);
-                    		g2d.fillRect(DEFAULT_X_START,y-(DEFAULT_Y_HEIGHT/2)-2,dstruc.width,DEFAULT_Y_STEP);
+                    		g2d.fillRect(DEFAULT_X_START,y-(DEFAULT_Y_HEIGHT/2)-2,width,DEFAULT_Y_STEP);
                     		g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,1.0f));
                     }
                 }
             }
         }
-        
+        //y+= DEFAULT_Y_STEP;
         return y ;
     }
     
@@ -312,7 +272,7 @@ public class TypeLabelPanel extends SizeableJPanel {
         
         int mouseY = eventY;
         
-        float top = mouseY - DEFAULT_Y_START -1 ;
+        float top = mouseY - DEFAULT_Y_STEP -1 ;
         // java.lang.Math.round((y-DEFAULT_Y_START)/ (DEFAULT_Y_STEP + DEFAULT_Y_HEIGHT-1));
         float interval  = DEFAULT_Y_STEP  ;
         

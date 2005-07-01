@@ -49,6 +49,7 @@ implements MouseListener, MouseMotionListener {
     TypeLabelPanel oldSelection;
     
     public static int DEFAULT_X_START = 11;
+    public static int DEFAULT_Y_STEP  = 10;
     public static Logger logger = Logger.getLogger("org.biojava.spice");
     /**
      * 
@@ -60,13 +61,11 @@ implements MouseListener, MouseMotionListener {
         
     }
       
-    
-    
     public void mouseMoved(MouseEvent e){
         int x = e.getX();
         int y = e.getY();
         
-        FeatureView fv = parent.getParentFeatureView(e,TypeLabelPanel.class) ;
+        FeatureView fv = parent.getParentFeatureView(e) ;
         if ( fv == null ){
             System.err.println("no parent found!");
             //fv.setSelected(true);
@@ -74,7 +73,7 @@ implements MouseListener, MouseMotionListener {
             return;
         } 
         
-        Point p = parent.getLocationOnLabelBox(fv);
+        
         TypeLabelPanel typ = fv.getTypePanel();
         if (  oldSelection != null){
             if ( ! oldSelection.equals(typ)){
@@ -83,17 +82,23 @@ implements MouseListener, MouseMotionListener {
         }
         oldSelection = typ;
         
-        int line = typ.getLineNr(y-p.y);
-        //System.out.println("p " + p  +" " + x + " "+ y +" line "+ line);
-        //if ( line < 0 ) { 
-        //    disableSelection(e);
-        //}
+        Point p = parent.getLocationOnLabelBox(fv);
+        // y is relative to the TypePanelContainer
+        // make it relative to the featureview
+        int relY = y -p.y + DEFAULT_Y_STEP;
+        
+        int line = typ.getLineNr(relY);
+        System.out.println("p " + p  +" " + x + " "+ y +" line "+ line);
+        if ( line < 0 ) { 
+            disableSelection(e);
+        }
         Feature f;
         try {
             f = fv.getFeatureAt(line);
         } catch (java.util.NoSuchElementException ex){
             //System.out.println(ex.getMessage());
-            typ.setToolTipText(null);
+            //TODO: re-enable tool tips on TypePanel
+            //typ.setToolTipText(null);
             typ.setSelectedType(-1);
             return;
         }
@@ -104,7 +109,7 @@ implements MouseListener, MouseMotionListener {
             String link = f.getLink();
             if (( link != null) && (! link.equals(""))) {
                 typ.setSelectedLink(line, true);
-                typ.setToolTipText(link);
+                //typ.setToolTipText(link);
                 return;
             }
         } else {
@@ -114,7 +119,8 @@ implements MouseListener, MouseMotionListener {
         }
         
         typ.setSelectedType(line);
-        typ.setToolTipText(f.toString());
+        //typ.setToolTipText(f.toString());
+        
         SelectedFeatureListener[] featlisteners = typ.getSelectedFeatureListeners();
         for ( int i = 0 ; i< featlisteners.length ; i++ ){
             
@@ -128,12 +134,13 @@ implements MouseListener, MouseMotionListener {
             FeatureEvent event = new FeatureEvent(fv,f);
             fvl.mouseOverFeature(event);
         }
+        parent.repaint();
     }
     public void mouseEntered(MouseEvent e){}
     
     
     private void disableSelection(TypeLabelPanel typ){
-        typ.setToolTipText(null);
+        //typ.setToolTipText(null);
         typ.setSelectedType(-1);
         SelectedFeatureListener[] featlisteners = typ.getSelectedFeatureListeners();
         for ( int i = 0 ; i< featlisteners.length ; i++ ){
@@ -145,7 +152,7 @@ implements MouseListener, MouseMotionListener {
     
     private void disableSelection(MouseEvent e){
         
-        FeatureView fv = parent.getParentFeatureView(e,TypeLabelPanel.class) ;
+        FeatureView fv = parent.getParentFeatureView(e) ;
         if ( fv == null ){
             System.err.println("no parent found!");
             //fv.setSelected(true);
@@ -163,8 +170,9 @@ implements MouseListener, MouseMotionListener {
     }
     public void mousePressed(MouseEvent e){}
     public void mouseReleased(MouseEvent e){
-        System.out.println("mouse released ");
-        FeatureView fv = parent.getParentFeatureView(e,TypeLabelPanel.class) ;
+        
+        //System.out.println("mouse released ");
+        FeatureView fv = parent.getParentFeatureView(e) ;
         if ( fv == null ){
             System.err.println("no parent found!");
             //fv.setSelected(true);
@@ -181,16 +189,17 @@ implements MouseListener, MouseMotionListener {
         oldSelection = typ;
         int x = e.getX();
         int y = e.getY();
-        int line = typ.getLineNr(y-p.y);
-        System.out.println("TypePanelMouseListenere mouse released x " + x + " line " + line);
+        // get position relative to featureview
+        int relY = y -p.y + DEFAULT_Y_STEP;
+        
+        int line = typ.getLineNr(relY);
+        System.out.println("TypePanelMouseListener mouse released x " + x + " line " + line);
         if ( x < DEFAULT_X_START) {
             System.out.println("clicked link region line:" + line );
         }
         
         if ( line < 0 )  
             return;
-        
-        
         
         typ.setSelectedType(line);
         Feature f = null;
@@ -226,6 +235,8 @@ implements MouseListener, MouseMotionListener {
             FeatureEvent event = new FeatureEvent(fv,f);
             fvl.featureSelected(event);
         }
+        
+        parent.repaint();
     }
     
     public boolean showDocument(URL url) 

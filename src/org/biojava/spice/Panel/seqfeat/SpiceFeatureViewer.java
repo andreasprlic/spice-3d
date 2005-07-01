@@ -24,7 +24,6 @@ package org.biojava.spice.Panel.seqfeat;
 
 import javax.swing.*;
 
-
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -39,16 +38,13 @@ import org.biojava.spice.Feature.*;
 import org.biojava.spice.Panel.seqfeat.FeaturePanel;
 import org.biojava.spice.Panel.seqfeat.FeaturePanelMouseListener;
 import org.biojava.spice.Panel.seqfeat.FeatureView;
-import org.biojava.spice.Panel.seqfeat.LabelBoxListener;
+import org.biojava.spice.Panel.seqfeat.LabelPanelListener;
 import org.biojava.spice.Panel.seqfeat.LabelPane;
 import org.biojava.spice.Panel.seqfeat.SelectedSeqPositionListener;
 import org.biojava.spice.Panel.seqfeat.SeqScale;
-import org.biojava.spice.Panel.seqfeat.SeqScaleCanvas;
 import org.biojava.spice.Panel.seqfeat.TypeLabelPanel;
 import org.biojava.spice.Panel.seqfeat.TypePanelMouseListener;
 import org.biojava.spice.Panel.seqfeat.DasSourceListener;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeEvent;
 import org.biojava.spice.Config.SpiceDasSource;
 import org.biojava.bio.structure.ChainImpl;
 import org.biojava.bio.structure.Chain;
@@ -74,6 +70,8 @@ ChangeListener
     static int DEFAULT_VISIBLE_HEIGHT = 100;
     static int DEFAULT_SEQSCROLL_WIDTH = 200;
     static int DEFAULT_SEQSCROLL_HEIGHT = 30;
+    static Color BACKGROUND_COLOR = Color.black;
+    
     List featureViews;
     
     //int scale;
@@ -84,9 +82,9 @@ ChangeListener
     
     JSplitPane labelSplit;
     JSplitPane typeSplit;
-    Box labelBox;
-    Box typeBox;
-    Box featureBox;
+    //Box labelBox;
+    //Box typeBox;
+    //Box featureBox;
     JScrollPane featureScroll;
     JSlider residueSizeSlider ;
     
@@ -96,12 +94,17 @@ ChangeListener
     List featureViewListeners;
     List selectedSeqPositionListeners;
     List dasSourceListeners;
+    
     int typePanelSize;
     int labelPanelSize;
     boolean selectionIsLocked ;
     JPopupMenu popupMenu;
     Chain chain;
-    LabelBoxListener lbml;
+    LabelPanelListener lbml;
+    
+    TypePanelContainer typePanel;
+    LabelPanelContainer labelPanel;
+    FeaturePanelContainer featurePanel;
     
     /**
      * 
@@ -148,17 +151,29 @@ ChangeListener
         
         // three boxes to contain the 3 panels as provided by each FeatureView object
         
-        labelBox   = Box.createVerticalBox();
-        labelBox.setBorder(BorderFactory.createEmptyBorder());
+        //labelBox   = Box.createVerticalBox();
+        //labelBox.setBorder(BorderFactory.createEmptyBorder());
         
-        typeBox    = Box.createVerticalBox();
-        typeBox.setBorder(BorderFactory.createEmptyBorder());
+        //typeBox    = Box.createVerticalBox();
+        //typeBox.setBorder(BorderFactory.createEmptyBorder());
         
-        featureBox = Box.createVerticalBox();
-        featureBox.setBorder(BorderFactory.createEmptyBorder());
-        featureBox.setBackground(Color.black);
+        //featureBox = Box.createVerticalBox();
+        //featureBox.setBorder(BorderFactory.createEmptyBorder());
+        //featureBox.setBackground(Color.black);
         
-        featureScroll = new JScrollPane(featureBox);
+        featurePanel = new FeaturePanelContainer(this);
+        typePanel    = new TypePanelContainer(this);
+        labelPanel   = new LabelPanelContainer(this);
+        
+        labelPanel.setPreferredSize(new Dimension(60,labelPanel.getHeight()));
+        typePanel.setPreferredSize(new Dimension(60,typePanel.getHeight()));
+        
+        featurePanel.setBackground(BACKGROUND_COLOR);
+        typePanel.setBackground(   BACKGROUND_COLOR);
+        labelPanel.setBackground(  BACKGROUND_COLOR);
+        
+        
+        featureScroll = new JScrollPane(featurePanel);
         featureScroll.setBorder(BorderFactory.createEmptyBorder());
         featureScroll.setBackground(Color.black);
         
@@ -173,80 +188,42 @@ ChangeListener
         // there is a sequence ruler on top 
         seqScale = new SeqScale();
         seqScale.setFeatures(new FeatureImpl[0]);
+
+        labelPanel.setSeqScale(seqScale);
+        featurePanel.setSeqScale(seqScale);
+        typePanel.setSeqScale(seqScale);
+        //initLabelPane();
         
-        FeaturePanelMouseListener fpml = new FeaturePanelMouseListener(this,seqScale);
+        FeaturePanelMouseListener fpml = new FeaturePanelMouseListener(this);
         //fpml.addSelectedSeqListener(this);
-        SeqScaleCanvas ssc = seqScale.getSeqScaleCanvas();
-        ssc.addMouseListener(fpml);
-        ssc.addMouseMotionListener(fpml);
-        ssc.setFeaturePanelMouseListener(fpml);
+        //SeqScaleCanvas ssc = seqScale.getSeqScaleCanvas();
+        featurePanel.addMouseListener(fpml);
+        featurePanel.addMouseMotionListener(fpml);
+        featurePanel.setFeaturePanelMouseListener(fpml);
         
-        initLabelPane();
         
-        lbml = new LabelBoxListener(this);
+        
+        lbml = new LabelPanelListener(this);
         popupMenu = createPopupMenu();
         lbml.setPopupMenu(popupMenu);
-        labelBox.addMouseListener(lbml);
-        labelBox.addMouseMotionListener(lbml);
+        labelPanel.addMouseListener(lbml);
+        labelPanel.addMouseMotionListener(lbml);
         
         //labelBox.add(popupMenu);
+
         TypePanelMouseListener tpml = new TypePanelMouseListener(this);
-        typeBox.addMouseListener(tpml);
-        typeBox.addMouseMotionListener(tpml);
+        typePanel.addMouseListener(tpml);
+        typePanel.addMouseMotionListener(tpml);
         
-        typeSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,typeBox,featureScroll);
+       
+        
+        typeSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,typePanel,featureScroll);
         typeSplit.setBorder(BorderFactory.createEmptyBorder());
-        //typeSplit.setBackground(Color.black);
-        typeSplit.addPropertyChangeListener("dividerLocation", 
-                new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                
-                // get the size of the divider, adjust the typeLabelPanel sizes below ..
-                
-                Integer w = (Integer) evt.getNewValue();
-                int width = w.intValue();
-               
-                //System.out.println("divloc " + width);
-                
-                TypeLabelPanel s = seqScale.getTypePanel();
-                s.setWidth(width);
-                FeatureView[] fvs = getFeatureViews();
-                for ( int i = 0 ; i < fvs.length ; i++){
-                    FeatureView fv =fvs[i];
-                    TypeLabelPanel tlp = fv.getTypePanel();
-                    tlp.setWidth(width);
-                    
-                }
-            }
-        }        
-        );        
-        labelSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,labelBox,typeSplit);
+      
+        labelSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,labelPanel,typeSplit);
         labelSplit.setBorder(BorderFactory.createEmptyBorder());
         //labelSplit.setBackground(Color.black);
-        labelSplit.addPropertyChangeListener("dividerLocation", 
-                new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                
-                // get the size of the divider, adjust the typeLabelPanel sizes below ..
-                
-                Integer w = (Integer) evt.getNewValue();
-                int width = w.intValue();
-                
-                LabelPane s = seqScale.getLabel();
-                s.setWidth(width);
-                FeatureView[] fvs = getFeatureViews();
-                for ( int i = 0 ; i < fvs.length ; i++){
-                    FeatureView fv =fvs[i];
-                    LabelPane tlp = fv.getLabel();
-                    tlp.setWidth(width);
-                }
-                
-            }
-        }        
-        );        
         
-        //JScrollPane scroller = new JScrollPane(labelSplit);
-        //vBox.add();
         Box hBox2 = Box.createHorizontalBox();
         hBox2.setBackground(Color.black);
         hBox2.add(labelSplit);
@@ -262,8 +239,53 @@ ChangeListener
         
         //float scale = calcScale(100);
         //setScale(scale);
-        
+        // TODO: remove this:
+        vBox.setBorder(BorderFactory.createLineBorder(Color.blue) );
     }
+    
+    /*
+    public void paintComponent( Graphics g) {
+        System.out.println("paintComponent");
+        super.paintComponent(g);
+        
+        Graphics labelG   = labelPanel.getGraphics();
+        Graphics typeG    = typePanel.getGraphics();
+        Graphics featureG = featurePanel.getGraphics();
+        
+        int y = 0 ;
+        
+        //LabelPane label      = seqScale.getLabel();    
+        TypeLabelPanel typL  = seqScale.getTypePanel();        
+        SeqScaleCanvas sscan = seqScale.getSeqScaleCanvas();
+        
+        //label.setCanvasHeight(labelPanel.getHeight());
+        //label.setCanvasWidth(labelPanel.getWidth());
+        
+        //label.paintComponent(labelG,y);
+        typL.paintComponent(typeG,y);
+        y = sscan.paintComponent(featureG,y);
+         // paint the typePane
+        
+        // fore each featureview:
+        Iterator iter = featureViews.iterator();
+        while (iter.hasNext()){
+            FeatureView fv = (FeatureView)iter.next();
+            //LabelPane      lp = fv.getLabel(); 
+            TypeLabelPanel tlp = fv.getTypePanel();
+            FeaturePanel   fp = fv.getFeaturePanel();
+            
+            //lp.paintComponent(labelG,y);
+            tlp.paintComponent(typeG,y);
+            y = fp.paintComponent(featureG,y);
+        }
+        
+        
+        //labelPanel.repaint();
+        //typePanel.repaint();
+        //featurePanel.repaint();
+
+    }
+    */
     
     
     
@@ -274,6 +296,9 @@ ChangeListener
     public void clear() {
         featureViews = new ArrayList();
         updateDisplay();
+        featurePanel.clear();
+        labelPanel.clear();
+        typePanel.clear();
     }
     
     public void addDasSourceListener(DasSourceListener dsl){
@@ -308,25 +333,7 @@ ChangeListener
         return (SelectedSeqPositionListener[]) selectedSeqPositionListeners.toArray(new SelectedSeqPositionListener[selectedSeqPositionListeners.size()]);
     }
     
-	public void mouseOverFeature(FeatureEvent e){ 
-	    /*
-	    Iterator iter = featureViewListeners.iterator();
-	    while (iter.hasNext()) {
-	        FeatureViewListener fvl = (FeatureViewListener) iter.next();
-	        fvl.mouseOverFeature(e);
-	    }
-	    */
-	}
-	public void mouseOverSegment(FeatureEvent e){
-	    /*
-	    Iterator iter = featureViewListeners.iterator();
-	    while (iter.hasNext()) {
-	        FeatureViewListener fvl = (FeatureViewListener) iter.next();
-	        fvl.mouseOverSegment(e);
-	    }
-	    */
-	}
-	
+		
     
     /** sets the visible size of the feature panel 
      * If it is larger there will be a scrollpanel...
@@ -336,24 +343,13 @@ ChangeListener
         
         //      THIS IS SETTING THE SIZE!!!
         preferredVisibleWidth = x ;
+        int height = featurePanel.getHeight();
+        Dimension d = new Dimension(x,height);
+        featurePanel.setFixedSize(d);
         
         float scale = calcScale(residueSize);
         setScale(scale);
         
-        // test the width of the underlying featurePanels ...
-        if ( seqScale != null) {
-            SeqScaleCanvas sscan = seqScale.getSeqScaleCanvas();
-            if ( sscan.getWidth() < x ){
-                sscan.setWidth(x);
-            }
-        }
-        Iterator iter = featureViews.iterator();
-        while (iter.hasNext()){
-            FeatureView fv = (FeatureView)iter.next();
-            FeaturePanel fp = fv.getFeaturePanel();
-            if ( fp.getWidth()< x)
-                fp.setWidth(x);
-        }
         //this.validate();
         
         this.revalidate();
@@ -367,22 +363,23 @@ ChangeListener
         float scale = calcScale(val);
         setScale(scale);
     }
+    /*
     public void initLabelPane(){
                 
         // add the seq. position liner
-        LabelPane label      = seqScale.getLabel();    
-        TypeLabelPanel typL  = seqScale.getTypePanel();
-        SeqScaleCanvas sscan = seqScale.getSeqScaleCanvas();
+        //LabelPane label      = seqScale.getLabel();    
+        //TypeLabelPanel typL  = seqScale.getTypePanel();
+        //SeqScaleCanvas sscan = seqScale.getSeqScaleCanvas();
         
-               
-        labelBox.add(label);
-        typeBox.add(typL);
-        featureBox.add(sscan);
+        
+        //labelBox.add(label);
+        //typeBox.add(typL);
+        //featureBox.add(sscan);
        // featureBox.add(sscan);
     }
-    
+    */
   
-    private float calcScale(int residueSize){
+    private float calcScale(int zoomFactor){
 
         //SeqScaleCanvas sscan = seqScale.getSeqScaleCanvas();
         
@@ -393,7 +390,7 @@ ChangeListener
         
         float scale = width / (float) ( seqLength +DEFAULT_X_START + DEFAULT_X_END);
         //System.out.println("100% displayed =  " + scale + " residueSize: " + residueSize);
-        scale = 90* scale /(residueSize) ;
+        scale = 90* scale /(zoomFactor) ;
         
         //float scale =  ( seqLength +DEFAULT_X_START + DEFAULT_X_END) / (residueSize);
         //float scale = 10 - residueSize ;
@@ -420,6 +417,9 @@ ChangeListener
     
     public void setChain(Chain chain){
         this.chain = chain;
+        featurePanel.setChain(chain);
+        
+        /*
         if ( seqScale != null)
             seqScale.setChain(chain);
         Iterator iter = featureViews.iterator();
@@ -427,6 +427,7 @@ ChangeListener
             FeatureView fv = (FeatureView)iter.next();
             fv.setChain(chain);
         }
+        */
         this.revalidate();
         this.repaint();
     }
@@ -466,8 +467,10 @@ ChangeListener
             scale = MAX_SCALE;
         }
         
+        
         if ( seqScale != null)
             seqScale.setScale(scale);
+        
         if ( featureViews == null)
             	return;
         Iterator iter = featureViews.iterator();
@@ -475,12 +478,16 @@ ChangeListener
             FeatureView fv = (FeatureView)iter.next();
             fv.setScale(scale);
         }
+        
         this.revalidate();
         this.repaint();
     }
     public void setSeqLength(int length){
         this.seqLength = length;
-        seqScale.setSeqLength(seqLength);
+        
+        featurePanel.setSeqLength(length);
+        
+        seqScale.setSeqLength(length);
         Iterator iter = featureViews.iterator();
         while (iter.hasNext()){
             FeatureView fv = (FeatureView)iter.next();
@@ -490,8 +497,12 @@ ChangeListener
         // a new sequence has been assigned, reset the scroll value;
         setScrollValue(100);
         float scale = calcScale(100);
-        int thissize = Math.round(seqLength * scale) + 
+        int thissize = Math.round(length * scale) + 
         DEFAULT_X_START + 20;
+        Dimension nsize  = new Dimension(thissize,featurePanel.getHeight());
+        //featurePanel.setPreferredSize(nsize);
+        //featurePanel.setSize(nsize);
+        //featurePanel.setMinimumSize(nsize);
         
         if ( thissize < preferredVisibleWidth ) {
             setFeaturePaneVisibleSize(thissize,DEFAULT_VISIBLE_HEIGHT) ;
@@ -508,16 +519,19 @@ ChangeListener
     }
     
     public void evaluateLayout(){
-                
-               
-        //System.out.println("evaluateLayout old size" + d.width + " " + d.height);
+              
+        Dimension d = this.getSize();        
+        System.out.println("evaluateLayout old size" + d.width + " " + d.height);
         
-        int newHeight = getSubHeight() +20;
+        int newHeight = getSubHeight();
         
+        int otherStuff = 20 ;
+        newHeight += otherStuff;
         //System.out.println("new height " + newHeight);
-        Dimension d = this.getSize(); 
-        int newWidth = d.width  ;
-        int stuffWidth = getLabelWidth() + getTypeWidth();
+        
+        this.setPreferredSize(new Dimension(d.width,newHeight));
+        vBox.setPreferredSize(new Dimension(d.width,newHeight));
+        /*int stuffWidth = getLabelWidth() + getTypeWidth();
         newWidth = newWidth - stuffWidth;
         if ( newWidth < 1 ) {
             newWidth = 1 ;
@@ -526,11 +540,16 @@ ChangeListener
         setHeight(newHeight);
         setFeaturePaneVisibleSize(newWidth, newHeight);
         
-        featureScroll.setPreferredSize(new Dimension(newWidth,newHeight));
+        //labelPanel.setCanvasHeight(newHeight);
+        System.out.println("new size "+newsize);
+        //labelPanel.setPreferredSize(newsize);
+        featureScroll.setPreferredSize(newsize);
         featureScroll.setSize(new Dimension(newWidth,newHeight));
         //parent.setPreferredSize(new Dimension(d.width,d.height));
         //featureScroll.setPreferredSize(new Dimension(newHeight, newWidth));
         //featureScroll.revalidate();
+         * 
+         */
         this.revalidate();
         this.repaint();
     }
@@ -540,26 +559,30 @@ ChangeListener
         view.setSeqLength(seqLength);
         view.setScale(calcScale(residueSize));
         view.setSpiceFeatureViewer(this);
-        view.setChain(chain);
+        //view.setChain(chain);
         
         LabelPane lab      = view.getLabel();
         TypeLabelPanel typ = view.getTypePanel();
         FeaturePanel sub   = view.getFeaturePanel();
         
+
     
         //LabelPaneMouseListener lpml = new LabelPaneMouseListener(this); 
         //lab.addMouseListener(lpml);
         //lab.addMouseMotionListener(lpml);
-        FeaturePanelMouseListener fpml = new FeaturePanelMouseListener(this,view);
+        //FeaturePanelMouseListener fpml = new FeaturePanelMouseListener(this);
         //fpml.addSelectedSeqListener(this);
         //fpml.addFeatureViewListener(this);
         
-        sub.setFeaturePanelMouseListener(fpml);
+        //sub.setFeaturePanelMouseListener(fpml);
         
         featureViews.add(view);
-        labelBox.add(lab);
-        typeBox.add(typ);
-        featureBox.add(sub);
+        labelPanel.addFeatureView(view);
+        featurePanel.addFeatureView(view);
+        typePanel.addFeatureView(view);
+        //labelBox.add(lab);
+        //typeBox.add(typ);
+        //featureBox.add(sub);
         
         //featureScroll.repaint();
         //vBox.add(view);
@@ -592,31 +615,43 @@ ChangeListener
     
     public void selectedSeqPosition(int position) {
         // highlite in FeaturePanels
+        
+        // draw a line and repaint
+        
         if ( selectionIsLocked) return;
-        seqScale.highlite(position);
+        featurePanel.highlite(position);
+        /*seqScale.highlite(position);
         Iterator iter = featureViews.iterator();
         while (iter.hasNext()){
             FeatureView fv = (FeatureView)iter.next();
             fv.highlite(position);
         }
+        */
+        
     }
     public void selectedSeqRange(int start, int end){
-//      highlite in FeaturePanels
         if ( selectionIsLocked) return;
+        featurePanel.highlite(start,end);
+//      highlite in FeaturePanels
+        /*
+        
         seqScale.highlite(start,end);
         Iterator iter = featureViews.iterator();
         while (iter.hasNext()){
             FeatureView fv = (FeatureView)iter.next();
             fv.highlite(start,end);
         }
+        */
     }
     
     public void selectionLocked(boolean flag){
         //System.out.println("SpiceFeatureView selection locked " + flag);
         selectionIsLocked = flag;
-        FeaturePanel fp = seqScale.getSeqScaleCanvas();
-        FeaturePanelMouseListener fpml = fp.getFeaturePanelMouseListener();
+        
+        //FeaturePanel fp = seqScale.getSeqScaleCanvas();
+        FeaturePanelMouseListener fpml = featurePanel.getFeaturePanelMouseListener();
         fpml.selectionLocked(flag);
+        /*
         Iterator iter = featureViews.iterator();
         
         while ( iter.hasNext()){
@@ -625,37 +660,23 @@ ChangeListener
             fpml = fpa.getFeaturePanelMouseListener();
             fpml.selectionLocked(flag);
         }
+        */
     }
     
-    
-    public FeatureView getParentFeatureView( MouseEvent e, Class where){
+    /** detect the location of a feature view from a mouse event
+     * 
+     * @param e the mouse event
+     * @return the feature view of this mouse event
+     */
+    public FeatureView getParentFeatureView( MouseEvent e){
         
         int mouse_y = e.getY();
         
         int y = 0;
-        
-        if ( where == LabelPane.class ){
-            /*LabelPane l1 = seqScroller.getLabel();
-            y+= l1.getHeight();
-            if ( y > mouse_y) {
-                return seqScroller;
-            }*/
-            
-            LabelPane label      = seqScale.getLabel();
-            y += label.getHeight();
-            if ( y > mouse_y ) {
-                return seqScale;
-            //	return null;
-            }
-        }
-        else if ( where == TypeLabelPanel.class){
-            TypeLabelPanel label      = seqScale.getTypePanel();
-            
-            y += label.getHeight();
-            if ( y > mouse_y ) {
-                return seqScale;
-            //	return null;
-            }
+        y += seqScale.getHeight();
+        if ( y > mouse_y ) {
+            return seqScale;
+        //	return null;
         }
         
         //System.out.println(y);
@@ -664,14 +685,7 @@ ChangeListener
         while ( iter.hasNext()){
             FeatureView fv = (FeatureView)iter.next();
             
-            if ( where == LabelPane.class ){
-                LabelPane lab = fv.getLabel();
-                y+= lab.getHeight();
-            
-            }  else if ( where == TypeLabelPanel.class){
-                TypeLabelPanel lab = fv.getTypePanel();
-                y+= lab.getHeight();
-            }
+            y+= fv.getHeight();
             if (y > mouse_y) {
                 return fv;
             }
@@ -681,38 +695,38 @@ ChangeListener
         return null;
     }
     
-    public int getLabelWidth() {
-        if ( seqScale == null) return 0;
-        
-        LabelPane label      = seqScale.getLabel();
-        return label.getWidth();
+    
+    public int getFeatureWidth(){
+        return featurePanel.getWidth();
     }
     
     public int getTypeWidth() {
-        if ( seqScale == null) return 0;
         
-        TypeLabelPanel label      = seqScale.getTypePanel();
-        return label.getWidth();
+        return typePanel.getWidth();
     }
+    public int getLabelWidth(){
+        return labelPanel.getWidth();
+    }
+    
     
     /** returns the total height of all sub-panels added together*/
     public int getSubHeight() {
         int y = 0;
         
         if (seqScale != null) {
-            LabelPane label      = seqScale.getLabel();
-            y += label.getHeight();
+            //LabelPane label      = seqScale.getLabel();
+            //y += label.getCanvasHeight();
+            y+= seqScale.getHeight();
         }
         
         if ( featureViews != null ) {
             Iterator iter = featureViews.iterator();
             while ( iter.hasNext()){
                 FeatureView fvtmp = (FeatureView)iter.next();
-                LabelPane lab = fvtmp.getLabel();
-                y+= lab.getHeight();
+               y+= fvtmp.getHeight()+30;
             } 
         }
-        
+        //System.out.println("subheight: " + y);
         return y;
     }
     
@@ -720,32 +734,22 @@ ChangeListener
     public Point getLocationOnLabelBox(FeatureView fv) {
         int y = 0;
         
-        /*LabelPane l1 =  seqScroller.getLabel();
-        if ( seqScroller.equals(fv)) {
-            return new Point(0,y);
-        }
-        y+= l1.getHeight();
-        */
+       
         LabelPane label      = seqScale.getLabel();
        
         if ( seqScale.equals(fv) ) {
-            //return label.getLocation();
             return new Point (0,y);
             //return null;
         }
-        y += label.getHeight();
-        
+        y += seqScale.getHeight();
         
         Iterator iter = featureViews.iterator();
         while ( iter.hasNext()){
             FeatureView fvtmp = (FeatureView)iter.next();
             if (fv.equals(fvtmp)) {
-                //System.out.println("location on labelbox " + y);
                 return new Point (0,y);
-                //return fv.getLocation();
             }
-            LabelPane lab = fvtmp.getLabel();
-            y+= lab.getHeight();
+            y+= fvtmp.getHeight();
         }
         
         // out of range;
@@ -753,12 +757,13 @@ ChangeListener
     }
     
     
-    /** rebuild the display after the order of featureviews has been changed ... */
+    /** rebuild the display after the order of featureviews has been changed ...
+     * use in combination with clear() */
     public void updateDisplay(){
-        labelBox.removeAll();
-        typeBox.removeAll();
-        featureBox.removeAll();
-        initLabelPane();
+        //labelBox.removeAll();
+        //typeBox.removeAll();
+        //featureBox.removeAll();
+        //initLabelPane();
         List tmplist = featureViews;
         featureViews = new ArrayList();
         Iterator iter = tmplist.iterator();
@@ -785,6 +790,11 @@ ChangeListener
         if ( position >= featureViews.size()-1) return;
         featureViews.remove(position);
         featureViews.add(position+1,fv);
+        
+        List tmp = featureViews;
+        clear();
+        featureViews = tmp;
+        
         updateDisplay();
         //System.out.println("moved Down to" + (position +1));
     }
@@ -796,7 +806,9 @@ ChangeListener
         
         featureViews.remove(position);
         featureViews.add(position-1,fv);
-        
+        List tmp = featureViews;
+        clear();
+        featureViews = tmp;
         updateDisplay();
        // System.out.println("moved Up to" + (position -1));
     }
@@ -810,9 +822,9 @@ ChangeListener
 class ShowDasSourceListener implements ActionListener {
     
     //SpiceFeatureViewer featureView ;
-    LabelBoxListener parent;
+    LabelPanelListener parent;
     
-    public ShowDasSourceListener ( LabelBoxListener parent) {
+    public ShowDasSourceListener ( LabelPanelListener parent) {
         //this.featureView = featureView;
         this.parent = parent ;
         

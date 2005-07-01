@@ -185,7 +185,7 @@ ConfigurationListener
         
         // first thing is to start communication
         
-        RegistryConfigIO regi = new RegistryConfigIO (this,REGISTRY_URLS);
+        RegistryConfigIO regi = new RegistryConfigIO (REGISTRY_URLS);
         regi.addConfigListener(this);
         regi.run();
         
@@ -382,7 +382,7 @@ ConfigurationListener
         //dascanv.addSelectedSeqPositionListener(sfpl);
         
         dasPanel = new JScrollPane(dascanv);
-        SpiceComponentListener mcl = new SpiceComponentListener(dascanv);
+        SpiceComponentListener mcl = new SpiceComponentListener(dascanv,dasPanel);
         dasPanel.addComponentListener(mcl);
         //dasPanel.setOpaque(true);
         //dasPanel.setBackground(Color.black);
@@ -816,10 +816,8 @@ ConfigurationListener
         statusPanel.setPDB(pdbcode);
         //statusPanel.setSP("");
         
-        
         LoadStructureThread thr = new LoadStructureThread(this,pdbcod);
         thr.start();
-               
         
     }
     
@@ -1317,8 +1315,8 @@ ConfigurationListener
         logger.finest("updateDisplays + features size: " + features.size());
         //SeqFeatureCanvas dascanv = daspanel.getCanv();
         
-        //dascanv.repaint();
-        dascanv.paint(dascanv.getGraphics());
+        dascanv.repaint();
+        //dascanv.paint(dascanv.getGraphics());
         
         sharedPanel.paint(sharedPanel.getGraphics());
         //leftPanel.paint(leftPanel.getGraphics());

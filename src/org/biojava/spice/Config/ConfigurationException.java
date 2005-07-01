@@ -38,15 +38,7 @@ public class ConfigurationException extends BioException {
     public ConfigurationException(String s) {
 	super(s);
     }
-    /**
-     * Constructs a StructureException object.
-     *
-     * @param t  a Throwable object
-     * @param s  a String ...
-     */
-    public ConfigurationException (Throwable t, String s) {
-	super(t, s);
-    }
+    
     /**
      * Constructs a StructureException object.
      *

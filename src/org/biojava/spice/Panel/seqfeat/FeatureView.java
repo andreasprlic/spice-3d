@@ -32,7 +32,6 @@ import java.util.logging.Logger;
 import java.util.NoSuchElementException;
 import java.util.List;
 import java.util.Iterator;
-import org.biojava.bio.structure.*;
 
 
 /** A class that renders features. E.g. all the features retrieved from a DasSource.
@@ -42,7 +41,6 @@ import org.biojava.bio.structure.*;
  *
  */
 public class FeatureView 
-extends JPanel
  {
     
     public static final int    DEFAULT_X_START        = 20  ;
@@ -91,14 +89,14 @@ extends JPanel
         dasSource  = new SpiceDasSource();
         labelField = new LabelPane(this);
         labelField.setLabel(label);
-        labelField.setBorder(BorderFactory.createEmptyBorder());
+        //labelField.setBorder(BorderFactory.createEmptyBorder());
         
-        featurePanel = new FeaturePanel();
-        featurePanel.setBorder(BorderFactory.createEmptyBorder());
+        featurePanel = new FeaturePanel(this);
+        //featurePanel.setBorder(BorderFactory.createEmptyBorder());
         
-        typeLabelPanel = new TypeLabelPanel();
+        typeLabelPanel = new TypeLabelPanel(this);
         typeLabelPanel.addSelectedFeatureListener(featurePanel);
-        typeLabelPanel.setBorder(BorderFactory.createEmptyBorder());
+        //typeLabelPanel.setBorder(BorderFactory.createEmptyBorder());
        
         
        isLoading = false;
@@ -111,10 +109,10 @@ extends JPanel
         return parent ; 
     }
     
-    public void setChain(Chain c){
+    //public void setChain(Chain c){
         //chain = c;
-        featurePanel.setChain(c);
-    }
+      //  featurePanel.setChain(c);
+    //}
     
     public void setDasSource(SpiceDasSource ds){ dasSource = ds; }
     public SpiceDasSource getDasSource(){ return dasSource; }
@@ -154,12 +152,13 @@ extends JPanel
         
     }
     
+    /*
     public void setCanvasHeight(int height) {
      featurePanel.setCanvasHeight(height);
      typeLabelPanel.setCanvasHeight(height);
      labelField.setCanvasHeight(height);
      
-    }
+    }*/
     
     /**  display a nice JSsscroller to display that data is being loaded ... */
     	public void setLoading(boolean flag){
@@ -200,10 +199,10 @@ extends JPanel
     
     private void updateDisplay(){
         
-        labelField.repaint();
-        typeLabelPanel.repaint();
-        featurePanel.repaint();
-        this.revalidate();
+        //labelField.repaint();
+        //typeLabelPanel.repaint();
+        //featurePanel.repaint();
+        //this.revalidate();
     }
     
     public void setFeatures(Feature[] features){
@@ -219,14 +218,14 @@ extends JPanel
         //labelField.setPreferredSize(new Dimension(x,y));
         
         int height = getHeight();
-        setCanvasHeight(height);
+        //setCanvasHeight(height);
         setLoading(false);
         updateDisplay();
        
     }
     
     public void setSelected(boolean flag){
-        //.println("setting selected " + flag );
+        //System.out.println("setting selected " + flag );
         selected = flag;
         typeLabelPanel.setSelected(flag);
         featurePanel.setSelected(flag);

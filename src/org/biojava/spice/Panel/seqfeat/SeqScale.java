@@ -25,7 +25,7 @@ package org.biojava.spice.Panel.seqfeat;
 import org.biojava.spice.Feature.*;
 import org.biojava.spice.Panel.seqfeat.FeatureView;
 import org.biojava.spice.Panel.seqfeat.SeqScaleCanvas;
-import org.biojava.bio.structure.Chain;
+
 
 /**
  * @author Andreas Prlic
@@ -41,26 +41,27 @@ public class SeqScale extends FeatureView
      */
     public SeqScale() {
         super();
-       seqScaleCanv  = new SeqScaleCanvas();
+       seqScaleCanv  = new SeqScaleCanvas(this);
       
     }
     
-    
-    public void setCanvasHeight(int height) {
-        super.setCanvasHeight(height);
-        seqScaleCanv.setCanvasHeight(height);
-    }
-    
+   
     public SeqScaleCanvas getSeqScaleCanvas(){
         return seqScaleCanv;
     }
     
-    
-    public void setSeqLength(int seqLength){
-        super.setSeqLength(seqLength);
-        this.seqLength = seqLength;
+    public int getHeight(){
+        int h =  DEFAULT_STRUCTURE_Y + DEFAULT_Y_STEP * 2;
+        //System.out.println("*** seq scale  height " + h );
+        return h;
         
-        seqScaleCanv.setSeqLength(seqLength);
+    }
+    
+    public void setSeqLength(int seqL){
+        super.setSeqLength(seqL);
+        seqLength = seqL;
+        
+        seqScaleCanv.setSeqLength(seqL);
         
         //this.repaint();
     }
@@ -82,11 +83,6 @@ public class SeqScale extends FeatureView
         labelField.setFeatures(feats);
     }
     
-    
-    public void setChain(Chain chain){
-        super.setChain(chain);
-        seqScaleCanv.setChain(chain);
-    }
     public void setScale(float scale){
         super.setScale(scale);
         seqScaleCanv.setScale(scale);
