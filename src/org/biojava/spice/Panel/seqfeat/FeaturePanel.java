@@ -29,7 +29,6 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
 import java.util.List;
@@ -227,15 +226,7 @@ public class FeaturePanel
             return y;
         }
        
-        // draw region covered with structure
-        //TODO cleanup, move to spicefeaturepane
-        //drawStructureRegion(g2D,aminosize);
-        
         int newy = drawFeatures(g2D,aminosize,width,y,seqLength,scale);
-        
-        // TODO:
-        // cleanup, move to spice parent ...
-        //drawSelection(g2D, aminosize, scale);
         
         if ( selected ){
             // the whole featureview has been selected
@@ -245,8 +236,6 @@ public class FeaturePanel
             g2D.fillRect(0,y,width,parent.getHeight());
             
         }
-        
-        
         
         //this.setPreferredSize(new Dimension(y+DEFAULT_Y_STEP,dstruc.width));
         g2D.setComposite(oldComposite);
@@ -403,6 +392,8 @@ public class FeaturePanel
         //initImgBuffer();
         //this.revalidate();
     }
+    
+   
     
     public float getScale(){
         

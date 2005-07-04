@@ -70,7 +70,7 @@ public class CliTools {
         try {
             bi = Introspector.getBeanInfo(bean.getClass());
         } catch (Exception ex) {
-            throw new ConfigurationException(ex,"Couldn't get information for target bean");
+            throw new ConfigurationException("Couldn't get information for target bean " + ex.getMessage());
         }
         
         Map propertiesByName = new HashMap();
@@ -219,9 +219,9 @@ public class CliTools {
                     try {
                         pd.getWriteMethod().invoke(bean, new Object[] {propVal});
                     } catch (InvocationTargetException ex) {
-                        throw new ConfigurationException(ex.getTargetException(),"Error configuring '" + pd.getName() + "'");
+                        throw new ConfigurationException("Error configuring '" + pd.getName() + "'");
                     } catch (Exception ex) {
-                        throw new ConfigurationException(ex,"Error configuring '" + pd.getName() + "'");
+                        throw new ConfigurationException("Error configuring '" + pd.getName() + "'");
                     }
                     usedProps.add(pd);
                 }
@@ -251,9 +251,9 @@ public class CliTools {
             try {
                 pd.getWriteMethod().invoke(bean, new Object[] {valArray});
             } catch (InvocationTargetException ex) {
-                throw new ConfigurationException( ex.getTargetException(),"Error configuring '" + pd.getName() + "'");
+                throw new ConfigurationException("Error configuring '" + pd.getName() + "'");
             } catch (Exception ex) {
-                throw new ConfigurationException(ex,"Error configuring '" + pd.getName() + "'");
+                throw new ConfigurationException("Error configuring '" + pd.getName() + "'");
             }
         }
         

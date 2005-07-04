@@ -21,7 +21,7 @@
  * @author Andreas Prlic
  *
  */
-package org.biojava.spice.DAS                  ;
+package org.biojava.spice.DAS;
 
 import org.biojava.spice.Config.*          ;
 import java.net.URL                        ;
@@ -41,7 +41,7 @@ import java.util.HashMap ;
  * @author Andreas Prlic
  *
  */
-public class DAS_SequenceRetreive {
+public class DAS_SequenceRetrieve {
 
     String sequence ;
     //String connection ;
@@ -56,7 +56,7 @@ public class DAS_SequenceRetreive {
      */
 
     Logger logger ;
-    public DAS_SequenceRetreive(RegistryConfiguration configuration) {
+    public DAS_SequenceRetrieve(RegistryConfiguration configuration) {
 	super();
 	// TODO Auto-generated constructor stub
 	logger = Logger.getLogger("org.biojava.spice");
@@ -93,6 +93,13 @@ public class DAS_SequenceRetreive {
     }
 
 
+    /** connect to  Sequence - DAS servers that are available through the registry and tries to connect a Sequence for the requested accession code
+     * Will use the first server that gives successfull result. If a server fails, the next one from the list of available DAS-sequence servers is used.
+     * 
+     * @param sp_accession - a UniProt accession code. E.g. P50225
+     * @return the Sequence as a String.
+     * @throws ConfigurationException
+     */
     public String get_sequence(String sp_accession)
 	throws ConfigurationException
     {
@@ -132,7 +139,7 @@ public class DAS_SequenceRetreive {
 	    
 	    try {
 		
-		sequence = retreiveSequence(connstr);
+		sequence = retrieveSequence(connstr);
 		// bug in aristotle das source?
 		sequence.replaceAll(" ","");
 		gotSequence = true ;
@@ -155,7 +162,15 @@ public class DAS_SequenceRetreive {
 	addSequenceToMemory(sequence,sp_accession);	
 	return sequence ;
     }
-    private String retreiveSequence( String connstr) 
+    
+    
+    /** retrieve the Sequence from a DAS server.  
+     * 
+     * @param connstr - the DAS - request string. e.g. http://www.ebi.ac.uk/das-srv/uniprot/das/aristotle/sequence?segment=P00280
+     * @return the requested Sequence
+     * @throws Exception
+     */
+    public String retrieveSequence( String connstr) 
 	throws Exception 
     {
 
@@ -170,8 +185,9 @@ public class DAS_SequenceRetreive {
 	    SAXParserFactory.newInstance();
 	
 	String vali = System.getProperty("XMLVALIDATION");
+	
 	boolean validate = false ;
-	if ( vali.equals("true") ) 
+	if ((vali != null) && ( vali.equals("true")) ) 
 	    validate = true ;
 	spfactory.setValidating(validate);
 	

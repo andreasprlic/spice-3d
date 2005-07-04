@@ -931,7 +931,7 @@ class ConfigPanel extends JPanel implements ConfigurationListener {
         URL registryurl = config.getRegistryUrl();
         URL[] uarr = new URL[1];
         uarr[0] = registryurl;
-        RegistryConfigIO registryIO = new RegistryConfigIO(spice,uarr);
+        RegistryConfigIO registryIO = new RegistryConfigIO(uarr);
         registryIO.setConfiguration(config);
         registryIO.saveConfiguration();
         
@@ -1142,7 +1142,7 @@ class ConfigActionListener implements ActionListener{
             URL registryurl = config.getRegistryUrl();
             URL[] uarr = new URL[1];
             uarr[0] = registryurl;
-            RegistryConfigIO registryIO = new RegistryConfigIO(spice,uarr);
+            RegistryConfigIO registryIO = new RegistryConfigIO(uarr);
             registryIO.setForceUpdate(true);
             registryIO.addConfigListener(parent);
             registryIO.run();

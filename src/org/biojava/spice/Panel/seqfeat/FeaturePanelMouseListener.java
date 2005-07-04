@@ -95,11 +95,7 @@ implements MouseListener, MouseMotionListener {
         }
             
         FeaturePanelContainer container = (FeaturePanelContainer) c;
-        //System.out.println(c);
-        //System.out.println("mouse Moved, select locked");
-        //if ( selectionIsLocked ) return ;
-        //FeaturePanelContainer  cont = (FeaturePanelContainer) c;
-        
+               
         
         //System.out.println(view);
         FeatureView featureView = parent.getParentFeatureView(e);

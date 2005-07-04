@@ -96,7 +96,7 @@ extends JPanel{
         Dimension dstruc = this.getSize();
         int width = this.getWidth();
         int height = getPanelHeight();
-        System.out.println("AbstractFeatureContainer initImgBuffer" + width + " " + height);
+        //System.out.println("AbstractFeatureContainer initImgBuffer" + width + " " + height);
         //System.out.println(width);
         if ( height < 1) 
             height=1;
@@ -109,7 +109,6 @@ extends JPanel{
         
     }
     
-    /** init the image buffer for buffered rendering ... */
-    //abstract  void paintComponent( Graphics g) ;
+    
       
 }

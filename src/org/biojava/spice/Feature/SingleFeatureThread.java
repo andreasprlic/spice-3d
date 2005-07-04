@@ -64,7 +64,7 @@ extends Thread
     
     private synchronized void doDasConnection() {
         logger.finer("opening " + dascommand);
-        DAS_FeatureRetreive ftmp = new DAS_FeatureRetreive(dascommand);
+        DAS_FeatureRetrieve ftmp = new DAS_FeatureRetrieve(dascommand);
         ArrayList features = ftmp.get_features();
         //logger.finest("doDasConnection got " + features.size() + " features") ;
         //new ArrayList();

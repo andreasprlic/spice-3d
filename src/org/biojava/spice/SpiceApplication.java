@@ -219,7 +219,6 @@ ConfigurationListener
         spiceMenuListener = new SpiceMenuListener(this,structurePanelListener) ;
         initListeners();
         
-        
         memoryfeatures = new HashMap();
         features = new ArrayList();
         
@@ -227,7 +226,6 @@ ConfigurationListener
         this.setJMenuBar(menu);
           
         this.setTitle("SPICE") ;
-        
         
         //this.show();
         
@@ -384,24 +382,17 @@ ConfigurationListener
         dasPanel = new JScrollPane(dascanv);
         SpiceComponentListener mcl = new SpiceComponentListener(dascanv,dasPanel);
         dasPanel.addComponentListener(mcl);
-        //dasPanel.setOpaque(true);
-        //dasPanel.setBackground(Color.black);
+
         dasPanel.getVerticalScrollBar().setUnitIncrement(DEFAULT_Y_SCROLL);
         dasPanel.getHorizontalScrollBar().setUnitIncrement(DEFAULT_Y_SCROLL);
-        //scroll.add(dascanv);
-        dasPanel.setBorder(BorderFactory.createEmptyBorder());
-        //daspanel = new SeqPanel(this);
-        //daspanel.setMinimumSize(new Dimension(100,100));
-        
+
+        dasPanel.setBorder(BorderFactory.createEmptyBorder());       
         
         sharedPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                 chainPanel, dasPanel);
         sharedPanel.setOneTouchExpandable(true);
-        //sharedPanel.setDividerLocation(150);
+        
         sharedPanel.setPreferredSize(new Dimension(400, 400));
-        //sharedPanel.setOpaque(true);
-        //sharedPanel.setResizeWeight(0);	
-        //sharedPanel.setBackground(Color.black);
         
         seqTextPane = new SeqTextPane(this);
         //seqField.setSize( 700, 30);
@@ -847,7 +838,7 @@ ConfigurationListener
         //TODO: build up a new dascanv!
         
         logger.info("setting features");
-        //TODO: create Feature for structure mapping
+        
         //first_load = false ;
         //logger.info("SpiceAplication setting features for "+sp_id);
         String mem_id = makeFeatureMemoryCode(sp_id);
@@ -1326,7 +1317,10 @@ ConfigurationListener
         //ListCellRenderer lcr = ent_list.getCellRenderer();
         //ent_list.paint() ;
         sharedPanel.setVisible(true);
-        dasPanel.updateUI();
+        //dasPanel.updateUI();
+        dasPanel.revalidate();
+        dasPanel.repaint();
+        
         //dasPanel.revalidate();
         //dasPanel.repaint();
         

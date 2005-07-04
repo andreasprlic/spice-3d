@@ -359,7 +359,7 @@ implements SpiceStructureFeeder
     private String getSequence(String uniprotcode) {
         logger.finest("loading sequence " + uniprotcode);
         String sequence = null ;
-        DAS_SequenceRetreive seq_das = new DAS_SequenceRetreive(config) ;
+        DAS_SequenceRetrieve seq_das = new DAS_SequenceRetrieve(config) ;
         try {
             sequence              = seq_das.get_sequence(uniprotcode);
         } catch ( ConfigurationException e) {

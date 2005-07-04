@@ -47,9 +47,12 @@ implements ComponentListener {
     public void componentHidden(ComponentEvent e){}
     public void componentMoved(ComponentEvent e){}
     public void componentResized(ComponentEvent e){
-        Component c = e.getComponent();
-        System.out.println("component parent of spicefeauteview was resized " + c);
         
+        Component c = e.getComponent();
+        //System.out.println("component parent of spicefeauteview was resized " + c);
+        //System.out.println(c.getSize());
+        parent.setParentWidth(c.getWidth());
+        /*
         parent.setPreferredSize(c.getSize());
         //parent.evaluateLayout();
         
@@ -75,6 +78,8 @@ implements ComponentListener {
         //parent.setPreferredSize(new Dimension(d.width,d.height));
          * 
          */
+        
+        /*
         parent.revalidate();
         parent.repaint();
         //c.invalidate();
@@ -89,6 +94,7 @@ implements ComponentListener {
         c.invalidate();
         c.validate();
         c.repaint();
+        */
     }
     public void componentShown(ComponentEvent e){}
 }

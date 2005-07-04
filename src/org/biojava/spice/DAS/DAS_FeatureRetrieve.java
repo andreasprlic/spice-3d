@@ -41,7 +41,7 @@ import java.net.HttpURLConnection           ;
  * @author Andreas Prlic
  *
  */
-public class DAS_FeatureRetreive {
+public class DAS_FeatureRetrieve {
 
 	ArrayList features ;
     Logger logger     ;
@@ -49,7 +49,7 @@ public class DAS_FeatureRetreive {
 	/**
 	 * 
 	 */
-	public DAS_FeatureRetreive(URL url) {
+	public DAS_FeatureRetrieve(URL url) {
 		super();
 		// TODO Auto-generated constructor stub
 		logger = Logger.getLogger("org.biojava.spice");

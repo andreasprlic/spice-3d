@@ -81,11 +81,12 @@ class LabelPanelListener implements MouseListener,MouseMotionListener{
             System.err.println("no parent found!");
         }
         
-        int mouseButton = e.getButton();
+        maybeShowPopup(e);
+        /*int mouseButton = e.getButton();
         if ( mouseButton == MouseEvent.BUTTON3 )  {
-            maybeShowPopup(e);
+            
         }
-        
+        */
         
     }
     
@@ -165,7 +166,7 @@ class LabelPanelListener implements MouseListener,MouseMotionListener{
                 isDragging = false;
                 testMoveFV(e,fv);
                 
-                
+                maybeShowPopup(e);
                 
             } else {
                 System.err.println("no parent found!");

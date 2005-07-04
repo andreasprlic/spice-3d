@@ -107,6 +107,7 @@ implements MouseListener, MouseMotionListener {
         if ( x < DEFAULT_X_START){
             // test if a link is selected
             String link = f.getLink();
+            //System.out.println(link);
             if (( link != null) && (! link.equals(""))) {
                 typ.setSelectedLink(line, true);
                 //typ.setToolTipText(link);

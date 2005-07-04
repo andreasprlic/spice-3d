@@ -162,9 +162,6 @@ public class TypeLabelPanel  {
    
     public int paintComponent( Graphics g, int width, int y) {
         //logger.info("paintComponent "  + label);
-        
-      
-        
         //Graphics g2 = featureCanvas.getGraphics();
         Graphics2D g2D = (Graphics2D)g ;
         //BufferedImage imbuf = (BufferedImage)this.createImage(dstruc.width,dstruc.height);      
@@ -175,7 +172,6 @@ public class TypeLabelPanel  {
         g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,1.0f));                 
         g2D.setFont(plainFont);
         
-    
         /////////////
         //      do the actual painting...
 //      
@@ -187,7 +183,6 @@ public class TypeLabelPanel  {
                 g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));
                 g2D.setColor(SELECTION_COLOR);
                 g2D.fillRect(0,y,width,parent.getHeight());
-            
         }
         
         g2D.setComposite(oldComposite);
@@ -204,16 +199,12 @@ public class TypeLabelPanel  {
         
         if ( features == null) 
             return y;
-        //logger.info("number features: "+features.length);
-        //logger.finest(i%entColors.length);
-        //g2D.setColor(entColors[i%entColors.length]);
                 
         for ( int f =0 ; f< features.length;f++) {
             
             Feature feature = features[f];
             y+= DEFAULT_Y_STEP;
                         
-            
             List segments = feature.getSegments() ;
             
             // draw the firefox icon 
@@ -247,7 +238,7 @@ public class TypeLabelPanel  {
                     Graphics2D g2d = (Graphics2D)g2D ;
                 		g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));
                     
-                		if ( linkSelected){
+                		if ( linkSelected ){
                 		    if (( link != null) && (! link.equals(""))){
                 		        g2D.setColor(SELECTED_TYPE_COLOR);
                 		        g2D.fillRect(0,y-(DEFAULT_Y_HEIGHT/2)-2,DEFAULT_X_START,DEFAULT_Y_STEP);

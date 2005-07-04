@@ -65,7 +65,7 @@ public class FeaturePanelContainer extends
     int seqLength;
     FeaturePanelMouseListener featurePanelMouseListener;
     SpiceFeatureViewer parent;
-    
+    float scale;
     
     /**
      * 
@@ -76,6 +76,7 @@ public class FeaturePanelContainer extends
         
         selectStart = selectEnd = seqpos = seqLength = -1 ;
         structureFeature = new FeatureImpl();
+        scale = 2.0f;
     }
     
     public void setFixedSize(Dimension d){
@@ -259,6 +260,20 @@ public class FeaturePanelContainer extends
             
         }
     }
+    
+    public void setScale(float scale){
+        this.scale = scale;
+    }
+    
+    public int getWidth(){
+        
+        int width = Math.round(scale * seqLength) + DEFAULT_X_START + DEFAULT_X_RIGHT_BORDER;
+        //System.out.println("feature panel cont getWidth " + width);
+        
+        return width;
+        
+    }
+    
     /** draw structrure covered region as feature */
     private void drawStructureRegion(Graphics2D g2D, int aminosize, float scale){
         // data is coming from chain;
