@@ -48,6 +48,9 @@ import org.biojava.spice.Panel.seqfeat.DasSourceListener;
 import org.biojava.spice.Config.SpiceDasSource;
 import org.biojava.bio.structure.ChainImpl;
 import org.biojava.bio.structure.Chain;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+
 
 /** A class that can display features (e.g. retrieved from different DAS sources).
  * A SpiceFeatureView contains zero, one or multiple FeatureView objects, which do the actual rendering.
@@ -91,9 +94,11 @@ ChangeListener
     int residueSize ;
     int preferredVisibleWidth;
     int parentWidth;
+    
     List featureViewListeners;
     List selectedSeqPositionListeners;
     List dasSourceListeners;
+    List componentListeners;
     
     int typePanelSize;
     int labelPanelSize;
@@ -105,6 +110,7 @@ ChangeListener
     TypePanelContainer typePanel;
     LabelPanelContainer labelPanel;
     FeaturePanelContainer featurePanel;
+    
     
     /**
      * 
@@ -123,6 +129,7 @@ ChangeListener
         featureViews = new ArrayList();
         featureViewListeners = new ArrayList();
         selectedSeqPositionListeners = new ArrayList();
+        componentListeners = new ArrayList();
         
         //scale = 1;
         seqLength = 0;
@@ -247,7 +254,11 @@ ChangeListener
         return (DasSourceListener[]) dasSourceListeners.toArray(new DasSourceListener[dasSourceListeners.size()]);
     }
     
-    public void triggerSelectedDasSource(SpiceDasSource ds){
+    /** a DAS source has been selected 
+     * 
+     * @param ds
+     */
+    private void triggerSelectedDasSource(SpiceDasSource ds){
         DasSourceListener[] dsls = getDasSourceListeners();
         for (int i = 0 ; i < dsls.length;i++){
             DasSourceListener dsl = dsls[i];
@@ -255,6 +266,26 @@ ChangeListener
             
         }
     }
+    
+    /** add a Component Listener */
+    public void addComponentListener(ComponentListener cl){
+        componentListeners.add(cl);
+    }
+
+    /** get the ComponentListeners 
+     * */
+    public ComponentListener[] getComponentListeners(){
+        
+        return (ComponentListener[]) componentListeners.toArray(new ComponentListener[componentListeners.size()]);
+    }
+    public void triggerComponentResized(ComponentEvent e){
+        ComponentListener[] cls = getComponentListeners();
+        for ( int i = 0 ; i < cls.length ; i++){
+            ComponentListener cl = cls[i];
+            cl.componentResized(e);
+        }
+    }
+    
     public void addSelectedSeqPositionListener(SelectedSeqPositionListener listener){
         selectedSeqPositionListeners.add(listener);
     }
@@ -273,7 +304,7 @@ ChangeListener
     
     
     
-    
+    /** set the value of the sequence scroller */
     public void setScrollValue(int val){
         //seqScroller.setScrollValue(val);
         residueSize = val;
@@ -282,6 +313,7 @@ ChangeListener
     }
     
     /** set the width of the component that contains spice
+     * required to display the feature panel properly.
      * 
      *
      */
@@ -363,6 +395,17 @@ ChangeListener
         
     }
     
+    /** add a component listener */
+    public void addComonentListener(ComponentListener listener){
+        
+    }
+    
+    /** set the scale factor of the displayed sequence.
+     * After the displays have been updated,
+     * componentListener 
+     * 
+     * @param scale
+     */
     public void setScale(float scale){
         float minscale = getMinimalScale();
         if ( scale < minscale ) {
@@ -393,8 +436,14 @@ ChangeListener
         vBox.repaint();
         this.revalidate();
         this.repaint();
+        ComponentEvent e = new ComponentEvent(this, ComponentEvent.COMPONENT_RESIZED);
+        triggerComponentResized(e);
     }
     
+    /** set the length of the displayed sequence 
+     * 
+     * @param length
+     */
     public void setSeqLength(int length){
         this.seqLength = length;
         
@@ -421,6 +470,11 @@ ChangeListener
     }
     
     
+    /** add a feature view object 
+     * 
+     * @param view
+     * @param update - should the display be updated immediately after adding
+     */
     public void addFeatureView(FeatureView view, boolean update){
         
         view.setSeqLength(seqLength);

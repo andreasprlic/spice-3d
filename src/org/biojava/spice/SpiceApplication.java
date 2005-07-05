@@ -382,7 +382,15 @@ ConfigurationListener
         dasPanel = new JScrollPane(dascanv);
         SpiceComponentListener mcl = new SpiceComponentListener(dascanv,dasPanel);
         dasPanel.addComponentListener(mcl);
-
+        dascanv.addComponentListener(new ComponentListener(){
+            public void componentHidden(ComponentEvent e){}
+            public void componentMoved(ComponentEvent e){}
+            public void componentShown(ComponentEvent e){}
+            public void componentResized(ComponentEvent e){
+                dasPanel.revalidate();
+            }
+        }
+        );
         dasPanel.getVerticalScrollBar().setUnitIncrement(DEFAULT_Y_SCROLL);
         dasPanel.getHorizontalScrollBar().setUnitIncrement(DEFAULT_Y_SCROLL);
 
