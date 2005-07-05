@@ -258,7 +258,7 @@ ChangeListener
      * 
      * @param ds
      */
-    private void triggerSelectedDasSource(SpiceDasSource ds){
+    public void triggerSelectedDasSource(SpiceDasSource ds){
         DasSourceListener[] dsls = getDasSourceListeners();
         for (int i = 0 ; i < dsls.length;i++){
             DasSourceListener dsl = dsls[i];
