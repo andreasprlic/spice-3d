@@ -93,8 +93,9 @@ public class TypeLabelPanel  {
         
         selected = false;
         selectedFeatureListeners = new ArrayList();
+        linkSelected = false;
+        typeSelected = false;
         
-        typeSelected =false;
         selectedType = -1 ;
         oldSelectedType = -1;
         //initImgBuffer();
@@ -140,7 +141,9 @@ public class TypeLabelPanel  {
         
     		setSelectedType(linenr);
     		linkSelected = flag; 
-    		
+    		SpiceFeatureViewer sfv = parent.getSpiceFeatureViewer();
+    		//sfv.updateDisplay();
+    		sfv.repaint();
     }
 
     
@@ -195,6 +198,8 @@ public class TypeLabelPanel  {
      * */
     private int drawFeatures(Graphics g2D,int width, int y){
         
+        
+        
         boolean secstruc = false ;
         
         if ( features == null) 
@@ -236,9 +241,11 @@ public class TypeLabelPanel  {
             if ( typeSelected ){
                 if (f == selectedType) {
                     Graphics2D g2d = (Graphics2D)g2D ;
+                    Composite oldComposite = g2d.getComposite();
                 		g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));
-                    
+                     //System.out.println("link selected: " +linkSelected);
                 		if ( linkSelected ){
+                		    //System.out.println("drawing linkselected " + link);
                 		    if (( link != null) && (! link.equals(""))){
                 		        g2D.setColor(SELECTED_TYPE_COLOR);
                 		        g2D.fillRect(0,y-(DEFAULT_Y_HEIGHT/2)-2,DEFAULT_X_START,DEFAULT_Y_STEP);
@@ -250,6 +257,7 @@ public class TypeLabelPanel  {
                     		g2d.fillRect(DEFAULT_X_START,y-(DEFAULT_Y_HEIGHT/2)-2,width,DEFAULT_Y_STEP);
                     		g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,1.0f));
                     }
+                		g2d.setComposite(oldComposite);
                 }
             }
         }

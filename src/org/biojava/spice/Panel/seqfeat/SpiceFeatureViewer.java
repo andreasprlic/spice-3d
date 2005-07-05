@@ -240,7 +240,7 @@ ChangeListener
      */
     public void clear() {
         featureViews = new ArrayList();
-        updateDisplay();
+        //updateDisplay();
         featurePanel.clear();
         labelPanel.clear();
         typePanel.clear();
@@ -351,7 +351,7 @@ ChangeListener
             scale = minscale;
         if ( scale > MAX_SCALE)
             scale = MAX_SCALE;
-        System.out.println("calc scale " + scale);
+        //System.out.println("calc scale " + scale);
         return scale;
         
     }
@@ -359,7 +359,7 @@ ChangeListener
         
         JSlider source = (JSlider)e.getSource();
         if (!source.getValueIsAdjusting()) {
-            System.out.println("slider at " +source.getValue());
+            //System.out.println("slider at " +source.getValue());
             residueSize = (int)source.getValue();
             float scale = calcScale(residueSize);
             
@@ -684,13 +684,13 @@ ChangeListener
     /** rebuild the display after the order of featureviews has been changed ...
      * use in combination with clear() */
     public void updateDisplay(){
-        //labelBox.removeAll();
-        //typeBox.removeAll();
-        //featureBox.removeAll();
-        //initLabelPane();
+        
+        
         List tmplist = featureViews;
         featureViews = new ArrayList();
+        clear();
         Iterator iter = tmplist.iterator();
+        
         while (iter.hasNext()){
             FeatureView fv = (FeatureView)iter.next();
             addFeatureView(fv, false);
@@ -715,9 +715,6 @@ ChangeListener
         featureViews.remove(position);
         featureViews.add(position+1,fv);
         
-        List tmp = featureViews;
-        clear();
-        featureViews = tmp;
         
         updateDisplay();
         //System.out.println("moved Down to" + (position +1));
@@ -730,9 +727,7 @@ ChangeListener
         
         featureViews.remove(position);
         featureViews.add(position-1,fv);
-        List tmp = featureViews;
-        clear();
-        featureViews = tmp;
+        
         updateDisplay();
         // System.out.println("moved Up to" + (position -1));
     }

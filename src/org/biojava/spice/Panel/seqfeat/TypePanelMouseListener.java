@@ -88,7 +88,7 @@ implements MouseListener, MouseMotionListener {
         int relY = y -p.y + DEFAULT_Y_STEP;
         
         int line = typ.getLineNr(relY);
-        System.out.println("p " + p  +" " + x + " "+ y +" line "+ line);
+        //System.out.println("p " + p  +" " + x + " "+ y +" line "+ line);
         if ( line < 0 ) { 
             disableSelection(e);
         }
@@ -100,6 +100,7 @@ implements MouseListener, MouseMotionListener {
             //TODO: re-enable tool tips on TypePanel
             //typ.setToolTipText(null);
             typ.setSelectedType(-1);
+            //System.out.println("no feature selected, returning");
             return;
         }
         //System.out.println(f);
@@ -107,8 +108,9 @@ implements MouseListener, MouseMotionListener {
         if ( x < DEFAULT_X_START){
             // test if a link is selected
             String link = f.getLink();
-            //System.out.println(link);
+            //System.out.println("type panel mouselistener:" + link);
             if (( link != null) && (! link.equals(""))) {
+                //System.out.println("setting link true");
                 typ.setSelectedLink(line, true);
                 //typ.setToolTipText(link);
                 return;
@@ -194,10 +196,8 @@ implements MouseListener, MouseMotionListener {
         int relY = y -p.y + DEFAULT_Y_STEP;
         
         int line = typ.getLineNr(relY);
-        System.out.println("TypePanelMouseListener mouse released x " + x + " line " + line);
-        if ( x < DEFAULT_X_START) {
-            System.out.println("clicked link region line:" + line );
-        }
+        //System.out.println("TypePanelMouseListener mouse released x " + x + " line " + line);
+        
         
         if ( line < 0 )  
             return;
@@ -212,7 +212,7 @@ implements MouseListener, MouseMotionListener {
         }
         
         if ( x < DEFAULT_X_START) {
-            System.out.println("clicked link region 2");
+            //System.out.println("clicked link region 2");
             String link = f.getLink();
             if ( (link != null) && ( ! link.equals(""))){
                 System.out.println("open link " + link);
