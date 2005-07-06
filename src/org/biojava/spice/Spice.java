@@ -94,7 +94,11 @@ public class Spice extends Applet {
      * @param dasSourceIds a ";" separated list of DAS source ids e.g. DS_101;DS_102;DS_110
      */
     public void setDisplay(String dasSourceIds){
+        System.out.println("restricting display to servers with Unique Ids " + dasSourceIds);
         display = dasSourceIds;
+        if ( displayLabel.equals("all")){
+            displayLabel = "";
+        }
     }
     
     /** choose all das source belonging to a particular label to be highlited.
@@ -102,7 +106,10 @@ public class Spice extends Applet {
      * @param label a ";" separated list of labels e.f. biosapiens;efamily
      */
     public void setDisplayLabel(String label){
+        System.out.println("restricting display to servers with label " + label);
         this.displayLabel = label;
+        if ( display.equals("all"))
+            display = "";
     }
     
     /** set the accession code to be displayed in SPICE. eg. PDB - 5pti UniProt P00280

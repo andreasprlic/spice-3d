@@ -120,11 +120,23 @@ public class FeatureFetcher extends Thread
      * @param spiceargument
      */
     public void setDisplayServers(String spiceargument){
+        //logger.info("FeatureFetcher got servers " + spiceargument);
         if ( spiceargument == null )
-            return;
-        if ( spiceargument.equals("all")) {
-            displayDASServers = new String[0];
-            return;
+            if ((displayLabels == null ) || ( displayLabels.length == 0)) {
+                displayDASServers = new String[0];
+                return;
+            } else{
+                displayDASServers = null;
+                return;
+            }
+        if ( (spiceargument.equals("all")) || ( spiceargument.equals(""))) {
+            if ( (displayLabels == null ) || ( displayLabels.length == 0)) {
+                displayDASServers = new String[0];
+                return;
+            } else {
+                displayDASServers = null;
+                return;
+            }
         }
         
         String[] spl =  spiceargument.split(";");
@@ -161,17 +173,29 @@ public class FeatureFetcher extends Thread
         }
         String[] ds_ids = (String[]) ds.toArray(new String[ds.size()]);
         displayDASServers = ds_ids;
+        if ( (displayLabels != null) && (displayLabels.length == 0)) 
+            displayLabels = null;
     }
     
     public void setDisplayLabels(String spiceargument){
-        if ( spiceargument == null )
-            return;
-        
-        if ( spiceargument.equals("all")){
-            displayLabels = new String[0];
-            
+        //logger.info("FeatureFetcher got labels " + spiceargument);
+        if ( spiceargument == null ) {
+            if ( (displayDASServers == null ) || (displayDASServers.length == 0))
+                displayLabels = new String[0];
+            else
+                displayLabels = null;
             return;
         }
+        
+        if ( spiceargument.equals("all")){
+            if ((displayDASServers == null ) || ( displayDASServers.length == 0))
+                displayLabels = new String[0];
+            else 
+                	displayLabels = null;
+            return;
+        }
+        
+        
         String[] spl =  spiceargument.split(";");
         if ( spl.length == 0)
             return ;
@@ -182,12 +206,15 @@ public class FeatureFetcher extends Thread
             String label = spl[i];
             if ( label.length() > 40){
                 logger.warning("Label length is too long! (" + label.length() +">40)");
-                return;
+                continue;
             }
             ds.add(label);
         }
         String []label_ids = (String[])ds.toArray(new String[ds.size()]);
         displayLabels = label_ids;
+        if ( (displayDASServers != null ) && (displayDASServers.length == 0)){
+            displayDASServers = null;
+        }
         
     }
     
@@ -201,6 +228,8 @@ public class FeatureFetcher extends Thread
     
     
     private boolean isInDisplayLabels(SpiceDasSource ds){
+        // no labels provided but servers
+        if ( displayLabels == null ) return false;
         if ( displayLabels.length == 0 )
             return true;
         
@@ -222,6 +251,9 @@ public class FeatureFetcher extends Thread
     }
     
     private boolean isInDisplayServers(SpiceDasSource ds){
+        // no servers provided, but label
+        if ( displayDASServers == null )
+            	return false;
         if ( displayDASServers.length == 0)
             return true ;
         
@@ -245,8 +277,10 @@ public class FeatureFetcher extends Thread
     private List getUserRequestedServers(List servers){
         
         /** if nothing provided return all */
-        if ( displayDASServers.length == 0 )
-            if ( displayLabels.length == 0)
+        if (   ( displayDASServers != null )
+            && ( displayDASServers.length == 0 ) 
+            && ( displayLabels != null )
+            && ( displayLabels.length == 0))
                 return servers;
             
             // iterate over all servers and select only those that match
