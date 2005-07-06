@@ -33,8 +33,9 @@ import org.biojava.spice.Panel.seqfeat.FeatureView;
 import org.biojava.spice.Panel.seqfeat.LabelPane;
 import org.biojava.spice.Panel.seqfeat.SelectedSeqPositionListener;
 import org.biojava.spice.Panel.seqfeat.SpiceFeatureViewer;
-
+import javax.swing.JPanel;
 import java.util.NoSuchElementException;
+
 /**
  * @author Andreas Prlic
  *
@@ -67,6 +68,12 @@ implements MouseListener, MouseMotionListener {
         oldposition = -1;
         dragging = false;
         mouseDragStart = -1;
+    }
+    
+    private void setToolTipText(String txt){
+        JPanel panel = parent.getFeaturePanel();
+        panel.setToolTipText(txt);
+        
     }
     
     public void mouseMoved(MouseEvent e)
@@ -103,6 +110,7 @@ implements MouseListener, MouseMotionListener {
         //out of range:
         if ( featureView == null) { 
             oldsegment = null;
+            setToolTipText(null);
             return;
         }
             
@@ -123,16 +131,18 @@ implements MouseListener, MouseMotionListener {
         
         if ( linenr < 0 ) {
             oldsegment = null;
+            setToolTipText(null);
             return ;
         }
         if ( seqpos < 0 ) {
             oldsegment = null;
+            setToolTipText(null);
             return ;
         }
         
         if ( seqpos == oldposition)
             return;
-        System.out.println("mouse moved " + seqpos + " ("+oldposition+") line" + linenr);
+        //System.out.println("mouse moved " + seqpos + " ("+oldposition+") line" + linenr);
         
         oldposition = seqpos;
         
@@ -142,9 +152,11 @@ implements MouseListener, MouseMotionListener {
         Feature feat ;
         try {
             feat = featureView.getFeatureAt(linenr);
+            setToolTipText(feat.toString());
         } catch (NoSuchElementException ex){
             oldsegment = null;
             triggerSelectedSeqPosition(seqpos);
+            setToolTipText(null);
             return;
         }
         Segment seg = null;
@@ -201,11 +213,16 @@ implements MouseListener, MouseMotionListener {
     }	
     
     public void mouseEntered(MouseEvent e)  {}
-    public void mouseExited(MouseEvent e)   {}
+    public void mouseExited(MouseEvent e)   {
+        if ( ! selectionIsLocked){
+            triggerSelectedSeqPosition(-1);
+        }
+    }
     
     
     public void mousePressed(MouseEvent e)  {
         int b = e.getButton();
+        
         
         triggerSelectionLocked(false);
         oldsegment = null;
@@ -329,6 +346,8 @@ implements MouseListener, MouseMotionListener {
                 li.segmentSelected(event2);
             }
         }
+        
+        triggerSelectionLocked(true);
         
         
         

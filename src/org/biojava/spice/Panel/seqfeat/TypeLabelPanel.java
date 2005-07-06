@@ -75,6 +75,8 @@ public class TypeLabelPanel  {
     BufferedImage imbuf;
     int canvasHeight ;
     boolean linkSelected;
+    boolean selectionLocked;
+    
     public static Logger logger = Logger.getLogger("org.biojava.spice");
 
     ImageIcon miniFirefox ;
@@ -100,7 +102,7 @@ public class TypeLabelPanel  {
         oldSelectedType = -1;
         //initImgBuffer();
         canvasHeight = MINIMUM_HEIGHT;
-        
+        selectionLocked = false;
         miniFirefox = createImageIcon("firefox10x10.png");
         
     }
@@ -116,7 +118,13 @@ public class TypeLabelPanel  {
         }
     }
 
+   public void setSelectionLocked(boolean flag){
+       selectionLocked = flag;
+   }
    
+   public boolean isSelectionLocked(){
+       return selectionLocked;
+   }
     
     public void setSelected(boolean flag){
         selected = flag;
@@ -218,12 +226,13 @@ public class TypeLabelPanel  {
                 URL url ;
                 try {
                     url = new URL(link);
+                    //g2D.drawString("L->", 1,y+DEFAULT_Y_HEIGHT);
+                    if ( miniFirefox != null)
+                        miniFirefox.paintIcon(null, g2D, 1,y-DEFAULT_Y_HEIGHT);
                 } catch (MalformedURLException e){
-                    continue ;
+                    //continue ;
                 }
-                //g2D.drawString("L->", 1,y+DEFAULT_Y_HEIGHT);
-                if ( miniFirefox != null)
-                    miniFirefox.paintIcon(null, g2D, 1,y-DEFAULT_Y_HEIGHT);
+               
             }
             
             // draw text
@@ -234,7 +243,7 @@ public class TypeLabelPanel  {
             Segment seg0 = (Segment) segments.get(0) ;
             Color col =  seg0.getColor();	
             g2D.setColor(col);
-            
+            //System.out.println(feature.getName()+" " + feature.getMethod());
             g2D.drawString(feature.getName(), DEFAULT_X_START,y+DEFAULT_Y_HEIGHT);
             
             // draw selected type:

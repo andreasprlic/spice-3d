@@ -225,7 +225,7 @@ extends FeaturePanel
     
 }
 
-//TODO re-enable Scale mouse listener
+
 /*
 class ScaleMouseListener
 implements MouseListener, MouseMotionListener
@@ -244,6 +244,7 @@ implements MouseListener, MouseMotionListener
         if ( seqpos >= parent.getSeqLength())
             return;
             
+        JPanel panel = parent.get
         parent.setToolTip("Sequence Position " + seqpos);
     
     }

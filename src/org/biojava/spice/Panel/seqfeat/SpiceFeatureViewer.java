@@ -486,8 +486,6 @@ ChangeListener
         TypeLabelPanel typ = view.getTypePanel();
         FeaturePanel sub   = view.getFeaturePanel();
         
-        
-        
         //LabelPaneMouseListener lpml = new LabelPaneMouseListener(this); 
         //lab.addMouseListener(lpml);
         //lab.addMouseMotionListener(lpml);
@@ -537,6 +535,18 @@ ChangeListener
         return (FeatureView[])featureViews.toArray(new FeatureView[featureViews.size()]);
     }
     
+    public JPanel getFeaturePanel(){
+        return featurePanel;
+    }
+    
+    public JPanel getTypePanel(){
+        return typePanel;
+    }
+    
+    public JPanel getLabelPanel(){
+        return labelPanel;
+    }
+    
     public void selectedSeqPosition(int position) {
         // highlite in FeaturePanels
         
@@ -575,16 +585,19 @@ ChangeListener
         //FeaturePanel fp = seqScale.getSeqScaleCanvas();
         FeaturePanelMouseListener fpml = featurePanel.getFeaturePanelMouseListener();
         fpml.selectionLocked(flag);
-        /*
+        
+        // lock selecting also in TypeLabelpanel
+        
+        
          Iterator iter = featureViews.iterator();
          
          while ( iter.hasNext()){
          FeatureView fv = (FeatureView)iter.next();
-         FeaturePanel fpa = fv.getFeaturePanel();
-         fpml = fpa.getFeaturePanelMouseListener();
+         TypeLabelPanel tpl = fv.getTypePanel();
+         tpl.setSelectionLocked(flag);
          fpml.selectionLocked(flag);
          }
-         */
+        
     }
     
     /** detect the location of a feature view from a mouse event
@@ -756,10 +769,12 @@ class ShowDasSourceListener implements ActionListener {
         Object source = e.getSource();
         
         FeatureView fv = parent.getCurrentFeatureView();
+        if ( fv == null) 
+            return;
         SpiceFeatureViewer viewer = fv.getSpiceFeatureViewer();
         //displayFeatureViewFrame(viewer,fv);
         
-        System.out.println("trigger selectedDasSource");
+        //System.out.println("trigger selectedDasSource");
         viewer.triggerSelectedDasSource(fv.getDasSource());
         
     }

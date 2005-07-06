@@ -47,6 +47,7 @@ class LabelPanelListener implements MouseListener,MouseMotionListener{
     boolean moved;
     boolean isDragging ;
     FeatureView selectedFeatureView;
+    FeatureView oldFeatureView;
     JPopupMenu popupMenu ;
     
     public LabelPanelListener(SpiceFeatureViewer parent) {
@@ -57,6 +58,7 @@ class LabelPanelListener implements MouseListener,MouseMotionListener{
         isDragging =  false;
         selectedFeatureView = null;
         popupMenu = parent.getPopupMenu();
+        oldFeatureView = null;
         
     }
     
@@ -69,24 +71,23 @@ class LabelPanelListener implements MouseListener,MouseMotionListener{
     }
     public void mousePressed(MouseEvent e) {
         System.out.println("mouse pressed" + e.getX()+" " + e.getY());
-        
+        maybeShowPopup(e);
         
         FeatureView fv = parent.getParentFeatureView(e) ;
+        if ( oldFeatureView != null ) {
+            oldFeatureView.setSelected(false);
+        }
         if ( fv != null ){
             fv.setSelected(true);
             selectedFeatureView = fv;
-            
+            oldFeatureView =selectedFeatureView;
             parent.repaint();
         } else {
-            System.err.println("no parent found!");
+            //System.err.println("no parent found!");
         }
         
-        maybeShowPopup(e);
-        /*int mouseButton = e.getButton();
-        if ( mouseButton == MouseEvent.BUTTON3 )  {
-            
-        }
-        */
+        
+        
         
     }
     
@@ -150,18 +151,21 @@ class LabelPanelListener implements MouseListener,MouseMotionListener{
         //System.out.println("mouse Released" + e.getX()+" " + e.getY() + " button " + e.getButton());
         moved = false;
         int mouseButton = e.getButton();
-        if ( mouseButton == MouseEvent.BUTTON1 )  {
+        maybeShowPopup(e);
+        if ( oldFeatureView != null ){
+            oldFeatureView.setSelected(false);
+        }
+        
             //FeatureView fv = parent.getParentFeatureView(e) ;
             FeatureView fv = selectedFeatureView;
             if ( fv != null ){
                 fv.setSelected(false);
-                selectedFeatureView = null;
+                //selectedFeatureView = null;
                 //Component c = e.getComponent();
                 parent.repaint();
                 if (! isDragging) {
                     return;
                 } 
-                
                 //	System.out.println("isdragging: " + isDragging);
                 isDragging = false;
                 testMoveFV(e,fv);
@@ -169,16 +173,9 @@ class LabelPanelListener implements MouseListener,MouseMotionListener{
                 maybeShowPopup(e);
                 
             } else {
-                System.err.println("no parent found!");
+                //System.err.println("no parent found!");
             }
-            
-        } else  {
-            // open a popupMenu...
-            //System.out.println("button 3 pressed");
-            maybeShowPopup(e);
-            
-        }
-        
+                
     }
     public void mouseEntered(MouseEvent e) {}
     public void mouseExited(MouseEvent e) {}

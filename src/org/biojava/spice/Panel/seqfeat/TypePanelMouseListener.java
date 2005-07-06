@@ -25,7 +25,7 @@ package org.biojava.spice.Panel.seqfeat;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-
+import javax.swing.JPanel;
 import org.biojava.spice.JNLPProxy;
 import org.biojava.spice.Feature.Feature;
 import org.biojava.spice.Panel.seqfeat.FeatureView;
@@ -82,6 +82,11 @@ implements MouseListener, MouseMotionListener {
         }
         oldSelection = typ;
         
+        if ( typ.isSelectionLocked()){
+            //System.out.println("selection locked, returning");
+            return;
+        }
+        
         Point p = parent.getLocationOnLabelBox(fv);
         // y is relative to the TypePanelContainer
         // make it relative to the featureview
@@ -97,8 +102,8 @@ implements MouseListener, MouseMotionListener {
             f = fv.getFeatureAt(line);
         } catch (java.util.NoSuchElementException ex){
             //System.out.println(ex.getMessage());
-            //TODO: re-enable tool tips on TypePanel
-            //typ.setToolTipText(null);
+            
+            setToolTipText(null);
             typ.setSelectedType(-1);
             //System.out.println("no feature selected, returning");
             return;
@@ -112,7 +117,7 @@ implements MouseListener, MouseMotionListener {
             if (( link != null) && (! link.equals(""))) {
                 //System.out.println("setting link true");
                 typ.setSelectedLink(line, true);
-                //typ.setToolTipText(link);
+                setToolTipText(link);
                 return;
             }
         } else {
@@ -122,7 +127,7 @@ implements MouseListener, MouseMotionListener {
         }
         
         typ.setSelectedType(line);
-        //typ.setToolTipText(f.toString());
+        setToolTipText(f.toString());
         
         SelectedFeatureListener[] featlisteners = typ.getSelectedFeatureListeners();
         for ( int i = 0 ; i< featlisteners.length ; i++ ){
@@ -143,7 +148,7 @@ implements MouseListener, MouseMotionListener {
     
     
     private void disableSelection(TypeLabelPanel typ){
-        //typ.setToolTipText(null);
+        setToolTipText(null);
         typ.setSelectedType(-1);
         SelectedFeatureListener[] featlisteners = typ.getSelectedFeatureListeners();
         for ( int i = 0 ; i< featlisteners.length ; i++ ){
@@ -151,6 +156,11 @@ implements MouseListener, MouseMotionListener {
             lisi.selectedFeature(null);
             
         }
+    }
+    
+    private void setToolTipText(String txt){
+        JPanel panel = parent.getTypePanel();
+        panel.setToolTipText(txt);
     }
     
     private void disableSelection(MouseEvent e){
@@ -171,7 +181,9 @@ implements MouseListener, MouseMotionListener {
         //System.out.println("mouse exited");
         disableSelection(e);     
     }
-    public void mousePressed(MouseEvent e){}
+    public void mousePressed(MouseEvent e){
+        triggerSelectionLocked(false);
+    }
     public void mouseReleased(MouseEvent e){
         
         //System.out.println("mouse released ");
@@ -237,8 +249,24 @@ implements MouseListener, MouseMotionListener {
             fvl.featureSelected(event);
         }
         
+        triggerSelectionLocked(true);
+        
         parent.repaint();
     }
+    
+    /** goes through all SeqPositionSelected listeners and locks/unlocks selection */
+    private void triggerSelectionLocked(boolean flag){
+        boolean selectionIsLocked = flag;
+        parent.selectionLocked(flag);
+        SelectedSeqPositionListener[] selectedSeqListeners = parent.getSelectedSeqPositionListeners();
+        for ( int i =0 ; i < selectedSeqListeners.length; i++) {
+            
+            SelectedSeqPositionListener seli = selectedSeqListeners[i];
+            seli.selectionLocked(flag);
+        }
+        
+    }
+    
     
     public boolean showDocument(URL url) 
     {

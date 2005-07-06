@@ -52,7 +52,7 @@ public class FeatureView
     
     // the line where to draw the structure
     public static final int    DEFAULT_STRUCTURE_Y    = 20 ;
-    public static final int    MINIMUM_HEIGHT         = 30;
+    public static final int    MINIMUM_HEIGHT         = 20;
     
     //Logger logger        ;
     static Logger logger      = Logger.getLogger("org.biojava.spice");
