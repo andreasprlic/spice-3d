@@ -142,10 +142,16 @@ implements JmolStatusListener
             return;
         }
        
+	if ( structure.size() == 0 ) {
+	    executeCmd(EMPTYCMD);
+            return;
+	}
+
         String pdbstr = structure.toPDB();
         //System.out.println(pdbstr);
         if ( (pdbstr == null) || 
-                (pdbstr.equals("\n") )) {
+                (pdbstr.equals("\n")) ||
+		 (pdbstr.equals(""))) {
             executeCmd(EMPTYCMD);
             return;
         }
@@ -271,10 +277,11 @@ implements JmolStatusListener
         logger.finest(props.toString());
     }
     
-    public void notifyFileLoaded(String fullPathName, String fileName,
+	/*public void notifyFileLoaded(String fullPathName, String fileName,
             String modelName, Object clientFile){
         //logger.finest("Jmol loaded File "+ fileName); 
-    }
+	}
+	*/
     
     public void notifyFileNotLoaded(String fullPathName, String errorMsg){}
     

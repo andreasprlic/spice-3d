@@ -45,10 +45,10 @@ public class AboutDialog
 extends JDialog {
     
     public static final String VERSION = 
-        "0.7.alpha-2";
+        "0.7.0";
     
     static final String AUTHORS = 
-        " <a href=\"mailto:ap3@sanger.ac.uk\">Andreas Prlic</a>, Tim Hubbard <br>"+
+        " <a href=\"mailto:ap3@sanger.ac.uk\">Andreas Prlic</a>, Thomas Down, Tim Hubbard <br>"+
         "The Wellcome Trust Sanger Institute 2005<p>"; 
     
     static final String SPICEINFO = 
@@ -57,7 +57,7 @@ extends JDialog {
         " <a href=\"http://lists.sanger.ac.uk/mailman/listinfo/spice-das\">Mailing List</a><br>"+
         " <a href=\"http://www.sanger.ac.uk/Users/ap3/DAS/SPICE/SPICE_manual.pdf\">Manual</a><br>"+
         " <a href=\"http://www.derkholm.net/svn/repos/spice/trunk/\">Source code</a><br>" +
-        " <a href=\"http://www.gnu.org/copyleft/lesser.html\">License</a> (LGPL)<p/>";
+        " <a href=\"http://www.gnu.org/copyleft/lesser.html\">License</a> (LGPL)<p>";
     
     static final String THANKS = 
         " Thanks to the following Projects:<br>"+
@@ -92,7 +92,7 @@ extends JDialog {
         "</body></html>";
     
     
-    static int H_SIZE = 750;
+    static int H_SIZE = 760;
     static int V_SIZE = 600;
     //JTextField txt ;
     

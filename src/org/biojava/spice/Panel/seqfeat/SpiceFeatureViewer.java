@@ -52,7 +52,8 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
 
-/** A class that can display features (e.g. retrieved from different DAS sources).
+/** The main class of the graphical feature viewer.
+ * A class that can display features (e.g. retrieved from different DAS sources).
  * A SpiceFeatureView contains zero, one or multiple FeatureView objects, which do the actual rendering.
  * 
  * @author Andreas Prlic
@@ -512,6 +513,7 @@ ChangeListener
             featurePanel.revalidate();
             typePanel.revalidate();
             labelPanel.revalidate();
+	    this.revalidate();
             this.repaint();  
             
         }
@@ -660,7 +662,7 @@ ChangeListener
             Iterator iter = featureViews.iterator();
             while ( iter.hasNext()){
                 FeatureView fvtmp = (FeatureView)iter.next();
-                y+= fvtmp.getHeight();
+		y += fvtmp.getHeight();
             } 
         }
         //System.out.println("subheight: " + y);
@@ -709,6 +711,7 @@ ChangeListener
             addFeatureView(fv, false);
         }
         
+	this.revalidate();
         this.repaint();
         //labelSplit.repaint();
         //Component c = this.getParent().getParent();

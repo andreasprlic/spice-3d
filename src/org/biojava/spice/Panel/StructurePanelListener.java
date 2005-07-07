@@ -467,32 +467,22 @@ SelectedSeqPositionListener
         String cmd = "";
         
         // a disulfid bridge...
-        String ss =getSelectStrSingle(currentChainNumber,c1);
-        String es =getSelectStrSingle(currentChainNumber,c2);
-        cmd += "select ";
-        if (! ss.equals("")) {
-            cmd += ss;
-            if (! es.equals( "")){
-                cmd += ", "+es;
-            }
-        } else {
-            if ( ! es.equals("")) {
-                cmd += es;
-            }
-        } 
-        
-        
+	/*
        
         
         String cs1 = getSelectStrSingle(currentChainNumber,c1);
        if (! cs1.equals("")) {
            cmd += cs1 ;
        }
-       String cs2 = getSelectStr(currentChainNumber,c2);
+       String cs2 = getSelectStrSingle(currentChainNumber,c2);
        if ( ! cs2.equals("")){
+	   if ( ! cs1.equals("") )
+	       cmd +=", ";
            cmd += cs2;
            
        }
+       //cmd += ";";
+       //System.out.println("disulfid command " + cmd);
        return cmd ;
     }
     /** highlite a single segment */

@@ -87,6 +87,12 @@ public class Segment {
                 return true;
             }
         }
+
+	if ( this.start <= segment.getStart() ) {
+	    if ( this.end >= segment.getEnd() ) {
+		return true;
+	    }
+	}
         return false;
     }
     

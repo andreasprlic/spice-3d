@@ -68,7 +68,6 @@ extends Thread
     
     JProgressBar progressBar ;
     JFrame progressFrame      ;
-    //SPICEFrame spice  ;
     static Logger logger      = Logger.getLogger("org.biojava.spice");
     List configListeners ;
     boolean forceUpdate;
@@ -76,6 +75,7 @@ extends Thread
     public RegistryConfigIO ( URL[] registryurl) {
         
         //spice = parent ;
+
         registryArray = registryurl ;
         done = false ;
         configListeners = new ArrayList();
@@ -435,8 +435,7 @@ extends Thread
             logger.log(Level.WARNING,e.getMessage() + "while saving config locally");
         }
         
-        notifyConfigListeners();
-        //spice.setConfiguration(config);    
+	notifyConfigListeners();
         
     }
     

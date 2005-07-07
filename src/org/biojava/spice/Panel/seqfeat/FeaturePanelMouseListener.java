@@ -78,13 +78,14 @@ implements MouseListener, MouseMotionListener {
     
     public void mouseMoved(MouseEvent e)
     {	
-        int b = e.getButton();
-        //System.out.println("feature panel mouseMoved " + b );
+        
         if ( selectionIsLocked ) {
             //System.out.println(" FeaturePanelMouseMove selection locked");
             return ;
         }
         
+	int b = e.getButton();
+        //System.out.println("feature panel mouseMoved " + b );
         //System.out.println("mouseMoved button " +b);
         
         // do not change selection if we display the popup window
@@ -223,8 +224,6 @@ implements MouseListener, MouseMotionListener {
     public void mousePressed(MouseEvent e)  {
         int b = e.getButton();
         
-        
-        triggerSelectionLocked(false);
         oldsegment = null;
         
         // make sure the triggering class is a FeaturePanel
@@ -233,33 +232,21 @@ implements MouseListener, MouseMotionListener {
         if (c instanceof FeaturePanelContainer ){            
             FeaturePanelContainer view = (FeaturePanelContainer) c;
             //if ( b == MouseEvent.BUTTON1 )
-            mouseDragStart = view.getSeqPos(e);
+	    int seqpos = view.getSeqPos(e);
+            mouseDragStart = seqpos;
             
             dragging = false;
+	    triggerSelectedSeqPosition(seqpos);
+	    triggerSelectionLocked(false);
             //spice.setSelectionLocked(false);
         }
-        /*
-        else if ( c instanceof LabelPane){
-            LabelPane txf = (LabelPane) c;
-            
-            FeatureView fv = parent.getParentFeatureView(e) ;
-            if ( fv != null ){
-                fv.setSelected(true);
-            } else {
-                System.err.println("no parent found!");
-            }
-        }
-        */
+       
         
     }
     
     
     public void mouseReleased(MouseEvent e) {
         int b = e.getButton();
-        //System.out.println("mouseReleased "+b);       
-        if ( b != MouseEvent.BUTTON1) {          
-            return;
-        }           
         
         
         //      make sure the triggering class is a FeaturePanel
@@ -278,7 +265,7 @@ implements MouseListener, MouseMotionListener {
         }
         //System.out.println("feature panel mouse released");
         if (  selectionIsLocked) {
-            //System.out.println(" but select locked");
+            System.out.println(" selection  locked");
             return;
         }
         if ( ! (c instanceof FeaturePanelContainer) ){
@@ -301,21 +288,33 @@ implements MouseListener, MouseMotionListener {
         
         //int seqpos = view.getSeqPos(e);
         //int lineNr = view.getLineNr(e);
-        System.out.println("mouseReleased at " + seqpos + " line " + lineNr);
+        System.out.println("mouseReleased at " + seqpos + 
+			   " line " + lineNr + 
+			   "dragging " + dragging + 
+			   "selectionIsLocked" +selectionIsLocked );
         
         //if ( seqpos > seqLength) return ;
         
         //System.out.println("checking more");
-        if ( lineNr < 0 ) return ;
+       
         if ( seqpos < 0 ) return;
         
         if ( dragging) {
-            //System.out.print("getSegmentUnder");
-            triggerSelectedSeqRange(mouseDragStart,seqpos);
+            System.out.print("dragging");
+	    int start = mouseDragStart ;
+	    int end   = seqpos         ;
+	    if ( seqpos < mouseDragStart ) {
+		start = seqpos ;
+		end = mouseDragStart ;
+	    } 
+            triggerSelectedSeqRange(start,end);
             mouseDragStart =  -1 ;
             triggerSelectionLocked(true);
+	    dragging = false;
             
         }
+	
+	if ( lineNr < 0 ) return ;
         FeatureView featureView = parent.getParentFeatureView(e);
         Feature feat = null;
         try {
@@ -333,20 +332,20 @@ implements MouseListener, MouseMotionListener {
             return;
         }
         
-        
+        System.out.println("selected segment " + seg);
         FeatureViewListener[] fvls = parent.getFeatureViewListeners();
         for (int i = 0 ; i< fvls.length ; i++) {
             
             FeatureViewListener li = fvls[i];
-            FeatureEvent event = new FeatureEvent(featureView,feat);
+            //FeatureEvent event = new FeatureEvent(featureView,feat);
             
             if ( seg != null ) {
-                li.featureSelected(event);
+                //li.featureSelected(event);
                 FeatureEvent event2 = new FeatureEvent(featureView,seg);
                 li.segmentSelected(event2);
             }
         }
-        
+        parent.selectedSeqRange(seg.getStart()-1,seg.getEnd()-1);
         triggerSelectionLocked(true);
         
         
@@ -357,9 +356,9 @@ implements MouseListener, MouseMotionListener {
     public void mouseDragged(MouseEvent e) {
         dragging = true;
         //setSelectionLocked(true);
-        System.out.println("dragging mouse in feturePanel" +
-                " selection:" + selectionIsLocked +
-                " dragstart:"+mouseDragStart);
+        //System.out.println("dragging mouse in feturePanel" +
+        //        " selection:" + selectionIsLocked +
+        //        " dragstart:"+mouseDragStart);
         if ( mouseDragStart < 0 )
             return ;        
         

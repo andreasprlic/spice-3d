@@ -199,6 +199,11 @@ public class FeatureView
     
     private void updateDisplay(){
         
+	if ( parent != null) {
+	    parent.revalidate();
+	    parent.repaint();
+	}
+
         //labelField.repaint();
         //typeLabelPanel.repaint();
         //featurePanel.repaint();
