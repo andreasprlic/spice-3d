@@ -235,7 +235,11 @@ extends Thread
         
         // not finished flag for this thread..
         done = false;
-        
+
+        if ( registryArray == null ) {
+	    throw new ConfigurationException("not registration server has been provided!");
+	}
+
         boolean found = false;
         for ( int i =0 ; i < registryArray.length; i++){
             
