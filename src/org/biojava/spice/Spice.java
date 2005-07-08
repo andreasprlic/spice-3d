@@ -33,7 +33,17 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import org.biojava.spice.GUI.AboutDialog;
 
-/** the startup class of SPICE 
+/** the startup class of SPICE. It takes care of correctly parsing the arguments that are given to SPICE.
+ * currently supported arguments are:
+ * <ul>
+ * 	<li><b>-codetype</b> the <i>type</i> of the provided code. currently supported: <i>PDB</i> and <i>UniProt</i>.</li>
+ * 	<li><b>-code</b>the <i>Accession code</i>. e.g. 5pti for PDB or P00280 for UniProt.</li>
+ *  <li><b>-registry</b> the URL for the DAS - registration web service. Usually will be http://servlet.sanger.ac.uk/dasregistry/services/das_registry</li>
+ *  <li><b>-backupRegistry</b> the URl for a backup registration service. To be used if the primary service provided by <i>-registry</i> fails.</li>
+ *  <li><b>-display</b>  a list of DAS - sources (by their unique Id from registry) to be highlited. A ";" separated list of DAS source ids e.g. DS_101;DS_102;DS_110</li>.
+ *  <li><b>-displayLabel</b> Choose all das source belonging to a particular label to be highlited. A ";" separated list of labels e.f. biosapiens;efamily;</li>
+ * 
+ * 
  * 
  * @author Andreas Prlic
  * 
@@ -59,7 +69,7 @@ public class Spice extends Applet {
         
     } 
     
-    /** run spice */
+    /** Start SPICE @see SpiceApplication */
     public void run(){
         
         System.out.println("Welcome to the SPICE - DAS client!");

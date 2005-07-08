@@ -347,10 +347,6 @@ implements MouseListener, MouseMotionListener {
         }
         parent.selectedSeqRange(seg.getStart()-1,seg.getEnd()-1);
         triggerSelectionLocked(true);
-        
-        
-        
-        
     }
     
     public void mouseDragged(MouseEvent e) {

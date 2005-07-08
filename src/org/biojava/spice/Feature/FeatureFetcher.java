@@ -534,6 +534,7 @@ public class FeatureFetcher extends Thread
         FeatureView fv = featureViews[threadId];
         fv.setFeatures(fets);
         fv.setLoading(false);
+        
         notifyAll();
     }
     

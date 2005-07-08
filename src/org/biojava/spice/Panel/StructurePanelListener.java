@@ -467,9 +467,7 @@ SelectedSeqPositionListener
         String cmd = "";
         
         // a disulfid bridge...
-	/*
-       
-        
+	    
         String cs1 = getSelectStrSingle(currentChainNumber,c1);
        if (! cs1.equals("")) {
            cmd += cs1 ;
@@ -485,6 +483,7 @@ SelectedSeqPositionListener
        //System.out.println("disulfid command " + cmd);
        return cmd ;
     }
+    
     /** highlite a single segment */
     private void highliteSegment (Segment segment) {
         logger.finest("highlite Segment");
