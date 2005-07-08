@@ -31,8 +31,9 @@ import java.util.List;
 import java.net.URL;
 import org.biojava.spice.Panel.seqfeat.SpiceFeatureViewer;
 
-/** an interface that defined methods that are required by sub frames
- * of SPICE to communicate with the master application 
+/** an interface that defines methods provided by the master application. 
+
+ 
  * @author Andreas Prlic
  */
 public interface SPICEFrame 	
@@ -52,19 +53,7 @@ public interface SPICEFrame
      * problems with the loading threads  */    
     public boolean isLoading() ;
 
-    /** starts a new thread that retreives protein structure using the
-	DAS structure command from some other server this thread will
-	call the setStructure method to set the protein structure.
-    *
-    public void getStructure(String pdbcode) ;
-    */
-    
-    /** show status notification in defaul color *
-    public void   showStatus( String status ) ;
-    /** show status notification in specified color *
-    public void   showStatus( String status,Color c ) ;
-    
-
+   
 
     /** set a structure to be displayed. Use a default select command
      * to color structure
@@ -90,60 +79,6 @@ public interface SPICEFrame
     /** get the chain nr of the currently active chain */
     public int getCurrentChainNumber() ;
   
-    /** retreive the chainNumber by PDB character
-	@param PDB code for chain
-	@return number of chain in current structure, or -1.
-    *
-    public int getChainPosByPDB(String chainPDBcode);
-
-    /** retreive the sequence position for a residue by it's PDB code.
-	if there is an insertion code append it.
-	e.g.
-	getSeqPosByPDB("122");
-	getSeqPosByPDB("122A");
-	@param residuePDBcode PDB Code for residue. append insertion code if needed.
-	@return position of group in currently displayed chain or -1.
-    *
-    public int getSeqPosByPDB(String residuePDBcode);
-
-    /** highighting of range of residues *
-    public void highlite(int chainNumber, int start, int end, String colour);
-
-    /** highighting of range of residues *
-    public void highlite(int chainNumber, int start, int end);
-
-    /** highighting of single residue *
-    public void highlite(int chainNumber, int seqpos, String colour);
-
-    /** highighting of single residue *    
-    public void highlite(int chainNumber, int seqpos);
-
-    /** select range of residues *
-    public void select(int chainNumber, int start, int end);
-    
-    /** select single residue *
-    public void select(int chainNumber, int seqpos);
-
-    /** colour range of residues *
-    public void colour(int chainNumber, int start, int end, String colour);
-    
-    /** colour single residue *
-    public void colour (int chainNumber, int seqpos, String colour);
-    
-    
-    /** return command that can be send to executeCmd*
-    public String getSelectStr(int chain_number, int start, int end);
-    /** return command that can be send to executeCmd*
-    public String getSelectStr(int chain_number,int seqpos) ;
-
-    /** return the pdbcode + chainid to select a single residue. This
-     * can be used to create longer select statements for individual
-     * amino acids. *
-    public String getSelectStrSingle(int chain_number, int seqpos) ;
-    
-    /** send a command to the Jmol panel*
-    public void executeCmd(String cmd);
-    */
     /** reset the display, but do not change data */
     public void resetDisplay();
 
@@ -159,12 +94,7 @@ public interface SPICEFrame
     /** retreive info regarding structure */
     public Chain getChain(int chainnumber);
 
-    /** returns a string to display in the status window *
-    public String getToolString(int chainnumber, int seqpos);
-    */
-    /** display status in status window *
-    public void showSeqPos(int chainnumber, int seqpos);
-    */
+
     /** set the configuration from outside */
     public void setConfiguration(RegistryConfiguration conf);
 
@@ -172,16 +102,7 @@ public interface SPICEFrame
      * loading data */
     public void setLoading(boolean status);
     
-    /** if set to true, the selection is locked and 
-     * can not be changed, until released again */
-    //public void setSelectionLocked(boolean status);
-    
-    /** allows to query if selecting is possible
-     * 
-     * @return boolean value if selection  is locked .
-     */
-    //public boolean isSelectionLocked();
-    
+  
     
     /** open a web page in the browser 
      * returns true if the request succeeds, otherwise false

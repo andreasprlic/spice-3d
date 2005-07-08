@@ -22,7 +22,9 @@
  */
 package org.biojava.spice.Panel.seqfeat;
 
-/**
+/** An interface fore events related to selections of sequence
+ * position, sequence range and locking of the selection.
+ *
  * @author Andreas Prlic
  *
  */

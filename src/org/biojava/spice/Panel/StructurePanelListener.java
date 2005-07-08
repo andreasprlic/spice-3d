@@ -467,7 +467,6 @@ SelectedSeqPositionListener
         String cmd = "";
         
         // a disulfid bridge...
-	    
         String cs1 = getSelectStrSingle(currentChainNumber,c1);
        if (! cs1.equals("")) {
            cmd += cs1 ;

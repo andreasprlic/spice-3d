@@ -461,6 +461,7 @@ public class FeatureFetcher extends Thread
     
     /** add all features from a DasResponse to the locally stored ones 
      PDBresnum features are mapped to UniProt coordinate system.
+     * finally the newly loaded features are sent to the FeatureView, that is responsible for the visualisation.
      */
     private synchronized void addFeaturesFromDasResponse(DasResponse d, int threadId) {
         

@@ -55,6 +55,12 @@ import java.awt.event.ComponentListener;
 /** The main class of the graphical feature viewer.
  * A class that can display features (e.g. retrieved from different DAS sources).
  * A SpiceFeatureView contains zero, one or multiple FeatureView objects, which do the actual rendering.
+ * The data is displayed in three Panels : 
+ * <ul>
+ * <li> the Label panel - that dispay info about the DAS source, allows to re-order DAS-sources and with right-mouse click one can get detailed info about the DAS source. </li>
+ * <li>The FeatureLabel Panel - displays the Labels of the Features. Allows to select a whole line and provides a link icon if Link info is available for this line.</li>s
+ * <li> The FeaturePanel displays a graphical summary of the features.</li>
+ * </ul>
  * 
  * @author Andreas Prlic
  *

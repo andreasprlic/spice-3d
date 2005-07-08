@@ -26,9 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** An Abstract class representing a Feature as being diplayed in the SeqFeaturePanel 
- * There are different types of features and each implements it's own painting method:
- * e/g/ disulfid type features are different form secondary structure features, which 
- * are different from "default" features
+ *  A feature corresponds to everything that is visible in a "line" and can contain one or multiple Segments.
  * 
  * 
  * @author Andreas Prlic
