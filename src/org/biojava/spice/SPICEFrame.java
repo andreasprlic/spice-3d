@@ -121,4 +121,13 @@ public interface SPICEFrame
     /** return the DAS - feature viewer panel */
     public SpiceFeatureViewer getFeatureViewer();
     
+    /**set which Das servers should be displayed
+     */
+    public void setDasServerString(String dasServerString);
+    
+    /**     * set which DAS servers should be displayed.
+     */
+    public void setDasLabelString(String dasLabelString);
+        
+    
 }

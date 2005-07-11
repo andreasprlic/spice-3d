@@ -200,8 +200,9 @@ public class FeatureView
     private void updateDisplay(){
         
 	if ( parent != null) {
-	    parent.revalidate();
-	    parent.repaint();
+	    parent.updateDisplay();
+	    //parent.revalidate();
+	    //parent.repaint();
 	}
 
         //labelField.repaint();
@@ -213,17 +214,14 @@ public class FeatureView
     public void setFeatures(Feature[] features){
         // do something with the features.
         this.features = features;
-        //System.out.println("setting " + features.length + " features");
+     
         featurePanel.setFeatures(features);
         typeLabelPanel.setFeatures(features);
         labelField.setFeatures(features);
-        //int x = labelField.getWidth();
-        //int y = typeLabelPanel.getHeight();
-        //System.out.println("setting height " + x + " " + y);
-        //labelField.setPreferredSize(new Dimension(x,y));
+     
         
         int height = getHeight();
-        //setCanvasHeight(height);
+     
         setLoading(false);
         updateDisplay();
        

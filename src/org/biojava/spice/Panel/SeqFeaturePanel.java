@@ -24,10 +24,7 @@
 package org.biojava.spice.Panel;
 
 import org.biojava.spice.SPICEFrame  	   	;
-
-
 import org.biojava.spice.GUI.SelectionLockMenuListener;
-import org.biojava.spice.GUI.SelectionLockPopupListener;
 
 import org.biojava.spice.Feature.*     	;
 import org.biojava.spice.Panel.SeqPanel	;

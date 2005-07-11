@@ -55,12 +55,6 @@ import java.awt.event.ComponentListener;
 /** The main class of the graphical feature viewer.
  * A class that can display features (e.g. retrieved from different DAS sources).
  * A SpiceFeatureView contains zero, one or multiple FeatureView objects, which do the actual rendering.
- * The data is displayed in three Panels : 
- * <ul>
- * <li> the Label panel - that dispay info about the DAS source, allows to re-order DAS-sources and with right-mouse click one can get detailed info about the DAS source. </li>
- * <li>The FeatureLabel Panel - displays the Labels of the Features. Allows to select a whole line and provides a link icon if Link info is available for this line.</li>s
- * <li> The FeaturePanel displays a graphical summary of the features.</li>
- * </ul>
  * 
  * @author Andreas Prlic
  *
@@ -69,10 +63,9 @@ public class SpiceFeatureViewer
 
 extends JPanel
 implements SelectedSeqPositionListener,
-ChangeListener
+ChangeListener, ActionListener
 
 {
-    
     static int DEFAULT_X_START = 30;
     static int DEFAULT_X_END   = 30;
     static int MAX_SCALE       = 10;
@@ -106,24 +99,27 @@ ChangeListener
     List selectedSeqPositionListeners;
     List dasSourceListeners;
     List componentListeners;
+    List allDasServerListeners;
     
     int typePanelSize;
     int labelPanelSize;
     boolean selectionIsLocked ;
     JPopupMenu popupMenu;
     Chain chain;
-    LabelPanelListener lbml;
+    LabelPanelListener labelPanelListener;
     
     TypePanelContainer typePanel;
     LabelPanelContainer labelPanel;
     FeaturePanelContainer featurePanel;
-    
-    
+    JButton allServerButton;
+    boolean allServersDisplayed ;
     /**
      * 
      */
     public SpiceFeatureViewer() {
         super();
+        
+        allServersDisplayed = true;
         
         dasSourceListeners = new ArrayList();
         // when we are shown, add a resize listener to the parent component to
@@ -137,6 +133,7 @@ ChangeListener
         featureViewListeners = new ArrayList();
         selectedSeqPositionListeners = new ArrayList();
         componentListeners = new ArrayList();
+        allDasServerListeners = new ArrayList();
         
         //scale = 1;
         seqLength = 0;
@@ -151,18 +148,32 @@ ChangeListener
         
         // allows to change the scale of the sequence
         SeqScroller s1 = new SeqScroller();
+        s1.setBackground(BACKGROUND_COLOR);
         s1.setWidth(DEFAULT_SEQSCROLL_WIDTH);
         s1.setHeight(DEFAULT_SEQSCROLL_HEIGHT);
+        s1.addChangeListener(this);
         
-        int typePanelSize = 60;
-        int labelPanelSize =  60;
         
         Box hBox1 = Box.createHorizontalBox();
         setBackground(Color.black);
         hBox1.add(s1);
         hBox1.add(Box.createHorizontalGlue());
+        
+        // the all Server Button
+        allServerButton = new JButton("Show All");
+        allServerButton.setEnabled(false);
+        allServerButton.setActionCommand("displayAllDasSources");
+        allServerButton.setBackground(BACKGROUND_COLOR);
+        allServerButton.addActionListener(this);
+        setAllServersDisplayed(true);
+        hBox1.add(allServerButton);
         vBox.add(hBox1);
-        s1.addChangeListener(this);
+        
+        
+        int typePanelSize = 60;
+        int labelPanelSize =  60;
+        
+        
         
         
         // three boxes to contain the 3 panels as provided by each FeatureView object
@@ -206,11 +217,11 @@ ChangeListener
         
         
         
-        lbml = new LabelPanelListener(this);
+        labelPanelListener = new LabelPanelListener(this);
         popupMenu = createPopupMenu();
-        lbml.setPopupMenu(popupMenu);
-        labelPanel.addMouseListener(lbml);
-        labelPanel.addMouseMotionListener(lbml);
+        labelPanelListener.setPopupMenu(popupMenu);
+        labelPanel.addMouseListener(labelPanelListener);
+        labelPanel.addMouseMotionListener(labelPanelListener);
         
         //labelBox.add(popupMenu);
         
@@ -232,15 +243,60 @@ ChangeListener
         hBox2.add(labelSplit);
         vBox.add(hBox2);
         
-        
-        this.add(vBox);
-        
-        
+        this.add(vBox);    
     }
     
+    /** tell the feature viewer that all available servers are being displayed
+     * 
+     * @param flag
+     */
+    public void setAllServersDisplayed(boolean flag){
+       allServersDisplayed = flag;
+       if (allServersDisplayed){
+           allServerButton.setEnabled(false);
+           allServerButton.setToolTipText("all DAS servers are being displayed.");
+       } else {
+           allServerButton.setEnabled(true);
+           allServerButton.setToolTipText("not all DAS servers are displayed. press here to diplay All");
+       }
+    }
     
+    public void actionPerformed(ActionEvent e) {
+        System.out.println(e.getActionCommand());
+        // enable all DAS sources..
+        
+        if ( e.getActionCommand().equals("displayAllDasSources")){
+            // enable them...
+            Iterator iter =allDasServerListeners.iterator();
+            while ( iter.hasNext()){
+                DasServerConfigListener adsl = (DasServerConfigListener) iter.next();
+                adsl.enableAllDasSources();
+            }
+        } 
+    }
     
+    public void remove(FeatureView fv){
+        SpiceDasSource ds = fv.getDasSource();
+        String uId = ds.getId();
+                
+        int position = featureViews.indexOf(fv);
+        if ( position < 1) 
+            return;
+        
+        setAllServersDisplayed(false);
+        featureViews.remove(position);
+        updateDisplay();
+        
+        Iterator iter =allDasServerListeners.iterator();
+        while ( iter.hasNext()){
+            DasServerConfigListener adsl = (DasServerConfigListener) iter.next();
+            adsl.disableDasSource(uId);
+        }
+    }
     
+    public void addDasServerConfigListener(DasServerConfigListener adsl){
+        allDasServerListeners.add(adsl);
+    }
     /** remove the existing FeatureView objects to free the space for displaying e.g. the 
      * Annotations of a new sequence.
      *
@@ -532,10 +588,15 @@ ChangeListener
         
         JPopupMenu popupMenu = new JPopupMenu();
         JMenuItem menuItem = new JMenuItem("show DAS-source details");
-        ShowDasSourceListener sdsl = new ShowDasSourceListener(lbml);
+        DasSourceButtonListener sdsl = new DasSourceButtonListener(labelPanelListener);
+        menuItem.setActionCommand("select");
         menuItem.addActionListener(sdsl);
         popupMenu.add(menuItem);
         
+        JMenuItem disableItem = new JMenuItem("disable this DAS-source");
+        disableItem.setActionCommand("disable");
+        disableItem.addActionListener(sdsl);
+        popupMenu.add(disableItem);
         return popupMenu;
     }
     
@@ -717,7 +778,7 @@ ChangeListener
             addFeatureView(fv, false);
         }
         
-	this.revalidate();
+        this.revalidate();
         this.repaint();
         //labelSplit.repaint();
         //Component c = this.getParent().getParent();
@@ -760,12 +821,12 @@ ChangeListener
 
 
 
-class ShowDasSourceListener implements ActionListener {
+class DasSourceButtonListener implements ActionListener {
     
     //SpiceFeatureViewer featureView ;
     LabelPanelListener parent;
     
-    public ShowDasSourceListener ( LabelPanelListener parent) {
+    public DasSourceButtonListener ( LabelPanelListener parent) {
         //this.featureView = featureView;
         this.parent = parent ;
         
@@ -774,7 +835,28 @@ class ShowDasSourceListener implements ActionListener {
     public void actionPerformed(ActionEvent e){
         // show the details of a DAS source ...
         // open a new frame that does something
-        System.out.println("display DAS data!");
+        String cmd = e.getActionCommand();
+ 
+        if ( cmd.equals("select")) {
+            select(e);
+        } else if ( cmd.equals("disable")) {
+            disable(e);
+        }
+        
+        
+    }
+    
+    private void disable(ActionEvent e){
+        Object source = e.getSource();
+        
+        FeatureView fv = parent.getCurrentFeatureView();
+        if ( fv == null) 
+            return;
+        SpiceFeatureViewer viewer = fv.getSpiceFeatureViewer();
+        viewer.remove(fv);
+    }
+    
+    private void select(ActionEvent e){
         Object source = e.getSource();
         
         FeatureView fv = parent.getCurrentFeatureView();
@@ -788,6 +870,7 @@ class ShowDasSourceListener implements ActionListener {
         
     }
 }
+
 
 
 

@@ -72,7 +72,7 @@ public class FeatureFetcher extends Thread
     boolean finished ;
     String spId ;
     String pdbId ;
-    RegistryConfiguration spiceconfig ;
+    
     List allFeatures ;
     DasResponse[] subthreads ;
     FeatureView[] featureViews;
@@ -88,18 +88,19 @@ public class FeatureFetcher extends Thread
     
     boolean updateDisplay ;
     
-    /** @param config the SPICE config Map
+    /** 
+     * @param config the SPICE config Map
      * @param sp_id SwissProt ID
      * @param pdb_id PDB ID
      * @param c Chain object to which these features should be linked
      */
-    public FeatureFetcher(SPICEFrame spice, RegistryConfiguration config, String sp_id, String pdb_id, Chain c ) {
+    public FeatureFetcher(SPICEFrame spice, String sp_id, String pdb_id, Chain c ) {
         logger = Logger.getLogger("org.biojava.spice");
         parent      = spice ;
         finished    = false ;
         spId        = sp_id ;
         pdbId       = pdb_id ;
-        spiceconfig = config ;
+        //spiceconfig = config ;
         allFeatures = new ArrayList();
         chain       = c ;
         
@@ -280,15 +281,36 @@ public class FeatureFetcher extends Thread
         if (   ( displayDASServers != null )
             && ( displayDASServers.length == 0 ) 
             && ( displayLabels != null )
-            && ( displayLabels.length == 0))
-                return servers;
+            && ( displayLabels.length == 0)) {
+            	
+            List retlst = new ArrayList();  
+            	Iterator iter = servers.iterator();
+            	while ( iter.hasNext()) {
+            	   SpiceDasSource ds = (SpiceDasSource) iter.next();
+                //System.out.println(ds.getNickname() + ds.getStatus());
+                logger.info("getUserRequestServers o " + ds.getNickname() +" " + ds.getStatus());
+                // skip disabled servers ...
+                if ( ds.getStatus() == false ){
+                    logger.info("skipping das source " + ds.getNickname());
+                    continue;
+                }
+                retlst.add(ds);
+            }
+            return retlst;
+        }
             
             // iterate over all servers and select only those that match
         List retlst = new ArrayList();  
         Iterator iter = servers.iterator();
         while ( iter.hasNext()) {
             SpiceDasSource ds = (SpiceDasSource) iter.next();
-            
+            //System.out.println(ds.getNickname() + ds.getStatus());
+            logger.info("getuserRequestServers u" + ds.getNickname() +" " + ds.getStatus());
+            // skip disabled servers ...
+            if ( ds.getStatus() == false ){
+                logger.info("skipping das source " + ds.getNickname());
+                continue;
+            }
             if ( isInDisplayLabels(ds)) {
                 retlst.add(ds);
                 continue;
@@ -305,11 +327,30 @@ public class FeatureFetcher extends Thread
         finished = false ;
         allFeatures = new ArrayList();
         // contact sequence feature servers
+        RegistryConfiguration spiceconfig = parent.getConfiguration();
+        
         List tmpfeatservs    =  spiceconfig.getServers("features",UNIPROTCOORDSYS);
         List tmppdbresservs  =  spiceconfig.getServers("features",PDBCOORDSYS);
         
-        List featservs = getUserRequestedServers(tmpfeatservs);
+        
+        Iterator iter = tmpfeatservs.iterator();
+        while (iter.hasNext()){
+            SpiceDasSource ds = (SpiceDasSource) iter.next();
+            logger.info("in feature fetcher " + ds.getNickname() + " " + ds.getStatus());
+        }
+        
+        List featservs   = getUserRequestedServers(tmpfeatservs);
         List pdbresservs = getUserRequestedServers(tmppdbresservs);
+        
+        boolean allServersDisplayed = true ;
+        logger.info("size comparison "+ tmpfeatservs.size() + " ==" + 
+                featservs.size() + ", " + tmppdbresservs.size() + "==" + pdbresservs.size() );
+        if ( tmpfeatservs.size() != featservs.size())
+            allServersDisplayed = false;
+        if ( tmppdbresservs.size() != pdbresservs.size())
+            allServersDisplayed = false;
+        SpiceFeatureViewer sfv = parent.getFeatureViewer();
+        sfv.setAllServersDisplayed(allServersDisplayed);
         
         
         int nrservers =0;
@@ -461,7 +502,6 @@ public class FeatureFetcher extends Thread
     
     /** add all features from a DasResponse to the locally stored ones 
      PDBresnum features are mapped to UniProt coordinate system.
-     * finally the newly loaded features are sent to the FeatureView, that is responsible for the visualisation.
      */
     private synchronized void addFeaturesFromDasResponse(DasResponse d, int threadId) {
         

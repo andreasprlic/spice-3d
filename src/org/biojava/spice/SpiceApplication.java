@@ -34,6 +34,7 @@ import org.biojava.bio.structure.*;
 import org.biojava.spice.Panel.seqfeat.SpiceComponentListener;
 import org.biojava.spice.Panel.seqfeat.SpiceFeatureViewer;
 import org.biojava.spice.Panel.seqfeat.DasSourceListener;
+import org.biojava.spice.Panel.seqfeat.SpiceDasServerConfigListener;
 
 
 // to get config file via http
@@ -207,6 +208,8 @@ ConfigurationListener
         //seq_pos        = new JTextField();
         
         dascanv        = new SpiceFeatureViewer();
+        SpiceDasServerConfigListener sdsl = new SpiceDasServerConfigListener(this);
+        dascanv.addDasServerConfigListener(sdsl);
         
         strucommand    = new StructureCommandPanel(structurePanelListener);
         //strucommand    = new JTextField()  ;
@@ -755,10 +758,6 @@ ConfigurationListener
     }
     
     
-    /** return the feature servers */
-    private List getFeatureServers() {
-        return config.getServers("feature");
-    }
     
     private void resetStatusPanel(){
         statusPanel.setPDB("");
@@ -927,7 +926,13 @@ ConfigurationListener
         features.clear();
         dascanv.clear();
         dascanv.setSeqLength(chain.getLength());
-        FeatureFetcher ff = new FeatureFetcher(this,config,sp_id,pdbcode,chain);	
+        List l = config.getAllServers();
+        Iterator iter = l.iterator();
+        while (iter.hasNext()){
+            SpiceDasSource ds = (SpiceDasSource) iter.next();
+            logger.info(ds.getNickname() + " " + ds.getStatus());
+        }
+        FeatureFetcher ff = new FeatureFetcher(this,sp_id,pdbcode,chain);	
         ff.setDisplayServers(this.dasServerList);
         ff.setDisplayLabels(this.labelList);
         
@@ -940,7 +945,27 @@ ConfigurationListener
         
     }
 
-
+    /**set which Das servers should be displayed
+     * @param dasServerString  ";" separated list of DAS source ids e.g. DS:101;DS:102;DS:110 to be highlited. "all" for all
+     * 
+     *  
+     * 
+     * 
+     */
+    public void setDasServerString(String dasServerString) {
+        dasServerList = dasServerString;
+    }
+    
+    /**
+     * set which DAS servers should be displayed.
+     * 
+     * @param labelString ";" separated list of labels DAS sources belonging to the labels will be highlited. "all" for all.
+     * 
+     */
+    public void setDasLabelString(String dasLabelString){
+        labelList = dasLabelString;
+    
+    }
     // store all features in memory -> speed up
     private ArrayList getFeaturesFromMemory(String mem_id) {
         logger.entering(this.getClass().getName(), "getFeaturesFromMemory()",  new Object[]{mem_id});
@@ -969,30 +994,9 @@ ConfigurationListener
         return arr ;
     }
     
-    /*
-    public void showSeqPos(int chainnumber, int seqpos){
-        String drstr = getToolString(chainnumber,seqpos);
-        showStatus(drstr);
-        
-    }
-*/
-
     
     
-    
-    /** show status notification in defaul color *
-    public void showStatus(String status) {
-        showStatus(status,Color.white);
-        return ;
-    }
-    
-    /** show status notification in specified color *
-    public void showStatus(String status,Color c) {	
-        
-        //seq_pos.setColor(c);
-        seq_pos.setForeground(c);
-        seq_pos.setText(status);
-    }
+   
     
     
     /** set a structure to be displayed and sends a script command to
@@ -1041,14 +1045,7 @@ ConfigurationListener
             }
         }
         
-        /*List chains = structure.getChains(0);
-        Iterator iter = chains.iterator();
-        while ( iter.hasNext()) {
-            Chain c = (Chain) iter.next();
-            Annotation anno = c.getAnnotation();
-            logger.info("SpiceApplication got chain anno " + anno);
-        }
-        */
+      
         
         structurePanelListener.setStructure(structure);
         
@@ -1118,6 +1115,7 @@ ConfigurationListener
         statusPanel.setCurrentChainNumber(newCurrentChain);
         
         //TODO move this functionality into other class
+        // move to SpiceDasServerConfigListener ???
         // update features to be displayed ...
         Chain chain = getChain(newCurrentChain) ;
         currentChain = chain;
@@ -1158,6 +1156,9 @@ ConfigurationListener
             logger.info("no UniProt sequence found for"+chain.getName());
         }
         
+        getNewFeatures(sp_id) ;
+        /*
+         //TODO: re-enable feature caching ...
         String mem_id = makeFeatureMemoryCode(sp_id);
         ArrayList tmpfeat = getFeaturesFromMemory(mem_id) ;
         
@@ -1180,6 +1181,7 @@ ConfigurationListener
             seqTextPane.setChain(chain,currentChainNumber);
             //updateDisplays();
         }
+        */
         
         
     }

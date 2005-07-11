@@ -35,7 +35,6 @@ import org.biojava.spice.Panel.seqfeat.SpiceFeatureViewer;
 /* Displays the das -source name label in the spice feature view
  * allows resorting the order of the das-sources in the feature view
  * 
- * TODO: enable / disable this dassource ...
  *  
  * @author Andreas Prlic
  *
@@ -70,7 +69,7 @@ class LabelPanelListener implements MouseListener,MouseMotionListener{
         //System.out.println("mouse clicked" + e.getX()+" " + e.getY());    
     }
     public void mousePressed(MouseEvent e) {
-        System.out.println("mouse pressed" + e.getX()+" " + e.getY());
+        //System.out.println("mouse pressed" + e.getX()+" " + e.getY());
         maybeShowPopup(e);
         
         FeatureView fv = parent.getParentFeatureView(e) ;
