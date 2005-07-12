@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 import java.awt.image.BufferedImage;
 
 import javax.swing.ImageIcon;
+import javax.swing.JPopupMenu;
 
 import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.Feature.Feature;
@@ -76,7 +77,7 @@ public class TypeLabelPanel  {
     int canvasHeight ;
     boolean linkSelected;
     boolean selectionLocked;
-    
+    JPopupMenu popupMenu ;
     public static Logger logger = Logger.getLogger("org.biojava.spice");
 
     ImageIcon miniFirefox ;
@@ -87,6 +88,7 @@ public class TypeLabelPanel  {
     public TypeLabelPanel(FeatureView parent) {
         super();
         this.parent = parent;
+        
         //this.setBackground(Color.black);
         //this.setDoubleBuffered(true);
         //this.setPreferredSize(new Dimension(DEFAULT_WIDTH,MINIMUM_HEIGHT));

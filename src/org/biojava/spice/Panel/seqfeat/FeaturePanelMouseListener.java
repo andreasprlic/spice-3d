@@ -33,7 +33,11 @@ import org.biojava.spice.Panel.seqfeat.FeatureView;
 import org.biojava.spice.Panel.seqfeat.LabelPane;
 import org.biojava.spice.Panel.seqfeat.SelectedSeqPositionListener;
 import org.biojava.spice.Panel.seqfeat.SpiceFeatureViewer;
+
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+
 import java.util.NoSuchElementException;
 
 /**
@@ -41,10 +45,11 @@ import java.util.NoSuchElementException;
  *
  */
 public class FeaturePanelMouseListener 
-implements MouseListener, MouseMotionListener {
+implements PanelListener,
+MouseListener, MouseMotionListener {
     
     public static int DEFAULT_Y_STEP  = 10;
-    
+    FeatureView oldFeatureView;
     SpiceFeatureViewer parent;
     int oldposition;
     boolean dragging;
@@ -54,6 +59,9 @@ implements MouseListener, MouseMotionListener {
     //FeatureView featureView;
     boolean selectionIsLocked;
     Segment oldsegment ;
+    JPopupMenu popupMenu ;
+    
+    
     /**
      * 
      */
@@ -61,6 +69,7 @@ implements MouseListener, MouseMotionListener {
         super();
         oldsegment = null;
         this.parent = parent;
+        popupMenu = createPopupMenu();
         //selectedSeqListeners = new ArrayList();
         //featureViewListeners = new ArrayList();
         //this.featureView = featureView;
@@ -69,6 +78,7 @@ implements MouseListener, MouseMotionListener {
         dragging = false;
         mouseDragStart = -1;
     }
+    
     
     private void setToolTipText(String txt){
         JPanel panel = parent.getFeaturePanel();
@@ -222,8 +232,8 @@ implements MouseListener, MouseMotionListener {
     
     
     public void mousePressed(MouseEvent e)  {
-        int b = e.getButton();
         
+        maybeShowPopup(e);
         oldsegment = null;
         
         // make sure the triggering class is a FeaturePanel
@@ -240,14 +250,34 @@ implements MouseListener, MouseMotionListener {
 	    triggerSelectionLocked(false);
             //spice.setSelectionLocked(false);
         }
-       
+        
+        int mouseButton = e.getButton();
+        if (mouseButton == MouseEvent.BUTTON3 ){
+           
+            FeatureView fv = parent.getParentFeatureView(e) ;
+            System.out.println(fv);
+            if ( oldFeatureView != null ) {
+                oldFeatureView.setSelected(false);
+            }
+            if ( fv != null ){
+                fv.setSelected(true);
+                oldFeatureView = fv;
+                parent.repaint();
+            }
+        }
         
     }
-    
+    public FeatureView getCurrentFeatureView(){
+        return oldFeatureView;
+    }
     
     public void mouseReleased(MouseEvent e) {
         int b = e.getButton();
         
+        if ( oldFeatureView != null ){
+            oldFeatureView.setSelected(false);
+        }
+        maybeShowPopup(e);
         
         //      make sure the triggering class is a FeaturePanel
         Object c = e.getSource();
@@ -275,7 +305,7 @@ implements MouseListener, MouseMotionListener {
         FeatureView fv = parent.getParentFeatureView(e);
         FeaturePanel view = fv.getFeaturePanel();
         //System.out.println(view);
-        
+        fv.setSelected(false);
         
         int y = e.getY();
         int seqpos = container.getSeqPos(e);
@@ -288,11 +318,11 @@ implements MouseListener, MouseMotionListener {
         
         //int seqpos = view.getSeqPos(e);
         //int lineNr = view.getLineNr(e);
-        System.out.println("mouseReleased at " + seqpos + 
+       /* System.out.println("mouseReleased at " + seqpos + 
 			   " line " + lineNr + 
 			   "dragging " + dragging + 
 			   "selectionIsLocked" +selectionIsLocked );
-        
+        */
         //if ( seqpos > seqLength) return ;
         
         //System.out.println("checking more");
@@ -300,7 +330,7 @@ implements MouseListener, MouseMotionListener {
         if ( seqpos < 0 ) return;
         
         if ( dragging) {
-            System.out.print("dragging");
+            //System.out.print("dragging");
 	    int start = mouseDragStart ;
 	    int end   = seqpos         ;
 	    if ( seqpos < mouseDragStart ) {
@@ -332,7 +362,7 @@ implements MouseListener, MouseMotionListener {
             return;
         }
         
-        System.out.println("selected segment " + seg);
+        //System.out.println("selected segment " + seg);
         FeatureViewListener[] fvls = parent.getFeatureViewListeners();
         for (int i = 0 ; i< fvls.length ; i++) {
             
@@ -362,7 +392,10 @@ implements MouseListener, MouseMotionListener {
         //  return;
         
         int b = e.getButton();
-                
+        if ( b == MouseEvent.BUTTON3){
+            // do not allow right -mouse dragging ...
+            return;
+        }
         //      make sure the triggering class is a FeaturePanel
         Object c = e.getSource();
         if ( ! (c instanceof FeaturePanelContainer) ){
@@ -379,7 +412,7 @@ implements MouseListener, MouseMotionListener {
             start = selEnd ;
             end = mouseDragStart ;
         } 
-        System.out.println("dragging mouse " + start + " " + end );
+        //System.out.println("dragging mouse " + start + " " + end );
         triggerSelectedSeqRange(start,end);
     }  
     
@@ -424,4 +457,26 @@ implements MouseListener, MouseMotionListener {
         
     }
     
+    private void maybeShowPopup(MouseEvent e) {
+        
+        if (e.isPopupTrigger()) {
+            popupMenu.show(e.getComponent(),		       
+                    e.getX(), e.getY());
+        }
+    }
+    private JPopupMenu createPopupMenu(){ 
+        
+        JPopupMenu popupMenu = new JPopupMenu();
+        JMenuItem menuItem = new JMenuItem("show DAS-source details");
+        PanelPopupMenuListener sdsl = new PanelPopupMenuListener(this);
+        menuItem.setActionCommand("select");
+        menuItem.addActionListener(sdsl);
+        popupMenu.add(menuItem);
+        
+        JMenuItem disableItem = new JMenuItem("disable this DAS-source");
+        disableItem.setActionCommand("disable");
+        disableItem.addActionListener(sdsl);
+        popupMenu.add(disableItem);
+        return popupMenu;
+    }
 }

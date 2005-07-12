@@ -25,7 +25,11 @@ package org.biojava.spice.Panel.seqfeat;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+
 import org.biojava.spice.JNLPProxy;
 import org.biojava.spice.Feature.Feature;
 import org.biojava.spice.Panel.seqfeat.FeatureView;
@@ -43,14 +47,17 @@ import java.util.logging.*;
  *
  */
 public class TypePanelMouseListener
-implements MouseListener, MouseMotionListener {
+implements PanelListener,
+MouseListener, MouseMotionListener {
     
     SpiceFeatureViewer parent;
     TypeLabelPanel oldSelection;
-    
+    FeatureView oldFeatureView;
+     
     public static int DEFAULT_X_START = 11;
     public static int DEFAULT_Y_STEP  = 10;
     public static Logger logger = Logger.getLogger("org.biojava.spice");
+    JPopupMenu popupMenu ;
     /**
      * 
      */
@@ -58,6 +65,8 @@ implements MouseListener, MouseMotionListener {
         super();
         this.parent=parent;
         oldSelection = null;
+        popupMenu = createPopupMenu();
+        
         
     }
       
@@ -181,19 +190,46 @@ implements MouseListener, MouseMotionListener {
         //System.out.println("mouse exited");
         disableSelection(e);     
     }
+    
     public void mousePressed(MouseEvent e){
         triggerSelectionLocked(false);
-    }
-    public void mouseReleased(MouseEvent e){
         
+        int mouseButton = e.getButton();
+        if (mouseButton == MouseEvent.BUTTON3 ){
+            maybeShowPopup(e);
+            FeatureView fv = parent.getParentFeatureView(e) ;
+            if ( oldFeatureView != null ) {
+                oldFeatureView.setSelected(false);
+            }
+            if ( fv != null ){
+                fv.setSelected(true);
+                oldFeatureView = fv;
+                parent.repaint();
+            }
+        }
+    }
+    
+    public FeatureView getCurrentFeatureView(){
+        return oldFeatureView;
+    }
+    
+    public void mouseReleased(MouseEvent e){
+        maybeShowPopup(e);
         //System.out.println("mouse released ");
         FeatureView fv = parent.getParentFeatureView(e) ;
         if ( fv == null ){
             System.err.println("no parent found!");
-            //fv.setSelected(true);
-            //selectedFeatureView = fv;
             return;
         } 
+        
+        if ( oldFeatureView != null ){
+            oldFeatureView.setSelected(false);
+        }
+        
+        //FeatureView fv = parent.getParentFeatureView(e) ;
+        fv.setSelected(false);
+        
+        
         Point p = parent.getLocationOnLabelBox(fv);
         TypeLabelPanel typ = fv.getTypePanel();
         if (  oldSelection != null){
@@ -295,5 +331,31 @@ implements MouseListener, MouseMotionListener {
     
     public void mouseClicked(MouseEvent e){}
     public void mouseDragged(MouseEvent e){}
+    
+    
+    private void maybeShowPopup(MouseEvent e) {
+        
+        if (e.isPopupTrigger()) {
+            popupMenu.show(e.getComponent(),		       
+                    e.getX(), e.getY());
+        }
+    }
+    
+
+    private JPopupMenu createPopupMenu(){ 
+        
+        JPopupMenu popupMenu = new JPopupMenu();
+        JMenuItem menuItem = new JMenuItem("show DAS-source details");
+        PanelPopupMenuListener sdsl = new PanelPopupMenuListener(this);
+        menuItem.setActionCommand("select");
+        menuItem.addActionListener(sdsl);
+        popupMenu.add(menuItem);
+        
+        JMenuItem disableItem = new JMenuItem("disable this DAS-source");
+        disableItem.setActionCommand("disable");
+        disableItem.addActionListener(sdsl);
+        popupMenu.add(disableItem);
+        return popupMenu;
+    }
     
 }

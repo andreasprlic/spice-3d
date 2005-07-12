@@ -27,6 +27,8 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+
+import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import org.biojava.spice.Panel.seqfeat.FeatureView;
 import org.biojava.spice.Panel.seqfeat.LabelPane;
@@ -40,7 +42,8 @@ import org.biojava.spice.Panel.seqfeat.SpiceFeatureViewer;
  *
  */
 
-class LabelPanelListener implements MouseListener,MouseMotionListener{
+class LabelPanelListener implements PanelListener,
+MouseListener,MouseMotionListener{
     SpiceFeatureViewer parent ;
     int prev_y ;
     boolean moved;
@@ -56,7 +59,7 @@ class LabelPanelListener implements MouseListener,MouseMotionListener{
         moved = false;
         isDragging =  false;
         selectedFeatureView = null;
-        popupMenu = parent.getPopupMenu();
+        popupMenu = createPopupMenu();
         oldFeatureView = null;
         
     }
@@ -169,7 +172,7 @@ class LabelPanelListener implements MouseListener,MouseMotionListener{
                 isDragging = false;
                 testMoveFV(e,fv);
                 
-                maybeShowPopup(e);
+                //maybeShowPopup(e);
                 
             } else {
                 //System.err.println("no parent found!");
@@ -184,10 +187,13 @@ class LabelPanelListener implements MouseListener,MouseMotionListener{
     public void mouseDragged(MouseEvent e) {
         //System.out.println("mouse dragged" + e.getX()+" " + e.getY());
         
-        isDragging = true ;
-        FeatureView fv = selectedFeatureView;
-        if ( fv != null ){
-            testMoveFV(e,fv);
+        int mouseButton = e.getButton();
+        if ( mouseButton == MouseEvent.BUTTON1 ) {
+            isDragging = true ;
+            FeatureView fv = selectedFeatureView;
+            if ( fv != null ){
+                testMoveFV(e,fv);
+            }
         }
         
     }
@@ -201,6 +207,22 @@ class LabelPanelListener implements MouseListener,MouseMotionListener{
             popupMenu.show(e.getComponent(),		       
                     e.getX(), e.getY());
         }
+    }
+    
+    private JPopupMenu createPopupMenu(){ 
+        
+        JPopupMenu popupMenu = new JPopupMenu();
+        JMenuItem menuItem = new JMenuItem("show DAS-source details");
+        PanelPopupMenuListener sdsl = new PanelPopupMenuListener(this);
+        menuItem.setActionCommand("select");
+        menuItem.addActionListener(sdsl);
+        popupMenu.add(menuItem);
+        
+        JMenuItem disableItem = new JMenuItem("disable this DAS-source");
+        disableItem.setActionCommand("disable");
+        disableItem.addActionListener(sdsl);
+        popupMenu.add(disableItem);
+        return popupMenu;
     }
     
 }

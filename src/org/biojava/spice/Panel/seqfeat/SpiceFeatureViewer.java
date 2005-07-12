@@ -104,7 +104,7 @@ ChangeListener, ActionListener
     int typePanelSize;
     int labelPanelSize;
     boolean selectionIsLocked ;
-    JPopupMenu popupMenu;
+    //JPopupMenu popupMenu;
     Chain chain;
     LabelPanelListener labelPanelListener;
     
@@ -173,7 +173,7 @@ ChangeListener, ActionListener
         int typePanelSize = 60;
         int labelPanelSize =  60;
         
-        
+        //popupMenu = createPopupMenu();
         
         
         // three boxes to contain the 3 panels as provided by each FeatureView object
@@ -218,8 +218,8 @@ ChangeListener, ActionListener
         
         
         labelPanelListener = new LabelPanelListener(this);
-        popupMenu = createPopupMenu();
-        labelPanelListener.setPopupMenu(popupMenu);
+      
+        //labelPanelListener.setPopupMenu(popupMenu);
         labelPanel.addMouseListener(labelPanelListener);
         labelPanel.addMouseMotionListener(labelPanelListener);
         
@@ -275,12 +275,16 @@ ChangeListener, ActionListener
         } 
     }
     
+    
+    
     public void remove(FeatureView fv){
+        
         SpiceDasSource ds = fv.getDasSource();
         String uId = ds.getId();
-                
+        //System.out.println("remove " + uId);        
         int position = featureViews.indexOf(fv);
-        if ( position < 1) 
+        	//System.out.println(position);
+        if ( position < 0) 
             return;
         
         setAllServersDisplayed(false);
@@ -581,24 +585,8 @@ ChangeListener, ActionListener
         }
     }
     
-    public JPopupMenu getPopupMenu(){
-        return popupMenu;
-    }
-    private JPopupMenu createPopupMenu(){ 
-        
-        JPopupMenu popupMenu = new JPopupMenu();
-        JMenuItem menuItem = new JMenuItem("show DAS-source details");
-        DasSourceButtonListener sdsl = new DasSourceButtonListener(labelPanelListener);
-        menuItem.setActionCommand("select");
-        menuItem.addActionListener(sdsl);
-        popupMenu.add(menuItem);
-        
-        JMenuItem disableItem = new JMenuItem("disable this DAS-source");
-        disableItem.setActionCommand("disable");
-        disableItem.addActionListener(sdsl);
-        popupMenu.add(disableItem);
-        return popupMenu;
-    }
+    
+    
     
     public FeatureView[] getFeatureViews(){
         return (FeatureView[])featureViews.toArray(new FeatureView[featureViews.size()]);
@@ -819,57 +807,6 @@ ChangeListener, ActionListener
     
 }
 
-
-
-class DasSourceButtonListener implements ActionListener {
-    
-    //SpiceFeatureViewer featureView ;
-    LabelPanelListener parent;
-    
-    public DasSourceButtonListener ( LabelPanelListener parent) {
-        //this.featureView = featureView;
-        this.parent = parent ;
-        
-    }
-    
-    public void actionPerformed(ActionEvent e){
-        // show the details of a DAS source ...
-        // open a new frame that does something
-        String cmd = e.getActionCommand();
- 
-        if ( cmd.equals("select")) {
-            select(e);
-        } else if ( cmd.equals("disable")) {
-            disable(e);
-        }
-        
-        
-    }
-    
-    private void disable(ActionEvent e){
-        Object source = e.getSource();
-        
-        FeatureView fv = parent.getCurrentFeatureView();
-        if ( fv == null) 
-            return;
-        SpiceFeatureViewer viewer = fv.getSpiceFeatureViewer();
-        viewer.remove(fv);
-    }
-    
-    private void select(ActionEvent e){
-        Object source = e.getSource();
-        
-        FeatureView fv = parent.getCurrentFeatureView();
-        if ( fv == null) 
-            return;
-        SpiceFeatureViewer viewer = fv.getSpiceFeatureViewer();
-        //displayFeatureViewFrame(viewer,fv);
-        
-        //System.out.println("trigger selectedDasSource");
-        viewer.triggerSelectedDasSource(fv.getDasSource());
-        
-    }
-}
 
 
 
