@@ -44,7 +44,7 @@ import java.awt.event.ActionListener;
  * inspired by
  * http://cvs.sourceforge.net/viewcvs.py/jmol/Jmol/examples/Integration.java?view=markup
  * - the Jmol example of how to integrate Jmol into an application.
- * Here some mouse listeners are added that talk back to the main SPICE application.
+ *
  * 
  */
 public class StructurePanel

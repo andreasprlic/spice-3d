@@ -223,6 +223,16 @@ public class FeatureView
         int height = getHeight();
      
         setLoading(false);
+	
+	JPanel featurePanel = parent.getFeaturePanel();
+	JPanel typePanel = parent.getTypePanel();
+	JPanel labelPanel = parent.getLabelPanel();
+
+
+	featurePanel.revalidate();
+	typePanel.revalidate();
+	labelPanel.revalidate();
+	
         updateDisplay();
        
     }

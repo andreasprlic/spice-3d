@@ -144,11 +144,11 @@ ChangeListener, ActionListener
         // the vertical Box contains the scroller + the featureview panels ...
         vBox = Box.createVerticalBox();
         vBox.setBorder(BorderFactory.createEmptyBorder());
-        vBox.setBackground(Color.black);
+        //vBox.setBackground(BACKGROUND_COLOR);
         
         // allows to change the scale of the sequence
         SeqScroller s1 = new SeqScroller();
-        s1.setBackground(BACKGROUND_COLOR);
+        //s1.setBackground(BACKGROUND_COLOR);
         s1.setWidth(DEFAULT_SEQSCROLL_WIDTH);
         s1.setHeight(DEFAULT_SEQSCROLL_HEIGHT);
         s1.addChangeListener(this);
@@ -163,7 +163,8 @@ ChangeListener, ActionListener
         allServerButton = new JButton("Show All");
         allServerButton.setEnabled(false);
         allServerButton.setActionCommand("displayAllDasSources");
-        allServerButton.setBackground(BACKGROUND_COLOR);
+        //allServerButton.setBackground(BACKGROUND_COLOR);
+	//allServerButton.setForeground(Color.white);
         allServerButton.addActionListener(this);
         setAllServersDisplayed(true);
         hBox1.add(allServerButton);
@@ -576,9 +577,7 @@ ChangeListener, ActionListener
         //updateDisplay();
         
         if ( update){
-            featurePanel.revalidate();
-            typePanel.revalidate();
-            labelPanel.revalidate();
+           
 	    this.revalidate();
             this.repaint();  
             
@@ -765,7 +764,10 @@ ChangeListener, ActionListener
             FeatureView fv = (FeatureView)iter.next();
             addFeatureView(fv, false);
         }
-        
+        featurePanel.revalidate();
+	typePanel.revalidate();
+	labelPanel.revalidate();
+
         this.revalidate();
         this.repaint();
         //labelSplit.repaint();
@@ -788,7 +790,7 @@ ChangeListener, ActionListener
         
         
         updateDisplay();
-        //System.out.println("moved Down to" + (position +1));
+        //System.out.println("move1cdgd Down to" + (position +1));
     }
     
     public void moveUp(FeatureView fv ){

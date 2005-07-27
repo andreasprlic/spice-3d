@@ -97,10 +97,6 @@ MouseListener,MouseMotionListener{
         return selectedFeatureView;
     }
     
-    
-    
-    
-    
     private void testMoveFV(MouseEvent e, FeatureView fv){
         
         Component compo = e.getComponent();
@@ -116,11 +112,11 @@ MouseListener,MouseMotionListener{
         Point relative_p = parent.getLocationOnLabelBox(fv);
         int relative_y = relative_p.y;
         
-        //System.out.println("y " + y + "prev_y" + prev_y + " cx:" + cx + " cy:" + cy + " compo_h " + compo_h );
+       
         
         int compo_h = lab.getCanvasHeight();
         int y = e.getY();
-        
+
         //System.out.println("y " + y + " rel_y " + relative_y + " h " + compo_h );
         
         
@@ -133,7 +129,7 @@ MouseListener,MouseMotionListener{
         // moving down one ...
         if ( y > (compo_h+relative_y ) ){
             // reorder FeatureView one down ...
-            //System.out.println("md " + y + " " + prev_y);
+            //System.out.println("md " + y );
             //FeatureView fv = parent.getParentFeatureView(lp,LabelPane.class);
             parent.moveDown(fv);
             moved = true;
@@ -141,7 +137,7 @@ MouseListener,MouseMotionListener{
         }
         
         if ( y < relative_y ) {
-            //System.out.println("mu"+ y + " " + prev_y);
+            //System.out.println("mu"+ y);
             //FeatureView fv = parent.getParentFeatureView(lp,LabelPane.class);
             parent.moveUp(fv);
             moved =true;
@@ -185,16 +181,17 @@ MouseListener,MouseMotionListener{
         //System.out.println("mouse moved" + e.getX()+" " + e.getY());
     }
     public void mouseDragged(MouseEvent e) {
-        //System.out.println("mouse dragged" + e.getX()+" " + e.getY());
+
         
         int mouseButton = e.getButton();
-        if ( mouseButton == MouseEvent.BUTTON1 ) {
+	//System.out.println("mouse dragged" + e.getX()+" " + e.getY() + " " + mouseButton);
+        //if ( mouseButton == MouseEvent.BUTTON1 ) {
             isDragging = true ;
             FeatureView fv = selectedFeatureView;
             if ( fv != null ){
                 testMoveFV(e,fv);
             }
-        }
+	    //s}
         
     }
     
