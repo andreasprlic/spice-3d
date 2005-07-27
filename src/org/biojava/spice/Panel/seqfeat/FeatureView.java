@@ -269,8 +269,8 @@ public class FeatureView
         Iterator iter =segments.iterator();
         while ( iter.hasNext()){
             Segment seg = (Segment) iter.next();
-            int start = seg.getStart();
-            int end = seg.getEnd();
+            int start = seg.getStart()-1;
+            int end = seg.getEnd()-1;
             if (( start <= seqpos) && ( end >= seqpos)) {
                 return seg;
             }

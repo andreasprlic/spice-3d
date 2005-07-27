@@ -58,6 +58,7 @@ MouseListener, MouseMotionListener {
     public static int DEFAULT_Y_STEP  = 10;
     public static Logger logger = Logger.getLogger("org.biojava.spice");
     JPopupMenu popupMenu ;
+    
     /**
      * 
      */
@@ -229,7 +230,6 @@ MouseListener, MouseMotionListener {
         //FeatureView fv = parent.getParentFeatureView(e) ;
         fv.setSelected(false);
         
-        
         Point p = parent.getLocationOnLabelBox(fv);
         TypeLabelPanel typ = fv.getTypePanel();
         if (  oldSelection != null){
@@ -244,8 +244,6 @@ MouseListener, MouseMotionListener {
         int relY = y -p.y + DEFAULT_Y_STEP;
         
         int line = typ.getLineNr(relY);
-        //System.out.println("TypePanelMouseListener mouse released x " + x + " line " + line);
-        
         
         if ( line < 0 )  
             return;
@@ -263,12 +261,11 @@ MouseListener, MouseMotionListener {
             //System.out.println("clicked link region 2");
             String link = f.getLink();
             if ( (link != null) && ( ! link.equals(""))){
-                System.out.println("open link " + link);
+                //System.out.println("open link " + link);
                 showDocument(link);
             }
         }
-        
-        
+                
         SelectedFeatureListener[] featlisteners = typ.getSelectedFeatureListeners();
         for ( int i = 0 ; i< featlisteners.length ; i++ ){
             

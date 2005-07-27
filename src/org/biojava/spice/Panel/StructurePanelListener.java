@@ -44,7 +44,7 @@ implements FeatureViewListener,
 SelectedSeqPositionListener
 
 {
-
+//1l1y
     static String INIT_SELECT = "select all; cpk off ; wireframe off ; backbone off; "
         +"cartoon on; colour chain;select not protein and not solvent;spacefill 2.0;";
     
@@ -208,7 +208,6 @@ SelectedSeqPositionListener
             return getSelectStr( chain_number, start-1) ;
         }
         
-        
         String startpdb = gs.getPDBCode() ;
         String endpdb = ge.getPDBCode() ;
         String cmd =  "select "+startpdb+"-"+endpdb;
@@ -253,15 +252,22 @@ SelectedSeqPositionListener
         
         if ( ! cmd.equals(""))
             executeCmd(cmd);
+        else {
+            cmd = "select null ; set display selected" ;
+            executeCmd(cmd);	
+        }
     }
     public void mouseOverFeature(FeatureEvent e){
+        /*
         Feature feat = (Feature) e.getSource();
         //System.out.println("StructurePanel mouse over feature " + feat);
         
         highliteFeature(feat,false);
+        */
     }
     
     public void mouseOverSegment(FeatureEvent e){
+        /*
         Segment s = (Segment)e.getSource();
         //System.out.println("StructurePanel mouseOverSegment " + s);
         //highliteSegment(seg);
@@ -281,6 +287,7 @@ SelectedSeqPositionListener
         } 
         cmd += " set display selected;  ";
         executeCmd(cmd);
+        */
     }
     public void featureSelected(FeatureEvent e){
         
@@ -317,9 +324,10 @@ SelectedSeqPositionListener
         
         List segments = feature.getSegments() ;
         String cmd = "" ;
-        boolean addselect = false;
-        boolean first = true;
+  
+        //boolean first = true;
         for ( int i =0; i< segments.size() ; i++ ) {
+            cmd += "select ";
             Segment segment = (Segment) segments.get(i);
             //highliteSegment(segment);
             
@@ -328,7 +336,6 @@ SelectedSeqPositionListener
             //logger.finest("highilte feature " +featurenr+" " + start + " " +end );
             
             if ( feature.getType().equals("DISULFID")){
-                addselect = true;
             
                 String c = getDisulfidSelect(start,end);
                 cmd += c;
@@ -336,52 +343,94 @@ SelectedSeqPositionListener
                 
             } else {
                 
-                Group gs = getGroupNext( currentChainNumber,(start-1),"incr");
+                Group gs = getGroupNext( currentChainNumber,(start),"incr");
                 //Group gs = chain.getGroup(start-1);	
-                Group ge = getGroupNext( currentChainNumber,(end-1),"decr");
+                Group ge = getGroupNext( currentChainNumber,(end),"decr");
                 //= chain.getGroup(end-1);	
                 //logger.finest("gs: "+gs+" ge: "+ge);
                 if (( gs == null) || (ge == null) ) {
                     continue;
                 }
                 
-                addselect = true;
                 String startpdb = gs.getPDBCode() ;
                 String endpdb = ge.getPDBCode() ;
                 
-                //String c = getSelectStr(currentChainNumber,start,end);
                 String c = "" ;
-                if ( ! first)
-                    c+=", ";
+
+           
+                c += startpdb + " - " + endpdb ; 
+                cmd += c;
+            } 
+            cmd +=";";
+            
+            if ( color){
+                cmd += " color " + segment.getTxtColor() +";";
+            }
+            
+            if ( ( feature.getType().equals("METAL")) ||
+                    ( feature.getType().equals("SITE"))  ||
+                    ( feature.getType().equals("ACT_SITE")) 	     
+            ){
+                if ( color)
+                    	cmd += " spacefill on; " ;
+            } else if ( feature.getType().equals("MSD_SITE")|| 
+                    feature.getType().equals("snp") 
+            ) {
+                if ( color)
+                    cmd += " wireframe on; " ;
+            } else if ( feature.getType().equals("DISULFID")){
+                if ( color)
+                    cmd += "colour cpk; spacefill on;";
+            }
+            
+        }
+     
+        cmd += "select ";
+        // and now select everything ...
+        boolean first = true;
+        for ( int i =0; i< segments.size() ; i++ ) {
+            //
+            Segment segment = (Segment) segments.get(i);
+            //highliteSegment(segment);
+            
+            int start = segment.getStart() -1;
+            int end   = segment.getEnd() -1;
+            
+            //logger.finest("highilte feature " +featurenr+" " + start + " " +end );
+            
+            if ( feature.getType().equals("DISULFID")){
+            
+                String c = getDisulfidSelect(start,end);
+                cmd += c;
+
+                
+            } else {
+                
+                Group gs = getGroupNext( currentChainNumber,(start),"incr");
+                //Group gs = chain.getGroup(start-1);	
+                Group ge = getGroupNext( currentChainNumber,(end),"decr");
+                //= chain.getGroup(end-1);	
+                //logger.finest("gs: "+gs+" ge: "+ge);
+                if (( gs == null) || (ge == null) ) {
+                    continue;
+                }
+                
+                String startpdb = gs.getPDBCode() ;
+                String endpdb = ge.getPDBCode() ;
+                
+                String c = "" ;
+                if ( ! first){
+                    c += ", ";
+                }
                 first = false;
                 c += startpdb + " - " + endpdb ; 
                 cmd += c;
-                
             } 
-            //if ( start == end ) {
-            //cmd += " spacefill on;";
-            //}
-        }
-        if ( ( feature.getType().equals("METAL")) ||
-                ( feature.getType().equals("SITE"))  ||
-                ( feature.getType().equals("ACT_SITE")) 	     
-        ){
-            if ( color)
-                	cmd += "; spacefill on; " ;
-        } else if ( feature.getType().equals("MSD_SITE")|| 
-                feature.getType().equals("snp") 
-        ) {
-            if ( color)
-                cmd += "; wireframe on; " ;
-        } else if ( feature.getType().equals("DISULFID")){
-            if ( color)
-                cmd += "colour cpk; spacefill on;";
         }
         
-        if ( addselect)	
-            	cmd = "select "+ cmd ; 
         //logger.finest("cmd: "+cmd);
         cmd += "; set display selected;";
+        logger.info(cmd);
         executeCmd(cmd);
         
         
@@ -498,8 +547,6 @@ SelectedSeqPositionListener
         
         int start = segment.getStart() -1 ;
         int end   = segment.getEnd()   -1 ;
-        
-        
         
         String type =  segment.getParent().getType() ;
         //logger.finest(start+" " + end+" "+type);

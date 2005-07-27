@@ -39,6 +39,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
 import java.util.NoSuchElementException;
+import java.awt.Cursor;
 
 /**
  * @author Andreas Prlic
@@ -49,6 +50,9 @@ implements PanelListener,
 MouseListener, MouseMotionListener {
     
     public static int DEFAULT_Y_STEP  = 10;
+    public static boolean PASSIVE_SELECT = false; 
+    
+    
     FeatureView oldFeatureView;
     SpiceFeatureViewer parent;
     int oldposition;
@@ -61,6 +65,8 @@ MouseListener, MouseMotionListener {
     Segment oldsegment ;
     JPopupMenu popupMenu ;
     
+    static Cursor normalCursor = new Cursor(Cursor.DEFAULT_CURSOR);
+    static Cursor handCursor   = new Cursor(Cursor.HAND_CURSOR);
     
     /**
      * 
@@ -91,29 +97,29 @@ MouseListener, MouseMotionListener {
         
         if ( selectionIsLocked ) {
             //System.out.println(" FeaturePanelMouseMove selection locked");
+            parent.setCursor(normalCursor);
             return ;
         }
         
-	int b = e.getButton();
-        //System.out.println("feature panel mouseMoved " + b );
-        //System.out.println("mouseMoved button " +b);
-        
+        int b = e.getButton();
+       
         // do not change selection if we display the popup window
         
         if (b != 0 )
             if ( b != MouseEvent.BUTTON1 ) {
                 oldsegment = null;
+                parent.setCursor(normalCursor);
                 return;
             }
             // make sure the triggering class is a FeaturePanel
         Object c = e.getSource();
         if ( ! (c instanceof FeaturePanelContainer)){
             oldsegment = null;
+            parent.setCursor(normalCursor);
             return;
         }
-            
+        
         FeaturePanelContainer container = (FeaturePanelContainer) c;
-               
         
         //System.out.println(view);
         FeatureView featureView = parent.getParentFeatureView(e);
@@ -122,9 +128,10 @@ MouseListener, MouseMotionListener {
         if ( featureView == null) { 
             oldsegment = null;
             setToolTipText(null);
+            parent.setCursor(normalCursor);
             return;
         }
-            
+        
         FeaturePanel view = featureView.getFeaturePanel();  
         
         //, int x, int y
@@ -137,28 +144,28 @@ MouseListener, MouseMotionListener {
         TypeLabelPanel typ = featureView.getTypePanel();
         int linenr = typ.getLineNr(relY);
         
-        
         //int linenr = view.getLineNr(e);
         
         if ( linenr < 0 ) {
             oldsegment = null;
             setToolTipText(null);
+            parent.setCursor(normalCursor);
+            
             return ;
         }
         if ( seqpos < 0 ) {
             oldsegment = null;
             setToolTipText(null);
+            parent.setCursor(normalCursor);
             return ;
         }
         
-        if ( seqpos == oldposition)
+        if ( seqpos == oldposition) 
             return;
-        //System.out.println("mouse moved " + seqpos + " ("+oldposition+") line" + linenr);
         
         oldposition = seqpos;
         
         //int featurenr = get_featurenr(y); 
-        
         
         Feature feat ;
         try {
@@ -168,47 +175,57 @@ MouseListener, MouseMotionListener {
             oldsegment = null;
             triggerSelectedSeqPosition(seqpos);
             setToolTipText(null);
+            parent.setCursor(normalCursor);
             return;
         }
         Segment seg = null;
         try {
             seg = featureView.getSegmentAt(linenr, seqpos);
+            parent.setCursor(handCursor);
         } catch (NoSuchElementException ex) {
             oldsegment = null;
+            parent.setCursor(normalCursor);
         }
         
-        // trigger mouseOveerSegment, featureSelected...
-        boolean triggered = false;
-        FeatureViewListener[] fvls = parent.getFeatureViewListeners();
-        if ( seg != null ) {
+        boolean triggered = false;      
+        
+            // trigger mouseOveerSegment, featureSelected...
             
-            if ( oldsegment != null ){
-                if ( seg.equals(oldsegment)) {
-                    // nothing to do here ...
-                    return;
+            FeatureViewListener[] fvls = parent.getFeatureViewListeners();
+            if ( seg != null ) {
+                
+                if ( oldsegment != null ){
+                    if ( seg.equals(oldsegment)) {
+                        // nothing to do here ...
+                        return;
+                    }
+                }
+                oldsegment = seg;
+                for (int i = 0 ; i< fvls.length ; i++) {
+                    
+                    FeatureViewListener li = fvls[i];
+                    // do not trigger mouse over feature here ...
+                    // this is done by TypeLabelpane...
+                    //FeatureEvent event = new FeatureEvent(featureView,feat);
+                    //li.mouseOverFeature(event);
+                    FeatureEvent event2 = new FeatureEvent(featureView,seg);
+                    li.mouseOverSegment(event2);
+                    //triggered = true;
+                }
+                if ( PASSIVE_SELECT ){
+                    int start = seg.getStart() -1 ;
+                    int end   = seg.getEnd() -1 ;
+                    parent.selectedSeqRange(start,end);
                 }
             }
-            oldsegment = seg;
-            for (int i = 0 ; i< fvls.length ; i++) {
-            
-                FeatureViewListener li = fvls[i];
-                // do not trigger mouse over feature here ...
-                // this is done by TypeLabelpane...
-                //FeatureEvent event = new FeatureEvent(featureView,feat);
-                //li.mouseOverFeature(event);
-                FeatureEvent event2 = new FeatureEvent(featureView,seg);
-                li.mouseOverSegment(event2);
-                triggered = true;
-            }
-            int start = seg.getStart() -1 ;
-            int end   = seg.getEnd() -1 ;
-            parent.selectedSeqRange(start,end);
-        }
+         
         
+         
         if ( ! triggered ) {
             triggerSelectedSeqPosition(seqpos);
             //parent.selectedSeqPosition(seqpos);
         }
+        
     }
     
     
@@ -242,18 +259,18 @@ MouseListener, MouseMotionListener {
         if (c instanceof FeaturePanelContainer ){            
             FeaturePanelContainer view = (FeaturePanelContainer) c;
             //if ( b == MouseEvent.BUTTON1 )
-	    int seqpos = view.getSeqPos(e);
+            int seqpos = view.getSeqPos(e);
             mouseDragStart = seqpos;
             
             dragging = false;
-	    triggerSelectedSeqPosition(seqpos);
-	    triggerSelectionLocked(false);
+            triggerSelectedSeqPosition(seqpos);
+            triggerSelectionLocked(false);
             //spice.setSelectionLocked(false);
         }
         
         int mouseButton = e.getButton();
         if (mouseButton == MouseEvent.BUTTON3 ){
-           
+            
             FeatureView fv = parent.getParentFeatureView(e) ;
             System.out.println(fv);
             if ( oldFeatureView != null ) {
@@ -316,35 +333,28 @@ MouseListener, MouseMotionListener {
         TypeLabelPanel typ = fv.getTypePanel();
         int lineNr = typ.getLineNr(relY);
         
-        //int seqpos = view.getSeqPos(e);
-        //int lineNr = view.getLineNr(e);
-       /* System.out.println("mouseReleased at " + seqpos + 
-			   " line " + lineNr + 
-			   "dragging " + dragging + 
-			   "selectionIsLocked" +selectionIsLocked );
-        */
-        //if ( seqpos > seqLength) return ;
+       
         
         //System.out.println("checking more");
-       
+        
         if ( seqpos < 0 ) return;
         
         if ( dragging) {
             //System.out.print("dragging");
-	    int start = mouseDragStart ;
-	    int end   = seqpos         ;
-	    if ( seqpos < mouseDragStart ) {
-		start = seqpos ;
-		end = mouseDragStart ;
-	    } 
+            int start = mouseDragStart ;
+            int end   = seqpos         ;
+            if ( seqpos < mouseDragStart ) {
+                start = seqpos ;
+                end = mouseDragStart ;
+            } 
             triggerSelectedSeqRange(start,end);
             mouseDragStart =  -1 ;
             triggerSelectionLocked(true);
-	    dragging = false;
+            dragging = false;
             
         }
-	
-	if ( lineNr < 0 ) return ;
+        
+        if ( lineNr < 0 ) return ;
         FeatureView featureView = parent.getParentFeatureView(e);
         Feature feat = null;
         try {
@@ -402,7 +412,7 @@ MouseListener, MouseMotionListener {
             return ;
         }
         FeaturePanelContainer view = (FeaturePanelContainer) c;
-      
+        
         int seqpos = view.getSeqPos(e);
         
         int selEnd =  seqpos;
@@ -418,7 +428,7 @@ MouseListener, MouseMotionListener {
     
     
     private void triggerSelectedSeqPosition(int seqpos){
-
+        
         SelectedSeqPositionListener[] selectedSeqListeners = parent.getSelectedSeqPositionListeners();
         for ( int i =0 ; i < selectedSeqListeners.length; i++) {
             
@@ -430,7 +440,7 @@ MouseListener, MouseMotionListener {
     }
     
     private void triggerSelectedSeqRange(int start, int end){
-
+        
         SelectedSeqPositionListener[] selectedSeqListeners = parent.getSelectedSeqPositionListeners();
         for ( int i =0 ; i < selectedSeqListeners.length; i++) {
             

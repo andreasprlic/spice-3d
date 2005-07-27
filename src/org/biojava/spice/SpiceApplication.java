@@ -136,7 +136,6 @@ ConfigurationListener
     JTextField getCom ;
     List knownFeatureLinks;
     
-    
     StructureCommandPanel  strucommand; 
     StatusPanel statusPanel ;
    
@@ -494,7 +493,6 @@ ConfigurationListener
         seqTextPane.addSelectedSeqPositionListener(structurePanelListener);
         seqTextPane.addSelectedSeqPositionListener(statusPanel);
         seqTextPane.addSelectedSeqPositionListener(spiceMenuListener);
-        
     }
     
     /**
@@ -930,7 +928,7 @@ ConfigurationListener
         Iterator iter = l.iterator();
         while (iter.hasNext()){
             SpiceDasSource ds = (SpiceDasSource) iter.next();
-            logger.info(ds.getNickname() + " " + ds.getStatus());
+            //logger.info(ds.getNickname() + " " + ds.getStatus());
         }
         FeatureFetcher ff = new FeatureFetcher(this,sp_id,pdbcode,chain);	
         ff.setDisplayServers(this.dasServerList);

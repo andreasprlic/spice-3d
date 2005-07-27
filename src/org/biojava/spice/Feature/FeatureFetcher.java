@@ -108,7 +108,7 @@ public class FeatureFetcher extends Thread
         displayLabels = new String[0];
         
         updateDisplay = false ;
-	
+        
     }
     
     
@@ -192,7 +192,7 @@ public class FeatureFetcher extends Thread
             if ((displayDASServers == null ) || ( displayDASServers.length == 0))
                 displayLabels = new String[0];
             else 
-                	displayLabels = null;
+                displayLabels = null;
             return;
         }
         
@@ -234,7 +234,7 @@ public class FeatureFetcher extends Thread
         if ( displayLabels.length == 0 )
             return true;
         
-//      check if in labels;
+        //      check if in labels;
         String[] labels = ds.getLabels();
         if ( labels != null){
             for ( int i = 0 ; i< labels.length ; i++){
@@ -254,17 +254,17 @@ public class FeatureFetcher extends Thread
     private boolean isInDisplayServers(SpiceDasSource ds){
         // no servers provided, but label
         if ( displayDASServers == null )
-            	return false;
+            return false;
         if ( displayDASServers.length == 0)
             return true ;
         
         // check if in ids
         String id = ds.getId();
         for ( int i=0; i< displayDASServers.length;i++){
-          String testid = displayDASServers[i];
-          if ( testid.equals(id)){
-              return true;
-          }
+            String testid = displayDASServers[i];
+            if ( testid.equals(id)){
+                return true;
+            }
         }
         
         return false;
@@ -279,36 +279,42 @@ public class FeatureFetcher extends Thread
         
         /** if nothing provided return all */
         if (   ( displayDASServers != null )
-            && ( displayDASServers.length == 0 ) 
-            && ( displayLabels != null )
-            && ( displayLabels.length == 0)) {
-            	
+                && ( displayDASServers.length == 0 ) 
+                && ( displayLabels != null )
+                && ( displayLabels.length == 0)) {
+            
             List retlst = new ArrayList();  
-            	Iterator iter = servers.iterator();
-            	while ( iter.hasNext()) {
-            	   SpiceDasSource ds = (SpiceDasSource) iter.next();
+            Iterator iter = servers.iterator();
+            while ( iter.hasNext()) {
+                SpiceDasSource ds = (SpiceDasSource) iter.next();
                 //System.out.println(ds.getNickname() + ds.getStatus());
-                logger.info("getUserRequestServers o " + ds.getNickname() +" " + ds.getStatus());
+                //logger.info("getUserRequestServers o " + ds.getNickname() +" " + ds.getStatus());
                 // skip disabled servers ...
                 if ( ds.getStatus() == false ){
-                    logger.info("skipping das source " + ds.getNickname());
+                    //logger.info("skipping das source " + ds.getNickname());
                     continue;
                 }
                 retlst.add(ds);
             }
             return retlst;
         }
-            
-            // iterate over all servers and select only those that match
+        
+        // iterate over all servers and select only those that match
         List retlst = new ArrayList();  
         Iterator iter = servers.iterator();
         while ( iter.hasNext()) {
             SpiceDasSource ds = (SpiceDasSource) iter.next();
             //System.out.println(ds.getNickname() + ds.getStatus());
-            logger.info("getuserRequestServers u" + ds.getNickname() +" " + ds.getStatus());
+            //logger.info("getuserRequestServers u" + ds.getNickname() +" " + ds.getStatus());
             // skip disabled servers ...
             if ( ds.getStatus() == false ){
-                logger.info("skipping das source " + ds.getNickname());
+                //logger.info("skipping das source " + ds.getNickname());
+                continue;
+            }
+            
+            // always display user config servers
+            if (! ds.getRegistered()){
+                retlst.add(ds);
                 continue;
             }
             if ( isInDisplayLabels(ds)) {
@@ -317,6 +323,7 @@ public class FeatureFetcher extends Thread
             }
             if( isInDisplayServers(ds)){
                 retlst.add(ds);
+                continue;
             }
         }
         return retlst;
@@ -336,15 +343,15 @@ public class FeatureFetcher extends Thread
         Iterator iter = tmpfeatservs.iterator();
         while (iter.hasNext()){
             SpiceDasSource ds = (SpiceDasSource) iter.next();
-            logger.info("in feature fetcher " + ds.getNickname() + " " + ds.getStatus());
+            //logger.info("in feature fetcher " + ds.getNickname() + " " + ds.getStatus());
         }
         
         List featservs   = getUserRequestedServers(tmpfeatservs);
         List pdbresservs = getUserRequestedServers(tmppdbresservs);
         
         boolean allServersDisplayed = true ;
-        logger.info("size comparison "+ tmpfeatservs.size() + " ==" + 
-                featservs.size() + ", " + tmppdbresservs.size() + "==" + pdbresservs.size() );
+        //logger.info("size comparison "+ tmpfeatservs.size() + " ==" + 
+        //        featservs.size() + ", " + tmppdbresservs.size() + "==" + pdbresservs.size() );
         if ( tmpfeatservs.size() != featservs.size())
             allServersDisplayed = false;
         if ( tmppdbresservs.size() != pdbresservs.size())
@@ -410,8 +417,7 @@ public class FeatureFetcher extends Thread
         // and the servers serving in structure coordinates
         for ( int f =0;f<pdbresservs.size();f++) {
             if (pdbId == null ) 
-                continue ;
-            
+                continue ;           
             
             DasResponse d=new DasResponse(PDBCOORDSYS);
             subthreads[responsecounter] = d; 
@@ -482,7 +488,7 @@ public class FeatureFetcher extends Thread
         
         for (int i=0 ; i<groups.size();i++){
             Group g = (Group)groups.get(i);
-                        
+            
             String pdbCode = g.getPDBCode() ;
             if ( pdbCode != null ){
                 //logger.finest(g);
@@ -547,7 +553,7 @@ public class FeatureFetcher extends Thread
                     }
                     //logger.finest("pdb feature: "+feat);
                 }
-
+                
                 // by AP
                 //if ( (mappDone != null ) && (mappDone.equals("true")))
                 //    allFeatures.add(feat) ;		    
@@ -566,7 +572,7 @@ public class FeatureFetcher extends Thread
                     feat.put("dassource", nickname);  
                     
                 }
-                	// by AP
+                // by AP
                 //allFeatures.add(feat) ;		
             } 
         } 
@@ -586,7 +592,7 @@ public class FeatureFetcher extends Thread
         DasResponse d = subthreads[threadId] ;
         d.setFeatures(features);
         
-               
+        
         addFeaturesFromDasResponse(d,threadId);
         
         if ( allFinished()){
@@ -680,22 +686,22 @@ public class FeatureFetcher extends Thread
                     if ( ! (feat==null)) {
                         features = testAddFeatures(features,feat);
                         /*
-                        if ( ! secstrucContained) {
-                            secstrucfeature = feat;
-                            secstrucContained = true;
-                            
-                            //features.add(feat);
-                        } else {
-                            //add this feature data to the secstruc feature...
-                            // do NOT add this feature to features ...
+                         if ( ! secstrucContained) {
+                         secstrucfeature = feat;
+                         secstrucContained = true;
+                         
+                         //features.add(feat);
+                          } else {
+                          //add this feature data to the secstruc feature...
+                           // do NOT add this feature to features ...
                             List segs = feat.getSegments();
                             Iterator iter = segs.iterator();
                             while (iter.hasNext()){
-                                Segment seg = (Segment)iter.next();
-                                secstrucfeature.addSegment(seg);
+                            Segment seg = (Segment)iter.next();
+                            secstrucfeature.addSegment(seg);
                             }
-                        }
-                        */
+                            }
+                            */
                     }
                     
                 }
@@ -756,10 +762,10 @@ public class FeatureFetcher extends Thread
     private boolean isSecondaryStructureFeat(Feature feat){
         String type = feat.getType();
         if (
-            type.equals("HELIX")  || 
-            type.equals("STRAND") || 
-            type.equals("TURN")
-            ) return true;
+                type.equals("HELIX")  || 
+                type.equals("STRAND") || 
+                type.equals("TURN")
+        ) return true;
         return false;
     }
     private List testAddFeatures(List features,Feature feat){
@@ -809,132 +815,132 @@ public class FeatureFetcher extends Thread
                         Segment newseg = (Segment)newsegsiter.next();
                         tmpfeat.addSegment(newseg);
                     }
-                        
+                    
                     return features;
                 } 
             }
             
         }
-//      if we get here, the  features could not be joint with any other one, so there is always some overlap
+        //      if we get here, the  features could not be joint with any other one, so there is always some overlap
         // add to the list of known features
         features.add(feat);
         return features;
     }
     
     /** returns a list of SPICE-Features objects 
-    public Feature[] convertMap2Features(List mapfeatures){
-        List features = new ArrayList();
+     public Feature[] convertMap2Features(List mapfeatures){
+     List features = new ArrayList();
+     
+     boolean secstruc = false ;
+     String prevtype = "@prevtype" ;
+     boolean first = true ;
+     
+     FeatureImpl feat    = null ;
+     Segment segment = null ;
+     
+     boolean secstrucContained = false;
+     Feature secstrucfeature = new FeatureImpl() ;
+     
+     for (int i = 0 ; i< mapfeatures.size();i++) {
+     HashMap currentFeatureMap = (HashMap) mapfeatures.get(i);
+     String type = (String) currentFeatureMap.get("TYPE") ;
+     
+     // we are skipping literature references for the moment 
+      if ( type.equals("reference") || type.equals("GOA")){
+      continue ;
+      }
+      
+      
+      if (! first) 
+      {
+      // if not first feature
+       
+       if ( ! secstruc ) 			    
+       // if not secondary structure ...
+        features.add(feat);
         
-        boolean secstruc = false ;
-        String prevtype = "@prevtype" ;
-        boolean first = true ;
-        
-        FeatureImpl feat    = null ;
-        Segment segment = null ;
-        
-        boolean secstrucContained = false;
-        Feature secstrucfeature = new FeatureImpl() ;
-        
-        for (int i = 0 ; i< mapfeatures.size();i++) {
-            HashMap currentFeatureMap = (HashMap) mapfeatures.get(i);
-            String type = (String) currentFeatureMap.get("TYPE") ;
-            
-            // we are skipping literature references for the moment 
-            if ( type.equals("reference") || type.equals("GOA")){
-                continue ;
-            }
-            
-            
-            if (! first) 
-            {
-                // if not first feature
-                
-                if ( ! secstruc ) 			    
-                    // if not secondary structure ...
-                    features.add(feat);
-                
-                else if ( ! 
-                        (
-                                type.equals("HELIX")  || 
-                                type.equals("STRAND") || 
-                                type.equals("TURN")  
-                        ) 
-                )
-                {
-                    // end of secondary structure
-                    secstruc = false ;
-                    if ( ! (feat==null)) {
-                                                
-                        if ( ! secstrucContained) {
-                            secstrucfeature = feat;
-                            secstrucContained = true;
-                            features.add(feat);
-                        } else {
-                            //add this feature data to the secstruc feature...
-                            // do NOT add this feature to features ...
-                            	List segs = feat.getSegments();
-                            	Iterator iter = segs.iterator();
-                            	while (iter.hasNext()){
-                            	    Segment seg = (Segment)iter.next();
-                            	    secstrucfeature.addSegment(seg);
-                            	}
-                        }
-                    }
-
-                }
-            }
-            
-            first = false ;				
-            if ( ! secstruc) {
-                feat = getNewFeat(currentFeatureMap);		
-            }
-            
-            //}
+        else if ( ! 
+        (
+        type.equals("HELIX")  || 
+        type.equals("STRAND") || 
+        type.equals("TURN")  
+        ) 
+        )
+        {
+        // end of secondary structure
+         secstruc = false ;
+         if ( ! (feat==null)) {
+         
+         if ( ! secstrucContained) {
+         secstrucfeature = feat;
+         secstrucContained = true;
+         features.add(feat);
+         } else {
+         //add this feature data to the secstruc feature...
+          // do NOT add this feature to features ...
+           List segs = feat.getSegments();
+           Iterator iter = segs.iterator();
+           while (iter.hasNext()){
+           Segment seg = (Segment)iter.next();
+           secstrucfeature.addSegment(seg);
+           }
+           }
+           }
+           
+           }
+           }
+           
+           first = false ;				
+           if ( ! secstruc) {
+           feat = getNewFeat(currentFeatureMap);		
+           }
+           
+           //}
             
             
             if (type.equals("STRAND")){
-                secstruc = true ;
-                currentFeatureMap.put("color",STRAND_COLOR);
-                currentFeatureMap.put("colorTxt","yellow");
-                feat.setName("SECSTRUC");		
+            secstruc = true ;
+            currentFeatureMap.put("color",STRAND_COLOR);
+            currentFeatureMap.put("colorTxt","yellow");
+            feat.setName("SECSTRUC");		
             }
             
             else if (type.equals("HELIX")) {
-                secstruc = true ;
-                currentFeatureMap.put("color",HELIX_COLOR);
-                currentFeatureMap.put("colorTxt","red");
-                feat.setName("SECSTRUC");
+            secstruc = true ;
+            currentFeatureMap.put("color",HELIX_COLOR);
+            currentFeatureMap.put("colorTxt","red");
+            feat.setName("SECSTRUC");
             }	
             
             else if (type.equals("TURN")) {
-                secstruc = true ;
-                currentFeatureMap.put("color",TURN_COLOR);
-                currentFeatureMap.put("colorTxt","white");
-                feat.setName("SECSTRUC");
+            secstruc = true ;
+            currentFeatureMap.put("color",TURN_COLOR);
+            currentFeatureMap.put("colorTxt","white");
+            feat.setName("SECSTRUC");
             } 	  
             else {
-                secstruc = false ;
-                currentFeatureMap.put("color"   ,entColors[i%entColors.length]);
-                currentFeatureMap.put("colorTxt",txtColors[i%txtColors.length]);
-                try {
-                    feat.setName(type);
-                } catch ( NullPointerException e) {
-                    //e.printStackTrace();
-                    feat.setName("null");
-                }
-            }
-            
-            segment = getNewSegment(currentFeatureMap);
-            feat.addSegment(segment);	    
-            //feat.addSegment(currentFeatureMap);
-            prevtype = type;
-        }	
-        if ( ! (feat==null))  features.add(feat);
-        
-        return (Feature[])features.toArray(new Feature[features.size()]) ;
-    }
-
-  */  
+            secstruc = false ;
+            currentFeatureMap.put("color"   ,entColors[i%entColors.length]);
+            currentFeatureMap.put("colorTxt",txtColors[i%txtColors.length]);
+            try {
+            feat.setName(type);
+            } catch ( NullPointerException e) {
+            //e.printStackTrace();
+             feat.setName("null");
+             }
+             }
+             
+             segment = getNewSegment(currentFeatureMap);
+             feat.addSegment(segment);	    
+             //feat.addSegment(currentFeatureMap);
+              prevtype = type;
+              }	
+              if ( ! (feat==null))  features.add(feat);
+              
+              return (Feature[])features.toArray(new Feature[features.size()]) ;
+              }
+              
+              */  
     
     
     

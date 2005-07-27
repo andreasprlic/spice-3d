@@ -45,6 +45,7 @@ public class SpiceDasSource
 	super();
 	status    = true ;  // default source is actived and used .
 	registered = true ; // default true = source comes from registry
+	setNickname("MySource");
     }
 
     public void    setStatus(boolean flag) { status = flag ; }
