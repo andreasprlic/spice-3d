@@ -210,7 +210,7 @@ MouseListener, MouseMotionListener {
                     //li.mouseOverFeature(event);
                     FeatureEvent event2 = new FeatureEvent(featureView,seg);
                     li.mouseOverSegment(event2);
-                    //triggered = true;
+                    triggered = true;
                 }
                 if ( PASSIVE_SELECT ){
                     int start = seg.getStart() -1 ;

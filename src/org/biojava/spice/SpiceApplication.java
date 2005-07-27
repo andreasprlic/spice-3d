@@ -477,7 +477,6 @@ ConfigurationListener
      */
     private void initListeners(){
         
-        
         MyDasSourceListener mdsl = new MyDasSourceListener(this);
         dascanv.addDasSourceListener(mdsl);
         
