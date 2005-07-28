@@ -335,7 +335,7 @@ SelectedSeqPositionListener
         
         //boolean first = true;
         for ( int i =0; i< segments.size() ; i++ ) {
-            cmd += "select ";
+            
             Segment segment = (Segment) segments.get(i);
             //highliteSegment(segment);
             
@@ -346,7 +346,7 @@ SelectedSeqPositionListener
             if ( feature.getType().equals("DISULFID")){
             
                 String c = getDisulfidSelect(start,end);
-                cmd += c;
+                cmd += "select " + c;
 
                 
             } else {
@@ -367,7 +367,7 @@ SelectedSeqPositionListener
 
            
                 c += startpdb + " - " + endpdb + chainselect ; 
-                cmd += c;
+                cmd += "select "+  c;
             } 
             cmd +=";";
             
@@ -393,7 +393,7 @@ SelectedSeqPositionListener
             
         }
      
-        cmd += "select ";
+        
         // and now select everything ...
         boolean first = true;
         for ( int i =0; i< segments.size() ; i++ ) {
@@ -409,7 +409,7 @@ SelectedSeqPositionListener
             if ( feature.getType().equals("DISULFID")){
             
                 String c = getDisulfidSelect(start,end);
-                cmd += c;
+                cmd +="select " + c;
 
                 
             } else {
@@ -427,12 +427,14 @@ SelectedSeqPositionListener
                 String endpdb = ge.getPDBCode() ;
                 
                 String c = "" ;
-                if ( ! first){
+                if ( first ){
+                    c += "select ";
+                } else{
                     c += ", ";
                 }
                 first = false;
                 c += startpdb + " - " + endpdb +chainselect; 
-                cmd += c;
+                cmd +=  c;
             } 
         }
         
