@@ -85,7 +85,7 @@ public class FeatureFetcher extends Thread
     static String UNIPROTCOORDSYS = "UniProt,Protein Sequence";
     
     Logger logger        ;
-    
+    int featuresCounter;
     boolean updateDisplay ;
     
     /** 
@@ -108,7 +108,7 @@ public class FeatureFetcher extends Thread
         displayLabels = new String[0];
         
         updateDisplay = false ;
-        
+        featuresCounter = 0;
     }
     
     
@@ -666,6 +666,7 @@ public class FeatureFetcher extends Thread
         //Feature secstrucfeature = new FeatureImpl() ;
         
         for (int i = 0 ; i< mapfeatures.size();i++) {
+            featuresCounter +=1;
             HashMap currentFeatureMap = (HashMap) mapfeatures.get(i);
             String type = (String) currentFeatureMap.get("TYPE") ;
             
@@ -747,8 +748,8 @@ public class FeatureFetcher extends Thread
             } 	  
             else {
                 secstruc = false ;
-                currentFeatureMap.put("color"   ,entColors[i%entColors.length]);
-                currentFeatureMap.put("colorTxt",txtColors[i%txtColors.length]);
+                currentFeatureMap.put("color"   ,entColors[featuresCounter%entColors.length]);
+                currentFeatureMap.put("colorTxt",txtColors[featuresCounter%txtColors.length]);
                 try {
                     feat.setName(type);
                 } catch ( NullPointerException e) {
