@@ -45,7 +45,7 @@ public class SpiceDasSource
 	super();
 	status    = true ;  // default source is actived and used .
 	registered = true ; // default true = source comes from registry
-	setNickname("MySource");
+	setNickname("MyDASsource");
     }
 
     public void    setStatus(boolean flag) { status = flag ; }
@@ -71,6 +71,11 @@ public class SpiceDasSource
 	this.setHelperurl(ds.getHelperurl());
     }
 
+    
+    public String toString() {
+        String txt = getId()  + " " + getNickname() + " " + getUrl() ;
+        return txt;
+    }
 
     /** convert to XML. */
     public XMLWriter toXML(XMLWriter xw)

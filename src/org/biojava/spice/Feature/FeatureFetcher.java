@@ -53,13 +53,13 @@ public class FeatureFetcher extends Thread
 {
     
     public static final  Color[] entColors = new Color []{
-            new Color(153,153,255), 
-            new Color(255,153,153), 
-            new Color(153,255,153), 
-            new Color(255,255,102),
-            new Color(102,255,102),
-            new Color(0,51,204),
-            new Color(253,0,153)
+            new Color(51,51,255), // blue
+            new Color(255,153,153), // pink
+            new Color(153,255,153), // green
+            new Color(255,255,102), //yellow
+            new Color(255,51,51),   // red
+            new Color(102,255,255),    // cyan
+            new Color(255,51,255)    // pink 
     };
     
     
@@ -294,6 +294,10 @@ public class FeatureFetcher extends Thread
                     //logger.info("skipping das source " + ds.getNickname());
                     continue;
                 }
+                //if (! ds.getRegistered()){
+                //    logger.info("using local DAS source " + ds);
+                //    continue;
+                //}
                 retlst.add(ds);
             }
             return retlst;
@@ -315,6 +319,7 @@ public class FeatureFetcher extends Thread
             // always display user config servers
             if (! ds.getRegistered()){
                 retlst.add(ds);
+                //logger.info("adding local DAS source " + ds);
                 continue;
             }
             if ( isInDisplayLabels(ds)) {
@@ -340,11 +345,6 @@ public class FeatureFetcher extends Thread
         List tmppdbresservs  =  spiceconfig.getServers("features",PDBCOORDSYS);
         
         
-        Iterator iter = tmpfeatservs.iterator();
-        while (iter.hasNext()){
-            SpiceDasSource ds = (SpiceDasSource) iter.next();
-            //logger.info("in feature fetcher " + ds.getNickname() + " " + ds.getStatus());
-        }
         
         List featservs   = getUserRequestedServers(tmpfeatservs);
         List pdbresservs = getUserRequestedServers(tmppdbresservs);
@@ -352,6 +352,16 @@ public class FeatureFetcher extends Thread
         boolean allServersDisplayed = true ;
         //logger.info("size comparison "+ tmpfeatservs.size() + " ==" + 
         //        featservs.size() + ", " + tmppdbresservs.size() + "==" + pdbresservs.size() );
+        
+        /*
+         Iterator iter = pdbresservs.iterator();
+        while (iter.hasNext()){
+            SpiceDasSource ds = (SpiceDasSource) iter.next();
+            logger.info("in feature fetcher using" + ds.getNickname() + " " + ds.getStatus());
+        }
+        */
+        
+        
         if ( tmpfeatservs.size() != featservs.size())
             allServersDisplayed = false;
         if ( tmppdbresservs.size() != pdbresservs.size())

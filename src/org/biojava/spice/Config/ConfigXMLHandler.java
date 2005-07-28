@@ -13,7 +13,6 @@
  *
  * For more information on the BioJava project and its aims,
  * or to join the biojava-l mailing list, visit the home page
- * at:
  *
  *      http://www.biojava.org/
  *
@@ -73,7 +72,10 @@ public class ConfigXMLHandler extends DefaultHandler {
 	    
 	    source.setUrl(atts.getValue("url"));
 	    source.setAdminemail(atts.getValue("adminemail"));
-	    source.setNickname(atts.getValue("nickname"));
+	    String nickname = atts.getValue("nickname");
+	    if ( nickname.equals(""))
+	        nickname = "MyDASsource";
+	    source.setNickname(nickname);
 	    String status = atts.getValue("status") ;
 	    boolean flag = false ;
 	    if (status.equals("true"))

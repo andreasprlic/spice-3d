@@ -325,6 +325,14 @@ SelectedSeqPositionListener
         List segments = feature.getSegments() ;
         String cmd = "" ;
   
+        Chain chain = getChain(currentChainNumber);
+        String chainId = chain.getName();
+        String chainselect = ":"+chainId;
+        if ( chainId.equals(" ") || chainId.equals("")){
+            chainselect = "";
+        }
+        
+        
         //boolean first = true;
         for ( int i =0; i< segments.size() ; i++ ) {
             cmd += "select ";
@@ -358,7 +366,7 @@ SelectedSeqPositionListener
                 String c = "" ;
 
            
-                c += startpdb + " - " + endpdb ; 
+                c += startpdb + " - " + endpdb + chainselect ; 
                 cmd += c;
             } 
             cmd +=";";
@@ -423,7 +431,7 @@ SelectedSeqPositionListener
                     c += ", ";
                 }
                 first = false;
-                c += startpdb + " - " + endpdb ; 
+                c += startpdb + " - " + endpdb +chainselect; 
                 cmd += c;
             } 
         }

@@ -105,10 +105,7 @@ public class PersistentConfig
 	    PrintWriter pw = new PrintWriter(os,true);
 	    XMLWriter xw = config.toXML(pw);
 	   
-	    //sw.flush();
-	    //logger.finest(sw.toString());
-	    //sw.close();
-	    //xw.flush();
+	
 	    pw.flush();
 	    os.flush();
 

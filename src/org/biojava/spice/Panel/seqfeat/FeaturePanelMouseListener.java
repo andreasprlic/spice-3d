@@ -94,6 +94,8 @@ MouseListener, MouseMotionListener {
     
     public void mouseMoved(MouseEvent e)
     {	
+       // System.out.println("mouseMoved " + e.getY());
+        
         
         if ( selectionIsLocked ) {
             //System.out.println(" FeaturePanelMouseMove selection locked");
@@ -137,28 +139,32 @@ MouseListener, MouseMotionListener {
         //, int x, int y
         int y = e.getY();
         int seqpos = container.getSeqPos(e);
+        
         Point p = parent.getLocationOnLabelBox(featureView);
         // y is relative to the TypePanelContainer
         // make it relative to the featureview
         int relY = y -p.y + DEFAULT_Y_STEP;
         TypeLabelPanel typ = featureView.getTypePanel();
         int linenr = typ.getLineNr(relY);
+        //System.out.println(linenr + " " + seqpos);
         
         //int linenr = view.getLineNr(e);
-        
-        if ( linenr < 0 ) {
-            oldsegment = null;
-            setToolTipText(null);
-            parent.setCursor(normalCursor);
-            
-            return ;
-        }
         if ( seqpos < 0 ) {
             oldsegment = null;
             setToolTipText(null);
             parent.setCursor(normalCursor);
             return ;
         }
+        
+        if ( linenr < 0 ) {
+            oldsegment = null;
+            setToolTipText(null);
+            parent.setCursor(normalCursor);
+            
+            triggerSelectedSeqPosition(seqpos);
+            return ;
+        }
+       
         
         if ( seqpos == oldposition) 
             return;
@@ -312,7 +318,7 @@ MouseListener, MouseMotionListener {
         }
         //System.out.println("feature panel mouse released");
         if (  selectionIsLocked) {
-            System.out.println(" selection  locked");
+            //System.out.println(" selection  locked");
             return;
         }
         if ( ! (c instanceof FeaturePanelContainer) ){
@@ -428,7 +434,7 @@ MouseListener, MouseMotionListener {
     
     
     private void triggerSelectedSeqPosition(int seqpos){
-        
+        //System.out.println("trigger selected seq position " + seqpos);
         SelectedSeqPositionListener[] selectedSeqListeners = parent.getSelectedSeqPositionListeners();
         for ( int i =0 ; i < selectedSeqListeners.length; i++) {
             
