@@ -45,7 +45,7 @@ public class AboutDialog
 extends JDialog {
     
     public static final String VERSION = 
-        "0.7.0";
+        "0.7.1";
     
     static final String AUTHORS = 
         " <a href=\"mailto:ap3@sanger.ac.uk\">Andreas Prlic</a>, Thomas Down, Tim Hubbard <br>"+
