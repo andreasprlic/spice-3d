@@ -66,19 +66,33 @@ SelectedSeqPositionListener
     }
     
     /** display a new PDB structure in Jmol 
-    * @param structure a Biojava structure object    
+    * @param structure a Biojava structure object
+    * @param displayScript  a flag to set if the INIT_SELECT script should be executed or not    
     *
     */
-   public  void setStructure(Structure structure) {
+   public  void setStructure(Structure structure, boolean displayScript) {
        if ( structure == null ) {
            //executeCmd(EMPTYCMD);
            return;
        }
        this.structure=structure;
        structurePanel.setStructure(structure);
+       if ( displayScript)
        executeCmd(INIT_SELECT);
+   
       
    }
+   
+   /** display a new PDB structure in Jmol 
+    * @param structure a Biojava structure object    
+    *
+    */
+   public  void setStructure(Structure structure) {
+       boolean displayScript = true;
+       setStructure(structure, displayScript );
+      
+   }
+   
     public void setCurrentChainNumber(int i){
         currentChainNumber = i;
     }

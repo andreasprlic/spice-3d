@@ -57,18 +57,23 @@ import java.util.Iterator  ;
 // relfection for setting HttpURLConnectiontimeouts
 
 // gui
+import java.awt.BorderLayout;
 import java.awt.Dimension                       ;
 import java.awt.Color                           ;
 import java.awt.Event                           ;
 import java.awt.event.*                         ;
 
 import javax.swing.Box                          ;
+import javax.swing.JButton;
+import javax.swing.JEditorPane;
 import javax.swing.JSplitPane                   ;
 import javax.swing.JFrame                       ;
 import javax.swing.JList                        ;
 import javax.swing.JScrollPane                  ;
 import javax.swing.DefaultListModel             ;
 import javax.swing.JTextField                   ;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.event.ListSelectionListener  ;
 import javax.swing.event.ListSelectionEvent     ;  
 import javax.swing.ImageIcon                    ;
@@ -78,6 +83,11 @@ import javax.swing.JMenu                        ;
 import javax.swing.JMenuItem                    ;
 import org.biojava.bio.Annotation               ;
 import java.util.Map;
+import javax.swing.JDialog;
+import java.awt.Container;
+
+
+
 
 /** the main application layer of SPICE
  * do not interact with this class directly, but interact with SPICEFrame interface.
@@ -153,20 +163,56 @@ ConfigurationListener
     String dasServerList;
     String labelList;
     
+    String rasmolScript =null;
+    int seqSelectStart = -1;
+    int seqSelectEnd = -1;
+    String pdbSelectStart = null;
+    String pdbSelectEnd = null;
+    
+    String displayMessage;
+    int messageWidth;
+    int messageHeight;
+    
     /** 
      * start the spice appplication
      * 
      * @param registry_urls an array of URLs that point to DAS - registration servers. only the first that can successfully be contacted will be used.
      * @param dasServerList  ";" separated list of DAS source ids e.g. DS:101;DS:102;DS:110 to be highlited
      * @param labelList ";" separated list of labels DAS sources belonging to the labels will be highlited.
-     *  
+     * @param rasmolScript a rasmol script to be sent to Jmol, after the (first) structure has been loaded.
      * 
      */
-    public SpiceApplication( URL[] registry_urls, String dasServerList, String labelList) {
+    public SpiceApplication( URL[] registry_urls, String dasServerList, String labelList, String rasmolScript, 
+            int seqSelectStart, int seqSelectEnd,
+            String pdbSelectStart, String pdbSelectEnd,
+            String message, int messageWidth, int messageHeight) {
         super();
-        
+        this.rasmolScript = rasmolScript;
         this.dasServerList = dasServerList;
         this.labelList = labelList;
+        this.seqSelectStart = seqSelectStart;
+        
+        // a few error checks.
+        if ( seqSelectStart > seqSelectEnd){
+            int tmp = seqSelectEnd;
+            seqSelectEnd = seqSelectStart;
+            seqSelectStart = tmp;
+        }
+        if ( seqSelectEnd >= 0 )
+            this.seqSelectEnd = seqSelectEnd;
+        else 
+            this.seqSelectEnd = seqSelectStart;
+        
+        
+        // only select structure if seq. is not selected...
+        if ( seqSelectStart < 0) {
+            this.pdbSelectStart = pdbSelectStart;
+            this.pdbSelectEnd = pdbSelectEnd;
+        }
+        
+        displayMessage = message;
+        this.messageWidth = messageWidth;
+        this.messageHeight = messageHeight;
         
         // selection is possible at the start ;
         selectionLocked = false ;
@@ -1043,9 +1089,12 @@ ConfigurationListener
         }
         
       
-        
-        structurePanelListener.setStructure(structure);
-        
+        if ( displayMessage != null) {
+            boolean displayScript = false; 
+            structurePanelListener.setStructure(structure,displayScript);
+        } else {
+            structurePanelListener.setStructure(structure);
+        }
         Map header = structure.getHeader();
         //logger.info("structure header " + header);
         statusPanel.setPDB(structure.getPDBCode());
@@ -1060,10 +1109,103 @@ ConfigurationListener
         dascanv.setChain(chain);
         if ( chain != null) 
             seqTextPane.setChain(chain,0);
+        
+        if ( rasmolScript != null){
+            // only execute the rasmol script command the first time.
+            structurePanelListener.executeCmd(rasmolScript);
+            rasmolScript = null;
+        }
+      
+        if ( displayMessage != null ){
+            displayMessage(displayMessage, messageWidth, messageHeight);
+            displayMessage = null;
+        }
+        
+        
+        if ( seqSelectStart >=0 ){
+            dascanv.selectedSeqRange(seqSelectStart, seqSelectEnd);
+            structurePanelListener.selectedSeqRange(seqSelectStart, seqSelectEnd);
+            seqTextPane.selectedSeqRange(seqSelectStart, seqSelectEnd);
+            
+            // lock selectiion
+            dascanv.selectionLocked(true);
+            structurePanelListener.selectionLocked(true);
+            seqTextPane.selectionLocked(true);
+            
+            //reset...
+            seqSelectStart = -1;
+            seqSelectEnd = -1;
+        } else {
+            // perhaps a PDB range has been provided
+            if ( pdbSelectStart != null){
+                String cmd = "select " + pdbSelectStart + " - " + pdbSelectEnd + "; set displaySelected";
+                structurePanelListener.executeCmd(cmd);
+                pdbSelectStart = null;
+                pdbSelectEnd = null;
+            }
+        }
+        
+      
+        
         updateDisplays();
                 
     }
     
+    
+    /** display a dialog with a message... 
+     * 
+     * @param txt
+     * @param width
+     * @param height
+     */
+    private void displayMessage(String msg, int width, int height){
+        
+        JDialog dialog = new JDialog();
+        
+        dialog.setSize(new Dimension(width,height));
+        
+        JEditorPane txt = new JEditorPane("text/html", msg);
+        txt.setEditable(false);
+        
+        txt.addHyperlinkListener(new HyperlinkListener(){
+            public void hyperlinkUpdate(HyperlinkEvent e) {
+                //System.out.println(e);
+                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                    String href = e.getDescription();
+                    showDocument(href);
+                }
+            }
+        });
+        
+        JScrollPane scroll = new JScrollPane(txt);
+        
+        Box vBox = Box.createVerticalBox();
+        vBox.add(scroll);
+        
+        JButton close = new JButton("Close");
+        
+        close.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent event) {
+                Object source = event.getSource();
+                System.out.println(source);
+                JButton but = (JButton)source;
+                Container parent = but.getParent().getParent().getParent().getParent().getParent().getParent() ;
+                System.out.println(parent);
+                JDialog dia = (JDialog) parent;
+                dia.dispose();
+            }
+        });
+        
+        Box hBoxb = Box.createHorizontalBox();
+        hBoxb.add(Box.createGlue());
+        hBoxb.add(close,BorderLayout.EAST);
+        
+        vBox.add(hBoxb);
+        
+        dialog.getContentPane().add(vBox);
+        dialog.show();
+        
+    }
     
     
     public Structure getStructure(){
