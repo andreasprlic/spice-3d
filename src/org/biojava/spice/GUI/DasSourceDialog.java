@@ -167,6 +167,7 @@ extends JDialog{
                txt+= caps[i] + " ";
                continue;
             }
+            
             txt+= "<a href=\""+cmd+"\">"+capability+"</a> ";
         }
         txt +="</td></tr>";
@@ -183,6 +184,8 @@ extends JDialog{
         txt += "</table>";
         txt += "<p>";
         txt += "<a href=\"http://das.sanger.ac.uk/registry/validateServer.jsp?auto_id="+ds.getId()+"\">validate</a> this DasSource.";
+        txt += "</p><p>";
+        txt += "<a href=\"http://das.sanger.ac.uk/registry/sendToFriend.jsp?auto_id="+ds.getId()+"\">send</a> this DasSource to a friend.";
         txt += "</p>";
         txt += "</body></html>";
         
