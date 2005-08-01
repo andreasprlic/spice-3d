@@ -109,7 +109,7 @@ public class ConfigGui {
         frame.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         //Make sure we have the standard desktop window decorations.
         JFrame.setDefaultLookAndFeelDecorated(false);
-        ImageIcon icon = createImageIcon("spice.png");
+        ImageIcon icon = createImageIcon("spice16x16.gif");
         frame.setIconImage(icon.getImage());
         
         //Create and set up the content pane.
@@ -283,7 +283,7 @@ class ConfigPanel extends JPanel implements ConfigurationListener {
         
         
         tabbedPane = new JTabbedPane();
-        ImageIcon icon = createImageIcon("spice.png");
+        ImageIcon icon = createImageIcon("spice16x16.gif");
         
         selectMoveStartPosition = -1 ;
         
@@ -767,7 +767,7 @@ class ConfigPanel extends JPanel implements ConfigurationListener {
     
     /** Returns an ImageIcon, or null if the path was invalid. */
     protected ImageIcon createImageIcon(String path) {
-        java.net.URL imgURL = ConfigPanel.class.getResource(path);
+        java.net.URL imgURL = SpiceApplication.class.getResource(path);
         if (imgURL != null) {
             return new ImageIcon(imgURL);
         } else {

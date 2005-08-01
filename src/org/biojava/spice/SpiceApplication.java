@@ -281,7 +281,7 @@ ConfigurationListener
         JFrame.setDefaultLookAndFeelDecorated(false);
 	
         firefoxIcon = createImageIcon("firefox.png");
-        ImageIcon icon = createImageIcon("spice.png");
+        ImageIcon icon = createImageIcon("spice16x16.gif");
         this.setIconImage(icon.getImage());
         this.pack();
         
