@@ -165,7 +165,7 @@ ConfigurationListener
     
     String rasmolScript =null;
     int seqSelectStart = -1;
-    int seqSelectEnd = -1;
+    int seqSelectEnd   = -1;
     String pdbSelectStart = null;
     String pdbSelectEnd = null;
     
@@ -183,23 +183,23 @@ ConfigurationListener
      * 
      */
     public SpiceApplication( URL[] registry_urls, String dasServerList, String labelList, String rasmolScript, 
-            int seqSelectStart, int seqSelectEnd,
+            int sSelectStart, int sSelectEnd,
             String pdbSelectStart, String pdbSelectEnd,
             String message, int messageWidth, int messageHeight) {
         super();
         this.rasmolScript = rasmolScript;
         this.dasServerList = dasServerList;
         this.labelList = labelList;
-        this.seqSelectStart = seqSelectStart;
+        this.seqSelectStart = sSelectStart;
         
         // a few error checks.
-        if ( seqSelectStart > seqSelectEnd){
-            int tmp = seqSelectEnd;
+        if ( seqSelectStart > sSelectEnd){
+            int tmp = sSelectEnd;
             seqSelectEnd = seqSelectStart;
             seqSelectStart = tmp;
         }
         if ( seqSelectEnd >= 0 )
-            this.seqSelectEnd = seqSelectEnd;
+            this.seqSelectEnd = sSelectEnd;
         else 
             this.seqSelectEnd = seqSelectStart;
         

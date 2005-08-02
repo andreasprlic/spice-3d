@@ -22,6 +22,8 @@
  */
 package org.biojava.spice.GUI.msdkeyword;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.logging.Logger;
 
 import javax.swing.*;
@@ -30,16 +32,21 @@ import javax.swing.event.*;
 import org.biojava.spice.*;
 
 
+
 /** a dialog that lists the results of a keword search
- *  and allows to open matching PDB files.
+ *  and allows to load matching PDBs in spice.
  * @author Andreas Prlic
  *
  */
 public class MSDWindow extends JDialog{
     
+    static final String[] columnNames = {"code","method","resolution","classification"};
+    
     static Logger logger = Logger.getLogger("org.biojava.spice");
     SPICEFrame spice;
     JTable dataTable;
+    JTextField kwsearch;
+    JLabel title;
     static int H_SIZE = 600;
     static int V_SIZE = 200 ;
     /**
@@ -51,22 +58,55 @@ public class MSDWindow extends JDialog{
         
         
         logger.info("searching MSD search web service for keyword " + keyword);
-        MSDKeywordSearch msd = new MSDKeywordSearch();
-        Deposition[] depos = msd.search(keyword);
-        //System.out.println("got " + depos.length + " results.");
-        int length = depos.length;
-        JLabel title = new JLabel(length + " results for keyword " + keyword);
+        
+        title = new JLabel("searching " + keyword);
         Box vBox  = Box.createVerticalBox();
         vBox.add(title);
+              
         
-        String[] columnNames = {"code","method","resolution","classification"};
-        Object[][] data =  getData(depos);
-        dataTable = new JTable(data,columnNames) ;
+       
+        
+        kwsearch = new JTextField(10);
+        kwsearch.addActionListener(new ActionListener()  {
+            public void actionPerformed(ActionEvent e) {
+                
+                String kw  = kwsearch.getText();
+                
+                //System.out.println("search kw " + kw);
+                search(kw);
+                			    
+            }
+            
+        });
+        JButton openKw = new JButton("Search");
+        openKw.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                
+                String kw  = kwsearch.getText();
+                
+                //System.out.println("search kw " + kw);
+                search(kw);
+            }
+        });
+        
+        JLabel kwl = new JLabel("keyword:");
+        Box hBox2 = Box.createHorizontalBox();
+        hBox2.add(kwl);
+        hBox2.add(kwsearch);
+        hBox2.add(openKw);
+        
+         
+        Object[][] data = new Object[0][0];
+        
+        //dataTable = new JTable(data,columnNames) ;
+        dataTable = new JTable(new MyTableModel(data, columnNames));
+        
         TableColumn col0 = dataTable.getColumnModel().getColumn(0);
         col0.setPreferredWidth(30);
         TableColumn col1 = dataTable.getColumnModel().getColumn(2);
         col1.setPreferredWidth(30);
         JScrollPane sc = new JScrollPane(dataTable);
+        
         vBox.add(sc);
         
         dataTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -84,12 +124,28 @@ public class MSDWindow extends JDialog{
                }
            }
         });
+        
+        vBox.add(hBox2);
         this.getContentPane().add(vBox);
         this.setSize(H_SIZE, V_SIZE);
         this.show();
+        search(keyword);
         
     }
 
+        private void search(String keyword ){
+            MSDKeywordSearch msd = new MSDKeywordSearch();
+            Deposition[] depos = msd.search(keyword);
+            //System.out.println("got " + depos.length + " results.");
+            int length = depos.length;
+            title.setText(length + " results for keyword " + keyword); 
+            
+            Object[][] data =  getData(depos);
+            dataTable.setModel(new MyTableModel(data, columnNames));
+            dataTable.repaint();
+            
+        }
+        
     private Object[][] getData(Deposition[] depos){
         Object[][] data = new Object[depos.length][4];
         
@@ -103,4 +159,40 @@ public class MSDWindow extends JDialog{
         return data;
         
     }
+    
+    
+    
+    class MyTableModel extends AbstractTableModel{
+        	   Object[][] data;
+        	   String[] columnNames;
+            public MyTableModel(Object[][] data, String[] columnNames){
+                this.data = data;
+                this.columnNames = columnNames;
+            }
+            
+            
+        
+            public String getColumnName(int col) {
+                return columnNames[col].toString();
+            }
+            public int getRowCount() { return data.length; }
+            public int getColumnCount() { return columnNames.length; }
+            public Object getValueAt(int row, int col) {
+                return data[row][col];
+            }
+            public boolean isCellEditable(int row, int col)
+                { return false; }
+            public void setValueAt(Object value, int row, int col) {
+                data[row][col] = value;
+                fireTableCellUpdated(row, col);
+            }
+            public Class getColumnClass(int c) {
+                return getValueAt(0, c).getClass();
+            }
+        
+    }
+    
 }
+
+
+

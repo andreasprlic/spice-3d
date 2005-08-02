@@ -24,9 +24,11 @@ package org.biojava.spice.GUI.msdkeyword;
 
 import java.util.*;
 
-/** thanks to Adel Golovin for providing this code
+/** thanks to Adel Golovin for providing most of this code.
+ * A class that contains the data returned by
+ * e.g. http://www.ebi.ac.uk/msd-srv/msdsite/entryQueryXML?act=getall&searchOptions=%26keyword=histone";
  * 
- * @author Andreas Prlic
+ * @author Andreas Prlic, Adel Golovin
  *
  */
 public class Deposition {

@@ -265,7 +265,6 @@ class ConfigPanel extends JPanel implements ConfigurationListener {
     static String PDBCOORDSYS     = "PDBresnum,Protein Structure";
     static String UNIPROTCOORDSYS = "UniProt,Protein Sequence";
 
-
     public ConfigPanel(SPICEFrame spice_,RegistryConfiguration conf) {
         super(new GridLayout(1, 1));
         spice = spice_;
