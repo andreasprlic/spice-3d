@@ -22,13 +22,14 @@
  */
 package org.biojava.spice.GUI.msdkeyword;
 
+
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+import java.util.zip.GZIPInputStream;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -40,6 +41,10 @@ import org.xml.sax.XMLReader;
  
 
 /**
+ * request all PDB accession codes that match to a particular keyword.
+ * All data is retrieved from e.g.
+ * http://www.ebi.ac.uk/msd-srv/msdsite/entryQueryXML?act=getall&searchOptions=%26keyword=histone";
+ * 
  * @author Andreas Prlic
  *
  */
@@ -60,11 +65,13 @@ public class MSDKeywordSearch {
     
     public Deposition[] search( String keyword){
         
-        keyword.replaceAll(" ","%26");
+        keyword = keyword.replaceAll(" ","%26");
         //System.out.println("keyword: " + keyword);
         URL url;
         try {
-            url = new URL(MSDLOCATION + keyword);
+            String msdrequest =MSDLOCATION + keyword;
+            logger.info("requesting " + msdrequest);
+            url = new URL(msdrequest);
         }
         catch (MalformedURLException e){
             e.printStackTrace();
@@ -132,13 +139,18 @@ public class MSDKeywordSearch {
         
     }
     
+    /** open an InputStream to the url below. Requests data in gzip encoding, if supported
+     * 
+     * @param url
+     * @return
+     */
     private InputStream open(URL url) {
         {
             
             InputStream inStream = null;
             try{
                 
-                /// PROXY!!!!
+              
                 /*String proxy = "wwwcache.sanger.ac.uk";
                 String port = "3128" ;
                 Properties systemProperties = System.getProperties();
@@ -148,36 +160,26 @@ public class MSDKeywordSearch {
                 */
                 
                 HttpURLConnection huc = null;
-                //huc = (HttpURLConnection) dasUrl.openConnection();
-                
-                //huc = proxyUrl.openConnection();
-                
-                //logger.finer("opening "+url);
+               
                 huc = org.biojava.spice.SpiceApplication.openHttpURLConnection(url);
-                
-                
+                huc.setRequestProperty("Accept-Encoding", "gzip");
                 logger.finest(huc.getResponseMessage());
                 String contentEncoding = huc.getContentEncoding();
-                //logger.finest("encoding: " + contentEncoding);
-                //logger.finest("code:" + huc.getResponseCode());
-                //logger.finest("message:" + huc.getResponseMessage());
-                inStream = huc.getInputStream();
-                //logger.finest(inStream);
-                
-                //in	= new BufferedReader(new InputStreamReader(inStream));
-                
-                //String inputLine ;
-                //while (null != (inputLine = in.readLine()) ) {
-                
-                //logger.finest(inputLine);
-                //}
-                
-                
+            	
+            		inStream = huc.getInputStream();	
+
+            		if (contentEncoding != null) {
+            		    if (contentEncoding.indexOf("gzip") != -1) {
+            		// 	we have gzip encoding
+            		        inStream = new GZIPInputStream(inStream);
+            		        //System.out.println("using gzip encoding!");
+            		    }
+            		}
                 
             }
             catch ( Exception ex){
                 ex.printStackTrace();
-                logger.log(Level.WARNING,"Uncaught exception", ex);
+                logger.log(Level.WARNING,"exception while performing keyword search ", ex);
             }
             
             return inStream;
