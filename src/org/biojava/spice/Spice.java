@@ -32,6 +32,7 @@ import java.net.MalformedURLException ;
 import java.util.ArrayList;
 import javax.swing.JFrame;
 import org.biojava.spice.GUI.AboutDialog;
+import java.util.List;
 
 /** the startup class of SPICE. It takes care of correctly parsing the arguments that are given to SPICE.
  * currently supported arguments are:
@@ -39,7 +40,7 @@ import org.biojava.spice.GUI.AboutDialog;
  * 	<li><b>-codetype</b> the <i>type</i> of the provided code. currently supported: <i>PDB</i> and <i>UniProt</i>.</li>
  * 	<li><b>-code</b>the <i>Accession code</i>. e.g. 5pti for PDB or P00280 for UniProt.</li>
  *  <li><b>-registry</b> the URL for the DAS - registration web service. Usually will be http://servlet.sanger.ac.uk/dasregistry/services/das_registry</li>
- *  <li><b>-backupRegistry</b> the URl for a backup registration service. To be used if the primary service provided by <i>-registry</i> fails.</li>
+ *  <li><b>-backupRegistry</b> (optional) the URl for a backup registration service. To be used if the primary service provided by <i>-registry</i> fails.</li>
  *  <li><b>-display</b> (optional) a list of DAS - sources (by their unique Id from registry) to be highlited. A ";" separated list of DAS source ids e.g. DS_101;DS_102;DS_110</li>.
  *  <li><b>-displayLabel</b> (optional) Choose all das source belonging to a particular label to be highlited. A ";" separated list of labels e.f. biosapiens;efamily;</li>
  *  <li><b>-rasmolScript</b> (optional) Send a rasmol script to be executed after the (first) structure has been loaded. 
@@ -72,13 +73,34 @@ public class Spice extends Applet {
     public static void main(String[] argv) {
         
         Spice app = new Spice();
-        try {
-            // init the configuration
-            argv = CliTools.configureBean(app, argv);
-            app.run();
-        } catch(ConfigurationException e){
-            e.printStackTrace();
+        
+        // init the configuration
+        
+        List mandatoryArgs= new ArrayList();
+        mandatoryArgs.add("primaryRegistry");
+        mandatoryArgs.add("code");
+        mandatoryArgs.add("codetype");
+        
+        
+        for (int i = 0 ; i < argv.length; i++){
+            String arg = argv[i];
+            String[] tmp = new String[1];
+            tmp[0] = arg;
+            
+            try {
+                CliTools.configureBean(app, tmp);        
+            } catch (ConfigurationException e){
+                e.printStackTrace();
+                if ( mandatoryArgs.contains(arg) ) {
+                    // there must not be a ConfigurationException with mandatory arguments.
+                    return;
+                } else {
+                    // but there can be with optional ...
+                }
+            }           
         }
+         
+        app.run();
         
     } 
     
