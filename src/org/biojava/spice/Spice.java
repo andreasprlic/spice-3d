@@ -83,9 +83,11 @@ public class Spice extends Applet {
         
         
         for (int i = 0 ; i < argv.length; i++){
-            String arg = argv[i];
-            String[] tmp = new String[1];
-            tmp[0] = arg;
+            String arg   = argv[i];
+	    String value = argv[i+1];
+	    i++;
+            String[] tmp = {arg,value};
+
             
             try {
                 CliTools.configureBean(app, tmp);        
