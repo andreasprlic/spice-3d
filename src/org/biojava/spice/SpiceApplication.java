@@ -294,8 +294,8 @@ ConfigurationListener
    
     private void initLoggingPanel(){
         LoggingPanel loggingPanel = new LoggingPanel(logger);
-        loggingPanel.getHandler().setLevel(Level.INFO);	
-        logger.setLevel(Level.INFO);
+        loggingPanel.getHandler().setLevel(Level.FINEST);	
+        logger.setLevel(Level.FINEST);
         loggingPanel.show(null);
     }
     
@@ -1187,10 +1187,10 @@ ConfigurationListener
         close.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent event) {
                 Object source = event.getSource();
-                System.out.println(source);
+                //System.out.println(source);
                 JButton but = (JButton)source;
                 Container parent = but.getParent().getParent().getParent().getParent().getParent().getParent() ;
-                System.out.println(parent);
+                //System.out.println(parent);
                 JDialog dia = (JDialog) parent;
                 dia.dispose();
             }

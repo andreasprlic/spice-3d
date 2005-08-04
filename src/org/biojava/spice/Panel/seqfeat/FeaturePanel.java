@@ -36,21 +36,24 @@ import java.util.logging.Logger;
 import org.biojava.spice.Feature.Feature;
 import org.biojava.spice.Feature.Segment;
 import org.biojava.spice.Panel.seqfeat.SelectedFeatureListener;
+import org.biojava.spice.Config.SpiceDasSource;
+import java.util.Map;
 
-/**
+/** The class responsible for painting the 2D - features.
+ * 
  * @author Andreas Prlic
  *
  */
 public class FeaturePanel 
-	//extends SizeableJPanel
-	implements SelectedFeatureListener
-	{
-   
+//extends SizeableJPanel
+implements SelectedFeatureListener
+{
+    
     public static final int    DEFAULT_X_START        = 20  ;
     public static final int    DEFAULT_X_RIGHT_BORDER = 20 ;
     public static final int    DEFAULT_Y_START        = 0 ;
-    public static final int    DEFAULT_Y_STEP         = 10 ;
-    public static final int    DEFAULT_Y_HEIGHT       = 4 ;
+    public static final int    DEFAULT_Y_STEP         = 15 ;
+    public static final int    DEFAULT_Y_HEIGHT       = 10 ;
     public static final int    DEFAULT_Y_BOTTOM       = 16 ;
     
     
@@ -85,7 +88,7 @@ public class FeaturePanel
     
     BufferedImage imbuf;
     int canvasHeight;
-  
+    
     
     FeatureView parent;
     /**
@@ -108,25 +111,25 @@ public class FeaturePanel
         //oldSelectedFeaturePos  =1;
         featureSelected = false;
         //height = MINIMUM_HEIGHT;
-       selected =false;
-       
-       isLoading = false;
-       progressBar = new JProgressBar(0,100);
-       progressBar.setStringPainted(true); //get space for the string
-       progressBar.setString("");          //but don't paint it
-       progressBar.setIndeterminate(true);
-       progressBar.setValue(0);
-       //progressBar.setMaximumSize(new Dimension(400,20));
-       progressBar.setBorder(BorderFactory.createEmptyBorder());
-       
+        selected =false;
+        
+        isLoading = false;
+        progressBar = new JProgressBar(0,100);
+        progressBar.setStringPainted(true); //get space for the string
+        progressBar.setString("");          //but don't paint it
+        progressBar.setIndeterminate(true);
+        progressBar.setValue(0);
+        //progressBar.setMaximumSize(new Dimension(400,20));
+        progressBar.setBorder(BorderFactory.createEmptyBorder());
+        
         progressBar.setVisible(false);
         
         float scale = getScale();
         //initImgBuffer();
         
-       // this.add(progressBar);
+        // this.add(progressBar);
     }
-   
+    
     
     public void setLoading(boolean flag){
         isLoading = flag;
@@ -143,9 +146,9 @@ public class FeaturePanel
     
     //public int getCanvasHeight(){ return canvasHeight;}
     public void setFeatures(Feature[] features){
-       
+        //logger.finest("received " +features.length + "features  from" +parent.getDasSource().getNickname());
         this.features = features;
-
+        
     }
     
     public void setSeqLength(int seqL){
@@ -158,32 +161,13 @@ public class FeaturePanel
     public int getSeqLength(){
         return seqLength;
     }
-    /*
-    private void initImgBuffer(){
-        int aminosize =  Math.round(1 * scale) ;
-        Dimension dstruc = this.getSize();
-        int width = this.getImgWidth(aminosize);
-        int height = getCanvasHeight();
-        //System.out.println(width);
-        if ( height <= 0) 
-            height=MINIMUM_HEIGHT;
-        
-        imbuf = (BufferedImage)this.createImage(width,height); 
-        
-        
-        //g2D.fillRect(0,0,dstruc.width,dstruc.height);
-        //this.setSize(width,height);
-        //this.setPreferredSize(new Dimension(width,height));
-        this.setHeight(height);
-        this.setWidth(width);
-    }
     
-    */
+    
     
     private int getImgWidth(int aminosize){
         // 
         //if ( aminosize < 1) 
-            //aminosize =1;
+        //aminosize =1;
         //int imgwidth = DEFAULT_X_START+DEFAULT_X_RIGHT_BORDER + (seqLength* aminosize);
         //int imgwidth =  (seqLength * aminosize);
         int imgwidth = Math.round(seqLength * scale) + DEFAULT_X_START + DEFAULT_X_RIGHT_BORDER;
@@ -192,15 +176,15 @@ public class FeaturePanel
         return imgwidth;
     }
     
-   
+    
     
     /** a FeatureView consists of a Label and the rendered features */
     
     public int paintComponent( Graphics g, int width, int y) {
         //System.out.println("FeaturePanel paintComponent - y" + y + " width:" + width + " seqLength:"+seqLength);
-          
+        
         //logger.info("paintComponent "  + label);
-//      Graphics g2 = featureCanvas.getGraphics();
+        //      Graphics g2 = featureCanvas.getGraphics();
         Graphics2D g2D = (Graphics2D)g ;
         float scale = getScale();
         //	 minimum size of one aminoacid
@@ -214,8 +198,8 @@ public class FeaturePanel
         // Set current alpha
         Composite oldComposite = g2D.getComposite();
         g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,1.0f));                 
-
-         
+        
+        
         // background ... :-/ ???
         // seems that img does not have background ...
         //g2D.setColor(BACKGROUND_COLOR);
@@ -225,7 +209,7 @@ public class FeaturePanel
             //System.out.println("isLoading - return");
             return y;
         }
-       
+        
         int newy = drawFeatures(g2D,aminosize,width,y,seqLength,scale);
         
         if ( selected ){
@@ -248,40 +232,310 @@ public class FeaturePanel
      * */
     private int drawFeatures(Graphics g, int aminosize, int fullwidth, int y, int chainlength,float scale){
         
-        Graphics2D g2D =(Graphics2D) g;
-        //System.out.println("FeaturePanel drwaFeatures aminosize "+ aminosize + " y " + y);
         
+        //System.out.println("FeaturePanel drwaFeatures aminosize "+ aminosize + " y " + y);
+        //logger.info("drawFeatures " + features);
         boolean secstruc = false ;
         
         if ( features == null) 
             return y;
-                        
+        
+        SpiceDasSource ds = parent.getDasSource();
+        Map[] styleSheetMap = ds.getStylesheet() ;
+        if (( styleSheetMap == null) || (styleSheetMap.length == 0) ) {
+            //logger.info(parent.getDasSource().getNickname() + " did not provide stylesheet");
+            y = paintNoStylesheetFeatures(g,aminosize,fullwidth,y,chainlength,scale);
+        }
+        else {
+            //logger.info(parent.getDasSource().getNickname() + "painting with stylesheet");
+            y = paintStylesheetFeatures(styleSheetMap,g,aminosize,fullwidth,y,chainlength,scale);
+        }
+        return y;
+    }
+    
+    private int paintNoStylesheetFeatures(Graphics g, int aminosize,int fullwidth,int y,int chainlength, float scale) {
+        
+        
         for ( int f =0 ; f< features.length;f++) {
             
-            y+= DEFAULT_Y_STEP;
-           
+            y += DEFAULT_Y_STEP;
             Feature feature = features[f];
-            List segments = feature.getSegments() ;
-             
-            Segment seg0 = (Segment) segments.get(0) ;
+            checkDrawSelectedFeature(feature,f,DEFAULT_Y_HEIGHT,g,aminosize,fullwidth,y,chainlength,scale);
+            String featureType = feature.getType();
             
-            Color col =  seg0.getColor();	
-            g2D.setColor(col);
+            if (  featureType.equals("DISULFID")){
+                drawSpanFeature(feature,f,DEFAULT_Y_HEIGHT,g,aminosize,fullwidth,y,chainlength,scale);
+                
+            } else if (  featureType.equals("SECSTRUC") || 
+                    featureType.equals("HELIX") || 
+                    featureType.equals("STRAND") || 
+                    featureType.equals("COIL") ||
+                    featureType.equals("TURN")
+            ){
+                drawSecstrucFeature(feature,f,DEFAULT_Y_HEIGHT,g,aminosize,fullwidth,y,chainlength,scale);
+            } else { 
+                drawLineFeature(feature,f,DEFAULT_Y_HEIGHT,g,aminosize,fullwidth,y,chainlength,scale);
+            }
+            //drawLineFeature(feature,f,DEFAULT_Y_HEIGHT,g,aminosize,fullwidth,y,chainlength,scale);
+        }
+        return y;
+        
+    }
+    
+    private int paintStylesheetFeatures(Map[] style,Graphics g, int aminosize,int fullwidth,int y,int chainlength, float scale) {
+        Graphics2D g2D =(Graphics2D) g;
+        
+        for ( int f =0 ; f< features.length;f++) {
             
-            if ( featureSelected){
-                if (f == selectedFeaturePos) {
-                    //Dimension dstruc = this.getSize();
-                    g2D.setColor(SELECTED_FEATURE_COLOR);
-                    Composite oldComp = g2D.getComposite();
-                    g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_IN ,0.6f));
-                    g2D.fillRect(0,y,fullwidth,DEFAULT_Y_HEIGHT);
-                    g2D.setComposite(oldComp);
+            y += DEFAULT_Y_STEP;
+            
+            Feature  feat = features[f];
+            String featureType = feat.getType();
+            
+            checkDrawSelectedFeature(feat,f,DEFAULT_Y_HEIGHT,g,aminosize,fullwidth,y,chainlength,scale);
+            
+            boolean matchingStyle = false ;
+            for (int m=0; m< style.length;m++){
+                Map s = style[m];
+                //logger.finest(" style:" + s);
+                String styleType = (String) s.get("type");
+                if ( styleType.equals(featureType) ){
+                    // this style sheet applies here!
+                    
+                    
+                    String featStyle = (String)s.get("style");
+                    int h = getDrawHeight(s);
+                    
+                    if ( featStyle.equals("line")){
+                        //logger.finest("drawing line + style ");
+                        matchingStyle = true ;
+                        
+                        drawLineFeature(feat,f,h,g,aminosize,fullwidth,y,chainlength,scale);
+                    }
+                    else if ( featStyle.equals("box")) {
+                        //logger.finest("drawing box + style ");
+                        matchingStyle = true ;
+                        drawBoxFeature(feat,f,h,g,aminosize,fullwidth,y,chainlength,scale);
+                    }
+                    else if ( featStyle.equals("span")) {
+                        //logger.finest("drawing span + style ");
+                        matchingStyle = true ;
+                        drawSpanFeature(feat,f,h,g,aminosize,fullwidth,y,chainlength,scale);
+                    }
+                    else if ( featStyle.equals("triangle")) {
+                        // logger.finest("drawing triangle + style ");
+                        matchingStyle = true ;
+                        drawTriangleFeature(feat,f,h,g,aminosize,fullwidth,y,chainlength,scale);
+                    }
+                    else if ( featStyle.equals("helix")) {
+                        // logger.finest("drawing triangle + style ");
+                        matchingStyle = true ;
+                        drawHelixFeature(feat,f,h,g,aminosize,fullwidth,y,chainlength,scale);
+                    }
+                    else if ( featStyle.equals("arrow")) {
+                        // logger.finest("drawing triangle + style ");
+                        matchingStyle = true ;
+                        drawArrowFeature(feat,f,h,g,aminosize,fullwidth,y,chainlength,scale);
+                    }
+                    
+                    else {
+                        logger.finest("could not find matching feat. style " + featStyle + " falling back to default.");
+                    }
+                } 
+            }
+            
+            if ( ! matchingStyle){
+                //logger.finest("no matching stylesheet found for feature type " + featureType);
+                // no stylesheet type has been found that describes how to paint this feature - use default...
+                if (  featureType.equals("DISULFID")){
+                    drawSpanFeature(feat,f,DEFAULT_Y_HEIGHT,g,aminosize,fullwidth,y,chainlength,scale);
+                } else if (  featureType.equals("SECSTRUC") || 
+                        featureType.equals("HELIX") || 
+                        featureType.equals("STRAND") || 
+                        featureType.equals("COIL") ||
+                        featureType.equals("TURN")
+                ){
+                    drawSecstrucFeature(feat,f,DEFAULT_Y_HEIGHT,g,aminosize,fullwidth,y,chainlength,scale);
+                } else { 
+                    drawLineFeature(feat,f,DEFAULT_Y_HEIGHT,g,aminosize,fullwidth,y,chainlength,scale);
                 }
             }
-            //g2D.drawString(feature.getName(), 1,y+DEFAULT_Y_HEIGHT);
+        }
+        
+        return y;
+    }
+    
+    private int getDrawHeight(Map styleMap){
+        
+        String height = (String)styleMap.get("height");
+        int h = DEFAULT_Y_HEIGHT;
+        if ( height != null){
+            try {
+                h = Integer.parseInt(height);
+            } catch (Exception e){}
+        }
+        
+        if (h > DEFAULT_Y_HEIGHT){
+            h = DEFAULT_Y_HEIGHT;
+        }
+        return h;
+    }
+    
+    
+    private void checkDrawSelectedFeature(Feature feature,int featurePos, int drawHeight,Graphics g, int aminosize,int fullwidth,int y,int chainlength, float scale){
+        Graphics2D g2D =(Graphics2D) g;
+        int f = featurePos;
+        if ( featureSelected){
+            if (f == selectedFeaturePos) {
+                //Dimension dstruc = this.getSize();
+                g2D.setColor(SELECTED_FEATURE_COLOR);
+                Composite oldComp = g2D.getComposite();
+                g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_IN ,0.6f));
+                g2D.fillRect(0,y,fullwidth,drawHeight);
+                g2D.setComposite(oldComp);
+            }
+        }
+    }
+    
+    /** draw a solid rectangle 
+     * 
+     * @param feature
+     * @param featurePos
+     * @param drawHeight
+     * @param g
+     * @param aminosize
+     * @param fullwidth
+     * @param y
+     * @param chainlength
+     * @param scale
+     */
+    private void drawLineFeature(Feature feature,int featurePos, int drawHeight,Graphics g, int aminosize,int fullwidth,int y,int chainlength, float scale) 
+    {
+        // logger.finest("draw Line Feature " + feature );
+        Graphics2D g2D =(Graphics2D) g;
+        List segments = feature.getSegments() ;
+        int f = featurePos;     
+        
+        Segment seg0 = (Segment) segments.get(0) ;
+        
+        Color col =  seg0.getColor();	
+        g2D.setColor(col);
+        
+        
+        //g2D.drawString(feature.getName(), 1,y+DEFAULT_Y_HEIGHT);
+        
+        for (int s=0; s<segments.size();s++){
+            Segment segment=(Segment) segments.get(s);
             
-            for (int s=0; s<segments.size();s++){
-                Segment segment=(Segment) segments.get(s);
+            int start     = segment.getStart() -1 ;
+            int end       = segment.getEnd()   -1 ;
+            
+            // hum some people say this if annotation relates to whole seq.
+            if (( start == -1) && ( end == -1 )){
+                //System.out.println(feature);
+                start = 0;
+                end = chainlength - 1;
+                segment.setStart(1);
+                segment.setEnd(chainlength);
+            }
+            
+            if ( ! (featureSelected && ( f== selectedFeaturePos))){
+                col = segment.getColor();
+                g2D.setColor(col);
+            }
+            
+            int xstart =  java.lang.Math.round(start * scale) + DEFAULT_X_START;
+            int width   = java.lang.Math.round(  end * scale) - xstart +  DEFAULT_X_START+aminosize ;
+            
+            int height = drawHeight ;
+            
+            // draw the line ...
+            g2D.fillRect(xstart,y,width,height);
+            
+        }
+    }
+    
+    private void drawTriangleFeature(Feature feature,int featurePos, int drawHeight,Graphics g, int aminosize,int fullwidth,int y,int chainlength, float scale) 
+    {
+        // logger.finest("draw Triangle Feature " + feature );
+        Graphics2D g2D =(Graphics2D) g;
+        List segments = feature.getSegments() ;
+        int f = featurePos;     
+        
+        Segment seg0 = (Segment) segments.get(0) ;
+        
+        Color col =  seg0.getColor();	
+        g2D.setColor(col);
+        
+        
+        //g2D.drawString(feature.getName(), 1,y+DEFAULT_Y_HEIGHT);
+        
+        for (int s=0; s<segments.size();s++){
+            Segment segment=(Segment) segments.get(s);
+            
+            int start     = segment.getStart() -1 ;
+            int end       = segment.getEnd()   -1 ;
+            
+            // hum some people say this if annotation relates to whole seq.
+            if (( start == -1) && ( end == -1 )){
+                //System.out.println(feature);
+                start = 0;
+                end = chainlength - 1;
+                segment.setStart(1);
+                segment.setEnd(chainlength);
+            }
+            
+            if ( ! (featureSelected && ( f== selectedFeaturePos))){
+                col = segment.getColor();
+                g2D.setColor(col);
+            }
+            
+            int xstart =  java.lang.Math.round(start * scale) + DEFAULT_X_START;
+            int width   = java.lang.Math.round(  end * scale) - xstart +  DEFAULT_X_START+aminosize ;
+            
+            int height = drawHeight ;
+            
+            // draw the line ...
+            //g2D.fillRect(xstart,y,width,height);
+            int middlex = xstart + (width/2);
+            g2D.drawLine(xstart,(y+DEFAULT_Y_HEIGHT),middlex,y);
+            g2D.drawLine(middlex,y,xstart+width,(y+DEFAULT_Y_HEIGHT));
+            g2D.drawLine(xstart,(y+DEFAULT_Y_HEIGHT),xstart+width,(y+DEFAULT_Y_HEIGHT));
+            
+            
+            
+        }
+    }
+    
+    
+    private void drawSecstrucFeature(Feature feature,int featurePos, int drawHeight,Graphics g, int aminosize,int fullwidth,int y,int chainlength, float scale) 
+    {
+        //logger.finest("draw Secstruc Feature " + feature );
+        Graphics2D g2D =(Graphics2D) g;
+        List segments = feature.getSegments() ;
+        int f = featurePos;     
+        
+        Segment seg0 = (Segment) segments.get(0) ;
+        
+        Color col =  seg0.getColor();	
+        g2D.setColor(col);
+        
+        
+        //g2D.drawString(feature.getName(), 1,y+DEFAULT_Y_HEIGHT);
+        logger.finest(""+feature);
+        
+        for (int s=0; s<segments.size();s++){
+            Segment segment=(Segment) segments.get(s);
+            logger.finest(""+segment);
+            if ( segment.getName().equals("HELIX")){
+                // draw helix
+                drawHelixSegment(segment, drawHeight,g, aminosize,fullwidth,y,chainlength, scale);
+            } else if ( segment.getName().equals("STRAND")){
+               
+                drawArrowSegment(segment, drawHeight,g, aminosize,fullwidth,y,chainlength, scale);
+            
+            } else {
+                
                 
                 int start     = segment.getStart() -1 ;
                 int end       = segment.getEnd()   -1 ;
@@ -295,33 +549,240 @@ public class FeaturePanel
                     segment.setEnd(chainlength);
                 }
                 
-                if ( ! (featureSelected && ( f== selectedFeaturePos))){
-                    col = segment.getColor();
-                    g2D.setColor(col);
-                }
+                //if ( ! (featureSelected && ( f== selectedFeaturePos))){
+                col = segment.getColor();
+                g2D.setColor(col);
+                //}
                 
                 int xstart =  java.lang.Math.round(start * scale) + DEFAULT_X_START;
                 int width   = java.lang.Math.round(  end * scale) - xstart +  DEFAULT_X_START+aminosize ;
                 
-                int height = DEFAULT_Y_HEIGHT ;
-                //logger.info(feature+ " " + end +" " + width);
-                //logger.finest("color"+entColors[i%entColors.length]);
-                //logger.info("new feature  ("+f+"): x1:"+ xstart+" y1:"+y+" width:"+width+" height:"+height);
-                String type = feature.getType() ;
-                if (  type.equals("DISULFID")){
-                    
-                    g2D.fillRect(xstart,y,aminosize,height);
-                    g2D.fillRect(xstart,y+(height/2),width,1);
-                    g2D.fillRect(xstart+width-aminosize,y,aminosize,height);
-                } else {
-                    g2D.fillRect(xstart,y,width,height);
-                }
+                int height = drawHeight ;
+                
+                // draw the line ...
+                
+                
+                g2D.fillRect(xstart,y,width,height);
             }
+            
+        }
+        
+    }
+    
+    
+    private void drawHelixSegment(Segment segment, int drawHeight,Graphics g, int aminosize,int fullwidth,int y,int chainlength, float scale){
+        logger.finest("drawHelixSegment");
+        Graphics2D g2D =(Graphics2D) g;
+        int start     = segment.getStart() -1 ;
+        int end       = segment.getEnd()   -1 ;
+        
+        int xstart =  java.lang.Math.round(start * scale) + DEFAULT_X_START;
+        int width   = java.lang.Math.round(  end * scale) - xstart +  DEFAULT_X_START+aminosize ;
+        
+        
+        // draw a sinus - double helix ...
+        float ang = 0.0f;
+        
+        // do one helix / 4 amino acids ...
+        float inc = (float)(360 /( 4* aminosize)); 
+        logger.finest("increase " + inc);
+        double RAD = 3.1415926535 / 180.0 ;
+        int oldy1 = y+DEFAULT_Y_HEIGHT;
+        int oldy2 = y+DEFAULT_Y_HEIGHT;
+        g2D.setColor(Color.red);
+        for ( int i =xstart ; i<= (xstart+width); i++ ){
+            ang += inc;
+            if ( ang > 360) ang = 0;
+            float ypos = (float) (Math.cos(ang) ) + 1;
+            //System.out.println("ypos helix " + ypos);
+            float ypos2 = (float) (Math.sin(ang) +1);
+            int currentY = y ;
+            int currentY2 = y ;
+            if ( ypos != 0) 
+                currentY = y+ Math.round(DEFAULT_Y_HEIGHT / 2 * ypos) -1;
+            if ( ypos2 != 0)
+                currentY2 = y+ Math.round(DEFAULT_Y_HEIGHT / 2 * ypos2)-1;
+            //System.out.println("i " + i + "inc " + inc + " ang " + ang + " ypos helix " + currentY );
+            
+            
+            g2D.drawLine(i,oldy1,i,currentY);
+            //g2D.setColor(Color.red);
+            //g2D.drawLine(i,oldy2,i,currentY2);
+            g2D.drawLine(i,currentY,i,currentY2);
+            oldy1= currentY;
+            oldy2 = currentY2;
             
             
         }
-        //y+= DEFAULT_Y_STEP;
-        return y ;
+        
+        
+    }
+    
+    /** draw the frame of a rectangle .
+     * 
+     * 
+     * @param feature
+     * @param featurePos
+     * @param drawHeight
+     * @param g
+     * @param aminosize
+     * @param fullwidth
+     * @param y
+     * @param chainlength
+     * @param scale
+     */
+    private void drawBoxFeature(Feature feature,int featurePos, int drawHeight,Graphics g, int aminosize,int fullwidth,int y,int chainlength, float scale) 
+    {
+        //logger.finest("draw Box Feature " + feature );
+        
+        Graphics2D g2D =(Graphics2D) g;
+        List segments = feature.getSegments() ;
+        int f = featurePos;     
+        
+        Segment seg0 = (Segment) segments.get(0) ;
+        
+        Color col =  seg0.getColor();	
+        g2D.setColor(col);
+        
+        
+        for (int s=0; s<segments.size();s++){
+            Segment segment=(Segment) segments.get(s);
+            
+            int start     = segment.getStart() -1 ;
+            int end       = segment.getEnd()   -1 ;
+            
+            // hum some people say this if annotation relates to whole seq.
+            if (( start == -1) && ( end == -1 )){
+                //System.out.println(feature);
+                start = 0;
+                end = chainlength - 1;
+                segment.setStart(1);
+                segment.setEnd(chainlength);
+            }
+            
+            if ( ! (featureSelected && ( f== selectedFeaturePos))){
+                col = segment.getColor();
+                g2D.setColor(col);
+            }
+            
+            int xstart =  java.lang.Math.round(start * scale) + DEFAULT_X_START;
+            int width   = java.lang.Math.round(  end * scale) - xstart +  DEFAULT_X_START+aminosize ;
+            
+            g2D.drawRect(xstart,y,width,drawHeight);
+            //g2D.drawLine(xstart,y,)
+        }
+        
+    }
+    
+    private void drawArrowFeature(Feature feature,int featurePos, int drawHeight,Graphics g, int aminosize,int fullwidth,int y,int chainlength, float scale) 
+    {
+        //logger.finest("draw Box Feature " + feature );
+        
+        
+        List segments = feature.getSegments() ;
+        int f = featurePos;     
+        
+        Segment seg0 = (Segment) segments.get(0) ;
+        
+        //Color col =  seg0.getColor();	
+        //g2D.setColor(col);
+        
+        
+        for (int s=0; s<segments.size();s++){
+            
+            
+            Segment segment=(Segment) segments.get(s);
+            
+            drawArrowSegment(segment,drawHeight, g,  aminosize, fullwidth, y, chainlength,  scale);
+        }
+    }
+    
+    private void drawArrowSegment(Segment segment, int drawHeight,Graphics g, int aminosize,int fullwidth,int y,int chainlength, float scale){
+        logger.finest("drawArrowsegment");
+        Graphics2D g2D =(Graphics2D) g;
+        int start     = segment.getStart() -1 ;
+        int end       = segment.getEnd()   -1 ;
+        
+        // hum some people say this if annotation relates to whole seq.
+        if (( start == -1) && ( end == -1 )){
+            //System.out.println(feature);
+            start = 0;
+            end = chainlength - 1;
+            segment.setStart(1);
+            segment.setEnd(chainlength);
+        }
+        
+        
+        Color col = segment.getColor();
+        g2D.setColor(col);
+        
+        
+        int xstart =  java.lang.Math.round(start * scale) + DEFAULT_X_START;
+        int width   = java.lang.Math.round(  end * scale) - xstart +  DEFAULT_X_START+aminosize ;
+        
+        int half = drawHeight / 2 ;
+        
+        
+        if ( width > 4) {
+            g2D.fillRect(xstart,y+half-1,width-4,drawHeight-half+1);
+            // draw arrow head
+            int x1 = xstart + width -4  ; int y1 = y ;
+            int x2 = xstart + width -4  ; int y2 = y + DEFAULT_Y_HEIGHT;
+            int x3 = xstart + width     ; int y3 = y + half ; 
+            int[] xPoints =  { x1,x2,x3};
+            int[] yPoints =  { y1,y2,y3};
+            g2D.fillPolygon(xPoints,yPoints, 3);
+        }
+        else
+            g2D.fillRect(xstart,y+half,width,drawHeight-half);
+        //g2D.drawLine(xstart,y,)
+    }
+    
+    
+    
+    
+    
+    private void drawHelixFeature(Feature feature,int featurePos, int drawHeight,Graphics g, int aminosize,int fullwidth,int y,int chainlength, float scale){
+        //logger.finest("draw Helix Feature " + feature );
+        Graphics2D g2D =(Graphics2D) g;
+        List segments = feature.getSegments() ;
+        
+        
+        
+        for (int s=0; s<segments.size();s++){
+            Segment segment=(Segment) segments.get(s);
+            
+            drawHelixSegment(segment, drawHeight, g,  aminosize, fullwidth, y, chainlength,  scale);
+            
+        }
+        
+    }
+    
+    private void drawSpanFeature(Feature feature,int featurePos, int drawHeight,Graphics g, int aminosize,int fullwidth,int y,int chainlength, float scale){
+        logger.finest("draw Span Feature " + feature );
+        Graphics2D g2D =(Graphics2D) g;
+        List segments = feature.getSegments() ;
+        
+        if ( feature.getType().equals("DISULFID")){
+            g2D.setColor(Color.yellow);
+        }
+        
+        for (int s=0; s<segments.size();s++){
+            Segment segment=(Segment) segments.get(s);
+            
+            int start     = segment.getStart() -1 ;
+            int end       = segment.getEnd()   -1 ;
+            
+            int xstart =  java.lang.Math.round(start * scale) + DEFAULT_X_START;
+            int width   = java.lang.Math.round(  end * scale) - xstart +  DEFAULT_X_START+aminosize ;
+            
+            int height = drawHeight;
+            g2D.fillRect(xstart,y,aminosize,height);
+            g2D.fillRect(xstart,y+(height/2),width,1);
+            g2D.fillRect(xstart+width-aminosize,y,aminosize,height);
+            
+        }
+        
     }
     
     /** draw the selected region */
@@ -332,7 +793,7 @@ public class FeaturePanel
             //Dimension dstruc=this.getSize();
             Composite oldComp = g2D.getComposite();
             g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));        
-         
+            
             g2D.setColor(SELECTION_COLOR);
             int seqx = java.lang.Math.round(selectStart*scale)+DEFAULT_X_START ;
             
@@ -360,8 +821,8 @@ public class FeaturePanel
         if ( feat == null) { 
             featureSelected = false;
             selectedFeaturePos = -1;
-        		//this.repaint();
-        		return;
+            //this.repaint();
+            return;
         }
         featureSelected = true;
         // determin on which position this featue is ...
@@ -373,14 +834,14 @@ public class FeaturePanel
                 List tmpsegs = feat.getSegments();
                 List segs = feature.getSegments();
                 if ( tmpsegs.equals(segs)){
-                
+                    
                     selectedFeaturePos = f;
                 }
                 //System.out.println("featurepanel selected feature " + feat + " pos" + f);
             }
         }
         //if ( oldSelectedFeaturePos != selectedFeaturePos){
-          //  this.repaint();
+        //  this.repaint();
         //}
         //this.repaint();
         //oldSelectedFeaturePos = selectedFeaturePos;
@@ -393,24 +854,15 @@ public class FeaturePanel
         //this.revalidate();
     }
     
-   
+    
     
     public float getScale(){
         
         return scale;
-       
+        
     }
     
-    /** get the sequence position of the current mouse event 
-    public int getSeqPos(MouseEvent e) {
-        // get r
-        int x = e.getX();
-        int y = e.getY();
-        float scale = getScale();
-        int seqpos =  java.lang.Math.round((x-DEFAULT_X_START-2)/scale) ;
-        
-        return seqpos  ;
-    }	*/
+    
     
     /* check if the mouse is over a feature and if it is 
      * return the feature number 
@@ -447,8 +899,8 @@ public class FeaturePanel
         selectStart  = seqpos ;
         selectEnd    = seqpos ;
         dragging = false;
-      
-//      this.repaint();
+        
+        //      this.repaint();
         
     }
     

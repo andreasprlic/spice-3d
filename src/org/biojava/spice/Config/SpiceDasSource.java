@@ -31,6 +31,9 @@ import org.biojava.utils.xml.*            ;
 import java.io.IOException                ;
 import java.text.DateFormat               ;
 import java.text.SimpleDateFormat         ;
+import java.util.*;
+import org.biojava.spice.DAS.DAS_StylesheetRetrieve;
+import java.net.URL;
 
 /** Manages all data about a DAS source that SPICE requires */
 public class SpiceDasSource
@@ -41,13 +44,42 @@ public class SpiceDasSource
 
     boolean status ;
     boolean registered ; // a flag to trace if source comes from registry or from user vonfig
+    Map[] typeStyles;
+    
     public SpiceDasSource() {
 	super();
 	status    = true ;  // default source is actived and used .
 	registered = true ; // default true = source comes from registry
 	setNickname("MyDASsource");
+	typeStyles = new Map[0];
     }
 
+    public void loadStylesheet(){
+        DAS_StylesheetRetrieve dsr = new DAS_StylesheetRetrieve();
+        String cmd = getUrl()+"stylesheet";
+        URL url = null;
+        try {
+            url = new URL(cmd);
+        } catch (Exception e){
+            e.printStackTrace();
+            return ;
+        }
+        Map[] styles = dsr.retrieve(url);
+        if ( styles != null){
+            typeStyles = styles;
+        }
+    }
+    
+    /** returns the Stylesheet that is provided by a DAS source.
+     * It provides info of how to draw a particular feature.
+     * 
+     * @return
+     */
+    public Map[] getStylesheet(){
+        return typeStyles;
+    }
+    
+    
     public void    setStatus(boolean flag) { status = flag ; }
     public boolean getStatus()             { return status ; }
 

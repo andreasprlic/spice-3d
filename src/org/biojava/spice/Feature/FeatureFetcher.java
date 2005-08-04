@@ -396,6 +396,14 @@ public class FeatureFetcher extends Thread
             DasResponse d=new DasResponse(UNIPROTCOORDSYS);
             subthreads[responsecounter] = d; 
             SpiceDasSource featureserver = (SpiceDasSource) featservs.get(f) ;
+            // now with support for stylesheets.
+            featureserver.loadStylesheet();
+            
+            Map[] typeStyle = featureserver.getStylesheet(); 
+            for ( int m=0; m< typeStyle.length;m++){
+                logger.info("got stylesheet: " + typeStyle[m]);    
+            }
+            
             FeatureView fv = createNewFeatureView(featureserver);
             featureViews[responsecounter] = fv;
             
@@ -744,6 +752,7 @@ public class FeatureFetcher extends Thread
                 secstruc = true ;
                 currentFeatureMap.put("color",TURN_COLOR);
                 currentFeatureMap.put("colorTxt","white");
+                
                 feat.setName("SECSTRUC");
             } 	  
             else {
