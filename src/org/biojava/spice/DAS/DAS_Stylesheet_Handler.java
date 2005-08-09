@@ -26,6 +26,7 @@ package org.biojava.spice.DAS;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.Attributes            ;
 import java.util.*;
+import java.awt.Color;
 
 /** a class to parse the XML response of a DAS - stylesheet request.
  * @author Andreas Prlic
@@ -78,7 +79,7 @@ public class DAS_Stylesheet_Handler extends DefaultHandler {
             String id = atts.getValue("id");
             currentType = new HashMap(); 
             currentType.put("type",id);
-        }
+        } 
         
         else if ( qName.equals("ARROW")){
             currentType.put("style","arrow");
@@ -106,7 +107,11 @@ public class DAS_Stylesheet_Handler extends DefaultHandler {
         if ( qName.equals("HEIGHT")){
             currentType.put("height",chars);
         } else if ( qName.equals("COLOR")){
-            currentType.put("color",chars);
+            System.out.println("got color " + chars);
+            if (!  chars.equals("rotate")) {
+                Color col = Color.decode(chars);
+                currentType.put("color",col);
+            }
         } else if ( qName.equals("OUTLINECOLOR")){
             currentType.put("outlinecolor",chars);
         } else if ( qName.equals("BACKGROUND")){
@@ -131,8 +136,6 @@ public class DAS_Stylesheet_Handler extends DefaultHandler {
         } else if ( qName.equals("WIDTH")){
             currentType.put("width",chars);
         }
-        
-        
         
         else if ( qName.equals("TYPE")){
             if ( threeDstyle){

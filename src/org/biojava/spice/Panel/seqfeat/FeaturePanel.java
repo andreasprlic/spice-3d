@@ -38,6 +38,7 @@ import org.biojava.spice.Feature.Segment;
 import org.biojava.spice.Panel.seqfeat.SelectedFeatureListener;
 import org.biojava.spice.Config.SpiceDasSource;
 import java.util.Map;
+import java.util.HashMap;
 
 /** The class responsible for painting of 2D - features.
  * 
@@ -55,14 +56,11 @@ implements SelectedFeatureListener
     public static final int    DEFAULT_Y_STEP         = 10 ;
     public static final int    DEFAULT_Y_HEIGHT       = 4 ;
     public static final int    DEFAULT_Y_BOTTOM       = 16 ;
-    
-    
     public static final int    MINIMUM_HEIGHT         = 30;
     
     public static final Color BACKGROUND_COLOR        = Color.black;
     public static final Color SELECTION_COLOR         = Color.lightGray;
     public static final Color SELECTED_FEATURE_COLOR  = Color.yellow;
-    
     
     int mouseDragStart ;
     //int height;
@@ -260,7 +258,9 @@ implements SelectedFeatureListener
             
             y += DEFAULT_Y_STEP;
             Feature feature = features[f];
+            
             checkDrawSelectedFeature(feature,f,DEFAULT_Y_HEIGHT,g,aminosize,fullwidth,y,chainlength,scale);
+            setColor(g,feature,new HashMap());
             String featureType = feature.getType();
             
             if (  featureType.equals("DISULFID")){
@@ -282,6 +282,33 @@ implements SelectedFeatureListener
         
     }
     
+    /** set the color to be used for painting 
+     * 
+     * @param feature
+     * @param style
+     * @return
+     */
+    private void setColor(Graphics g, Feature feature, Map style){
+        Color c = (Color) style.get("color");
+        if ( c != null) {
+            
+            logger.info("using stylesheet defined color " + c);
+            g.setColor(c);
+        } else {
+            logger.info("no stylesheet defined color found for" + feature.getName());
+            if ( feature.getType().equals("DISULFID")){
+                g.setColor(Color.yellow);
+            } else {
+                List segments = feature.getSegments();
+                Segment seg0 = (Segment) segments.get(0) ;
+                
+                Color col =  seg0.getColor();	
+                g.setColor(col);
+                
+            }
+        }
+    }
+    
     private int paintStylesheetFeatures(Map[] style,Graphics g, int aminosize,int fullwidth,int y,int chainlength, float scale) {
         Graphics2D g2D =(Graphics2D) g;
         
@@ -294,6 +321,8 @@ implements SelectedFeatureListener
             
             checkDrawSelectedFeature(feat,f,DEFAULT_Y_HEIGHT,g,aminosize,fullwidth,y,chainlength,scale);
             
+            
+            
             boolean matchingStyle = false ;
             for (int m=0; m< style.length;m++){
                 Map s = style[m];
@@ -301,7 +330,8 @@ implements SelectedFeatureListener
                 String styleType = (String) s.get("type");
                 if ( styleType.equals(featureType) ){
                     // this style sheet applies here!
-                    
+                    logger.info("drawing " + styleType + " with stylesheet support");
+                    setColor(g,feat,s);
                     
                     String featStyle = (String)s.get("style");
                     int h = getDrawHeight(s);
@@ -381,6 +411,18 @@ implements SelectedFeatureListener
         return h;
     }
     
+    /** check if the feature is selected, if yest, color the background in SELECTED_FEATURE_COLOR
+     * 
+     * @param feature
+     * @param featurePos
+     * @param drawHeight
+     * @param g
+     * @param aminosize
+     * @param fullwidth
+     * @param y
+     * @param chainlength
+     * @param scale
+     */
     
     private void checkDrawSelectedFeature(Feature feature,int featurePos, int drawHeight,Graphics g, int aminosize,int fullwidth,int y,int chainlength, float scale){
         Graphics2D g2D =(Graphics2D) g;
@@ -418,8 +460,8 @@ implements SelectedFeatureListener
         
         Segment seg0 = (Segment) segments.get(0) ;
         
-        Color col =  seg0.getColor();	
-        g2D.setColor(col);
+        //Color col =  seg0.getColor();	
+        //g2D.setColor(col);
         
         
         //g2D.drawString(feature.getName(), 1,y+DEFAULT_Y_HEIGHT);
@@ -439,10 +481,10 @@ implements SelectedFeatureListener
                 segment.setEnd(chainlength);
             }
             
-            if ( ! (featureSelected && ( f== selectedFeaturePos))){
-                col = segment.getColor();
-                g2D.setColor(col);
-            }
+            //if ( ! (featureSelected && ( f== selectedFeaturePos))){
+            //    col = segment.getColor();
+            //    g2D.setColor(col);
+            //}
             
             int xstart =  java.lang.Math.round(start * scale) + DEFAULT_X_START;
             int width   = java.lang.Math.round(  end * scale) - xstart +  DEFAULT_X_START+aminosize ;
@@ -462,10 +504,10 @@ implements SelectedFeatureListener
         List segments = feature.getSegments() ;
         int f = featurePos;     
         
-        Segment seg0 = (Segment) segments.get(0) ;
+        //Segment seg0 = (Segment) segments.get(0) ;
         
-        Color col =  seg0.getColor();	
-        g2D.setColor(col);
+        //Color col =  seg0.getColor();	
+        //g2D.setColor(col);
         
         
         //g2D.drawString(feature.getName(), 1,y+DEFAULT_Y_HEIGHT);
@@ -485,10 +527,10 @@ implements SelectedFeatureListener
                 segment.setEnd(chainlength);
             }
             
-            if ( ! (featureSelected && ( f== selectedFeaturePos))){
-                col = segment.getColor();
-                g2D.setColor(col);
-            }
+            //if ( ! (featureSelected && ( f== selectedFeaturePos))){
+            //    col = segment.getColor();
+            //    g2D.setColor(col);
+            //}
             
             int xstart =  java.lang.Math.round(start * scale) + DEFAULT_X_START;
             int width   = java.lang.Math.round(  end * scale) - xstart +  DEFAULT_X_START+aminosize ;
@@ -517,8 +559,8 @@ implements SelectedFeatureListener
         
         Segment seg0 = (Segment) segments.get(0) ;
         
-        Color col =  seg0.getColor();	
-        g2D.setColor(col);
+        //Color col =  seg0.getColor();	
+        //g2D.setColor(col);
         
         
         //g2D.drawString(feature.getName(), 1,y+DEFAULT_Y_HEIGHT);
@@ -531,12 +573,12 @@ implements SelectedFeatureListener
                 // draw helix
                 drawHelixSegment(segment, drawHeight,g, aminosize,fullwidth,y,chainlength, scale);
             } else if ( segment.getName().equals("STRAND")){
-               
+                g.setColor(Color.yellow);
                 drawArrowSegment(segment, drawHeight,g, aminosize,fullwidth,y,chainlength, scale);
             
             } else {
                 
-                
+                g.setColor(Color.gray);
                 int start     = segment.getStart() -1 ;
                 int end       = segment.getEnd()   -1 ;
                 
@@ -550,8 +592,8 @@ implements SelectedFeatureListener
                 }
                 
                 //if ( ! (featureSelected && ( f== selectedFeaturePos))){
-                col = segment.getColor();
-                g2D.setColor(col);
+                //col = segment.getColor();
+                //g2D.setColor(col);
                 //}
                 
                 int xstart =  java.lang.Math.round(start * scale) + DEFAULT_X_START;
@@ -579,6 +621,7 @@ implements SelectedFeatureListener
         int xstart =  java.lang.Math.round(start * scale) + DEFAULT_X_START;
         int width   = java.lang.Math.round(  end * scale) - xstart +  DEFAULT_X_START+aminosize ;
   
+        // Helix is  always red...
         g2D.setColor(Color.red);
         g2D.fillRect(xstart,y,width,drawHeight);
         /*
@@ -647,8 +690,8 @@ implements SelectedFeatureListener
         
         Segment seg0 = (Segment) segments.get(0) ;
         
-        Color col =  seg0.getColor();	
-        g2D.setColor(col);
+        //Color col =  seg0.getColor();	
+        //g2D.setColor(col);
         
         
         for (int s=0; s<segments.size();s++){
@@ -666,10 +709,10 @@ implements SelectedFeatureListener
                 segment.setEnd(chainlength);
             }
             
-            if ( ! (featureSelected && ( f== selectedFeaturePos))){
-                col = segment.getColor();
-                g2D.setColor(col);
-            }
+            //if ( ! (featureSelected && ( f== selectedFeaturePos))){
+            //    col = segment.getColor();
+            //    g2D.setColor(col);
+            //}
             
             int xstart =  java.lang.Math.round(start * scale) + DEFAULT_X_START;
             int width   = java.lang.Math.round(  end * scale) - xstart +  DEFAULT_X_START+aminosize ;
@@ -719,8 +762,8 @@ implements SelectedFeatureListener
         }
         
         
-        Color col = segment.getColor();
-        g2D.setColor(col);
+        //Color col = segment.getColor();
+        //g2D.setColor(col);
         
         
         int xstart =  java.lang.Math.round(start * scale) + DEFAULT_X_START;
@@ -769,9 +812,9 @@ implements SelectedFeatureListener
         Graphics2D g2D =(Graphics2D) g;
         List segments = feature.getSegments() ;
         
-        if ( feature.getType().equals("DISULFID")){
-            g2D.setColor(Color.yellow);
-        }
+        //if ( feature.getType().equals("DISULFID")){
+        //    g2D.setColor(Color.yellow);
+        //}
         
         for (int s=0; s<segments.size();s++){
             Segment segment=(Segment) segments.get(s);
