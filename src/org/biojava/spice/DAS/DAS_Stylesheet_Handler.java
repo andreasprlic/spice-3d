@@ -36,6 +36,8 @@ public class DAS_Stylesheet_Handler extends DefaultHandler {
     List typeGlyphMaps;
     Map  currentType;
     String chars ;
+    boolean threeDstyle;
+    List threeDGlyphMaps;
     
     /**
      * 
@@ -44,6 +46,8 @@ public class DAS_Stylesheet_Handler extends DefaultHandler {
         super();
         typeGlyphMaps = new ArrayList();
         currentType = new HashMap();
+        threeDGlyphMaps = new ArrayList();
+        threeDstyle = false;
     }
     
     
@@ -51,8 +55,24 @@ public class DAS_Stylesheet_Handler extends DefaultHandler {
         return (Map[]) typeGlyphMaps.toArray(new Map[typeGlyphMaps.size()]);
     }
     
+    public Map[] get3DStyles(){
+        return (Map[]) threeDGlyphMaps.toArray(new Map[threeDGlyphMaps.size()]);
+    }
+    
     public void startElement (String uri, String name, String qName, Attributes atts){
         chars = "";
+        
+        if ( qName.equals("CATEGORY")){
+            String id = atts.getValue("id");
+            if ( id.equals("3D")){
+                // here follow the 3D styles...
+                threeDstyle = true;
+            } else {
+                threeDstyle = false;
+                
+            }
+        }
+        
         if ( qName.equals("TYPE")){
             // this glyph matches to features of type >id<.
             String id = atts.getValue("id");
@@ -96,10 +116,30 @@ public class DAS_Stylesheet_Handler extends DefaultHandler {
                 currentType.put("bump","no");
             else 
                 currentType.put("bump","yes");
-        } 
+        
+            // 3D stuff
+        }  else if ( qName.equals("WIREFRAME")){
+            currentType.put("display","wireframe");
+        } else if ( qName.equals("SPACEFILL")){
+            currentType.put("display","spacefill");
+        } else if ( qName.equals("BACKBONE")){
+            currentType.put("display","backbone");
+        } else if ( qName.equals("CARTOON")){
+            currentType.put("display","cartoon");
+        } else if ( qName.equals("RIBBONS")){
+            currentType.put("display","ribbons");
+        } else if ( qName.equals("WIDTH")){
+            currentType.put("width",chars);
+        }
+        
+        
         
         else if ( qName.equals("TYPE")){
-            typeGlyphMaps.add(currentType);
+            if ( threeDstyle){
+             threeDGlyphMaps.add(currentType);   
+            } else {
+                typeGlyphMaps.add(currentType);
+            }
         }
     }
     

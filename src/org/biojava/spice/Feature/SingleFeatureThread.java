@@ -27,7 +27,9 @@ package org.biojava.spice.Feature ;
 import org.biojava.spice.DAS.*		   ;
 import java.util.logging.*             ;
 import java.util.ArrayList             ;
+import java.util.Map;
 import java.net.URL                    ;
+import org.biojava.spice.Config.*;
 
 /** a thread that connects to a DAS - Feature service
  * and sets results in "parent thread" FeatureFetcher.
@@ -42,7 +44,7 @@ extends Thread
     FeatureFetcher parentfetcher ;
     int myId ;
     Logger logger        ;
-    
+    SpiceDasSource dasSource;
     
     /** contact a single DAS feature server and retreive features 
      @param parent a link to the parent class
@@ -50,12 +52,13 @@ extends Thread
      @param threadid id for this thread, if job is finished parent
      is told that threadid has finised
      */
-    public SingleFeatureThread(FeatureFetcher parent, URL dascmd,int threadid) {
+    public SingleFeatureThread(FeatureFetcher parent, URL dascmd,int threadid, SpiceDasSource ds) {
         logger = Logger.getLogger("org.biojava.spice");
         logger.finest("init new thread " + threadid + " " + dascmd);
         dascommand = dascmd ;
         parentfetcher = parent ;
         myId = threadid ;
+        dasSource = ds;
     }
     /** start thread */
     public void run() {
@@ -75,6 +78,22 @@ extends Thread
         //    features.add(feat) ;		
         //} 
         //logger.finest("done "+ dascommand);
+
+        // now with support for stylesheets.
+        
+        Map[] typeStyle = dasSource.getStylesheet();
+        // is null if no stylesheet has been loaded ...
+        if ( typeStyle == null){
+            dasSource.loadStylesheet();
+            typeStyle = dasSource.getStylesheet();
+            for ( int m=0; m< typeStyle.length;m++){
+                logger.finest("got stylesheet: " + typeStyle[m]);    
+            }
+        }
+        
+         
+        
+
         parentfetcher.setFinished(myId,features);
         notifyAll();
     }

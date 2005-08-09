@@ -43,6 +43,7 @@ public class DAS_StylesheetRetrieve {
     /**
      * 
      */
+    Map[] t3DMap;
     public DAS_StylesheetRetrieve() {
         super();
        
@@ -93,15 +94,17 @@ public class DAS_StylesheetRetrieve {
 		    xmlreader.parse(insource);			
 			Map[] typeMap = cont_handle.getTypeStyles();
 			 
+			t3DMap = cont_handle.get3DStyles();
 			return typeMap;
 		    
 		} catch (Exception e) {
 		    logger.finest(e.getMessage());
 		    return null;
-		}
-		
-		
-        
+		}        
     }
 
+    
+    public Map[] get3DStyle(){
+        return t3DMap;
+    }
 }

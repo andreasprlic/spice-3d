@@ -45,13 +45,15 @@ public class SpiceDasSource
     boolean status ;
     boolean registered ; // a flag to trace if source comes from registry or from user vonfig
     Map[] typeStyles;
+    Map[] threeDstyles;
     
     public SpiceDasSource() {
 	super();
 	status    = true ;  // default source is actived and used .
 	registered = true ; // default true = source comes from registry
 	setNickname("MyDASsource");
-	typeStyles = new Map[0];
+	typeStyles = null;
+	threeDstyles = null;
     }
 
     public void loadStylesheet(){
@@ -65,18 +67,39 @@ public class SpiceDasSource
             return ;
         }
         Map[] styles = dsr.retrieve(url);
+        
         if ( styles != null){
             typeStyles = styles;
+        } else {
+            typeStyles = new Map[0];	
+        }
+        
+        
+        Map[] t3dStyles = dsr.get3DStyle();
+        if ( t3dStyles != null){
+            threeDstyles = t3dStyles;
+        } else {
+            threeDstyles = new Map[0];
         }
     }
     
     /** returns the Stylesheet that is provided by a DAS source.
      * It provides info of how to draw a particular feature.
+     * returns null if not attempt has been made to load the stylesheet.
+     * afterwards it returns a Map[0] or the Map[] containing the style data.
      * 
      * @return
      */
     public Map[] getStylesheet(){
         return typeStyles;
+    }
+    
+    /** get the stylesheet containing the instructions how to paint in 3D.
+     * 
+     * @return
+     */
+    public Map[] get3DStylesheet(){
+       return threeDstyles; 
     }
     
     

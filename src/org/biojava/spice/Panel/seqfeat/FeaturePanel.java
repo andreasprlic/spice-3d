@@ -39,7 +39,7 @@ import org.biojava.spice.Panel.seqfeat.SelectedFeatureListener;
 import org.biojava.spice.Config.SpiceDasSource;
 import java.util.Map;
 
-/** The class responsible for painting the 2D - features.
+/** The class responsible for painting of 2D - features.
  * 
  * @author Andreas Prlic
  *
@@ -52,8 +52,8 @@ implements SelectedFeatureListener
     public static final int    DEFAULT_X_START        = 20  ;
     public static final int    DEFAULT_X_RIGHT_BORDER = 20 ;
     public static final int    DEFAULT_Y_START        = 0 ;
-    public static final int    DEFAULT_Y_STEP         = 15 ;
-    public static final int    DEFAULT_Y_HEIGHT       = 10 ;
+    public static final int    DEFAULT_Y_STEP         = 10 ;
+    public static final int    DEFAULT_Y_HEIGHT       = 4 ;
     public static final int    DEFAULT_Y_BOTTOM       = 16 ;
     
     
@@ -522,11 +522,11 @@ implements SelectedFeatureListener
         
         
         //g2D.drawString(feature.getName(), 1,y+DEFAULT_Y_HEIGHT);
-        logger.finest(""+feature);
+        //logger.finest(""+feature.getName());
         
         for (int s=0; s<segments.size();s++){
             Segment segment=(Segment) segments.get(s);
-            logger.finest(""+segment);
+            //logger.finest(""+segment);
             if ( segment.getName().equals("HELIX")){
                 // draw helix
                 drawHelixSegment(segment, drawHeight,g, aminosize,fullwidth,y,chainlength, scale);
@@ -571,25 +571,30 @@ implements SelectedFeatureListener
     
     
     private void drawHelixSegment(Segment segment, int drawHeight,Graphics g, int aminosize,int fullwidth,int y,int chainlength, float scale){
-        logger.finest("drawHelixSegment");
+        //logger.finest("drawHelixSegment");
         Graphics2D g2D =(Graphics2D) g;
         int start     = segment.getStart() -1 ;
         int end       = segment.getEnd()   -1 ;
         
         int xstart =  java.lang.Math.round(start * scale) + DEFAULT_X_START;
         int width   = java.lang.Math.round(  end * scale) - xstart +  DEFAULT_X_START+aminosize ;
-        
-        
+  
+        g2D.setColor(Color.red);
+        g2D.fillRect(xstart,y,width,drawHeight);
+        /*
         // draw a sinus - double helix ...
         float ang = 0.0f;
         
+        
         // do one helix / 4 amino acids ...
-        float inc = (float)(360 /( 4* aminosize)); 
+        float inc = (float)(360 /( 4)); 
         logger.finest("increase " + inc);
         double RAD = 3.1415926535 / 180.0 ;
         int oldy1 = y+DEFAULT_Y_HEIGHT;
         int oldy2 = y+DEFAULT_Y_HEIGHT;
-        g2D.setColor(Color.red);
+  
+        
+        // iter over every pixel between xstart and width ...
         for ( int i =xstart ; i<= (xstart+width); i++ ){
             ang += inc;
             if ( ang > 360) ang = 0;
@@ -614,9 +619,10 @@ implements SelectedFeatureListener
             
             
         }
-        
-        
-    }
+        */
+       
+     
+    }    
     
     /** draw the frame of a rectangle .
      * 
@@ -698,7 +704,7 @@ implements SelectedFeatureListener
     }
     
     private void drawArrowSegment(Segment segment, int drawHeight,Graphics g, int aminosize,int fullwidth,int y,int chainlength, float scale){
-        logger.finest("drawArrowsegment");
+        //logger.finest("drawArrowsegment");
         Graphics2D g2D =(Graphics2D) g;
         int start     = segment.getStart() -1 ;
         int end       = segment.getEnd()   -1 ;
@@ -759,7 +765,7 @@ implements SelectedFeatureListener
     }
     
     private void drawSpanFeature(Feature feature,int featurePos, int drawHeight,Graphics g, int aminosize,int fullwidth,int y,int chainlength, float scale){
-        logger.finest("draw Span Feature " + feature );
+        //logger.finest("draw Span Feature " + feature.getName() );
         Graphics2D g2D =(Graphics2D) g;
         List segments = feature.getSegments() ;
         

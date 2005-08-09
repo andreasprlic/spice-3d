@@ -214,7 +214,7 @@ MouseListener, MouseMotionListener {
                     // this is done by TypeLabelpane...
                     //FeatureEvent event = new FeatureEvent(featureView,feat);
                     //li.mouseOverFeature(event);
-                    FeatureEvent event2 = new FeatureEvent(featureView,seg);
+                    FeatureEvent event2 = new FeatureEvent(featureView,featureView.getDasSource(), seg);
                     li.mouseOverSegment(event2);
                     triggered = true;
                 }
@@ -387,7 +387,7 @@ MouseListener, MouseMotionListener {
             
             if ( seg != null ) {
                 //li.featureSelected(event);
-                FeatureEvent event2 = new FeatureEvent(featureView,seg);
+                FeatureEvent event2 = new FeatureEvent(featureView,featureView.getDasSource(), seg);
                 li.segmentSelected(event2);
             }
         }

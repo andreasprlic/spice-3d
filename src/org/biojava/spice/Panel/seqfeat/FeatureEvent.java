@@ -22,6 +22,8 @@
  */
 package org.biojava.spice.Panel.seqfeat;
 
+import org.biojava.spice.Config.*;
+
 /**
  * @author Andreas Prlic
  *
@@ -30,15 +32,23 @@ public class FeatureEvent {
 
     FeatureView parent;
     Object source;
+    SpiceDasSource dasSource;
     /**
      * 
      */
-    public FeatureEvent(FeatureView parent, Object source) {
+    public FeatureEvent(FeatureView parent,SpiceDasSource dasSource, Object source) {
         super();
+        this.dasSource = dasSource;
         this.parent = parent;
         this.source = source;
-        // TODO Auto-generated constructor stub
+     
     }
+    
+    /** returns the das source this event belongs to 
+     * 
+     * @return
+     */
+    public SpiceDasSource getDasSource(){ return dasSource; }
     
     /** the paretn FeatureView in which this event occured */
     public FeatureView getParent(){ return parent ;}

@@ -97,6 +97,8 @@ public class MSDContentHandler  extends DefaultHandler{
 		}
         else if ( qName.equals("expData")){
             depo.setExpData(txt);
+        } else if ( qName.equals("title")){
+            depo.setTitle(txt);
         }
         else if ( qName.equals("entry")){
             depositions.add(depo);

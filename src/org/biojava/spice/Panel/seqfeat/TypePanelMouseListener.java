@@ -149,7 +149,7 @@ MouseListener, MouseMotionListener {
         FeatureViewListener[] fvls = parent.getFeatureViewListeners();
         for ( int i = 0 ; i< fvls.length ; i++ ){
             FeatureViewListener fvl = fvls[i];
-            FeatureEvent event = new FeatureEvent(fv,f);
+            FeatureEvent event = new FeatureEvent(fv,fv.getDasSource(), f);
             fvl.mouseOverFeature(event);
         }
         parent.repaint();
@@ -278,7 +278,7 @@ MouseListener, MouseMotionListener {
         FeatureViewListener[] fvls = parent.getFeatureViewListeners();
         for ( int i = 0 ; i< fvls.length ; i++ ){
             FeatureViewListener fvl = fvls[i];
-            FeatureEvent event = new FeatureEvent(fv,f);
+            FeatureEvent event = new FeatureEvent(fv,fv.getDasSource(),f);
             fvl.featureSelected(event);
         }
         

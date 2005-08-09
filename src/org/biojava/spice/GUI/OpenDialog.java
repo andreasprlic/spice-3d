@@ -139,10 +139,8 @@ extends JDialog
         kwsearch = new JTextField(10);
         kwsearch.addActionListener(new ActionListener()  {
             public void actionPerformed(ActionEvent e) {
-                
                 String kw  = kwsearch.getText();
-                
-                System.out.println("search kw " + kw);
+                //System.out.println("search kw " + kw);
                 MSDWindow msd = new MSDWindow(spice,kw);
                 dispose();			    
             }

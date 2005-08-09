@@ -34,6 +34,7 @@ import org.biojava.spice.Feature.Segment;
 import org.biojava.spice.Panel.seqfeat.FeatureEvent;
 import org.biojava.spice.Panel.seqfeat.FeatureViewListener;
 import org.biojava.spice.Panel.seqfeat.SelectedSeqPositionListener;
+import java.util.Map;
 
 /**
  * @author Andreas Prlic
@@ -307,7 +308,8 @@ SelectedSeqPositionListener
         
         Feature feat = (Feature) e.getSource();
         //System.out.println("StructurePanel selected feature " + feat);
-        highliteFeature(feat,true);
+        Map[] stylesheet = e.getDasSource().get3DStylesheet();
+        highliteFeature(feat,stylesheet,true);
     }
     public void segmentSelected(FeatureEvent e){
         Segment seg = (Segment)e.getSource();
@@ -330,8 +332,8 @@ SelectedSeqPositionListener
         
     }
     
-    private void highliteFeature(Feature feature, boolean color ){
-        //logger.finest("highlite feature " + feature);
+    private void highliteFeature(Feature feature, Map[] stylesheet, boolean color ){
+        logger.finest("highlite feature " + feature.getName());
         //Feature feature = (Feature) features.get(featurenr) ;
         //logger.finest("highlite feature " + feature);
         
@@ -361,7 +363,6 @@ SelectedSeqPositionListener
             
                 String c = getDisulfidSelect(start,end);
                 cmd += "select " + c;
-
                 
             } else {
                 
@@ -385,24 +386,74 @@ SelectedSeqPositionListener
             } 
             cmd +=";";
             
-            if ( color){
-                cmd += " color " + segment.getTxtColor() +";";
-            }
+           
             
-            if ( ( feature.getType().equals("METAL")) ||
-                    ( feature.getType().equals("SITE"))  ||
-                    ( feature.getType().equals("ACT_SITE")) 	     
-            ){
-                if ( color)
-                    	cmd += " spacefill on; " ;
-            } else if ( feature.getType().equals("MSD_SITE")|| 
-                    feature.getType().equals("snp") 
-            ) {
-                if ( color)
-                    cmd += " wireframe on; " ;
-            } else if ( feature.getType().equals("DISULFID")){
-                if ( color)
-                    cmd += "colour cpk; spacefill on;";
+            // check for stylesheet, otherwise use default ...
+            //feature.getSource();
+            
+            String type = feature.getType();
+            boolean cmdSet = false;
+            String[] displayTypes = { "cartoon","wireframe","spacefill","backbone","ribbons"};
+            if (( stylesheet != null ) &( stylesheet.length>0)){
+                for (int m=0; m< stylesheet.length;m++){
+                    Map s = stylesheet[m];
+                    //logger.finest(" style:" + s);
+                    String styleType = (String) s.get("type");
+                    if ( styleType.equals(type)){
+                        logger.finest("coloring 3D stylesheet");
+                        cmdSet = true;
+                        String display = (String)s.get("display");
+                        for ( int d = 0 ; d< displayTypes.length; d++){
+                            String cType = displayTypes[d];
+                            cmd += " " + cType;
+                            if ( cType.equals(display)){
+                                String width = (String)s.get("width");
+                                
+                                if ( width != null){
+                                     cmd += " "+width+";";
+                                } else 
+                                    cmd += " on;";
+                            } else  {
+                                cmd += " off;";
+                            }
+                        }
+                        
+                        String colorStyle = (String)s.get("color");
+                        if (  colorStyle.equals("cpk")  )
+                            
+                            cmd += "colour cpk;";
+                        else 
+                            if ( color){
+                                cmd += " color " + segment.getTxtColor() +";";
+                            }
+                            
+                            
+                      
+                    }
+                }
+                
+            }
+            if ( ! cmdSet ) {
+                if ( color){
+                    cmd += " color " + segment.getTxtColor() +";";
+                }
+                
+                logger.finest("no 3D stylesheet found");
+                if ( ( feature.getType().equals("METAL")) ||
+                        ( feature.getType().equals("SITE"))  ||
+                        ( feature.getType().equals("ACT_SITE")) 	     
+                ){
+                    if ( color)
+                        cmd += " spacefill on; " ;
+                } else if ( feature.getType().equals("MSD_SITE")|| 
+                        feature.getType().equals("snp") 
+                ) {
+                    if ( color)
+                        cmd += " wireframe on; " ;
+                } else if ( feature.getType().equals("DISULFID")){
+                    if ( color)
+                        cmd += "colour cpk; spacefill on;";
+                }
             }
             
         }
@@ -575,6 +626,10 @@ SelectedSeqPositionListener
         String type =  segment.getParent().getType() ;
         //logger.finest(start+" " + end+" "+type);
         //logger.finest(segment);
+        
+        
+        
+        
         if ( type.equals("DISULFID")){
             //highlite(currentChainNumber,start);
             //highlite(currentChainNumber,end);

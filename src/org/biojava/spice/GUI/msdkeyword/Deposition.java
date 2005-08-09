@@ -40,13 +40,16 @@ public class Deposition {
     protected String classification;
     protected String expData;
     protected String heteroList;
+    protected String title;
+    
     public Deposition() {}
     public Deposition(String id,  
 		      String accessionCode, 
 		      float resolution, 
 		      float rfactor, 
 		      Date lastModified, 
-		      String classification, 
+		      String classification,
+		      String title,
 		      String expData,
 		      String heteroList) {
 	this.id = id; 
@@ -57,10 +60,11 @@ public class Deposition {
 	this.classification = classification;
 	this.expData = expData;
 	this.heteroList = heteroList;
+	this.title = title;
     }
     
     public String toString() {
-        String txt = accessionCode + " " + expData + " " + resolution + " " + classification;
+        String txt = accessionCode + " " + expData + " " + resolution + " " + title + " " +classification;
         return txt;
     }
     public void setId(String id) { this.id = id; }
@@ -78,7 +82,8 @@ public class Deposition {
     public String getClassification() { return classification; }
     public void setExpData(String expdat) { expData = expdat;}
     public String getExpData() { return expData; }
-    
+    public void setTitle(String title){ this.title=title;}
+    public String getTitle(){ return title;}
     public void setHeteroList(String hetlist){heteroList = hetlist;}
     public String getHeteroList() { return heteroList; }
 };

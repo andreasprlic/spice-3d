@@ -396,14 +396,8 @@ public class FeatureFetcher extends Thread
             DasResponse d=new DasResponse(UNIPROTCOORDSYS);
             subthreads[responsecounter] = d; 
             SpiceDasSource featureserver = (SpiceDasSource) featservs.get(f) ;
-            // now with support for stylesheets.
-            featureserver.loadStylesheet();
             
-            Map[] typeStyle = featureserver.getStylesheet(); 
-            for ( int m=0; m< typeStyle.length;m++){
-                logger.info("got stylesheet: " + typeStyle[m]);    
-            }
-            
+                        
             FeatureView fv = createNewFeatureView(featureserver);
             featureViews[responsecounter] = fv;
             
@@ -427,7 +421,7 @@ public class FeatureFetcher extends Thread
                 continue ;
             }
             
-            SingleFeatureThread sft = new SingleFeatureThread ( this ,spUrl,responsecounter);
+            SingleFeatureThread sft = new SingleFeatureThread ( this ,spUrl,responsecounter,featureserver);
             sft.start();
             responsecounter++;
         }
@@ -459,7 +453,7 @@ public class FeatureFetcher extends Thread
                 continue ;
             }
             //logger.finest("starting thread");
-            SingleFeatureThread sft = new SingleFeatureThread ( this ,spUrl,responsecounter);
+            SingleFeatureThread sft = new SingleFeatureThread ( this ,spUrl,responsecounter,featureserver);
             sft.start();
             responsecounter++;
         }

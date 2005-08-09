@@ -191,8 +191,8 @@ public class LoggingPanel extends JPanel {
         super(new BorderLayout());
 
         table.setShowGrid(false);
-	// by AP
-	table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        // by AP
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setCellSelectionEnabled(true);
 	
         table.setGridColor(Color.LIGHT_GRAY);
@@ -490,7 +490,7 @@ public class LoggingPanel extends JPanel {
         frame.setSize(frameWidth, frameHeight);
         frame.setVisible(true);
         doLayout();
-	frame.show();
+        frame.show();
         return frame;
     }
     

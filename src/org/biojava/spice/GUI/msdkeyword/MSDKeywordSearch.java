@@ -65,6 +65,12 @@ public class MSDKeywordSearch {
     
     public Deposition[] search( String keyword){
         
+        // remove trainling and ending spaces ...
+        keyword = keyword.trim();
+        
+        if ( keyword.equals("")){
+            return new Deposition[0];
+        }
         keyword = keyword.replaceAll(" ","%26");
         //System.out.println("keyword: " + keyword);
         URL url;
