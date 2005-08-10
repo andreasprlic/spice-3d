@@ -29,6 +29,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.awt.image.BufferedImage;
@@ -37,6 +38,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JPopupMenu;
 
 import org.biojava.spice.SpiceApplication;
+import org.biojava.spice.Config.SpiceDasSource;
 import org.biojava.spice.Feature.Feature;
 import org.biojava.spice.Feature.Segment;
 import org.biojava.spice.Panel.seqfeat.SelectedFeatureListener;
@@ -208,8 +210,6 @@ public class TypeLabelPanel  {
      * */
     private int drawFeatures(Graphics g2D,int width, int y){
         
-        
-        
         boolean secstruc = false ;
         
         if ( features == null) 
@@ -242,9 +242,11 @@ public class TypeLabelPanel  {
                 logger.finest("can not find segments in " + feature.getMethod());
                 continue ;
             }
-            Segment seg0 = (Segment) segments.get(0) ;
-            Color col =  seg0.getColor();	
-            g2D.setColor(col);
+            
+            SpiceDasSource ds = parent.getDasSource();
+            Map[] styleSheetMap = ds.getStylesheet() ;
+            setColors(g2D, styleSheetMap, feature);
+            
             //System.out.println(feature.getName()+" " + feature.getMethod());
             g2D.drawString(feature.getName(), DEFAULT_X_START,y+DEFAULT_Y_HEIGHT);
             
@@ -274,6 +276,53 @@ public class TypeLabelPanel  {
         }
         //y+= DEFAULT_Y_STEP;
         return y ;
+    }
+    
+    private void setColor(Graphics g, Feature feature, Map style){
+        Color c = (Color) style.get("color");
+        if ( c != null) {
+            
+            //logger.info("using stylesheet defined color " + c);
+            g.setColor(c);
+        } else {
+            //logger.info("no stylesheet defined color found for" + feature.getName());
+            if ( feature.getType().equals("DISULFID")){
+                g.setColor(Color.yellow);
+            } else {
+                setDefaultColor(g,feature);
+            }
+        }
+    }
+    
+    private void setColors(Graphics g, Map[] stylesheet, Feature feat){
+        if (( stylesheet == null) || (stylesheet.length == 0) ) {
+            setDefaultColor(g,feat);
+        } else {
+            String featureType = feat.getType();
+        
+            boolean matchingStyle = false ;
+            for (int m=0; m< stylesheet.length;m++){
+                Map s = stylesheet[m];
+                //logger.finest(" style:" + s);
+                String styleType = (String) s.get("type");
+                if ( styleType.equals(featureType) ){
+                    matchingStyle = true;
+                    setColor(g,feat,s);
+                }
+                
+            }
+            if (! matchingStyle){
+                setDefaultColor(g,feat);
+            }
+        }
+        
+    }
+    private void setDefaultColor(Graphics g, Feature feat){
+        // set default...
+        List segments = feat.getSegments();
+        Segment seg0 = (Segment) segments.get(0) ;
+        Color col =  seg0.getColor();	
+        g.setColor(col);
     }
     
     public int getLineNr(int eventY){

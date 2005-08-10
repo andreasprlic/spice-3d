@@ -26,6 +26,7 @@ package org.biojava.spice.DAS;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.Attributes            ;
 import java.util.*;
+import java.util.logging.Logger;
 import java.awt.Color;
 
 /** a class to parse the XML response of a DAS - stylesheet request.
@@ -39,6 +40,7 @@ public class DAS_Stylesheet_Handler extends DefaultHandler {
     String chars ;
     boolean threeDstyle;
     List threeDGlyphMaps;
+    static Logger logger      = Logger.getLogger("org.biojava.spice");
     
     /**
      * 
@@ -103,15 +105,53 @@ public class DAS_Stylesheet_Handler extends DefaultHandler {
         
     }
     
+    /**  convert the color provided by the stylesheet to a java Color 
+     * 
+     * @param chars
+     * @return
+     */
+    private Color getColorFromString(String chars){
+        
+        
+        if (chars.equals("rotate")) {
+            // use the default SPICE colors ...
+            return null;
+        }
+        
+        try {
+            Color col = Color.decode(chars);
+            return col;
+        } catch ( Exception e) {
+            logger.finest("could not decode color from stylesheet " + e.getMessage());
+        }
+        
+        
+        // map the string to a build in color...
+        // thanks to the Xpm.java script provided by Phil Brown (under LGPL)
+        // AP downloaded it from http://www.bolthole.com/java/Xpm.java
+        
+        // the DAS spec stylesheet only requires 16 VGA colors to be supported, but here we do more... :-)
+        
+        int[] rgb = Xpm.NameToRGB3(chars);
+        if ( rgb != null) {
+            Color col = new Color(rgb[0],rgb[1],rgb[2]);
+            return col;
+        }
+        
+        return null ;
+    
+    }
+    
     public void endElement(String uri, String name, String qName) {
         if ( qName.equals("HEIGHT")){
             currentType.put("height",chars);
         } else if ( qName.equals("COLOR")){
             System.out.println("got color " + chars);
-            if (!  chars.equals("rotate")) {
-                Color col = Color.decode(chars);
+            Color col = getColorFromString(chars);
+            if ( col != null ){
                 currentType.put("color",col);
             }
+            
         } else if ( qName.equals("OUTLINECOLOR")){
             currentType.put("outlinecolor",chars);
         } else if ( qName.equals("BACKGROUND")){
@@ -137,7 +177,7 @@ public class DAS_Stylesheet_Handler extends DefaultHandler {
             currentType.put("width",chars);
         }
         
-        else if ( qName.equals("TYPE")){
+        else if ( qName.equals("TYPE")){           
             if ( threeDstyle){
              threeDGlyphMaps.add(currentType);   
             } else {

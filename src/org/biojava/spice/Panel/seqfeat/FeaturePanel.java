@@ -292,24 +292,28 @@ implements SelectedFeatureListener
         Color c = (Color) style.get("color");
         if ( c != null) {
             
-            logger.info("using stylesheet defined color " + c);
+            //logger.info("using stylesheet defined color " + c);
             g.setColor(c);
         } else {
-            logger.info("no stylesheet defined color found for" + feature.getName());
+            //logger.info("no stylesheet defined color found for" + feature.getName());
             if ( feature.getType().equals("DISULFID")){
                 g.setColor(Color.yellow);
             } else {
-                List segments = feature.getSegments();
-                Segment seg0 = (Segment) segments.get(0) ;
-                
-                Color col =  seg0.getColor();	
-                g.setColor(col);
-                
+                setDefaultColor(g,feature);
             }
         }
     }
     
+    private void setDefaultColor(Graphics g, Feature feature){
+        List segments = feature.getSegments();
+        Segment seg0 = (Segment) segments.get(0) ;
+        
+        Color col =  seg0.getColor();	
+        g.setColor(col);
+    }
+    
     private int paintStylesheetFeatures(Map[] style,Graphics g, int aminosize,int fullwidth,int y,int chainlength, float scale) {
+        //logger.info("paintSylesheetFeatures " );
         Graphics2D g2D =(Graphics2D) g;
         
         for ( int f =0 ; f< features.length;f++) {
@@ -321,16 +325,14 @@ implements SelectedFeatureListener
             
             checkDrawSelectedFeature(feat,f,DEFAULT_Y_HEIGHT,g,aminosize,fullwidth,y,chainlength,scale);
             
-            
-            
             boolean matchingStyle = false ;
             for (int m=0; m< style.length;m++){
                 Map s = style[m];
-                //logger.finest(" style:" + s);
+               // logger.finest(" style:" + s);
                 String styleType = (String) s.get("type");
                 if ( styleType.equals(featureType) ){
                     // this style sheet applies here!
-                    logger.info("drawing " + styleType + " with stylesheet support");
+                    //logger.info("drawing " + styleType + " with stylesheet support");
                     setColor(g,feat,s);
                     
                     String featStyle = (String)s.get("style");
@@ -375,6 +377,9 @@ implements SelectedFeatureListener
             }
             
             if ( ! matchingStyle){
+                // color has not been set ...
+                setDefaultColor(g,feat);
+                
                 //logger.finest("no matching stylesheet found for feature type " + featureType);
                 // no stylesheet type has been found that describes how to paint this feature - use default...
                 if (  featureType.equals("DISULFID")){
