@@ -294,8 +294,8 @@ ConfigurationListener
    
     private void initLoggingPanel(){
         LoggingPanel loggingPanel = new LoggingPanel(logger);
-        loggingPanel.getHandler().setLevel(Level.FINEST);	
-        logger.setLevel(Level.FINEST);
+        loggingPanel.getHandler().setLevel(Level.INFO);	
+        logger.setLevel(Level.INFO);
         loggingPanel.show(null);
     }
     

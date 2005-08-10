@@ -137,16 +137,14 @@ public class DAS_Stylesheet_Handler extends DefaultHandler {
             Color col = new Color(rgb[0],rgb[1],rgb[2]);
             return col;
         }
-        
         return null ;
-    
     }
     
     public void endElement(String uri, String name, String qName) {
         if ( qName.equals("HEIGHT")){
             currentType.put("height",chars);
         } else if ( qName.equals("COLOR")){
-            System.out.println("got color " + chars);
+            //System.out.println("got color " + chars);
             Color col = getColorFromString(chars);
             if ( col != null ){
                 currentType.put("color",col);
