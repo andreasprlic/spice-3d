@@ -35,6 +35,7 @@ import org.biojava.spice.Panel.seqfeat.FeatureEvent;
 import org.biojava.spice.Panel.seqfeat.FeatureViewListener;
 import org.biojava.spice.Panel.seqfeat.SelectedSeqPositionListener;
 import java.util.Map;
+import java.awt.Color;
 
 /**
  * @author Andreas Prlic
@@ -418,13 +419,19 @@ SelectedSeqPositionListener
                             }
                         }
                         
-                        String colorStyle = (String)s.get("color");
-                        if (  colorStyle.equals("cpk")  )
-                            
+                        String colorStyle = (String)s.get("cpkcolor");
+                        
+                        if ((colorStyle!= null ) &&(  colorStyle.equals("true")))
                             cmd += "colour cpk;";
                         else 
                             if ( color){
-                                cmd += " color " + segment.getTxtColor() +";";
+                                Color col = (Color)s.get("color");
+                                if ( col != null )
+                                    cmd += " color [" +col.getRed()+","+col.getGreen() +","+col.getBlue() +"];";
+                                else {
+                                    col = segment.getColor();
+                                    cmd += " color [" +col.getRed()+","+col.getGreen()+","+col.getBlue() +"];";
+                                }
                             }
                             
                             
@@ -435,7 +442,9 @@ SelectedSeqPositionListener
             }
             if ( ! cmdSet ) {
                 if ( color){
-                    cmd += " color " + segment.getTxtColor() +";";
+                    Color col = segment.getColor();
+                    cmd += " color [" +col.getRed()+","+col.getGreen()+","+col.getBlue() +"];";
+                    //cmd += " color " + segment.getTxtColor() +";";
                 }
                 
                 logger.finest("no 3D stylesheet found");

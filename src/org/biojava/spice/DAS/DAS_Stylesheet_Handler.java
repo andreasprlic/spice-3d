@@ -148,6 +148,10 @@ public class DAS_Stylesheet_Handler extends DefaultHandler {
             Color col = getColorFromString(chars);
             if ( col != null ){
                 currentType.put("color",col);
+            } else {
+                if ( chars.equals("cpk")){
+                    currentType.put("cpkcolor","true");
+                }
             }
             
         } else if ( qName.equals("OUTLINECOLOR")){
