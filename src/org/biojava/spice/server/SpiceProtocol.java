@@ -84,8 +84,12 @@ public class SpiceProtocol {
                     spice.load(type,accessionCode);
                     if ( spice instanceof SpiceApplication ){
                         SpiceApplication parent = (SpiceApplication) spice;
-                        parent.requestFocus();
+                        parent.setVisible(true);
+                        parent.show();
                         parent.toFront();
+                        parent.requestFocus();
+                        
+                        
                     }
                     return SPICE_OK;
                 }
@@ -93,8 +97,6 @@ public class SpiceProtocol {
                     // what kind of type is this ???
                     return SPICE_WHAT;
                 }
-                
-                
                 
             } else {
                 return SPICE_WHAT;
