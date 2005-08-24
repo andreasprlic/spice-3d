@@ -146,8 +146,7 @@ public class Spice extends Applet {
         // 	start spice
             SpiceApplication appFrame = new SpiceApplication(regis, display,displayLabel,rasmolScript,seqSelectStart, seqSelectEnd, pdbSelectStart,pdbSelectEnd, message, messageWidth, messageHeight) ;	
             appFrame.load(codetype,code);
-            appFrame.requestFocus();
-            appFrame.toFront();
+            
             
             
         } else {

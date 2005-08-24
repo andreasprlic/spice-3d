@@ -82,6 +82,11 @@ public class SpiceProtocol {
                 if (  (type.equals("PDB")    ) || 
                       (type.equals("UniProt")) ) {
                     spice.load(type,accessionCode);
+                    if ( spice instanceof SpiceApplication ){
+                        SpiceApplication parent = (SpiceApplication) spice;
+                        parent.requestFocus();
+                        parent.toFront();
+                    }
                     return SPICE_OK;
                 }
                 else {
