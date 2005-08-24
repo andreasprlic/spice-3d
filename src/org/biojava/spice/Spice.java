@@ -24,15 +24,15 @@
 
 package org.biojava.spice ;
 
-import org.biojava.spice.utils.CliTools;
+import org.biojava.spice.server.SpiceClient;
 import java.applet.Applet;
 import org.biojava.spice.Config.ConfigurationException;
 import java.net.URL;
 import java.net.MalformedURLException ;
 import java.util.ArrayList;
-import javax.swing.JFrame;
 import org.biojava.spice.GUI.AboutDialog;
 import java.util.List;
+import org.biojava.spice.utils.CliTools;
 
 /** the startup class of SPICE. It takes care of correctly parsing the arguments that are given to SPICE.
  * currently supported arguments are:
@@ -129,12 +129,55 @@ public class Spice extends Applet {
             regis = registryurls;
         }
         
-        // start spice
-        SpiceApplication appFrame = new SpiceApplication(regis, display,displayLabel,rasmolScript,seqSelectStart, seqSelectEnd, pdbSelectStart,pdbSelectEnd, message, messageWidth, messageHeight) ;	
-        appFrame.load(codetype,code);
-        appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        System.out.println("got registries...");
+        for (int i = 0 ; i< regis.length; i++){
+            System.out.println(regis[i]);
+        }
+        
+        
+        /** test if already one instance of SPICE is running
+         * if yes the code should be displayed there...
+         * 
+         */
+        boolean serverFound = testSendToServer(codetype,code);
+        
+        if ( ! serverFound){
+            
+        // 	start spice
+            SpiceApplication appFrame = new SpiceApplication(regis, display,displayLabel,rasmolScript,seqSelectStart, seqSelectEnd, pdbSelectStart,pdbSelectEnd, message, messageWidth, messageHeight) ;	
+            appFrame.load(codetype,code);
+            appFrame.requestFocus();
+            appFrame.toFront();
+            
+            
+        } else {
+            // quit this one, the code is being loaded in SPICE... in another SPICEFrame ...
+            System.exit(0);
+        }
         
     }
+    
+    private boolean testSendToServer(String type, String accessioncode){
+        
+        SpiceClient sc = new SpiceClient();
+        
+        try {
+//          contact the port at which SPICE is listening ...
+            // if successfull communication, no need to start another SPICE window...
+            int status = sc.send(type,accessioncode);
+            if  (status == SpiceClient.SPICE_SUBMITTED )
+                return true;
+            
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            
+        }
+        
+        return false;
+        
+    }
+    
     
     /** set a list of DAS - sources (by their unique Id from registry) to be highlited
      * 

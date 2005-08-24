@@ -86,8 +86,7 @@ import java.util.Map;
 import javax.swing.JDialog;
 import java.awt.Container;
 
-
-
+import org.biojava.spice.server.SpiceServer;
 
 /** the main application layer of SPICE
  * do not interact with this class directly, but interact with SPICEFrame interface.
@@ -173,6 +172,8 @@ ConfigurationListener
     int messageWidth;
     int messageHeight;
     
+    SpiceServer spiceServer;
+    
     /** 
      * start the spice appplication
      * 
@@ -187,6 +188,10 @@ ConfigurationListener
             String pdbSelectStart, String pdbSelectEnd,
             String message, int messageWidth, int messageHeight) {
         super();
+        
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        
         this.rasmolScript = rasmolScript;
         this.dasServerList = dasServerList;
         this.labelList = labelList;
@@ -287,6 +292,28 @@ ConfigurationListener
         
         //this.setSize(800, 600);
         this.setVisible(true);
+        
+        
+        initSpiceServer();
+    }
+    
+    private void initSpiceServer(){
+        
+        spiceServer = new SpiceServer(this);
+        
+        this.addWindowListener(new WindowListener() {
+            public void windowDeiconified(WindowEvent e){}
+            public void windowIconified(WindowEvent e){}
+            public void windowActivated(WindowEvent e){}
+            public void windowDeactivated(WindowEvent e){}
+            public void windowOpened(WindowEvent e){}
+            public void windowClosing(WindowEvent e){
+                logger.info("destroying SPICE server");
+                
+                spiceServer.destroy();
+            }
+            public void windowClosed(WindowEvent e){}
+        });
         
     }
     
@@ -1577,6 +1604,14 @@ ConfigurationListener
 	throws IOException, ConnectException {
 	HttpURLConnection huc = null;
 	huc = (HttpURLConnection) url.openConnection();
+	
+	String os_name    = java.lang.System.getProperty("os.name");
+	String os_version = java.lang.System.getProperty("os.version");
+	String os_arch    = java.lang.System.getProperty("os.arch");
+	
+	String userAgent = "SPICE/" + AboutDialog.getVersion() + "("+os_name+"; "+os_arch + " ; "+ os_version+")";
+	//e.g. "Mozilla/5.0 (Windows; U; Win98; en-US; rv:1.7.2) Gecko/20040803"
+     huc.addRequestProperty("User-Agent", userAgent);
 	//logger.finest("opening "+url);
 
 

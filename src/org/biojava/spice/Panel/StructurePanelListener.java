@@ -622,7 +622,7 @@ SelectedSeqPositionListener
         //logger.finest("segment");
         
         // clicked on a segment!
-        String col =  segment.getTxtColor();
+        //String col =  segment.getTxtColor();
         //seqColorOld = col ;
         //spice.setOldColor(col) ;
         
@@ -657,6 +657,17 @@ SelectedSeqPositionListener
             // feature of size 1
             highlite(currentChainNumber,start+1,start+1  ,"cpk");	     
         } else {
+            
+            Color c = null; 
+            if ( type.equals("SECSTRUC")){
+                c = segment.getColor();
+            } else {
+                Segment first = (Segment) segment.getParent().getSegments().get(0);
+                c = first.getColor();
+            }
+            
+            
+            String col = "[" +c.getRed()+","+c.getGreen()+","+c.getBlue() +"]";
             colour(currentChainNumber,start+1  ,end+1  ,col);	    
         }
         
