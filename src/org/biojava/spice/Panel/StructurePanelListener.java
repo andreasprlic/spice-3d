@@ -47,8 +47,8 @@ SelectedSeqPositionListener
 
 {
 //1l1y
-    static String INIT_SELECT = "select all; cpk off ; wireframe off ; backbone off; "
-        +"cartoon on; colour chain;select not protein and not solvent;spacefill 2.0;";
+    static String INIT_SELECT = "select all; cpk off ; cartoon off ; backbone 0.5; " +
+        "wireframe off; colour chain;select not protein and not solvent; spacefill on;";
     
     StructurePanel structurePanel ;
     int currentChainNumber ;
