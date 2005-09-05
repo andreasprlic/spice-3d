@@ -30,6 +30,7 @@ import java.util.ArrayList             ;
 import java.util.Map;
 import java.net.URL                    ;
 import org.biojava.spice.Config.*;
+//import java.util.Iterator;
 
 /** a thread that connects to a DAS - Feature service
  * and sets results in "parent thread" FeatureFetcher.
@@ -69,7 +70,14 @@ extends Thread
         logger.finer("opening " + dascommand);
         DAS_FeatureRetrieve ftmp = new DAS_FeatureRetrieve(dascommand);
         ArrayList features = ftmp.get_features();
-        //logger.finest("doDasConnection got " + features.size() + " features") ;
+        
+        /*Iterator iter =features.iterator();
+        	while (iter.hasNext()){
+        	    Map f = (Map)iter.next();
+        	    logger.info(f+"");
+        	}*/
+        
+        //logger.info("SingleeFeatureThread got " + features.size() + " features") ;
         //new ArrayList();
         //ArrayList tmp = 
         //for (int i=0; i<tmp.size();i++){

@@ -534,10 +534,9 @@ public class FeatureFetcher extends Thread
             
             for (int j=0; j<features.size();j++){
                 HashMap feat = (HashMap)features.get(j);	
-                // overwrite the real DAS request...
-                // many uusers complained about it...
+                
                 String nickname = dassource.getNickname();
-                //logger.info("FeatureFeatcher: got dassource "+ " " +dassource.getId() + " " + nickname);
+                //logger.info("FeatureFeatcher: got dassource "+ " " +dassource.getId() + " " + nickname + " "+feat);
                 if ( ! ((nickname == null) || ( nickname.equals("") )) ){
                     feat.put("dassource", nickname);  
                     
@@ -578,7 +577,7 @@ public class FeatureFetcher extends Thread
             for (int j=0; j<features.size();j++){
                 HashMap feat = (HashMap)features.get(j);			
                 //Feature feat = (Feature)features.get(j);			
-                //logger.finest("uniprot feature: "+feat);
+                //logger.info("uniprot feature: "+feat);
                 String nickname = dassource.getNickname();
                 if ( ! ((nickname == null) || ( nickname.equals("") )) ){
                     feat.put("dassource", nickname);  
@@ -770,7 +769,17 @@ public class FeatureFetcher extends Thread
         //if ( ! (feat==null))  features.add(feat);
         if ( ! (feat==null))  
             features =testAddFeatures(features,feat);
-        return (Feature[])features.toArray(new Feature[features.size()]) ;
+        
+        
+        Feature[] fs = new Feature[features.size()];
+        Iterator iter = features.iterator();
+        int i = 0;
+        while (iter.hasNext()){
+            Feature f = (Feature) iter.next();
+            fs[i] = f;
+            i++;
+        }
+        return fs;
     }
     
     private boolean isSecondaryStructureFeat(Feature feat){
@@ -1018,8 +1027,10 @@ class DasResponse{
         // sort features ...
         finished = true ;
         Map[] featarr = (Map[]) feats.toArray(new Map[feats.size()]);
-        FeatureMapComparator comp = new FeatureMapComparator();
-        java.util.Arrays.sort(featarr,comp) ; 
+        
+        // do not touch the order of features any more!
+        //FeatureMapComparator comp = new FeatureMapComparator();
+        //java.util.Arrays.sort(featarr,comp) ; 
         
         List sortfeats = java.util.Arrays.asList(featarr);
         //logger.finest(sortfeats); 
