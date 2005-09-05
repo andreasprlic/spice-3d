@@ -113,6 +113,10 @@ public class Spice extends Applet {
         System.out.println("SPICE version: " + AboutDialog.VERSION);
         System.out.println("displaying for you: " + codetype + " " + code);
        
+        //for ( int i =0; i<registryurls.length; i++) {
+        //    System.out.println("debug 2" + registryurls[i]);
+        //}
+        
         
         URL[] regis ;
         int numberregis = 1 ;
@@ -122,17 +126,18 @@ public class Spice extends Applet {
         if ( primaryRegistry != null ){
             regis = new URL[numberregis];
             regis[0] = primaryRegistry;
-            for ( int i =0;i<registryurls.length;i++) {
+            for ( int i =0; i<registryurls.length; i++) {
+                System.out.println(registryurls[i]);
                 regis[i+1] = registryurls[i];
             }
         } else {
             regis = registryurls;
         }
         
-        System.out.println("got registries...");
-        for (int i = 0 ; i< regis.length; i++){
-            System.out.println(regis[i]);
-        }
+        //System.out.println("got " + regis.length + " registries...");
+        //for (int i = 0 ; i< regis.length; i++){
+        //    System.out.println(regis[i]);
+        //}
         
         
         /** test if already one instance of SPICE is running
@@ -141,18 +146,19 @@ public class Spice extends Applet {
          */
         boolean serverFound = testSendToServer(codetype,code);
         
-        if ( ! serverFound){
-            
-        // 	start spice
-            SpiceApplication appFrame = new SpiceApplication(regis, display,displayLabel,rasmolScript,seqSelectStart, seqSelectEnd, pdbSelectStart,pdbSelectEnd, message, messageWidth, messageHeight) ;	
-            appFrame.load(codetype,code);
-            
-            
-            
-        } else {
-            // quit this one, the code is being loaded in SPICE... in another SPICEFrame ...
+        if (  serverFound){
+            // quit this SPICE instance, 
+            // the code is being loaded in SPICE in another instance that is already running ...
             System.exit(0);
         }
+        	
+        	// 	start a spice instance
+        SpiceApplication appFrame = new SpiceApplication(regis, display,displayLabel,rasmolScript,seqSelectStart, seqSelectEnd, pdbSelectStart,pdbSelectEnd, message, messageWidth, messageHeight) ;	
+        
+        // and display the accession code...
+        appFrame.load(codetype,code);
+            
+           
         
     }
     
@@ -252,13 +258,35 @@ public class Spice extends Applet {
         for ( int i = 0 ;i< urls.length;i++){
             try {
                 URL u = new URL(urls[i]);
+                //System.out.println("adding " + u );
                 regis.add(u);
                 
             } catch (MalformedURLException e){
                 e.printStackTrace();
             }
         }
-        registryurls = (URL[]) regis.toArray(new URL[regis.size()]);
+        
+        URL[] oldregistryurls = registryurls ;
+        int oldsize = 0;
+        if ( registryurls != null) {
+            oldsize = registryurls.length;
+        }
+        URL[] tmpregistryurls = (URL[]) regis.toArray(new URL[regis.size()]);
+        int newsize = oldsize + regis.size();
+        registryurls = new URL[newsize];
+        
+        
+        for ( int i =0; i<oldsize; i++) {
+            //System.out.println("debug 1a" + oldregistryurls[i]);
+            registryurls[i] = oldregistryurls[i];
+        }
+        
+        for ( int i =0; i<tmpregistryurls.length; i++) {
+            //System.out.println("debug 1b" + tmpregistryurls[i]);
+            registryurls[i+oldsize] = tmpregistryurls[i];
+        }
+        
+    
     }
     
     public void setRasmolScript(String script){
