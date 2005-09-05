@@ -88,7 +88,7 @@ public class SpiceProtocol {
                         parent.show();
                         parent.toFront();
                         parent.requestFocus();
-                        
+                        parent.setState(java.awt.Frame.NORMAL);
                         
                     }
                     return SPICE_OK;
