@@ -24,7 +24,9 @@ package org.biojava.spice.GUI;
 
 import org.biojava.spice.*;
 import org.biojava.spice.Feature.*;
+import org.biojava.spice.Config.*;
 import org.biojava.spice.Feature.Segment;
+import org.biojava.spice.Panel.seqfeat.FeatureView;
 import org.biojava.spice.DAS.StructureXMLStAXAdaptor;
 import org.biojava.utils.stax.DelegationManager;
 import org.biojava.utils.stax.StAXContentHandler;
@@ -57,23 +59,23 @@ import org.xml.sax.*;
  */
 public class SaveLoadSession {
 
-    	SPICEFrame spice;
+    	SpiceApplication spice;
     	File  oldfile;
     	Logger logger; 
     /**
      * 
      */
-    public SaveLoadSession(SPICEFrame parent) {
+    public SaveLoadSession(SpiceApplication parent) {
         super();
         logger = Logger.getLogger("org.biojava.spice");
         spice = parent;
         oldfile = null;
-        // TODO Auto-generated constructor stub
+        
     }
     
     /** save current SPICE session */
     public void save() {
-        System.out.println("save");
+        System.out.println("save - new");
         File f = null;
         if ( oldfile == null ){
             try {	
@@ -169,8 +171,7 @@ public class SaveLoadSession {
     {
         System.out.println("init XML file parse");
         // get stream from file
-       
-        
+               
         SAXParserFactory spfactory =
 		    SAXParserFactory.newInstance();
 		
@@ -229,12 +230,40 @@ public class SaveLoadSession {
     		xw.closeTag("CurrentChain");
     		
     		xw.openTag("Features");
-    		List features = spice.getFeatures();
-    		Iterator iter =features.iterator();
-    		while ( iter.hasNext()){
-    		    Feature feat = (Feature) iter.next();
-    		    feature2XML(feat,xw);
-    		}
+    			
+    		 	FeatureView[] fvs = spice.getFeatureViews();
+    	        
+    	        List features = new ArrayList();
+    	        for ( int i = 0 ; i < fvs.length ; i++){
+    	            FeatureView fv = fvs[i];
+    	            xw.openTag("DasSource");
+    	            SpiceDasSource ds = fv.getDasSource();
+    	            xw.attribute("nickname",ds.getNickname());
+    	            xw.attribute("url",ds.getUrl());
+    	            xw.attribute("testcode",ds.getTestCode());
+    	            xw.openTag("description");
+    	            xw.print(ds.getDescription());
+    	            xw.closeTag("description");
+    	            String[] caps = ds.getCapabilities();
+    	            for ( int c=0; c<caps.length;c++){
+    	                xw.openTag("capability");
+    	                xw.print(caps[c]);
+    	                xw.closeTag("capability");
+    	            }
+    	            //TODO: also save labels, coordsys, adminemail 
+    	            
+    	            
+    	            Feature[] feats =fv.getFeatures();
+    	            for ( int fc = 0 ; fc< feats.length;fc++){
+    	                Feature feat =feats[fc];
+    	                feature2XML(feat,xw);
+    	            }
+    	            	xw.closeTag("DasSource");
+    	        }
+    	        
+    		
+    		
+    		
     		xw.closeTag("Features");
     		
 //    		 the structure is serialized using biojava
@@ -313,7 +342,7 @@ public class SaveLoadSession {
 class MyParser
 	extends StAXContentHandlerBase{
     
-    SPICEFrame spice;
+    SpiceApplication spice;
     StructureXMLStAXAdaptor sxs;
     String date;
     String uniProtCode;
@@ -323,22 +352,28 @@ class MyParser
     List features;
     Feature currentFeature;
     Logger logger;
-    
-    public MyParser(SPICEFrame parent){
+    SpiceDasSource currentDasSource;
+    List capabilities;
+    List featureViews ;
+    public MyParser(SpiceApplication parent){
         spice = parent;
 		sxs = new StructureXMLStAXAdaptor() ;
 		characterdata = "";
 		//System.out.println("init MyParser");
-		features  = new ArrayList();
+		features       = new ArrayList();
+		featureViews   = new ArrayList();
+		capabilities   = new ArrayList();
 		currentFeature = new FeatureImpl();
 		currentChain=0;
 		logger= Logger.getLogger("org.biojava.spice");
 		uniProtCode = "";
 		pdbCode ="";
+		currentDasSource = new SpiceDasSource();
     }
     
     public void startTree() throws SAXException {
         //System.out.println("startTree");
+        spice.clear();
     }
     public void endTree()
     	throws SAXException
@@ -346,7 +381,7 @@ class MyParser
         // structure needs to be set first, before features,
         // otherwise SPICE does not know where the features belong to...
         
-        System.out.println("getting structure");
+        //System.out.println("getting structure");
         Structure s = sxs.getStructure();
         spice.setStructure(s);
         
@@ -356,15 +391,23 @@ class MyParser
         // then setting features, because once we select the chain,
         // spice checks if they are already in memory, otherwise it tries 
         // to get them via DAS and we do not want this during session-restore.
-        System.out.println("setting features "+ uniProtCode);
-        System.out.println(features.size());
-        spice.setFeatures(uniProtCode,features);
+        //System.out.println("setting features "+ uniProtCode);
+        //System.out.println(features.size());
+        //spice.setFeatures(uniProtCode,features);
 
         	// finally setting the currently active Chain in spice
         // features have to be already  set ( see above)
-        System.out.println(currentChain);
+        //System.out.println(currentChain);
+        
+        FeatureView[] fvs = (FeatureView[])featureViews.toArray(new FeatureView[featureViews.size()]);
+        for ( int i =0 ; i < fvs.length; i++){
+            FeatureView fv = fvs[i];
+            fv.setSeqLength(s.getChain(currentChain).getLengthAminos() );
+        }
+        
+        spice.setFeatureViews(fvs);
         spice.setCurrentChainNumber(currentChain);
-        System.out.println(currentChain);
+        //System.out.println(currentChain);
         spice.setCurrentChainNumber(currentChain);
         
         logger.info("restored session from "+date);
@@ -377,6 +420,7 @@ class MyParser
             DelegationManager dm)
     throws SAXException
     {
+        System.out.println(qName);
         characterdata = "";
         //System.out.println("startElement nsURI: " + nsURI + " localName: "+ localName+" qName "+qName);
         if (qName.equals("DASStructure")){
@@ -386,11 +430,27 @@ class MyParser
             createNewFeature(attrs);
         } else if (qName.equals("segment")){
             addSegment(attrs);
+        }
+        else if ( qName.equals("DasSource")){
+            newDasSource(attrs);
+            capabilities = new ArrayList();
+        } else if ( qName.equals("capability")){
+            //capabilities = new ArrayList();
         }else {
            // System.out.println("startElement nsURI: " + nsURI + " localName: "+ localName+" qName "+qName);
         }
     }
     
+    
+    private void newDasSource(Attributes attrs){
+        currentDasSource = new SpiceDasSource();
+        String nickname  = attrs.getValue("nickname");
+        String url       = attrs.getValue("url");
+        String testCode  = attrs.getValue("testCode");
+        currentDasSource.setNickname(nickname);
+        currentDasSource.setUrl(url);
+        currentDasSource.setTestCode(testCode);
+    }
     
     private void createNewFeature(Attributes attrs){
         currentFeature = new FeatureImpl();
@@ -424,7 +484,7 @@ class MyParser
             StAXContentHandler delegate)
     throws SAXException
     {
-        //System.out.println("edElement " + nsURI);
+        System.out.println("endElement " + qName +" " +characterdata);
         if ( qName.equals("DASStructure")){
             //
             
@@ -441,7 +501,33 @@ class MyParser
             features.add(currentFeature);
         } else if (qName.equals("Features")){
           //
+        } else if (qName.equals("DasSource")){
+            String[] caps = (String[]) capabilities.toArray(new String[capabilities.size()]);
+            currentDasSource.setCapabilities(caps);
+            System.out.println("a");
+            FeatureView fv = new FeatureView();
+            spice.addFeatureView(fv);
+            
+            fv.setLabel(currentDasSource.getNickname());
+            System.out.println("b");
+            fv.setDasSource(currentDasSource);
+            System.out.println("c");
+            Feature[] feat = (Feature[])features.toArray(new Feature[features.size()]);
+            System.out.println("d");
+            for (int i=0;i<feat.length;i++){
+                System.out.println(feat[i]);
+            }
+            
+            fv.setFeatures(feat);
+            System.out.println("e");
+            featureViews.add(fv);
+            features = new ArrayList();
+            
+            // get features, set in currentFeature View
+        } else if ( qName.equals("capability")){
+            capabilities.add(characterdata);
         }
+        
         characterdata = "";
     }
     

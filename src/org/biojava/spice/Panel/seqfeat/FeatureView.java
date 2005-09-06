@@ -164,6 +164,7 @@ public class FeatureView
     	public void setLoading(boolean flag){
     	    isLoading = flag;
     	    featurePanel.setLoading(flag);
+    	    
     	}
     
   /** set the length of the displayed sequence
@@ -209,6 +210,11 @@ public class FeatureView
         //typeLabelPanel.repaint();
         //featurePanel.repaint();
         //this.revalidate();
+    }
+    
+    
+    public Feature[] getFeatures() {
+        return features;
     }
     
     public void setFeatures(Feature[] features){

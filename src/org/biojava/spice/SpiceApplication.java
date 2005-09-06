@@ -87,6 +87,7 @@ import javax.swing.JDialog;
 import java.awt.Container;
 
 import org.biojava.spice.server.SpiceServer;
+import org.biojava.spice.Panel.seqfeat.FeatureView;
 
 /** the main application layer of SPICE
  * do not interact with this class directly, but interact with SPICEFrame interface.
@@ -902,9 +903,49 @@ ConfigurationListener
         return mem_id;
     }
 
+    /** return the feature views used in the 2D feature display. required for saving...
+     * 
+     * @return
+     */
+    public FeatureView[] getFeatureViews(){
+        // TODO find a nicer solution to this ...
+        return dascanv.getFeatureViews();
+    }
+    
+    public void setFeatureViews(FeatureView[] fvs){
+        dascanv.clear();
+        for ( int i = 0 ; i < fvs.length; i++){
+            FeatureView fv = fvs[i];
+            dascanv.addFeatureView(fv);
+        }
+    }
+    
+    public void addFeatureView(FeatureView fv){
+        dascanv.addFeatureView(fv);
+        
+    }
+    
+    /** clear the displayed data */
+    public void clear(){
+        dascanv.clear();
+        Structure s = new StructureImpl();
+        setStructure(s);
+    }
+    
     /** return the features */
     public List getFeatures(){
-        //TODO: get the features from dascanv!
+        FeatureView[] fvs = dascanv.getFeatureViews();
+        
+        List features = new ArrayList();
+        for ( int i = 0 ; i < fvs.length ; i++){
+            FeatureView fv = fvs[i];
+            Feature[] feats =fv.getFeatures();
+            for ( int f = 0 ; f< feats.length;f++){
+                Feature feat =feats[f];
+                features.add(feat);
+            }
+        }
+        
         return features;
         //return dascanv.getFeatures();
     }
@@ -1357,14 +1398,7 @@ ConfigurationListener
         statusPanel.setLoading(status);
     }
     
-    //public void setSelectionLocked(boolean status) {
-    //    selectionLocked = status ;
-        //lockMenu.setEnabled(selectionLocked);     
-    //}
-    
-    //public boolean isSelectionLocked() {
-    //    return selectionLocked ;
-    //}
+ 
     
     /** get Chain number X from structure 
      * @return a Chain object or null ;

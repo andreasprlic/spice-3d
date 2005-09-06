@@ -30,7 +30,7 @@ import org.biojava.spice.Panel.StructurePanelListener;
 import org.biojava.spice.SPICEFrame;
 import org.biojava.spice.GUI.alignmentchooser.AlignmentChooser;
 import org.biojava.spice.Panel.seqfeat.*;
-
+import org.biojava.spice.SpiceApplication;
 
 /**This class takes care of the events that are triggered 
  * if a MenuItem is choosen from the main spice menu.
@@ -68,11 +68,15 @@ SelectedSeqPositionListener
             OpenDialog op = new OpenDialog(parent);
             op.show();
         } else if (cmd.equals("Save")){
-            SaveLoadSession save = new SaveLoadSession(parent);
-            save.save();
+            if ( parent instanceof SpiceApplication) {
+                SaveLoadSession save = new SaveLoadSession((SpiceApplication)parent);
+                save.save();
+            }
         } else if (cmd.equals("Load")){
-            SaveLoadSession load = new SaveLoadSession(parent);
-            load.load();
+            if ( parent instanceof SpiceApplication) {
+                SaveLoadSession load = new SaveLoadSession((SpiceApplication)parent);
+                load.load();
+            }
         } else if (cmd.equals("Exit")) {
             System.exit(0);
         } else if (cmd.equals("Properties")) {
