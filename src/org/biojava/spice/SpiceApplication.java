@@ -1037,12 +1037,18 @@ ConfigurationListener
         features.clear();
         dascanv.clear();
         dascanv.setSeqLength(chain.getLength());
-        List l = config.getAllServers();
+        List l = null;
+        if ( config != null )
+            l =config.getAllServers();
+        if (l == null){
+            l = new ArrayList();
+        }
         Iterator iter = l.iterator();
         while (iter.hasNext()){
             SpiceDasSource ds = (SpiceDasSource) iter.next();
-            //logger.info(ds.getNickname() + " " + ds.getStatus());
+            logger.info(ds.getNickname() + " " + ds.getStatus());
         }
+        //logger.info("init feature fetcher");
         FeatureFetcher ff = new FeatureFetcher(this,sp_id,pdbcode,chain);	
         ff.setDisplayServers(this.dasServerList);
         ff.setDisplayLabels(this.labelList);
@@ -1315,8 +1321,13 @@ ConfigurationListener
     public int getCurrentChainNumber() {
         return currentChainNumber;
     }
+    
     public void setCurrentChainNumber( int newCurrentChain) {
-        logger.finer("setCurrentChain " + newCurrentChain);
+        setCurrentChainNumber(newCurrentChain,true);
+    }
+    
+    public void setCurrentChainNumber( int newCurrentChain,boolean getNewFeaturesFlag) {
+        //logger.info("setCurrentChainNumber " + newCurrentChain + " " + getNewFeaturesFlag);
         
         structurePanelListener.setCurrentChainNumber(newCurrentChain);
         statusPanel.setCurrentChainNumber(newCurrentChain);
@@ -1329,8 +1340,8 @@ ConfigurationListener
         currentChainNumber = newCurrentChain ;
         if ( chain == null) return ;
         String sp_id = chain.getSwissprotId() ;
-        logger.finest("SP_ID "+sp_id);
-        
+        //logger.info("SP_ID "+sp_id);
+        //logger.info("getting annotation");
         // display pdb annotation
         Annotation anno = chain.getAnnotation();
         boolean annotationFound = false ;
@@ -1363,7 +1374,10 @@ ConfigurationListener
             logger.info("no UniProt sequence found for"+chain.getName());
         }
         
-        getNewFeatures(sp_id) ;
+        if(getNewFeaturesFlag){
+            //logger.info("getting new features");
+            getNewFeatures(sp_id) ;
+        }
         /*
          //TODO: re-enable feature caching ...
         String mem_id = makeFeatureMemoryCode(sp_id);

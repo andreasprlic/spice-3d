@@ -76,7 +76,7 @@ public class RegistryConfiguration
         capabilities      = new String[] { "sequence","structure","alignment","features","entry_points"} ;
         pdbFileExtensions = new String[] { ".pdb",".ent"};
         updateBehave      = "always";
-        lastContact       = null ;
+        lastContact       = new Date(0) ;
         try {
             registryUrl       = new URL(DEFAULTREGISTRY);
         } catch( MalformedURLException e ){

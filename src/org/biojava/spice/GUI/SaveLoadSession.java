@@ -348,7 +348,7 @@ class MyParser
     String uniProtCode;
     String pdbCode;
     String characterdata;
-    int currentChain;
+    int currentChainNumber;
     List features;
     Feature currentFeature;
     Logger logger;
@@ -364,7 +364,7 @@ class MyParser
 		featureViews   = new ArrayList();
 		capabilities   = new ArrayList();
 		currentFeature = new FeatureImpl();
-		currentChain=0;
+		currentChainNumber=0;
 		logger= Logger.getLogger("org.biojava.spice");
 		uniProtCode = "";
 		pdbCode ="";
@@ -383,10 +383,10 @@ class MyParser
         
         //System.out.println("getting structure");
         Structure s = sxs.getStructure();
-        spice.setStructure(s);
+        
         
         // spice.setStructure set loading to false;
-        spice.setLoading(true);
+        //spice.setLoading(true);
         
         // then setting features, because once we select the chain,
         // spice checks if they are already in memory, otherwise it tries 
@@ -402,15 +402,22 @@ class MyParser
         FeatureView[] fvs = (FeatureView[])featureViews.toArray(new FeatureView[featureViews.size()]);
         for ( int i =0 ; i < fvs.length; i++){
             FeatureView fv = fvs[i];
-            fv.setSeqLength(s.getChain(currentChain).getLengthAminos() );
+            fv.setSeqLength(s.getChain(currentChainNumber).getLengthAminos() );
         }
         
-        spice.setFeatureViews(fvs);
-        spice.setCurrentChainNumber(currentChain);
-        //System.out.println(currentChain);
-        spice.setCurrentChainNumber(currentChain);
+       
+        //logger.info("setting structure");
+        spice.setStructure(s);
+        //spice.setCurrentChainNumber(currentChain);
+        //logger.info("setting current chain" + currentChainNumber);
         
-        logger.info("restored session from "+date);
+        spice.setCurrentChainNumber(currentChainNumber,false);
+       
+        //logger.info("setting feature views");        
+        spice.setFeatureViews(fvs);
+        
+        //logger.info("restored session");
+        logger.info("restored session date: " +date);
        
     }
     public void startElement(String nsURI,
@@ -496,7 +503,7 @@ class MyParser
             pdbCode = characterdata;
         } else if (qName.equals("CurrentChain")){
             //System.out.println("processing chaindata >" + characterdata+"<");
-            currentChain = Integer.parseInt(characterdata);
+            currentChainNumber = Integer.parseInt(characterdata);
         } else if (qName.equals("feature")){
             features.add(currentFeature);
         } else if (qName.equals("Features")){
@@ -504,22 +511,22 @@ class MyParser
         } else if (qName.equals("DasSource")){
             String[] caps = (String[]) capabilities.toArray(new String[capabilities.size()]);
             currentDasSource.setCapabilities(caps);
-            System.out.println("a");
+            
             FeatureView fv = new FeatureView();
             spice.addFeatureView(fv);
             
             fv.setLabel(currentDasSource.getNickname());
-            System.out.println("b");
+      
             fv.setDasSource(currentDasSource);
-            System.out.println("c");
+          
             Feature[] feat = (Feature[])features.toArray(new Feature[features.size()]);
-            System.out.println("d");
-            for (int i=0;i<feat.length;i++){
-                System.out.println(feat[i]);
-            }
+     
+            //for (int i=0;i<feat.length;i++){
+            //    System.out.println(feat[i]);
+            //}
             
             fv.setFeatures(feat);
-            System.out.println("e");
+            //System.out.println("e");
             featureViews.add(fv);
             features = new ArrayList();
             
