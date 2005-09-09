@@ -1044,10 +1044,10 @@ ConfigurationListener
             l = new ArrayList();
         }
         Iterator iter = l.iterator();
-        while (iter.hasNext()){
-            SpiceDasSource ds = (SpiceDasSource) iter.next();
-            logger.info(ds.getNickname() + " " + ds.getStatus());
-        }
+        //while (iter.hasNext()){
+        //    SpiceDasSource ds = (SpiceDasSource) iter.next();
+        //    logger.info(ds.getNickname() + " " + ds.getStatus());
+        //}
         //logger.info("init feature fetcher");
         FeatureFetcher ff = new FeatureFetcher(this,sp_id,pdbcode,chain);	
         ff.setDisplayServers(this.dasServerList);
@@ -1373,7 +1373,7 @@ ConfigurationListener
             
             logger.info("no UniProt sequence found for"+chain.getName());
         }
-        
+        dascanv.setChain(chain);
         if(getNewFeaturesFlag){
             //logger.info("getting new features");
             getNewFeatures(sp_id) ;
