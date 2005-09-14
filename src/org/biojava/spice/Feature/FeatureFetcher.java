@@ -222,9 +222,11 @@ public class FeatureFetcher extends Thread
     /** start one thread per server to fetch all the features!
      */
     public void run() {
+        System.out.println("featurefetcher run");
         logger.finest("retreiving features for PDB " + pdbId + " UniProt " + spId);
         parent.setLoading(true);
         doDasCommunication() ;
+       
     }
     
     
@@ -335,7 +337,7 @@ public class FeatureFetcher extends Thread
     }
     
     private synchronized void doDasCommunication() {
-        
+        System.out.println("FeatureFetcher doDasCommunication");
         finished = false ;
         allFeatures = new ArrayList();
         // contact sequence feature servers
@@ -378,8 +380,10 @@ public class FeatureFetcher extends Thread
         
         logger.finest("total: " + nrservers + "feature servers applicable here");
         // no network connection ( to registry);
-        if ( nrservers == 0)
+        if ( nrservers == 0) {
+            notifyAll();
             return;
+        }
         
         subthreads = new DasResponse[nrservers];
         
@@ -420,7 +424,7 @@ public class FeatureFetcher extends Thread
                 responsecounter++;
                 continue ;
             }
-            
+            System.out.println("FeatureFetcher starting new thread...");
             SingleFeatureThread sft = new SingleFeatureThread ( this ,spUrl,responsecounter,featureserver);
             sft.start();
             responsecounter++;
@@ -469,6 +473,9 @@ public class FeatureFetcher extends Thread
                 done = true ;
             }
         }
+        
+        System.out.println("featurefetcher end .. parent setLoading false");
+        
         parent.setLoading(false);
         notifyAll();
         
@@ -600,6 +607,8 @@ public class FeatureFetcher extends Thread
      * features for this thread are set */
     public synchronized void setFinished(int threadId, List features) {
         //logger.finest("Got "+ features.size()+ " features from " + threadId);
+        
+        //System.out.println("FeatureFetcher setting finished for " + threadId);
         DasResponse d = subthreads[threadId] ;
         d.setFeatures(features);
         

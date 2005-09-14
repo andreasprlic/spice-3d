@@ -34,6 +34,7 @@ import org.jmol.api.*;
 import org.jmol.adapter.smarter.SmarterJmolAdapter;
 // biojava structure stuff
 import org.biojava.bio.structure.Structure ;
+import org.biojava.bio.structure.StructureImpl ;
 // logging
 import java.util.logging.*;
 
@@ -67,6 +68,7 @@ implements JmolStatusListener
     JTextField  strucommand  ; 
     int currentChainNumber;
     Structure structure ;
+    
     public StructurePanel(){
         this(null);
     }
@@ -84,7 +86,7 @@ implements JmolStatusListener
     
     
     
-   
+    
     
     /** returns the JmolViewer */
     public JmolViewer getViewer() {
@@ -111,6 +113,7 @@ implements JmolStatusListener
         if (errorMessage != null){
             logger.log(Level.SEVERE,errorMessage);
         }
+        
     }
     
     public void showConsole(boolean showConsole){
@@ -125,11 +128,19 @@ implements JmolStatusListener
         if (logger.isLoggable(Level.FINEST)) {
             logger.finest("sending Jmol command: "+command);
         }
+        System.out.println("sending Jmol command: " + command);
         
+        //TODO: is this needed?
+        synchronized(viewer){
+            viewer.evalString(command);
+        }
         
-        JmolThread thr = new JmolThread(viewer,command);
-        thr.start();
+        //JmolThread thr = new JmolThread(viewer,command);
+        //thr.start();
         //viewer.evalString(command);
+        logger.finest("sent command");
+        System.out.println("sent command");
+       
     }
     
     /** display a new PDB structure in Jmol 
@@ -138,28 +149,31 @@ implements JmolStatusListener
      */
     public  void setStructure(Structure structure) {
         if ( structure == null ) {
-            executeCmd(EMPTYCMD);
-            return;
+            structure = new StructureImpl();            
         }
-       
-	if ( structure.size() == 0 ) {
-	    executeCmd(EMPTYCMD);
-            return;
-	}
-
+        
+        //if ( structure.size() == 0 ) {
+          //  executeCmd(EMPTYCMD);
+            //notifyAll();
+            //return;
+        
+        
         String pdbstr = structure.toPDB();
         //System.out.println(pdbstr);
-        if ( (pdbstr == null) || 
+        /*if ( (pdbstr == null) || 
                 (pdbstr.equals("\n")) ||
-		 (pdbstr.equals(""))) {
+                (pdbstr.equals(""))) {
             executeCmd(EMPTYCMD);
+            //notifyAll();
             return;
-        }
+        }*/
         
-        synchronized ( viewer) {
-            viewer.openStringInline(pdbstr);
-        }
-        
+         
+         viewer.openStringInline(pdbstr);
+         if ( structure.size() == 0 ) {
+             executeCmd(EMPTYCMD);
+         }
+       
         //String cmd ="select all; cpk off; wireframe off;"  ;
         //executeCmd(cmd);
         
@@ -174,6 +188,8 @@ implements JmolStatusListener
         if ( pdbstr.equals("")){
             executeCmd(EMPTYCMD);
         }
+        logger.finest("end of setStructure");
+        //notifyAll();
     }
     
     
@@ -277,11 +293,11 @@ implements JmolStatusListener
         logger.finest(props.toString());
     }
     
-	/*public void notifyFileLoaded(String fullPathName, String fileName,
-            String modelName, Object clientFile){
-        //logger.finest("Jmol loaded File "+ fileName); 
-	}
-	*/
+    /*public void notifyFileLoaded(String fullPathName, String fileName,
+     String modelName, Object clientFile){
+     //logger.finest("Jmol loaded File "+ fileName); 
+      }
+      */
     
     public void notifyFileNotLoaded(String fullPathName, String errorMsg){}
     
@@ -394,7 +410,7 @@ implements JmolStatusListener
         return display;
     }
     
-
+    
     
     
     

@@ -39,7 +39,7 @@ public class SpiceProtocol {
      */
     public SpiceProtocol() {
         super();
-       
+        
     }
     
     
@@ -77,11 +77,13 @@ public class SpiceProtocol {
                 }
                 String type = split[2];
                 String accessionCode = split[3];
-                System.out.println("trying to display " +type+ " " + accessionCode);
+                System.out.println("SpiceProtocol recieved request to display " +type+ " " + accessionCode);
                 
                 if (  (type.equals("PDB")    ) || 
-                      (type.equals("UniProt")) ) {
+                        (type.equals("UniProt")) ) {
+                    
                     spice.load(type,accessionCode);
+                    
                     if ( spice instanceof SpiceApplication ){
                         SpiceApplication parent = (SpiceApplication) spice;
                         parent.setVisible(true);
@@ -101,13 +103,13 @@ public class SpiceProtocol {
             } else {
                 return SPICE_WHAT;
             }
-                
+            
         } catch (Exception e) {
             e.printStackTrace();
             return SPICE_ERROR;
         }
         
-     //   return SPICE_ERROR;
+        //   return SPICE_ERROR;
     }
-
+    
 }

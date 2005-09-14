@@ -149,10 +149,13 @@ public class Spice extends Applet {
         if (  serverFound){
             // quit this SPICE instance, 
             // the code is being loaded in SPICE in another instance that is already running ...
+            String msg = " sent " + codetype + " " + code + " to already running spice instance";
+            System.out.println(msg);
             System.exit(0);
         }
         	
         	// 	start a spice instance
+        System.out.println("no spice instance has been found - starting new one for "+codetype + " " + code);
         SpiceApplication appFrame = new SpiceApplication(regis, display,displayLabel,rasmolScript,seqSelectStart, seqSelectEnd, pdbSelectStart,pdbSelectEnd, message, messageWidth, messageHeight) ;	
         
         // and display the accession code...

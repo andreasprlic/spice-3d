@@ -56,6 +56,7 @@ extends Thread {
     
     public void run () {
         loadCompound() ;
+      
     }
     
     public boolean isDone() {
@@ -75,15 +76,17 @@ extends Thread {
             //spiceframe.showStatus("Loading...Wait...",Color.red);
             //DAS_PDBFeeder pdb_f =  new DAS_PDBFeeder(structureURL,dassequencecommand,dasalignmentcommand) ;
             RegistryConfiguration config = spiceframe.getConfiguration();
+           
             while ( config == null){
                 try {
                     wait(30);
                     config = spiceframe.getConfiguration();
+                   
                 } catch (InterruptedException e){
-                    
-                    return;
                 }               
             }
+            if ( config == null)
+                return;
             
             DAS_Feeder dasPdb = new DAS_Feeder (config);
             Structure struc = dasPdb.loadPDB(pdb_file);
@@ -97,16 +100,17 @@ extends Thread {
             */
             spiceframe.setStructure(struc);
             finished = true ;
-            notifyAll();
+          
         }
         catch (Exception e){ 
             // at some point raise some IO exception, which should be defined by the Inferface
             e.printStackTrace();
+            logger.warning(e.getMessage());
             finished = true ;
             StructureImpl n = new StructureImpl();
             spiceframe.setStructure(n);
             
         }
-        
+        notifyAll();
     }
 }

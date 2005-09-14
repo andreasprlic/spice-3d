@@ -49,6 +49,7 @@ public class LoadUniProtThread
     public void run () {
 	logger.finest("running UniProtThread");
 	loadCompound() ;
+	
     }
 
     public boolean isDone() {
@@ -63,17 +64,20 @@ public class LoadUniProtThread
 	    
 	    // do something ...
 	    RegistryConfiguration config = spiceframe.getConfiguration();
+	    
 	    while ( config == null){
 	        try {
 	            wait(30);
 	            config = spiceframe.getConfiguration();
 	        } catch (InterruptedException e){
 	            logger.info("did not get configuration");
-	            return;
 	        }
-	        
 	    }
-	     
+	    
+	    if ( config == null) {
+	        notifyAll();
+	        return;
+	    }
 	    if (uniprot == null){
 	        logger.finest("got uniprot code null, returning");
 	    }
@@ -85,14 +89,16 @@ public class LoadUniProtThread
 
 	    spiceframe.setLoading(false);
 	    //spiceframe.showStatus(uniprot +" loaded");
-	    notifyAll();
+	    
 
 	}catch (Exception e){ 
 	    // at some point raise some IO exception, which should be defined by the Inferface
 	    e.printStackTrace();
+	    logger.warning(e.getMessage());
 	    finished = true ;	  
 	    StructureImpl n = new StructureImpl();
 	    spiceframe.setStructure(n);
 	}
+	notifyAll();
     }
 }

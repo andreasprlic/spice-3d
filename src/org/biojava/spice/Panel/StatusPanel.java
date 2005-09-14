@@ -187,6 +187,7 @@ implements FeatureViewListener, SelectedSeqPositionListener
             pdb = "-";
         
         pdbCode.setText(pdb);
+        pdbCode.repaint();
         
     }
     
@@ -195,11 +196,13 @@ implements FeatureViewListener, SelectedSeqPositionListener
             sp = "-" ;
         
         spCode.setText(sp)  ;
+        spCode.repaint();
         
     }
     
     public void setPDBDescription(String desc){
         pdbDescription.setText(desc);
+        pdbDescription.repaint();
     }
     
     

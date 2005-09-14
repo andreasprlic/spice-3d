@@ -435,12 +435,13 @@ ChangeListener, ActionListener
         }
     }
     
-    public void setChain(Chain chain){
+    public synchronized void setChain(Chain chain){
         this.chain = chain;
         featurePanel.setChain(chain);
         
         this.revalidate();
         this.repaint();
+        notifyAll();
     }
     
     /** the minimal scale is so that the whole sequence is visible on the screen */

@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.Group;
 import org.biojava.bio.structure.Structure ;
+import org.biojava.bio.structure.StructureImpl ;
 import org.biojava.spice.Feature.Feature;
 import org.biojava.spice.Feature.Segment;
 import org.biojava.spice.Panel.seqfeat.FeatureEvent;
@@ -65,6 +66,7 @@ SelectedSeqPositionListener
         currentChainNumber = 0;
         int oldpos = -1;
         selectionIsLocked =false;
+        structure = new StructureImpl();
     }
     
     /** display a new PDB structure in Jmol 
@@ -75,12 +77,13 @@ SelectedSeqPositionListener
    public  void setStructure(Structure structure, boolean displayScript) {
        if ( structure == null ) {
            //executeCmd(EMPTYCMD);
-           return;
+           //return;
+           structure = new StructureImpl();
        }
-       this.structure=structure;
+       //this.structure=structure;
        structurePanel.setStructure(structure);
        if ( displayScript)
-       executeCmd(INIT_SELECT);
+           executeCmd(INIT_SELECT);
    
       
    }

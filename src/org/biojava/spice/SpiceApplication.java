@@ -224,8 +224,9 @@ ConfigurationListener
         selectionLocked = false ;
         configLoaded = false;
         
-        currentChainNumber = -1 ;
-        currentChain = null;
+        setCurrentChain(null,-1);
+        //currentChainNumber = -1 ;
+        //currentChain = null;
         
         // init logging related stuff
         initLoggingPanel();
@@ -322,8 +323,8 @@ ConfigurationListener
    
     private void initLoggingPanel(){
         LoggingPanel loggingPanel = new LoggingPanel(logger);
-        loggingPanel.getHandler().setLevel(Level.INFO);	
-        logger.setLevel(Level.INFO);
+        loggingPanel.getHandler().setLevel(Level.FINEST);	
+        logger.setLevel(Level.FINEST);
         loggingPanel.show(null);
     }
     
@@ -757,6 +758,9 @@ ConfigurationListener
      * @see org.biojava.spice.SPICEFrame#load(java.lang.String, java.lang.String)
      */
     public void load(String type, String code){
+        String msg = "SpiceApplication load: " + type + " " + code;
+        System.out.println(msg);
+        logger.finest(msg);
         if (type.equals("PDB")){
             if ( code.length() == 4 ) 
                 this.loadStructure(code);
@@ -800,7 +804,7 @@ ConfigurationListener
         
         // need to call showduring init, to make sure das registry frame and threads can set status.
         // threads can only be started once the config is loaded from registry 
-        
+        /*
         if ( config == null ) {
             return ;
         }
@@ -820,6 +824,7 @@ ConfigurationListener
             thr.start();
             
         }
+        */
         
     }
        
@@ -842,8 +847,9 @@ ConfigurationListener
      protein structure
      */
     public void loadUniprot(String uniprot) {
-        logger.info("SpiceApplication getUniprot " + uniprot);
-        currentChain = null;
+        logger.info("SpiceApplication loadUniprot " + uniprot);
+        //currentChain = null;
+        setCurrentChain(null,-1);
         resetStatusPanel();
         statusPanel.setSP(uniprot);
         statusPanel.setLoading(true);
@@ -865,8 +871,8 @@ ConfigurationListener
     public void loadStructure(String pdbcod) {
         
         
-        currentChain = null ;
-        
+        //currentChain = null ;
+        setCurrentChain(null,-1);
         if (logger.isLoggable(Level.FINER)) {
             logger.entering(this.getClass().getName(), "getStructure",  new Object[]{pdbcod});
         }
@@ -1028,10 +1034,15 @@ ConfigurationListener
 
 
     private  void getNewFeatures(String sp_id) {
+        System.out.println("SpiceApplication get new Features " + sp_id);
         //ArrayList featureservers = getFeatureServers() ;
-        
+        logger.finest(" getNewFeatures" + sp_id);
         Chain chain = getChain(currentChainNumber) ;
-        if ( chain == null) return ;
+        if ( chain == null) {
+            System.out.println("SpiceApplication chain == null, returning ...");
+            	return ;
+            	
+        }
         //first_load = true ;
         this.setLoading(true);
         features.clear();
@@ -1048,12 +1059,14 @@ ConfigurationListener
         //    SpiceDasSource ds = (SpiceDasSource) iter.next();
         //    logger.info(ds.getNickname() + " " + ds.getStatus());
         //}
-        //logger.info("init feature fetcher");
+        System.out.println("SpiceApplication init feature fetcher");
+        logger.finest("init feature fetcher");
         FeatureFetcher ff = new FeatureFetcher(this,sp_id,pdbcode,chain);	
         ff.setDisplayServers(this.dasServerList);
         ff.setDisplayLabels(this.labelList);
         
         ff.start() ;
+        
         statusPanel.setLoading(true);
         //dascanv.setChain(chain,currentChainNumber);
         
@@ -1121,7 +1134,7 @@ ConfigurationListener
      * @param structure_ a Biojava structure object
      */
     
-    public void setStructure(Structure structure_ ) {
+    public  void setStructure(Structure structure_ ) {
         
         if (logger.isLoggable(Level.FINER)) {
             logger.entering(this.getClass().getName(), "setStructure",  new Object[]{"got structure object"});
@@ -1138,9 +1151,9 @@ ConfigurationListener
             return ;
         }
         
-        
-        
-        structure = structure_ ; 
+        structure = structure_ ;
+        //currentChain = null;
+        setCurrentChain(null,-1);
         pdbcode = structure.getPDBCode();
         
         if (pdbcode != null)
@@ -1160,27 +1173,39 @@ ConfigurationListener
                 Chain ch = (Chain) chains.get(i);
                 model.add(i,ch.getName());
             }
+            //notifyAll();
+               
         }
         
-      
+        System.out.println("SpiceApplication... setting structure in Jmol");
+        
         if ( displayMessage != null) {
             boolean displayScript = false; 
             structurePanelListener.setStructure(structure,displayScript);
         } else {
             structurePanelListener.setStructure(structure);
         }
+        System.out.println("SpiceApplication... back in main spice");
+        logger.finest("back in main spice ...");
+        
         Map header = structure.getHeader();
         //logger.info("structure header " + header);
         statusPanel.setPDB(structure.getPDBCode());
         statusPanel.setPDBHeader(structure.getHeader());
         
         //structurePanelListener.executeCmd(selectcmd);
-        
-        
+        System.out.println("SpiceApplication... setting chain");
+        logger.finest("setting chain...");
         setCurrentChainNumber(0);
+        System.out.println("SpiceApplication... requesting getChain");
         Chain chain = getChain(currentChainNumber) ;
-        currentChain = chain;
-        dascanv.setChain(chain);
+        
+        
+        //currentChain = chain;
+        System.out.println("SpiceApplication... setting chain in dascanv");
+        //dascanv.setChain(chain);
+        System.out.println("SpiceApplication... set chain in dascanv");
+        
         if ( chain != null) 
             seqTextPane.setChain(chain,0);
         
@@ -1222,6 +1247,7 @@ ConfigurationListener
       
         
         updateDisplays();
+        //notifyAll();
                 
     }
     
@@ -1326,8 +1352,15 @@ ConfigurationListener
         setCurrentChainNumber(newCurrentChain,true);
     }
     
-    public void setCurrentChainNumber( int newCurrentChain,boolean getNewFeaturesFlag) {
+    public synchronized void setCurrentChain(Chain c, int chainNumber){
+        currentChain = c;
+        currentChainNumber = chainNumber;
+        notifyAll();
+    }
+    
+    public  void setCurrentChainNumber( int newCurrentChain,boolean getNewFeaturesFlag) {
         //logger.info("setCurrentChainNumber " + newCurrentChain + " " + getNewFeaturesFlag);
+        System.out.println("SpiceApplication setCurrentChainNumber " + newCurrentChain);
         
         structurePanelListener.setCurrentChainNumber(newCurrentChain);
         statusPanel.setCurrentChainNumber(newCurrentChain);
@@ -1336,14 +1369,22 @@ ConfigurationListener
         // move to SpiceDasServerConfigListener ???
         // update features to be displayed ...
         Chain chain = getChain(newCurrentChain) ;
-        currentChain = chain;
-        currentChainNumber = newCurrentChain ;
-        if ( chain == null) return ;
+        System.out.println("SpiceApplication got chain " );
+        setCurrentChain(chain, newCurrentChain);
+        //currentChain = chain;
+        //currentChainNumber = newCurrentChain ;
+        if ( chain == null) {
+            //notifyAll();
+            return ;
+        }
+        System.out.println("SpiceApplication chain != null " );
         String sp_id = chain.getSwissprotId() ;
+        System.out.println("SpiceApplication sp: " +sp_id);
         //logger.info("SP_ID "+sp_id);
         //logger.info("getting annotation");
         // display pdb annotation
         Annotation anno = chain.getAnnotation();
+        System.out.println("SpiceApplication anno: " +anno);
         boolean annotationFound = false ;
         //logger.info("chain annotation " + anno);
         if (  ( anno != Annotation.EMPTY_ANNOTATION) && ( anno != null )){
@@ -1361,6 +1402,7 @@ ConfigurationListener
         }
         
         statusPanel.setSP(sp_id);
+        System.out.println("SpiceApplication statusPanel set: ");
         if (sp_id != null){
             upMenu.setEnabled(true);
             dastyMenu.setEnabled(true);
@@ -1373,11 +1415,16 @@ ConfigurationListener
             
             logger.info("no UniProt sequence found for"+chain.getName());
         }
+        
+        System.out.println("SpiceApplication setCurrentChain .. setChain dascanv");
         dascanv.setChain(chain);
+        System.out.println("SpiceApplication setCurrentChain ..  chain set in dascanv");
         if(getNewFeaturesFlag){
-            //logger.info("getting new features");
+            //logger.info("getting new features");            
             getNewFeatures(sp_id) ;
         }
+        
+        //notifyAll();
         /*
          //TODO: re-enable feature caching ...
         String mem_id = makeFeatureMemoryCode(sp_id);
@@ -1410,6 +1457,7 @@ ConfigurationListener
     public void setLoading(boolean status){
         first_load = status;
         statusPanel.setLoading(status);
+       
     }
     
  
@@ -1418,6 +1466,8 @@ ConfigurationListener
      * @return a Chain object or null ;
      */
     public Chain getChain(int chainnumber) {
+        
+        System.out.println("SpiceApplication... get chain " + chainnumber);
         
         // speedup
         if ( chainnumber == currentChainNumber ){
@@ -1431,7 +1481,7 @@ ConfigurationListener
         }
         
         if ( structure.size() < 1 ) {
-            logger.log(Level.WARNING,"structure object is empty, please load new structure");
+            //logger.log(Level.WARNING,"structure object is empty, please load new structure");
             return null ;
         }
         

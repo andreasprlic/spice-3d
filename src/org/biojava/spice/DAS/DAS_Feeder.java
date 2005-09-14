@@ -132,6 +132,7 @@ implements SpiceStructureFeeder
         pdb_structure.setPDBCode(pdbcode);
         if ( noAlignmentFound ) {
             logger.finest("no alignment found - returning pdb structue");
+            notifyAll();
             return pdb_structure;
         }
         
@@ -171,7 +172,7 @@ implements SpiceStructureFeeder
         
         
         // build up an empty (=no 3d info) based on the sequences.
-        
+        notifyAll();
         return struc;
     }
     
@@ -205,7 +206,7 @@ implements SpiceStructureFeeder
         AlignmentTools aligTools = new AlignmentTools(config);
         try {
             
-            logger.finest("in DAS_Feeder UniProt...");
+            logger.finest("in DAS_Feeder UniProt... " + uniprotcode);
             
             // get matching pdb codes
             // by making DAS_Alignment request
@@ -214,14 +215,16 @@ implements SpiceStructureFeeder
             
             
             // Problem: No alignment found
-            if ( alignments == null ) {
+            if ( (alignments == null ) || ( alignments.length == 0)) {
                 // aargh catch exception ...	
                 logger.warning("could not retreive any UniProt-PDB alignment from DAS servers");
                 String sequence = getSequence(uniprotcode);
                 if (sequence == null ) {
+                    notifyAll();
                     return struc ;
                 }
                 struc = makeStructureFromSequence(uniprotcode,sequence);
+                notifyAll();
                 return struc ;
             }
             
@@ -249,9 +252,11 @@ implements SpiceStructureFeeder
                 // get sequence
                 String sequence = getSequence(uniprotcode);
                 if (sequence == null ) {
+                    notifyAll();
                     return struc ;
                 }
                 struc = makeStructureFromSequence(uniprotcode,sequence);
+                notifyAll();
                 return struc;
             }
             
@@ -301,6 +306,7 @@ implements SpiceStructureFeeder
             // Problem, found structure and alignment, but no sequence
             if (sequence == null ) {
                 logger.warning("no sequence found, using PDB structure");
+                notifyAll();
                 return pdb_structure ;
             }
             
@@ -338,13 +344,14 @@ implements SpiceStructureFeeder
          System.err.println("XML exception reading document.");
          }
          */
-        
+        notifyAll();
         return struc ;
         
     }
     
     /** "emergency" procedure to create an "empty" Structure, which represents the sequence to be displayed in SPICE */
     private Structure makeStructureFromSequence(String id,String sequence ) {
+        logger.finest("makeStructureFromSequence for " +id);
         StructureBuilder sbuilder = new StructureBuilder();
         Chain chain =  sbuilder.getChainFromSequence(sequence);
         chain.setSwissprotId(id);
@@ -375,6 +382,7 @@ implements SpiceStructureFeeder
     public synchronized void setStructure(Structure struc) {
         logger.finest("setting structure in DAS_Feeder");
         pdb_structure = struc ;
+        notifyAll();
     }
     
     //public Structure getStructure(){	

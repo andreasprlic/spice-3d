@@ -64,6 +64,7 @@ extends Thread
     /** start thread */
     public void run() {
         doDasConnection();
+        
     }
     
     private synchronized void doDasConnection() {
