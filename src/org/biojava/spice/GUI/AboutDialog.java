@@ -45,7 +45,7 @@ public class AboutDialog
 extends JDialog {
     
     public static final String VERSION = 
-        "0.7.4-devel";
+        "0.7.4";
     
     static final String AUTHORS = 
         " <a href=\"mailto:ap3@sanger.ac.uk\">Andreas Prlic</a>, Thomas Down, Tim Hubbard <br>"+
@@ -66,7 +66,8 @@ extends JDialog {
         " <b>Geotools</b> - <a href=\"http://modules.geotools.org/\">http://modules.geotools.org/</a> for the logging panel. (LGPL)<br>"+
         " <b>Nuvola</b> - <a href=\"http://www.icon-king.com\">http://www.icon-king.com</a> - for many of the icons used here. (LGPL) <br>"+
         " <b>Axis</b> - <a href=\"http://ws.apache.org/axis/\">http://ws.apache.org/axis/</a> - for the WebService (SOAP) library used for contacting the "+
-        " <a href=\"http://das.sanger.ac.uk/registry/\">DAS registration server</a> <p>";
+        " <a href=\"http://das.sanger.ac.uk/registry/\">DAS registration server</a><br>"+
+        " <a href=\"http://www.ebi.ac.uk/msd-srv/msdmotif/\">MSD</a> for providing the keyword search web service. <p>";
     
     static final String LICENSE = 
         " <pre>This library is free software; you can redistribute it and/or <br>"+
