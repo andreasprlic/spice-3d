@@ -62,13 +62,13 @@ extends JDialog {
     static final String THANKS = 
         " Thanks to the following Projects:<br>"+
         " <b>Jmol</b> - <a href=\"http://www.jmol.org\">http://www.jmol.org</a> - for the 3D visualization API. (LGPL)<br>"+
+        " <b>MSD</b> - <a href=\"http://www.ebi.ac.uk/msd-srv/msdmotif/\">http://www.ebi.ac.uk/msd-srv/msdmotif/</a> for providing the UniProt - PDB alignment data and the keyword search web service. <br>"+
         " <b>BioJava</b> - <a href=\"http://www.biojava.org\">http://www.biojava.org</a> - for various libs. (LGPL)<br>"+
         " <b>Geotools</b> - <a href=\"http://modules.geotools.org/\">http://modules.geotools.org/</a> for the logging panel. (LGPL)<br>"+
         " <b>Nuvola</b> - <a href=\"http://www.icon-king.com\">http://www.icon-king.com</a> - for many of the icons used here. (LGPL) <br>"+
         " <b>Axis</b> - <a href=\"http://ws.apache.org/axis/\">http://ws.apache.org/axis/</a> - for the WebService (SOAP) library used for contacting the "+
-        " <a href=\"http://das.sanger.ac.uk/registry/\">DAS registration server</a><br>"+
-        " <a href=\"http://www.ebi.ac.uk/msd-srv/msdmotif/\">MSD</a> for providing the keyword search web service. <p>";
-    
+        " <a href=\"http://das.sanger.ac.uk/registry/\">DAS registration server</a><p>";
+        
     static final String LICENSE = 
         " <pre>This library is free software; you can redistribute it and/or <br>"+
         "modify it under the terms of the GNU Lesser General Public <br>"+

@@ -148,7 +148,7 @@ SelectedSeqPositionListener
         }
         
         Chain c = structure.getChain(chainnumber);
-        System.out.println(c);
+        //System.out.println(c);
         return c;
     }
     
