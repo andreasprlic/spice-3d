@@ -74,13 +74,18 @@ SelectedSeqPositionListener
     * @param displayScript  a flag to set if the INIT_SELECT script should be executed or not    
     *
     */
-   public  void setStructure(Structure structure, boolean displayScript) {
-       if ( structure == null ) {
+   public  void setStructure(Structure struc, boolean displayScript) {
+       logger.finest("setting structure in StructurePanelListener");
+       //System.out.println(struc.toPDB());
+       if ( struc == null ) {
            //executeCmd(EMPTYCMD);
            //return;
-           structure = new StructureImpl();
+           logger.finest("empty structure in StructurePanelListener");
+           struc = new StructureImpl();
+       } else {
+           logger.finest("structure size: " + structure.size());
        }
-       //this.structure=structure;
+       this.structure=struc;
        structurePanel.setStructure(structure);
        if ( displayScript)
            executeCmd(INIT_SELECT);
@@ -98,8 +103,10 @@ SelectedSeqPositionListener
       
    }
    
-    public void setCurrentChainNumber(int i){
+    public synchronized void setCurrentChainNumber(int i){
+        logger.finest("setting current chain in StructurePanelListener " + i);
         currentChainNumber = i;
+        notifyAll();
     }
     
 
@@ -122,11 +129,11 @@ SelectedSeqPositionListener
      * @return a Chain object or null ;
      */
     public Chain getChain(int chainnumber) {
-        
+        logger.finest("StructurePanelListener getChain " + chainnumber);
       
         
         if ( structure == null ) {
-            //logger.log(Level.WARNING,"no structure loaded, yet");
+            logger.log(Level.WARNING,"no structure loaded, yet");
             return null ;
         }
         
@@ -141,6 +148,7 @@ SelectedSeqPositionListener
         }
         
         Chain c = structure.getChain(chainnumber);
+        System.out.println(c);
         return c;
     }
     
@@ -346,6 +354,10 @@ SelectedSeqPositionListener
         String cmd = "" ;
   
         Chain chain = getChain(currentChainNumber);
+        if ( chain == null ){
+            logger.finest("chain=null!");
+            return;
+        }
         String chainId = chain.getName();
         String chainselect = ":"+chainId;
         if ( chainId.equals(" ") || chainId.equals("")){
@@ -361,7 +373,7 @@ SelectedSeqPositionListener
             
             int start = segment.getStart()-1;
             int end   = segment.getEnd()-1;
-            //logger.finest("highilte feature " +featurenr+" " + start + " " +end );
+            logger.finest("highilte segment " + i+" " + start + " " +end + "chain" + currentChainNumber );
             
             if ( feature.getType().equals("DISULFID")){
             

@@ -1177,7 +1177,7 @@ ConfigurationListener
                
         }
         
-        System.out.println("SpiceApplication... setting structure in Jmol");
+        //System.out.println("SpiceApplication... setting structure in Jmol");
         
         if ( displayMessage != null) {
             boolean displayScript = false; 
@@ -1185,7 +1185,8 @@ ConfigurationListener
         } else {
             structurePanelListener.setStructure(structure);
         }
-        System.out.println("SpiceApplication... back in main spice");
+        
+        //System.out.println("SpiceApplication... back in main spice");
         logger.finest("back in main spice ...");
         
         Map header = structure.getHeader();
@@ -1194,17 +1195,17 @@ ConfigurationListener
         statusPanel.setPDBHeader(structure.getHeader());
         
         //structurePanelListener.executeCmd(selectcmd);
-        System.out.println("SpiceApplication... setting chain");
+        //System.out.println("SpiceApplication... setting chain");
         logger.finest("setting chain...");
         setCurrentChainNumber(0);
-        System.out.println("SpiceApplication... requesting getChain");
+        //System.out.println("SpiceApplication... requesting getChain");
         Chain chain = getChain(currentChainNumber) ;
         
         
         //currentChain = chain;
-        System.out.println("SpiceApplication... setting chain in dascanv");
+        //System.out.println("SpiceApplication... setting chain in dascanv");
         //dascanv.setChain(chain);
-        System.out.println("SpiceApplication... set chain in dascanv");
+        //System.out.println("SpiceApplication... set chain in dascanv");
         
         if ( chain != null) 
             seqTextPane.setChain(chain,0);
