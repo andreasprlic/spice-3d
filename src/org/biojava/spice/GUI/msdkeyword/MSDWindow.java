@@ -67,7 +67,7 @@ public class MSDWindow {
 class MSDPanel extends JPanel{
     static final String[] columnNames = {"code","method","resolution","classification","title"};
     static Logger logger = Logger.getLogger("org.biojava.spice");
-    
+    static final String[] suggestionColumns = {"suggestion"};
     SPICEFrame spice;
     JTable dataTable;
     JTextField kwsearch;
@@ -76,10 +76,10 @@ class MSDPanel extends JPanel{
     static int H_SIZE = 750;
     static int V_SIZE = 300 ;
     MyTableModel model;
-    
+    boolean suggestionMode;
     public MSDPanel(SPICEFrame parent){
         super();
-        
+        suggestionMode = false;
         spice = parent;
         //logger.info("searching MSD search web service for keyword " + keyword);
         String keyword = "";
@@ -151,8 +151,14 @@ class MSDPanel extends JPanel{
                     // nothing selected
                 } else {
                     int selectedRow = lsm.getMinSelectionIndex();
-                    String pdbcode = (String) dataTable.getValueAt(selectedRow,0);
-                    spice.load("PDB",pdbcode);
+                    if ( ! suggestionMode ){
+                     
+                        String pdbcode = (String) dataTable.getValueAt(selectedRow,0);
+                        spice.load("PDB",pdbcode);
+                    } else {
+                        String suggestion = (String) dataTable.getValueAt(selectedRow,0);
+                        search(suggestion);
+                    }
                 }
             }
         });
@@ -179,20 +185,36 @@ class MSDPanel extends JPanel{
         //doLayout();
     }
     public void search(String keyword ){
+        suggestionMode =false;
         MSDKeywordSearch msd = new MSDKeywordSearch();
         Deposition[] depos = msd.search(keyword);
         //System.out.println("got " + depos.length + " results.");
         int length = depos.length;
         title.setText(length + " results for keyword " + keyword); 
         title.repaint();
-        Object[][] data =  getData(depos);
-        model = new MyTableModel(data, columnNames);
+        if ( length != 0 ){
+            Object[][] data =  getData(depos);
+            model = new MyTableModel(data, columnNames);
+        } else {
+            suggestionMode =true;
+            String[] suggestions = msd.getSuggestions();
+            Object[][] data = getSuggestionData(suggestions);
+            model = new MyTableModel(data, suggestionColumns);
+        }
         dataTable.setModel(model);
         dataTable.repaint();
         //this.revalidate();
         setColumnWidth();
         doLayout();
         this.repaint();
+    }
+    
+    private Object[][] getSuggestionData(String[] suggestions){
+        Object[][]data = new Object[suggestions.length][1];
+        for ( int i = 0 ; i< suggestions.length; i++){
+            data[i][0]= suggestions[i];
+        }
+        return data;
     }
     
     private Object[][] getData(Deposition[] depos){

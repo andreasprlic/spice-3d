@@ -54,17 +54,19 @@ public class MSDKeywordSearch {
     
     
     static Logger logger = Logger.getLogger("org.biojava.spice");
-    
+    String[] suggestions;
     
     /**
      * 
      */
     public MSDKeywordSearch() {
         super();
+        suggestions = new String[0];
     }
     
     public Deposition[] search( String keyword){
-        
+        	suggestions = new String[0];
+        	
         // remove trainling and ending spaces ...
         keyword = keyword.trim();
         
@@ -136,6 +138,7 @@ public class MSDKeywordSearch {
             xmlreader.parse(insource);
             Deposition[] depos = cont_handle.getDepositions();
             //logger.finest("Got sequence from DAS: " +sequence);
+            suggestions = cont_handle.getSuggestions();
             
             return depos ;
         } catch (Exception e){
@@ -143,6 +146,10 @@ public class MSDKeywordSearch {
             return null;
         }    
         
+    }
+    
+    public String[] getSuggestions(){
+        return suggestions;
     }
     
     /** open an InputStream to the url below. Requests data in gzip encoding, if supported

@@ -42,6 +42,8 @@ public class MSDContentHandler  extends DefaultHandler{
     List depositions ;
     Deposition depo;
     String txt;
+    List suggestions;
+    
     /**
      * 
      */
@@ -49,11 +51,17 @@ public class MSDContentHandler  extends DefaultHandler{
         super();
         depositions = new ArrayList();
         depo = new Deposition();
+        suggestions = new ArrayList();
         
     }
 
     public Deposition[] getDepositions(){
         return (Deposition[]) depositions.toArray(new Deposition[depositions.size()]);
+    }
+    
+    
+    public String[] getSuggestions(){
+        return (String[]) suggestions.toArray(new String[suggestions.size()]);
     }
     
     public void startElement (String uri, String name, String qName, Attributes atts){
@@ -87,6 +95,7 @@ public class MSDContentHandler  extends DefaultHandler{
 	        depo.setLastModified(date);
 	    }
 	    
+	    
 		
 	}
     
@@ -102,7 +111,10 @@ public class MSDContentHandler  extends DefaultHandler{
         }
         else if ( qName.equals("entry")){
             depositions.add(depo);
-        }
+        } 
+        else if ( qName.equals("suggestion")){
+            suggestions.add(txt);
+	    }
         
     }
     
