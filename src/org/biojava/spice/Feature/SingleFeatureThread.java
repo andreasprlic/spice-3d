@@ -26,7 +26,7 @@ package org.biojava.spice.Feature ;
 
 import org.biojava.spice.DAS.*		   ;
 import java.util.logging.*             ;
-import java.util.ArrayList             ;
+import java.util.List             ;
 import java.util.Map;
 import java.net.URL                    ;
 import org.biojava.spice.Config.*;
@@ -46,6 +46,7 @@ extends Thread
     int myId ;
     Logger logger        ;
     SpiceDasSource dasSource;
+    static int MAX_NR_FEATURES = 300;
     
     /** contact a single DAS feature server and retreive features 
      @param parent a link to the parent class
@@ -70,7 +71,14 @@ extends Thread
     private synchronized void doDasConnection() {
         logger.finer("opening " + dascommand);
         DAS_FeatureRetrieve ftmp = new DAS_FeatureRetrieve(dascommand);
-        ArrayList features = ftmp.get_features();
+        List features = ftmp.get_features();
+        
+        // a fallback mechanism to prevent DAS sources from bringing down spice
+        if ( features.size() > MAX_NR_FEATURES){
+            logger.warning("DAS source returned more than " + MAX_NR_FEATURES + "features. " +
+                    	" throwing away excess features at " +dascommand);
+            features = features.subList(0,MAX_NR_FEATURES);
+        }
         
         /*Iterator iter =features.iterator();
         	while (iter.hasNext()){
