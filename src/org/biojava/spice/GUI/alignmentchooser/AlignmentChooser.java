@@ -444,9 +444,9 @@ public class AlignmentChooser {
                     
                     Location l = new RangeLocation(start,end);
                     temp.location = l;
-                    org.biojava.bio.seq.Feature f ;
+                    //org.biojava.bio.seq.Feature f ;
                     try {
-                        f= sequence.createFeature(temp);                        
+                        sequence.createFeature(temp);                        
                         
                     } catch (Exception e){
                         logger.warning(e.getMessage());

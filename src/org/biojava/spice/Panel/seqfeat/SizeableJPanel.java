@@ -36,6 +36,9 @@ import java.awt.Dimension;
 public class SizeableJPanel
 extends JPanel
 {
+    
+    private static final long serialVersionUID = 7312478744121234578L;
+    
     public static final int DEFAULT_WIDTH  = 60;
     public static final int DEFAULT_HEIGHT = 30;
     

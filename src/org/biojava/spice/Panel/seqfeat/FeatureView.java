@@ -226,7 +226,7 @@ public class FeatureView
         labelField.setFeatures(features);
      
         
-        int height = getHeight();
+        //int height = getHeight();
      
         setLoading(false);
 	

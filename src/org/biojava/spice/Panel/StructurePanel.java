@@ -53,7 +53,8 @@ extends JPanel
 implements JmolStatusListener
 
 {
-    
+ 
+    private static final long serialVersionUID = 969575436790157931L;
     final  Dimension currentSize = new Dimension();
     final Rectangle  rectClip    = new Rectangle();
     

@@ -233,7 +233,7 @@ public class SaveLoadSession {
     			
     		 	FeatureView[] fvs = spice.getFeatureViews();
     	        
-    	        List features = new ArrayList();
+    	        //List features = new ArrayList();
     	        for ( int i = 0 ; i < fvs.length ; i++){
     	            FeatureView fv = fvs[i];
     	            xw.openTag("DasSource");

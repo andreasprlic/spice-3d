@@ -34,7 +34,7 @@ import org.biojava.bio.structure.Group  	;
 
 import java.awt.Color                     ;
 import java.awt.Graphics                  ;
-import java.awt.image.BufferedImage       ;
+//import java.awt.image.BufferedImage       ;
 import java.awt.Font                      ;
 import java.awt.Dimension                 ;
 
@@ -73,7 +73,7 @@ extends JPanel
 implements SeqPanel, MouseListener, MouseMotionListener
 
 {
-    
+    private static final long serialVersionUID = 94293124130433611L;
     
     public static final int    DEFAULT_X_START        = 60  ;
     public static final int    DEFAULT_X_RIGHT_BORDER = 20 ;
@@ -132,7 +132,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
      */
     public SeqFeaturePanel(SPICEFrame spicefr ) {
         super();
-        int oldposition = -1;
+        //int oldposition = -1;
         //logger = Logger.getLogger("org.biojava.spice");
         setDoubleBuffered(true) ;
         
@@ -166,7 +166,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         popupMenu = new JPopupMenu();
         
         
-        SelectionLockMenuListener ml = new SelectionLockMenuListener(spice,null);
+        //SelectionLockMenuListener ml = new SelectionLockMenuListener(spice,null);
         
         //JMenuItem menuItem = new JMenuItem("lock selection");
         //menuItem.addActionListener(ml);
@@ -191,7 +191,8 @@ implements SeqPanel, MouseListener, MouseMotionListener
         if ( chain == null   ) return ;
         
         Dimension dstruc=this.getSize();
-        BufferedImage imbuf = (BufferedImage)this.createImage(dstruc.width,dstruc.height);
+        //BufferedImage imbuf = (BufferedImage)
+        this.createImage(dstruc.width,dstruc.height);
         
         Graphics2D g2D = (Graphics2D)g ;
         
@@ -369,7 +370,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         //logger.finest("number features: "+features.size());
         //System.out.println("seqFeatCanvas aminosize "+ aminosize);
         
-        boolean secstruc = false ;
+        //boolean secstruc = false ;
         
         
         for (int i = 0 ; i< drawLines.size();i++) {
@@ -612,7 +613,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
     }
     
     
-    /** select a single segment */
+    /** select a single segment 
     private void selectSegment (Segment segment) {
         //logger.finest("select Segment");
         /*
@@ -640,9 +641,9 @@ implements SeqPanel, MouseListener, MouseMotionListener
               spice.select(current_chainnumber,start+1,end+1);
               
               }
-              */
+              
     }
-    
+    */
     
     
     /** highlite all segments of a feature */
@@ -728,6 +729,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         
     }
     
+    /*
     private Feature getFeatureAt(int seqpos, int lineNr){
         //logger.finest("getFeatureAt " + seqpos + " " + lineNr);
         Segment s = getSegmentUnder(seqpos,lineNr);
@@ -737,7 +739,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         return s.getParent();
         
     }
-    
+    */
     
     /** check if mouse is over a segment and if it is, return the segment */
     private Segment getSegmentUnder( int seqpos,int lineNr){
@@ -813,7 +815,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         
     }
     
-    /** test if the click was on the name of the feature */
+    /** test if the click was on the name of the feature 
     private boolean nameClicked(MouseEvent e) {
         int x = e.getX();
         if (x <= DEFAULT_X_START) {
@@ -821,12 +823,12 @@ implements SeqPanel, MouseListener, MouseMotionListener
         }
         return false ;
     }
-    
+    */
     /** get the sequence position of the current mouse event */
     private int getSeqPos(MouseEvent e) {
         
         int x = e.getX();
-        int y = e.getY();
+        //int y = e.getY();
         
         int seqpos =  java.lang.Math.round((x-DEFAULT_X_START)/scale) ;
         
@@ -1015,7 +1017,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
         //if (spice.isSelectionLocked())
         //  return;
         
-        int b = e.getButton();
+        //int b = e.getButton();
         //logger.finest("dragging mouse "+b);
         
         // ARGH my linux java 142_05 does not show Button 1 when being dragged!
@@ -1024,15 +1026,15 @@ implements SeqPanel, MouseListener, MouseMotionListener
         
         
         // only do with left mouse click
-        int seqpos = getSeqPos(e);
+        //int seqpos = getSeqPos(e);
         
-        int selEnd =  seqpos;
-        int start = mouseDragStart ;
-        int end   = selEnd         ;
-        if ( selEnd < mouseDragStart ) {
-            start = selEnd ;
-            end = mouseDragStart ;
-        }
+        //int selEnd =  seqpos;
+        //int start = mouseDragStart ;
+        //int end   = selEnd         ;
+        //if ( selEnd < mouseDragStart ) {
+            //start = selEnd ;
+            //end = mouseDragStart ;
+        //}
         //spice.highlite(current_chainnumber,start,end);
     }
     

@@ -55,7 +55,7 @@ extends Thread {
                     new InputStreamReader(
                             socket.getInputStream()));
             
-            String inputLine, outputLine;
+            String outputLine;
             SpiceProtocol kkp = new SpiceProtocol();
             //outputLine = kkp.processInput(null);
             //out.println(outputLine);

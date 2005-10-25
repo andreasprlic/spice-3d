@@ -55,7 +55,7 @@ public class PanelPopupMenuListener  implements ActionListener {
     }
     
     private void disable(ActionEvent e){
-        Object source = e.getSource();
+        //Object source = e.getSource();
         
         FeatureView fv = parent.getCurrentFeatureView();
         if ( fv == null) 
@@ -65,7 +65,7 @@ public class PanelPopupMenuListener  implements ActionListener {
     }
     
     private void select(ActionEvent e){
-        Object source = e.getSource();
+        //Object source = e.getSource();
         
         FeatureView fv = parent.getCurrentFeatureView();
         if ( fv == null) 

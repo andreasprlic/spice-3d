@@ -34,6 +34,9 @@ import java.util.Iterator;
  */
 public class LabelPanelContainer extends AbstractFeatureViewContainer {
 
+    private static final long serialVersionUID = 2345879654231741256L;
+    
+    
     SpiceFeatureViewer parent;
     /**
      * 

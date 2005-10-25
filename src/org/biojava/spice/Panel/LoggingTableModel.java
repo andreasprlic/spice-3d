@@ -125,6 +125,7 @@ final class LoggingTableModel extends Handler implements TableModel {
      * and values are <code>String[]</code>. This is a cache for faster rendering.
      */
     private final Map cache = new LinkedHashMap() {
+        private static final long serialVersionUID = 4689139871234987390L;
         protected boolean removeEldestEntry(final Map.Entry eldest) {
             return size() >= Math.min(capacity, 80);
         }

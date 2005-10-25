@@ -22,7 +22,7 @@
  */
 package org.biojava.spice.Panel.seqfeat;
 
-import java.awt.Component;
+
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -99,7 +99,7 @@ MouseListener,MouseMotionListener{
     
     private void testMoveFV(MouseEvent e, FeatureView fv){
         
-        Component compo = e.getComponent();
+        //Component compo = e.getComponent();
         
         
         //int compo_h = compo.getHeight();
@@ -148,7 +148,7 @@ MouseListener,MouseMotionListener{
     public void mouseReleased(MouseEvent e) {
         //System.out.println("mouse Released" + e.getX()+" " + e.getY() + " button " + e.getButton());
         moved = false;
-        int mouseButton = e.getButton();
+        //int mouseButton = e.getButton();
         maybeShowPopup(e);
         if ( oldFeatureView != null ){
             oldFeatureView.setSelected(false);
@@ -183,7 +183,7 @@ MouseListener,MouseMotionListener{
     public void mouseDragged(MouseEvent e) {
 
         
-        int mouseButton = e.getButton();
+        //int mouseButton = e.getButton();
 	//System.out.println("mouse dragged" + e.getX()+" " + e.getY() + " " + mouseButton);
         //if ( mouseButton == MouseEvent.BUTTON1 ) {
             isDragging = true ;

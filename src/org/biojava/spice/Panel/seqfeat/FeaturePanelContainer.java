@@ -46,6 +46,9 @@ import org.biojava.spice.Feature.Segment;
 public class FeaturePanelContainer extends
         AbstractFeatureViewContainer {
 
+    private static final long serialVersionUID = 7531946371573495316L;
+    
+    
     public static final Color SELECTION_COLOR            = Color.lightGray;
     public static final Color STRUCTURE_COLOR            = Color.red;
     public static final Color STRUCTURE_BACKGROUND_COLOR = new Color(0.5f, 0.1f, 0.5f, 0.5f);
@@ -182,7 +185,7 @@ public class FeaturePanelContainer extends
     public int getSeqPos(MouseEvent e) {
         
         int x = e.getX();
-        int y = e.getY();
+        //int y = e.getY();
         float scale = seqScale.getScale();
         int seqpos =  java.lang.Math.round((x-DEFAULT_X_START-2)/scale) ;
         
@@ -298,7 +301,7 @@ public class FeaturePanelContainer extends
         
         int xstart = java.lang.Math.round(start * scale) + DEFAULT_X_START;
         int endx   = java.lang.Math.round(end * scale)-xstart + DEFAULT_X_START +aminosize;
-        int width  = aminosize ;
+        //int width  = aminosize ;
         int height = DEFAULT_Y_HEIGHT ;
         
         // draw the red structure line

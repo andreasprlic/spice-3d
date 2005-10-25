@@ -210,7 +210,7 @@ public class TypeLabelPanel  {
      * */
     private int drawFeatures(Graphics g2D,int width, int y){
         
-        boolean secstruc = false ;
+        //boolean secstruc = false ;
         
         if ( features == null) 
             return y;
@@ -225,9 +225,9 @@ public class TypeLabelPanel  {
             // draw the firefox icon 
             String link = feature.getLink();
             if (( link != null) && (! link.equals(""))){
-                URL url ;
+                //URL url ;
                 try {
-                    url = new URL(link);
+                    new URL(link);
                     //g2D.drawString("L->", 1,y+DEFAULT_Y_HEIGHT);
                     if ( miniFirefox != null)
                         miniFirefox.paintIcon(null, g2D, 1,y-DEFAULT_Y_HEIGHT);

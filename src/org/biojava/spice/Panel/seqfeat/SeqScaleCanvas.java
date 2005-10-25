@@ -79,7 +79,7 @@ extends FeaturePanel
           //      	" seqLength:" + this.seqLength + 
             //    	" scale:" + this.scale);
         
-        int aminosize =  Math.round(1 * scale) ;  
+        //int aminosize =  Math.round(1 * scale) ;  
         
         Graphics2D g2D = (Graphics2D)g ;
         

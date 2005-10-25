@@ -82,7 +82,7 @@ import javax.swing.JMenuBar                     ;
 import javax.swing.JMenu                        ;
 import javax.swing.JMenuItem                    ;
 import org.biojava.bio.Annotation               ;
-import java.util.Map;
+//import java.util.Map;
 import javax.swing.JDialog;
 import java.awt.Container;
 
@@ -100,6 +100,10 @@ implements SPICEFrame,
 ConfigurationListener
 
 {     
+    
+    private static final long serialVersionUID = 8273923744127087422L;
+        
+    
     public static Logger logger =  Logger.getLogger("org.biojava.spice");
     
     URL[] REGISTRY_URLS    ; // the url to the registration server
@@ -1054,7 +1058,7 @@ ConfigurationListener
         if (l == null){
             l = new ArrayList();
         }
-        Iterator iter = l.iterator();
+        //Iterator iter = l.iterator();
         //while (iter.hasNext()){
         //    SpiceDasSource ds = (SpiceDasSource) iter.next();
         //    logger.info(ds.getNickname() + " " + ds.getStatus());
@@ -1096,6 +1100,8 @@ ConfigurationListener
         labelList = dasLabelString;
     
     }
+    
+    /*
     // store all features in memory -> speed up
     private ArrayList getFeaturesFromMemory(String mem_id) {
         logger.entering(this.getClass().getName(), "getFeaturesFromMemory()",  new Object[]{mem_id});
@@ -1125,7 +1131,7 @@ ConfigurationListener
     }
     
     
-    
+    */
    
     
     
@@ -1189,7 +1195,7 @@ ConfigurationListener
         //System.out.println("SpiceApplication... back in main spice");
         logger.finest("back in main spice ...");
         
-        Map header = structure.getHeader();
+        //Map header = structure.getHeader();
         //logger.info("structure header " + header);
         statusPanel.setPDB(structure.getPDBCode());
         statusPanel.setPDBHeader(structure.getHeader());

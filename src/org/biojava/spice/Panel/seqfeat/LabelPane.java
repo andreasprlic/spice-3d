@@ -81,7 +81,7 @@ public class LabelPane
         //this.setWidth(MINIMUM_HEIGHT);
         //this.setHeight(DEFAULT_X_SIZE);
         
-        int oldposition = 0;
+        //int oldposition = 0;
         
         //height = MINIMUM_HEIGHT;
         selected =false;

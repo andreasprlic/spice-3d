@@ -33,8 +33,6 @@ import org.biojava.bio.program.das.dasalignment.*      ;
 import org.biojava.bio.structure.Structure ;
 import org.biojava.bio.structure.StructureImpl ;
 import org.biojava.bio.structure.Chain ;
-import org.biojava.bio.structure.Group ;
-
 
 
 import java.io.*								;
@@ -390,7 +388,7 @@ implements SpiceStructureFeeder
     //}
     
     
-    
+    /*
     private Chain getMatchingChain(Structure pdbcontainer, String chainID) 
     throws DASException
     {
@@ -405,9 +403,9 @@ implements SpiceStructureFeeder
         
         throw new DASException("no chain with ID >"+ chainID +"< found");
     }
+    */
     
-    
-    /** find the group that has PDBCode pdbcode in Chain mapped_chain */
+    /* find the group that has PDBCode pdbcode in Chain mapped_chain 
     private Group getMatchingGroup(Chain mapped_chain,String pdbcode) 
     throws DASException
     {
@@ -428,5 +426,5 @@ implements SpiceStructureFeeder
         // can happen aat N terminal MET that is not aligned . e.g. pdb 103m
         throw new DASException("no aminoacid found with pdbcode >"+pdbcode+"<");
     }
-    
+    */
 }

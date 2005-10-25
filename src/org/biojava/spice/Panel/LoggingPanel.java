@@ -108,6 +108,10 @@ import java.util.ArrayList;
  */
 public class LoggingPanel extends JPanel {
 
+    private static final long serialVersionUID = 1429403307410293841L;
+    
+    
+    
     JScrollPane scroll ;
 
     /**
@@ -521,6 +525,8 @@ public class LoggingPanel extends JPanel {
     private final class CellRenderer extends DefaultTableCellRenderer
                                   implements TableColumnModelListener
     {
+        private static final long serialVersionUID = 96315731843284319L;
+        
         /**
          * Default color for the foreground.
          */

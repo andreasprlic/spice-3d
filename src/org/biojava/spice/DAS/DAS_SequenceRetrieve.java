@@ -236,8 +236,7 @@ public class DAS_SequenceRetrieve {
 
     private InputStream open(URL url) {
 	{
-	    // TODO Auto-generated method stub
-	    
+	  	    
 	    InputStream inStream = null;
 	    try{
 		
@@ -260,7 +259,7 @@ public class DAS_SequenceRetrieve {
 		
 		
 		logger.finest(huc.getResponseMessage());
-		String contentEncoding = huc.getContentEncoding();
+		//String contentEncoding = huc.getContentEncoding();
 		//logger.finest("encoding: " + contentEncoding);
 		//logger.finest("code:" + huc.getResponseCode());
 		//logger.finest("message:" + huc.getResponseMessage());

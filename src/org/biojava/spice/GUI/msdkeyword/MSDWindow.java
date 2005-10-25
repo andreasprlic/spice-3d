@@ -65,6 +65,11 @@ public class MSDWindow {
 
 
 class MSDPanel extends JPanel{
+    
+    private static final long serialVersionUID = 1038712766150941394L;
+    
+    
+    
     static final String[] columnNames = {"code","method","resolution","classification","title"};
     static Logger logger = Logger.getLogger("org.biojava.spice");
     static final String[] suggestionColumns = {"suggestion"};
@@ -260,16 +265,16 @@ class MSDPanel extends JPanel{
     
     public Component show(final Component owner) { 
         
-        int frameWidth  = H_SIZE ;
-        int frameHeight = V_SIZE ;
-        
+        //int frameWidth  = H_SIZE ;
+        //int frameHeight = V_SIZE ;
        
-        
+               
         // Get the size of the default screen
         //	java.awt.Dimension dim = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         
         //System.out.println("LoggingPanel show!!!!!!!");
         JFrame frame = new JFrame();
+        
         //frame.setLocation((dim.width - frameWidth),(dim.height - frameHeight));
         frame.setLocation(0,0);
         frame.setTitle("MSD - keyword search");
@@ -295,6 +300,9 @@ class MSDPanel extends JPanel{
     
     
     class MyTableModel extends AbstractTableModel{
+        
+        private static final long serialVersionUID = 236923487983417928L;
+        
         Object[][] data;
         String[] columnNames;
         public MyTableModel(Object[][] data, String[] columnNames){

@@ -55,6 +55,9 @@ import org.biojava.spice.utils.CliTools;
  * 
  * */
 public class Spice extends Applet {
+    
+    private static final long serialVersionUID = 8273923744127087423L;
+    
     private URL primaryRegistry ;
     private URL[] registryurls;
     private String code;

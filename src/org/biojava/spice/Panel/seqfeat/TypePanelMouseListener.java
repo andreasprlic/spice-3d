@@ -289,7 +289,7 @@ MouseListener, MouseMotionListener {
     
     /** goes through all SeqPositionSelected listeners and locks/unlocks selection */
     private void triggerSelectionLocked(boolean flag){
-        boolean selectionIsLocked = flag;
+        //boolean selectionIsLocked = flag;
         parent.selectionLocked(flag);
         SelectedSeqPositionListener[] selectedSeqListeners = parent.getSelectedSeqPositionListeners();
         for ( int i =0 ; i < selectedSeqListeners.length; i++) {

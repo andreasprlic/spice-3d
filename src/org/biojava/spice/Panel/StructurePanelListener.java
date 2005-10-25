@@ -47,6 +47,8 @@ implements FeatureViewListener,
 SelectedSeqPositionListener
 
 {
+    
+    
 //1l1y
     static String INIT_SELECT = "select all; cpk off ; cartoon off ; backbone 0.5; " +
         "wireframe off; colour chain;select not protein and not solvent; spacefill on;";
@@ -64,7 +66,7 @@ SelectedSeqPositionListener
         super();
         this.structurePanel = structurePanel;
         currentChainNumber = 0;
-        int oldpos = -1;
+        //int oldpos = -1;
         selectionIsLocked =false;
         structure = new StructureImpl();
     }
@@ -249,7 +251,7 @@ SelectedSeqPositionListener
     /** test if pdbserial has an insertion code */
     private boolean hasInsertionCode(String pdbserial) {
         try {
-            int pos = Integer.parseInt(pdbserial) ;
+            Integer.parseInt(pdbserial) ;
         } catch (NumberFormatException e) {
             return true ;
         }

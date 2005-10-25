@@ -30,6 +30,7 @@ import org.biojava.bio.BioException;
  */
 
 public class ConfigurationException extends BioException {
+    private static final long serialVersionUID = 8273923744127087419L;
     /**
      * Constructs a StructureException object.
      *

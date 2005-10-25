@@ -31,6 +31,9 @@ import org.biojava.spice.Panel.StructurePanelListener;
  */
 public class StructureCommandPanel 
 extends JTextField {
+    private static final long serialVersionUID = 974238740140894010L;
+    
+    
     //SPICEFrame spice;
     StructurePanelListener structurePanelListener;
     

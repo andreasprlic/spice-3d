@@ -28,7 +28,7 @@ import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
+//import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
 import java.util.List;
@@ -101,7 +101,7 @@ implements SelectedFeatureListener
         
         popupMenu = new JPopupMenu();
         
-        int oldposition = 0;
+        //int oldposition = 0;
         
         selectStart    = -1 ;
         selectEnd      =  1 ;
@@ -122,7 +122,7 @@ implements SelectedFeatureListener
         
         progressBar.setVisible(false);
         
-        float scale = getScale();
+        //float scale = getScale();
         //initImgBuffer();
         
         // this.add(progressBar);
@@ -161,7 +161,7 @@ implements SelectedFeatureListener
     }
     
     
-    
+    /*
     private int getImgWidth(int aminosize){
         // 
         //if ( aminosize < 1) 
@@ -173,7 +173,7 @@ implements SelectedFeatureListener
             imgwidth = 1;
         return imgwidth;
     }
-    
+    */
     
     
     /** a FeatureView consists of a Label and the rendered features */
@@ -233,7 +233,7 @@ implements SelectedFeatureListener
         
         //System.out.println("FeaturePanel drwaFeatures aminosize "+ aminosize + " y " + y);
         //logger.info("drawFeatures " + features);
-        boolean secstruc = false ;
+        //boolean secstruc = false ;
         
         if ( features == null) 
             return y;
@@ -314,7 +314,7 @@ implements SelectedFeatureListener
     
     private int paintStylesheetFeatures(Map[] style,Graphics g, int aminosize,int fullwidth,int y,int chainlength, float scale) {
         //logger.info("paintSylesheetFeatures " );
-        Graphics2D g2D =(Graphics2D) g;
+        //Graphics2D g2D =(Graphics2D) g;
         
         for ( int f =0 ; f< features.length;f++) {
             
@@ -461,9 +461,9 @@ implements SelectedFeatureListener
         // logger.finest("draw Line Feature " + feature );
         Graphics2D g2D =(Graphics2D) g;
         List segments = feature.getSegments() ;
-        int f = featurePos;     
+        //int f = featurePos;     
         
-        Segment seg0 = (Segment) segments.get(0) ;
+        //Segment seg0 = (Segment) segments.get(0) ;
         
         //Color col =  seg0.getColor();	
         //g2D.setColor(col);
@@ -507,7 +507,7 @@ implements SelectedFeatureListener
         // logger.finest("draw Triangle Feature " + feature );
         Graphics2D g2D =(Graphics2D) g;
         List segments = feature.getSegments() ;
-        int f = featurePos;     
+        //int f = featurePos;     
         
         //Segment seg0 = (Segment) segments.get(0) ;
         
@@ -540,7 +540,7 @@ implements SelectedFeatureListener
             int xstart =  java.lang.Math.round(start * scale) + DEFAULT_X_START;
             int width   = java.lang.Math.round(  end * scale) - xstart +  DEFAULT_X_START+aminosize ;
             
-            int height = drawHeight ;
+            //int height = drawHeight ;
             
             // draw the line ...
             //g2D.fillRect(xstart,y,width,height);
@@ -560,9 +560,9 @@ implements SelectedFeatureListener
         //logger.finest("draw Secstruc Feature " + feature );
         Graphics2D g2D =(Graphics2D) g;
         List segments = feature.getSegments() ;
-        int f = featurePos;     
+        //int f = featurePos;     
         
-        Segment seg0 = (Segment) segments.get(0) ;
+        //Segment seg0 = (Segment) segments.get(0) ;
         
         //Color col =  seg0.getColor();	
         //g2D.setColor(col);
@@ -691,9 +691,9 @@ implements SelectedFeatureListener
         
         Graphics2D g2D =(Graphics2D) g;
         List segments = feature.getSegments() ;
-        int f = featurePos;     
+        //int f = featurePos;     
         
-        Segment seg0 = (Segment) segments.get(0) ;
+        //Segment seg0 = (Segment) segments.get(0) ;
         
         //Color col =  seg0.getColor();	
         //g2D.setColor(col);
@@ -734,9 +734,9 @@ implements SelectedFeatureListener
         
         
         List segments = feature.getSegments() ;
-        int f = featurePos;     
+        //int f = featurePos;     
         
-        Segment seg0 = (Segment) segments.get(0) ;
+        //Segment seg0 = (Segment) segments.get(0) ;
         
         //Color col =  seg0.getColor();	
         //g2D.setColor(col);
@@ -798,7 +798,7 @@ implements SelectedFeatureListener
     
     private void drawHelixFeature(Feature feature,int featurePos, int drawHeight,Graphics g, int aminosize,int fullwidth,int y,int chainlength, float scale){
         //logger.finest("draw Helix Feature " + feature );
-        Graphics2D g2D =(Graphics2D) g;
+        //Graphics2D g2D =(Graphics2D) g;
         List segments = feature.getSegments() ;
         
         
@@ -839,7 +839,7 @@ implements SelectedFeatureListener
         
     }
     
-    /** draw the selected region */
+    /** draw the selected region 
     private void drawSelection(Graphics2D g2D, int aminosize, float scale){
         
         //System.out.println("draw selection " + selectStart + " end" + selectEnd);
@@ -863,7 +863,7 @@ implements SelectedFeatureListener
             g2D.setComposite(oldComp);
             
         }
-    }
+    }*/
     
     
     

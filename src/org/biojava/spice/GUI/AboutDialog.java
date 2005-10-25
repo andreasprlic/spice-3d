@@ -44,6 +44,9 @@ import javax.swing.event.HyperlinkEvent;
 public class AboutDialog
 extends JDialog {
     
+    private static final long serialVersionUID = 8273923744121231231L;
+    
+    
     public static final String VERSION = 
         "0.7.4";
     
@@ -68,7 +71,7 @@ extends JDialog {
         " <b>Nuvola</b> - <a href=\"http://www.icon-king.com\">http://www.icon-king.com</a> - for many of the icons used here. (LGPL) <br>"+
         " <b>Axis</b> - <a href=\"http://ws.apache.org/axis/\">http://ws.apache.org/axis/</a> - for the WebService (SOAP) library used for contacting the "+
         " <a href=\"http://das.sanger.ac.uk/registry/\">DAS registration server</a><p>";
-        
+   
     static final String LICENSE = 
         " <pre>This library is free software; you can redistribute it and/or <br>"+
         "modify it under the terms of the GNU Lesser General Public <br>"+

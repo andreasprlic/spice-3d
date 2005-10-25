@@ -232,10 +232,10 @@ public class StructureBuilder{
         
         // map segment of aminoacids to structure...
         int strustart = 0 ;
-        int struend   = 0 ;
+        //int struend   = 0 ;
         try {
             strustart = Integer.parseInt((String)arr[1].getProperty("start"));
-            struend   = Integer.parseInt((String)arr[1].getProperty("end"));
+            //struend   = Integer.parseInt((String)arr[1].getProperty("end"));
             //logger.finest(strustart + " " + struend);
         } catch (Exception e) {
             // if this does not work  there is an insertion code
@@ -301,7 +301,7 @@ public class StructureBuilder{
         return chain ;
     }
     
-    /** retrieve a chain with a particular chainid from the structure */
+    /* retrieve a chain with a particular chainid from the structure 
     private static Chain findChain(Structure struc, String chainid) throws StructureException{
         
         List chains = struc.getChains(0);
@@ -316,7 +316,7 @@ public class StructureBuilder{
         }
         throw new StructureException("no chain with chainid >" + chainid + "< found in structure");
     }
-    
+    */
     private String getChainIdFromPDBCode(String pdbcode) {
         //logger.finest("DASAlignment_Handler: getChainFromPDBCode" + pdbcode);
         String[] spl = pdbcode.split("\\.");
@@ -439,7 +439,7 @@ public class StructureBuilder{
     {
         // go through objects and get sequence one ...
         Annotation[] objects = ali.getObjects();
-        HashMap seq_obj = new HashMap() ;
+        //HashMap seq_obj = new HashMap() ;
         
         for (int i =0 ; i<objects.length;i++) {
             Annotation object = objects[i];

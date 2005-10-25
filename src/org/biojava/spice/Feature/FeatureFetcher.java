@@ -160,7 +160,7 @@ public class FeatureFetcher extends Thread
                 return;
             }
             try {
-                int number = Integer.parseInt(codespl[1]);
+                Integer.parseInt(codespl[1]);
             } catch (Exception e){
                 logger.warning("DAS-source id does not contain a number after the >_< " + code);
                 return;
@@ -666,7 +666,7 @@ public class FeatureFetcher extends Thread
         List features = new ArrayList();
         
         boolean secstruc = false ;
-        String prevtype = "@prevtype" ;
+        //String prevtype = "@prevtype" ;
         boolean first = true ;
         
         FeatureImpl feat    = null ;
@@ -773,7 +773,7 @@ public class FeatureFetcher extends Thread
             //Feature oldFeat = testIfFit
             feat.addSegment(segment);	    
             //feat.addSegment(currentFeatureMap);
-            prevtype = type;
+            //prevtype = type;
         }	
         //if ( ! (feat==null))  features.add(feat);
         if ( ! (feat==null))  

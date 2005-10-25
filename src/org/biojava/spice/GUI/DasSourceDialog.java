@@ -45,6 +45,7 @@ import org.biojava.services.das.registry.DasCoordinateSystem;
 public class DasSourceDialog
 extends JDialog{
     
+    private static final long serialVersionUID = 8273923712341234123L;
     
     SpiceDasSource dasSource;
     SPICEFrame spice;

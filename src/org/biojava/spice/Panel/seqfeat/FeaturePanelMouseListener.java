@@ -28,7 +28,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import org.biojava.spice.Feature.Feature;
 import org.biojava.spice.Feature.Segment;
-import org.biojava.spice.Panel.seqfeat.FeaturePanel;
+//import org.biojava.spice.Panel.seqfeat.FeaturePanel;
 import org.biojava.spice.Panel.seqfeat.FeatureView;
 import org.biojava.spice.Panel.seqfeat.LabelPane;
 import org.biojava.spice.Panel.seqfeat.SelectedSeqPositionListener;
@@ -134,7 +134,7 @@ MouseListener, MouseMotionListener {
             return;
         }
         
-        FeaturePanel view = featureView.getFeaturePanel();  
+        //FeaturePanel view = featureView.getFeaturePanel();  
         
         //, int x, int y
         int y = e.getY();
@@ -295,7 +295,7 @@ MouseListener, MouseMotionListener {
     }
     
     public void mouseReleased(MouseEvent e) {
-        int b = e.getButton();
+        //int b = e.getButton();
         
         if ( oldFeatureView != null ){
             oldFeatureView.setSelected(false);
@@ -306,7 +306,7 @@ MouseListener, MouseMotionListener {
         Object c = e.getSource();
         
         if ( c instanceof LabelPane){
-            LabelPane txf = (LabelPane) c;
+            //LabelPane txf = (LabelPane) c;
             
             FeatureView fv = parent.getParentFeatureView(e) ;
             if ( fv != null ){
@@ -326,7 +326,7 @@ MouseListener, MouseMotionListener {
         }
         FeaturePanelContainer container = (FeaturePanelContainer) c;
         FeatureView fv = parent.getParentFeatureView(e);
-        FeaturePanel view = fv.getFeaturePanel();
+        //FeaturePanel view = fv.getFeaturePanel();
         //System.out.println(view);
         fv.setSelected(false);
         
@@ -362,9 +362,9 @@ MouseListener, MouseMotionListener {
         
         if ( lineNr < 0 ) return ;
         FeatureView featureView = parent.getParentFeatureView(e);
-        Feature feat = null;
+        //Feature feat = null;
         try {
-            feat = featureView.getFeatureAt(lineNr);
+            featureView.getFeatureAt(lineNr);
         } catch (NoSuchElementException ex){
             return;
         }

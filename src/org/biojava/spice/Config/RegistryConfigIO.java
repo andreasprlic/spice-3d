@@ -345,7 +345,7 @@ extends Thread
              throw new ConfigurationException("Did not get any DasSource from registration service at " + registryurl);
           
         }
-        ArrayList servers = new ArrayList();
+        //ArrayList servers = new ArrayList();
         
         for (int i = 0 ; i < sources.length; i++) {
             DasSource s = sources[i];	    

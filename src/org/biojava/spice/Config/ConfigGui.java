@@ -242,6 +242,9 @@ implements ActionListener
 
 
 class ConfigPanel extends JPanel implements ConfigurationListener {
+    
+    private static final long serialVersionUID = 8273923744127087421L;
+    
     //static String[] colNames= new String [] {"url","coordinateSystems","adminemail","capabilities","description","public","active"};
     static String[] colNames= new String [] {"url","coordinateSystems","capabilities","public","active"};
     
@@ -343,7 +346,7 @@ class ConfigPanel extends JPanel implements ConfigurationListener {
         updateDasSourceTable();
     }
     protected JPanel getGeneralConfigPanel(){
-        JPanel panel = new JPanel();
+        //JPanel panel = new JPanel();
         
         TitledBorder dasborder;
         dasborder = BorderFactory.createTitledBorder("general");
@@ -453,7 +456,7 @@ class ConfigPanel extends JPanel implements ConfigurationListener {
         
         go.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                int result;
+                //int result;
                 
                 if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) { 
                     
@@ -616,9 +619,9 @@ class ConfigPanel extends JPanel implements ConfigurationListener {
             public void valueChanged(ListSelectionEvent e) {
                 ListSelectionModel lsm = (ListSelectionModel)e.getSource();
                 
-                int firstIndex = e.getFirstIndex();
-                int lastIndex = e.getLastIndex();
-                boolean isAdjusting = e.getValueIsAdjusting();
+                //int firstIndex = e.getFirstIndex();
+                //int lastIndex = e.getLastIndex();
+                //boolean isAdjusting = e.getValueIsAdjusting();
                 //System.out.println("Event for indexes "
                 //+ firstIndex + " - " + lastIndex
                 //	       + "; isAdjusting is " + isAdjusting
@@ -672,7 +675,7 @@ class ConfigPanel extends JPanel implements ConfigurationListener {
                 
                 //dasSourceTable.getSelectionModel()
                 int minIndex = lsm.getMinSelectionIndex();
-                int maxIndex = lsm.getMaxSelectionIndex();
+                //int maxIndex = lsm.getMaxSelectionIndex();
                 //System.out.println(selectMoveStartPosition + " " + minIndex+" " + maxIndex);
                 
                 if (selectMoveStartPosition == -1 ) {
@@ -1003,7 +1006,7 @@ class PopupListener extends MouseAdapter {
 
 /** a table model twhere the last colun is a checkbox to deceide if true or false */
 class MyTableModel extends AbstractTableModel {
-    
+    private static final long serialVersionUID = 8273923744127087420L;
     ConfigPanel parent ;
     
     private Object[][] data ;
@@ -1111,8 +1114,8 @@ class MyTableModel extends AbstractTableModel {
         int row = e.getFirstRow();
         int column = e.getColumn();
         MyTableModel model = (MyTableModel)e.getSource();
-        String columnName = model.getColumnName(column);
-        Object cell = model.getValueAt(row, column);
+        //String columnName = model.getColumnName(column);
+        //Object cell = model.getValueAt(row, column);
         
         if ( column == ( columnNames.length - 1 )) {
             

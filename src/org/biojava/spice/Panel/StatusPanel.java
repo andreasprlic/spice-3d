@@ -65,6 +65,8 @@ public class StatusPanel
 extends JPanel
 implements FeatureViewListener, SelectedSeqPositionListener
 {
+    
+    private static final long serialVersionUID = 928391747589181827L;
     public static String PDBLINK = "http://www.rcsb.org/pdb/cgi/explore.cgi?pdbId=";
     public static String UNIPROTLINK = "http://www.ebi.uniprot.org/uniprot-srv/uniProtView.do?proteinAc=" ;
     
@@ -273,11 +275,11 @@ implements FeatureViewListener, SelectedSeqPositionListener
         if ( seqpos >= chain.getLength()) return "n.a.";
         
         Group g = chain.getGroup(seqpos);	
-        Character amino1 = new Character(" ".charAt(0)) ;
-        if (g.getType() == "amino" ) {
-            AminoAcid a = (AminoAcid) g ;
-            amino1 = a.getAminoType();
-        }
+        //Character amino1 = new Character(" ".charAt(0)) ;
+        //if (g.getType() == "amino" ) {
+          //  AminoAcid a = (AminoAcid) g ;
+            //amino1 = a.getAminoType();
+        //}
         String pdbstr = g.getPDBCode();	
         
         if (pdbstr == null ) {
@@ -458,7 +460,7 @@ class PDBDescMouseListener implements MouseListener, MouseMotionListener {
         
         Dimension d = floatingFrame.getSize();
         int dx = d.width;
-        int dy = d.height;
+        //int dy = d.height;
         
         int posx = cx + x  - ( dx/2)    ;
         int posy = cy + y + compo_h + 5 ;

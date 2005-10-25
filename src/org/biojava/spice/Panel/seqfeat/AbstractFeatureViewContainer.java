@@ -91,9 +91,9 @@ extends JPanel{
     
     public void initImgBuffer(){
         
-        float scale = seqScale.getScale();
-        int aminosize =  Math.round(1 * scale) ;
-        Dimension dstruc = this.getSize();
+        //float scale = seqScale.getScale();
+        //int aminosize =  Math.round(1 * scale) ;
+        //Dimension dstruc = this.getSize();
         int width = this.getWidth();
         int height = getPanelHeight();
         //System.out.println("AbstractFeatureContainer initImgBuffer" + width + " " + height);

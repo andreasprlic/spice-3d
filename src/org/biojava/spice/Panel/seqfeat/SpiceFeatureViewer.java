@@ -35,14 +35,14 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.Color;
 import org.biojava.spice.Feature.*;
-import org.biojava.spice.Panel.seqfeat.FeaturePanel;
+//import org.biojava.spice.Panel.seqfeat.FeaturePanel;
 import org.biojava.spice.Panel.seqfeat.FeaturePanelMouseListener;
 import org.biojava.spice.Panel.seqfeat.FeatureView;
 import org.biojava.spice.Panel.seqfeat.LabelPanelListener;
-import org.biojava.spice.Panel.seqfeat.LabelPane;
+//import org.biojava.spice.Panel.seqfeat.LabelPane;
 import org.biojava.spice.Panel.seqfeat.SelectedSeqPositionListener;
 import org.biojava.spice.Panel.seqfeat.SeqScale;
-import org.biojava.spice.Panel.seqfeat.TypeLabelPanel;
+//import org.biojava.spice.Panel.seqfeat.TypeLabelPanel;
 import org.biojava.spice.Panel.seqfeat.TypePanelMouseListener;
 import org.biojava.spice.Panel.seqfeat.DasSourceListener;
 import org.biojava.spice.Config.SpiceDasSource;
@@ -66,6 +66,8 @@ implements SelectedSeqPositionListener,
 ChangeListener, ActionListener
 
 {
+    private static final long serialVersionUID = 1659514579213654987L;
+    
     static int DEFAULT_X_START = 30;
     static int DEFAULT_X_END   = 30;
     static int MAX_SCALE       = 10;
@@ -171,8 +173,8 @@ ChangeListener, ActionListener
         vBox.add(hBox1);
         
         
-        int typePanelSize = 60;
-        int labelPanelSize =  60;
+        //int typePanelSize = 60;
+        //int labelPanelSize =  60;
         
         //popupMenu = createPopupMenu();
         
@@ -551,9 +553,9 @@ ChangeListener, ActionListener
         view.setSpiceFeatureViewer(this);
         //view.setChain(chain);
         
-        LabelPane lab      = view.getLabel();
-        TypeLabelPanel typ = view.getTypePanel();
-        FeaturePanel sub   = view.getFeaturePanel();
+        //LabelPane lab      = view.getLabel();
+        //TypeLabelPanel typ = view.getTypePanel();
+        //FeaturePanel sub   = view.getFeaturePanel();
         
         //LabelPaneMouseListener lpml = new LabelPaneMouseListener(this); 
         //lab.addMouseListener(lpml);
@@ -729,7 +731,7 @@ ChangeListener, ActionListener
         int y = 0;
         
         
-        LabelPane label      = seqScale.getLabel();
+        //LabelPane label      = seqScale.getLabel();
         
         if ( seqScale.equals(fv) ) {
             return new Point (0,y);

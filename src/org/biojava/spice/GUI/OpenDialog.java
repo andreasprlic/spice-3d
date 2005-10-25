@@ -52,6 +52,9 @@ public class OpenDialog
 extends JDialog 
 {
     
+    private static final long serialVersionUID = 2832023723402743924L;
+    
+    
     //static final String[] supportedCoords = { "PDB","UniProt","ENSP"};
     static final String[] supportedCoords = { "PDB","UniProt"};
     static int H_SIZE = 350;
@@ -141,7 +144,8 @@ extends JDialog
             public void actionPerformed(ActionEvent e) {
                 String kw  = kwsearch.getText();
                 //System.out.println("search kw " + kw);
-                MSDWindow msd = new MSDWindow(spice,kw);
+                new MSDWindow(spice,kw);
+              
                 dispose();			    
             }
             
@@ -212,8 +216,8 @@ implements ActionListener{
         else if ( cmd.equals("Search")){
             String kw  = parent.kwsearch.getText();
 	    
-            System.out.println("search kw " + kw);
-            MSDWindow msd = new MSDWindow(spice,kw);
+            //System.out.println("search kw " + kw);
+            new MSDWindow(spice,kw);
     		   parent.dispose();
         }  
     } 

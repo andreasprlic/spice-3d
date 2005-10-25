@@ -26,7 +26,7 @@ package org.biojava.spice.Panel;
 import org.biojava.spice.SPICEFrame ;
 import org.biojava.spice.Feature.Feature;
 import org.biojava.spice.Feature.Segment;
-import org.biojava.spice.GUI.SelectionLockMenuListener;
+//import org.biojava.spice.GUI.SelectionLockMenuListener;
 import org.biojava.spice.Panel.seqfeat.FeatureEvent;
 import org.biojava.spice.Panel.seqfeat.SelectedSeqPositionListener;
 import org.biojava.spice.Panel.seqfeat.FeatureViewListener;
@@ -60,6 +60,7 @@ implements FeatureViewListener,
 SelectedSeqPositionListener,
 MouseListener, MouseMotionListener
 {
+    private static final long serialVersionUID = 4585664879865347753L;
     
     SPICEFrame spice ;
     Chain chain ;
@@ -79,7 +80,7 @@ MouseListener, MouseMotionListener
         spice = spicef;
         chain = null ;
         dragging = false ;
-        int current_chainnumber = -1;
+        //int current_chainnumber = -1;
         selectionStart = -1 ;
         //this.setBackground(Color.black);
         
@@ -112,7 +113,7 @@ MouseListener, MouseMotionListener
         
         popupMenu = new JPopupMenu();
         
-        SelectionLockMenuListener ml = new SelectionLockMenuListener(spice, null);
+        //SelectionLockMenuListener ml = new SelectionLockMenuListener(spice, null);
         
         /*JMenuItem menuItem = new JMenuItem("lock selection");
         menuItem.addActionListener(ml);

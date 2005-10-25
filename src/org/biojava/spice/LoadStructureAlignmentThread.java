@@ -212,13 +212,13 @@ catch (Exception e){
 	
 	// get chainName from PDB code 
 	String[] spl   = pdbcode.split("\\.");
-	String prot    = "";
+	//String prot    = "";
 	String chainName = "" ;
 	if (spl.length<2) {
-	    prot = pdbcode    ;
+	    //prot = pdbcode    ;
 	    chainName = " " ;
 	} else {
-	    prot      = spl[0]    ;
+	    //prot      = spl[0]    ;
 	    chainName = spl[1] ;
 	}
 

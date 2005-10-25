@@ -38,6 +38,9 @@ import java.awt.Color;
 public class SeqScroller
 extends SizeableJPanel 
  {
+    
+    private static final long serialVersionUID = 7895462165489756423L;
+    
     static final int RES_MIN  = 1;
     static final int RES_MAX  = 100;
     static final int RES_INIT = 100;
