@@ -1,0 +1,49 @@
+0.7.5 - Oct 26, 2005
+
+
+
+
+0.7.4  - Sep 15, 2005
+
+* fixed a bug related to freezing threads
+* if no structure is found for a uniprot sequence, now correctly clears 
+the structure display (e.g. P00123)
+* and some other minor things
+
+
+0.7.3 - Sept 9, 2005
+
+* Only one SPICE instance running: When a new SPICE instance is started 
+it tries to send the accession code to be displayed to another instance 
+listening at a high numbered port. If something is running there, the 
+first instance will take over, otherwise this instance will become the 
+main one.
+
+some other minor things:
+* update to latest das-registry and Jmol libraries
+* features are now displayed in the order returned by the server
+
+
+0.7.2 - Aug 10, 2005
+
+* a keyword search to identify matching PDB codes using a webservice  
+provided by MSD
+* support for DAS stylesheet command ( allows to control display of  
+features)
+* new ways how to interact with SPICE from the outside - and affect the  
+first accession code to be loaded:
+	* select regions to be selected at startup
+	* send a rasmol scripts at startup
+
+
+0.7.1 - Jul 28, 2005
+
+* Changed the mouse behavior - now does not auto-select features.
+* fixed some minor bugs.
+
+
+0.7.0 - Jul 12, 2005
+
+* plenty of work done on feature viewer
+* enable/disable DAS sources through external startup link
+
