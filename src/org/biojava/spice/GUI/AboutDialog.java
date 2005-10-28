@@ -48,7 +48,7 @@ extends JDialog {
     
     
     public static final String VERSION = 
-        "0.7.4";
+        "0.7.5";
     
     static final String AUTHORS = 
         " <a href=\"mailto:ap3@sanger.ac.uk\">Andreas Prlic</a>, Thomas Down, Tim Hubbard <br>"+
@@ -85,7 +85,8 @@ extends JDialog {
         ""+
         "You should have received a copy of the GNU Lesser General Public<br>"+
         "License along with this library; if not, write to the Free Software<br>" +
-        "Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA</pre><br>" ;
+	"Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA<br>"+
+	"</pre><br>" ;
     
     
     static String DESCRIPTION_TEXT = 
@@ -96,8 +97,8 @@ extends JDialog {
         "</body></html>";
     
     
-    static int H_SIZE = 760;
-    static int V_SIZE = 600;
+    static int H_SIZE = 700;
+    static int V_SIZE = 700;
     //JTextField txt ;
     
     SPICEFrame spice; 
