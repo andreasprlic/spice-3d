@@ -348,7 +348,7 @@ public class RegistryConfiguration
         
         //pdbFileExtensions ;
         for (int i =0;i<pdbFileExtensions.length;i++){
-            System.out.println("pdb ext" + pdbFileExtensions[i]);
+            //System.out.println("pdb ext" + pdbFileExtensions[i]);
             
             xw.openTag("pdbFileExtension");
             xw.attribute("name",pdbFileExtensions[i]);

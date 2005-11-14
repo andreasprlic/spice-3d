@@ -164,19 +164,19 @@ ConfigurationListener
     
     boolean configLoaded ;
     SpiceMenuListener spiceMenuListener;
-    String dasServerList;
-    String labelList;
+    //String dasServerList;
+    //String labelList;
     
-    String rasmolScript =null;
-    int seqSelectStart = -1;
-    int seqSelectEnd   = -1;
-    String pdbSelectStart = null;
-    String pdbSelectEnd = null;
+    //String rasmolScript =null;
+    //int seqSelectStart = -1;
+    //int seqSelectEnd   = -1;
+    //String pdbSelectStart = null;
+    //String pdbSelectEnd = null;
     
-    String displayMessage;
-    int messageWidth;
-    int messageHeight;
-    
+    //String displayMessage;
+    //int messageWidth;
+    //int messageHeight;
+    SpiceStartParameters startParameters;
     SpiceServer spiceServer;
     
     /** 
@@ -188,41 +188,23 @@ ConfigurationListener
      * @param rasmolScript a rasmol script to be sent to Jmol, after the (first) structure has been loaded.
      * 
      */
-    public SpiceApplication( URL[] registry_urls, String dasServerList, String labelList, String rasmolScript, 
-            int sSelectStart, int sSelectEnd,
-            String pdbSelectStart, String pdbSelectEnd,
-            String message, int messageWidth, int messageHeight) {
+    public SpiceApplication( SpiceStartParameters params) {
         super();
-        
+        startParameters = params;
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         
-        this.rasmolScript = rasmolScript;
-        this.dasServerList = dasServerList;
-        this.labelList = labelList;
-        this.seqSelectStart = sSelectStart;
+        //this.rasmolScript = rasmolScript;
+        //this.dasServerList = dasServerList;
+        //this.labelList = labelList;
+        //this.seqSelectStart = sSelectStart;
         
         // a few error checks.
-        if ( seqSelectStart > sSelectEnd){
-            int tmp = sSelectEnd;
-            seqSelectEnd = seqSelectStart;
-            seqSelectStart = tmp;
-        }
-        if ( seqSelectEnd >= 0 )
-            this.seqSelectEnd = sSelectEnd;
-        else 
-            this.seqSelectEnd = seqSelectStart;
+        checkStartParameters();
         
-        
-        // only select structure if seq. is not selected...
-        if ( seqSelectStart < 0) {
-            this.pdbSelectStart = pdbSelectStart;
-            this.pdbSelectEnd = pdbSelectEnd;
-        }
-        
-        displayMessage = message;
-        this.messageWidth = messageWidth;
-        this.messageHeight = messageHeight;
+        //displayMessage = message;
+        //this.messageWidth = messageWidth;
+        //this.messageHeight = messageHeight;
         
         // selection is possible at the start ;
         selectionLocked = false ;
@@ -238,11 +220,12 @@ ConfigurationListener
         // set some system properties
         setSystemProperties();
 
-        REGISTRY_URLS = registry_urls ;
+        //REGISTRY_URLS = registry_urls ;
         
         // first thing is to start communication
+        URL[] registries = getAllRegistryURLs();
         
-        RegistryConfigIO regi = new RegistryConfigIO (REGISTRY_URLS);
+        RegistryConfigIO regi = new RegistryConfigIO(registries);
         regi.addConfigListener(this);
         regi.run();
         
@@ -303,6 +286,55 @@ ConfigurationListener
         initSpiceServer();
     }
     
+    private URL[] getAllRegistryURLs(){
+        URL[] regis;
+        int numberregis = 1 ;
+        URL[] registryurls = startParameters.getRegistryurls() ;
+        if (registryurls != null) {
+            numberregis += registryurls.length;
+        }
+        try {
+            URL primaryRegistry = new URL(startParameters.getRegistry());
+            if ( primaryRegistry != null ){
+                regis = new URL[numberregis];
+                regis[0] = primaryRegistry;
+                for ( int i =0; i<registryurls.length; i++) {
+                    System.out.println(registryurls[i]);
+                    regis[i+1] = registryurls[i];
+                }   
+            } else {
+                regis = registryurls;
+            }
+        } catch (Exception e){
+            regis = registryurls;
+        }
+        
+        return regis;
+    }
+    
+    private void checkStartParameters(){
+
+        int seqSelectStart = startParameters.getSeqSelectStart();
+        int seqSelectEnd   = startParameters.getSeqSelectEnd();
+        
+        if ( seqSelectStart > seqSelectEnd){
+            int tmp = seqSelectEnd;
+            startParameters.setSeqSelectEnd(seqSelectStart);
+            startParameters.setSeqSelectStart( tmp);
+        }
+        
+        if ( seqSelectEnd >= 0 )
+            startParameters.setSeqSelectEnd(seqSelectEnd);
+        else 
+            startParameters.setSeqSelectEnd(seqSelectStart);
+        
+        
+        // only select structure if seq. is not selected...
+        if ( seqSelectStart > 0) {
+            startParameters.setPdbSelectStart( null);
+            startParameters.setPdbSelectEnd(null);;
+        }
+    }
     private void initSpiceServer(){
         
         spiceServer = new SpiceServer(this);
@@ -758,6 +790,16 @@ ConfigurationListener
         }
     }
 
+    
+    public void setSpiceStartParameters(SpiceStartParameters parameters){
+        startParameters = parameters;        
+    }
+    
+    
+    public SpiceStartParameters getSpiceStartParameters(){
+        return startParameters;
+    }
+    
     /* (non-Javadoc)
      * @see org.biojava.spice.SPICEFrame#load(java.lang.String, java.lang.String)
      */
@@ -1065,9 +1107,23 @@ ConfigurationListener
         //}
         System.out.println("SpiceApplication init feature fetcher");
         logger.finest("init feature fetcher");
-        FeatureFetcher ff = new FeatureFetcher(this,sp_id,pdbcode,chain);	
-        ff.setDisplayServers(this.dasServerList);
-        ff.setDisplayLabels(this.labelList);
+        FeatureFetcher ff = new FeatureFetcher(this,sp_id,pdbcode,chain);
+        String disp = startParameters.getDisplay();
+        String labe = startParameters.getDisplayLabel();
+        
+        if (! disp.equals("all")){
+            if ( labe.equals("all")){
+                labe = "";
+            }
+        }
+        
+        if ( ! labe.equals("all"))
+            if ( disp.equals("all"))
+                disp = "";
+        logger.finest("got display list: "+ disp );
+        
+        ff.setDisplayServers(disp);
+        ff.setDisplayLabels(labe);
         
         ff.start() ;
         
@@ -1079,27 +1135,7 @@ ConfigurationListener
         
     }
 
-    /**set which Das servers should be displayed
-     * @param dasServerString  ";" separated list of DAS source ids e.g. DS:101;DS:102;DS:110 to be highlited. "all" for all
-     * 
-     *  
-     * 
-     * 
-     */
-    public void setDasServerString(String dasServerString) {
-        dasServerList = dasServerString;
-    }
     
-    /**
-     * set which DAS servers should be displayed.
-     * 
-     * @param labelString ";" separated list of labels DAS sources belonging to the labels will be highlited. "all" for all.
-     * 
-     */
-    public void setDasLabelString(String dasLabelString){
-        labelList = dasLabelString;
-    
-    }
     
     /*
     // store all features in memory -> speed up
@@ -1185,7 +1221,7 @@ ConfigurationListener
         
         //System.out.println("SpiceApplication... setting structure in Jmol");
         
-        if ( displayMessage != null) {
+        if ( startParameters.getDisplayMessage() != null) {
             boolean displayScript = false; 
             structurePanelListener.setStructure(structure,displayScript);
         } else {
@@ -1216,17 +1252,22 @@ ConfigurationListener
         if ( chain != null) 
             seqTextPane.setChain(chain,0);
         
-        if ( rasmolScript != null){
+        
+        if ( startParameters.getRasmolScript() != null){
             // only execute the rasmol script command the first time.
-            structurePanelListener.executeCmd(rasmolScript);
-            rasmolScript = null;
+            structurePanelListener.executeCmd(startParameters.getRasmolScript());
+            startParameters.setRasmolScript( null);
         }
       
-        if ( displayMessage != null ){
-            displayMessage(displayMessage, messageWidth, messageHeight);
-            displayMessage = null;
-        }
+        if ( startParameters.getDisplayMessage() != null ){
+            displayMessage(startParameters.getDisplayMessage(),
+                    startParameters.getMessageWidth().intValue(),
+                    startParameters.getMessageHeight().intValue());
+            startParameters.setDisplayMessage(null);
+            }
         
+        int seqSelectStart = startParameters.getSeqSelectStart();
+        int seqSelectEnd   = startParameters.getSeqSelectEnd();
         
         if ( seqSelectStart >=0 ){
             dascanv.selectedSeqRange(seqSelectStart, seqSelectEnd);
@@ -1243,6 +1284,9 @@ ConfigurationListener
             seqSelectEnd = -1;
         } else {
             // perhaps a PDB range has been provided
+            String pdbSelectStart = startParameters.getPdbSelectEnd();
+            String pdbSelectEnd   = startParameters.getPdbSelectEnd();
+            
             if ( pdbSelectStart != null){
                 String cmd = "select " + pdbSelectStart + " - " + pdbSelectEnd + "; set displaySelected";
                 structurePanelListener.executeCmd(cmd);
@@ -1547,40 +1591,7 @@ ConfigurationListener
         cfg.showConfigFrame();
     }
     
-    /*
-   
-    
-    public void colour(int chainNumber, int seqpos, String colour) {
-        if (first_load)       return ;		
-        if ( seqpos    < 0 ) return ;
-        if (chainNumber < 0 ) return ;
-        String cmd = getSelectStr( chainNumber,  seqpos);
-        if (! cmd.equals("")){
-            cmd += "colour "+ colour+";";
-            structurePanel.executeCmd(cmd);
-        }
-        //structurePanel.forceRepaint();
-        
-        
-    }
-    
-   
-    public void highlite(int chainNumber, int start, int end) {
-        highlite(chainNumber, start, end, "");
-        
-    }
-    
-    
-    public void highlite(int chain_number,int seqpos){
-        
-        highlite(chain_number,seqpos,"");
-        
-    }
-    */
-    
-
-    
-    
+  
     
     /** update the DIsplays of the subpanes */
     public void updateDisplays() {

@@ -136,7 +136,7 @@ public class SpiceDasSource
     public XMLWriter toXML(XMLWriter xw)
 	throws IOException
     {
-	System.out.println("writing XML of" + getUrl());
+	//System.out.println("writing XML of" + getUrl());
 	xw.openTag("SpiceDasSource");
 	xw.attribute("url",getUrl());
 	xw.attribute("nickname",getNickname());

@@ -24,6 +24,7 @@ package org.biojava.spice.Panel.seqfeat;
 
 import java.util.List;
 
+import org.biojava.spice.SpiceStartParameters ;
 import org.biojava.spice.SPICEFrame ;
 import org.biojava.spice.Config.SpiceDasSource;
 import org.biojava.spice.Config.RegistryConfiguration;
@@ -52,9 +53,10 @@ implements DasServerConfigListener
     
     /** display all available DAS servers */
     public void enableAllDasSources(){
-        parent.setDasServerString("all");
-        parent.setDasLabelString("all");
-        
+        SpiceStartParameters params = parent.getSpiceStartParameters();
+        params.setDisplay ("all");
+        params.setDisplayLabel("all");
+        parent.setSpiceStartParameters(params);
         RegistryConfiguration config = parent.getConfiguration();
         
         List servers =  config.getAllServers();
@@ -67,8 +69,11 @@ implements DasServerConfigListener
     }
     /** disable the display of all das sources */
     public void disableAllDasSources(){
-        parent.setDasServerString("");
-        parent.setDasLabelString("");
+
+        SpiceStartParameters params = parent.getSpiceStartParameters();
+        params.setDisplay ("all");
+        params.setDisplayLabel("all");
+        parent.setSpiceStartParameters(params);
         
         RegistryConfiguration config = parent.getConfiguration();
         

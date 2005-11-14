@@ -32,7 +32,7 @@ import java.awt.Rectangle;
 import java.util.Iterator;
 import java.util.List;
 import java.awt.event.MouseEvent;
-
+import javax.swing.JPanel;
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.Group;
 import org.biojava.spice.Feature.Feature;
@@ -70,6 +70,10 @@ public class FeaturePanelContainer extends
     SpiceFeatureViewer parent;
     float scale;
     
+    //JPanel featureCanvas;
+    //JPanel selectionCanvas;
+    
+    
     /**
      * 
      */
@@ -80,6 +84,13 @@ public class FeaturePanelContainer extends
         selectStart = selectEnd = seqpos = seqLength = -1 ;
         structureFeature = new FeatureImpl();
         scale = 2.0f;
+        
+        
+        //featureCanvas = new JPanel();
+        //selectionCanvas = new JPanel();
+        
+        //this.add(featureCanvas,   new Integer(1));
+        //this.add(selectionCanvas, new Integer(2));
     }
     
     public void setFixedSize(Dimension d){

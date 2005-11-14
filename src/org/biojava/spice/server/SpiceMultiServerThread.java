@@ -56,20 +56,28 @@ extends Thread {
                             socket.getInputStream()));
             
             String outputLine;
-            SpiceProtocol kkp = new SpiceProtocol();
+            SpiceProtocol spiceProtocol = new SpiceProtocol();
             //outputLine = kkp.processInput(null);
             //out.println(outputLine);
             
+            
             String msg =in.readLine();
             
-            System.out.println("received msg "+msg);
-            
-            outputLine = kkp.processInput(msg, spice);
-            out.println(outputLine);
-            
-            out.close();
-            in.close();
-            socket.close();
+            while (msg != null){
+                System.out.println("received msg "+msg);
+                if ( msg.equals("SPICE: close")){
+                    out.close();    
+                    in.close();
+                    socket.close();
+                    break;
+                }
+                
+                outputLine = spiceProtocol.processInput(msg, spice);
+                out.println(outputLine);
+                
+                msg = in.readLine();
+                
+            }
             
         } catch ( IOException e ) {
             e.printStackTrace();

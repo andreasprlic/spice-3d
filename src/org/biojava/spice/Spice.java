@@ -58,25 +58,11 @@ public class Spice extends Applet {
     
     private static final long serialVersionUID = 8273923744127087423L;
     
-    private URL primaryRegistry ;
-    private URL[] registryurls;
-    private String code;
-    private String codetype;
-    private String displayLabel = "all";
-    private String display = "all";
-    private String rasmolScript   = null ;
-    private int seqSelectStart = -1;
-    private int seqSelectEnd   = -1;
-    private String pdbSelectStart = null;
-    private String pdbSelectEnd   = null;
-    private int messageWidth = 300;
-    private int messageHeight = 100;
-    private String message;
-    
+   
     public static void main(String[] argv) {
         
         Spice app = new Spice();
-        
+        SpiceStartParameters params = new SpiceStartParameters();
         // init the configuration
         
         List mandatoryArgs= new ArrayList();
@@ -93,7 +79,7 @@ public class Spice extends Applet {
 
             
             try {
-                CliTools.configureBean(app, tmp);        
+                CliTools.configureBean(params, tmp);        
             } catch (ConfigurationException e){
                 e.printStackTrace();
                 if ( mandatoryArgs.contains(arg) ) {
@@ -105,37 +91,24 @@ public class Spice extends Applet {
             }           
         }
          
-        app.run();
+        app.run(params);
         
     } 
     
     /** Start SPICE @see SpiceApplication */
-    public void run(){
+    public void run(SpiceStartParameters params){
         
         System.out.println("Welcome to the SPICE - DAS client!");
         System.out.println("SPICE version: " + AboutDialog.VERSION);
-        System.out.println("displaying for you: " + codetype + " " + code);
+        System.out.println("displaying for you: " + params.getCodetype() + " " + params.getCode());
        
         //for ( int i =0; i<registryurls.length; i++) {
         //    System.out.println("debug 2" + registryurls[i]);
         //}
         
         
-        URL[] regis ;
-        int numberregis = 1 ;
-        if (registryurls != null) {
-            numberregis += registryurls.length;
-        }
-        if ( primaryRegistry != null ){
-            regis = new URL[numberregis];
-            regis[0] = primaryRegistry;
-            for ( int i =0; i<registryurls.length; i++) {
-                System.out.println(registryurls[i]);
-                regis[i+1] = registryurls[i];
-            }
-        } else {
-            regis = registryurls;
-        }
+        //URL[] regis = params.getAllRegistryURLs();
+        
         
         //System.out.println("got " + regis.length + " registries...");
         //for (int i = 0 ; i< regis.length; i++){
@@ -147,35 +120,34 @@ public class Spice extends Applet {
          * if yes the code should be displayed there...
          * 
          */
-        boolean serverFound = testSendToServer(codetype,code);
+        boolean serverFound = testSendToServer(params);
         
         if (  serverFound){
             // quit this SPICE instance, 
             // the code is being loaded in SPICE in another instance that is already running ...
-            String msg = " sent " + codetype + " " + code + " to already running spice instance";
+            String msg = " sent " + params.getCodetype() + " " + params.getCode() + " to already running spice instance";
             System.out.println(msg);
             System.exit(0);
         }
         	
         	// 	start a spice instance
-        System.out.println("no spice instance has been found - starting new one for "+codetype + " " + code);
-        SpiceApplication appFrame = new SpiceApplication(regis, display,displayLabel,rasmolScript,seqSelectStart, seqSelectEnd, pdbSelectStart,pdbSelectEnd, message, messageWidth, messageHeight) ;	
+        System.out.println("no spice instance has been found - starting new one for "+ params.getCodetype() + " " + params.getCode());
+        SpiceApplication appFrame = new SpiceApplication(params);
         
         // and display the accession code...
-        appFrame.load(codetype,code);
-            
-           
+        appFrame.load(params.getCodetype(),params.getCode());
         
     }
     
-    private boolean testSendToServer(String type, String accessioncode){
+    
+    private boolean testSendToServer(SpiceStartParameters params){
         
         SpiceClient sc = new SpiceClient();
         
         try {
 //          contact the port at which SPICE is listening ...
             // if successfull communication, no need to start another SPICE window...
-            int status = sc.send(type,accessioncode);
+            int status = sc.send(params);
             if  (status == SpiceClient.SPICE_SUBMITTED )
                 return true;
             
@@ -189,145 +161,7 @@ public class Spice extends Applet {
         
     }
     
-    
-    /** set a list of DAS - sources (by their unique Id from registry) to be highlited
-     * 
-     * @param dasSourceIds a ";" separated list of DAS source ids e.g. DS_101;DS_102;DS_110
-     */
-    public void setDisplay(String dasSourceIds){
-        System.out.println("restricting display to servers with Unique Ids " + dasSourceIds);
-        display = dasSourceIds;
-        if ( displayLabel.equals("all")){
-            displayLabel = "";
-        }
-    }
-    
-    /** choose all das source belonging to a particular label to be highlited.
-     * 
-     * @param label a ";" separated list of labels e.f. biosapiens;efamily
-     */
-    public void setDisplayLabel(String label){
-        System.out.println("restricting display to servers with label " + label);
-        this.displayLabel = label;
-        if ( display.equals("all"))
-            display = "";
-    }
-    
-    /** set the accession code to be displayed in SPICE. eg. PDB - 5pti UniProt P00280
-     * 
-     * @param accessioncode the accession code to be displayed in SPICE. eg. PDB - 5pti UniProt P00280
-     */
-    public void setCode(String accessioncode){
-        code = accessioncode;
-    }
-    /** get the accession code
-     * 
-     * @returns the accesion code
-     */
-    public String getCode(){ return code;}
-    
-    /** sets the type of the accession code being displayed.
-     * Currently supported PDB, UniProt. 
-     * 
-     * @param codetype currently supported: PDB, UniProt
-     */
-    public void setCodetype(String codetype){
-        this.codetype = codetype;
-    }
-    /** returns the type of the accession code that is displayed. Currently supported PDB, UniProt. 
-     * 
-     * @return the codetype
-     */
-    public String getCodetype() {
-        return codetype;
-    }
-    
-    /** set the primary registry.
-     * @param url  Usually this should be:
-     * http://servlet.sanger.ac.uk/dasregistry/services/das_registry
-     */
-    public void setRegistry(String url){
-        try {
-            primaryRegistry = new URL(url);
-            
-        } catch (MalformedURLException e){
-            e.printStackTrace();
-        } 
-    }
-    
-    /** set backup registry servers. These will be contacted 
-     * only if there is a problem occuring with the primary
-     * 
-     */
-    public void setBackupRegistry(String[] urls){
-        ArrayList regis = new ArrayList();
-        for ( int i = 0 ;i< urls.length;i++){
-            try {
-                URL u = new URL(urls[i]);
-                //System.out.println("adding " + u );
-                regis.add(u);
-                
-            } catch (MalformedURLException e){
-                e.printStackTrace();
-            }
-        }
         
-        URL[] oldregistryurls = registryurls ;
-        int oldsize = 0;
-        if ( registryurls != null) {
-            oldsize = registryurls.length;
-        }
-        URL[] tmpregistryurls = (URL[]) regis.toArray(new URL[regis.size()]);
-        int newsize = oldsize + regis.size();
-        registryurls = new URL[newsize];
-        
-        
-        for ( int i =0; i<oldsize; i++) {
-            //System.out.println("debug 1a" + oldregistryurls[i]);
-            registryurls[i] = oldregistryurls[i];
-        }
-        
-        for ( int i =0; i<tmpregistryurls.length; i++) {
-            //System.out.println("debug 1b" + tmpregistryurls[i]);
-            registryurls[i+oldsize] = tmpregistryurls[i];
-        }
-        
-    
-    }
-    
-    public void setRasmolScript(String script){
-        rasmolScript = script;
-    }
-    
-    public void setSeqSelectStart(String start){
-        seqSelectStart = Integer.parseInt(start);
-    }
-    
-    public void setSeqSelectEnd(String end){
-        seqSelectEnd = Integer.parseInt(end);
-    }
-    
-    public void setPdbSelectStart(String start){
-        pdbSelectStart = start;
-    }
-    
-    public void setPdbSelectEnd(String end){
-        pdbSelectEnd = end;
-    }
-    
-    public void setDisplayMessage(String txt){
-        message = txt;
-    }
-    
-    public void setMessageWidth(int width){
-        messageWidth = width;
-    }
-    
-    public void setMessageHeight(int height){
-        messageHeight = height;
-    }
-    	
-    
 }
 
 

@@ -121,13 +121,12 @@ public interface SPICEFrame
     /** return the DAS - feature viewer panel */
     public SpiceFeatureViewer getFeatureViewer();
     
-    /**set which Das servers should be displayed
+    /** set which parameters should be used for loading the next molecule.
+     * typically set before doing a new load(type,code) call.
+     * @param params
      */
-    public void setDasServerString(String dasServerString);
+    public void setSpiceStartParameters(SpiceStartParameters params);
     
-    /**     * set which DAS servers should be displayed.
-     */
-    public void setDasLabelString(String dasLabelString);
-        
-    
+    /** get the parameters that are used while loading the next molecule */
+    public SpiceStartParameters getSpiceStartParameters();
 }
