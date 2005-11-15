@@ -1110,6 +1110,7 @@ ConfigurationListener
         FeatureFetcher ff = new FeatureFetcher(this,sp_id,pdbcode,chain);
         String disp = startParameters.getDisplay();
         String labe = startParameters.getDisplayLabel();
+        logger.info("got " + disp + " " + labe);
         
         if (! disp.equals("all")){
             if ( labe.equals("all")){

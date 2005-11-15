@@ -175,6 +175,7 @@ public class FeatureFetcher extends Thread
         String[] ds_ids = (String[]) ds.toArray(new String[ds.size()]);
         displayDASServers = ds_ids;
         if ( (displayLabels != null) && (displayLabels.length == 0)) 
+            logger.finest("setting displayLabels null");
             displayLabels = null;
     }
     
@@ -214,6 +215,7 @@ public class FeatureFetcher extends Thread
         String []label_ids = (String[])ds.toArray(new String[ds.size()]);
         displayLabels = label_ids;
         if ( (displayDASServers != null ) && (displayDASServers.length == 0)){
+            logger.finest("setting displayDASServers null");
             displayDASServers = null;
         }
         
@@ -264,7 +266,9 @@ public class FeatureFetcher extends Thread
         String id = ds.getId();
         for ( int i=0; i< displayDASServers.length;i++){
             String testid = displayDASServers[i];
+            //logger.finest("comparing " + testid + " " + id);
             if ( testid.equals(id)){
+                //logger.finest("match");
                 return true;
             }
         }
@@ -278,6 +282,19 @@ public class FeatureFetcher extends Thread
      * @return list of requested servers.
      */
     private List getUserRequestedServers(List servers){
+        
+        /*if ( displayDASServers != null ){
+            for ( int i = 0 ; i < displayDASServers.length;i++) {
+                logger.finest("displayDASServers: " + displayDASServers[i]);
+            }
+        }
+        
+        if ( displayLabels != null) {
+            for ( int i=0;i<displayLabels.length; i ++){
+                logger.finest("displayLabels: " + displayLabels[i]);
+            }
+        }
+        */
         
         /** if nothing provided return all */
         if (   ( displayDASServers != null )
@@ -314,7 +331,7 @@ public class FeatureFetcher extends Thread
             //logger.info("getuserRequestServers u" + ds.getNickname() +" " + ds.getStatus());
             // skip disabled servers ...
             if ( ds.getStatus() == false ){
-                //logger.info("skipping das source " + ds.getNickname());
+                logger.info("skipping das source " + ds.getNickname());
                 continue;
             }
             
@@ -333,11 +350,38 @@ public class FeatureFetcher extends Thread
                 continue;
             }
         }
-        return retlst;
+        
+        List finallist = new ArrayList();
+        
+        // reorder -according to user request 
+        if ( ( displayDASServers != null )
+                && ( displayDASServers.length > 0 )  ){
+            
+            // reorder:
+            for ( int i=0; i< displayDASServers.length;i++){
+                String testid = displayDASServers[i];
+                iter = retlst.iterator();
+                
+                while ( iter.hasNext()) {
+                    SpiceDasSource ds = (SpiceDasSource) iter.next();
+                    if ( testid.equals(ds.getId())){
+                        logger.finest("displaying " + ds);
+                        finallist.add(ds);
+                    }
+                }
+            }
+            
+            
+        } else {
+            finallist = retlst;
+        }
+            
+        
+        return finallist;
     }
     
     private synchronized void doDasCommunication() {
-        System.out.println("FeatureFetcher doDasCommunication");
+        //System.out.println("FeatureFetcher doDasCommunication");
         finished = false ;
         allFeatures = new ArrayList();
         // contact sequence feature servers
@@ -352,16 +396,16 @@ public class FeatureFetcher extends Thread
         List pdbresservs = getUserRequestedServers(tmppdbresservs);
         
         boolean allServersDisplayed = true ;
-        //logger.info("size comparison "+ tmpfeatservs.size() + " ==" + 
-        //        featservs.size() + ", " + tmppdbresservs.size() + "==" + pdbresservs.size() );
+        //logger.finest("size comparison "+ tmpfeatservs.size() + " ==" + 
+         //       featservs.size() + ", " + tmppdbresservs.size() + "==" + pdbresservs.size() );
         
-        /*
+        
          Iterator iter = pdbresservs.iterator();
         while (iter.hasNext()){
             SpiceDasSource ds = (SpiceDasSource) iter.next();
-            logger.info("in feature fetcher using" + ds.getNickname() + " " + ds.getStatus());
+            //logger.finest("in feature fetcher using" + ds.getNickname() + " " + ds.getStatus());
         }
-        */
+        
         
         
         if ( tmpfeatservs.size() != featservs.size())
