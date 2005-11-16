@@ -165,10 +165,39 @@ public class RegistryConfiguration
         return tmp ;
     }
     
-    public void addServer(SpiceDasSource s, boolean status) {	
-        allservers.add(s);
-        if (s.getStatus()) {
-            activeservers.add(s);
+    /** add a new DAS server to the list of available ones.
+     * can be used e.g. to add a local server
+     * @param s .. the Das Source
+   
+     */
+    public void addServer(SpiceDasSource s) {
+        // make sure no server with that url already exists
+        Iterator iter = allservers.iterator();
+        boolean known =false;
+        SpiceDasSource knownSource = null;
+        while (iter.hasNext()) {
+            knownSource = (SpiceDasSource) iter.next();
+            if (knownSource.getUrl().equals(s.getUrl())){
+                known = true;
+                break;
+            }
+        }
+        if ( ! known) {
+            allservers.add(s);
+            if (s.getStatus()) {
+                activeservers.add(s);
+            }
+        } else {
+            // we already know this source, update the info on it...
+            knownSource.setRegistered(s.getRegistered());
+            knownSource.setNickname(s.getNickname());
+            
+            if (! knownSource.getStatus()){
+                if ( s.getStatus()){
+                    knownSource.setStatus(true);
+                    activeservers.add(knownSource);
+                }
+            }
         }
     }
     

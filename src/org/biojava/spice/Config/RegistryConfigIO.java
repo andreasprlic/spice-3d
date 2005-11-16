@@ -277,7 +277,7 @@ extends Thread
                 
                 SpiceDasSource ds = (SpiceDasSource) localservers.get(i);
                 logger.finest("adding localserver to new config " + ds.getUrl());
-                config.addServer(ds,ds.getStatus());
+                config.addServer(ds);
             }
             //logger.finest("adding registry "+ REGISTRY.toString());
             
@@ -352,7 +352,7 @@ extends Thread
             SpiceDasSource sds = new SpiceDasSource();
             sds.fromDasSource(s);
             //logger.info(" RegistryIO  go dassource " +sds.getNickname() );
-            myconfig.addServer(sds,true);
+            myconfig.addServer(sds);
         }
         return myconfig;
         

@@ -110,19 +110,18 @@ public abstract class AbstractFeature implements Feature {
      * 
      * */
     public  boolean equals(Feature feat) {
-        
+//      if ( note == null) {
+        //  if (( feat.getNote() == null ) || 
+          // ( feat.getNote().equals(""))) {
+    //} else if ( this.note.equals(feat.getNote())){
+      //  return true;
+    //}
         if ( this.type.equals(feat.getType())){
             if ( this.method.equals(feat.getMethod())){
-                if ( this.source.equals(feat.getSource())){
-                    if ( note == null) {
-                        if (( feat.getNote() == null ) || 
-                         ( feat.getNote().equals(""))) {
-                            return true;
-                        }
-                    } else if ( this.note.equals(feat.getNote())){
+                    if ( this.source.equals(feat.getSource())){
+                    
                         return true;
                     }
-                }
             }
         }
         return false;

@@ -117,7 +117,7 @@ public class SpiceProtocol {
             }
             else if (str.substring(0,12).equals("SPICE: param")) {
                 String[] split = str.split(" ");
-                if ( split.length != 4) {
+                if ( split.length < 4) {
                     logger.info("message does not have right length...") ;
 //                  use default settings for this parameter...
                     
@@ -126,7 +126,7 @@ public class SpiceProtocol {
                     //return SPICE_WHAT;
                 }
                 String parameterName  = split[2];
-                String parameterValue = split[3];
+                String parameterValue = str.substring((13 + parameterName.length()+1),str.length());
                 
                 testSetParameter(parameterName,parameterValue);
                 spice.setSpiceStartParameters(params);

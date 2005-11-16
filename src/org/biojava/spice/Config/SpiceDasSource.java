@@ -46,14 +46,19 @@ public class SpiceDasSource
     boolean registered ; // a flag to trace if source comes from registry or from user vonfig
     Map[] typeStyles;
     Map[] threeDstyles;
-    
+    public static String DEFAULT_NICKNAME = "MyDASsource";
+    public static String DEFAULT_CAPABILITY = "features";
     public SpiceDasSource() {
 	super();
+    
 	status    = true ;  // default source is actived and used .
 	registered = true ; // default true = source comes from registry
-	setNickname("MyDASsource");
+	setNickname(DEFAULT_NICKNAME);
 	typeStyles = null;
 	threeDstyles = null;
+    String[] caps = new String[1];
+    caps[0] = DEFAULT_CAPABILITY;
+    setCapabilities(caps);
     }
 
     public void loadStylesheet(){
@@ -102,7 +107,10 @@ public class SpiceDasSource
        return threeDstyles; 
     }
     
-    
+    /** a flag if this das source is active
+     * or 
+     * @param flag
+     */
     public void    setStatus(boolean flag) { status = flag ; }
     public boolean getStatus()             { return status ; }
 

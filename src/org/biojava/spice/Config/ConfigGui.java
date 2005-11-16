@@ -871,6 +871,7 @@ class ConfigPanel extends JPanel implements ConfigurationListener {
             }
             SpiceDasSource sds = new SpiceDasSource();
             sds.setRegistered(false);
+            sds.setStatus(true);
             sds.setUrl(              (String) formdata.get("url"));
             sds.setAdminemail(       (String) formdata.get("adminemail"));
             sds.setDescription(      (String) formdata.get("description"));
@@ -889,7 +890,7 @@ class ConfigPanel extends JPanel implements ConfigurationListener {
             sds.setCapabilities(capabs);
             
             
-            config.addServer(sds,true);
+            config.addServer(sds);
             
             updateDasSourceTable() ;
             
@@ -915,7 +916,7 @@ class ConfigPanel extends JPanel implements ConfigurationListener {
 	    dcss[0] = dcs;
             sds.setCoordinateSystem(dcss);
             sds.setCapabilities(capabs);
-            config.addServer(sds,true);
+            config.addServer(sds);
             updateDasSourceTable();
         }
         else if ( pos == 3 ) {

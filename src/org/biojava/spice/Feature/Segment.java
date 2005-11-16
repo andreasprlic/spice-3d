@@ -35,6 +35,8 @@ public class Segment {
     Color color ;
     Feature parent ;
     String txtColor ;
+    String note;
+    
     public Segment() {
 	start = 0 ;
 	end   = 0 ;
@@ -42,11 +44,22 @@ public class Segment {
 	color = Color.white ;
 	txtColor = "white" ;
 	parent = null ;
+    note = "";
     }
 
     public String toString() {
 	String str = "Segment: " +name + " " +start + " " + end ;
+    if ( ( note != null ) && ( ! note.equals("null")))
+            str += note;
 	return str ;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 
     public void setStart(int strt) {start = strt ; }

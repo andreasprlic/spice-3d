@@ -52,7 +52,20 @@ public class SpiceStartParameters {
     private int messageWidth = 300;
     private int messageHeight = 100;
     private String displayMessage;
+    private String localServerURL = "";
+    private String localServerCoordSys = "";
+    private String localServerName="";
     
+    public String getLocalServerName() {
+        return localServerName;
+    }
+
+
+    public void setLocalServerName(String localServerName) {
+        this.localServerName = localServerName;
+    }
+
+
     public SpiceStartParameters() {
         super();
 
@@ -293,6 +306,26 @@ public class SpiceStartParameters {
     
     public void setMessageHeight(Integer height){
         messageHeight = height.intValue();
+    }
+
+
+    public String getLocalServerCoordSys() {
+        return localServerCoordSys;
+    }
+
+
+    public void setLocalServerCoordSys(String localServerCoordSys) {
+        this.localServerCoordSys = localServerCoordSys;
+    }
+
+
+    public String getLocalServerURL() {
+        return localServerURL;
+    }
+
+
+    public void setLocalServerURL(String localServerURL) {
+        this.localServerURL = localServerURL;
     }
         
 

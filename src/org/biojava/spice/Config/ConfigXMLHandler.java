@@ -146,7 +146,7 @@ public class ConfigXMLHandler extends DefaultHandler {
     public void endElement(String uri,String name, String qName){
 	//System.out.println("end element >" + name + "< >" + qName+"<" + uri);
 	if ( qName.equals("SpiceDasSource")){
-	    config.addServer(source,source.getStatus());
+	    config.addServer(source);
 	} else if ( qName.equals("coordinateSystems")){
 	    String[] coordSys = (String[])coords.toArray(new String[coords.size()]);
 

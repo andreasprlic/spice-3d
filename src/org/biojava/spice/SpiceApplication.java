@@ -23,6 +23,7 @@
 
 package org.biojava.spice ;
 
+import org.biojava.services.das.registry.DasCoordinateSystem;
 import org.biojava.spice.Panel.*;
 import org.biojava.spice.Config.*;
 import org.biojava.spice.Feature.*;
@@ -793,6 +794,7 @@ ConfigurationListener
     
     public void setSpiceStartParameters(SpiceStartParameters parameters){
         startParameters = parameters;        
+        testAddLocalServer();
     }
     
     
@@ -1080,7 +1082,7 @@ ConfigurationListener
 
 
     private  void getNewFeatures(String sp_id) {
-        System.out.println("SpiceApplication get new Features " + sp_id);
+        //logger.("SpiceApplication get new Features " + sp_id);
         //ArrayList featureservers = getFeatureServers() ;
         logger.finest(" getNewFeatures" + sp_id);
         Chain chain = getChain(currentChainNumber) ;
@@ -1094,12 +1096,19 @@ ConfigurationListener
         features.clear();
         dascanv.clear();
         dascanv.setSeqLength(chain.getLength());
-        List l = null;
-        if ( config != null )
-            l =config.getAllServers();
-        if (l == null){
-            l = new ArrayList();
+        //List l = null;
+        if ( config != null ){
+            // test if a new local DAS source is in params
+         
+            testAddLocalServer();
+            
+           
+            //l =config.getAllServers();
         }
+       
+        //if (l == null){
+            //l = new ArrayList();
+        //}
         //Iterator iter = l.iterator();
         //while (iter.hasNext()){
         //    SpiceDasSource ds = (SpiceDasSource) iter.next();
@@ -1136,7 +1145,33 @@ ConfigurationListener
         
     }
 
-    
+    private void testAddLocalServer(){
+        if ( config == null){
+            return ;
+        }
+        String localurl = startParameters.getLocalServerURL();
+        
+        if (! ((localurl == null) || (localurl.equals("")))) {
+            String localcood = startParameters.getLocalServerCoordSys();
+            String localname = startParameters.getLocalServerName();
+            //logger.info("adding new local DAS source");
+            
+            SpiceDasSource localDs = new SpiceDasSource();
+            localDs.setUrl(localurl);
+            localDs.setStatus(true);
+            localDs.setRegistered(false);
+            localDs.setNickname(localname);
+            DasCoordinateSystem dcs = DasCoordinateSystem.fromString(localcood);
+            DasCoordinateSystem[] csa = new DasCoordinateSystem[1];
+            csa[0]=dcs;
+            localDs.setCoordinateSystem(csa);
+            config.addServer(localDs);
+            
+            // and clean up - we do not need to do this a second time again after ...
+            startParameters.setLocalServerURL("");              
+            startParameters.setLocalServerName(SpiceDasSource.DEFAULT_NICKNAME);
+        }
+    }
     
     /*
     // store all features in memory -> speed up

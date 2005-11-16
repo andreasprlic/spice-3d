@@ -331,14 +331,14 @@ public class FeatureFetcher extends Thread
             //logger.info("getuserRequestServers u" + ds.getNickname() +" " + ds.getStatus());
             // skip disabled servers ...
             if ( ds.getStatus() == false ){
-                logger.info("skipping das source " + ds.getNickname());
+                logger.finest("skipping das source " + ds.getNickname());
                 continue;
             }
             
             // always display user config servers
             if (! ds.getRegistered()){
                 retlst.add(ds);
-                //logger.info("adding local DAS source " + ds);
+                logger.finest("adding local DAS source " + ds);
                 continue;
             }
             if ( isInDisplayLabels(ds)) {
@@ -370,7 +370,15 @@ public class FeatureFetcher extends Thread
                     }
                 }
             }
+            // now add all local ones..
+            iter = retlst.iterator();
             
+            while ( iter.hasNext()) {
+                SpiceDasSource ds = (SpiceDasSource) iter.next();
+                if (! finallist.contains(ds)){
+                    finallist.add(ds);
+                }
+            }
             
         } else {
             finallist = retlst;
@@ -1031,6 +1039,7 @@ public class FeatureFetcher extends Thread
         s.setName((String)featureMap.get("TYPE"));
         s.setTxtColor((String)featureMap.get("colorTxt"));	
         s.setColor((Color)featureMap.get("color"));
+        s.setNote((String) featureMap.get("NOTE"));
         return s ;
         
     }
