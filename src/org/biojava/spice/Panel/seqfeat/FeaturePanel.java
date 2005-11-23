@@ -36,7 +36,8 @@ import java.util.logging.Logger;
 import org.biojava.spice.Feature.Feature;
 import org.biojava.spice.Feature.Segment;
 import org.biojava.spice.Panel.seqfeat.SelectedFeatureListener;
-import org.biojava.spice.Config.SpiceDasSource;
+import org.biojava.spice.das.SpiceDasSource;
+
 import java.util.Map;
 import java.util.HashMap;
 

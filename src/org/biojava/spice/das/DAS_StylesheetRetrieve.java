@@ -20,7 +20,8 @@
  * Created on Aug 3, 2005
  *
  */
-package org.biojava.spice.DAS;
+package org.biojava.spice.das;
+
 import java.io.InputStream;
 import java.net.*;
 import java.util.*;

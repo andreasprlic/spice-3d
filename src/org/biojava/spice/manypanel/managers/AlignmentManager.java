@@ -29,8 +29,8 @@ import java.util.Iterator;
 
 
 import org.biojava.services.das.registry.*;
-import org.biojava.spice.Config.SpiceDasSource;
-import org.biojava.spice.manypanel.das.AlignmentThread;
+import org.biojava.spice.das.AlignmentThread;
+import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.manypanel.eventmodel.*;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.program.das.dasalignment.Alignment;

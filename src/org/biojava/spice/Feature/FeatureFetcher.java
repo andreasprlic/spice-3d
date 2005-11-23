@@ -42,6 +42,7 @@ import org.biojava.bio.structure.Chain ;
 import org.biojava.bio.structure.Group ;
 
 import org.biojava.spice.Panel.seqfeat.*;
+import org.biojava.spice.das.SpiceDasSource;
 
 //import org.biojava.services.das.registry.DasSource;
 

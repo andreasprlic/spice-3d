@@ -22,7 +22,7 @@
  *
  */
 
-package org.biojava.spice.Config ;
+package org.biojava.spice.das ;
 
 //import org.biojava.services.das.registry.*;
 import org.biojava.services.das.registry.DasSource;
@@ -37,11 +37,11 @@ import java.net.URL;
 
 /** Manages all data about a DAS source that SPICE requires */
 public class SpiceDasSource
-    extends DasSource 
+extends DasSource 
 
 {
-
-
+    
+    
     boolean status ;
     boolean registered ; // a flag to trace if source comes from registry or from user vonfig
     Map[] typeStyles;
@@ -49,18 +49,18 @@ public class SpiceDasSource
     public static String DEFAULT_NICKNAME = "MyDASsource";
     public static String DEFAULT_CAPABILITY = "features";
     public SpiceDasSource() {
-	super();
-    
-	status    = true ;  // default source is actived and used .
-	registered = true ; // default true = source comes from registry
-	setNickname(DEFAULT_NICKNAME);
-	typeStyles = null;
-	threeDstyles = null;
-    String[] caps = new String[1];
-    caps[0] = DEFAULT_CAPABILITY;
-    setCapabilities(caps);
+        super();
+        
+        status    = true ;  // default source is actived and used .
+        registered = true ; // default true = source comes from registry
+        setNickname(DEFAULT_NICKNAME);
+        typeStyles = null;
+        threeDstyles = null;
+        String[] caps = new String[1];
+        caps[0] = DEFAULT_CAPABILITY;
+        setCapabilities(caps);
     }
-
+    
     public void loadStylesheet(){
         DAS_StylesheetRetrieve dsr = new DAS_StylesheetRetrieve();
         String cmd = getUrl()+"stylesheet";
@@ -104,7 +104,7 @@ public class SpiceDasSource
      * @return
      */
     public Map[] get3DStylesheet(){
-       return threeDstyles; 
+        return threeDstyles; 
     }
     
     /** a flag if this das source is active
@@ -113,81 +113,83 @@ public class SpiceDasSource
      */
     public void    setStatus(boolean flag) { status = flag ; }
     public boolean getStatus()             { return status ; }
-
+    
     public void    setRegistered(boolean flag) { registered = flag ; }
     public boolean getRegistered()             { return registered ; }
     
     
     /** convert DasSource to SpiceDasSource */
-    public void fromDasSource(DasSource ds) {
-	this.setUrl(ds.getUrl());
-	this.setAdminemail(ds.getAdminemail());
-	this.setDescription(ds.getDescription());
-	this.setCoordinateSystem(ds.getCoordinateSystem());
-	this.setCapabilities(ds.getCapabilities());
-	this.setRegisterDate(ds.getRegisterDate());
-	this.setLeaseDate(ds.getLeaseDate());
-	this.setNickname(ds.getNickname());
-	this.setTestCode(ds.getTestCode());
-	this.setId(ds.getId());
-	this.setLabels(ds.getLabels());
-	this.setHelperurl(ds.getHelperurl());
+    public static SpiceDasSource  fromDasSource(DasSource ds) {
+        SpiceDasSource s = new SpiceDasSource();
+        s.setUrl(ds.getUrl());
+        s.setAdminemail(ds.getAdminemail());
+        s.setDescription(ds.getDescription());
+        s.setCoordinateSystem(ds.getCoordinateSystem());
+        s.setCapabilities(ds.getCapabilities());
+        s.setRegisterDate(ds.getRegisterDate());
+        s.setLeaseDate(ds.getLeaseDate());
+        s.setNickname(ds.getNickname());
+        s.setTestCode(ds.getTestCode());
+        s.setId(ds.getId());
+        s.setLabels(ds.getLabels());
+        s.setHelperurl(ds.getHelperurl());
+        return s;
     }
-
+    
     
     public String toString() {
         String txt = getId()  + " " + getNickname() + " " + getUrl() ;
         return txt;
     }
-
+    
     /** convert to XML. */
     public XMLWriter toXML(XMLWriter xw)
-	throws IOException
+    throws IOException
     {
-	//System.out.println("writing XML of" + getUrl());
-	xw.openTag("SpiceDasSource");
-	xw.attribute("url",getUrl());
-	xw.attribute("nickname",getNickname());
-	xw.attribute("adminemail",getAdminemail());
-	//xw.attribute("description",getDescription());
-	xw.attribute("status",""+status);
-	xw.attribute("registered",""+registered);
-	DateFormat df = new SimpleDateFormat("dd.MM.yyyy"); 
-	//DateFormat df = DateFormat.getDateInstance();
-	String rds = df.format(getRegisterDate());
-	String lds = df.format(getLeaseDate());
-	xw.attribute("registerDate",rds);
-	xw.attribute("leaseDate",lds);
-
-	// description
-	xw.openTag("description");
-	xw.print(getDescription());
-	xw.closeTag("description");
-
-	// coordinateSystems
-	xw.openTag("coordinateSystems");
-	DasCoordinateSystem[] coords = getCoordinateSystem();
-	for (int i = 0; i < coords.length; i++){
-	    xw.openTag("coordinateSystem");
-	    xw.attribute("name",coords[i].toString());
-	    xw.attribute("uniqId",coords[i].getUniqueId());
-	    xw.closeTag("coordinateSystem");
-	} 
-	xw.closeTag("coordinateSystems");
-
-	// capabilities
-	xw.openTag("capabilities");
-	String[] caps = getCapabilities();
-	for (int i = 0; i < caps.length; i++){
-	    xw.openTag("capability");
-	    xw.attribute("service",caps[i]);
-	    xw.closeTag("capability");
-	} 
-	xw.closeTag("capabilities");
-
-	xw.closeTag("SpiceDasSource");
-	return xw ;
+        //System.out.println("writing XML of" + getUrl());
+        xw.openTag("SpiceDasSource");
+        xw.attribute("url",getUrl());
+        xw.attribute("nickname",getNickname());
+        xw.attribute("adminemail",getAdminemail());
+        //xw.attribute("description",getDescription());
+        xw.attribute("status",""+status);
+        xw.attribute("registered",""+registered);
+        DateFormat df = new SimpleDateFormat("dd.MM.yyyy"); 
+        //DateFormat df = DateFormat.getDateInstance();
+        String rds = df.format(getRegisterDate());
+        String lds = df.format(getLeaseDate());
+        xw.attribute("registerDate",rds);
+        xw.attribute("leaseDate",lds);
+        
+        // description
+        xw.openTag("description");
+        xw.print(getDescription());
+        xw.closeTag("description");
+        
+        // coordinateSystems
+        xw.openTag("coordinateSystems");
+        DasCoordinateSystem[] coords = getCoordinateSystem();
+        for (int i = 0; i < coords.length; i++){
+            xw.openTag("coordinateSystem");
+            xw.attribute("name",coords[i].toString());
+            xw.attribute("uniqId",coords[i].getUniqueId());
+            xw.closeTag("coordinateSystem");
+        } 
+        xw.closeTag("coordinateSystems");
+        
+        // capabilities
+        xw.openTag("capabilities");
+        String[] caps = getCapabilities();
+        for (int i = 0; i < caps.length; i++){
+            xw.openTag("capability");
+            xw.attribute("service",caps[i]);
+            xw.closeTag("capability");
+        } 
+        xw.closeTag("capabilities");
+        
+        xw.closeTag("SpiceDasSource");
+        return xw ;
     }
     
-
+    
 }

@@ -20,7 +20,7 @@
  * Created on Mar 9, 2005
  *
  */
-package org.biojava.spice.DAS;
+package org.biojava.spice.das;
 
 import org.biojava.utils.stax.StAXContentHandlerBase;
 import org.biojava.utils.stax.*;

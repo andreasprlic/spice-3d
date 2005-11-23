@@ -20,7 +20,7 @@
  * Created on Nov 7, 2005
  *
  */
-package org.biojava.spice.DAS;
+package org.biojava.spice.das;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.io.DASStructureClient;
 import org.biojava.bio.structure.io.PDBFileReader;
-import org.biojava.spice.Config.SpiceDasSource;
 import org.biojava.spice.manypanel.eventmodel.StructureEvent;
 import org.biojava.spice.manypanel.eventmodel.StructureListener;
 

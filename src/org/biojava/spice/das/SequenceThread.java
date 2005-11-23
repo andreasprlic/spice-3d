@@ -20,7 +20,7 @@
  * Created on Nov 20, 2005
  *
  */
-package org.biojava.spice.DAS;
+package org.biojava.spice.das;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -32,7 +32,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.biojava.spice.Config.SpiceDasSource;
 import org.biojava.spice.DAS.DAS_Sequence_Handler;
 import org.biojava.spice.manypanel.eventmodel.*;
 import org.xml.sax.InputSource;

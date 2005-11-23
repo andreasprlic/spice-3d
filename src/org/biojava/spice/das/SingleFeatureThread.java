@@ -22,9 +22,9 @@
  *
  */
 
-package org.biojava.spice.DAS ;
+package org.biojava.spice.das ;
 
-import org.biojava.spice.DAS.*		   ;
+
 import org.biojava.spice.manypanel.drawable.*;
 import org.biojava.spice.manypanel.eventmodel.*;
 import java.util.logging.*             ;

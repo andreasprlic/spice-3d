@@ -15,7 +15,7 @@
  * If it doesnt, please send me email, with a sample xpm image
  * that it fails under, and I'll try to fix it.
  */
-package org.biojava.spice.DAS;
+package org.biojava.spice.das;
 
 
 import java.awt.Image;

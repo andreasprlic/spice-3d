@@ -38,10 +38,11 @@ import javax.swing.ImageIcon;
 import javax.swing.JPopupMenu;
 
 import org.biojava.spice.SpiceApplication;
-import org.biojava.spice.Config.SpiceDasSource;
 import org.biojava.spice.Feature.Feature;
 import org.biojava.spice.Feature.Segment;
 import org.biojava.spice.Panel.seqfeat.SelectedFeatureListener;
+import org.biojava.spice.das.SpiceDasSource;
+
 import java.net.URL;
 import java.net.MalformedURLException;
 

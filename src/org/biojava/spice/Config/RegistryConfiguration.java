@@ -40,6 +40,8 @@ import org.biojava.utils.xml.*            ;
 import java.net.MalformedURLException;
 import java.net.URL;
 import org.biojava.services.das.registry.*;
+import org.biojava.spice.das.SpiceDasSource;
+
 import java.util.Iterator;
 import java.util.logging.Logger;
 

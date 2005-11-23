@@ -87,6 +87,7 @@ import org.biojava.bio.Annotation               ;
 import javax.swing.JDialog;
 import java.awt.Container;
 
+import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.server.SpiceServer;
 import org.biojava.spice.Panel.seqfeat.FeatureView;
 

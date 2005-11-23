@@ -21,7 +21,7 @@
  *
  */
 package org.biojava.spice.Panel.seqfeat;
-import org.biojava.spice.Config.SpiceDasSource;
+import org.biojava.spice.das.SpiceDasSource;
 
 /** An interface for classes that doe something with DasSources ..
  * @author Andreas Prlic

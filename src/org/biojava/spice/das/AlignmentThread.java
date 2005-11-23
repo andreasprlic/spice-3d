@@ -20,7 +20,7 @@
  * Created on Nov 20, 2005
  *
  */
-package org.biojava.spice.DAS;
+package org.biojava.spice.das;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +35,6 @@ import java.util.zip.GZIPInputStream;
 import java.util.ArrayList;
 import org.biojava.bio.program.das.dasalignment.Alignment;
 import org.biojava.bio.program.das.dasalignment.DASAlignmentCall;
-import org.biojava.spice.Config.SpiceDasSource;
 import org.biojava.spice.DAS.AlignmentTools;
 import org.biojava.spice.manypanel.eventmodel.*;
 

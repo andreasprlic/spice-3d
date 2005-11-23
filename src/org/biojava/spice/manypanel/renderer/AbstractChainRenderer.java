@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JLayeredPane;
 import org.biojava.bio.structure.*;
-import org.biojava.spice.Config.SpiceDasSource;
+import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.spice.manypanel.drawable.DrawableDasSource;
 import org.biojava.spice.manypanel.drawable.DrawableSequence;

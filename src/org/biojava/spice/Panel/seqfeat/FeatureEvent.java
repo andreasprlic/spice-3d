@@ -23,6 +23,7 @@
 package org.biojava.spice.Panel.seqfeat;
 
 import org.biojava.spice.Config.*;
+import org.biojava.spice.das.SpiceDasSource;
 
 /**
  * @author Andreas Prlic

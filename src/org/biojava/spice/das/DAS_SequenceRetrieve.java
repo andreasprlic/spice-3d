@@ -21,14 +21,12 @@
  * @author Andreas Prlic
  *
  */
-package org.biojava.spice.DAS;
+package org.biojava.spice.das;
 
 import org.biojava.spice.Config.*          ;
 import java.net.URL                        ;
 import java.io.InputStream                 ;
 import java.net.HttpURLConnection          ;
-import org.xml.sax.InputSource             ;
-import org.xml.sax.XMLReader               ;
 import org.xml.sax.*                       ;
 import javax.xml.parsers.*                 ;
 import java.util.List                      ;

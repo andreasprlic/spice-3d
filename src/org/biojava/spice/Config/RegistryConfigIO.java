@@ -34,6 +34,7 @@ import java.util.List                      ;
 
 // for DAS registration server:
 import org.biojava.services.das.registry.* ;
+import org.biojava.spice.das.SpiceDasSource;
 
 //for logging
 import java.util.logging.*                 ;

@@ -26,8 +26,8 @@ import java.util.List;
 
 import org.biojava.spice.SpiceStartParameters ;
 import org.biojava.spice.SPICEFrame ;
-import org.biojava.spice.Config.SpiceDasSource;
 import org.biojava.spice.Config.RegistryConfiguration;
+import org.biojava.spice.das.SpiceDasSource;
 
 
 

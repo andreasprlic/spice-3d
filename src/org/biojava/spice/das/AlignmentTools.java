@@ -20,17 +20,15 @@
  * Created on Feb 4, 2005
  *
  */
-package org.biojava.spice.DAS;
+package org.biojava.spice.das;
 
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.*;
 
 import org.biojava.bio.Annotation;
 import org.biojava.bio.program.das.dasalignment.Alignment;
 import org.biojava.bio.program.das.dasalignment.DASAlignmentCall;
 import org.biojava.spice.Config.RegistryConfiguration;
-import org.biojava.spice.Config.SpiceDasSource;
 import java.net.*;
 import java.io.*;
 import java.util.zip.GZIPInputStream;

@@ -21,7 +21,7 @@
  * @author Andreas Prlic
  *
  */
-package org.biojava.spice.DAS;
+package org.biojava.spice.das;
 
 
 import java.net.URL                         ;

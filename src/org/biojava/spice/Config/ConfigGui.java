@@ -69,6 +69,7 @@ import javax.swing.table.TableColumn;
 
 import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.SPICEFrame;
+import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.services.das.registry.DasCoordinateSystem;
 import java.net.URL;
 

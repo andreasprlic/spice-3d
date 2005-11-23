@@ -33,8 +33,7 @@ import javax.swing.JSlider;
 import java.util.*;
 import java.util.logging.Logger;
 
-import org.biojava.spice.Config.*;
-//import org.biojava.spice.manypanel.drawable.*;
+import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.manypanel.eventmodel.*;
 import org.biojava.spice.manypanel.managers.*;
 import org.biojava.spice.manypanel.renderer.*;

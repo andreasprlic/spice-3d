@@ -45,7 +45,7 @@ import org.biojava.spice.Panel.seqfeat.SeqScale;
 //import org.biojava.spice.Panel.seqfeat.TypeLabelPanel;
 import org.biojava.spice.Panel.seqfeat.TypePanelMouseListener;
 import org.biojava.spice.Panel.seqfeat.DasSourceListener;
-import org.biojava.spice.Config.SpiceDasSource;
+import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.bio.structure.ChainImpl;
 import org.biojava.bio.structure.Chain;
 import java.awt.event.ComponentEvent;

@@ -26,7 +26,8 @@ import org.biojava.spice.Feature.*;
 import org.biojava.spice.Panel.seqfeat.FeaturePanel;
 import org.biojava.spice.Panel.seqfeat.LabelPane;
 import org.biojava.spice.Panel.seqfeat.TypeLabelPanel;
-import org.biojava.spice.Config.SpiceDasSource;
+import org.biojava.spice.das.SpiceDasSource;
+
 import javax.swing.*;
 import java.util.logging.Logger;
 import java.util.NoSuchElementException;

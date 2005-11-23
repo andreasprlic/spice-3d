@@ -30,9 +30,9 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.biojava.services.das.registry.DasSource;
-import org.biojava.spice.Config.SpiceDasSource;
 //import org.biojava.servlets.dazzle.datasource.GFFFeature;
 import org.biojava.spice.Feature.*;
+import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.manypanel.eventmodel.*;
 
 /** all the data about a particular DAS source and the
