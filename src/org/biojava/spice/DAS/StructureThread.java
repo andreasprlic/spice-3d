@@ -20,7 +20,7 @@
  * Created on Nov 7, 2005
  *
  */
-package org.biojava.spice.manypanel.das;
+package org.biojava.spice.DAS;
 
 import java.io.IOException;
 import java.util.Iterator;

@@ -22,7 +22,7 @@
  *
  */
 
-package org.biojava.spice.manypanel.das ;
+package org.biojava.spice.DAS ;
 
 import org.biojava.spice.DAS.*		   ;
 import org.biojava.spice.manypanel.drawable.*;
