@@ -40,5 +40,5 @@ public interface ObjectListener {
      * 
      * @param object
      */
-    public void newObject(Object object);
+    //public void newObject(Object object);
 }
