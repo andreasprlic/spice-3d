@@ -28,10 +28,10 @@ import org.biojava.spice.das.SpiceDasSource;
 
 
 
-/** an example of how to contact the DAS - registration server.
- *  This can be done as part of the dasregistry package and
- * does actually not depend on SPICE.
-
+/** an example of how to contact the DAS - registration server.  This
+ *  can be done as part of the dasregistry package. This example gets
+ *  a list of DasSources from the registration servers.
+ *  
  */
 
 public class contactRegistry {
@@ -50,9 +50,9 @@ public class contactRegistry {
 
 
 	    // if you are behind a proxy, please uncomment the following lines
-	    System.setProperty("proxySet","true");
-	    System.setProperty("proxyHost","wwwcache.sanger.ac.uk");
-	    System.setProperty("proxyPort","3128");
+	    //System.setProperty("proxySet","true");
+	    //System.setProperty("proxyHost","yourhosthere");
+	    //System.setProperty("proxyPort","yourporthere");
 
 	    
 
