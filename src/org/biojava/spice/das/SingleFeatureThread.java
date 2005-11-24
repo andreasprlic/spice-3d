@@ -34,7 +34,6 @@ import java.util.List             ;
 import java.util.Map;
 import java.net.MalformedURLException;
 import java.net.URL                    ;
-import org.biojava.spice.Config.*;
 
 //import java.util.Iterator;
 

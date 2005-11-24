@@ -409,11 +409,11 @@ public class FeatureFetcher extends Thread
          //       featservs.size() + ", " + tmppdbresservs.size() + "==" + pdbresservs.size() );
         
         
-         Iterator iter = pdbresservs.iterator();
-        while (iter.hasNext()){
-            SpiceDasSource ds = (SpiceDasSource) iter.next();
+        //Iterator iter = pdbresservs.iterator();
+        //while (iter.hasNext()){
+            //SpiceDasSource ds = (SpiceDasSource) iter.next();
             //logger.finest("in feature fetcher using" + ds.getNickname() + " " + ds.getStatus());
-        }
+        //}
         
         
         

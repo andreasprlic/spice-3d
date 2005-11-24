@@ -20,7 +20,7 @@
  * Created on 22.11.2004
  */
 
-package org.biojava.servlets.dazzle.datasource;
+package org.biojava.spice.manypanel;
 
 import org.biojava.utils.*;
 import org.biojava.utils.cache.*;
@@ -39,35 +39,9 @@ import org.biojava.spice.DAS.*;
 import java.util.* ;
 import java.net.*;
 
-public class SpiceTool {
+public class AlignmentTool {
 
-    public static Alignment[] doDASAlignmentCmd(String cmd,String query)
-	throws DataSourceException
-    {
-	System.out.println(cmd);
-	DASAlignmentClient dasc= new DASAlignmentClient(cmd);
-	Alignment[] alignments = null ;
-	
-	try{
-	    alignments = dasc.getAlignments(query);	
-	}catch ( Exception e) {
-	    e.printStackTrace();
-	    throw new DataSourceException(e);
-
-	}
-	return alignments ;
-    }
-
-    public static List doDASFeatureCmd(String cmd) 
-	throws DataSourceException,MalformedURLException
-    {
-
-	URL u = new URL(cmd);
-	DAS_FeatureRetrieve ftmp = new DAS_FeatureRetrieve(u);
-	List features = ftmp.get_features();
-	return features ;
-	
-    }
+   
     
     public static String getCigar(Alignment a, String intObjectId) 
 	throws Exception
