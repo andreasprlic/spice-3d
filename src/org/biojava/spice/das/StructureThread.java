@@ -53,7 +53,9 @@ extends Thread{
     public StructureThread(String accessionCode, SpiceDasSource ds) {
 	SpiceDasSource[] dss = new SpiceDasSource[1];
 	dss[0] = ds;
-	this(accessionCode,dss);
+	dasSources = dss;
+	this.accessionCode = accessionCode;
+        structureListeners = new ArrayList();
     }
 
 
