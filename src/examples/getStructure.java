@@ -40,23 +40,19 @@ public class getStructure  {
 	getStructure s = new getStructure();
 	s.showExample();
 	
-
-	
-
-	
     }
 
     public void showExample(){
 	try {
-	    // Since there is a time-delay between sending a DAS request
-	    // and getting the response, SPICE usually launches it's own
-	    // thread to perform the request. The main application can
-	    // then continue to do its job. A "Listener" class is waiting
-	    // for the response.
+	    // Since there is a time-delay between sending a DAS
+	    // request and getting the response, SPICE launches its
+	    // own thread to perform the request. The main application
+	    // can then continue with whatever it wished to do. A
+	    // "Listener" class is waiting for the response.
 	    
 	    
 	    // first let's create a SpiceDasSource which knows where the
-	    // server is located.
+	    // DAS server is located.
 	    
 	    SpiceDasSource dasSource = new SpiceDasSource();
 	    
@@ -64,6 +60,8 @@ public class getStructure  {
 	    
 	    
 	    String pdbCode = "1boi";
+	    
+	    // now we create the thread that will fetch the structure
 	    StructureThread thread = new StructureThread(pdbCode,dasSource);
 	    
 	    // add a structureListener that simply prints the PDB code
@@ -74,13 +72,16 @@ public class getStructure  {
 	    thread.start();
 
 
-	    // do an endless loop which is terminated in the StructureListener...
+	    // do an (almost) endless loop which is terminated in the StructureListener...
 	    int i = 0 ;
 	    while (true){
 		System.out.println(i  + "/10th seconds have passed");
-		i++;
-		//wait(1000);
+		i++;	
 		Thread.sleep(100);
+		if ( i > 1000) {
+		    System.err.println("something went wrong. Perhaps a proxy problem?");
+		    System.exit(1);
+		}
 	
 	    }
 	} catch (Exception e) {
