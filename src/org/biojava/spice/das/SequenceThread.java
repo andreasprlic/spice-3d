@@ -32,7 +32,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.biojava.spice.DAS.DAS_Sequence_Handler;
+//import org.biojava.spice.das.DAS_Sequence_Handler;
 import org.biojava.spice.manypanel.eventmodel.*;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
