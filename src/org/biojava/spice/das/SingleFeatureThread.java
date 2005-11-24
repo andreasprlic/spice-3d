@@ -159,7 +159,7 @@ extends Thread
     
     private void notifyFeatureListeners(Map[] feats){
 
-        FeatureEvent fevent = new FeatureEvent(feats);
+        FeatureEvent fevent = new FeatureEvent(feats,dasSource);
         Iterator fiter = featureListeners.iterator();
         while (fiter.hasNext()){
             FeatureListener fi = (FeatureListener)fiter.next();

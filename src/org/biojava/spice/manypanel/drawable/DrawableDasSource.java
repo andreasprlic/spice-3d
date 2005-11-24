@@ -133,7 +133,7 @@ FeatureListener{
         Iterator iter = featureListeners.iterator();
         while (iter.hasNext()){
             FeatureListener featL = (FeatureListener)iter.next();
-            FeatureEvent event = new FeatureEvent(feats);
+            FeatureEvent event = new FeatureEvent(feats,dasSource);
             featL.newFeatures(event);
         }
         

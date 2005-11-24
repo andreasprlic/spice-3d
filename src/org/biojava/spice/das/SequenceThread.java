@@ -150,8 +150,9 @@ extends Thread {
         SAXParserFactory spfactory =
             SAXParserFactory.newInstance();
         
-        String vali = System.getProperty("XMLVALIDATION");
-        
+	// never do this 
+        //String vali = System.getProperty("XMLVALIDATION");
+        String vali = "false";
         boolean validate = false ;
         if ((vali != null) && ( vali.equals("true")) ) 
             validate = true ;

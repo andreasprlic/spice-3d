@@ -47,14 +47,11 @@ public class contactRegistry {
 
 	    URL registryURL = new URL(registrylocation);
 	
-
-
 	    // if you are behind a proxy, please uncomment the following lines
 	    //System.setProperty("proxySet","true");
 	    //System.setProperty("proxyHost","yourhosthere");
 	    //System.setProperty("proxyPort","yourporthere");
 
-	    
 
 	    // the DasRegistryAxisClient class provides the wrapper for
 	    // the web service.
@@ -65,17 +62,6 @@ public class contactRegistry {
 
 	    System.out.println("got " + sources.length + " das sources from the registry");
 
-
-	    // for SPICE we use an extension to the DasSource class
-	    // the SpiceDasSource class..
-
-	    // create an array to store the spice sources.
-	    SpiceDasSource[] spicesources = new SpiceDasSource[sources.length];
-
-	    //loop over all sources and convert them to SpiceDasSource
-	    for (int i = 0 ; i < sources.length; i++ ) {
-		spicesources[i] = SpiceDasSource.fromDasSource(sources[i]);
-	    }
 
 	} catch (Exception e) {
 	    e.printStackTrace();

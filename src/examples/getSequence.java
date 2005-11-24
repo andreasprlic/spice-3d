@@ -22,51 +22,67 @@
  */
 
 import org.biojava.bio.structure.Structure;
-import org.biojava.spice.das.StructureThread;
+import org.biojava.spice.das.SequenceThread;
 import org.biojava.spice.das.SpiceDasSource;
-import org.biojava.spice.manypanel.eventmodel.StructureListener;
-import org.biojava.spice.manypanel.eventmodel.StructureEvent;
+import org.biojava.spice.manypanel.eventmodel.SequenceListener;
+import org.biojava.spice.manypanel.eventmodel.SequenceEvent;
 
 /** a class that demonstrates how to get a protein structure
  * from a structure DAS server.
  */
 
 
-public class getStructure  {
+public class getSequence {
 
     public static void main (String[] args) {
 	
 
-	getStructure s = new getStructure();
+	getSequence s = new getSequence();
 	s.showExample();
 	
     }
 
     public void showExample(){
 	try {
-	    // Since there is a time-delay between sending a DAS
-	    // request and getting the response, SPICE launches its
-	    // own thread to perform the request. The main application
-	    // can then continue with whatever it wished to do. A
-	    // "Listener" class is waiting for the response.
+
+
+
+	    // the sequence example is very similar to the structure example.
+	    // a new Thread is created that does the DAS communication
+	    // a Listener waits for the response.
+
+	    // first we set some system properties
+	   
+	    // make sure we use the Xerces XML parser..
+	    System.setProperty("javax.xml.parsers.DocumentBuilderFactory","org.apache.xerces.jaxp.DocumentBuilderFactoryImpl");
+	    System.setProperty("javax.xml.parsers.SAXParserFactory","org.apache.xerces.jaxp.SAXParserFactoryImpl");
 	    
+
+	    // if you are behind a proxy, please uncomment the following lines
+	    System.setProperty("proxySet","true");
+	    System.setProperty("proxyHost","wwwcache.sanger.ac.uk");
+	    System.setProperty("proxyPort","3128");
+
+
+
+
 	    
 	    // first let's create a SpiceDasSource which knows where the
 	    // DAS server is located.
 	    
 	    SpiceDasSource dasSource = new SpiceDasSource();
 	    
-	    dasSource.setUrl("http://das.sanger.ac.uk/das/structure/");
+	    dasSource.setUrl("http://www.ebi.ac.uk/das-srv/uniprot/das/aristotle/");
 	    
 	    
-	    String pdbCode = "1boi";
+	    String pdbCode = "P50225";
 	    
 	    // now we create the thread that will fetch the structure
-	    StructureThread thread = new StructureThread(pdbCode,dasSource);
+	    SequenceThread thread = new SequenceThread(pdbCode,dasSource);
 	    
 	    // add a structureListener that simply prints the PDB code
-	    StructureListener listener = new MyStructureListener();
-	    thread.addStructureListener(listener);
+	    SequenceListener listener = new MyListener();
+	    thread.addSequenceListener(listener);
 
 	    // and now start the DAS request
 	    thread.start();
@@ -75,10 +91,8 @@ public class getStructure  {
 	    // do an (almost) endless loop which is terminated in the StructureListener...
 	    int i = 0 ;
 	    while (true){
-		
 		System.out.println(i  + "/10th seconds have passed");
 		i++;	
-		// this should be approx. 1/10th of a second.
 		Thread.sleep(100);
 		if ( i > 1000) {
 		    System.err.println("something went wrong. Perhaps a proxy problem?");
@@ -94,23 +108,30 @@ public class getStructure  {
 
 
 
-    class MyStructureListener 
-	implements StructureListener {
+    class MyListener 
+	implements SequenceListener {
 
-	/** this method is called when the Thread finishes */
-	public synchronized void newStructure(StructureEvent event){
-	    Structure s = event.getStructure();
-	    System.out.println(s.toPDB()); 
-	    //System.out.println(s.toPDB()); 
+	/** this method is called when the Thread finishes 
+	    it prints out the sequence as in Fasta format
+	*/
+	public synchronized void newSequence(SequenceEvent event){
+	    String accessionCode = event.getAccessionCode();
+	    String sequence = event.getSequence();
+	    System.out.println(">"+accessionCode);
+	    System.out.println(sequence);
 	    System.exit(0);
 	}
 	
 
 
 	// the methods below are required by the interface but not needed here
-	public void selectedChain(StructureEvent event){}
 	public void newObjectRequested(String name){}
-	
+	public void selectionLocked(boolean flag){}
+	public void selectedSeqRange(int start, int end){}
+	public void selectedSeqPosition(int position){}
+
+
+
     }
 
 }
