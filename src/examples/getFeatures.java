@@ -88,7 +88,7 @@ public class getFeatures {
 	    
 	    doFeatureRequests(accessionCode,spiceSources);
 	    
-	    // do an (almost) endless loop which is terminated in the Listener...
+	    // do a loop over 10 seconds. the das sources really should respond during this time.
 	    int i = 0 ;
 	    while (true){
 		System.out.println(i  + " seconds have passed");
