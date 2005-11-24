@@ -32,7 +32,7 @@ import java.io.IOException                ;
 import java.text.DateFormat               ;
 import java.text.SimpleDateFormat         ;
 import java.util.*;
-import org.biojava.spice.DAS.DAS_StylesheetRetrieve;
+import org.biojava.spice.das.DAS_StylesheetRetrieve;
 import java.net.URL;
 
 /** Manages all data about a DAS source that SPICE requires */

@@ -52,6 +52,19 @@ public class getFeatures {
     
     public void showExample() {
 	try {
+
+	    // first we set some system properties
+	   
+	    // make sure we use the Xerces XML parser..
+	    System.setProperty("javax.xml.parsers.DocumentBuilderFactory","org.apache.xerces.jaxp.DocumentBuilderFactoryImpl");
+	    System.setProperty("javax.xml.parsers.SAXParserFactory","org.apache.xerces.jaxp.SAXParserFactoryImpl");
+
+	    // if you are behind a proxy, please uncomment the following lines
+	    System.setProperty("proxySet","true");
+	    System.setProperty("proxyHost","wwwcache.sanger.ac.uk");
+	    System.setProperty("proxyPort","3128");
+
+
 	    // get all das sources
 	    DasSource[] sources             = contactRegistry();
 	    
@@ -78,11 +91,11 @@ public class getFeatures {
 	    // do an (almost) endless loop which is terminated in the Listener...
 	    int i = 0 ;
 	    while (true){
-		System.out.println(i  + "/10th seconds have passed");
+		System.out.println(i  + " seconds have passed");
 		i++;	
-		Thread.sleep(100);
-		if ( i > 1000) {
-		    System.err.println("something went wrong. Perhaps a proxy problem?");
+		Thread.sleep(1000);
+		if ( i > 10) {
+		    System.err.println("We assume that das source do not take more than 10 seconds to provide a response.");
 		    System.exit(1);
 		}	    
 	    }	
@@ -187,7 +200,7 @@ public class getFeatures {
 	thread.addFeatureListener(listener);
 
 	// launch the thread
-	thread.run();
+	thread.start();
 	
     }
 
