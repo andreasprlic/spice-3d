@@ -53,7 +53,14 @@ extends Thread {
     List seqListeners;
     static Logger logger = Logger.getLogger("org.biojava.spice");
     
-    
+     public SequenceThread(String sp_accession,SpiceDasSource ds ) {
+        super();
+        SpiceDasSource[] dss =new SpiceDasSource[1];
+	dss[0] = ds;
+        this.sp_accession = sp_accession;
+        this.sequenceServers =dss ;
+        clearSequenceListeners();
+    }
     public SequenceThread(String sp_accession,SpiceDasSource[] ds ) {
         super();
         
