@@ -50,7 +50,13 @@ extends Thread{
     static Logger logger = Logger.getLogger("org.biojava.spice");
     List structureListeners;
      
-    
+    public StructureThread(String accessionCode, SpiceDasSource ds) {
+	SpiceDasSource[] dss = new SpiceDasSource[1];
+	dss[0] = ds;
+	this(accessionCode,dss);
+    }
+
+
     public StructureThread(String accessionCode, SpiceDasSource[] dss) {
         super();
         dasSources = dss;
