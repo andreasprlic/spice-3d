@@ -71,6 +71,18 @@ extends Thread
         if ( ! (lastChar == '/') ) 
             url +="/" ;
         
+        // if this is a PDB code, check for empty chain.
+        
+        
+        if ( accessionCode.substring(4,5).equals(".") ){
+            if ( accessionCode.substring(5,6).equals(" ")){
+                // found a PDB code with empty chain.
+                // change to PDB code only.
+                accessionCode = accessionCode.substring(0,4);
+            }
+        }
+        
+        
         String queryString = url + "features?segment="+ accessionCode ;
         URL Url = null ;
         try {

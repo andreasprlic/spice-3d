@@ -70,7 +70,7 @@ public abstract class AbstractChainRenderer
         // y .. height
         // (x1,y1,x2,y2)
         int width = getDisplayWidth();
-        featurePanel.setBounds(0,0,width,100);
+        featurePanel.setBounds(0,0,width,40);
         featurePanel.setLocation(0,0);
         
         //cursorPanel.setPreferredSize(new Dimension(600,600));
@@ -87,6 +87,10 @@ public abstract class AbstractChainRenderer
         updatePanelPositions();
     }
   
+    public CursorPanel getCursorPanel(){
+        return cursorPanel;
+    }
+    
     public void addSequenceListener(SequenceListener li){
         cursorPanel.addSequenceListener(li);
     }
@@ -156,6 +160,7 @@ public abstract class AbstractChainRenderer
             dsp.setScale(scale);
         }
         updatePanelPositions();
+        
     }
 
 
@@ -205,8 +210,8 @@ public abstract class AbstractChainRenderer
             totalH+=dsp.getDisplayHeight();
        
         }
-        if (totalH < 200)
-            totalH = 200;
+        if (totalH < 100)
+            totalH = 100;
         return totalH;
     }
     
@@ -239,9 +244,10 @@ public abstract class AbstractChainRenderer
         moveToFront(cursorPanel);
         dasSourcePanels.add(dspanel);
         Dimension d = new Dimension(width,h+panelHeight);
-        this.setPreferredSize(d);
+        //this.setPreferredSize(d);
         this.setSize(d);
         this.repaint();
+        this.revalidate();
     
 
     }
@@ -273,6 +279,8 @@ public abstract class AbstractChainRenderer
         Dimension totalD = new Dimension(width,h);
         this.setPreferredSize(totalD);
         this.setSize(totalD);
+        this.repaint();
+        this.revalidate();
     }
 
     public void disableDasSource(DasSourceEvent ds) {

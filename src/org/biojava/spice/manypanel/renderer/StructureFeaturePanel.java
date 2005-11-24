@@ -90,7 +90,7 @@ extends FeaturePanel{
         g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));
         g2D.setColor(STRUCTURE_BACKGROUND_COLOR);
         //Dimension dstruc=this.getSize();
-        Rectangle strucregion = new Rectangle(xstart , y, endx, getHeight());
+        Rectangle strucregion = new Rectangle(xstart , y, endx, DEFAULT_Y_HEIGHT);
         g2D.fill(strucregion);
         g2D.setComposite(origComposite);
     }

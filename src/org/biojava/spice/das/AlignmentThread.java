@@ -35,7 +35,6 @@ import java.util.zip.GZIPInputStream;
 import java.util.ArrayList;
 import org.biojava.bio.program.das.dasalignment.Alignment;
 import org.biojava.bio.program.das.dasalignment.DASAlignmentCall;
-import org.biojava.spice.DAS.AlignmentTools;
 import org.biojava.spice.manypanel.eventmodel.*;
 
 
@@ -63,6 +62,18 @@ extends Thread{
         if (dss == null){
             dasSources = new SpiceDasSource[0];
         }
+        
+        // if this is a PDB code, check for empty chain.      
+        
+        if ( query.substring(4,5).equals(".") ){
+            if ( query.substring(5,6).equals(" ")){
+                // found a PDB code with empty chain.
+                // change to PDB code only.
+                query = query.substring(0,4);
+            }
+        }
+        
+        
         this.query = query;
         clearAlignmentListeners();
     

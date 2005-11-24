@@ -22,22 +22,11 @@
 
 package org.biojava.spice.manypanel;
 
-import org.biojava.utils.*;
-import org.biojava.utils.cache.*;
+
 import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.db.*;
-import org.biojava.bio.seq.db.biosql.*;
-import org.biojava.bio.seq.io.*;
 import org.biojava.bio.program.das.dasalignment.*;
-import org.biojava.bio.program.das.*;
-import org.biojava.bio.program.gff.*;
-import org.biojava.bio.program.das.dasalignment.*;
-import org.biojava.utils.xml.*;
-import org.biojava.spice.DAS.*;
 
 import java.util.* ;
-import java.net.*;
 
 public class AlignmentTool {
 
@@ -46,7 +35,7 @@ public class AlignmentTool {
     public static String getCigar(Alignment a, String intObjectId) 
 	throws Exception
     {
-	Annotation[] objects = a.getObjects();
+	//Annotation[] objects = a.getObjects();
 	Annotation[] blocks = a.getBlocks();
 	if ( blocks.length > 1 ) {
 	    throw new Exception("Not Implemented Error, blocks> 1");
@@ -80,7 +69,17 @@ public class AlignmentTool {
 	return null ;
     }
 
-
+    /** returns a list of maps
+     * that has the length of the alignment (can include gaps).
+  
+     * each element of this list is a Map with the following keys:
+     * arraypos ...
+     * seqpos   ... position of the sequence. is null if this sequence position is not aligned
+     * 
+     * @param ali
+     * @param code the accessionCode for the object to be the reference.
+     * @return
+     */
     public static List createAlignmentTable(Alignment ali, String code) {
 	try { 
 	    String cigar = getCigar(ali,code);
@@ -149,7 +148,7 @@ public class AlignmentTool {
 	int seqpos   = 0 ;
 	for ( int i =0 ; i < cigar.length() ; i++ ) {
 	    char c = cigar.charAt(i);
-	    Character ch = new Character(c);
+	    //Character ch = new Character(c);
 	    if (Character.getType(c) == Character.DECIMAL_DIGIT_NUMBER) {
 		// got a number
 		

@@ -32,7 +32,8 @@ public class StructureEvent {
     
     /** the PDB code ( 4 chars ) */
     public StructureEvent(String pdbCode){
-        this.pdbCode = pdbCode.substring(0,4);
+        this.pdbCode = pdbCode;
+        //this.pdbCode = pdbCode.substring(0,4);
         structure = new StructureImpl();
         currentChainNumber = -1;
     }

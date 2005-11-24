@@ -115,6 +115,7 @@ implements ObjectManager, StructureListener {
         
         String code = event.getPDBCode() ;
         code = code.toLowerCase();
+        code += "."+c.getName();
         /*if ( ! c.getName().equals(" "))
             code +=  "." + c.getName();
         else 

@@ -23,7 +23,9 @@
 package org.biojava.spice.manypanel.managers;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import java.util.Iterator;
 
@@ -32,10 +34,10 @@ import org.biojava.services.das.registry.*;
 import org.biojava.spice.das.AlignmentThread;
 import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.manypanel.eventmodel.*;
+import org.biojava.spice.manypanel.AlignmentTool;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.program.das.dasalignment.Alignment;
 import org.biojava.bio.program.das.dasalignment.DASException;
-import org.biojava.bio.structure.AminoAcid;
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.ChainImpl;
 
@@ -62,6 +64,8 @@ implements AlignmentListener {
     String object2Id;
     Chain sequence1;
     Chain sequence2;
+    Map alignmentMap1;
+    Map alignmentMap2;
     
     static Logger logger = Logger.getLogger("org.biojava.spice");
     String panelName;
@@ -82,7 +86,9 @@ implements AlignmentListener {
         object2Id = "" ;
         sequence1 = new ChainImpl();
         sequence2 = new ChainImpl();
-       
+        
+       alignmentMap1= new HashMap();
+       alignmentMap2 = new HashMap();
     }
     
     public void clearObjectListeners(){
@@ -101,7 +107,7 @@ implements AlignmentListener {
         sequence1Listeners.add(one);
     }
     
-    public void addSequence2Listeners(SequenceListener two){
+    public void addSequence2Listener(SequenceListener two){
         sequence2Listeners.add(two);
     }
     
@@ -215,7 +221,7 @@ implements AlignmentListener {
         Annotation[] os = alignment.getObjects();
         if ( os.length < 2){
             // something strange is going on here..
-            logger.warning(panelName+" got  alignment of wrong # objects...");
+            logger.warning(panelName+" got  alignment of wrong # objects..." + os.length);
             return;
         }
         Annotation a1 = os[0];
@@ -233,7 +239,8 @@ implements AlignmentListener {
             found2 =true;
         
         if ( ! (found1 && found2)) {
-            logger.info(panelName + " can not create alignmentChain, yet");
+            logger.info(panelName + " can not create alignmentChain, yet >" + ac1 + "< >" + ac2 + 
+                      "< >" + object1Id + "< >" + object2Id+"<");
             return;
         }
         
@@ -250,6 +257,7 @@ implements AlignmentListener {
     }
     
     public void triggerObject1Request(String ac){
+        
         Iterator iter = object1Listeners.iterator();
         while (iter.hasNext()){
             ObjectListener li = (ObjectListener)iter.next();
@@ -369,11 +377,16 @@ implements AlignmentListener {
     // get the position of the second object ...
     private int getPosition2(int pos1){
         int pos2 = -1;
-    
+        //TODO add support for insertion codes...
         try {
-            AminoAcid a = (AminoAcid) sequence1.getGroup(pos1);
-            pos2 = Integer.parseInt(a.getPDBCode());
-        } catch (Exception e){}
+            //System.out.println(alignmentMap1);
+            Integer p = new Integer(pos1);
+            if ( alignmentMap1.containsKey(p)){
+                //System.out.println(alignmentMap1.get(p));
+                Integer spos2 = (Integer) alignmentMap1.get(p);
+                pos2 = spos2.intValue();
+            }
+        } catch (Exception e){ e.printStackTrace();}
             
         return pos2;
         
@@ -382,36 +395,74 @@ implements AlignmentListener {
     private int getPosition1(int pos2){
         int pos1 = -1;
         try {
-            AminoAcid a = (AminoAcid) sequence2.getGroup(pos2);
-            pos1 = Integer.parseInt(a.getPDBCode());
+           //System.out.println(alignmentMap2);
+            Integer p = new Integer(pos2);
+            if ( alignmentMap2.containsKey(p)){
+                //System.out.println(alignmentMap2.get(p));
+                Integer spos1 = (Integer) alignmentMap2.get(p);
+                pos1 = spos1.intValue();
+            }
         } catch (Exception e){}
         return pos1;
         
     }
     
     public void selectedSeqPosition1(int pos){
-        logger.info("selected seq pos1: " + pos + " pos2:" + getPosition2(pos));
+        //logger.info("selected seq pos1: " + pos + " pos2:" + getPosition2(pos));
+        Iterator iter = sequence1Listeners.iterator();
+        while (iter.hasNext()){
+            SequenceListener li = (SequenceListener)iter.next();
+            li.selectedSeqPosition(pos);
+        }
     }
     
     public void selectedSeqPosition2(int pos){
-        logger.info("selected seq pos1: " + getPosition1(pos) + " pos2:" + pos);
-        
+        //logger.info("selected seq pos1: " + getPosition1(pos) + " pos2:" + pos);
+        Iterator iter = sequence2Listeners.iterator();
+        while (iter.hasNext()){
+            SequenceListener li = (SequenceListener)iter.next();
+            li.selectedSeqPosition(pos);
+        }
     }
     
     public void selectedSeqRange1(int start, int end ){
+        int s = getPosition2(start);
+        int e = getPosition2(end);
+        Iterator iter = sequence2Listeners.iterator();
+        while (iter.hasNext()){
+            SequenceListener li = (SequenceListener)iter.next();
+            li.selectedSeqRange(s,e);
+        }
         
     }
     
     public void selectedSeqRange2(int start, int end ){
-        
+        int s = getPosition1(start);
+        int e = getPosition1(end);
+        Iterator iter = sequence1Listeners.iterator();
+        while (iter.hasNext()){
+            SequenceListener li = (SequenceListener)iter.next();
+            li.selectedSeqRange(s,e);
+        }
     }
     
     public void selectionLocked1(boolean flag){
-        
+     
+        Iterator iter = sequence1Listeners.iterator();
+        while (iter.hasNext()){
+            SequenceListener li = (SequenceListener)iter.next();
+            li.selectionLocked(flag);
+        }
+        object2Listener.selectionLocked(flag);
     }
     
     public void selectionLocked2(boolean flag){
-        
+        Iterator iter = sequence2Listeners.iterator();
+        while (iter.hasNext()){
+            SequenceListener li = (SequenceListener)iter.next();
+            li.selectionLocked(flag);
+        }
+        object1Listener.selectionLocked(flag);
     }
     
     /** get the Algignment between two accession codes 
@@ -432,7 +483,7 @@ implements AlignmentListener {
     private  void storeAlignment(Alignment ali) 
     throws DASException
     {
-        
+        System.out.println("storing alignment");
              
         
         // go over all blocks of alignment and join pdb info ...
@@ -440,19 +491,43 @@ implements AlignmentListener {
         
         Annotation stru_object  = getAlignmentObject(ali,coordSys2.toString());
         
-        logger.info(seq_object.getProperty("intObjectId").toString());
-        logger.info(stru_object.getProperty("intObjectId").toString());
+        String obj1Id = seq_object.getProperty("intObjectId").toString();
+        String obj2Id = stru_object.getProperty("intObjectId").toString();
+        
+        System.out.println("storing alignment " + obj1Id + " " + obj2Id);
         
         //Simple_AminoAcid_Map current_amino = null ;
-        
-        Annotation[] blocks = ali.getBlocks() ;
-        for ( int i =0; i < blocks.length;i++) {
-            Annotation block = blocks[i] ;
-            
-            mapSegments(block,seq_object,stru_object); 
-        }
-        
+        List aligMap1 = AlignmentTool.createAlignmentTable(ali,obj1Id);
+        List aligMap2 = AlignmentTool.createAlignmentTable(ali,obj2Id);
+               
       
+        // the two maps MUST have the same size!
+        //if ( aligMap1.size() != aligMap2.size()){
+        //    logger.warning("can ")
+        //    return
+        //}
+                       
+        // resolve the alignment maps
+        alignmentMap1 = new HashMap();
+        alignmentMap2 = new HashMap();
+        
+        for ( int pos = 0 ; pos < aligMap1.size(); pos++ ) {
+            Map m1 = (Map) aligMap1.get(pos);
+            Map m2 = (Map) aligMap2.get(pos);
+            //System.out.println("1:"+m1);
+            //System.out.println("2:"+m2);
+            Object s1 =  m1.get("seqpos");
+            Object s2 =  m2.get("seqpos");
+            
+            if (( s1 == null ) || (s2 == null)) {
+                // this sequence position is not aligned ...
+                continue;
+            }
+            //logger.info("aligned : "+ s1 + " " +s2);
+            alignmentMap1.put(s1,s2);
+            alignmentMap2.put(s2,s1);
+            
+        }
     }
     
     
@@ -493,7 +568,7 @@ implements AlignmentListener {
     
     
     
-    /** map from one segment to the other and store this info in chain  */
+    /** map from one segment to the other and store this info in chain  
     private  void mapSegments(
             Annotation block,
             Annotation seq_obj, 
@@ -657,18 +732,24 @@ implements AlignmentListener {
         
       
     }
-    
+    */
     
 }
 
 
 class AlignmentSequenceListener implements SequenceListener{
     int objectNr;
+    int oldpos;
+    int oldend;
+    boolean selectionLocked;
     AlignmentManager parent;
     
     public AlignmentSequenceListener(AlignmentManager parent, int nr){
         this.parent=parent;
         objectNr = nr;
+        oldpos = -1;
+        oldend = -1;
+        selectionLocked = false;
     }
     
     public void newSequence(SequenceEvent e) {
@@ -679,7 +760,15 @@ class AlignmentSequenceListener implements SequenceListener{
             parent.newSequence2(e);
     }
     public void selectedSeqPosition(int position) {
-        // TODO Auto-generated method stub
+        if ( selectionLocked )
+            return;
+         
+        
+        if ( oldpos == position)            
+            return;
+        oldpos = position;
+        oldend = position;
+        
         if ( objectNr == 1)
             parent.selectedSeqPosition1(position);
         else
@@ -687,7 +776,14 @@ class AlignmentSequenceListener implements SequenceListener{
         
     }
     public void selectedSeqRange(int start, int end) {
-        // TODO Auto-generated method stub
+       if ( selectionLocked )
+           return;
+        if (( oldpos == start ) && ( oldend == end)){
+            return;
+        }
+        oldpos = start;
+        oldend = end;
+        
         if ( objectNr == 1)
             parent.selectedSeqRange1(start,end);
         else
@@ -695,15 +791,20 @@ class AlignmentSequenceListener implements SequenceListener{
     }
     
     public void selectionLocked(boolean flag) {
-        // TODO Auto-generated method stub
-        if ( objectNr == 1)
-            parent.selectionLocked1(flag);
-        else
-            parent.selectionLocked2(flag);
+        System.out.println("AlignmentManager got selectionLocked " + flag + " "+selectionLocked);
+        if ( selectionLocked == flag) {
+            System.out.println("not reporting further");
+            return;
+        }
+        selectionLocked = flag;
+        // selection lock is for all objects...
+        parent.selectionLocked1(flag);
+        parent.selectionLocked2(flag);
     }
     
     public void newObject(Object object) {
-        // TODO Auto-generated method stub
+        
+        
         if ( objectNr == 1){
             parent.newObject1(object);
         } else {
@@ -714,6 +815,7 @@ class AlignmentSequenceListener implements SequenceListener{
     
     public void newObjectRequested(String accessionCode) {
         // TODO Auto-generated method stub
+        
         if ( objectNr == 1){
             parent.requestedObject1(accessionCode);
         } else {

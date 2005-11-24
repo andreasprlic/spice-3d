@@ -29,6 +29,7 @@ import javax.swing.Box;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
+import javax.swing.JSplitPane;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -80,18 +81,23 @@ ChangeListener
     StructureRenderer structureRenderer ;
     SequenceRenderer seqRenderer;
     SequenceRenderer enspRenderer;
+    
     public static int DEFAULT_PANE_WIDTH = 600;
     public static int DEFAULT_PANE_HEIGHT = 600;
     
     public BrowserPane() {
         super();
         JPanel contentPanel = new JPanel();
-        JScrollPane scroll = new JScrollPane(contentPanel);
-        Dimension d = new Dimension(DEFAULT_PANE_WIDTH,DEFAULT_PANE_HEIGHT);
-        scroll.setPreferredSize(d);
-        scroll.setSize(d);
+        //JScrollPane scroll = new JScrollPane(contentPanel);
+        //Dimension d = new Dimension(DEFAULT_PANE_WIDTH,DEFAULT_PANE_HEIGHT);
+        this.add(contentPanel);
+        //contentPanel.setPreferredSize(d);
+        //contentPanel.setSize(d);
         
-        this.add(scroll);
+        //scroll.setPreferredSize(d);
+        //scroll.setSize(d);
+        
+        //this.add(scroll);
         
         this.setOpaque(true);
         
@@ -108,7 +114,7 @@ ChangeListener
         logger.info("got " + allsources.length + " das sources");
         //this.setOpaque(true);
         
-        Box box = Box.createVerticalBox();
+        //Box box = Box.createVerticalBox();
         
         StructureManager strucManager = new StructureManager();
         addStructureListener(strucManager);
@@ -118,8 +124,10 @@ ChangeListener
         //this.setBounds(0,0,200,300);
         //structureRenderer.setBounds(0,0,800,800);
         //structureRenderer.setPreferredSize(new Dimension(400,400));
-        box.add(structureRenderer);
-        contentPanel.add(box);  
+        JScrollPane structureScroller = new JScrollPane(structureRenderer);
+        //structureScroller.setWidth(DEFAULT_PANE_WIDTH);
+        //box.add(structureScroller);
+        //contentPanel.add(box);  
         //setBounds(0,0,200,300);
         //this.setPreferredSize(new Dimension(1000,1000));
         strucManager.addStructureRenderer(structureRenderer);
@@ -161,7 +169,8 @@ ChangeListener
         addUniProtListener(seqManager);
         
          seqRenderer = new SequenceRenderer();
-         box.add(seqRenderer);  
+         JScrollPane seqScroller = new JScrollPane(seqRenderer);
+         //box.add(seqScroller);  
          
          DasCoordinateSystem seqdcs = DasCoordinateSystem.fromString(UNIPROTCOORDSYS);
          seqManager.setCoordinateSystem(seqdcs);
@@ -212,6 +221,9 @@ ChangeListener
          aligManager.addObject1Listener(strucManager);
          aligManager.addObject2Listener(seqManager);
          
+         aligManager.addSequence1Listener(structureRenderer.getCursorPanel());         
+         aligManager.addSequence2Listener(seqRenderer.getCursorPanel());
+         
          ///////////////
          // now add the ENSP
          //////////////
@@ -221,7 +233,8 @@ ChangeListener
          addEnspListener(enspManager);
          
           enspRenderer = new SequenceRenderer();
-          box.add(enspRenderer);  
+          JScrollPane enspScroller = new JScrollPane(enspRenderer);
+          //box.add(enspScroller);  
        
           DasCoordinateSystem enspdcs = DasCoordinateSystem.fromString(ENSPCOORDSYS);
           enspManager.setCoordinateSystem(enspdcs);
@@ -272,9 +285,29 @@ ChangeListener
           ensaligManager.addObject1Listener(seqManager);
           ensaligManager.addObject2Listener(enspManager);
           
+          ensaligManager.addSequence1Listener(seqRenderer.getCursorPanel());
+          ensaligManager.addSequence2Listener(enspRenderer.getCursorPanel());
+          ensaligManager.addSequence1Listener(upList);
           
+          aligManager.addSequence2Listener(upenspList);
         //browserPane.addPane(structureSequencePane);
         
+        
+          
+        // build up the display from the components:
+          
+        JSplitPane split1 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,structureScroller,seqScroller);
+        split1.setOneTouchExpandable(true);
+        split1.setResizeWeight(0.5);
+        
+        JSplitPane split2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,split1,enspScroller);
+        split2.setOneTouchExpandable(true);
+        split2.setResizeWeight(0.5);
+        
+        Dimension d = new Dimension(DEFAULT_PANE_WIDTH,DEFAULT_PANE_HEIGHT);
+        split2.setPreferredSize(d);
+        contentPanel.add(split2);
+          
         // the scale ...
         int RES_MIN  = 1;
         int RES_MAX  = 100;
