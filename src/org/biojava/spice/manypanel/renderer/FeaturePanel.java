@@ -31,23 +31,23 @@ import java.util.logging.*;
 import javax.swing.JPanel;
 import org.biojava.bio.structure.*;
 
-import java.awt.Dimension;
+
 import java.awt.Color;
 import java.util.*;
 import org.biojava.spice.Feature.*;
-import org.biojava.spice.manypanel.drawable.*;
+
 
 import java.awt.Image;
 
 public class FeaturePanel
 extends JPanel{
     
-    
+    static final long serialVersionUID = 7893248902423l;
     public static final int    DEFAULT_X_START          = 50  ;
     public static final int    DEFAULT_X_RIGHT_BORDER   = 20 ;
     public static final int    DEFAULT_Y_START          = 0 ;
     public static final int    DEFAULT_Y_STEP           = 10 ;
-    public static final int    DEFAULT_Y_HEIGHT         = 4 ;
+    public static final int    DEFAULT_Y_HEIGHT         = 8 ;// thes size of the boxs
     public static final int    DEFAULT_Y_BOTTOM         = 16 ;
     public static final int    LINE_HEIGHT              = 10 ;
     

@@ -24,6 +24,8 @@ package org.biojava.spice.manypanel.renderer;
 
 
 
+import java.util.Iterator;
+
 import org.biojava.bio.structure.ChainImpl;
 import org.biojava.spice.manypanel.drawable.*;
 
@@ -53,6 +55,13 @@ extends AbstractChainRenderer
         this.sequence=sequence;
         featurePanel.setChain(sequence.getSequence());
         cursorPanel.setChain(sequence.getSequence());
+        
+        Iterator iter = dasSourcePanels.iterator();
+        while (iter.hasNext()){
+            DasSourcePanel dsp = (DasSourcePanel)iter.next();
+            dsp.setChain(sequence.getSequence());
+        }
+        
         calcScale(100);
        
     }
