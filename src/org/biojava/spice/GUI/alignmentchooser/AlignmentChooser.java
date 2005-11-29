@@ -35,7 +35,7 @@ import org.biojava.bio.structure.Group;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.RangeLocation;
-import org.biojava.spice.DAS.AlignmentTools;
+import org.biojava.spice.das.AlignmentTools;
 import org.biojava.spice.Feature.FeatureImpl;
 import org.biojava.spice.Panel.SeqFeaturePanel;
 import org.biojava.bio.gui.sequence.BasicFeatureRenderer;

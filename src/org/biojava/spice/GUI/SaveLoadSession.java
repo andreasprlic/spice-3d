@@ -28,7 +28,7 @@ import org.biojava.spice.Config.*;
 import org.biojava.spice.Feature.Segment;
 import org.biojava.spice.Panel.seqfeat.FeatureView;
 import org.biojava.spice.das.SpiceDasSource;
-import org.biojava.spice.DAS.StructureXMLStAXAdaptor;
+import org.biojava.spice.das.StructureXMLStAXAdaptor;
 import org.biojava.utils.stax.DelegationManager;
 import org.biojava.utils.stax.StAXContentHandler;
 import org.biojava.utils.stax.StAXContentHandlerBase;

@@ -23,10 +23,17 @@
 package org.biojava.spice.manypanel;
 
 import javax.swing.*;
-
+import java.net.*;
+import org.biojava.services.das.registry.*;
+import org.biojava.spice.das.SpiceDasSource;
 
 public class SpiceLayeredPanel 
 {
+    
+    public static String PDBCOORDSYS     = "PDBresnum,Protein Structure";
+    public static String UNIPROTCOORDSYS = "UniProt,Protein Sequence";
+    public static String ENSPCOORDSYS    = "Ensembl,Protein Sequence";
+    public static  String registry = "http://servlet.sanger.ac.uk/dasregistry/services/das_registry";
     
     JLayeredPane layeredPane;
     /*private String[] layerStrings = { "Yellow (0)", "Magenta (1)",
@@ -96,6 +103,14 @@ public class SpiceLayeredPanel
     }
     */
     
+   public static DasSource[] getAllDasSources() throws Exception{
+    
+    URL rurl = new URL(registry);
+    DasRegistryAxisClient rclient = new DasRegistryAxisClient(rurl);
+    DasSource[]  allsources = rclient.listServices();
+    return allsources;
+}   
+    
     /**
      * Create the GUI and show it.  For thread safety,
      * this method should be invoked from the
@@ -122,13 +137,22 @@ public class SpiceLayeredPanel
         JFrame spiceFrame = new JFrame("SPICE - devel");
         spiceFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
-        BrowserPane browserPane = new BrowserPane();
-        
+        BrowserPane browserPane = new BrowserPane(PDBCOORDSYS,UNIPROTCOORDSYS,ENSPCOORDSYS);
+        try {
+        DasSource[] dss = SpiceLayeredPanel.getAllDasSources();
+        SpiceDasSource[] sds = new SpiceDasSource[dss.length];
+        for (int i =0 ; i < dss.length;i++){
+            sds[i] = SpiceDasSource.fromDasSource(dss[i]);
+        }
+        browserPane.setDasSources(sds);
         browserPane.triggerLoadStructure("1boi");
         //browserPane.triggerLoadUniProt("P50225");
         //browserPane.triggerLoadENSP("ENSP00000346625");
         //browserPane.setPreferredSize(new Dimension(1000, 1000));
         //browserPane.setOpaque(true); // contentPanes must be opaque
+        } catch (Exception e){
+            e.printStackTrace();
+        }
         spiceFrame.setContentPane(browserPane); 
         spiceFrame.pack();
         spiceFrame.setVisible(true);

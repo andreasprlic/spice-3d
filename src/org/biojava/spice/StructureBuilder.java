@@ -37,7 +37,7 @@ import org.biojava.bio.*                               ;
 import java.util.*                                     ;
 import java.util.logging.*                             ;
 import java.io.*;
-import org.biojava.spice.DAS.AlignmentTools;
+import org.biojava.spice.das.AlignmentTools;
 
 import org.biojava.bio.program.ssbind.AnnotationFactory;
 import org.biojava.utils.ChangeVetoException;

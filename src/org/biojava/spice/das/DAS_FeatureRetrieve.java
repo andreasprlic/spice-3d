@@ -54,7 +54,7 @@ public class DAS_FeatureRetrieve {
 		// TODO Auto-generated constructor stub
 		logger = Logger.getLogger("org.biojava.spice");
 		features = new ArrayList() ;
-		logger.info("requesting features from " + url);
+		//logger.info("requesting features from " + url);
 		try {
 			
 		    //DAS_httpConnector dhtp = new DAS_httpConnector() ;
@@ -148,7 +148,7 @@ public class DAS_FeatureRetrieve {
 				
 	HttpURLConnection huc = org.biojava.spice.SpiceApplication.openHttpURLConnection(url);
 	
-	logger.finest("got connection: "+huc.getResponseMessage());
+	//logger.finest("got connection: "+huc.getResponseMessage());
 	//String contentEncoding = huc.getContentEncoding();
 	inStream = huc.getInputStream();		
 	return inStream;

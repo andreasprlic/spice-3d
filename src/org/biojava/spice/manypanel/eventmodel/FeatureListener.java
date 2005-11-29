@@ -22,10 +22,16 @@
  */
 package org.biojava.spice.manypanel.eventmodel;
 
+//import org.biojava.spice.multipanel.eventmodel.FeatureEvent;
+
 
 public interface FeatureListener {
     
     public void newFeatures(FeatureEvent e);
-    public void featureSelected(FeatureEvent e);
     
 }
+
+    
+    
+    
+

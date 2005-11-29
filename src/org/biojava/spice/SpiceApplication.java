@@ -32,10 +32,10 @@ import org.biojava.spice.GUI.*;
 import java.lang.reflect.*;
 // for protein 3D stuff
 import org.biojava.bio.structure.*;
-import org.biojava.spice.Panel.seqfeat.SpiceComponentListener;
+//import org.biojava.spice.Panel.seqfeat.SpiceComponentListener;
 import org.biojava.spice.Panel.seqfeat.SpiceFeatureViewer;
 import org.biojava.spice.Panel.seqfeat.DasSourceListener;
-import org.biojava.spice.Panel.seqfeat.SpiceDasServerConfigListener;
+//import org.biojava.spice.Panel.seqfeat.SpiceDasServerConfigListener;
 
 
 // to get config file via http
@@ -88,6 +88,7 @@ import javax.swing.JDialog;
 import java.awt.Container;
 
 import org.biojava.spice.das.SpiceDasSource;
+import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.spice.server.SpiceServer;
 import org.biojava.spice.Panel.seqfeat.FeatureView;
 
@@ -129,7 +130,7 @@ ConfigurationListener
     //JTextField seq_pos ;
     JList ent_list;   // list available chains
     //SeqFeaturePanel dascanv ;
-    SpiceFeatureViewer dascanv;
+    //SpiceFeatureViewer dascanv;
     JScrollPane dasPanel ;
     //JPanel leftPanel ;
     JSplitPane sharedPanel;
@@ -161,11 +162,14 @@ ConfigurationListener
     boolean structureAlignmentMode ;
     
     //public static Logger logger = Logger.getLogger("org.biojava.spice");
-  
+    String waitingCode;
+    String waitingType;
+    
     ImageIcon firefoxIcon ;
     
     boolean configLoaded ;
     SpiceMenuListener spiceMenuListener;
+    BrowserPane browserPane ;
     //String dasServerList;
     //String labelList;
     
@@ -227,6 +231,8 @@ ConfigurationListener
         // first thing is to start communication
         URL[] registries = getAllRegistryURLs();
         
+        browserPane = new BrowserPane(params.getPdbcoordsys(),params.getUniprotcoordsys(), params.getEnspcoordsys());
+        
         RegistryConfigIO regi = new RegistryConfigIO(registries);
         regi.addConfigListener(this);
         regi.run();
@@ -248,14 +254,14 @@ ConfigurationListener
         statusPanel    = new StatusPanel(this);
         //seq_pos        = new JTextField();
         
-        dascanv        = new SpiceFeatureViewer();
-        SpiceDasServerConfigListener sdsl = new SpiceDasServerConfigListener(this);
-        dascanv.addDasServerConfigListener(sdsl);
+        //dascanv        = new SpiceFeatureViewer();
+        //SpiceDasServerConfigListener sdsl = new SpiceDasServerConfigListener(this);
+        //dascanv.addDasServerConfigListener(sdsl);
         
         strucommand    = new StructureCommandPanel(structurePanelListener);
         //strucommand    = new JTextField()  ;
         
-        Box vBox = arrangePanels(statusPanel,structurePanel,dascanv,strucommand,"left"); 
+        Box vBox = arrangePanels(statusPanel,structurePanel,browserPane,strucommand,"left"); 
         
      
         this.getContentPane().add(vBox);
@@ -441,7 +447,7 @@ ConfigurationListener
      */
     private Box arrangePanels(StatusPanel statusPanel,
             StructurePanel structurePanel,
-            SpiceFeatureViewer dascanv, 
+            BrowserPane browserPane, 
             StructureCommandPanel strucommand,
             String structureLocation){
         
@@ -487,32 +493,32 @@ ConfigurationListener
         //chainPanel.setBorder(BorderFactory.createEmptyBorder());
         
         // init dascanv
-        dascanv.setBackground(Color.black);
+        //dascanv.setBackground(Color.black);
         
         // add a listener that listens to all event in the Featurepanel
         //SpiceFeaturePanelListener  sfpl = new SpiceFeaturePanelListener(this);
         //dascanv.addFeatureViewListener(sfpl);
         //dascanv.addSelectedSeqPositionListener(sfpl);
         
-        dasPanel = new JScrollPane(dascanv);
-        SpiceComponentListener mcl = new SpiceComponentListener(dascanv,dasPanel);
-        dasPanel.addComponentListener(mcl);
-        dascanv.addComponentListener(new ComponentListener(){
-            public void componentHidden(ComponentEvent e){}
-            public void componentMoved(ComponentEvent e){}
-            public void componentShown(ComponentEvent e){}
-            public void componentResized(ComponentEvent e){
-                dasPanel.revalidate();
-            }
-        }
-        );
-        dasPanel.getVerticalScrollBar().setUnitIncrement(DEFAULT_Y_SCROLL);
-        dasPanel.getHorizontalScrollBar().setUnitIncrement(DEFAULT_Y_SCROLL);
+        //dasPanel = new JScrollPane(browserPane);
+        //SpiceComponentListener mcl = new SpiceComponentListener(dascanv,dasPanel);
+        //dasPanel.addComponentListener(mcl);
+        //dascanv.addComponentListener(new ComponentListener(){
+        //    public void componentHidden(ComponentEvent e){}
+        //    public void componentMoved(ComponentEvent e){}
+        //    public void componentShown(ComponentEvent e){}
+        //    public void componentResized(ComponentEvent e){
+        //        dasPanel.revalidate();
+        //    }
+        //}
+        //);
+        //dasPanel.getVerticalScrollBar().setUnitIncrement(DEFAULT_Y_SCROLL);
+        //dasPanel.getHorizontalScrollBar().setUnitIncrement(DEFAULT_Y_SCROLL);
 
-        dasPanel.setBorder(BorderFactory.createEmptyBorder());       
+        //dasPanel.setBorder(BorderFactory.createEmptyBorder());       
         
         sharedPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-                chainPanel, dasPanel);
+                chainPanel, browserPane);
         sharedPanel.setOneTouchExpandable(true);
         
         sharedPanel.setPreferredSize(new Dimension(400, 400));
@@ -590,8 +596,8 @@ ConfigurationListener
      */
     private void initListeners(){
         
-        MyDasSourceListener mdsl = new MyDasSourceListener(this);
-        dascanv.addDasSourceListener(mdsl);
+        //MyDasSourceListener mdsl = new MyDasSourceListener(this);
+        /*dascanv.addDasSourceListener(mdsl);
         
         dascanv.addFeatureViewListener(seqTextPane);
         dascanv.addSelectedSeqPositionListener(seqTextPane);
@@ -602,9 +608,14 @@ ConfigurationListener
         dascanv.addSelectedSeqPositionListener(spiceMenuListener);
         
         seqTextPane.addSelectedSeqPositionListener(dascanv);
-        seqTextPane.addSelectedSeqPositionListener(structurePanelListener);
-        seqTextPane.addSelectedSeqPositionListener(statusPanel);
-        seqTextPane.addSelectedSeqPositionListener(spiceMenuListener);
+        */
+        //seqTextPane.addSelectedSeqPositionListener(structurePanelListener);
+        //seqTextPane.addSelectedSeqPositionListener(statusPanel);
+        //seqTextPane.addSelectedSeqPositionListener(spiceMenuListener);
+        
+        
+        browserPane.addStructureListener(structurePanelListener);
+        browserPane.addPDBPositionListener(structurePanelListener);
     }
     
     /**
@@ -897,6 +908,14 @@ ConfigurationListener
      */
     public void loadUniprot(String uniprot) {
         logger.info("SpiceApplication loadUniprot " + uniprot);
+        
+        if ( config == null){
+            // we have to wait until contacting the DAS registry is finished ...
+            waitingType="UniProt";
+            waitingCode=uniprot;
+            return;
+        }
+        
         //currentChain = null;
         setCurrentChain(null,-1);
         resetStatusPanel();
@@ -904,12 +923,16 @@ ConfigurationListener
         statusPanel.setLoading(true);
         
         
-        LoadUniProtThread thr = new LoadUniProtThread(this,uniprot) ;
-        thr.start();
+        //LoadUniProtThread thr = new LoadUniProtThread(this,uniprot) ;
+        //thr.start();
         pdbMenu.setEnabled(false);
         upMenu.setEnabled(false);
         dastyMenu.setEnabled(false);
         proviewMenu.setEnabled(false);
+        browserPane.triggerLoadUniProt(uniprot);
+
+        
+        
     }
     
     
@@ -919,11 +942,12 @@ ConfigurationListener
      */
     public void loadStructure(String pdbcod) {
         
+               
         
         //currentChain = null ;
         setCurrentChain(null,-1);
         if (logger.isLoggable(Level.FINER)) {
-            logger.entering(this.getClass().getName(), "getStructure",  new Object[]{pdbcod});
+            logger.entering(this.getClass().getName(), "loadStructure",  new Object[]{pdbcod});
         }
         
         logger.log(Level.INFO,"getting new structure "+pdbcod);
@@ -931,6 +955,15 @@ ConfigurationListener
         if (logger.isLoggable(Level.FINEST)) {
             logger.finest("SpiceApplication: getStructure "+ pdbcod);
         }
+        
+        if ( config == null){
+            // we have to wait until contacting the DAS registry is finished ...
+            waitingType="PDB";
+            waitingCode= pdbcod;
+            return;
+        }
+        
+        
         this.setLoading(true);
         pdbcode = pdbcod ;
         
@@ -940,8 +973,9 @@ ConfigurationListener
         statusPanel.setPDB(pdbcode);
         //statusPanel.setSP("");
         
-        LoadStructureThread thr = new LoadStructureThread(this,pdbcod);
-        thr.start();
+        //LoadStructureThread thr = new LoadStructureThread(this,pdbcod);
+        //thr.start();
+        browserPane.triggerLoadStructure(pdbcode);
         
     }
     
@@ -964,32 +998,33 @@ ConfigurationListener
      */
     public FeatureView[] getFeatureViews(){
         // TODO find a nicer solution to this ...
-        return dascanv.getFeatureViews();
+        //return dascanv.getFeatureViews();
+        return null;
     }
     
     public void setFeatureViews(FeatureView[] fvs){
-        dascanv.clear();
+        //dascanv.clear();
         for ( int i = 0 ; i < fvs.length; i++){
             FeatureView fv = fvs[i];
-            dascanv.addFeatureView(fv);
+            //dascanv.addFeatureView(fv);
         }
     }
     
     public void addFeatureView(FeatureView fv){
-        dascanv.addFeatureView(fv);
+        //dascanv.addFeatureView(fv);
         
     }
     
     /** clear the displayed data */
     public void clear(){
-        dascanv.clear();
+        
         Structure s = new StructureImpl();
         setStructure(s);
     }
     
     /** return the features */
     public List getFeatures(){
-        FeatureView[] fvs = dascanv.getFeatureViews();
+        /*FeatureView[] fvs = dascanv.getFeatureViews();
         
         List features = new ArrayList();
         for ( int i = 0 ; i < fvs.length ; i++){
@@ -1000,8 +1035,9 @@ ConfigurationListener
                 features.add(feat);
             }
         }
-        
-        return features;
+        */
+        return null;
+        //return features;
         //return dascanv.getFeatures();
     }
     
@@ -1095,8 +1131,8 @@ ConfigurationListener
         //first_load = true ;
         this.setLoading(true);
         features.clear();
-        dascanv.clear();
-        dascanv.setSeqLength(chain.getLength());
+        //dascanv.clear();
+        //dascanv.setSeqLength(chain.getLength());
         //List l = null;
         if ( config != null ){
             // test if a new local DAS source is in params
@@ -1307,12 +1343,12 @@ ConfigurationListener
         int seqSelectEnd   = startParameters.getSeqSelectEnd();
         
         if ( seqSelectStart >=0 ){
-            dascanv.selectedSeqRange(seqSelectStart, seqSelectEnd);
+            //dascanv.selectedSeqRange(seqSelectStart, seqSelectEnd);
             structurePanelListener.selectedSeqRange(seqSelectStart, seqSelectEnd);
             seqTextPane.selectedSeqRange(seqSelectStart, seqSelectEnd);
             
             // lock selectiion
-            dascanv.selectionLocked(true);
+            //dascanv.selectionLocked(true);
             structurePanelListener.selectionLocked(true);
             seqTextPane.selectionLocked(true);
             
@@ -1415,13 +1451,19 @@ ConfigurationListener
         Chain chain = getChain(c);
         return chain.getSwissprotId();
     }
+    
     public void setConfiguration(RegistryConfiguration reg) {
+        logger.info("setting configuration");
         config = reg;
         List s = config.getServers();
+        SpiceDasSource[] sources = new SpiceDasSource[s.size()];
+        
         for ( int i=0; i< s.size();i++){
             SpiceDasSource d = (SpiceDasSource)s.get(i);
+            sources[i] = d;
             logger.finest(d.getUrl());
         }
+        browserPane.setDasSources(sources);
         
         Chain chain = getChain(currentChainNumber) ;
         if ( chain != null) {
@@ -1505,7 +1547,7 @@ ConfigurationListener
         }
         
         System.out.println("SpiceApplication setCurrentChain .. setChain dascanv");
-        dascanv.setChain(chain);
+        //dascanv.setChain(chain);
         System.out.println("SpiceApplication setCurrentChain ..  chain set in dascanv");
         if(getNewFeaturesFlag){
             //logger.info("getting new features");            
@@ -1609,13 +1651,42 @@ ConfigurationListener
     }
     
     public SpiceFeatureViewer getFeatureViewer() {
-        return dascanv;
+        //return dascanv;
+        return null;
     }
     
     public synchronized void newConfigRetrieved(RegistryConfiguration conf){
-        //logger.info("received new config");
+        logger.info("received new config " );
         config = conf;
         configLoaded =true;
+        
+        List l = config.getAllServers();
+        logger.finest("got " + l.size() + " servers");
+        Iterator iter = l.iterator();
+        SpiceDasSource[] sources = new SpiceDasSource[l.size()];
+        int i = 0;
+        while (iter.hasNext()){
+            SpiceDasSource ds = (SpiceDasSource) iter.next();
+            //logger.finest(ds.get)
+            sources[i] = ds;
+            i++;
+        }
+        
+        browserPane.clearDasSources();
+        browserPane.setDasSources(sources);
+        
+        // trigger queued requests
+        
+        if ( waitingType != null){
+            if ( waitingType.equals("PDB"))
+                loadStructure(waitingCode);
+            else if (waitingType.equals("UniProt"))
+                loadUniprot(waitingCode);
+            waitingType = null;
+            waitingCode = null;
+        }
+        
+        
         notifyAll();
     }
     
@@ -1635,7 +1706,7 @@ ConfigurationListener
         logger.finest("updateDisplays + features size: " + features.size());
         //SeqFeatureCanvas dascanv = daspanel.getCanv();
         
-        dascanv.repaint();
+        browserPane.repaint();
         //dascanv.paint(dascanv.getGraphics());
         
         sharedPanel.paint(sharedPanel.getGraphics());

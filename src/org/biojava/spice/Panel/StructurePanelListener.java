@@ -35,6 +35,11 @@ import org.biojava.spice.Feature.Segment;
 import org.biojava.spice.Panel.seqfeat.FeatureEvent;
 import org.biojava.spice.Panel.seqfeat.FeatureViewListener;
 import org.biojava.spice.Panel.seqfeat.SelectedSeqPositionListener;
+import org.biojava.spice.manypanel.eventmodel.SequenceEvent;
+import org.biojava.spice.manypanel.eventmodel.SequenceListener;
+import org.biojava.spice.manypanel.eventmodel.StructureEvent;
+import org.biojava.spice.manypanel.eventmodel.StructureListener;
+
 import java.util.Map;
 import java.awt.Color;
 
@@ -44,7 +49,9 @@ import java.awt.Color;
  */
 public class StructurePanelListener
 implements FeatureViewListener,
-SelectedSeqPositionListener
+SelectedSeqPositionListener,
+StructureListener,
+SequenceListener
 
 {
     
@@ -267,16 +274,21 @@ SelectedSeqPositionListener
             executeCmd(cmd);
     }
     
+    
+    public void newSequence(SequenceEvent e){
+        
+    }
+    
     public void selectionLocked(boolean flag){
         selectionIsLocked = flag;
     }
     
     public void selectedSeqPosition(int seqpos){
-        
+        //System.out.println("structurepanel selected seqpos " + seqpos );
         //highlite(currentChainNumber,seqpos,"");
         if ( seqpos == oldpos ) return ;
         oldpos = seqpos ; 
-        //System.out.println("structurepanel selected seqpos " + seqpos );
+        
         String cmd = getSelectStr(currentChainNumber,seqpos);
         
         if ( ! cmd.equals(""))
@@ -689,4 +701,30 @@ SelectedSeqPositionListener
         }
         
     }
+
+    public void newStructure(StructureEvent event) {
+        logger.info("got new structure");
+        Structure s = event.getStructure();
+        setStructure(s);
+        
+    }
+
+    public void selectedChain(StructureEvent event) {
+        logger.info("net chain selected");
+       int c = event.getCurrentChainNumber();
+       setCurrentChainNumber(c);
+        
+    }
+
+    public void newObjectRequested(String accessionCode) {
+        logger.info("requested new structure " + accessionCode);
+       // clean the Jmol display;
+        structure = new StructureImpl();
+        setStructure(structure);
+        
+    }
+    
+    
+    
+    
 }

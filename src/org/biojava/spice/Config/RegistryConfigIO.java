@@ -351,7 +351,7 @@ extends Thread
         for (int i = 0 ; i < sources.length; i++) {
             DasSource s = sources[i];	    
             SpiceDasSource sds = new SpiceDasSource();
-            sds.fromDasSource(s);
+            sds = SpiceDasSource.fromDasSource(s);
             //logger.info(" RegistryIO  go dassource " +sds.getNickname() );
             myconfig.addServer(sds);
         }

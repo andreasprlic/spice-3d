@@ -27,7 +27,7 @@ import javax.swing.JProgressBar;
 
 
 import org.biojava.spice.SPICEFrame;
-import org.biojava.spice.DAS.AlignmentTools;
+import org.biojava.spice.das.AlignmentTools;
 import org.biojava.bio.program.das.dasalignment.Alignment;
 
 /**

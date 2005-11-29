@@ -126,10 +126,10 @@ implements JmolStatusListener
      */
     public void executeCmd(String command) {
         
-        if (logger.isLoggable(Level.FINEST)) {
-            logger.finest("sending Jmol command: "+command);
-        }
-        System.out.println("sending Jmol command: " + command);
+        //if (logger.isLoggable(Level.FINEST)) {
+        //    logger.finest("sending Jmol command: "+command);
+        //}
+        //System.out.println("sending Jmol command: " + command);
         
         //TODO: is this needed?
         synchronized(viewer){
@@ -139,8 +139,8 @@ implements JmolStatusListener
         //JmolThread thr = new JmolThread(viewer,command);
         //thr.start();
         //viewer.evalString(command);
-        logger.finest("sent command");
-        System.out.println("sent command");
+        //logger.finest("sent command");
+        //System.out.println("sent command");
        
     }
     

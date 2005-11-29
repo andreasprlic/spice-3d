@@ -24,7 +24,7 @@
 
 package org.biojava.spice.Feature ;
 
-import org.biojava.spice.DAS.*		   ;
+import org.biojava.spice.das.*		   ;
 import org.biojava.spice.das.SpiceDasSource;
 
 import java.util.logging.*             ;

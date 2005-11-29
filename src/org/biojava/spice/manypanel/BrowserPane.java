@@ -25,7 +25,6 @@ package org.biojava.spice.manypanel;
 import java.net.URL;
 import java.util.ArrayList;
 
-import javax.swing.Box;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
@@ -67,14 +66,15 @@ ChangeListener
     
     static Logger logger = Logger.getLogger("org.biojava.spice");
     
-    public static  String registry = "http://servlet.sanger.ac.uk/dasregistry/services/das_registry";
+    //public static  String registry = "http://servlet.sanger.ac.uk/dasregistry/services/das_registry";
     //public static  String registry = "http://www.spice-3d.org/dasregistry/services/das_registry";
     
-    public static String PDBCOORDSYS     = "PDBresnum,Protein Structure";
-    public static String UNIPROTCOORDSYS = "UniProt,Protein Sequence";
-    public static String ENSPCOORDSYS    = "Ensembl,Protein Sequence";
+    //public static String PDBCOORDSYS     = "PDBresnum,Protein Structure";
+    //public static String UNIPROTCOORDSYS = "UniProt,Protein Sequence";
+    //public static String ENSPCOORDSYS    = "Ensembl,Protein Sequence";
  
-    DasSource[] allsources ;
+    List allsources ; // a list of DasSource[] 
+    
     List structureListeners;
     List uniProtListeners;
     List enspListeners;
@@ -82,10 +82,21 @@ ChangeListener
     SequenceRenderer seqRenderer;
     SequenceRenderer enspRenderer;
     
+    
+    StructureManager strucManager;
+    SequenceManager seqManager;
+    SequenceManager enspManager;
+    AlignmentManager aligManager;
+    AlignmentManager ensaligManager;
+    
+    FeatureManager pdbFeatureManager;
+    FeatureManager upFeatureManager;
+    FeatureManager enspFeatureManager;
+    
     public static int DEFAULT_PANE_WIDTH = 600;
     public static int DEFAULT_PANE_HEIGHT = 600;
     
-    public BrowserPane() {
+    public BrowserPane(String PDBCOORDSYS, String UNIPROTCOORDSYS, String ENSPCOORDSYS) {
         super();
         JPanel contentPanel = new JPanel();
         //JScrollPane scroll = new JScrollPane(contentPanel);
@@ -104,19 +115,24 @@ ChangeListener
         structureListeners = new ArrayList();
         uniProtListeners   = new ArrayList();
         enspListeners      = new ArrayList();
+        allsources         = new ArrayList();
         
-        try {
+       
+        //allsources = new ArrayList();
+        
+        /*try {
             allsources = getAllDasSources();
         } catch (Exception e){
             e.printStackTrace();
             return;
-        }
-        logger.info("got " + allsources.length + " das sources");
+        }*/
+        
+        //logger.info("got " + allsources.length + " das sources");
         //this.setOpaque(true);
         
         //Box box = Box.createVerticalBox();
         
-        StructureManager strucManager = new StructureManager();
+        strucManager = new StructureManager();
         addStructureListener(strucManager);
         
         structureRenderer = new StructureRenderer();   
@@ -135,20 +151,16 @@ ChangeListener
         DasCoordinateSystem dcs = DasCoordinateSystem.fromString(PDBCOORDSYS);
         strucManager.setCoordinateSystem(dcs);
         
-        DasSource[]strucservs = getServers("structure",PDBCOORDSYS);
-        strucManager.setDasSources(strucservs);
-        
-                
-        FeatureManager fm = new FeatureManager();
-        fm.setCoordinateSystem(dcs);
-        fm.addDasSourceListener(structureRenderer);
+                        
+        pdbFeatureManager = new FeatureManager();
+        pdbFeatureManager.setCoordinateSystem(dcs);
+        pdbFeatureManager.addDasSourceListener(structureRenderer);
         //addStructureListener(fm);
         FeatureRenderer featureRenderer = new FeatureRenderer();
-        fm.addFeatureRenderer(featureRenderer);
+        pdbFeatureManager.addFeatureRenderer(featureRenderer);
         
         
-        DasSource[]featservs = getServers("features",PDBCOORDSYS);
-        fm.setDasSources(featservs);
+        
         //fm.addDasSourceListener(structureRenderer);
         
         //structureRenderer.addFeatureRenderer(featureRenderer);
@@ -156,7 +168,7 @@ ChangeListener
         
         // link the feature manager to the StructureManager        
         //strucManager.setFeatureManager(fm);
-        strucManager.addSequenceListener(fm);
+        strucManager.addSequenceListener(pdbFeatureManager);
         //structureSequencePane.set
       
         
@@ -165,7 +177,7 @@ ChangeListener
         // now add the UniProt
         //////////////
         
-        SequenceManager seqManager = new SequenceManager();
+        seqManager = new SequenceManager();
         addUniProtListener(seqManager);
         
          seqRenderer = new SequenceRenderer();
@@ -175,35 +187,28 @@ ChangeListener
          DasCoordinateSystem seqdcs = DasCoordinateSystem.fromString(UNIPROTCOORDSYS);
          seqManager.setCoordinateSystem(seqdcs);
          
-         DasSource[]seqservs = getServers("sequence",UNIPROTCOORDSYS);
         
-         seqManager.setDasSources(seqservs);
          seqManager.addSequenceRenderer(seqRenderer);
                  
-         FeatureManager seqfm = new FeatureManager();
-         seqfm.setCoordinateSystem(seqdcs);
-         seqfm.addDasSourceListener(seqRenderer);
-         addUniProtListener(seqfm);
+         upFeatureManager = new FeatureManager();
+         upFeatureManager.setCoordinateSystem(seqdcs);
+         upFeatureManager.addDasSourceListener(seqRenderer);
+         addUniProtListener(upFeatureManager);
          FeatureRenderer seqFeatureRenderer = new FeatureRenderer();
-         seqfm.addFeatureRenderer(seqFeatureRenderer);
+         upFeatureManager.addFeatureRenderer(seqFeatureRenderer);
          
          
-         DasSource[]seqfeatservs = getServers("features",UNIPROTCOORDSYS);
-         //TODO remove debug
-         //DasSource[] ss = new DasSource[1];
-         //ss[0]=seqfeatservs[0];
-         
-         seqfm.setDasSources(seqfeatservs);
+       
          
          //seqManager.setFeatureManager(seqfm);
-         seqManager.addSequenceListener(seqfm);
+         seqManager.addSequenceListener(upFeatureManager);
          
          
          ///////////////
          // now add the Alignment PDB to UniProt
          //////////////
          
-         AlignmentManager aligManager = new AlignmentManager("PDB_UP",dcs,seqdcs);
+         aligManager = new AlignmentManager("PDB_UP",dcs,seqdcs);
          
          SequenceListener pdbList = aligManager.getSeq1Listener();
          SequenceListener upList = aligManager.getSeq2Listener();
@@ -215,8 +220,7 @@ ChangeListener
          seqRenderer.addSequenceListener(upList);
          
          // get the alignment das source
-         SpiceDasSource[] strucaligs = getAlignmentServers(allsources,dcs,seqdcs);
-         aligManager.setAlignmentServers(strucaligs);
+         
          
          aligManager.addObject1Listener(strucManager);
          aligManager.addObject2Listener(seqManager);
@@ -229,7 +233,7 @@ ChangeListener
          //////////////
          
 
-         SequenceManager enspManager = new SequenceManager();
+         enspManager = new SequenceManager();
          addEnspListener(enspManager);
          
           enspRenderer = new SequenceRenderer();
@@ -239,26 +243,24 @@ ChangeListener
           DasCoordinateSystem enspdcs = DasCoordinateSystem.fromString(ENSPCOORDSYS);
           enspManager.setCoordinateSystem(enspdcs);
           
-          DasSource[]enspservs = getServers("sequence",ENSPCOORDSYS);
          
-          enspManager.setDasSources(enspservs);
           enspManager.addSequenceRenderer(enspRenderer);
                   
-          FeatureManager enspfm = new FeatureManager();
-          enspfm.setCoordinateSystem(enspdcs);
-          enspfm.addDasSourceListener(enspRenderer);
-          addEnspListener(enspfm);
+          enspFeatureManager = new FeatureManager();
+          enspFeatureManager.setCoordinateSystem(enspdcs);
+          enspFeatureManager.addDasSourceListener(enspRenderer);
+          addEnspListener(enspFeatureManager);
           FeatureRenderer enspFeatureRenderer = new FeatureRenderer();
-          enspfm.addFeatureRenderer(enspFeatureRenderer);
+          enspFeatureManager.addFeatureRenderer(enspFeatureRenderer);
           
           
-          DasSource[]enspfeatservs = getServers("features",ENSPCOORDSYS);
+          DasSource[]enspfeatservs = getServers("features",enspdcs);
          
           
-          enspfm.setDasSources(enspfeatservs);
+          enspFeatureManager.setDasSources(enspfeatservs);
           
           //enspManager.setFeatureManager(enspfm);
-          enspManager.addSequenceListener(enspfm);
+          enspManager.addSequenceListener(enspFeatureManager);
          
          
           
@@ -266,7 +268,7 @@ ChangeListener
           // now add the Alignment ENSP to UniProt
           //////////////
           
-          AlignmentManager ensaligManager = new AlignmentManager("UP_ENSP",seqdcs,enspdcs);
+          ensaligManager = new AlignmentManager("UP_ENSP",seqdcs,enspdcs);
           
           SequenceListener upenspList = ensaligManager.getSeq1Listener();
           SequenceListener enspList   = ensaligManager.getSeq2Listener();
@@ -278,9 +280,7 @@ ChangeListener
           seqManager.addSequenceListener(upenspList);
           enspManager.addSequenceListener(enspList);
           
-          // get the alignment das source
-          SpiceDasSource[] enspupaligs = getAlignmentServers(allsources,seqdcs,enspdcs);
-          ensaligManager.setAlignmentServers(enspupaligs);
+         
           
           ensaligManager.addObject1Listener(seqManager);
           ensaligManager.addObject2Listener(enspManager);
@@ -293,6 +293,9 @@ ChangeListener
         //browserPane.addPane(structureSequencePane);
         
         
+          // reset all the DAS sources...
+          clearDasSources();
+          
           
         // build up the display from the components:
           
@@ -346,6 +349,7 @@ ChangeListener
     }
     
        
+
     
 
     public void disableDasSource(DasSourceEvent dsEvent) {
@@ -359,24 +363,100 @@ ChangeListener
     }
 
     public void newDasSource(DasSourceEvent dsEvent) {
-        
+    
         //DrawableDasSource dds = dsEvent.getDasSource();
         // filer ds
         //SpiceDasSource ds = dds.getDasSource();
         //DasCoordinateSystem[] css =  ds.getCoordinateSystem();
         
         // TODO: enable and filter the new DAS source in the appropriate Manager
+        allsources.add(dsEvent.getDasSource().getDasSource());
+    }
+    
+    
+    /** set all das sources at once
+     * 
+     * @param sources
+     */
+    public void setDasSources(SpiceDasSource[] sources){
         
+        // clear the das sources ...
+        clearDasSources();
+        
+        
+        for (int i = 0 ; i< sources.length;i++){
+            SpiceDasSource ds = sources[i];
+            allsources.add(ds);
+        }
+        
+        // this are the coord.sys.
+       
+        DasCoordinateSystem dcs     = strucManager.getCoordinateSystem();
+        DasCoordinateSystem seqdcs  = seqManager.getCoordinateSystem();
+        DasCoordinateSystem enspdcs = enspManager.getCoordinateSystem();
+        
+        
+        // set the reference servers 
+        DasSource[]strucservs = getServers("structure",dcs);
+        strucManager.setDasSources(strucservs);
+                        
+        DasSource[]seqservs = getServers("sequence",seqdcs);        
+        seqManager.setDasSources(seqservs);
+        
+        DasSource[]enspservs = getServers("sequence",enspdcs);        
+        enspManager.setDasSources(enspservs);
+        
+        
+        // set the annotation servers
+        
+        DasSource[]featservs = getServers("features",dcs);
+        pdbFeatureManager.setDasSources(featservs);
+        
+        
+        DasSource[]seqfeatservs = getServers("features",seqdcs);        
+        upFeatureManager.setDasSources(seqfeatservs);
+        
+        DasSource[] enspfeatservs = getServers("features",enspdcs);
+        enspFeatureManager.setDasSources(enspfeatservs);
+        
+        SpiceDasSource[] strucaligs = getAlignmentServers(allsources,dcs,seqdcs);
+        aligManager.setAlignmentServers(strucaligs);
+        
+        // get the alignment das source
+        SpiceDasSource[] enspupaligs = getAlignmentServers(allsources,seqdcs,enspdcs);
+        ensaligManager.setAlignmentServers(enspupaligs);
         
     }
 
+    
+    public void clearDasSources() {
+        allsources = new ArrayList();
+        ensaligManager.clearDasSources();
+        aligManager.clearDasSources();
+        upFeatureManager.clearDasSources();
+        enspManager.clearDasSources();
+        seqManager.clearDasSources();
+        pdbFeatureManager.clearDasSources();
+        strucManager.clearDasSources();
+        
+    }
+    
+    
     public void selectedDasSource(DasSourceEvent ds) {
        
         
     }
     
-    public void addStructureListener(ObjectListener li){
-        structureListeners.add(li);
+    
+    public void addPDBPositionListener(SequenceListener li){
+        ChainRendererMouseListener mouser = structureRenderer.getChainRendererMouseListener();
+        mouser.addSequenceListener(li);
+        //aligManager.addSequence1Listener(li);
+    }
+    
+    public void addStructureListener(StructureListener li){
+        structureListeners.add(li);        
+        strucManager.addStructureListener(li);
     }
     
     public void addUniProtListener(ObjectListener li){
@@ -412,13 +492,13 @@ ChangeListener
     }
     
 
-    public DasSource[] getAllDasSources() throws Exception{
+    /*public DasSource[] getAllDasSources() throws Exception{
        
         URL rurl = new URL(registry);
         DasRegistryAxisClient rclient = new DasRegistryAxisClient(rurl);
         DasSource[]  allsources = rclient.listServices();
         return allsources;
-    }
+    }*/
     
     //public void initData() {
 //      String registry = args[0] ;
@@ -460,7 +540,7 @@ ChangeListener
         */
     //}
     
-    private boolean hasCoordSys(String coordSys,DasSource source ) {
+    /*private boolean hasCoordSys(String coordSys,DasSource source ) {
         DasCoordinateSystem[] coordsys = source.getCoordinateSystem() ;
         for ( int i = 0 ; i< coordsys.length; i++ ) {
             String c = coordsys[i].toString();
@@ -474,22 +554,22 @@ ChangeListener
         return false ;
         
     }
-    
+    */
     
     
     
     /** test if a server is a UniProt vs PDBresnum alignment server */
-    public SpiceDasSource[] getAlignmentServers(DasSource[] sources,
+    public SpiceDasSource[] getAlignmentServers(List sources,
             DasCoordinateSystem cs1, 
             DasCoordinateSystem cs2) {
         
         List aligservers = new ArrayList();
         //DasCoordinateSystem[] coordsys = source.getCoordinateSystem() ;
-        for ( int i = 0; i< sources.length;i++){
+        for ( int i = 0; i< sources.size();i++){
             
-            if ( ! hasCapability("alignment", sources[i]))
+            if ( ! hasCapability("alignment", (DasSource)sources.get(i)))
                     continue;
-            SpiceDasSource source = SpiceDasSource.fromDasSource(sources[i]);
+            SpiceDasSource source = (SpiceDasSource)sources.get(i);
             
             boolean uniprotflag = false ;
             boolean pdbflag     = false ;
@@ -510,9 +590,9 @@ ChangeListener
         DasCoordinateSystem[] coordsys = source.getCoordinateSystem() ;
         for ( int i = 0 ; i< coordsys.length; i++ ) {
             DasCoordinateSystem thiscs  =  coordsys[i];
-            
+            System.out.println("comparing " + cs.toString() + " " + thiscs.toString());
             if ( cs.toString().equals( thiscs.toString()) ) {
-                //System.out.println("match");
+                System.out.println("match");
                 return true ;
             }
             
@@ -522,11 +602,14 @@ ChangeListener
     }
     
     
-    public DasSource[] getServers(String capability, String coordSys){
+    private DasSource[] getServers(String capability, DasCoordinateSystem coordSys){
+        // get all servers with a particular capability
         DasSource servers[] = getServers(capability);
+        
+        // now also check the coordinate system
         ArrayList retservers = new ArrayList();
         for ( int i = 0 ; i < servers.length ; i++ ) {
-            DasSource ds = (DasSource)servers[i];
+            SpiceDasSource ds = SpiceDasSource.fromDasSource((DasSource)servers[i]);
             
             if ( hasCoordSys(coordSys,ds)) {
                 retservers.add(ds);
@@ -537,7 +620,7 @@ ChangeListener
     }
     
     
-    public boolean hasCapability(String capability, DasSource ds){
+    private boolean hasCapability(String capability, DasSource ds){
         String[] capabilities = ds.getCapabilities() ;
         for ( int c=0; c<capabilities.length ;c++) {
             String capabil = capabilities[c];
@@ -548,10 +631,10 @@ ChangeListener
         return false;
     }
     
-    public DasSource[] getServers(String capability) {
+    private DasSource[] getServers(String capability) {
         ArrayList retservers = new ArrayList();
-        for ( int i = 0 ; i < allsources.length ; i++ ) {
-            DasSource ds = (DasSource) allsources[i];
+        for ( int i = 0 ; i < allsources.size() ; i++ ) {
+            DasSource ds = (DasSource) allsources.get(i);
             if ( hasCapability(capability,ds)){
           
             

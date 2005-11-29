@@ -55,6 +55,9 @@ public class SpiceStartParameters {
     private String localServerURL = "";
     private String localServerCoordSys = "";
     private String localServerName="";
+    private String pdbcoordsys;
+    private String uniprotcoordsys;
+    private String enspcoordsys;
     
     public String getLocalServerName() {
         return localServerName;
@@ -68,10 +71,42 @@ public class SpiceStartParameters {
 
     public SpiceStartParameters() {
         super();
-
+        pdbcoordsys     = "PDBresnum,Protein Structure";
+        uniprotcoordsys = "UniProt,Protein Sequence";
+        enspcoordsys    = "Ensembl,Protein Sequence";
     }
 
     
+    public String getEnspcoordsys() {
+        return enspcoordsys;
+    }
+
+
+    public void setEnspcoordsys(String enspcoordsys) {
+        this.enspcoordsys = enspcoordsys;
+    }
+
+
+    public String getPdbcoordsys() {
+        return pdbcoordsys;
+    }
+
+
+    public void setPdbcoordsys(String pdbcoordsys) {
+        this.pdbcoordsys = pdbcoordsys;
+    }
+
+
+    public String getUniprotcoordsys() {
+        return uniprotcoordsys;
+    }
+
+
+    public void setUniprotcoordsys(String uniprotcoordsys) {
+        this.uniprotcoordsys = uniprotcoordsys;
+    }
+
+
     public String getDisplayMessage() {
         return displayMessage;
     }

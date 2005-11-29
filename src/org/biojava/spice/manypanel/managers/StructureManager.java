@@ -46,6 +46,8 @@ implements ObjectManager, StructureListener {
     
    
     List structureRenderers;
+    List structureListeners;
+    
     String pdbCode;
     static Logger logger = Logger.getLogger("org.biojava.spice");
     
@@ -53,16 +55,29 @@ implements ObjectManager, StructureListener {
         super();
         structureRenderers = new ArrayList();
         pdbCode ="";
+        structureListeners = new ArrayList();
     }
     
-    
+    public void clearDasSources(){
+        super.clearDasSources();
+        if ( structureRenderers == null ) {
+            return;
+        }
+        Iterator iter = structureRenderers.iterator();
+        while (iter.hasNext()){
+            StructureRenderer rend = (StructureRenderer)iter.next();
+            rend.clearDasSources();
+        }
+    }
     
     public void addStructureRenderer(StructureRenderer renderer){
         structureRenderers.add(renderer);
         //renderer.setDasSource(dasSources);
     }
     
-    
+    public void addStructureListener(StructureListener li){
+        structureListeners.add(li);
+    }
     
     /** a new structure should be loaded
      * trigger the loading threads.
@@ -85,7 +100,12 @@ implements ObjectManager, StructureListener {
         }
         SpiceDasSource[] sds = toSpiceDasSource(dasSources);
         StructureThread dsh = new StructureThread(code,sds);
-        dsh.addStructureListener(this);
+        dsh.addStructureListener(this);      
+        Iterator iter = structureListeners.iterator();
+        while (iter.hasNext()){
+            StructureListener li = (StructureListener)iter.next();
+            dsh.addStructureListener(li);
+        }
         //dsh.addObjectListener(featureManager);
         dsh.start();
         //featureManager.newObjectRequested(accessionCode);

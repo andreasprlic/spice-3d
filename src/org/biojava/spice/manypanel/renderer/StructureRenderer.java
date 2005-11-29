@@ -67,6 +67,7 @@ extends AbstractChainRenderer
         this.sequence=ds;
         featurePanel.setChain(sequence.getSequence());
         cursorPanel.setChain(sequence.getSequence());
+        mouseListener.setChain(sequence.getSequence());
         calcScale(100);
         
         //setDrawableSequence(ds);

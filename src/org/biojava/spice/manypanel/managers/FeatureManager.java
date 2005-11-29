@@ -61,6 +61,17 @@ implements ObjectManager ,SequenceListener{
         currentAccessionCode = "";
         featureRenderers = new ArrayList();
         dasSourceListeners = new ArrayList();
+        clearDasSources();
+        //dasSources = new DrawableDasSource[0];
+    }
+    
+    public void clearDasSources(){
+        dasSources = new DrawableDasSource[0];
+        Iterator iter = featureRenderers.iterator();
+        while (iter.hasNext()){
+            FeatureRenderer rend = (FeatureRenderer)iter.next();
+            rend.clearDasSources();
+        }
     }
 
     public void addDasSourceListener(DasSourceListener dsl ){
@@ -108,12 +119,12 @@ implements ObjectManager ,SequenceListener{
         Iterator iter = featureRenderers.iterator();
         while (iter.hasNext()){
             FeatureRenderer rend = (FeatureRenderer)iter.next();
-            rend.clear();
+            rend.clearDasSources();
         }
         
         List dsses = new ArrayList();
         for ( int i = 0 ; i< dasSourcs.length; i++){
-            logger.info("got new feature source " + dasSourcs[i].getUrl());
+            //logger.info("got new feature source " + dasSourcs[i].getUrl());
             DasSource sds = dasSourcs[i];
             
             DrawableDasSource ds = DrawableDasSource.fromDasSource(sds);
@@ -171,7 +182,9 @@ implements ObjectManager ,SequenceListener{
     private void triggerFeatureRequests(String accessionCode){
         //logger.info("triggerFeatureRequests");
         
+        
         if (! accessionCode.equals(currentAccessionCode)){
+            
         for ( int i = 0 ; i< dasSources.length; i++){
             DrawableDasSource ds = (DrawableDasSource)dasSources[i];
             SpiceDasSource sds = ds.getDasSource();

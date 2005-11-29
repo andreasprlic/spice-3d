@@ -24,7 +24,7 @@
 package org.biojava.spice ;
 
 import org.biojava.spice.Config.RegistryConfiguration;
-import org.biojava.spice.DAS.DAS_Feeder;
+import org.biojava.spice.das.DAS_Feeder;
 import org.biojava.bio.structure.Structure ;
 import org.biojava.bio.structure.StructureImpl ;
 import java.util.logging.Logger;

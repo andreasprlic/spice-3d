@@ -39,11 +39,8 @@ import org.biojava.spice.manypanel.eventmodel.SequenceListener;
 public class CursorPanel 
 
 extends JPanel
-implements MouseMotionListener, 
-MouseListener, 
+implements
 SequenceListener
-
-
 
 {
     
@@ -72,18 +69,11 @@ SequenceListener
         this.setOpaque(false);
         setDoubleBuffered(true);
         dragging = false;
-        draggingStart = -1;
-        clearSequenceListeners();
+        draggingStart = -1;        
         selectionLocked = false;
     }
     
-    public void clearSequenceListeners(){
-        sequenceListeners = new ArrayList();
-    }
-    
-    public void addSequenceListener(SequenceListener li){
-        sequenceListeners.add(li);
-    }
+   
     
     
     
@@ -96,11 +86,11 @@ SequenceListener
     public void selectedSeqPosition(int position) {
         if (  selectionLocked )
             return;
-        logger.info("selected seq position " + position);
+        //logger.info("selected seq position " + position);
         setSelectionStart(position);
         setSelectionEnd(position);
         this.repaint();
-        this.revalidate();
+        //this.paintComponent(this.getGraphics());
         
     }
     
@@ -122,8 +112,9 @@ SequenceListener
         // TODO Auto-generated method stub
         
     }
-    
-    public void setSelectionStart(int start){
+   
+   
+    private void setSelectionStart(int start){
         if ( start < 0 )
             start = 0;
         if ( start > chainLength)
@@ -131,9 +122,10 @@ SequenceListener
         selectionStart = start;
     }
     
-    public void setSelectionEnd(int end){
-        if ( end < 0 )
-            end = 0;
+    
+    private void setSelectionEnd(int end){
+        //if ( end < 0 )
+            //end = 0;
         if ( end > chainLength)
             end = chainLength;
         selectionEnd = end;
@@ -152,7 +144,7 @@ SequenceListener
     
     /** get the sequence position of the current mouse event 
      * */
-    public int getSeqPos(MouseEvent e) {
+    private int getSeqPos(MouseEvent e) {
         
         int x = e.getX();
         //int y = e.getY();
@@ -170,6 +162,17 @@ SequenceListener
         
         //g.drawImage(imbuf, 0, 0, this);
         
+        
+        
+        // translate the seq positions into graphics positions ..
+        
+        if (  ( selectionStart < 0) && (selectionEnd < 0)){
+            return;
+        }
+        int tmpSelectionStart = selectionStart;
+        if (( selectionStart < 0 ) && ( selectionEnd >=0)) {
+            tmpSelectionStart = 0;
+        }
         Graphics2D g2D =(Graphics2D) g;
         
         Composite oldComp = g2D.getComposite();
@@ -177,11 +180,9 @@ SequenceListener
         
         g2D.setColor(SELECTION_COLOR);
         
-        // translate the seq positions into graphics positions ..
         
-        
-        int startX = Math.round(selectionStart *scale) + FeaturePanel.DEFAULT_X_START;
-        int endX   = Math.round((selectionEnd-selectionStart+1)*scale) ;
+        int startX = Math.round(tmpSelectionStart *scale) + FeaturePanel.DEFAULT_X_START;
+        int endX   = Math.round((selectionEnd-tmpSelectionStart+1)*scale) ;
         if (endX <1)
             endX = 1;
         //logger.info("selection " + selectionStart + " " + selectionEnd + 
@@ -191,146 +192,8 @@ SequenceListener
         
         //g2D.drawString("cursorPanel",10,40);
         
-        
-        
     }
     
-    
-    
-    public void mouseDragged(MouseEvent e) {
-        dragging = true;
-        
-        
-        
-        int pos = getSeqPos(e) ;
-        
-        //logger.info("mouseDragged " +pos + " " + dragging + " " 
-        //      + selectionStart + " " + selectionEnd);
-        
-        if (( pos < 0)|| ( pos> chainLength)){
-            return;
-        }
-        
-        //if ( pos < selectionStart){
-        //selectionEnd = selectionStart;
-        //   selectionStart = pos;
-        // this.repaint();
-        //return;
-        //}
-        if (pos == oldSelectionStart){
-            return;
-        }
-        oldSelectionStart = pos;
-        
-        if ( pos > draggingStart){
-            selectionStart = draggingStart;
-            selectionEnd = pos ;
-        } else {
-            selectionStart = pos;
-            selectionEnd = draggingStart;
-        }
-        triggerNewSequenceRange(selectionStart,selectionEnd);
-        this.repaint(); 
-        
-        
-        
-    }
-    
-    
-    
-    
-    public void mouseMoved(MouseEvent e) {
-        if ( selectionLocked )
-            return;
-        //int x = e.getX();
-        int pos = getSeqPos(e) ;
-        if ( pos == oldSelectionStart)
-            return;
-        //logger.info("CursorPanel: mouse moved " + x + " " + pos);
-        oldSelectionStart = pos;
-        this.setSelectionStart(pos);
-        this.setSelectionEnd(pos);
-        
-        triggerNewSequencePosition(pos);
-        
-        this.repaint();
-        
-        
-    }
-    
-    private void triggerSelectionLocked(boolean flag){
-        selectionLocked = flag;
-        logger.info("trigger selectionLocked " + flag);
-        
-        Iterator iter = sequenceListeners.iterator();
-        while(iter.hasNext()){
-            SequenceListener li = (SequenceListener)iter.next();
-            li.selectionLocked(flag);
-        }
-    }
-    
-    private void triggerNewSequencePosition(int pos){
-        if ( selectionLocked )
-            return;
-        Iterator iter = sequenceListeners.iterator();
-        while(iter.hasNext()){
-            SequenceListener li = (SequenceListener)iter.next();
-            li.selectedSeqPosition(pos);
-        }
-        
-    }
-    
-    public void mouseClicked(MouseEvent arg0) {
-        // TODO Auto-generated method stub
-        
-    }
-    
-    public void mouseEntered(MouseEvent arg0) {
-        // TODO Auto-generated method stub
-        
-    }
-    
-    public void mouseExited(MouseEvent arg0) {
-        // TODO Auto-generated method stub
-        
-    }
-    
-    public void mousePressed(MouseEvent e) {
-        //logger.info("mouse pressed");
-        //dragging = false;
-        int pos = getSeqPos(e);
-        draggingStart=pos;
-        selectionStart = pos ;
-        //selectionEnd   = pos ;
-        
-        triggerSelectionLocked(false);
-    }
-    
-    
-    
-    public void mouseReleased(MouseEvent arg0) {
-        //logger.info("mouse released");
-        
-        draggingStart = -1;
-        
-        if  ( ! selectionLocked)
-            if ( dragging)
-            triggerSelectionLocked(true);
-        
-        dragging = false ;
-    }
-    
-    private void triggerNewSequenceRange(int start,int end){
-        if ( selectionLocked)
-            return;
-        
-        Iterator iter = sequenceListeners.iterator();
-        while(iter.hasNext()){
-            SequenceListener li = (SequenceListener)iter.next();
-            li.selectedSeqRange(start,end);
-        }
-        
-    }
-    
+
     
 }

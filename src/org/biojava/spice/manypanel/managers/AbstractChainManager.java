@@ -51,6 +51,7 @@ implements ObjectManager {
         //featureManager = new FeatureManager(); 
     
         clearSequenceListeners();
+        clearDasSources();
     }
     public void clearSequenceListeners(){
         sequenceListeners = new ArrayList();
@@ -69,14 +70,15 @@ implements ObjectManager {
     //    featureManager = fm;
     //}
     
-    public DasCoordinateSystem getCoordinateSystem() {
-        
-        return coordinateSystem;
-    }
+   
     
     public DrawableDasSource[] getDasSources() {
         
         return dasSources;
+    }
+    
+    public DasCoordinateSystem getCoordinateSystem(){
+        return coordinateSystem;
     }
     
     public void setCoordinateSystem(DasCoordinateSystem coordSys) {
@@ -108,10 +110,14 @@ implements ObjectManager {
         this.dasSources = drawableDasSources; 
     }
     
-    
+    public void clearDasSources(){
+        dasSources = new DrawableDasSource[0];
+    }
     
     protected SpiceDasSource[] toSpiceDasSource( DrawableDasSource[] dds ){
-        
+        if (dds == null) {
+            return new SpiceDasSource[0];
+        }
         List sources = new ArrayList();
         for (int i = 0 ; i< dds.length; i++){
             DrawableDasSource draw = dds[i];

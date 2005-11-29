@@ -138,14 +138,7 @@ FeatureListener{
         }
         
     }
-    
-    
-    
-    public void featureSelected(FeatureEvent e) {
-        // TODO Auto-generated method stub
-        
-    }
-
+ 
     public Feature[] getFeatures(){
         return features;
     }
@@ -235,6 +228,7 @@ FeatureListener{
                 currentFeatureMap.put("color",STRAND_COLOR);
                 currentFeatureMap.put("colorTxt","yellow");
                 feat.setName("SECSTRUC");       
+                feat.setType("SECSTRUC");
             }
             
             else if (type.equals("HELIX")) {
@@ -242,6 +236,7 @@ FeatureListener{
                 currentFeatureMap.put("color",HELIX_COLOR);
                 currentFeatureMap.put("colorTxt","red");
                 feat.setName("SECSTRUC");
+                feat.setType("SECSTRUC");
             }   
             
             else if (type.equals("TURN")) {
@@ -250,6 +245,7 @@ FeatureListener{
                 currentFeatureMap.put("colorTxt","white");
                 
                 feat.setName("SECSTRUC");
+                feat.setType("SECSTRUC");
             }     
             else {
                 secstruc = false ;

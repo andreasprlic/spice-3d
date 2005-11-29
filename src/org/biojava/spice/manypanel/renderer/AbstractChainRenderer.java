@@ -23,10 +23,14 @@
 package org.biojava.spice.manypanel.renderer;
 
 import java.awt.Dimension;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.logging.Logger;
 
 import javax.swing.JLayeredPane;
 import org.biojava.bio.structure.*;
+import org.biojava.spice.Feature.Feature;
+import org.biojava.spice.manypanel.eventmodel.FeatureEvent;
 import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.spice.manypanel.drawable.DrawableDasSource;
@@ -42,6 +46,7 @@ public abstract class AbstractChainRenderer
     ObjectRenderer,
     DasSourceListener,
     FeatureListener
+    
     {
     
     public static final int    MAX_SCALE       = 10;
@@ -53,6 +58,8 @@ public abstract class AbstractChainRenderer
     
     List dasSourcePanels;
     
+    ChainRendererMouseListener mouseListener;
+    
     //List featureRenderers;
     
     public AbstractChainRenderer() {
@@ -61,7 +68,7 @@ public abstract class AbstractChainRenderer
         setDoubleBuffered(true);
         //clearFeatureRenderers();
         dasSourcePanels = new ArrayList();
-        
+        mouseListener = new ChainRendererMouseListener(this);
     }
 
     protected void initPanels(){
@@ -69,6 +76,12 @@ public abstract class AbstractChainRenderer
         //      x .. width
         // y .. height
         // (x1,y1,x2,y2)
+        
+        
+        //cursorPanel.addMouseListener(mouseListener);
+        mouseListener.addSequenceListener(cursorPanel);
+        
+        
         int width = getDisplayWidth();
         featurePanel.setBounds(0,0,width,40);
         featurePanel.setLocation(0,0);
@@ -82,17 +95,39 @@ public abstract class AbstractChainRenderer
         this.add(cursorPanel, new Integer(100));
         this.moveToFront(cursorPanel);
         //scale=1.0f;
-        this.addMouseMotionListener(cursorPanel);
-        this.addMouseListener(cursorPanel);
+        this.addMouseMotionListener(mouseListener);
+        this.addMouseListener(mouseListener);
         updatePanelPositions();
     }
   
+    
+    public void clearDasSources(){
+        Iterator iter = dasSourcePanels.iterator();
+        while (iter.hasNext()){
+            DasSourcePanel panel = (DasSourcePanel)iter.next();
+            this.remove(panel);
+        }
+        dasSourcePanels.clear();
+    }
+    
+    public List getDasSourcePanels(){
+        return dasSourcePanels;
+    }
+    
+    public FeaturePanel getFeaturePanel(){
+        return featurePanel;
+    }
+    
     public CursorPanel getCursorPanel(){
         return cursorPanel;
     }
     
+    public ChainRendererMouseListener getChainRendererMouseListener(){
+        return mouseListener;
+    }
+    
     public void addSequenceListener(SequenceListener li){
-        cursorPanel.addSequenceListener(li);
+        mouseListener.addSequenceListener(li);
     }
    
   
@@ -154,6 +189,8 @@ public abstract class AbstractChainRenderer
         //this.scale=scale;
         featurePanel.setScale(scale);
         cursorPanel.setScale(scale);
+        
+        
         Iterator iter = dasSourcePanels.iterator();
         while (iter.hasNext()){
             DasSourcePanel dsp = (DasSourcePanel)iter.next();
@@ -215,6 +252,9 @@ public abstract class AbstractChainRenderer
         return totalH;
     }
     
+    
+    
+    
     /** add DasSourcePanels
      * 
      */
@@ -225,8 +265,11 @@ public abstract class AbstractChainRenderer
         //SpiceDasSource ds = dds.getDasSource();
         
         DasSourcePanel dspanel = new DasSourcePanel(dds);
+        
+        // join the listeners
         dds.addFeatureListener(dspanel);
-        dds.addFeatureListener(this);
+        dds.addFeatureListener(this);        
+        mouseListener.addSpiceFeatureListener(dspanel);
         
         //dspanel.setPreferredSize(new Dimension(200,200));
         int h = getDisplayHeight();
@@ -323,7 +366,12 @@ public abstract class AbstractChainRenderer
         }
         
     }
-   
+
+    
+ 
+    
+    
+    
 
    
   

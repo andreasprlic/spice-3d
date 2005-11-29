@@ -75,7 +75,8 @@ implements AlignmentListener {
         
         this.coordSys1 = coordSys1;
         this.coordSys2 = coordSys2;
-        alignmentServers = new SpiceDasSource[0];
+        clearDasSources();
+        //alignmentServers = new SpiceDasSource[0];
         object1Listener = new AlignmentSequenceListener(this,1);
         object2Listener = new AlignmentSequenceListener(this,2);
         alignment = new Alignment();
@@ -89,6 +90,10 @@ implements AlignmentListener {
         
        alignmentMap1= new HashMap();
        alignmentMap2 = new HashMap();
+    }
+    
+    public void clearDasSources(){
+        alignmentServers = new SpiceDasSource[0];
     }
     
     public void clearObjectListeners(){
@@ -409,23 +414,26 @@ implements AlignmentListener {
     
     public void selectedSeqPosition1(int pos){
         //logger.info("selected seq pos1: " + pos + " pos2:" + getPosition2(pos));
-        Iterator iter = sequence1Listeners.iterator();
+        int npos = getPosition2(pos);
+        Iterator iter = sequence2Listeners.iterator();
         while (iter.hasNext()){
             SequenceListener li = (SequenceListener)iter.next();
-            li.selectedSeqPosition(pos);
+            li.selectedSeqPosition(npos);
         }
     }
     
     public void selectedSeqPosition2(int pos){
         //logger.info("selected seq pos1: " + getPosition1(pos) + " pos2:" + pos);
-        Iterator iter = sequence2Listeners.iterator();
+        int npos = getPosition1(pos);
+        Iterator iter = sequence1Listeners.iterator();
         while (iter.hasNext()){
             SequenceListener li = (SequenceListener)iter.next();
-            li.selectedSeqPosition(pos);
+            li.selectedSeqPosition(npos);
         }
     }
     
     public void selectedSeqRange1(int start, int end ){
+        
         int s = getPosition2(start);
         int e = getPosition2(end);
         Iterator iter = sequence2Listeners.iterator();
@@ -791,9 +799,9 @@ class AlignmentSequenceListener implements SequenceListener{
     }
     
     public void selectionLocked(boolean flag) {
-        System.out.println("AlignmentManager got selectionLocked " + flag + " "+selectionLocked);
+        //System.out.println("AlignmentManager got selectionLocked " + flag + " "+selectionLocked);
         if ( selectionLocked == flag) {
-            System.out.println("not reporting further");
+            //System.out.println("not reporting further");
             return;
         }
         selectionLocked = flag;

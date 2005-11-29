@@ -55,6 +55,7 @@ extends AbstractChainRenderer
         this.sequence=sequence;
         featurePanel.setChain(sequence.getSequence());
         cursorPanel.setChain(sequence.getSequence());
+        mouseListener.setChain(sequence.getSequence());
         
         Iterator iter = dasSourcePanels.iterator();
         while (iter.hasNext()){

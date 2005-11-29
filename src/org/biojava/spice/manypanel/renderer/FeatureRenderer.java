@@ -31,12 +31,14 @@ public class FeatureRenderer {
     List dasSources;
     public FeatureRenderer() {
         super();
-        clear();
+        clearDasSources();
     }
     
-    public void clear(){
+    public void clearDasSources(){
         dasSources = new ArrayList();
     }
+    
+    
     
     public void addDrawableDasSource(DrawableDasSource draw){
         dasSources.add(draw);

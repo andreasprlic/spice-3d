@@ -25,15 +25,17 @@ package org.biojava.spice.manypanel.eventmodel;
 import java.util.Map;
 import org.biojava.spice.das.SpiceDasSource;
 public class FeatureEvent {
-
-       Map[] features;
+    
+    Map[] features;
     SpiceDasSource dasSource;
+    
     public FeatureEvent(Map[] features,SpiceDasSource dasSource) {
         super();
         this.features =features;
-	this.dasSource = dasSource;
+        this.dasSource = dasSource;
     }
-
+    
+    
     
     /** get the features that have been found.
      * 
@@ -51,9 +53,9 @@ public class FeatureEvent {
     public Map[] getFeatures(){
         return features;
     }
-
+    
     public SpiceDasSource getDasSource(){
-	return dasSource;
+        return dasSource;
     }
     
 }

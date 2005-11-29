@@ -71,6 +71,18 @@ extends AbstractChainManager
 
     }
     
+    public void clearDasSources(){
+        super.clearDasSources();
+        if ( seqRenderers == null){
+            return;
+        }
+        Iterator iter = seqRenderers.iterator();
+        while (iter.hasNext()){
+            SequenceRenderer rend = (SequenceRenderer)iter.next();
+            rend.clearDasSources();
+        }
+    }
+    
     public void addSequenceRenderer(SequenceRenderer r) {
         seqRenderers.add(r);
     }
