@@ -25,14 +25,22 @@ package org.biojava.spice.Panel;
 
 import org.biojava.bio.structure.AminoAcid;
 import org.biojava.bio.structure.Chain;
+import org.biojava.bio.structure.ChainImpl;
 import org.biojava.bio.structure.Group;
 import org.biojava.bio.structure.Structure;
+import org.biojava.bio.structure.StructureImpl;
 import org.biojava.spice.SPICEFrame;
 import org.biojava.spice.Feature.Feature;
 import org.biojava.spice.Feature.Segment;
 import org.biojava.spice.Panel.seqfeat.FeatureEvent;
 import org.biojava.spice.Panel.seqfeat.FeatureViewListener;
 import org.biojava.spice.Panel.seqfeat.SelectedSeqPositionListener;
+import org.biojava.spice.manypanel.eventmodel.SequenceEvent;
+import org.biojava.spice.manypanel.eventmodel.SequenceListener;
+import org.biojava.spice.manypanel.eventmodel.SpiceFeatureEvent;
+import org.biojava.spice.manypanel.eventmodel.SpiceFeatureListener;
+import org.biojava.spice.manypanel.eventmodel.StructureEvent;
+import org.biojava.spice.manypanel.eventmodel.StructureListener;
 
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -63,7 +71,9 @@ import java.awt.Point;
  */
 public class StatusPanel
 extends JPanel
-implements FeatureViewListener, SelectedSeqPositionListener
+implements SpiceFeatureListener,
+SequenceListener,
+StructureListener
 {
     
     private static final long serialVersionUID = 928391747589181827L;
@@ -82,6 +92,8 @@ implements FeatureViewListener, SelectedSeqPositionListener
     //Structure structure;
     int currentChainNumber;
     PDBDescMouseListener pdbdescMouseListener;
+    Chain chain;
+    Structure structure;
     
     public StatusPanel(SPICEFrame parent){
         spice = parent;
@@ -93,7 +105,8 @@ implements FeatureViewListener, SelectedSeqPositionListener
         pdbtxt.setEditable(false);
         pdbtxt.setBorder(BorderFactory.createEmptyBorder());
         hBox.add(pdbtxt);
-        
+        chain = new ChainImpl();
+        structure = new StructureImpl();
         pdbCode = new JTextField("    ");
         pdbCode.setEditable(false);
         
@@ -167,6 +180,45 @@ implements FeatureViewListener, SelectedSeqPositionListener
         this.add(vBox);	
         
     }
+    
+    
+    
+    
+    public void newStructure(StructureEvent event) {
+        structure = event.getStructure();
+        chain = structure.getChain(0);
+        
+    }
+
+
+
+
+    public void selectedChain(StructureEvent event) {
+       chain = structure.getChain(event.getCurrentChainNumber());
+        
+    }
+
+
+
+
+    public void newObjectRequested(String accessionCode) {
+        
+        setLoading(true);
+    }
+
+
+
+
+    public void newSequence(SequenceEvent e) {
+      
+        setLoading(false);
+     
+    }
+    
+    
+
+
+
     public void setCurrentChainNumber(int number){
         currentChainNumber = number;
     }
@@ -208,39 +260,11 @@ implements FeatureViewListener, SelectedSeqPositionListener
     }
     
     
-    /** get Chain number X from structure 
-     * @return a Chain object or null ;
-     */
-    private Chain getChain(int chainnumber) {
-        if ( chainnumber < 0){
-            return null;
-        }
-        Structure structure = spice.getStructure();
-      
-        
-        if ( structure == null ) {
-            //logger.log(Level.WARNING,"no structure loaded, yet");
-            return null ;
-        }
-        
-        if ( structure.size() < 1 ) {
-            //logger.log(Level.WARNING,"structure object is empty, please load new structure");
-            return null ;
-        }
-        
-        if ( chainnumber > structure.size()) {
-            //logger.log(Level.WARNING,"requested chain number "+chainnumber+" but structure has size " + structure.size());
-            return null ;
-        }
-        
-        Chain c = structure.getChain(chainnumber);
-        return c;
-    }
-    
+   
     private String getToolString(int chainnumber,int seqpos) {
         //return "tmp in getToolString";
         
-        Chain chain = getChain(chainnumber);
+        
         if ( chain == null) return "" ;
         
         if ( ! ((seqpos >= 0) && (seqpos < chain.getLength()))) {
@@ -270,7 +294,7 @@ implements FeatureViewListener, SelectedSeqPositionListener
     public String getPDBPos( int chainnumber, int seqpos){
         
         if ( seqpos < 0 ) return "n.a.";
-        Chain chain = getChain(chainnumber);
+        
         if ( chain == null) return "n.a." ;
         if ( seqpos >= chain.getLength()) return "n.a.";
         
@@ -307,28 +331,31 @@ implements FeatureViewListener, SelectedSeqPositionListener
         String str = getToolString(currentChainNumber, seqpos);
         seq_pos.setText(str);
     }
-	public void mouseOverFeature(FeatureEvent e){
+	public void mouseOverFeature(SpiceFeatureEvent e){
 	    
-	    Feature feat = (Feature) e.getSource();
+	    Feature feat = e.getFeature();
 	    //System.out.println("mouse over feature " + feat);
 	    String txt= feat.toString();
 	    seq_pos.setText(txt);
 	}
 	
-	public void mouseOverSegment(FeatureEvent e){
-	    Segment seg = (Segment)e.getSource();
+	public void mouseOverSegment(SpiceFeatureEvent e){
+	    Segment seg = e.getSegment();
 	    //System.out.println("mouse over segment " + seg);
 	    String txt = seg.toString();
 	    seq_pos.setText(txt);
 	}
-	public void featureSelected(FeatureEvent e){
-	    Feature feat = (Feature) e.getSource();
+	public void featureSelected(SpiceFeatureEvent e){
+	    Feature feat = e.getFeature();
+        if ( feat.getMethod().equals("Unknown")) {
+            return;
+        }
 	    //System.out.println("selected feature " + feat);
 	    String txt= feat.toString();
 	    seq_pos.setText(txt);
 	}
-	public void segmentSelected(FeatureEvent e){
-	    Segment seg = (Segment)e.getSource();
+	public void segmentSelected(SpiceFeatureEvent e){
+	    Segment seg = e.getSegment();
 	    //System.out.println("selected segment " + seg);
 	    String txt = seg.toString();
         seq_pos.setText(txt);
@@ -374,7 +401,14 @@ implements MouseListener
         
     }
     public void mouseReleased(MouseEvent e){}
-    public void mousePressed(MouseEvent e){}
+    public void mousePressed(MouseEvent e){
+        
+        
+     
+    }
+    
+    
+    
 }
 
 
@@ -517,6 +551,6 @@ class PDBDescMouseListener implements MouseListener, MouseMotionListener {
         
     }
     
-
+  
     
 }

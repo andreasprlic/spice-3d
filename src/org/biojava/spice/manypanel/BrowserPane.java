@@ -42,6 +42,7 @@ import org.biojava.services.das.registry.DasCoordinateSystem;
 import org.biojava.services.das.registry.DasRegistryAxisClient;
 import org.biojava.services.das.registry.DasSource;
 import java.awt.Dimension;
+import java.awt.event.MouseListener;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -454,9 +455,24 @@ ChangeListener
         //aligManager.addSequence1Listener(li);
     }
     
+    public void addSpiceFeatureListener(SpiceFeatureListener li){
+        ChainRendererMouseListener mouser = structureRenderer.getChainRendererMouseListener();
+        mouser.addSpiceFeatureListener(li);
+        
+        ChainRendererMouseListener seqmouser = seqRenderer.getChainRendererMouseListener();
+        seqmouser.addSpiceFeatureListener(li);
+        
+        ChainRendererMouseListener enspmouser = enspRenderer.getChainRendererMouseListener();
+        enspmouser.addSpiceFeatureListener(li);
+    }
+    
     public void addStructureListener(StructureListener li){
         structureListeners.add(li);        
         strucManager.addStructureListener(li);
+    }
+    
+    public void addPDBSequenceListener(SequenceListener li){
+        strucManager.addSequenceListener(li);
     }
     
     public void addUniProtListener(ObjectListener li){

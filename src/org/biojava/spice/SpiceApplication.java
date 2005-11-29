@@ -616,6 +616,9 @@ ConfigurationListener
         
         browserPane.addStructureListener(structurePanelListener);
         browserPane.addPDBPositionListener(structurePanelListener);
+        browserPane.addSpiceFeatureListener(statusPanel);
+        browserPane.addPDBPositionListener(statusPanel);
+        browserPane.addStructureListener(statusPanel);
     }
     
     /**

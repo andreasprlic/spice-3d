@@ -207,14 +207,6 @@ public abstract class AbstractChainRenderer
     }
 
 
-    /*public void addFeatureRenderer(FeatureRenderer rendr){
-        featureRenderers.add(rendr);
-    }
-    
-    public void clearFeatureRenderers(){
-        featureRenderers = new ArrayList();    
-    }
-*/
     private int getSequenceLength(){
         int l = 0 ;
         if ( sequence != null) {

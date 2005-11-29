@@ -49,11 +49,11 @@ FeatureListener{
     
     public static final  Color[] entColors = new Color []{
         new Color(51,51,255), // blue
-        new Color(255,153,153), // pink
-        new Color(153,255,153), // green
-        new Color(255,255,102), //yellow
-        new Color(255,51,51),   // red
         new Color(102,255,255),    // cyan
+        new Color(153,255,153), // green
+        new Color(153,255,153), // green
+        new Color(255,153,153), // pink
+        new Color(255,51,51),   // red
         new Color(255,51,255)    // pink 
     };
 
@@ -161,7 +161,7 @@ FeatureListener{
         //Feature secstrucfeature = new FeatureImpl() ;
         int featuresCounter = 0;
         for (int i = 0 ; i< mapfeatures.length;i++) {
-            featuresCounter +=1;
+            
             Map currentFeatureMap = mapfeatures[i];
             String type = (String) currentFeatureMap.get("TYPE") ;
             
@@ -217,6 +217,7 @@ FeatureListener{
             
             first = false ;             
             if ( ! secstruc) {
+                featuresCounter +=1;
                 feat = getNewFeat(currentFeatureMap);       
             }
             
