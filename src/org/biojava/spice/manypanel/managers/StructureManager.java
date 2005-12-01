@@ -152,6 +152,8 @@ implements ObjectManager, StructureListener {
          
             li.newSequence(sevent);
         }
+        
+        
     }
     
     private void drawStructure(Structure struc){
@@ -162,8 +164,7 @@ implements ObjectManager, StructureListener {
         
         while (iter.hasNext()){
             StructureRenderer renderer = (StructureRenderer)iter.next();
-            
-            renderer.setDrawableStructure(draw);
+            renderer.setDrawableStructure(draw);         
         }
     }
     

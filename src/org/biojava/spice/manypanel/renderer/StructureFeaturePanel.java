@@ -43,7 +43,7 @@ extends FeaturePanel{
     public static final Color STRUCTURE_COLOR            = Color.red;
     public static final Color STRUCTURE_BACKGROUND_COLOR = new Color(0.5f, 0.1f, 0.5f, 0.5f);
     // the line where to draw the structure
-    public static final int    DEFAULT_STRUCTURE_Y    = 30 ;
+    //public static final int    DEFAULT_STRUCTURE_Y    = 30 ;
     
     Feature structureFeature;
     
@@ -60,9 +60,9 @@ extends FeaturePanel{
         Graphics2D g2D =(Graphics2D) g;
        
         // draw the structure features ...    
-        int aminosize =  Math.round(1 * scale) ;
-        int y = DEFAULT_STRUCTURE_Y;
-        drawStructureRegion(g2D,aminosize,scale,y);
+        //int aminosize =  Math.round(1 * scale) ;
+        //int y = DEFAULT_STRUCTURE_Y;
+        //drawStructureRegion(g2D,aminosize,scale,y);
      
         //g2D.drawString("structureFeaturePanel",10,30);
         

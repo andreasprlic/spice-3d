@@ -57,7 +57,15 @@ FeatureListener{
         new Color(255,51,255)    // pink 
     };
 
-
+    /** if the url of two das sources is the same
+     *  this will return true;
+     */
+    public boolean equals(DrawableDasSource compareToSource){
+        if ( dasSource.getUrl().equals(compareToSource.getDasSource().getUrl()))
+            return true;
+        return false;
+    }
+    
     public static final String[] txtColors = new String[] { "blue","pink","green","yellow","red","cyan","pink"};
 
     

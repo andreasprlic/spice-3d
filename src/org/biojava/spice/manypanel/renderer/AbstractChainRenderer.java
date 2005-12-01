@@ -57,7 +57,7 @@ public abstract class AbstractChainRenderer
     static Logger logger = Logger.getLogger("org.biojava.spice");
     
     List dasSourcePanels;
-    
+    SeqToolTipListener toolTipper;
     ChainRendererMouseListener mouseListener;
     
     //List featureRenderers;
@@ -69,21 +69,28 @@ public abstract class AbstractChainRenderer
         //clearFeatureRenderers();
         dasSourcePanels = new ArrayList();
         mouseListener = new ChainRendererMouseListener(this);
+        toolTipper = new SeqToolTipListener(this);
+        mouseListener.addSequenceListener(toolTipper);
+        
+        mouseListener.addSpiceFeatureListener(toolTipper);
+        
     }
 
     protected void initPanels(){
-        //featurePanel.setPreferredSize(new Dimension(200,200));
-        //      x .. width
-        // y .. height
-        // (x1,y1,x2,y2)
+        
+        
+        this.addMouseMotionListener(mouseListener);
+        this.addMouseListener(mouseListener);
         
         
         //cursorPanel.addMouseListener(mouseListener);
-        mouseListener.addSequenceListener(cursorPanel);
         
+        mouseListener.addSequenceListener(cursorPanel);
+        mouseListener.addSpiceFeatureListener(cursorPanel);
+       
         
         int width = getDisplayWidth();
-        featurePanel.setBounds(0,0,width,40);
+        featurePanel.setBounds(0,0,width,20);
         featurePanel.setLocation(0,0);
         
         //cursorPanel.setPreferredSize(new Dimension(600,600));
@@ -95,8 +102,8 @@ public abstract class AbstractChainRenderer
         this.add(cursorPanel, new Integer(100));
         this.moveToFront(cursorPanel);
         //scale=1.0f;
-        this.addMouseMotionListener(mouseListener);
-        this.addMouseListener(mouseListener);
+        //featurePanel.addMouseMotionListener(mouseListener);
+       
         updatePanelPositions();
     }
   
@@ -116,6 +123,10 @@ public abstract class AbstractChainRenderer
     
     public FeaturePanel getFeaturePanel(){
         return featurePanel;
+    }
+    
+    public SeqToolTipListener getToolTipListener(){
+        return toolTipper;
     }
     
     public CursorPanel getCursorPanel(){
@@ -261,7 +272,13 @@ public abstract class AbstractChainRenderer
         // join the listeners
         dds.addFeatureListener(dspanel);
         dds.addFeatureListener(this);        
+        
         mouseListener.addSpiceFeatureListener(dspanel);
+        //dspanel.addMouseListener(mouseListener);
+        //dspanel.addMouseMotionListener(mouseListener);
+        //SeqToolTipListener toolTipper = new SeqToolTipListener(dspanel);
+        //mouseListener.addSpiceFeatureListener(toolTipper);
+        
         
         //dspanel.setPreferredSize(new Dimension(200,200));
         int h = getDisplayHeight();
@@ -279,6 +296,9 @@ public abstract class AbstractChainRenderer
         moveToFront(cursorPanel);
         dasSourcePanels.add(dspanel);
         Dimension d = new Dimension(width,h+panelHeight);
+        
+        
+        
         //this.setPreferredSize(d);
         this.setSize(d);
         this.repaint();
@@ -341,20 +361,27 @@ public abstract class AbstractChainRenderer
     }
 
     public void loadingFinished(DasSourceEvent ds) {
-        
+        //logger.info("loading finished");
         Iterator iter = dasSourcePanels.iterator();
+        DrawableDasSource eventSource = ds.getDasSource();
         while (iter.hasNext()){
             DasSourcePanel dsp = (DasSourcePanel)iter.next();
-            dsp.setLoading(false);
+            DrawableDasSource thisSource = dsp.getDrawableDasSource();
+            if ( eventSource.equals(thisSource))
+                dsp.setLoading(false);
         }
     }
 
     public void loadingStarted(DasSourceEvent ds) {
-
+        
         Iterator iter = dasSourcePanels.iterator();
+        DrawableDasSource eventSource = ds.getDasSource();
+        //logger.info("loading started "+ eventSource.toString());
         while (iter.hasNext()){
             DasSourcePanel dsp = (DasSourcePanel)iter.next();
-            dsp.setLoading(true);
+            DrawableDasSource thisSource = dsp.getDrawableDasSource();
+            if ( eventSource.equals(thisSource))
+                dsp.setLoading(true);
         }
         
     }

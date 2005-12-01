@@ -137,8 +137,8 @@ SequenceListener
     /** get Chain number X from structure 
      * @return a Chain object or null ;
      */
-    public Chain getChain(int chainnumber) {
-        logger.finest("StructurePanelListener getChain " + chainnumber);
+    private Chain getChain(int chainnumber) {
+        //logger.finest("StructurePanelListener getChain " + chainnumber);
       
         
         if ( structure == null ) {
@@ -265,6 +265,11 @@ SequenceListener
         return false ;
     }
     
+    
+    
+    /** select a range of sequence.
+     *  only turns selection on
+     */
     public void selectedSeqRange(int start, int end) {
         //System.out.println("selected " + start + " " + end);
         //highlite(currentChainNumber,start,end,"");
@@ -369,7 +374,7 @@ SequenceListener
   
         Chain chain = getChain(currentChainNumber);
         if ( chain == null ){
-            logger.finest("chain=null!");
+            logger.finest("chain=null    !");
             return;
         }
         String chainId = chain.getName();
@@ -549,7 +554,14 @@ SequenceListener
         
     }
     
-    public void highlite(int chainNumber, int seqpos, String colour) {
+    
+    /** selects a single position and does spacefill on
+     * 
+     * @param chainNumber
+     * @param seqpos
+     * @param colour
+     */
+    private void highlite(int chainNumber, int seqpos, String colour) {
         //logger.finest("highlite " + seqpos);
         
         if ( seqpos     < 0 ) return ;
@@ -596,7 +608,14 @@ SequenceListener
         //cmd += "set display selected;";
     }
     
-    public void highlite(int chainNumber, int start, int end, String colour){
+    /** selects a range and does some coloring
+     * 
+     * @param chainNumber
+     * @param start
+     * @param end
+     * @param colour
+     */
+    private void highlite(int chainNumber, int start, int end, String colour){
         //logger.finest("highlite start end" + start + " " + end );
         //if ( first_load)       return ;		
       

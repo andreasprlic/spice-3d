@@ -24,9 +24,11 @@ package org.biojava.spice.manypanel.renderer;
 
 import java.awt.AlphaComposite;
 import java.awt.Composite;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.Shape;
 import java.util.logging.*;
 import javax.swing.JPanel;
 import org.biojava.bio.structure.*;
@@ -38,11 +40,16 @@ import org.biojava.spice.Feature.*;
 
 
 import java.awt.Image;
+import java.awt.font.FontRenderContext;
+import java.awt.font.GlyphVector;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 
 public class FeaturePanel
 extends JPanel{
     
     static final long serialVersionUID = 7893248902423l;
+    
     public static final int    DEFAULT_X_START          = 50  ;
     public static final int    DEFAULT_X_RIGHT_BORDER   = 20 ;
     public static final int    DEFAULT_Y_START          = 0 ;
@@ -52,8 +59,11 @@ extends JPanel{
     public static final int    LINE_HEIGHT              = 10 ;
     
     public static final int    MINIMUM_HEIGHT           = 20;
-    public static final Color  SEQUENCE_COLOR           = Color.CYAN;
-    public static final Color  SCALE_COLOR              = Color.BLACK;
+    public static final Color  SEQUENCE_COLOR           = Color.LIGHT_GRAY;
+    public static final Color  SCALE_COLOR              = Color.black;
+    public static final Color  TEXT_SCALE_COLOR         = Color.GRAY;
+    
+    Character[] seqArr;
     
     Chain chain;
     float scale;
@@ -63,26 +73,36 @@ extends JPanel{
     
     private Image dbImage;
     private Graphics dbg;
-  
+    
+    public static final Font seqFont = new Font("SansSerif", Font.BOLD, 10);
+   
+    
     public FeaturePanel() {
         super();
         this.setBackground(Color.white);
         chain = new ChainImpl();
         setDoubleBuffered(true);
         //features = getRandomFeatures();
-        
+        seqArr = new Character[0];       
     }
-    
-   
-    
-    
-    
+     
     public void setChain(Chain c){
         logger.info("FeaturePanel setting chain >" + c.getName()+"<");
-        chain = c;
-        //this.repaint();
-        //paintComponent(this.getGraphics());
+        List a = c.getGroups("amino");
+        seqArr = new Character[a.size()];
         
+        chain = new ChainImpl();
+        
+        Iterator iter = a.iterator();
+        int i = 0;
+        while (iter.hasNext()){
+            AminoAcid aa = (AminoAcid) iter.next();
+            chain.addGroup(aa);
+            seqArr[i] = aa.getAminoType();
+            i++;
+        }
+        
+            
     }
     
     public float getScale(){
@@ -151,50 +171,53 @@ extends JPanel{
     }
     /** draw the Scale */
     private int drawSequence(Graphics2D g2D, float scale, int length, int y){
+        //g2D.drawString(panelName,10,10);
         
         g2D.setColor(SEQUENCE_COLOR);
-        g2D.drawString(chain.getName(),10,10);
+        
         int l = Math.round(length*scale) ;
         
+        Composite oldComp = g2D.getComposite();
+        g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));  
         //logger.info("paint l " + l + " length " + length );
         if ( scale < 9){
             Rectangle seqline = new Rectangle(DEFAULT_X_START, y, l, LINE_HEIGHT);
             
             //g2D=  (Graphics2D)g;
             g2D.fill(seqline);   
+            g2D.setColor(Color.black);
+            g2D.draw(seqline);
         }
         
         if ( scale > 9){
-            Composite oldComp = g2D.getComposite();
-            g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));        
-            
+            g2D.setColor(Color.black);
+                  
+            g2D.setFont(seqFont);
             //g2D.setColor(SCALE_COLOR);
             
             // display the actual sequence!;
             for ( int i = 0 ; i < length;i++){
                 int xpos = Math.round(i*scale)+DEFAULT_X_START ;
-                Group g =chain.getGroup(i);
-                if ( g instanceof AminoAcid){
-                    AminoAcid a = (AminoAcid)g;
-                    //System.out.print(a.getAminoType());
-                    // TODO:
-                    // color amino acids by hydrophobicity
-                    g2D.drawString(""+a.getAminoType(),xpos,y+2);
-                }
-            }
-            g2D.setComposite(oldComp);
+                                
+                // TODO:
+                // color amino acids by hydrophobicity
+                g2D.drawString(seqArr[i].toString(),xpos+1,y+2+DEFAULT_Y_STEP);
+            }         
         }
-        
+        g2D.setComposite(oldComp);
         y+= DEFAULT_Y_STEP;
         return y;
     }
+    
+  
+       
     /** draw the Scale */
     private int drawScale(Graphics2D g2D, float scale, int length, int y){
         
         g2D.setColor(SCALE_COLOR);
         
         int aminosize = Math.round(1*scale);
-        y = y + DEFAULT_Y_STEP;
+        //y = y + DEFAULT_Y_STEP;
         // the base line:
         
         int l = Math.round(length*scale) ;
@@ -210,31 +233,36 @@ extends JPanel{
                 
                 if ( scale> 0.1) {
                     
-                    g2D.drawString(""+(i+1),xpos -5,y);
-                    
-                    g2D.fillRect(xpos, y, aminosize, y+10);
+                    //g2D.drawString(""+(i+1),xpos -5,y);
+                    g2D.setColor(TEXT_SCALE_COLOR);
+                    g2D.fillRect(xpos, y+2, aminosize, y+8);
+                    g2D.setColor(SCALE_COLOR);
                 }
                 
             }else if  ( ((i+1)%50) == 0 ) {
                 if ( scale>1.4) {
-                    g2D.drawString(""+(i+1),xpos-5,y);
-                    
-                    g2D.fillRect(xpos,y, aminosize, y+8);
+                    //g2D.drawString(""+(i+1),xpos-5,y);
+                    g2D.setColor(TEXT_SCALE_COLOR);
+                    g2D.fillRect(xpos,y+2, aminosize, y+8);
+                    g2D.setColor(SCALE_COLOR);
                 }
                 
             } else if  ( ((i+1)%10) == 0 ) {                
                 if ( scale> 3) {
-                    g2D.drawString(""+(i+1),xpos-5,y);
-                    g2D.fillRect(xpos, y, aminosize, y+4);
+                    //g2D.drawString(""+(i+1),xpos-5,y);
+                    g2D.setColor(TEXT_SCALE_COLOR);
+                    g2D.fillRect(xpos, y+2, aminosize, y+10);
+                    g2D.setColor(SCALE_COLOR);
                 }
                 
             } 
             
         }
-        int lastPos = Math.round(length*scale)+DEFAULT_X_START + 2;
-        g2D.drawString(""+length,lastPos,y);
         
-        return y + DEFAULT_Y_STEP;
+        int lastPos = Math.round(length*scale)+DEFAULT_X_START + 2;
+        g2D.drawString(""+length,lastPos,y+DEFAULT_Y_STEP);
+        
+        return y ;
         
     }
     

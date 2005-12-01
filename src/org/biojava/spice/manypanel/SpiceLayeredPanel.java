@@ -48,61 +48,8 @@ public class SpiceLayeredPanel
     
     public SpiceLayeredPanel() {
         super();
-        /*
-        layeredPane = new JLayeredPane();
-        layeredPane.addMouseMotionListener(this);
-        
-        layeredPane.setPreferredSize(new Dimension(layerStrings.length*140, 310));
-        layeredPane.setBorder(BorderFactory.createTitledBorder(
-        "Move the Mouse"));
-        
-        
-//      Add several labels to the layered pane.
-        //layeredPane.setLayout(new GridLayout(2,3));
-        for (int i = 0; i < layerStrings.length; i++) {
-            JLabel label = createColoredLabel(layerStrings[i],
-                    layerColors[i]);
-            label.setBounds((i*140-140),0,i*140,140);
-            layeredPane.add(label, new Integer(i));
-        }
-        
-        cursorPanel = new CursorPanel();
-        layeredPane.add(cursorPanel, new Integer(layerStrings.length));
-        layeredPane.moveToFront(cursorPanel);
-        cursorPanel.setLocation(0,0);
-        cursorPanel.setOpaque(false);
-        cursorPanel.setBounds(0,0,layerStrings.length*140,310);
-        //add(Box.createRigidArea(new Dimension(0, 10)));
-        //add(createControlPanel());
-        add(Box.createRigidArea(new Dimension(0, 10)));
-        add(layeredPane);
-        */
     }
-    
-    /*public void mouseMoved(MouseEvent e) {
-        int x = e.getX();
-        cursorPanel.setSelectionStart(x);
-        cursorPanel.setSelectionEnd(2);
-        cursorPanel.repaint();
-    }
-    */
-    //public void mouseDragged(MouseEvent e) {} //do nothing
-    
-    //Create and set up a colored label.
-   /* private JLabel createColoredLabel(String text,
-            Color color) {
-        JLabel label = new JLabel(text);
-        label.setVerticalAlignment(JLabel.TOP);
-        label.setHorizontalAlignment(JLabel.CENTER);
-        label.setOpaque(true);
-        label.setBackground(color);
-        label.setForeground(Color.black);
-        label.setBorder(BorderFactory.createLineBorder(Color.black));
-        label.setPreferredSize(new Dimension(140, 140));
-        return label;
-    }
-    */
-    
+
    public static DasSource[] getAllDasSources() throws Exception{
     
     URL rurl = new URL(registry);
@@ -118,22 +65,8 @@ public class SpiceLayeredPanel
      */
     private static void createAndShowGUI() {
         //Make sure we have nice window decorations.
-        /*JFrame.setDefaultLookAndFeelDecorated(true);
-        
-        //Create and set up the window.
-        JFrame frame = new JFrame("spiceLayeredPanel");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
-        //Create and set up the content pane.
-        JComponent newContentPane = new SpiceLayeredPanel();
-        newContentPane.setOpaque(true); //content panes must be opaque
-        frame.setContentPane(newContentPane);
-        
-        //Display the window.
-        frame.pack();
-        frame.setVisible(true);
-        */
-        
+       JFrame.setDefaultLookAndFeelDecorated(true);
+       
         JFrame spiceFrame = new JFrame("SPICE - devel");
         spiceFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
@@ -145,7 +78,7 @@ public class SpiceLayeredPanel
             sds[i] = SpiceDasSource.fromDasSource(dss[i]);
         }
         browserPane.setDasSources(sds);
-        browserPane.triggerLoadStructure("1boi");
+        browserPane.triggerLoadStructure("5pti");
         //browserPane.triggerLoadUniProt("P50225");
         //browserPane.triggerLoadENSP("ENSP00000346625");
         //browserPane.setPreferredSize(new Dimension(1000, 1000));

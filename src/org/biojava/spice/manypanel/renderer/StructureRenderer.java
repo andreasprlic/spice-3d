@@ -45,7 +45,7 @@ extends AbstractChainRenderer
         //super();
         sequence = new DrawableSequence(new ChainImpl());
        
-        logger.info("init StructureRenderer");
+        //logger.info("init StructureRenderer");
         
         featurePanel = new StructureFeaturePanel();
         cursorPanel  = new CursorPanel();       
@@ -68,6 +68,7 @@ extends AbstractChainRenderer
         featurePanel.setChain(sequence.getSequence());
         cursorPanel.setChain(sequence.getSequence());
         mouseListener.setChain(sequence.getSequence());
+        toolTipper.setChain(sequence.getSequence());
         calcScale(100);
         
         //setDrawableSequence(ds);

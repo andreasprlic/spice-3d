@@ -118,7 +118,7 @@ implements FeatureListener,SpiceFeatureListener
     }
     
     public int getDisplayHeight(){
-        int h = FeaturePanel.DEFAULT_Y_START + 10 + FeaturePanel.LINE_HEIGHT;
+        int h = FeaturePanel.DEFAULT_Y_START + FeaturePanel.DEFAULT_Y_STEP + FeaturePanel.LINE_HEIGHT;
         h += (dasSource.getFeatures().length +1 ) * FeaturePanel.DEFAULT_Y_STEP ;
         //logger.info(dasSource.getDasSource().getNickname() + " height:" + h);
         return h;
@@ -161,7 +161,7 @@ implements FeatureListener,SpiceFeatureListener
         
         Graphics2D g2D = (Graphics2D)g;
         
-        int y = FeaturePanel.DEFAULT_Y_START + 10 ;
+        int y = FeaturePanel.DEFAULT_Y_START + FeaturePanel.DEFAULT_Y_STEP ;
         //logger.info(dasSource.getDasSource().getNickname() + " " + dasSource.getLoading());
         
         //Composite oldComp = g2D.getComposite();
@@ -175,39 +175,12 @@ implements FeatureListener,SpiceFeatureListener
             // the whole featureview has been selected
             //if selected draw a rectangle over everything
             
-            //g2D.setColor(SELECTION_COLOR);
-            //g2D.fillRect(0,y,width,parent.getHeight());
+            g2D.setColor(SELECTED_FEATURE_COLOR);
+            g2D.fillRect(0,y,getWidth(),getHeight());
             
         }
         
-        /*
-         for ( int i = 0 ; i < features.length; i++){
-         
-         Feature f = features[i];
-         g.drawString(f.getType(),10,y+10);
-         //logger.info(f.toString());
-          List segs = f.getSegments();
-          Iterator iter = segs.iterator();
-          while ( iter.hasNext()){
-          Segment s = (Segment)iter.next();
-          g.setColor(s.getColor());
-          int pstart = s.getStart()-1;
-          int pend   = s.getEnd()-1;
-          int startX = Math.round(pstart*scale) + FeaturePanel.DEFAULT_X_START;
-          int segl = pend - pstart +1;
-          int endX   = Math.round(segl*scale);
-          //logger.info(s.getName()+ " "+ pstart+" ("+startX + ") " 
-           //+ pend + " (" +endX+") y:" + y );
-            Rectangle feature = new Rectangle(startX,y,endX,FeaturePanel.LINE_HEIGHT);
-            g2D.fill(feature);
-            //g2D.fillRect(startX,y,endX,FeaturePanel.LINE_HEIGHT);
-             }
-             
-             y+= FeaturePanel.DEFAULT_Y_STEP;    
-             }*/
-        
-        //g2D.setComposite(oldComp);
-        
+       
     }
     
     /** draw the features starting at position y
@@ -689,6 +662,10 @@ implements FeatureListener,SpiceFeatureListener
             
             // draw the line ...
             g2D.fillRect(xstart,y,width,height);
+            Color c = g2D.getColor();
+            g2D.setColor(Color.black);
+            g2D.drawRect(xstart,y,width,height);
+            g2D.setColor(c);
             
         }
     }

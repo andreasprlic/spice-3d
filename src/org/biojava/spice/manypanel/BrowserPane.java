@@ -452,7 +452,7 @@ ChangeListener
     public void addPDBPositionListener(SequenceListener li){
         ChainRendererMouseListener mouser = structureRenderer.getChainRendererMouseListener();
         mouser.addSequenceListener(li);
-        //aligManager.addSequence1Listener(li);
+        aligManager.addSequence1Listener(li);
     }
     
     public void addSpiceFeatureListener(SpiceFeatureListener li){

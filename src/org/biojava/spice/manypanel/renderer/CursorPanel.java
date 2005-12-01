@@ -33,14 +33,18 @@ import java.awt.event.*;
 
 
 import org.biojava.bio.structure.*;
+import org.biojava.spice.Feature.Segment;
 import org.biojava.spice.manypanel.eventmodel.SequenceEvent;
 import org.biojava.spice.manypanel.eventmodel.SequenceListener;
+import org.biojava.spice.manypanel.eventmodel.SpiceFeatureEvent;
+import org.biojava.spice.manypanel.eventmodel.SpiceFeatureListener;
 
 public class CursorPanel 
 
 extends JPanel
 implements
-SequenceListener
+SequenceListener,
+SpiceFeatureListener
 
 {
     
@@ -87,9 +91,12 @@ SequenceListener
         if (  selectionLocked )
             return;
         //logger.info("selected seq position " + position);
+        //setToolTipText("");
+        
         setSelectionStart(position);
         setSelectionEnd(position);
         this.repaint();
+        
         //this.paintComponent(this.getGraphics());
         
     }
@@ -97,6 +104,7 @@ SequenceListener
     public void selectedSeqRange(int start, int end) {
         if ( selectionLocked) 
             return;
+        //setToolTipText("");
         setSelectionStart(start);
         setSelectionEnd(end);
         this.repaint();
@@ -142,20 +150,58 @@ SequenceListener
         chainLength = c.getLength();
     }
     
-    /** get the sequence position of the current mouse event 
-     * */
-    private int getSeqPos(MouseEvent e) {
-        
-        int x = e.getX();
-        //int y = e.getY();
-        //float scale = seqScale.getScale();
-        int DEFAULT_X_START = FeaturePanel.DEFAULT_X_START;
-        int seqpos =  java.lang.Math.round((x-DEFAULT_X_START-2)/scale) ;
-        
-        return seqpos  ;
-    }   
     
     
+    
+    
+    
+    
+    public void featureSelected(SpiceFeatureEvent e) {
+        // TODO Auto-generated method stub
+        //setToolTipText(e.getFeature().toString());
+        
+        
+    }
+
+
+
+
+
+
+    public void mouseOverFeature(SpiceFeatureEvent e) {
+        // TODO Auto-generated method stub
+        //setToolTipText(e.getFeature().toString());
+        
+    }
+
+
+
+
+
+
+    public void mouseOverSegment(SpiceFeatureEvent e) {
+        // TODO Auto-generated method stub
+        //setToolTipText(e.getSegment().toString());
+        
+    }
+
+
+
+
+
+
+    public void segmentSelected(SpiceFeatureEvent e) {
+        
+        Segment segment = e.getSegment();
+        selectedSeqRange(segment.getStart()-1,segment.getEnd()-1);
+        //setToolTipText(segment.toString());
+    }
+
+
+
+
+
+
     public void paintComponent(Graphics g){
         //logger.info("paint cursorPanel");
         super.paintComponent(g);

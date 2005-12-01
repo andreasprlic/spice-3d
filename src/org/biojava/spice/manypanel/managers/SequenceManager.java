@@ -205,7 +205,7 @@ extends AbstractChainManager
         while (iter.hasNext()){
             SequenceRenderer renderer = (SequenceRenderer)iter.next();
             
-            renderer.setDrawableSequence(ds);
+            renderer.setDrawableSequence(ds);          
         }
     
         
@@ -216,6 +216,8 @@ extends AbstractChainManager
          
             li.newSequence(sevent);
         }
+        
+        
     }
 
 

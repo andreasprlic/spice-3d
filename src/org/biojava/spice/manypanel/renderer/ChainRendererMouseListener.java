@@ -22,6 +22,7 @@
  */
 package org.biojava.spice.manypanel.renderer;
 
+import java.awt.Cursor;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -33,6 +34,7 @@ import java.util.logging.Logger;
 import org.biojava.bio.structure.Chain;
 import org.biojava.spice.Feature.Feature;
 import org.biojava.spice.Feature.FeatureImpl;
+import org.biojava.spice.Feature.Segment;
 import org.biojava.spice.manypanel.drawable.DrawableDasSource;
 import org.biojava.spice.manypanel.eventmodel.SequenceListener;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureEvent;
@@ -120,13 +122,25 @@ MouseMotionListener
         return seqpos  ;
     }   
     
+    
+    /** returns the feature of a mouse event
+     * or null, if the event was not over a feature line
+     * 
+     * @param e
+     * @return
+     */
     private Feature getFeatureFromEvent(MouseEvent e){
         
         
         int y = e.getY();
         
         int h =  renderer.getFeaturePanel().getHeight();
-        if ( y < h ){
+        
+        // add the top of a Featurepanel - the empty space from there
+        //h += FeaturePanel.DEFAULT_Y_START ;
+        //+ FeaturePanel.DEFAULT_Y_STEP ;
+        
+        if ( y < h){
             return null ;
         }
         
@@ -146,8 +160,18 @@ MouseMotionListener
             }
                 
         }  
+        if (eventPanel == null) {
+            // no panel found below this event
+            return null;
+        }
         
-        h+= FeaturePanel.DEFAULT_Y_START + FeaturePanel.DEFAULT_Y_STEP + FeaturePanel.DEFAULT_Y_STEP;
+        h += FeaturePanel.DEFAULT_Y_START + FeaturePanel.DEFAULT_Y_STEP + FeaturePanel.LINE_HEIGHT;
+        if ( y < h){
+            // smaller than the "heading section" of the display
+            return null;
+        }
+        
+        
         
         DrawableDasSource source = eventPanel.getDrawableDasSource();
         
@@ -232,29 +256,48 @@ MouseMotionListener
         int pos = getSeqPos(e) ;
         if ( pos == oldSelectionStart)
             return;
-        //logger.info("CursorPanel: mouse moved " + x + " " + pos);
+        //logger.info("CursorPanel: mouse moved " + e.getX() + " " + pos);
         oldSelectionStart = pos;
         this.setSelectionStart(pos);
         this.setSelectionEnd(pos);
         
-        triggerNewSequencePosition(pos);
+        triggerNewSequencePosition(pos,e.getY());
         
+       
+        Feature feat = getFeatureFromEvent(e);
+        //System.out.println(pos + " " + feat);
+        if ( feat == null)
+            return;
+        
+        if ( pos >= 0) {
+//           check if pos is over a feature then trigger new SegmentSelected
+            List segments = feat.getSegments();
+            Iterator iter = segments.iterator();
+            while (iter.hasNext()) {
+                Segment s = (Segment)iter.next();
+                if ( (pos >= s.getStart()-1) && ( pos <= s.getEnd()-1)) {
+                    
+                    triggerMouseOverSegment(feat,s);
+                    //triggerSegmentSelected(feat,s);
+                }
+            }
+        }
     }
     
     
     
     public void mouseClicked(MouseEvent arg0) {
-        // TODO Auto-generated method stub
+        
         
     }
     
     public void mouseEntered(MouseEvent arg0) {
-        // TODO Auto-generated method stub
+    
         
     }
     
     public void mouseExited(MouseEvent arg0) {
-        // TODO Auto-generated method stub
+    
         
     }
     
@@ -273,14 +316,29 @@ MouseMotionListener
             } else {
                 int pos = getSeqPos(event) ;
                 Feature feat = getFeatureFromEvent(event);
-                System.out.println(pos + " " + feat);
+                //System.out.println(pos + " " + feat);
+                if ( feat == null)
+                    return;
                 
                 if ( pos < 0) {
                     // the user clicked on the label -> trigger a new FeatureSelected
                     
                     triggerFeatureSelected(feat);
                     triggerSelectionLocked(true);
-                    // else -> check if pos is over a feature then trigger new SegmentSelected
+                    
+                } else {
+//                   check if pos is over a feature then trigger new SegmentSelected
+                    List segments = feat.getSegments();
+                    Iterator iter = segments.iterator();
+                    while (iter.hasNext()) {
+                        Segment s = (Segment)iter.next();
+                        if ( (pos >= s.getStart()) && ( pos <= s.getEnd())) {
+                            
+                            triggerSegmentSelected(feat,s);
+                            triggerNewSequenceRange(s.getStart()-1,s.getEnd()-1);
+                            triggerSelectionLocked(true);
+                        }
+                    }
                 }
             }
         }
@@ -310,16 +368,26 @@ MouseMotionListener
         }
     }
     
-    protected void triggerNewSequencePosition(int pos){
+    protected void triggerNewSequencePosition(int pos, int mouseY){
         if ( selectionLocked )
             return;
         
-        
+        //logger.info("trigger new sequence position " + pos);
         
         Iterator iter = sequenceListeners.iterator();
         while(iter.hasNext()){
             SequenceListener li = (SequenceListener)iter.next();
-            li.selectedSeqPosition(pos);
+            // ugly! TODO: find a nice solution for this ...
+            // display seq cursor only over the sequyece ...
+            if ( li instanceof SeqToolTipListener ){
+                if ( mouseY < 20)
+                    li.selectedSeqPosition(pos);
+                else 
+                    li.selectedSeqPosition(-1);
+                
+            } else {
+                li.selectedSeqPosition(pos);
+            }
         }
         
     }
@@ -343,6 +411,9 @@ MouseMotionListener
         if (feature == null){
             feature = new FeatureImpl(); 
         }
+        //logger.info("trigger feture selected " + feature);
+        
+        
         //logger.info("trigger featureSelected " + feature);
         SpiceFeatureEvent event = new SpiceFeatureEvent(feature);
         Iterator iter = spiceFeatureListeners.iterator();
@@ -353,8 +424,37 @@ MouseMotionListener
         }
     }
     
+    protected void triggerSegmentSelected(Feature feature, Segment segment){
+        if ( selectionLocked)
+            return;
+        
+        
+        if ( segment == null){
+            segment = new Segment();
+        }
+        //logger.info("trigger segment selected " + segment);
+        SpiceFeatureEvent  event = new SpiceFeatureEvent(feature,segment);
+        Iterator iter = spiceFeatureListeners.iterator();
+        while (iter.hasNext()){
+            SpiceFeatureListener li = (SpiceFeatureListener)iter.next();
+            li.segmentSelected(event);
+        }
+    }
     
-    
+    protected void triggerMouseOverSegment(Feature feature, Segment segment){
+      
+        
+        if ( segment == null){
+            segment = new Segment();
+        }
+        
+        SpiceFeatureEvent  event = new SpiceFeatureEvent(feature,segment);
+        Iterator iter = spiceFeatureListeners.iterator();
+        while (iter.hasNext()){
+            SpiceFeatureListener li = (SpiceFeatureListener)iter.next();
+            li.mouseOverSegment(event);
+        }
+    }
     
     
 

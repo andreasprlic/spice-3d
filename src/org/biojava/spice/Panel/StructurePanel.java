@@ -126,21 +126,13 @@ implements JmolStatusListener
      */
     public void executeCmd(String command) {
         
-        //if (logger.isLoggable(Level.FINEST)) {
-        //    logger.finest("sending Jmol command: "+command);
-        //}
-        //System.out.println("sending Jmol command: " + command);
         
         //TODO: is this needed?
         synchronized(viewer){
             viewer.evalString(command);
         }
         
-        //JmolThread thr = new JmolThread(viewer,command);
-        //thr.start();
-        //viewer.evalString(command);
-        //logger.finest("sent command");
-        //System.out.println("sent command");
+        
        
     }
     
@@ -160,24 +152,14 @@ implements JmolStatusListener
         
         
         String pdbstr = structure.toPDB();
-        //System.out.println(pdbstr);
-        /*if ( (pdbstr == null) || 
-                (pdbstr.equals("\n")) ||
-                (pdbstr.equals(""))) {
-            executeCmd(EMPTYCMD);
-            //notifyAll();
-            return;
-        }*/
-        
+      
          
          viewer.openStringInline(pdbstr);
          if ( structure.size() == 0 ) {
              executeCmd(EMPTYCMD);
          }
        
-        //String cmd ="select all; cpk off; wireframe off;"  ;
-        //executeCmd(cmd);
-        
+      
         
         String strError = viewer.getOpenFileError();
         if (strError != null) {
@@ -195,97 +177,7 @@ implements JmolStatusListener
     
     
     
-    /*
-     public void mouseDragged(MouseEvent e) {
-     //logger.finest("dragging mouse "+e);
-      }	
-      */
     
-    /* when the mouse is moved of the structure panel,
-     the corresponing position in the sequence is highlited
-     */
-    
-    
-    /*
-     public void mouseMoved(MouseEvent e) {
-     //logger.finest("moving mouse over StructurePanel "+e);    	
-      int pos = viewer.findNearestAtomIndex(e.getX(),e.getY());
-      if ( pos == -1 ) { return ; }
-      
-      String chainId = viewer.getAtomChain( pos) ;
-      String seqCode = viewer.getAtomSequenceCode( pos) ;
-      
-      String[] spl = seqCode.split("\\^");
-      if ( spl.length > 1) {
-      //logger.finest("insertion code found! " + residuePDBcode );
-       seqCode = spl[0] + spl[1];
-       }
-       
-       
-       //logger.finest("chainid " + chainId + " seqcode: " + seqCode);
-        int chainpos = 0 ;
-        if  ( chainId != null ) 
-        chainpos   = spice.getChainPosByPDB(chainId);
-        
-        // what is the default return value for empty chain in Jmol ?
-         if (chainpos == -1 )
-         chainpos = 0 ;
-         int residuepos = spice.getSeqPosByPDB(seqCode);
-         
-         spice.select(chainpos,residuepos);
-         spice.showSeqPos(chainpos,residuepos);
-         
-         //logger.finest("atomIndex "+atom.getAtomIndex());
-          //logger.finest(viewer.getElementNumber(pos));
-           //logger.finest(viewer.getElementSymbol(pos));
-            //logger.finest("atomName " + viewer.getAtomName(pos));
-             //logger.finest("seqCode " + atom.getSeqcodeString());
-              
-              }
-              
-              */
-    /*
-     public void mouseClicked(MouseEvent e)
-     {
-     //logger.finest("mouseClick in structure Panel"+e);
-      
-      
-      // if right mouse button 
-       
-       
-       int pos = viewer.findNearestAtomIndex(e.getX(),e.getY());
-       if ( pos == -1 ) { return ; }
-       
-       String chainId = viewer.getAtomChain( pos) ;
-       String seqCode = viewer.getAtomSequenceCode( pos) ;
-       
-       String[] spl = seqCode.split("\\^");
-       if ( spl.length > 1) {
-       //logger.finest("insertion code found! " + residuePDBcode );
-        seqCode = spl[0] + spl[1];
-        }
-        
-        
-        
-        //logger.finest("chainid " + chainId + " seqcode: " + seqCode);
-         int chainpos = 0 ;
-         if  ( chainId != null ) 
-         chainpos   = spice.getChainPosByPDB(chainId);
-         
-         // what is the default return value for empty chain in Jmol ?
-          if (chainpos == -1 )
-          chainpos = 0 ;
-          int residuepos = spice.getSeqPosByPDB(seqCode);
-          
-          spice.highlite(chainpos,residuepos);
-          spice.showSeqPos(chainpos,residuepos);	
-          
-          }
-          public void mouseEntered(MouseEvent e)  {}
-          public void mouseExited(MouseEvent e)   {}
-          public void mousePressed(MouseEvent e)  {}
-          public void mouseReleased(MouseEvent e) {}
-          */
     
     public void notifyAtomPicked(int atomIndex, String strInfo){
         logger.finest("notifyAtomPicked "  + atomIndex + " " + strInfo);
@@ -294,11 +186,7 @@ implements JmolStatusListener
         logger.finest(props.toString());
     }
     
-    /*public void notifyFileLoaded(String fullPathName, String fileName,
-     String modelName, Object clientFile){
-     //logger.finest("Jmol loaded File "+ fileName); 
-      }
-      */
+  
     
     public void notifyFileNotLoaded(String fullPathName, String errorMsg){}
     
@@ -311,16 +199,16 @@ implements JmolStatusListener
     }
     
     public void scriptStatus(String strStatus){
-        logger.log(Level.FINEST,"jmol scriptStatus: " +strStatus);
+        //logger.log(Level.FINEST,"jmol scriptStatus: " +strStatus);
     }
     
     public void notifyScriptTermination(String statusMessage, int msWalltime){
         
-        logger.fine("Script finished in " + msWalltime + "ms");
+        //logger.fine("Script finished in " + msWalltime + "ms");
     }
     
     public void handlePopupMenu(int x, int y){
-        logger.finest("handlePopupMenu");
+        //logger.finest("handlePopupMenu");
         //viewer.popupMenu(e.getX(),e.getY());
         jmolpopup.show(x,y);
         
