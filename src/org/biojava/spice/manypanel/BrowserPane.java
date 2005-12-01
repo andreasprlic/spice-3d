@@ -142,6 +142,7 @@ ChangeListener
         //structureRenderer.setBounds(0,0,800,800);
         //structureRenderer.setPreferredSize(new Dimension(400,400));
         JScrollPane structureScroller = new JScrollPane(structureRenderer);
+        structureScroller.getVerticalScrollBar().setUnitIncrement(FeaturePanel.DEFAULT_Y_STEP);
         //structureScroller.setWidth(DEFAULT_PANE_WIDTH);
         //box.add(structureScroller);
         //contentPanel.add(box);  
@@ -183,6 +184,7 @@ ChangeListener
         
          seqRenderer = new SequenceRenderer();
          JScrollPane seqScroller = new JScrollPane(seqRenderer);
+         seqScroller.getVerticalScrollBar().setUnitIncrement(FeaturePanel.DEFAULT_Y_STEP);
          //box.add(seqScroller);  
          
          DasCoordinateSystem seqdcs = DasCoordinateSystem.fromString(UNIPROTCOORDSYS);
@@ -239,6 +241,7 @@ ChangeListener
          
           enspRenderer = new SequenceRenderer();
           JScrollPane enspScroller = new JScrollPane(enspRenderer);
+          enspScroller.getVerticalScrollBar().setUnitIncrement(FeaturePanel.DEFAULT_Y_STEP);
           //box.add(enspScroller);  
        
           DasCoordinateSystem enspdcs = DasCoordinateSystem.fromString(ENSPCOORDSYS);
