@@ -118,8 +118,6 @@ public interface SPICEFrame
     /** returns currently displayed UniProt code; null if none*/
     public String getUniProtCode();
 
-    /** return the DAS - feature viewer panel */
-    public SpiceFeatureViewer getFeatureViewer();
     
     /** set which parameters should be used for loading the next molecule.
      * typically set before doing a new load(type,code) call.

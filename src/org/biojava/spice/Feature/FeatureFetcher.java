@@ -110,6 +110,9 @@ public class FeatureFetcher extends Thread
         
         updateDisplay = false ;
         featuresCounter = 0;
+        
+        logger.warning("obsolete class. is going to be removed soon");
+        
     }
     
     
@@ -421,8 +424,8 @@ public class FeatureFetcher extends Thread
             allServersDisplayed = false;
         if ( tmppdbresservs.size() != pdbresservs.size())
             allServersDisplayed = false;
-        SpiceFeatureViewer sfv = parent.getFeatureViewer();
-        sfv.setAllServersDisplayed(allServersDisplayed);
+        //SpiceFeatureViewer sfv = parent.getFeatureViewer();
+        //sfv.setAllServersDisplayed(allServersDisplayed);
         
         
         int nrservers =0;
@@ -543,9 +546,9 @@ public class FeatureFetcher extends Thread
         fv.setDasSource(featureserver);
         // add fv to viewer ...
         
-        SpiceFeatureViewer sfv = parent.getFeatureViewer();
-        sfv.addFeatureView(fv);
-        sfv.repaint();
+        //SpiceFeatureViewer sfv = parent.getFeatureViewer();
+        //sfv.addFeatureView(fv);
+        //sfv.repaint();
         return fv;
     }
     

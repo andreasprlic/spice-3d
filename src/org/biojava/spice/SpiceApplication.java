@@ -1653,11 +1653,7 @@ ConfigurationListener
         return showDocument(url);
     }
     
-    public SpiceFeatureViewer getFeatureViewer() {
-        //return dascanv;
-        return null;
-    }
-    
+       
     public synchronized void newConfigRetrieved(RegistryConfiguration conf){
         logger.info("received new config " );
         config = conf;

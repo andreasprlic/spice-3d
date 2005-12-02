@@ -83,7 +83,7 @@ SpiceFeatureListener
     
     
     public void newSequence(SequenceEvent e) {
-        // TODO Auto-generated method stub
+    
         
     }
     
@@ -117,7 +117,7 @@ SpiceFeatureListener
     }
     
     public void newObjectRequested(String accessionCode) {
-        // TODO Auto-generated method stub
+       
         
     }
    
@@ -207,8 +207,6 @@ SpiceFeatureListener
         super.paintComponent(g);
         
         //g.drawImage(imbuf, 0, 0, this);
-        
-        
         
         // translate the seq positions into graphics positions ..
         

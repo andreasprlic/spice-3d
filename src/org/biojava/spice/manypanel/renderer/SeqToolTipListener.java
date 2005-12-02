@@ -74,7 +74,7 @@ implements SequenceListener, SpiceFeatureListener {
 
     public void selectedSeqPosition(int position) {
         parent.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-        if (( position < 0) || (position > length)) {
+        if (( position < 0) || (position >= length)) {
             parent.setToolTipText("");
             return;
         }
@@ -115,9 +115,14 @@ implements SequenceListener, SpiceFeatureListener {
         
         Feature f = e.getFeature();
         //logger.info("toolTipper over feature " + f);
-        parent.setToolTipText(f.toString());
-        
-        
+       
+        if ( f.getType().equals("unknown")){
+            parent.setToolTipText("");
+            parent.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+        } else {
+            parent.setToolTipText(f.toString());
+            parent.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        }     
     }
 
     public void mouseOverSegment(SpiceFeatureEvent e) {

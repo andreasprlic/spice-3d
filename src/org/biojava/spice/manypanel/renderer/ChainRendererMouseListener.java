@@ -26,12 +26,15 @@ import java.awt.Cursor;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
 import org.biojava.bio.structure.Chain;
+import org.biojava.spice.JNLPProxy;
 import org.biojava.spice.Feature.Feature;
 import org.biojava.spice.Feature.FeatureImpl;
 import org.biojava.spice.Feature.Segment;
@@ -65,6 +68,7 @@ MouseMotionListener
     int chainLength;
     List sequenceListeners;
     List spiceFeatureListeners;
+    Feature oldFeature;
     
     static Logger logger = Logger.getLogger("org.biojava.spice");
     
@@ -74,7 +78,7 @@ MouseMotionListener
         this.renderer = renderer;
         selectionLocked = false;
         dragging = false;
-        
+        oldFeature = new FeatureImpl();
         selectionStart = -1 ;
         selectionEnd = -1;
         oldSelectionStart = -1;
@@ -254,20 +258,44 @@ MouseMotionListener
             return;
         //int x = e.getX();
         int pos = getSeqPos(e) ;
-        if ( pos == oldSelectionStart)
-            return;
+        Feature feat = getFeatureFromEvent(e);
+        //System.out.println(pos + " " + feat + oldFeature);
+        
+        //
+        // test if nothing changed ...
+        // if nothing changed, return
+        if ( feat != null ){
+            if ( feat.equals(oldFeature))
+                if ( pos == oldSelectionStart)
+                    return;
+           
+        } else {
+            if ( pos == oldSelectionStart)
+                return;
+           
+        }
+            
+        
         //logger.info("CursorPanel: mouse moved " + e.getX() + " " + pos);
         oldSelectionStart = pos;
+        
+        
         this.setSelectionStart(pos);
         this.setSelectionEnd(pos);
         
         triggerNewSequencePosition(pos,e.getY());
         
        
-        Feature feat = getFeatureFromEvent(e);
-        //System.out.println(pos + " " + feat);
-        if ( feat == null)
+        
+        
+        if ( feat == null) 
             return;
+        
+        //if ( feat.equals(oldFeature)) 
+            //return;
+        
+        oldFeature = feat;
+        
         
         if ( pos >= 0) {
 //           check if pos is over a feature then trigger new SegmentSelected
@@ -281,6 +309,8 @@ MouseMotionListener
                     //triggerSegmentSelected(feat,s);
                 }
             }
+        } else {
+            triggerMouseOverFeature(feat);
         }
     }
     
@@ -321,10 +351,17 @@ MouseMotionListener
                     return;
                 
                 if ( pos < 0) {
-                    // the user clicked on the label -> trigger a new FeatureSelected
+                    // the user clicked on the label
+                    //int linkpos = 0 - (FeaturePanel.DEFAULT_X_START-DasSourcePanel.linkIconWidth-1);
+                    logger.info(pos+" " + event.getX());
+                    if ( event.getX() < DasSourcePanel.linkIconWidth) {
+                        triggerLinkSelected(feat);
+                    } else {
+                        //-> trigger a new FeatureSelected
                     
-                    triggerFeatureSelected(feat);
-                    triggerSelectionLocked(true);
+                        triggerFeatureSelected(feat);
+                        triggerSelectionLocked(true);
+                    }
                     
                 } else {
 //                   check if pos is over a feature then trigger new SegmentSelected
@@ -441,6 +478,19 @@ MouseMotionListener
         }
     }
     
+    
+    protected void triggerMouseOverFeature(Feature feature){
+        if ( feature == null )
+            feature = new FeatureImpl();
+        SpiceFeatureEvent event = new SpiceFeatureEvent(feature);
+        Iterator iter = spiceFeatureListeners.iterator();
+        while( iter.hasNext()){
+            SpiceFeatureListener li = (SpiceFeatureListener)iter.next();
+            li.mouseOverFeature(event);
+            
+        }
+    }
+    
     protected void triggerMouseOverSegment(Feature feature, Segment segment){
       
         
@@ -453,6 +503,23 @@ MouseMotionListener
         while (iter.hasNext()){
             SpiceFeatureListener li = (SpiceFeatureListener)iter.next();
             li.mouseOverSegment(event);
+        }
+    }
+    
+    protected void triggerLinkSelected(Feature f){
+        String link = f.getLink();
+        
+        if (( link != null) && (! link.equals(""))){
+            logger.info("triggerLinkSelected " + link);
+            try {
+                URL url =new URL(link);
+                
+                boolean success = JNLPProxy.showDocument(url); 
+                if ( ! success)
+                    logger.warning("could not open URL "+url+" in browser. check your config or browser version."); 
+            } catch (MalformedURLException e){
+                //continue ;
+            }
         }
     }
     

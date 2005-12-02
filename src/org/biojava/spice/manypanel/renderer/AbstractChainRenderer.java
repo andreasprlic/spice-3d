@@ -27,6 +27,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.logging.Logger;
 
+import javax.swing.BoxLayout;
 import javax.swing.JLayeredPane;
 import org.biojava.bio.structure.*;
 import org.biojava.spice.Feature.Feature;
@@ -60,6 +61,8 @@ public abstract class AbstractChainRenderer
     SeqToolTipListener toolTipper;
     ChainRendererMouseListener mouseListener;
     
+    int componentWidth;
+    int zoomFactor;
     //List featureRenderers;
     
     public AbstractChainRenderer() {
@@ -73,7 +76,7 @@ public abstract class AbstractChainRenderer
         mouseListener.addSequenceListener(toolTipper);
         
         mouseListener.addSpiceFeatureListener(toolTipper);
-        
+        componentWidth = BrowserPane.DEFAULT_PANE_WIDTH;
     }
 
     protected void initPanels(){
@@ -107,6 +110,15 @@ public abstract class AbstractChainRenderer
         updatePanelPositions();
     }
   
+    public void setComponentWidth(int width){
+        componentWidth = width;
+        //logger.info("componentWidth" + width);
+        calcScale(zoomFactor);
+        this.revalidate();
+        //this.repaint();
+        //this.updateUI();
+    }
+    
     
     public void clearDasSources(){
         Iterator iter = dasSourcePanels.iterator();
@@ -155,20 +167,25 @@ public abstract class AbstractChainRenderer
         if ( zoomFactor < 1)
             zoomFactor = 1;
         
+        this.zoomFactor = zoomFactor;
         int DEFAULT_X_START = FeaturePanel.DEFAULT_X_START;
         int DEFAULT_X_RIGHT_BORDER = FeaturePanel.DEFAULT_X_RIGHT_BORDER;
         
         int seqLength = getSequenceLength();
-        int defaultWidth = BrowserPane.DEFAULT_PANE_WIDTH;
+        // the maximum width depends on the size of the parent Component
+        int defaultWidth = componentWidth;
         int width=defaultWidth;
         //int width = l  + FeaturePanel.DEFAULT_X_START + FeaturePanel.DEFAULT_X_RIGHT_BORDER;
         //int seqLength = sequence.getSequence().getLength();
         
         float s = width / (float) ( seqLength + DEFAULT_X_START + DEFAULT_X_RIGHT_BORDER );
+        //logger.info("scale for 100% " + s + " " + seqLength);
         s = 100 * s /(zoomFactor) ;
         if ( s > MAX_SCALE)
             s = MAX_SCALE;
-        
+        //if (s < MIN_SCALE)
+          //  s = MIN_SCALE;
+        //logger.info("but changed to " + s);
         return s;
     }
     
@@ -268,6 +285,7 @@ public abstract class AbstractChainRenderer
         //SpiceDasSource ds = dds.getDasSource();
         
         DasSourcePanel dspanel = new DasSourcePanel(dds);
+        //dspanel.setLayout(new BoxLayout(dspanel,BoxLayout.Y_AXIS));
         
         // join the listeners
         dds.addFeatureListener(dspanel);
@@ -310,7 +328,7 @@ public abstract class AbstractChainRenderer
     public void updatePanelPositions(){
         int h = featurePanel.getHeight();
         int width = getDisplayWidth();
-        
+        //logger.info("update panel positions " + width + " " + h + " " + sequence.getSequence().getLength());
         featurePanel.setBounds(0,0,width,h);
         // x .. width
         // y .. height

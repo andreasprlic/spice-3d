@@ -28,21 +28,24 @@ import java.awt.Composite;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
+import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
 
 import org.biojava.bio.structure.Chain;
+import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.Feature.Feature;
 import org.biojava.spice.Feature.Segment;
 import org.biojava.spice.manypanel.eventmodel.FeatureEvent;
@@ -63,7 +66,7 @@ implements FeatureListener,SpiceFeatureListener
     
     public static final Font plainFont = new Font("SansSerif", Font.PLAIN, 10);
     public static final Font headFont = new Font("SansSerif", Font.BOLD, 11);
-    
+    public static final int linkIconWidth = 10;
     public static final Color SELECTED_FEATURE_COLOR  = Color.yellow;
     
     DrawableDasSource dasSource;
@@ -75,6 +78,7 @@ implements FeatureListener,SpiceFeatureListener
     boolean selected;
     boolean featureSelected;
     int selectedFeaturePos;
+    ImageIcon linkIcon ;
     
     int chainLength;
     
@@ -95,7 +99,8 @@ implements FeatureListener,SpiceFeatureListener
         selectedFeaturePos = -1;
         selected = false;
         chainLength = 0;
-       
+        linkIcon = createImageIcon("firefox10x10.png");
+        
     }
     
     
@@ -128,6 +133,20 @@ implements FeatureListener,SpiceFeatureListener
     public void setLoading(boolean flag){
         dasSource.setLoading(flag);
     }
+    
+    
+
+    /** Returns an ImageIcon, or null if the path was invalid. */
+    public static ImageIcon createImageIcon(String path) {
+    java.net.URL imgURL = SpiceApplication.class.getResource(path);
+    if (imgURL != null) {
+        return new ImageIcon(imgURL);
+    } else {
+        logger.log(Level.WARNING,"Couldn't find file: " + path);
+        return null;
+    }
+}
+    
     
     public void paint(Graphics g){
         super.paint(g);
@@ -597,14 +616,40 @@ implements FeatureListener,SpiceFeatureListener
             c = s.getColor();
         }
         g.setColor(c);
-        // draw a background rectangle
-        g.fillRect(0,y,FeaturePanel.DEFAULT_X_START,FeaturePanel.DEFAULT_Y_STEP);
         
+       
+        Shape clip = g.getClip();
+        
+        // draw a background rectangle
+        g.fillRect(0,y,FeaturePanel.DEFAULT_X_START ,FeaturePanel.DEFAULT_Y_STEP);
+        
+        
+        
+        // draw the link icon
+        // check if link
+        String link = f.getLink();
+        if (( link != null) && (! link.equals(""))){
+            //URL url ;
+            try {
+                new URL(link);
+                //g2D.drawString("L->", 1,y+DEFAULT_Y_HEIGHT);
+                if ( linkIcon != null)
+                    linkIcon.paintIcon(null, g, 1,y);
+            } catch (MalformedURLException e){
+                //continue ;
+            }
+        }
+        
+        
+        // now draw the actual label - text
         g.setColor(Color.black);
         
-        g.drawString(type,2,y+FeaturePanel.DEFAULT_Y_STEP);
+        g.clipRect(0,y,FeaturePanel.DEFAULT_X_START ,FeaturePanel.DEFAULT_Y_STEP);
+        
+        g.drawString(type,2+linkIconWidth,y+FeaturePanel.DEFAULT_Y_STEP);
         //g.setFont(plainFont);
         
+        g.setClip(clip);
         
     }
     

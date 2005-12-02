@@ -50,7 +50,7 @@ extends JPanel{
     
     static final long serialVersionUID = 7893248902423l;
     
-    public static final int    DEFAULT_X_START          = 50  ;
+    public static final int    DEFAULT_X_START          = 70  ;
     public static final int    DEFAULT_X_RIGHT_BORDER   = 20 ;
     public static final int    DEFAULT_Y_START          = 0 ;
     public static final int    DEFAULT_Y_STEP           = 10 ;
@@ -86,8 +86,8 @@ extends JPanel{
         seqArr = new Character[0];       
     }
      
-    public void setChain(Chain c){
-        logger.info("FeaturePanel setting chain >" + c.getName()+"<");
+    public synchronized void setChain(Chain c){
+        //logger.info("FeaturePanel setting chain >" + c.getName()+"<");
         List a = c.getGroups("amino");
         seqArr = new Character[a.size()];
         
@@ -101,35 +101,40 @@ extends JPanel{
             seqArr[i] = aa.getAminoType();
             i++;
         }
-        
-            
+        //this.update(this.getGraphics());
+          this.repaint();  
     }
     
-    public float getScale(){
+    public synchronized float getScale(){
         return scale;
     }
     
     public void setScale(float scale) {
         
         this.scale=scale;
+        //this.update(this.getGraphics());
         this.repaint();
     }
     
     
     public void update (Graphics g)
     {
-        logger.info("update FeaturePanel");
+        //logger.info("update FeaturePanel ");
         // initialize buffer
-        if (dbImage == null)
-        {
+        
+        int aminosize = Math.round(scale);
+        int requiredWidth = DEFAULT_X_START + (aminosize * chain.getLength()) + DEFAULT_X_RIGHT_BORDER ;
+        logger.info("required width " + requiredWidth);
+        //if (dbImage == null)
+        //{
            
-            dbImage = createImage (this.getSize().width, this.getSize().height);
-            dbg = dbImage.getGraphics ();
-        }
+        dbImage = createImage (requiredWidth, 30);
+        dbg = dbImage.getGraphics ();
+        //}
         
         // clear screen in background
         dbg.setColor (getBackground ());
-        dbg.fillRect (0, 0, this.getSize().width, this.getSize().height);
+        dbg.fillRect (0, 0, requiredWidth, this.getSize().height);
         
         // draw elements in background
         dbg.setColor (getForeground());
@@ -147,12 +152,12 @@ extends JPanel{
     public void paint(Graphics g){
         super.paint(g);
         //public void paintComponent(Graphics g){
-        // logger.info("paint featurePanel");
+        int length = chain.getLength();
+        //logger.info("paint featurePanel " + scale + " " + length + " " + this.getWidth() + " " + this.getHeight());
         //  super.paintComponent(g);
         Graphics2D g2D =(Graphics2D) g;
         
-        //  1st: draw the scale
-        int length = chain.getLength();
+        //  1st: draw the scale        
         int y = 1;
         y = drawScale(g2D,scale,length,1);
         
@@ -229,34 +234,33 @@ extends JPanel{
         // draw the vertical lines
         for (int i =1 ; i<= length ; i++){
             int xpos = Math.round(i*scale)+DEFAULT_X_START ;
+            
+            int lineH = 10;
+            if ( scale <= 3)
+                lineH = 6;
+            
             if ( ((i+1)%100) == 0 ) {
                 
                 if ( scale> 0.1) {
-                    
-                    //g2D.drawString(""+(i+1),xpos -5,y);
                     g2D.setColor(TEXT_SCALE_COLOR);
-                    g2D.fillRect(xpos, y+2, aminosize, y+8);
+                    g2D.fillRect(xpos, y+2, aminosize, y+lineH);
                     g2D.setColor(SCALE_COLOR);
                 }
                 
             }else if  ( ((i+1)%50) == 0 ) {
-                if ( scale>1.4) {
-                    //g2D.drawString(""+(i+1),xpos-5,y);
+                if ( scale>1.4) {                    
                     g2D.setColor(TEXT_SCALE_COLOR);
-                    g2D.fillRect(xpos,y+2, aminosize, y+8);
+                    g2D.fillRect(xpos,y+2, aminosize, y+lineH);
                     g2D.setColor(SCALE_COLOR);
                 }
                 
             } else if  ( ((i+1)%10) == 0 ) {                
                 if ( scale> 3) {
-                    //g2D.drawString(""+(i+1),xpos-5,y);
                     g2D.setColor(TEXT_SCALE_COLOR);
-                    g2D.fillRect(xpos, y+2, aminosize, y+10);
+                    g2D.fillRect(xpos, y+2, aminosize, y+lineH);
                     g2D.setColor(SCALE_COLOR);
                 }
-                
             } 
-            
         }
         
         int lastPos = Math.round(length*scale)+DEFAULT_X_START + 2;

@@ -25,6 +25,8 @@ package org.biojava.spice.manypanel;
 import java.net.URL;
 import java.util.ArrayList;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
@@ -39,8 +41,9 @@ import org.biojava.spice.manypanel.managers.*;
 import org.biojava.spice.manypanel.renderer.*;
 
 import org.biojava.services.das.registry.DasCoordinateSystem;
-import org.biojava.services.das.registry.DasRegistryAxisClient;
 import org.biojava.services.das.registry.DasSource;
+
+import javax.swing.BoxLayout;
 import java.awt.Dimension;
 import java.awt.event.MouseListener;
 
@@ -94,15 +97,18 @@ ChangeListener
     FeatureManager upFeatureManager;
     FeatureManager enspFeatureManager;
     
-    public static int DEFAULT_PANE_WIDTH = 600;
+    public static int DEFAULT_PANE_WIDTH  = 600;
     public static int DEFAULT_PANE_HEIGHT = 600;
     
     public BrowserPane(String PDBCOORDSYS, String UNIPROTCOORDSYS, String ENSPCOORDSYS) {
         super();
         JPanel contentPanel = new JPanel();
+        
+        contentPanel.setLayout(new BoxLayout(contentPanel,BoxLayout.X_AXIS));
+        
         //JScrollPane scroll = new JScrollPane(contentPanel);
         //Dimension d = new Dimension(DEFAULT_PANE_WIDTH,DEFAULT_PANE_HEIGHT);
-        this.add(contentPanel);
+      
         //contentPanel.setPreferredSize(d);
         //contentPanel.setSize(d);
         
@@ -119,35 +125,19 @@ ChangeListener
         allsources         = new ArrayList();
         
        
-        //allsources = new ArrayList();
-        
-        /*try {
-            allsources = getAllDasSources();
-        } catch (Exception e){
-            e.printStackTrace();
-            return;
-        }*/
-        
-        //logger.info("got " + allsources.length + " das sources");
-        //this.setOpaque(true);
-        
-        //Box box = Box.createVerticalBox();
+        this.setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
         
         strucManager = new StructureManager();
         addStructureListener(strucManager);
         
         structureRenderer = new StructureRenderer();   
-                
-        //this.setBounds(0,0,200,300);
-        //structureRenderer.setBounds(0,0,800,800);
-        //structureRenderer.setPreferredSize(new Dimension(400,400));
+        ComponentResizedChainListener strucComponentWidthSetter = new ComponentResizedChainListener(structureRenderer);
+        this.addComponentListener(strucComponentWidthSetter);
+        
         JScrollPane structureScroller = new JScrollPane(structureRenderer);
         structureScroller.getVerticalScrollBar().setUnitIncrement(FeaturePanel.DEFAULT_Y_STEP);
-        //structureScroller.setWidth(DEFAULT_PANE_WIDTH);
-        //box.add(structureScroller);
-        //contentPanel.add(box);  
-        //setBounds(0,0,200,300);
-        //this.setPreferredSize(new Dimension(1000,1000));
+        //structureRenderer.setLayout(new BoxLayout(structureRenderer,BoxLayout.Y_AXIS));
+        
         strucManager.addStructureRenderer(structureRenderer);
        
         DasCoordinateSystem dcs = DasCoordinateSystem.fromString(PDBCOORDSYS);
@@ -183,8 +173,14 @@ ChangeListener
         addUniProtListener(seqManager);
         
          seqRenderer = new SequenceRenderer();
+         
+         ComponentResizedChainListener seqComponentWidthSetter = new ComponentResizedChainListener(seqRenderer);
+         this.addComponentListener(seqComponentWidthSetter);
+         
+         
          JScrollPane seqScroller = new JScrollPane(seqRenderer);
          seqScroller.getVerticalScrollBar().setUnitIncrement(FeaturePanel.DEFAULT_Y_STEP);
+         //seqRenderer.setLayout(new BoxLayout(seqRenderer,BoxLayout.Y_AXIS));
          //box.add(seqScroller);  
          
          DasCoordinateSystem seqdcs = DasCoordinateSystem.fromString(UNIPROTCOORDSYS);
@@ -240,8 +236,13 @@ ChangeListener
          addEnspListener(enspManager);
          
           enspRenderer = new SequenceRenderer();
+          
+          ComponentResizedChainListener enspComponentWidthSetter = new ComponentResizedChainListener(enspRenderer);
+          this.addComponentListener(enspComponentWidthSetter);
+          
           JScrollPane enspScroller = new JScrollPane(enspRenderer);
           enspScroller.getVerticalScrollBar().setUnitIncrement(FeaturePanel.DEFAULT_Y_STEP);
+          //enspRenderer.setLayout(new BoxLayout(enspRenderer,BoxLayout.Y_AXIS));
           //box.add(enspScroller);  
        
           DasCoordinateSystem enspdcs = DasCoordinateSystem.fromString(ENSPCOORDSYS);
@@ -305,16 +306,21 @@ ChangeListener
           
         JSplitPane split1 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,structureScroller,seqScroller);
         split1.setOneTouchExpandable(true);
-        split1.setResizeWeight(0.5);
+        // uniprot panel gets a little more space, because so many more DAS sources...
+        split1.setResizeWeight(0.4);
         
         JSplitPane split2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,split1,enspScroller);
         split2.setOneTouchExpandable(true);
-        split2.setResizeWeight(0.5);
+        // uniprot panel gets more space
+        split2.setResizeWeight(0.7);
         
-        Dimension d = new Dimension(DEFAULT_PANE_WIDTH,DEFAULT_PANE_HEIGHT);
-        split2.setPreferredSize(d);
+        //Dimension d = new Dimension(DEFAULT_PANE_WIDTH,DEFAULT_PANE_HEIGHT);
+        //split2.setPreferredSize(d);
         contentPanel.add(split2);
-          
+         
+        
+        /// and now ...
+        
         // the scale ...
         int RES_MIN  = 1;
         int RES_MAX  = 100;
@@ -327,7 +333,15 @@ ChangeListener
         residueSizeSlider.setPaintTicks(false);
         residueSizeSlider.setPaintLabels(false);
         residueSizeSlider.addChangeListener(this);
-        this.add(residueSizeSlider);
+        residueSizeSlider.setPreferredSize(new Dimension(100,10));
+        Box hBox = Box.createHorizontalBox();
+        hBox.add(Box.createHorizontalGlue());
+        hBox.add(residueSizeSlider);
+        hBox.add(Box.createHorizontalGlue());
+        
+        this.add(contentPanel);
+        this.add(hBox);
+        
         
     }
 
@@ -609,9 +623,9 @@ ChangeListener
         DasCoordinateSystem[] coordsys = source.getCoordinateSystem() ;
         for ( int i = 0 ; i< coordsys.length; i++ ) {
             DasCoordinateSystem thiscs  =  coordsys[i];
-            System.out.println("comparing " + cs.toString() + " " + thiscs.toString());
+            //System.out.println("comparing " + cs.toString() + " " + thiscs.toString());
             if ( cs.toString().equals( thiscs.toString()) ) {
-                System.out.println("match");
+                //System.out.println("match");
                 return true ;
             }
             
