@@ -73,9 +73,9 @@ ChangeListener
     //public static  String registry = "http://servlet.sanger.ac.uk/dasregistry/services/das_registry";
     //public static  String registry = "http://www.spice-3d.org/dasregistry/services/das_registry";
     
-    //public static String PDBCOORDSYS     = "PDBresnum,Protein Structure";
-    //public static String UNIPROTCOORDSYS = "UniProt,Protein Sequence";
-    //public static String ENSPCOORDSYS    = "Ensembl,Protein Sequence";
+    public static String DEFAULT_PDBCOORDSYS     = "PDBresnum,Protein Structure";
+    public static String DEFAULT_UNIPROTCOORDSYS = "UniProt,Protein Sequence";
+    public static String DEFAULT_ENSPCOORDSYS    = "Ensembl,Protein Sequence";
  
     List allsources ; // a list of DasSource[] 
     
@@ -130,7 +130,8 @@ ChangeListener
         strucManager = new StructureManager();
         addStructureListener(strucManager);
         
-        structureRenderer = new StructureRenderer();   
+        structureRenderer = new StructureRenderer(); 
+        structureRenderer.getStatusPanel().setName("PDB");
         ComponentResizedChainListener strucComponentWidthSetter = new ComponentResizedChainListener(structureRenderer);
         this.addComponentListener(strucComponentWidthSetter);
         
@@ -173,7 +174,7 @@ ChangeListener
         addUniProtListener(seqManager);
         
          seqRenderer = new SequenceRenderer();
-         
+         seqRenderer.getStatusPanel().setName("UniProt");
          ComponentResizedChainListener seqComponentWidthSetter = new ComponentResizedChainListener(seqRenderer);
          this.addComponentListener(seqComponentWidthSetter);
          
@@ -236,12 +237,12 @@ ChangeListener
          addEnspListener(enspManager);
          
           enspRenderer = new SequenceRenderer();
-          
+          enspRenderer.getStatusPanel().setName("ENSP");
           ComponentResizedChainListener enspComponentWidthSetter = new ComponentResizedChainListener(enspRenderer);
           this.addComponentListener(enspComponentWidthSetter);
           
-          JScrollPane enspScroller = new JScrollPane(enspRenderer);
-          enspScroller.getVerticalScrollBar().setUnitIncrement(FeaturePanel.DEFAULT_Y_STEP);
+          //JScrollPane enspScroller = new JScrollPane(enspRenderer);
+          //enspScroller.getVerticalScrollBar().setUnitIncrement(FeaturePanel.DEFAULT_Y_STEP);
           //enspRenderer.setLayout(new BoxLayout(enspRenderer,BoxLayout.Y_AXIS));
           //box.add(enspScroller);  
        
@@ -312,7 +313,7 @@ ChangeListener
         // uniprot panel gets a little more space, because so many more DAS sources...
         split1.setResizeWeight(0.4);
         
-        JSplitPane split2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,split1,enspScroller);
+        JSplitPane split2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,split1,enspRenderer);
         split2.setOneTouchExpandable(true);
         // uniprot panel gets more space
         split2.setResizeWeight(0.7);

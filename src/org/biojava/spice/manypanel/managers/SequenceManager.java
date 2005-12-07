@@ -193,6 +193,13 @@ extends AbstractChainManager
         //thr.addSequenceListener(featureManager);
         thr.start();
         
+        Iterator iter = seqRenderers.iterator();
+        while (iter.hasNext()){
+            SequenceRenderer re = (SequenceRenderer)iter.next();
+            re.getStatusPanel().setLoading(true);
+        }
+        
+        
     }
 
 

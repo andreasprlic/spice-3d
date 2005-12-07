@@ -23,6 +23,8 @@
 package org.biojava.spice.manypanel;
 
 import javax.swing.*;
+
+import java.awt.Dimension;
 import java.net.*;
 import org.biojava.services.das.registry.*;
 import org.biojava.spice.das.SpiceDasSource;
@@ -79,9 +81,10 @@ public class SpiceLayeredPanel
         }
         browserPane.setDasSources(sds);
         browserPane.triggerLoadStructure("1boi");
+      
         //browserPane.triggerLoadUniProt("P50225");
         //browserPane.triggerLoadENSP("ENSP00000346625");
-        //browserPane.setPreferredSize(new Dimension(1000, 1000));
+        browserPane.setPreferredSize(new Dimension(600, 600));
         //browserPane.setOpaque(true); // contentPanes must be opaque
         } catch (Exception e){
             e.printStackTrace();

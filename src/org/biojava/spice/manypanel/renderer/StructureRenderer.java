@@ -58,6 +58,7 @@ extends AbstractChainRenderer
     
     
     public void setDrawableStructure(DrawableStructure draw){
+        statusPanel.setLoading(false);
         //logger.info("got new DrawableStructure");
         this.structure =draw;
       

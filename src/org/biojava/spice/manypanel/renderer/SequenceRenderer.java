@@ -50,6 +50,7 @@ extends AbstractChainRenderer
     }
 
     public void setDrawableSequence(DrawableSequence sequence) {
+        statusPanel.setLoading(false);
         logger.info("setting drawable sequence ");
         this.sequence=sequence;
         statusPanel.setAccessionCode(sequence.getAccessionCode());

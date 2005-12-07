@@ -504,7 +504,7 @@ ConfigurationListener
             mainsharedPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, sharedPanel,vBox2);
         
         mainsharedPanel.setOneTouchExpandable(true);
-        mainsharedPanel.setResizeWeight(0.5);
+        mainsharedPanel.setResizeWeight(0.6);
         
         mainsharedPanel.setPreferredSize(new Dimension(790, 590));
         

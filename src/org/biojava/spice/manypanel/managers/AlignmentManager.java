@@ -35,6 +35,7 @@ import org.biojava.spice.das.AlignmentThread;
 import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.manypanel.eventmodel.*;
 import org.biojava.spice.manypanel.AlignmentTool;
+import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.program.das.dasalignment.Alignment;
 import org.biojava.bio.program.das.dasalignment.DASException;
@@ -44,6 +45,8 @@ import org.biojava.bio.structure.ChainImpl;
 
 public class AlignmentManager 
 implements AlignmentListener {
+    
+    
     
     DasCoordinateSystem coordSys1;
     DasCoordinateSystem coordSys2;
@@ -185,6 +188,9 @@ implements AlignmentListener {
         
         String ac1 =  (String) a1.getProperty("dbAccessionId");
         String ac2 =  (String) a2.getProperty("dbAccessionId");
+        ac1 = ac1.toLowerCase();
+        ac2 = ac2.toLowerCase();
+        
         logger.info(panelName+" got new Alignment "+ac1 + " " + ac2+   " currently know:"+object1Id+" " + object2Id);
   
         
@@ -198,18 +204,27 @@ implements AlignmentListener {
     //  see wich object already was there..
        
        
-        if ( ac1.equals(object1Id) || ( ac1.substring(0,4).equals(object1Id))){
+        if ( ac1.equals(object1Id) || 
+                ( (coordSys1.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS)) &&
+                        (ac1.substring(0,4).equals(object1Id)))){
             // object1 = ac1
            
             triggerObject2Request(ac2);
-        } else if ( ac1.equals(object2Id)|| ( ac1.substring(0,4).equals(object2Id))){
+        } else if ( ac1.equals(object2Id)|| 
+                ((coordSys1.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS)) &&
+                        ( ac1.substring(0,4).equals(object2Id)))){
             // object2 = ac1
           
             triggerObject1Request(ac2);
-        } else if ( ac2.equals(object1Id)|| ( ac2.substring(0,4).equals(object1Id))){
+        } else if ( ac2.equals(object1Id)|| 
+                ((coordSys2.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS)) &&
+                ( ac2.substring(0,4).equals(object1Id)))){
            
             triggerObject2Request(ac1);
-        } else if ( ac2.equals(object2Id)|| ( ac2.substring(0,4).equals(object2Id))){
+            
+        } else if ( ac2.equals(object2Id)|| 
+                ((coordSys2.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS)) &&
+                ( ac2.substring(0,4).equals(object2Id)))){
           
             triggerObject1Request(ac1);
         } else {
@@ -235,6 +250,8 @@ implements AlignmentListener {
         String ac1 =  (String) a1.getProperty("dbAccessionId");
         String ac2 =  (String) a2.getProperty("dbAccessionId");
         
+        ac1 = ac1.toLowerCase();
+        ac2 = ac2.toLowerCase();
         
         boolean found1 = false;
         boolean found2 = false;
@@ -264,6 +281,9 @@ implements AlignmentListener {
     public void triggerObject1Request(String ac){
         
         Iterator iter = object1Listeners.iterator();
+        if  (! coordSys1.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS) )
+            ac = ac.toUpperCase();
+        
         while (iter.hasNext()){
             ObjectListener li = (ObjectListener)iter.next();
             li.newObjectRequested(ac);
@@ -271,6 +291,11 @@ implements AlignmentListener {
     }
     
     public void triggerObject2Request(String ac){
+        
+        if  (! coordSys2.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS) )
+            ac = ac.toUpperCase();
+        logger.info("triggerObject2Request " + ac);
+        
         Iterator iter = object2Listeners.iterator();
         while (iter.hasNext()){
             ObjectListener li = (ObjectListener)iter.next();
@@ -307,9 +332,9 @@ implements AlignmentListener {
     public void newSequence1(SequenceEvent e){
         logger.info(panelName+" alignment : new sequence1:" + e.getAccessionCode() + " currently know:"+object1Id+" " + object2Id);
         
-       
+       String ac = e.getAccessionCode().toLowerCase();
         
-        if (  object1Id.equals(e.getAccessionCode()) || object2Id.equals(e.getAccessionCode())){
+        if (  object1Id.equals(ac) || object2Id.equals(ac)){
             // we already go this one, ignore...
             logger.info("already loaded, skipping");
             tryCreateAlignmentChain();
@@ -320,7 +345,7 @@ implements AlignmentListener {
         sequence1 = sm.getChainFromString(e.getSequence());
       
         // a new object, request the data...
-        object1Id = e.getAccessionCode();
+        object1Id = ac;
         
         if ( object2Id == null) {
             // get first alignment for this sequence..
@@ -363,7 +388,10 @@ implements AlignmentListener {
     
     public void newSequence2(SequenceEvent e){
         logger.info(panelName+" alignment : new sequence2:"+e.getAccessionCode() + " currently know:"+object1Id+" " + object2Id);
-        if (  object2Id.equals(e.getAccessionCode()) || object1Id.equals(e.getAccessionCode())){
+        
+        String ac = e.getAccessionCode().toLowerCase();
+        
+        if (  object2Id.equals(ac) || object1Id.equals(ac)){
             // we already go this one, ignore...
             logger.info("already loaded, skipping");
             tryCreateAlignmentChain();
@@ -373,7 +401,7 @@ implements AlignmentListener {
         SequenceManager sm = new SequenceManager();
         sequence2 = sm.getChainFromString(e.getSequence());
       
-        object2Id = e.getAccessionCode();
+        object2Id = ac;
         
         if ( object1Id == null) {
             // get first alignment for this sequence..

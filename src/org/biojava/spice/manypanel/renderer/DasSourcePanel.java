@@ -82,6 +82,8 @@ implements FeatureListener,SpiceFeatureListener
     ImageIcon linkIcon ;
     
     int chainLength;
+    boolean progressThreadRunning;
+    ProgressThread progressThread;
     
     public DasSourcePanel(DrawableDasSource ds) {
         super();
@@ -101,7 +103,7 @@ implements FeatureListener,SpiceFeatureListener
         selected = false;
         chainLength = 0;
         linkIcon = createImageIcon("firefox10x10.png");
-        
+        progressThreadRunning = false;
     }
     
     
@@ -155,12 +157,21 @@ implements FeatureListener,SpiceFeatureListener
         if (dasSource.getLoading()){
             //logger.info(" draw loading bar");
             // add a progressbar           
-            bar.setIndeterminate(true);
+            if (!  progressThreadRunning ) {
+                //progressThread = new ProgressThread(bar,this);
+                //progressThread.start();
+                //progressThreadRunning = true;
+                bar.setIndeterminate(true);
+            }
             //add
             bar.paint(g);
             
         } else {
-            bar.setIndeterminate(false);
+            if ( progressThreadRunning){
+                bar.setIndeterminate(false);
+                //progressThread.cancel();
+                //progressThreadRunning = false;
+            }
         }
         
         
@@ -1008,4 +1019,37 @@ implements FeatureListener,SpiceFeatureListener
     
     
     
+}
+
+
+class ProgressThread extends Thread{
+    Component comp;
+    JProgressBar bar;
+    boolean continueFlag;
+    
+    public ProgressThread(JProgressBar bar, Component comp){
+        this.bar =bar ;
+        this.comp = comp;
+        continueFlag = false;
+    }
+    
+    
+    public void run(){
+        continueFlag = true;
+        while (continueFlag){
+            try {
+            
+                wait(100);
+            } catch (Exception e){
+            
+            }
+            bar.paint(comp.getGraphics());
+            //bar.revalidate();
+        }
+       System.out.println("stopping thread");
+    }
+    
+    public void cancel(){
+        continueFlag = false;
+    }
 }

@@ -23,8 +23,10 @@
 package org.biojava.spice.manypanel.renderer;
 
 import java.awt.Dimension;
+import java.awt.Point;
 import java.util.logging.Logger;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JLayeredPane;
@@ -50,8 +52,9 @@ public abstract class AbstractChainRenderer
     
     {
     
-    public static final int    MAX_SCALE       = 10;
-    public static final int STATUS_PANEL_HEIGHT = 20;
+    public static final int    MAX_SCALE        =  10;
+    public static final int STATUS_PANEL_HEIGHT =  20;
+    public static final int FEATURE_PANEL_HEIGHT = 20;
     FeaturePanel featurePanel;
     CursorPanel cursorPanel;
     DrawableSequence sequence;
@@ -67,6 +70,7 @@ public abstract class AbstractChainRenderer
     StatusPanel statusPanel;
     JLayeredPane layeredPane;
     JScrollPane scrollPane;
+    
     public AbstractChainRenderer() {
         super();        
         this.setOpaque(true);
@@ -75,10 +79,13 @@ public abstract class AbstractChainRenderer
         
         //clearFeatureRenderers();
         layeredPane = new JLayeredPane();
+        layeredPane.setBorder(BorderFactory.createEmptyBorder());
         layeredPane.setDoubleBuffered(true);
         layeredPane.setOpaque(true);
         
+        
         scrollPane = new JScrollPane(layeredPane);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.setOpaque(true);
         scrollPane.getVerticalScrollBar().setUnitIncrement(FeaturePanel.DEFAULT_Y_STEP);
         
@@ -90,12 +97,24 @@ public abstract class AbstractChainRenderer
         
         mouseListener.addSpiceFeatureListener(toolTipper);
         componentWidth = BrowserPane.DEFAULT_PANE_WIDTH;
-        statusPanel = new StatusPanel();
         
-        Box vBox = Box.createVerticalBox();
+        statusPanel = new StatusPanel();
+        statusPanel.setMaximumSize(new Dimension(Short.MAX_VALUE,20));
+        
+        statusPanel.setBorder(BorderFactory.createEmptyBorder());
+        // the statusPanel is in the header of the scrollbar
+        
+        //scrollPane.setColumnHeaderView(statusPanel);
+        //JPanel lowerPane = new JPanel();
+        //lowerPane.add(scrollPane);
+        
+        //Box vBox = Box.createVerticalBox();
         //vBox.add(statusPanel);
-        vBox.add(scrollPane);
-        this.add(vBox);
+        //vBox.add(lowerPane);
+        //vBox.add(scrollPane);
+        //this.add(vBox);
+        this.add(statusPanel);
+        this.add(scrollPane);
     }
 
     protected void initPanels(){
@@ -112,10 +131,10 @@ public abstract class AbstractChainRenderer
         
         int width = getDisplayWidth();
         
-        statusPanel.setLocation(0,0);
-        statusPanel.setBounds(0,0,width,STATUS_PANEL_HEIGHT);
-       //statusPanel.setPreferredSize(new Dimension(80,20));
-       statusPanel.setMaximumSize(new Dimension(Short.MAX_VALUE,20));
+        //statusPanel.setLocation(0,0);
+        //statusPanel.setBounds(0,0,width,STATUS_PANEL_HEIGHT);
+        //statusPanel.setPreferredSize(new Dimension(width,20));
+        
         //int y = statusPanel.getHeight();
         int y = 0;
 
@@ -127,7 +146,7 @@ public abstract class AbstractChainRenderer
         cursorPanel.setLocation(0,y);
         //cursorPanel.setOpaque(true);
         cursorPanel.setBounds(0,y,width,getDisplayHeight());
-        layeredPane.add(statusPanel,new Integer(99));
+        //layeredPane.add(statusPanel,new Integer(99));
         layeredPane.add(featurePanel,new Integer(0));
         layeredPane.add(cursorPanel, new Integer(100));
         layeredPane.moveToFront(cursorPanel);
@@ -162,6 +181,10 @@ public abstract class AbstractChainRenderer
     
     public FeaturePanel getFeaturePanel(){
         return featurePanel;
+    }
+    
+    public StatusPanel getStatusPanel(){
+        return statusPanel;
     }
     
     public SeqToolTipListener getToolTipListener(){
@@ -335,8 +358,7 @@ public abstract class AbstractChainRenderer
         layeredPane.moveToFront(cursorPanel);
         dasSourcePanels.add(dspanel);
         Dimension d = new Dimension(width,h+panelHeight);
-        
-        
+               
         
         //this.setPreferredSize(d);
         this.setSize(d);
@@ -347,14 +369,34 @@ public abstract class AbstractChainRenderer
     }
     
     public void updatePanelPositions(){
-        //int h = featurePanel.getHeight() + STATUS_PANEL_HEIGHT;
-        int h = 40;
+        //int h = featurePanel.getHeight() + 20;
+        int h = FEATURE_PANEL_HEIGHT;
         int width = getDisplayWidth();
         
-        logger.info("update panel positions " + width + " " + h + " " + sequence.getSequence().getLength());
-        logger.info("status panel size " + statusPanel.getHeight() + " " + statusPanel.getWidth());
-        statusPanel.setBounds(0,0,width,STATUS_PANEL_HEIGHT);
-        featurePanel.setBounds(0,STATUS_PANEL_HEIGHT,width,h);
+        //logger.info("update panel positions " + width + " " + h + " " + sequence.getSequence().getLength());
+        //logger.info("status panel size " + statusPanel.getHeight() + " " + statusPanel.getWidth());
+        
+        // put statuspanel on top of visible area
+        //Point p = scrollPane.getViewport().getViewPosition();
+        //logger.info("" +p);
+        Dimension viewSize = scrollPane.getViewport().getViewSize();
+        
+        
+        
+        //logger.info("viewSize " + viewSize.getWidth() + " " + viewSize.getHeight());
+        this.setPreferredSize(viewSize);
+        this.setSize(viewSize);
+        scrollPane.setPreferredSize(viewSize);
+        //   scrollPane.setSize(viewSize);
+        
+        
+        //int vw = viewSize.width;
+        statusPanel.setPreferredSize(new Dimension(viewSize.width,STATUS_PANEL_HEIGHT));
+        
+        //statusPanel.setLocation(p.x,0);
+        //statusPanel.setBounds(p.x,0,vw,STATUS_PANEL_HEIGHT);
+        //statusPanel.setBounds(0,0,width,STATUS_PANEL_HEIGHT);
+        featurePanel.setBounds(0,0,width,h);
         // x .. width
         // y .. height
         // (x1,y1,x2,y2)
@@ -373,10 +415,17 @@ public abstract class AbstractChainRenderer
         
         //logger.info("updatePanelPosition max: " + width + " "  + h);
         
-        cursorPanel.setBounds(0,STATUS_PANEL_HEIGHT,width,h);
+        cursorPanel.setBounds(0,0,width,h);
         Dimension totalD = new Dimension(width,h);
+        
         layeredPane.setPreferredSize(totalD);
         layeredPane.setSize(totalD);
+        layeredPane.repaint();        
+        layeredPane.revalidate();
+        
+        scrollPane.repaint();
+        scrollPane.revalidate();
+        
         this.repaint();
         this.revalidate();
     }

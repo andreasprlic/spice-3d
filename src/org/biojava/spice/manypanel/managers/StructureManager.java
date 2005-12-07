@@ -105,11 +105,18 @@ implements ObjectManager, StructureListener {
         while (iter.hasNext()){
             StructureListener li = (StructureListener)iter.next();
             dsh.addStructureListener(li);
+            
         }
         //dsh.addObjectListener(featureManager);
         dsh.start();
         //featureManager.newObjectRequested(accessionCode);
        
+        Iterator iter2 = structureRenderers.iterator();
+        while (iter2.hasNext()){
+            StructureRenderer re = (StructureRenderer)iter2.next();
+            re.getStatusPanel().setLoading(true);
+        }
+        
         
     }
     
