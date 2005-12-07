@@ -26,7 +26,7 @@ import org.biojava.spice.*;
 import org.biojava.spice.Feature.*;
 import org.biojava.spice.Config.*;
 import org.biojava.spice.Feature.Segment;
-import org.biojava.spice.Panel.seqfeat.FeatureView;
+//import org.biojava.spice.Panel.seqfeat.FeatureView;
 import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.das.StructureXMLStAXAdaptor;
 import org.biojava.utils.stax.DelegationManager;
@@ -232,6 +232,8 @@ public class SaveLoadSession {
     		
     		xw.openTag("Features");
     			
+            // todo: do differently ..
+            /*
     		 	FeatureView[] fvs = spice.getFeatureViews();
     	        
     	        //List features = new ArrayList();
@@ -251,7 +253,6 @@ public class SaveLoadSession {
     	                xw.print(caps[c]);
     	                xw.closeTag("capability");
     	            }
-    	            //TODO: also save labels, coordsys, adminemail 
     	            
     	            
     	            Feature[] feats =fv.getFeatures();
@@ -261,6 +262,7 @@ public class SaveLoadSession {
     	            }
     	            	xw.closeTag("DasSource");
     	        }
+                */
     	        
     		
     		
@@ -399,13 +401,14 @@ class MyParser
         	// finally setting the currently active Chain in spice
         // features have to be already  set ( see above)
         //System.out.println(currentChain);
-        
+        // todo: do differrently
+        /*
         FeatureView[] fvs = (FeatureView[])featureViews.toArray(new FeatureView[featureViews.size()]);
         for ( int i =0 ; i < fvs.length; i++){
             FeatureView fv = fvs[i];
             fv.setSeqLength(s.getChain(currentChainNumber).getLengthAminos() );
         }
-        
+        */
        
         //logger.info("setting structure");
         spice.setStructure(s);
@@ -414,8 +417,9 @@ class MyParser
         
         spice.setCurrentChainNumber(currentChainNumber,false);
        
-        //logger.info("setting feature views");        
-        spice.setFeatureViews(fvs);
+        //logger.info("setting feature views");
+        // todo do differently...
+        //spice.setFeatureViews(fvs);
         
         //logger.info("restored session");
         logger.info("restored session date: " +date);
@@ -513,12 +517,13 @@ class MyParser
             String[] caps = (String[]) capabilities.toArray(new String[capabilities.size()]);
             currentDasSource.setCapabilities(caps);
             
-            FeatureView fv = new FeatureView();
-            spice.addFeatureView(fv);
+            // todo: do differently
+            //FeatureView fv = new FeatureView();
+            //spice.addFeatureView(fv);
             
-            fv.setLabel(currentDasSource.getNickname());
+            //fv.setLabel(currentDasSource.getNickname());
       
-            fv.setDasSource(currentDasSource);
+            //fv.setDasSource(currentDasSource);
           
             Feature[] feat = (Feature[])features.toArray(new Feature[features.size()]);
      
@@ -526,9 +531,9 @@ class MyParser
             //    System.out.println(feat[i]);
             //}
             
-            fv.setFeatures(feat);
+            //fv.setFeatures(feat);
             //System.out.println("e");
-            featureViews.add(fv);
+            //featureViews.add(fv);
             features = new ArrayList();
             
             // get features, set in currentFeature View

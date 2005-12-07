@@ -32,11 +32,11 @@ import org.biojava.bio.structure.Structure ;
 import org.biojava.bio.structure.StructureImpl ;
 import org.biojava.spice.Feature.Feature;
 import org.biojava.spice.Feature.Segment;
-import org.biojava.spice.Panel.seqfeat.FeatureEvent;
-import org.biojava.spice.Panel.seqfeat.FeatureViewListener;
-import org.biojava.spice.Panel.seqfeat.SelectedSeqPositionListener;
+
 import org.biojava.spice.manypanel.eventmodel.SequenceEvent;
 import org.biojava.spice.manypanel.eventmodel.SequenceListener;
+import org.biojava.spice.manypanel.eventmodel.SpiceFeatureEvent;
+import org.biojava.spice.manypanel.eventmodel.SpiceFeatureListener;
 import org.biojava.spice.manypanel.eventmodel.StructureEvent;
 import org.biojava.spice.manypanel.eventmodel.StructureListener;
 
@@ -48,11 +48,10 @@ import java.awt.Color;
  *
  */
 public class StructurePanelListener
-implements FeatureViewListener,
-SelectedSeqPositionListener,
+implements 
 StructureListener,
-SequenceListener
-
+SequenceListener,
+SpiceFeatureListener
 {
     
     
@@ -303,7 +302,7 @@ SequenceListener
             executeCmd(cmd);	
         }
     }
-    public void mouseOverFeature(FeatureEvent e){
+    public void mouseOverFeature(SpiceFeatureEvent e){
         /*
         Feature feat = (Feature) e.getSource();
         //System.out.println("StructurePanel mouse over feature " + feat);
@@ -312,7 +311,7 @@ SequenceListener
         */
     }
     
-    public void mouseOverSegment(FeatureEvent e){
+    public void mouseOverSegment(SpiceFeatureEvent e){
         /*
         Segment s = (Segment)e.getSource();
         //System.out.println("StructurePanel mouseOverSegment " + s);
@@ -335,17 +334,25 @@ SequenceListener
         executeCmd(cmd);
         */
     }
-    public void featureSelected(FeatureEvent e){
+    
+    
+    public void featureSelected(SpiceFeatureEvent e){
         
-        Feature feat = (Feature) e.getSource();
+        Feature feat = (Feature) e.getFeature();
         //System.out.println("StructurePanel selected feature " + feat);
         Map[] stylesheet = e.getDasSource().get3DStylesheet();
         highliteFeature(feat,stylesheet,true);
     }
-    public void segmentSelected(FeatureEvent e){
-        Segment seg = (Segment)e.getSource();
+    public void segmentSelected(SpiceFeatureEvent e){
+        Segment seg = (Segment)e.getSegment();
         //System.out.println("StructurePanel: selected segment " + seg);
         highliteSegment(seg);
+    }
+    
+    public void clearSelection(){
+        String cmd = "select none ; set display selected;";
+        executeCmd(cmd);
+                
     }
     
     
@@ -364,7 +371,7 @@ SequenceListener
     }
     
     private void highliteFeature(Feature feature, Map[] stylesheet, boolean color ){
-        logger.finest("highlite feature " + feature.getName());
+        //logger.finest("highlite feature " + feature.getName());
         //Feature feature = (Feature) features.get(featurenr) ;
         //logger.finest("highlite feature " + feature);
         
@@ -392,7 +399,7 @@ SequenceListener
             
             int start = segment.getStart()-1;
             int end   = segment.getEnd()-1;
-            logger.finest("highilte segment " + i+" " + start + " " +end + "chain" + currentChainNumber );
+            //logger.finest("highilte segment " + i+" " + start + " " +end + "chain" + currentChainNumber );
             
             if ( feature.getType().equals("DISULFID")){
             
@@ -560,7 +567,7 @@ SequenceListener
      * @param chainNumber
      * @param seqpos
      * @param colour
-     */
+     
     private void highlite(int chainNumber, int seqpos, String colour) {
         //logger.finest("highlite " + seqpos);
         
@@ -580,8 +587,9 @@ SequenceListener
             colour(chainNumber,seqpos,colour) ;
         }
     }
+    */
     
-    public void colour(int chainNumber, int seqpos, String colour) {
+    public void colour(int chainNumber, int seqpos, String colour) { 
        		
         if ( seqpos    < 0 ) return ;
         if (chainNumber < 0 ) return ;

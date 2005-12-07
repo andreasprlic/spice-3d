@@ -24,20 +24,23 @@ package org.biojava.spice.manypanel.eventmodel;
 
 import org.biojava.spice.Feature.Feature;
 import org.biojava.spice.Feature.Segment;
+import org.biojava.spice.das.SpiceDasSource;
 
 public class SpiceFeatureEvent {
 
     Feature feature;
     Segment segment;
+    SpiceDasSource source;
     
-    public SpiceFeatureEvent(Feature feature) {
+    public SpiceFeatureEvent(SpiceDasSource source,Feature feature) {
         super();
         this.feature = feature;
         this.segment = null;
+        this.source = source;
     }
     
-    public SpiceFeatureEvent(Feature feature, Segment s){
-        this(feature);
+    public SpiceFeatureEvent(SpiceDasSource source,Feature feature, Segment s){
+        this(source,feature);
         segment = s;
     }
     
@@ -45,8 +48,25 @@ public class SpiceFeatureEvent {
         return feature;
     }
     
+    public void setFeature(Feature feat){
+        feature = feat;
+        
+    }
+    
     public Segment getSegment(){
         return segment;
     }
+    
+    public void setSegment(Segment s){
+        segment = s;
+    }
+    
+    public void setDasSource(SpiceDasSource source){
+        this.source = source;
+    }
 
+    public SpiceDasSource getDasSource(){
+        return source;
+    }
+    
 }

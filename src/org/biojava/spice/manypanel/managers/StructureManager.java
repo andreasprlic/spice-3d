@@ -133,7 +133,11 @@ implements ObjectManager, StructureListener {
         drawStructure(s);
         Chain c = s.getChain(event.getCurrentChainNumber());
         
-        String code = event.getPDBCode() ;
+        triggerNewSequence(c,event.getPDBCode());
+    }
+    
+    private void triggerNewSequence(Chain c,String code){
+        //String code = event.getPDBCode() ;
         code = code.toLowerCase();
         code += "."+c.getName();
         /*if ( ! c.getName().equals(" "))
@@ -157,7 +161,7 @@ implements ObjectManager, StructureListener {
     }
     
     private void drawStructure(Structure struc){
-        DrawableStructure draw = new DrawableStructure();
+        DrawableStructure draw = new DrawableStructure(struc.getPDBCode());
         draw.setStructure(struc);
         draw.setLoading(false);
         Iterator iter = structureRenderers.iterator();
@@ -169,9 +173,12 @@ implements ObjectManager, StructureListener {
     }
     
     public void selectedChain(StructureEvent event) {
-        //int nr = event.getCurrentChainNumber();
-        
+        int nr = event.getCurrentChainNumber();
+        Structure s = event.getStructure();
         // change the displayed sequence ...
+        Chain c = s.getChain(nr);
+        triggerNewSequence(c,event.getPDBCode());
+        
     }
     
     

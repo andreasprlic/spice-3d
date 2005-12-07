@@ -40,23 +40,25 @@ public class DrawableSequence
 implements Drawable
 
 {
+    String accessionCode;
     Chain sequence;
     boolean loading;
 
     
-    public DrawableSequence(){
+    public DrawableSequence(String accessionCode){
         this.sequence = new ChainImpl();
         this.loading = false;
+        this.accessionCode = accessionCode;
         
         
     }
-    public DrawableSequence(Chain sequence){
-        super();
+    public DrawableSequence(String accessionCode,Chain sequence){
+        this(accessionCode);
         this.sequence = sequence;
         
     }
     
-    public static DrawableSequence fromChain(Chain sequence){
+    public static DrawableSequence fromChain(String accessionCode,Chain sequence){
         List aminos = sequence.getGroups("amino");
         Chain newChain = new ChainImpl();
         for ( int i=0 ; i< aminos.size(); i++){
@@ -66,7 +68,7 @@ implements Drawable
         newChain.setName(sequence.getName());
         newChain.setSwissprotId(sequence.getSwissprotId());
         newChain.setAnnotation(sequence.getAnnotation());
-        return new DrawableSequence(newChain);
+        return new DrawableSequence(accessionCode,newChain);
     }
     
   
@@ -92,7 +94,7 @@ implements Drawable
     }
 
     public Chain getSequence() {
-        // TODO Auto-generated method stub
+        
         return sequence;
     }
 
@@ -100,6 +102,9 @@ implements Drawable
         this.sequence = sequence;
     }
 
+    public String getAccessionCode(){
+        return accessionCode;
+    }
  
   
     

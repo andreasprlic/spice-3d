@@ -239,6 +239,7 @@ implements ObjectManager ,SequenceListener{
         
     }
     
+    public void clearSelection(){};
     
     
 

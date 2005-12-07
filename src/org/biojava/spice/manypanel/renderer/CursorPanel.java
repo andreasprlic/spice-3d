@@ -24,14 +24,8 @@ package org.biojava.spice.manypanel.renderer;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.logging.Logger;
-import java.awt.event.*;
-
-
-
 import org.biojava.bio.structure.*;
 import org.biojava.spice.Feature.Segment;
 import org.biojava.spice.manypanel.eventmodel.SequenceEvent;
@@ -47,7 +41,7 @@ SequenceListener,
 SpiceFeatureListener
 
 {
-    
+    static final long serialVersionUID = 92019290011924233l;
     public static final Color SELECTION_COLOR = Color.DARK_GRAY;
     int selectionStart;
     int selectionEnd;
@@ -85,6 +79,15 @@ SpiceFeatureListener
     public void newSequence(SequenceEvent e) {
     
         
+    }
+    
+    public void clearSelection(){
+        //logger.info("cursorPanel clear selection");
+        selectionLocked = false;
+        setSelectionStart(-1);
+        setSelectionEnd(-1);
+        
+        this.repaint();
     }
     
     public void selectedSeqPosition(int position) {
@@ -140,7 +143,7 @@ SpiceFeatureListener
     }
     
     public void setScale(float scale) {
-        // TODO Auto-generated method stub
+        
         this.scale=scale;
         this.repaint();
     }
@@ -157,7 +160,7 @@ SpiceFeatureListener
     
     
     public void featureSelected(SpiceFeatureEvent e) {
-        // TODO Auto-generated method stub
+   
         //setToolTipText(e.getFeature().toString());
         
         
@@ -169,7 +172,7 @@ SpiceFeatureListener
 
 
     public void mouseOverFeature(SpiceFeatureEvent e) {
-        // TODO Auto-generated method stub
+       
         //setToolTipText(e.getFeature().toString());
         
     }
@@ -180,14 +183,10 @@ SpiceFeatureListener
 
 
     public void mouseOverSegment(SpiceFeatureEvent e) {
-        // TODO Auto-generated method stub
+        
         //setToolTipText(e.getSegment().toString());
         
     }
-
-
-
-
 
 
     public void segmentSelected(SpiceFeatureEvent e) {

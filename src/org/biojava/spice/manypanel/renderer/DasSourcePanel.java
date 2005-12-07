@@ -49,6 +49,7 @@ import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.Feature.Feature;
 import org.biojava.spice.Feature.Segment;
 import org.biojava.spice.manypanel.eventmodel.FeatureEvent;
+import org.biojava.spice.manypanel.eventmodel.SpiceFeatureEvent;
 import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.manypanel.drawable.*;
 import org.biojava.spice.manypanel.eventmodel.*;
@@ -189,7 +190,7 @@ implements FeatureListener,SpiceFeatureListener
         
         drawFeatures(g2D,features,y);
         
-        // TODO: add listener for DasSource selected
+        
         if ( selected ){
             // the whole featureview has been selected
             //if selected draw a rectangle over everything
@@ -548,7 +549,7 @@ implements FeatureListener,SpiceFeatureListener
     private void checkDrawSelectedFeature(Feature feature,int featurePos, Graphics g,int y){
         Graphics2D g2D =(Graphics2D) g;
         int f = featurePos;
-        // TODO color check for selection of features
+        
         if ( featureSelected){
             if (f == selectedFeaturePos) {
                 int fullwidth = Math.round(scale*chainLength);
@@ -915,6 +916,9 @@ implements FeatureListener,SpiceFeatureListener
         
         
         Feature f = e.getFeature();
+        
+        //logger.info("feature selected " + f);
+        
         if ( f == null) {
             if ( featureSelected){
                 featureSelected = false;
@@ -957,7 +961,7 @@ implements FeatureListener,SpiceFeatureListener
                 if ( ! found){
                     continue;
                 }
-                
+                logger.info("setting feature pos "  + i);
                 selectedFeaturePos = i;
                 featureOnThisPanel = true;
                 featureSelected = true;
@@ -979,13 +983,23 @@ implements FeatureListener,SpiceFeatureListener
 
 
     public void mouseOverSegment(SpiceFeatureEvent e) {
-        // TODO Auto-generated method stub
+      
         
     }
 
 
     public void segmentSelected(SpiceFeatureEvent e) {
-        // TODO Auto-generated method stub
+       
+        
+    }
+
+
+    public void clearSelection() {
+        //logger.info("clear selection");
+        featureSelected = false;
+        selectedFeaturePos = -1;
+        this.repaint();
+      
         
     }
 

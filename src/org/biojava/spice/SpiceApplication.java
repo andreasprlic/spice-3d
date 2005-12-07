@@ -33,8 +33,7 @@ import java.lang.reflect.*;
 // for protein 3D stuff
 import org.biojava.bio.structure.*;
 //import org.biojava.spice.Panel.seqfeat.SpiceComponentListener;
-import org.biojava.spice.Panel.seqfeat.SpiceFeatureViewer;
-import org.biojava.spice.Panel.seqfeat.DasSourceListener;
+//import org.biojava.spice.Panel.seqfeat.DasSourceListener;
 //import org.biojava.spice.Panel.seqfeat.SpiceDasServerConfigListener;
 
 
@@ -65,6 +64,7 @@ import java.awt.Event                           ;
 import java.awt.event.*                         ;
 
 import javax.swing.Box                          ;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JSplitPane                   ;
@@ -75,8 +75,6 @@ import javax.swing.DefaultListModel             ;
 import javax.swing.JTextField                   ;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-import javax.swing.event.ListSelectionListener  ;
-import javax.swing.event.ListSelectionEvent     ;  
 import javax.swing.ImageIcon                    ;
 import javax.swing.BorderFactory                ;
 import javax.swing.JMenuBar                     ;
@@ -89,8 +87,10 @@ import java.awt.Container;
 
 import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.manypanel.BrowserPane;
+import org.biojava.spice.manypanel.eventmodel.DasSourceEvent;
+import org.biojava.spice.manypanel.eventmodel.DasSourceListener;
 import org.biojava.spice.server.SpiceServer;
-import org.biojava.spice.Panel.seqfeat.FeatureView;
+
 
 /** the main application layer of SPICE
  * do not interact with this class directly, but interact with SPICEFrame interface.
@@ -138,7 +138,7 @@ ConfigurationListener
     
     JScrollPane seqScrollPane ;
     JSplitPane  seqSplitPane  ;
-    SeqTextPane seqTextPane      ;
+    //SeqTextPane seqTextPane      ;
     JMenuItem lock;
     JMenuItem unlock;
     JMenuItem lockMenu;
@@ -263,7 +263,7 @@ ConfigurationListener
         
         Box vBox = arrangePanels(statusPanel,structurePanel,browserPane,strucommand,"left"); 
         
-     
+        this.getContentPane().setLayout(new BoxLayout(this.getContentPane(),BoxLayout.X_AXIS));
         this.getContentPane().add(vBox);
         this.setLoading(false);
         spiceMenuListener = new SpiceMenuListener(this,structurePanelListener) ;
@@ -452,139 +452,79 @@ ConfigurationListener
             String structureLocation){
         
         Box vBox = Box.createVerticalBox();
+        
         //vBox.setBackground(Color.blue);
         // move to submenu
         //this.getContentPane().add(statusPanel,BorderLayout.SOUTH);
         //this.getContentPane().add(statusPanel);
         
-        statusPanel.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
-        vBox.add(statusPanel);
-        
-        //statusPanel.setLoading(first_load);
         
         
-        
-        //this.getContentPane().add(seq_pos,BorderLayout.NORTH);
-        //this.getContentPane().add(seq_pos);
-        //vBox.add(seq_pos);
-        
-        //showStatus("contacting DAS registry");
-        
-        /// init Structure Panel
-        
-        //structurePanel.setLayout(new BoxLayout(structurePanel, BoxLayout.X_AXIS));
-        //structurePanel.setPreferredSize(new Dimension(400, 300));
+       
+        Box vBox2 = Box.createVerticalBox();
         structurePanel.setMinimumSize(new Dimension(200,200));
-        //structurePanel.addMouseMotionListener(structurePanel);
-        //structurePanel.addMouseListener(      structurePanel);
-        //this.add(structurePanel,BorderLayout.CENTER);
+        vBox2.add(structurePanel);
+        strucommand.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
+        //this.getContentPane().add(strucommand,BorderLayout.SOUTH);
+        //this.getContentPane().add(strucommand);
+        vBox2.add(strucommand);
+        //structurePanel.setLayout(new BoxLayout(structurePanel,BoxLayout.X_AXIS)); 
+
                       
       
         DefaultListModel model = new DefaultListModel();
         model.add(0,"");
         ent_list=new JList(model);
-        EntListCommandListener entact = new EntListCommandListener(this);
-        ent_list.addListSelectionListener(entact);
+        
+        
         //ent_list.setPreferredSize(new Dimension(30,30));
         
         
         JScrollPane chainPanel = new JScrollPane(ent_list);
         chainPanel.setPreferredSize(new Dimension(30,30));
-        //chainPanel.setBorder(BorderFactory.createEmptyBorder());
+        //chainPanel.setLayout(new BoxLayout(chainPanel,BoxLayout.X_AXIS)); 
         
-        // init dascanv
-        //dascanv.setBackground(Color.black);
-        
-        // add a listener that listens to all event in the Featurepanel
-        //SpiceFeaturePanelListener  sfpl = new SpiceFeaturePanelListener(this);
-        //dascanv.addFeatureViewListener(sfpl);
-        //dascanv.addSelectedSeqPositionListener(sfpl);
-        
-        //dasPanel = new JScrollPane(browserPane);
-        //SpiceComponentListener mcl = new SpiceComponentListener(dascanv,dasPanel);
-        //dasPanel.addComponentListener(mcl);
-        //dascanv.addComponentListener(new ComponentListener(){
-        //    public void componentHidden(ComponentEvent e){}
-        //    public void componentMoved(ComponentEvent e){}
-        //    public void componentShown(ComponentEvent e){}
-        //    public void componentResized(ComponentEvent e){
-        //        dasPanel.revalidate();
-        //    }
-        //}
-        //);
-        //dasPanel.getVerticalScrollBar().setUnitIncrement(DEFAULT_Y_SCROLL);
-        //dasPanel.getHorizontalScrollBar().setUnitIncrement(DEFAULT_Y_SCROLL);
-
-        //dasPanel.setBorder(BorderFactory.createEmptyBorder());       
+        browserPane.setBorder(BorderFactory.createEmptyBorder());
         
         sharedPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                 chainPanel, browserPane);
         sharedPanel.setOneTouchExpandable(true);
         
-        sharedPanel.setPreferredSize(new Dimension(400, 400));
-        
-        seqTextPane = new SeqTextPane(this);
-        //seqField.setSize( 700, 30);
-        seqTextPane.setPreferredSize(new Dimension(700, 30));
-        seqTextPane.setMinimumSize(new Dimension(700, 30));
-        seqTextPane.addMouseMotionListener(seqTextPane);
-        seqTextPane.addMouseListener(seqTextPane);
-        
-      
-              
-        seqScrollPane = new JScrollPane(seqTextPane) ;
-        //seqScrollPane.setBorder(BorderFactory.createEmptyBorder());
-        //seqScrollPane.setSize( 700, 30);
-        //seqScrollPane.setPreferredSize(new Dimension(700, 30));;
-        //seqScrollPane.setMinimumSize(  new Dimension(700, 30));;
-        
-        seqSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                sharedPanel,seqScrollPane);
-        
-        seqSplitPane.setOneTouchExpandable(true);
-        //seqSplitPane.setOpaque(true);
-        seqSplitPane.setResizeWeight(0.7);
-        //seqSplitPane.setBackground(Color.black);
-        seqSplitPane.setPreferredSize(new Dimension(300,300));
-        seqSplitPane.setBorder(BorderFactory.createEmptyBorder());
-        //seqSplitPane.setDividerLocation(600);
-        
-        //sharedPanel.setLayout(new BoxLayout(sharedPanel, BoxLayout.X_AXIS));
-        //sharedPanel.add(leftPanel,BorderLayout.EAST);
-        //sharedPanel.add(scroll,BorderLayout.WEST);
-        //sharedPanel.add(dascanv,BorderLayout.WEST);
-        //sharedPanel.add(daspanel,BorderLayout.WEST);
-        //sharedPanel.setMaximumSize(new Dimension(Short.MAX_VALUE,300));
-        //this.add(sharedPanel,BorderLayout.SOUTH);
-        
+        //sharedPanel.setPreferredSize(new Dimension(400, 400));
+        //sharedPanel.setLayout(new BoxLayout(sharedPanel,BoxLayout.Y_AXIS)); 
+        sharedPanel.setBorder(BorderFactory.createEmptyBorder());
         
         if (structureLocation.equals("top"))
-            mainsharedPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, structurePanel,seqSplitPane);
+            mainsharedPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, vBox2,sharedPanel);
         else if  (structureLocation.equals("bottom"))
-            mainsharedPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, seqSplitPane,structurePanel);
+            mainsharedPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, sharedPanel,vBox2);
         else if  (structureLocation.equals("left"))
-            mainsharedPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, structurePanel,seqSplitPane);
+            mainsharedPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, vBox2,sharedPanel);
         else if  (structureLocation.equals("right"))
-            mainsharedPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, seqSplitPane,structurePanel);
+            mainsharedPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, sharedPanel,vBox2);
         
         mainsharedPanel.setOneTouchExpandable(true);
         mainsharedPanel.setResizeWeight(0.5);
-        //mainsharedPanel.setDividerLocation(150);
-        mainsharedPanel.setPreferredSize(new Dimension(790, 590));
-        //mainsharedPanel.setOpaque(true);
-        //mainsharedPanel.setBackground(Color.black);
-        //mainsharedPanel.setPreferredSize(new Dimension(700,700));
-        //mainsharedPanel.setResizeWeight(0.7);
-        //this.getContentPane().add(mainsharedPanel,BorderLayout.NORTH);
-        //this.getContentPane().add(mainsharedPanel);
-        mainsharedPanel.setBorder(BorderFactory.createEmptyBorder());
-                
-        vBox.add(mainsharedPanel);
         
-        strucommand.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
-        //this.getContentPane().add(strucommand,BorderLayout.SOUTH);
-        //this.getContentPane().add(strucommand);
-        vBox.add(strucommand);
+        mainsharedPanel.setPreferredSize(new Dimension(790, 590));
+        
+        mainsharedPanel.setBorder(BorderFactory.createEmptyBorder());
+        //mainsharedPanel.setLayout(new BoxLayout(mainsharedPanel,BoxLayout.Y_AXIS));  
+        Box hBox1 =  Box.createHorizontalBox();
+        hBox1.add(mainsharedPanel);
+        vBox.add(hBox1);
+        
+        
+        statusPanel.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
+        //statusPanel.setLayout(new BoxLayout(statusPanel,BoxLayout._AXIS));
+        statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.X_AXIS));
+        //statusPanel.setMaximumSize(new Dimension(Short.MAX_VALUE,20));
+        //Box hBox1 = Box.createHorizontalBox();
+        //hBox1.add(statusPanel);
+        Box hBox = Box.createHorizontalBox();
+        hBox.add(statusPanel);
+        vBox.add(hBox);
+        //vBox.add(hBox1);
         
         //vBox.add(loggingPanel);
         return vBox;
@@ -596,29 +536,31 @@ ConfigurationListener
      */
     private void initListeners(){
         
-        //MyDasSourceListener mdsl = new MyDasSourceListener(this);
-        /*dascanv.addDasSourceListener(mdsl);
-        
-        dascanv.addFeatureViewListener(seqTextPane);
-        dascanv.addSelectedSeqPositionListener(seqTextPane);
-        dascanv.addFeatureViewListener(structurePanelListener);
-        dascanv.addSelectedSeqPositionListener(structurePanelListener);
-        dascanv.addFeatureViewListener(statusPanel);
-        dascanv.addSelectedSeqPositionListener(statusPanel);
-        dascanv.addSelectedSeqPositionListener(spiceMenuListener);
-        
-        seqTextPane.addSelectedSeqPositionListener(dascanv);
-        */
-        //seqTextPane.addSelectedSeqPositionListener(structurePanelListener);
-        //seqTextPane.addSelectedSeqPositionListener(statusPanel);
-        //seqTextPane.addSelectedSeqPositionListener(spiceMenuListener);
-        
-        
+               
+        browserPane.addPDBSequenceListener(statusPanel);
+        browserPane.addUniProtSequenceListener(statusPanel);
         browserPane.addStructureListener(structurePanelListener);
         browserPane.addPDBPositionListener(structurePanelListener);
         browserPane.addSpiceFeatureListener(statusPanel);
         browserPane.addPDBPositionListener(statusPanel);
         browserPane.addStructureListener(statusPanel);
+    
+        // listener for das sources
+        browserPane.addSpiceFeatureListener(structurePanelListener);
+        
+        
+        MyDasSourceListener mdsl = new MyDasSourceListener(this);
+        browserPane.addDasSourceListener(mdsl);
+        
+        // things related to selecting chains
+        SpiceChainDisplay chainDisplay = new SpiceChainDisplay(ent_list);
+        browserPane.addStructureListener(chainDisplay);
+        ent_list.addListSelectionListener(chainDisplay);
+        chainDisplay.addStructureListener(browserPane.getStructureListener());
+        
+        browserPane.addPDBSequenceListener(spiceMenuListener);
+    
+        
     }
     
     /**
@@ -995,28 +937,6 @@ ConfigurationListener
         return mem_id;
     }
 
-    /** return the feature views used in the 2D feature display. required for saving...
-     * 
-     * @return
-     */
-    public FeatureView[] getFeatureViews(){
-        // TODO find a nicer solution to this ...
-        //return dascanv.getFeatureViews();
-        return null;
-    }
-    
-    public void setFeatureViews(FeatureView[] fvs){
-        //dascanv.clear();
-        for ( int i = 0 ; i < fvs.length; i++){
-            FeatureView fv = fvs[i];
-            //dascanv.addFeatureView(fv);
-        }
-    }
-    
-    public void addFeatureView(FeatureView fv){
-        //dascanv.addFeatureView(fv);
-        
-    }
     
     /** clear the displayed data */
     public void clear(){
@@ -1181,7 +1101,7 @@ ConfigurationListener
         //dascanv.setChain(chain,currentChainNumber);
         
         //dascanv.setBackground(Color.);
-        seqTextPane.setChain(chain,currentChainNumber);
+        //seqTextPane.setChain(chain,currentChainNumber);
         
     }
 
@@ -1253,7 +1173,7 @@ ConfigurationListener
      */
     
     public  void setStructure(Structure structure_ ) {
-        
+        logger.warning("depreciated method!");
         if (logger.isLoggable(Level.FINER)) {
             logger.entering(this.getClass().getName(), "setStructure",  new Object[]{"got structure object"});
         }
@@ -1317,7 +1237,7 @@ ConfigurationListener
         logger.finest("setting chain...");
         setCurrentChainNumber(0);
         //System.out.println("SpiceApplication... requesting getChain");
-        Chain chain = getChain(currentChainNumber) ;
+        //Chain chain = getChain(currentChainNumber) ;
         
         
         //currentChain = chain;
@@ -1325,8 +1245,8 @@ ConfigurationListener
         //dascanv.setChain(chain);
         //System.out.println("SpiceApplication... set chain in dascanv");
         
-        if ( chain != null) 
-            seqTextPane.setChain(chain,0);
+        //if ( chain != null) 
+            //seqTextPane.setChain(chain,0);
         
         
         if ( startParameters.getRasmolScript() != null){
@@ -1348,12 +1268,12 @@ ConfigurationListener
         if ( seqSelectStart >=0 ){
             //dascanv.selectedSeqRange(seqSelectStart, seqSelectEnd);
             structurePanelListener.selectedSeqRange(seqSelectStart, seqSelectEnd);
-            seqTextPane.selectedSeqRange(seqSelectStart, seqSelectEnd);
+            //seqTextPane.selectedSeqRange(seqSelectStart, seqSelectEnd);
             
             // lock selectiion
             //dascanv.selectionLocked(true);
             structurePanelListener.selectionLocked(true);
-            seqTextPane.selectionLocked(true);
+            //seqTextPane.selectionLocked(true);
             
             //reset...
             seqSelectStart = -1;
@@ -1872,51 +1792,36 @@ class MyDasSourceListener implements DasSourceListener{
     public MyDasSourceListener(SPICEFrame parent){
         this.parent=parent;
     }
-    public void selectedDasSource(SpiceDasSource ds){
+    public void selectedDasSource(DasSourceEvent event){
+        SpiceDasSource ds = event.getDasSource().getDasSource();
         DasSourceDialog dsd = new DasSourceDialog(parent, ds);
         dsd.show();
-    }
-}
-
-class EntListCommandListener implements ListSelectionListener {
-    SPICEFrame spice ;
-    static Logger logger      = Logger.getLogger("org.biojava.spice");
-    
-    public EntListCommandListener ( SPICEFrame spice_) {
-        super();
-        spice = spice_;
-    }
-    //public void itemStateChanged(ItemEvent event) {
-    public void valueChanged(ListSelectionEvent event) {
-        
-        if ( spice.isLoading() ) {
-            logger.log(Level.WARNING,"loading data, please be patient");
-            return ;
-        }
-        
-        //logger.finest("EVENT!");
-        //logger.finest(event);
-        JList list = (JList)event.getSource();
-        
-        // Get all selected items
-        //int i  = ((Integer)list.getSelectedValue()).intValue() ;
-        int i  = list.getSelectedIndex();
-        
-        if ( i < 0) return ; 
-        
-        //logger.finest("item:" + event.getItem());
-        //logger.finest("param:" + event.paramString());
-        //int i = ((Integer)event.getItem()).intValue();
-        spice.setCurrentChainNumber(i);
-        //logger.finest(event.id);
-        //logger.finest(event.arg);
+   }
+    public void disableDasSource(DasSourceEvent ds) {
+     
         
     }
-
-   
+    public void enableDasSource(DasSourceEvent ds) {
+       
+        
+    }
+    public void loadingFinished(DasSourceEvent ds) {
+      
+        
+    }
+    public void loadingStarted(DasSourceEvent ds) {
+       
+        
+    }
+    public void newDasSource(DasSourceEvent ds) {
+       
+        
+    }
+  
    
     
 }
+
 
 
 

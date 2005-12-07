@@ -39,6 +39,7 @@ import org.biojava.spice.Feature.Feature;
 import org.biojava.spice.Feature.FeatureImpl;
 import org.biojava.spice.Feature.Segment;
 import org.biojava.spice.manypanel.drawable.DrawableDasSource;
+import org.biojava.spice.manypanel.eventmodel.FeatureEvent;
 import org.biojava.spice.manypanel.eventmodel.SequenceListener;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureEvent;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureListener;
@@ -105,8 +106,9 @@ MouseMotionListener
         draggingStart=pos;
         selectionStart = pos ;
         //selectionEnd   = pos ;
-        triggerFeatureSelected(null);
+        triggerClearSelection();
         triggerSelectionLocked(false);
+        triggerNewSequencePosition(pos,event.getY());
             
         
     }
@@ -127,13 +129,13 @@ MouseMotionListener
     }   
     
     
-    /** returns the feature of a mouse event
+    /** creates a spiceFeatureEvent from a mouse event
      * or null, if the event was not over a feature line
      * 
      * @param e
      * @return
      */
-    private Feature getFeatureFromEvent(MouseEvent e){
+    private SpiceFeatureEvent getSpiceFeatureEvent(MouseEvent e){
         
         
         int y = e.getY();
@@ -183,7 +185,8 @@ MouseMotionListener
         for (int i = 0 ; i< feats.length; i ++){
             h += FeaturePanel.DEFAULT_Y_STEP;
             if ( y < h) {
-                return feats[i];
+                SpiceFeatureEvent event = new SpiceFeatureEvent(source.getDasSource(), feats[i]);
+                return event;
             }
         }
         return null;
@@ -258,7 +261,10 @@ MouseMotionListener
             return;
         //int x = e.getX();
         int pos = getSeqPos(e) ;
-        Feature feat = getFeatureFromEvent(e);
+        SpiceFeatureEvent event = getSpiceFeatureEvent(e);
+        Feature feat = null;
+        if ( event != null )
+            feat = event.getFeature();
         //System.out.println(pos + " " + feat + oldFeature);
         
         //
@@ -304,13 +310,13 @@ MouseMotionListener
             while (iter.hasNext()) {
                 Segment s = (Segment)iter.next();
                 if ( (pos >= s.getStart()-1) && ( pos <= s.getEnd()-1)) {
-                    
-                    triggerMouseOverSegment(feat,s);
+                    event.setSegment(s);
+                    triggerMouseOverSegment(event);
                     //triggerSegmentSelected(feat,s);
                 }
             }
         } else {
-            triggerMouseOverFeature(feat);
+            triggerMouseOverFeature(event);
         }
     }
     
@@ -345,38 +351,53 @@ MouseMotionListener
                 triggerSelectionLocked(true);
             } else {
                 int pos = getSeqPos(event) ;
-                Feature feat = getFeatureFromEvent(event);
-                //System.out.println(pos + " " + feat);
-                if ( feat == null)
-                    return;
+                SpiceFeatureEvent spiceEvent = getSpiceFeatureEvent(event);
                 
+                Feature feat = null ;
+                if ( spiceEvent != null ) 
+                    feat = spiceEvent.getFeature();
+                
+                //System.out.println(pos + " " + feat);
+                if ( feat == null) {
+                    oldFeature = new FeatureImpl();
+                    return;
+                }
                 if ( pos < 0) {
                     // the user clicked on the label
                     //int linkpos = 0 - (FeaturePanel.DEFAULT_X_START-DasSourcePanel.linkIconWidth-1);
-                    logger.info(pos+" " + event.getX());
+                    //logger.info(pos+" " + feat);
                     if ( event.getX() < DasSourcePanel.linkIconWidth) {
                         triggerLinkSelected(feat);
                     } else {
+                        //logger.info("here " + feat + " " + oldFeature);
                         //-> trigger a new FeatureSelected
-                    
-                        triggerFeatureSelected(feat);
-                        triggerSelectionLocked(true);
-                    }
+                       
+                            triggerFeatureSelected(spiceEvent);
+                            triggerSelectionLocked(true);
+                         
+                        
+                    }   
                     
                 } else {
 //                   check if pos is over a feature then trigger new SegmentSelected
                     List segments = feat.getSegments();
                     Iterator iter = segments.iterator();
+                    boolean somethingTriggered = false;
                     while (iter.hasNext()) {
                         Segment s = (Segment)iter.next();
                         if ( (pos >= s.getStart()) && ( pos <= s.getEnd())) {
-                            
-                            triggerSegmentSelected(feat,s);
+                            spiceEvent.setSegment(s);
+                            triggerSegmentSelected(spiceEvent);
                             triggerNewSequenceRange(s.getStart()-1,s.getEnd()-1);
                             triggerSelectionLocked(true);
+                            somethingTriggered = true;
                         }
                     }
+                    if ( ! somethingTriggered){
+                        triggerNewSequencePosition(pos,event.getY());
+                    }
                 }
+                oldFeature = feat;
             }
         }
         dragging = false ;
@@ -441,18 +462,20 @@ MouseMotionListener
         
     }
     
-    protected void triggerFeatureSelected(Feature feature){
-        
+    protected void triggerFeatureSelected(SpiceFeatureEvent event){
+        Feature feature = event.getFeature();
+        logger.info("trigger feture selected " + feature);
         if ( selectionLocked)
             return;
+        
         if (feature == null){
-            feature = new FeatureImpl(); 
-        }
-        //logger.info("trigger feture selected " + feature);
+            return;
+            }
+        
         
         
         //logger.info("trigger featureSelected " + feature);
-        SpiceFeatureEvent event = new SpiceFeatureEvent(feature);
+        
         Iterator iter = spiceFeatureListeners.iterator();
         while( iter.hasNext()){
             SpiceFeatureListener li = (SpiceFeatureListener)iter.next();
@@ -461,16 +484,39 @@ MouseMotionListener
         }
     }
     
-    protected void triggerSegmentSelected(Feature feature, Segment segment){
+    protected void triggerClearSelection(){
+        
+        //logger.info("trigger clearSelection " );
+                
+        //logger.info("trigger featureSelected " + feature);
+        
+        Iterator iter = spiceFeatureListeners.iterator();
+        while( iter.hasNext()){
+            SpiceFeatureListener li = (SpiceFeatureListener)iter.next();
+            li.clearSelection();
+            
+        }
+        
+        Iterator iter2 = sequenceListeners.iterator();
+        while (iter2.hasNext()){
+            SequenceListener li = (SequenceListener) iter2.next();
+            li.clearSelection();
+        }
+    }
+    
+    
+    protected void triggerSegmentSelected(SpiceFeatureEvent event){
         if ( selectionLocked)
             return;
         
+        Segment segment = event.getSegment();
         
         if ( segment == null){
             segment = new Segment();
+            event.setSegment(segment);
         }
         //logger.info("trigger segment selected " + segment);
-        SpiceFeatureEvent  event = new SpiceFeatureEvent(feature,segment);
+        
         Iterator iter = spiceFeatureListeners.iterator();
         while (iter.hasNext()){
             SpiceFeatureListener li = (SpiceFeatureListener)iter.next();
@@ -479,10 +525,12 @@ MouseMotionListener
     }
     
     
-    protected void triggerMouseOverFeature(Feature feature){
-        if ( feature == null )
+    protected void triggerMouseOverFeature(SpiceFeatureEvent event){
+        Feature feature = event.getFeature();
+        if ( feature == null ) {
             feature = new FeatureImpl();
-        SpiceFeatureEvent event = new SpiceFeatureEvent(feature);
+            event.setFeature(feature);
+        }
         Iterator iter = spiceFeatureListeners.iterator();
         while( iter.hasNext()){
             SpiceFeatureListener li = (SpiceFeatureListener)iter.next();
@@ -491,14 +539,15 @@ MouseMotionListener
         }
     }
     
-    protected void triggerMouseOverSegment(Feature feature, Segment segment){
+    protected void triggerMouseOverSegment(SpiceFeatureEvent event){
       
-        
+        Segment segment = event.getSegment();
         if ( segment == null){
             segment = new Segment();
+            event.setSegment(segment);
         }
         
-        SpiceFeatureEvent  event = new SpiceFeatureEvent(feature,segment);
+        
         Iterator iter = spiceFeatureListeners.iterator();
         while (iter.hasNext()){
             SpiceFeatureListener li = (SpiceFeatureListener)iter.next();
@@ -508,9 +557,9 @@ MouseMotionListener
     
     protected void triggerLinkSelected(Feature f){
         String link = f.getLink();
-        
+        logger.info("triggerLinkSelected " + link);
         if (( link != null) && (! link.equals(""))){
-            logger.info("triggerLinkSelected " + link);
+           
             try {
                 URL url =new URL(link);
                 

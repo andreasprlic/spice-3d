@@ -43,12 +43,13 @@ extends AbstractChainRenderer
     
     public StructureRenderer() {
         //super();
-        sequence = new DrawableSequence(new ChainImpl());
+        sequence = new DrawableSequence("",new ChainImpl());
        
         //logger.info("init StructureRenderer");
         
         featurePanel = new StructureFeaturePanel();
         cursorPanel  = new CursorPanel();       
+        statusPanel.setName("PDB");
         
         initPanels();
     }
@@ -63,8 +64,11 @@ extends AbstractChainRenderer
         Structure struc = structure.getStructure();
         Chain c = struc.getChain(structure.getCurrentChainNumber());
         
-        DrawableSequence ds = DrawableSequence.fromChain(c);
+        String ac = struc.getPDBCode() + " ." + c.getName();
+        DrawableSequence ds = DrawableSequence.fromChain(ac,c);
         this.sequence=ds;
+        
+        statusPanel.setAccessionCode(ac);
         featurePanel.setChain(sequence.getSequence());
         cursorPanel.setChain(sequence.getSequence());
         mouseListener.setChain(sequence.getSequence());

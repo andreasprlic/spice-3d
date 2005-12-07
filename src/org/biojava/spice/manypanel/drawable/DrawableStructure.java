@@ -34,8 +34,8 @@ extends DrawableSequence {
     
     int currentChainNumber ;
     
-    public DrawableStructure() {
-        super();
+    public DrawableStructure(String name) {
+        super(name);
 
     }
 

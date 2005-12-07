@@ -42,4 +42,9 @@ extends ObjectListener{
     
     public void newSequence(SequenceEvent e);
     
+    /** clear what has been selected
+     * 
+     *
+     */
+    public void clearSelection();
 }

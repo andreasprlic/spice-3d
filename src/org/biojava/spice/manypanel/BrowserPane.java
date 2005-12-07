@@ -134,9 +134,9 @@ ChangeListener
         ComponentResizedChainListener strucComponentWidthSetter = new ComponentResizedChainListener(structureRenderer);
         this.addComponentListener(strucComponentWidthSetter);
         
-        JScrollPane structureScroller = new JScrollPane(structureRenderer);
-        structureScroller.getVerticalScrollBar().setUnitIncrement(FeaturePanel.DEFAULT_Y_STEP);
-        //structureRenderer.setLayout(new BoxLayout(structureRenderer,BoxLayout.Y_AXIS));
+        //JScrollPane structureScroller = new JScrollPane(structureRenderer);
+        //structureScroller.getVerticalScrollBar().setUnitIncrement(FeaturePanel.DEFAULT_Y_STEP);
+        
         
         strucManager.addStructureRenderer(structureRenderer);
        
@@ -178,8 +178,8 @@ ChangeListener
          this.addComponentListener(seqComponentWidthSetter);
          
          
-         JScrollPane seqScroller = new JScrollPane(seqRenderer);
-         seqScroller.getVerticalScrollBar().setUnitIncrement(FeaturePanel.DEFAULT_Y_STEP);
+         //JScrollPane seqScroller = new JScrollPane(seqRenderer);
+         //seqScroller.getVerticalScrollBar().setUnitIncrement(FeaturePanel.DEFAULT_Y_STEP);
          //seqRenderer.setLayout(new BoxLayout(seqRenderer,BoxLayout.Y_AXIS));
          //box.add(seqScroller);  
          
@@ -302,9 +302,12 @@ ChangeListener
           clearDasSources();
           
           
+        //
         // build up the display from the components:
+        //
           
-        JSplitPane split1 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,structureScroller,seqScroller);
+          
+        JSplitPane split1 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,structureRenderer,seqRenderer);
         split1.setOneTouchExpandable(true);
         // uniprot panel gets a little more space, because so many more DAS sources...
         split1.setResizeWeight(0.4);
@@ -494,10 +497,27 @@ ChangeListener
     
     public void addUniProtListener(ObjectListener li){
         uniProtListeners.add(li);
+        
     }
+    public void addUniProtSequenceListener(SequenceListener li ){
+        seqManager.addSequenceListener(li);
+    }
+    
     public void addEnspListener(ObjectListener li){
         enspListeners.add(li);
     }
+    public void addEnspSeqeuenceListener(SequenceListener li){
+        enspManager.addSequenceListener(li);
+    }
+    
+    public void addDasSourceListener(DasSourceListener li){
+         pdbFeatureManager.addDasSourceListener(li);
+         upFeatureManager.addDasSourceListener(li);
+         enspFeatureManager.addDasSourceListener(li);
+    }
+    
+    
+    
     
     public void triggerLoadStructure(String pdbcode){
         
@@ -525,70 +545,10 @@ ChangeListener
     }
     
 
-    /*public DasSource[] getAllDasSources() throws Exception{
+   public StructureListener getStructureListener(){
+       return strucManager;
        
-        URL rurl = new URL(registry);
-        DasRegistryAxisClient rclient = new DasRegistryAxisClient(rurl);
-        DasSource[]  allsources = rclient.listServices();
-        return allsources;
-    }*/
-    
-    //public void initData() {
-//      String registry = args[0] ;
-        
-        //String registry = "http://www.spice-3d.org/dasregistry/services/das_registry";
-        //String registry = "http://localhost:8080/dasregistry/services/das_registry";
-        //String upcode = "P00280";
-        //String upcode = "P08045";
-        //String upcode = "P50225";
-        //String upcode = "P43379";
-        
-        /*
-         System.setProperty("proxySet","true");
-         String proxyname = "localhost";
-         System.setProperty("proxyHost",proxyname);
-         System.setProperty("http.proxyHost",proxyname);
-         System.setProperty("proxyPort","3128");
-         System.setProperty("http.proxyPort","3128");
-         
-        URL rurl = new URL(registry);
-        DasRegistryAxisClient rclient = new DasRegistryAxisClient(rurl);
-        
-        
-        DasSource[]seqservs = getServers("sequence",UNIPROTCOORDSYS);
-        DasSource seqs = seqservs[0];
-        String url = seqs.getUrl();
-        char lastChar = url.charAt(url.length()-1);      
-        if ( ! (lastChar == '/') ) 
-            url +="/" ;
-        
-        String scmd  = url + "sequence?segment=" + upcode;
-        
-   
-        DasSource[] featservs   = getServers("features",UNIPROTCOORDSYS);
-        DasSource[] pdbresservs = getServers("features",PDBCOORDSYS);
-        
-        System.out.println("found " + featservs.length   + "UniProt DAS sources");
-        System.out.println("found " + pdbresservs.length + "PDB DAS sources");
-        */
-    //}
-    
-    /*private boolean hasCoordSys(String coordSys,DasSource source ) {
-        DasCoordinateSystem[] coordsys = source.getCoordinateSystem() ;
-        for ( int i = 0 ; i< coordsys.length; i++ ) {
-            String c = coordsys[i].toString();
-            //System.out.println(">"+c+"< >"+coordSys+"<");
-            if ( c.equals(coordSys) ) {
-                //System.out.println("match");
-                return true ;
-            }
-            
-        }
-        return false ;
-        
-    }
-    */
-    
+   }
     
     
     /** test if a server is a UniProt vs PDBresnum alignment server */
@@ -672,16 +632,7 @@ ChangeListener
           
             
                 retservers.add(ds);
-                    //if ( capabil.equals("alignment") ){
-                    
-                    //if ( isSeqStrucAlignmentServer(ds) ){
-                    
-                    //} else {
-                    //System.out.println("DasSource " + ds.getUrl() + " is not a UniProt to PDB alignment service, unable to use");
-                    //}
-                    //} else {
-                    //retservers.add(ds);
-                    //}
+                  
                     
             }
         }
@@ -691,7 +642,7 @@ ChangeListener
     }
 
     public void loadingFinished(DasSourceEvent ds) {
-        // TODO Auto-generated method stub
+       logger.info("loading finished");
         
     }
 

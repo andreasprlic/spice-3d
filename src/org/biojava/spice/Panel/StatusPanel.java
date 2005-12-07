@@ -32,9 +32,9 @@ import org.biojava.bio.structure.StructureImpl;
 import org.biojava.spice.SPICEFrame;
 import org.biojava.spice.Feature.Feature;
 import org.biojava.spice.Feature.Segment;
-import org.biojava.spice.Panel.seqfeat.FeatureEvent;
-import org.biojava.spice.Panel.seqfeat.FeatureViewListener;
-import org.biojava.spice.Panel.seqfeat.SelectedSeqPositionListener;
+//import org.biojava.spice.Panel.seqfeat.FeatureEvent;
+//import org.biojava.spice.Panel.seqfeat.FeatureViewListener;
+//import org.biojava.spice.Panel.seqfeat.SelectedSeqPositionListener;
 import org.biojava.spice.manypanel.eventmodel.SequenceEvent;
 import org.biojava.spice.manypanel.eventmodel.SequenceListener;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureEvent;
@@ -77,7 +77,7 @@ StructureListener
 {
     
     private static final long serialVersionUID = 928391747589181827L;
-    public static String PDBLINK = "http://www.rcsb.org/pdb/cgi/explore.cgi?pdbId=";
+    public static String PDBLINK     = "http://www.rcsb.org/pdb/cgi/explore.cgi?pdbId=";
     public static String UNIPROTLINK = "http://www.ebi.uniprot.org/uniprot-srv/uniProtView.do?proteinAc=" ;
     
     Map pdbheader;
@@ -96,23 +96,31 @@ StructureListener
     Structure structure;
     
     public StatusPanel(SPICEFrame parent){
+        //TODO: clean up this class
+     
         spice = parent;
         currentChainNumber = -1;
-        this.setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
-        this.setBorder(BorderFactory.createEmptyBorder());
+        //this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+        //this.setBorder(BorderFactory.createEmptyBorder());
+        
         Box hBox =  Box.createHorizontalBox();
+        /*
         JTextField pdbtxt  = new JTextField("PDB code:");
         pdbtxt.setEditable(false);
         pdbtxt.setBorder(BorderFactory.createEmptyBorder());
+        pdbtxt.setMaximumSize(new Dimension(70,20));
+        pdbtxt.setPreferredSize(new Dimension(70,20));
         hBox.add(pdbtxt);
+        
         chain = new ChainImpl();
         structure = new StructureImpl();
+        */
         pdbCode = new JTextField("    ");
-        pdbCode.setEditable(false);
+        /*pdbCode.setEditable(false);
         
         pdbCode.setBorder(BorderFactory.createEmptyBorder());
-        
-       
+        pdbCode.setMaximumSize(new Dimension(40,20));
+        pdbCode.setPreferredSize(new Dimension(40,20));
         MouseListener mousiPdb = new PanelMouseListener(spice,this,PDBLINK);
         // mouse listener         
         pdbCode.addMouseListener(mousiPdb);
@@ -121,41 +129,37 @@ StructureListener
         hBox.add(pdbCode,BorderLayout.WEST);
 
         // pdb description
+         */
         pdbDescription = new JTextField("pdbDesc");
-        pdbDescription.setBorder(BorderFactory.createEmptyBorder());
+        /* pdbDescription.setBorder(BorderFactory.createEmptyBorder());
         pdbDescription.setEditable(false);
-        //pdbDescription.setMaximumSize(new Dimension(150,20));
-        
+        pdbDescription.setMaximumSize(new Dimension(150,30));
+        */
         pdbdescMouseListener = new PDBDescMouseListener();
-        //pdbdescMouseListener.setPDBHeader(new HashMap());
+        /*
+         * //pdbdescMouseListener.setPDBHeader(new HashMap());
         pdbdescMouseListener.setPDBHeader(pdbheader);
         pdbDescription.addMouseListener(pdbdescMouseListener);
         pdbDescription.addMouseMotionListener(pdbdescMouseListener);
         
         hBox.add(pdbDescription);
         
-        
-        
         JTextField sptxt  = new JTextField("UniProt code:");
         sptxt.setEditable(false);
         sptxt.setBorder(BorderFactory.createEmptyBorder());
+        sptxt.setMaximumSize(new Dimension(80,20));
         hBox.add(sptxt);
-        
-        
-        
+        */
         spCode = new JTextField("      ");
-        spCode.setBorder(BorderFactory.createEmptyBorder());
+        /*spCode.setBorder(BorderFactory.createEmptyBorder());
         spCode.setEditable(false);
+        spCode.setMaximumSize(new Dimension(80,20));
         MouseListener mousiSp = new PanelMouseListener(spice,this,UNIPROTLINK);
         // mouse listener 
         spCode.addMouseListener(mousiSp);
         
-        
         hBox.add(spCode);
-        
-        
-
-        
+        */
         progressBar = new JProgressBar(0,100);
         progressBar.setValue(0);
         progressBar.setStringPainted(false);
@@ -163,21 +167,25 @@ StructureListener
         progressBar.setMaximumSize(new Dimension(80,20));
         progressBar.setIndeterminate(false);
         progressBar.setBorder(BorderFactory.createEmptyBorder());
-        hBox.add(progressBar,BorderLayout.EAST);
+        //hBox.add(progressBar,BorderLayout.EAST);
+        
         
         seq_pos        = new JTextField();
         // init Seqouece position
-        seq_pos.setForeground(new Color(255, 255, 255));
-        seq_pos.setBackground(new Color(0, 0, 0));
+        //seq_pos.setForeground(new Color(255, 255, 255));
+        //seq_pos.setBackground(new Color(0, 0, 0));
         //seq_pos.setSize(700, 30);
-        seq_pos.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
-        seq_pos.setBorder(BorderFactory.createEmptyBorder());
+        seq_pos.setMaximumSize(new Dimension(Short.MAX_VALUE,20));
+        //seq_pos.setBorder(BorderFactory.createEmptyBorder());
         
-        Box vBox = Box.createVerticalBox();
-        vBox.add(hBox);
+        //Box vBox = Box.createVerticalBox();
+        //vBox.add(hBox);
+        //hBox.add(Box.createHorizontalGlue());
         
-        vBox.add(seq_pos);
-        this.add(vBox);	
+        hBox.add(seq_pos);
+        //vBox.add(seq_pos);
+        
+        this.add(hBox);	
         
     }
     
@@ -187,7 +195,7 @@ StructureListener
     public void newStructure(StructureEvent event) {
         structure = event.getStructure();
         chain = structure.getChain(0);
-        
+        setPDB(structure.getPDBCode());
     }
 
 
@@ -360,9 +368,19 @@ StructureListener
 	    String txt = seg.toString();
         seq_pos.setText(txt);
 	}
+
+
+
+
+    public void clearSelection() {
+       seq_pos.setText("");
+        
+    }
+    
+    
     
 }
-
+/*
 
 class PanelMouseListener
 implements MouseListener
@@ -411,10 +429,10 @@ implements MouseListener
     
 }
 
-
+*/
 
 /** a class responsible of creating afloating frame
- *  if the mouse is moved over the description of the PDB file */
+ *  if the mouse is moved over the description of the PDB file 
 class PDBDescMouseListener implements MouseListener, MouseMotionListener {
     Map pdbHeader ;
     boolean frameshown ;
@@ -554,3 +572,4 @@ class PDBDescMouseListener implements MouseListener, MouseMotionListener {
   
     
 }
+*/

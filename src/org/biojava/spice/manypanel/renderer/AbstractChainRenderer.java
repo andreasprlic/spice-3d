@@ -23,16 +23,16 @@
 package org.biojava.spice.manypanel.renderer;
 
 import java.awt.Dimension;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.logging.Logger;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JLayeredPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+
 import org.biojava.bio.structure.*;
-import org.biojava.spice.Feature.Feature;
 import org.biojava.spice.manypanel.eventmodel.FeatureEvent;
-import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.spice.manypanel.drawable.DrawableDasSource;
 import org.biojava.spice.manypanel.drawable.DrawableSequence;
@@ -42,7 +42,7 @@ import org.biojava.spice.manypanel.eventmodel.*;
 import java.util.*;
 
 public abstract class AbstractChainRenderer
-    extends JLayeredPane
+    extends JPanel
     implements
     ObjectRenderer,
     DasSourceListener,
@@ -51,7 +51,7 @@ public abstract class AbstractChainRenderer
     {
     
     public static final int    MAX_SCALE       = 10;
-    
+    public static final int STATUS_PANEL_HEIGHT = 20;
     FeaturePanel featurePanel;
     CursorPanel cursorPanel;
     DrawableSequence sequence;
@@ -64,46 +64,73 @@ public abstract class AbstractChainRenderer
     int componentWidth;
     int zoomFactor;
     //List featureRenderers;
-    
+    StatusPanel statusPanel;
+    JLayeredPane layeredPane;
+    JScrollPane scrollPane;
     public AbstractChainRenderer() {
         super();        
         this.setOpaque(true);
         setDoubleBuffered(true);
+        this.setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+        
         //clearFeatureRenderers();
+        layeredPane = new JLayeredPane();
+        layeredPane.setDoubleBuffered(true);
+        layeredPane.setOpaque(true);
+        
+        scrollPane = new JScrollPane(layeredPane);
+        scrollPane.setOpaque(true);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(FeaturePanel.DEFAULT_Y_STEP);
+        
+        
         dasSourcePanels = new ArrayList();
         mouseListener = new ChainRendererMouseListener(this);
-        toolTipper = new SeqToolTipListener(this);
+        toolTipper = new SeqToolTipListener(layeredPane);
         mouseListener.addSequenceListener(toolTipper);
         
         mouseListener.addSpiceFeatureListener(toolTipper);
         componentWidth = BrowserPane.DEFAULT_PANE_WIDTH;
+        statusPanel = new StatusPanel();
+        
+        Box vBox = Box.createVerticalBox();
+        //vBox.add(statusPanel);
+        vBox.add(scrollPane);
+        this.add(vBox);
     }
 
     protected void initPanels(){
         
         
-        this.addMouseMotionListener(mouseListener);
-        this.addMouseListener(mouseListener);
+        layeredPane.addMouseMotionListener(mouseListener);
+        layeredPane.addMouseListener(mouseListener);
         
         
         //cursorPanel.addMouseListener(mouseListener);
         
         mouseListener.addSequenceListener(cursorPanel);
         mouseListener.addSpiceFeatureListener(cursorPanel);
-       
         
         int width = getDisplayWidth();
-        featurePanel.setBounds(0,0,width,20);
-        featurePanel.setLocation(0,0);
+        
+        statusPanel.setLocation(0,0);
+        statusPanel.setBounds(0,0,width,STATUS_PANEL_HEIGHT);
+       //statusPanel.setPreferredSize(new Dimension(80,20));
+       statusPanel.setMaximumSize(new Dimension(Short.MAX_VALUE,20));
+        //int y = statusPanel.getHeight();
+        int y = 0;
+
+        //logger.info("statusp peanel h " + y);
+        featurePanel.setBounds(0,y,width,20);
+        featurePanel.setLocation(0,y);
         
         //cursorPanel.setPreferredSize(new Dimension(600,600));
-        cursorPanel.setLocation(0,0);
+        cursorPanel.setLocation(0,y);
         //cursorPanel.setOpaque(true);
-        cursorPanel.setBounds(0,0,width,getDisplayHeight());
-        
-        this.add(featurePanel,new Integer(0));
-        this.add(cursorPanel, new Integer(100));
-        this.moveToFront(cursorPanel);
+        cursorPanel.setBounds(0,y,width,getDisplayHeight());
+        layeredPane.add(statusPanel,new Integer(99));
+        layeredPane.add(featurePanel,new Integer(0));
+        layeredPane.add(cursorPanel, new Integer(100));
+        layeredPane.moveToFront(cursorPanel);
         //scale=1.0f;
         //featurePanel.addMouseMotionListener(mouseListener);
        
@@ -124,7 +151,7 @@ public abstract class AbstractChainRenderer
         Iterator iter = dasSourcePanels.iterator();
         while (iter.hasNext()){
             DasSourcePanel panel = (DasSourcePanel)iter.next();
-            this.remove(panel);
+            layeredPane.remove(panel);
         }
         dasSourcePanels.clear();
     }
@@ -229,12 +256,6 @@ public abstract class AbstractChainRenderer
     }
 
 
-    public void featureSelected(FeatureEvent e) {
-        // TODO Auto-generated method stub
-        
-    }
-
-
     private int getSequenceLength(){
         int l = 0 ;
         if ( sequence != null) {
@@ -260,7 +281,7 @@ public abstract class AbstractChainRenderer
     }
     public int getDisplayHeight(){
         
-        int totalH = featurePanel.getHeight();
+        int totalH = featurePanel.getHeight() + STATUS_PANEL_HEIGHT; // 20 for statuspanel
         Iterator iter = dasSourcePanels.iterator();
         while (iter.hasNext()){
             DasSourcePanel dsp = (DasSourcePanel)iter.next();
@@ -310,8 +331,8 @@ public abstract class AbstractChainRenderer
         int panelHeight = dspanel.getDisplayHeight();
         dspanel.setBounds(0,h,width,panelHeight);
         
-        this.add(dspanel,new Integer(panelPos+1));  
-        moveToFront(cursorPanel);
+        layeredPane.add(dspanel,new Integer(panelPos+1));  
+        layeredPane.moveToFront(cursorPanel);
         dasSourcePanels.add(dspanel);
         Dimension d = new Dimension(width,h+panelHeight);
         
@@ -326,10 +347,14 @@ public abstract class AbstractChainRenderer
     }
     
     public void updatePanelPositions(){
-        int h = featurePanel.getHeight();
+        //int h = featurePanel.getHeight() + STATUS_PANEL_HEIGHT;
+        int h = 40;
         int width = getDisplayWidth();
-        //logger.info("update panel positions " + width + " " + h + " " + sequence.getSequence().getLength());
-        featurePanel.setBounds(0,0,width,h);
+        
+        logger.info("update panel positions " + width + " " + h + " " + sequence.getSequence().getLength());
+        logger.info("status panel size " + statusPanel.getHeight() + " " + statusPanel.getWidth());
+        statusPanel.setBounds(0,0,width,STATUS_PANEL_HEIGHT);
+        featurePanel.setBounds(0,STATUS_PANEL_HEIGHT,width,h);
         // x .. width
         // y .. height
         // (x1,y1,x2,y2)
@@ -348,28 +373,28 @@ public abstract class AbstractChainRenderer
         
         //logger.info("updatePanelPosition max: " + width + " "  + h);
         
-        cursorPanel.setBounds(0,0,width,h);
+        cursorPanel.setBounds(0,STATUS_PANEL_HEIGHT,width,h);
         Dimension totalD = new Dimension(width,h);
-        this.setPreferredSize(totalD);
-        this.setSize(totalD);
+        layeredPane.setPreferredSize(totalD);
+        layeredPane.setSize(totalD);
         this.repaint();
         this.revalidate();
     }
 
     public void disableDasSource(DasSourceEvent ds) {
-        // TODO Auto-generated method stub
+        
         
     }
 
     public void enableDasSource(DasSourceEvent ds) {
-        // TODO Auto-generated method stub
+       
         
     }
 
     
 
     public void selectedDasSource(DasSourceEvent ds) {
-        // TODO Auto-generated method stub
+       
         
     }
 

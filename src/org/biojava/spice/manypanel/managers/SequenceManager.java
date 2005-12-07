@@ -126,9 +126,9 @@ extends AbstractChainManager
         return chain;
     }
     
-    public DrawableSequence fromString(String sequence){
+    public DrawableSequence fromString(String ac, String sequence){
         Chain chain = getChainFromString(sequence);
-        return new DrawableSequence(chain);
+        return new DrawableSequence(ac, chain);
     }
     
     
@@ -149,7 +149,7 @@ extends AbstractChainManager
         
     }
     
-    public  DrawableSequence getDrawableSequence(String sequence){
+    public  DrawableSequence getDrawableSequence(String ac, String sequence){
         Chain chain =  new ChainImpl();
         //chain.setSwissprotId(id);
         
@@ -177,7 +177,7 @@ extends AbstractChainManager
             
         }
         
-        return new DrawableSequence(chain);
+        return new DrawableSequence(ac,chain);
     
     }
     
@@ -198,7 +198,7 @@ extends AbstractChainManager
 
     public void newSequence(SequenceEvent e) {
         String sequence = e.getSequence();
-        DrawableSequence ds = fromString(sequence);
+        DrawableSequence ds = fromString(e.getAccessionCode(),sequence);
         
         Iterator iter = seqRenderers.iterator();
         
@@ -238,4 +238,5 @@ extends AbstractChainManager
         
     }
 
+    public void clearSelection(){};
 }

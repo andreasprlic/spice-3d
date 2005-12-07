@@ -41,18 +41,18 @@ extends AbstractChainRenderer
         
         logger.info("init sequenceRenderer");
         
-        sequence = new DrawableSequence(new ChainImpl());
+        sequence = new DrawableSequence("",new ChainImpl());
         featurePanel = new FeaturePanel();
         cursorPanel  = new CursorPanel();
+        statusPanel.setName("UniProt");
         initPanels();
         
     }
 
-    
-    
     public void setDrawableSequence(DrawableSequence sequence) {
         logger.info("setting drawable sequence ");
         this.sequence=sequence;
+        statusPanel.setAccessionCode(sequence.getAccessionCode());
         featurePanel.setChain(sequence.getSequence());
         cursorPanel.setChain(sequence.getSequence());
         mouseListener.setChain(sequence.getSequence());

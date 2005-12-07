@@ -26,9 +26,10 @@ package org.biojava.spice.manypanel.eventmodel;
 
 public interface SpiceFeatureListener {
 
-    public void mouseOverFeature(SpiceFeatureEvent e);
-    public void mouseOverSegment(SpiceFeatureEvent e);
-    public void featureSelected(SpiceFeatureEvent e);
-    public void segmentSelected(SpiceFeatureEvent e);
+    public void mouseOverFeature ( SpiceFeatureEvent e);
+    public void mouseOverSegment ( SpiceFeatureEvent e);
+    public void featureSelected  ( SpiceFeatureEvent e);
+    public void segmentSelected  ( SpiceFeatureEvent e);
+    public void clearSelection   ();
     
 }

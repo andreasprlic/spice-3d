@@ -111,6 +111,13 @@ implements SequenceListener, SpiceFeatureListener {
         
     }
 
+    
+    
+    public void clearSelection() {
+        // TODO Auto-generated method stub
+        parent.setToolTipText("");
+    }
+
     public void mouseOverFeature(SpiceFeatureEvent e) {
         
         Feature f = e.getFeature();

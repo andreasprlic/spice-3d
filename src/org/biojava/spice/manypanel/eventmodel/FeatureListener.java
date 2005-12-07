@@ -24,10 +24,15 @@ package org.biojava.spice.manypanel.eventmodel;
 
 //import org.biojava.spice.multipanel.eventmodel.FeatureEvent;
 
-
+/** a feature listener that returns the raw features as returned by a DAS source.
+ *  not to be confused by the SpiceFeatureEvent
+ *  
+ */
 public interface FeatureListener {
     
     public void newFeatures(FeatureEvent e);
+    
+
     
 }
 

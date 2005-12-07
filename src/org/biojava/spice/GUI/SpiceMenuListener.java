@@ -24,12 +24,15 @@ package org.biojava.spice.GUI;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.logging.Logger;
 
 
 import org.biojava.spice.Panel.StructurePanelListener;
+import org.biojava.spice.manypanel.eventmodel.SequenceEvent;
+import org.biojava.spice.manypanel.eventmodel.SequenceListener;
 import org.biojava.spice.SPICEFrame;
 import org.biojava.spice.GUI.alignmentchooser.AlignmentChooser;
-import org.biojava.spice.Panel.seqfeat.*;
+//import org.biojava.spice.Panel.seqfeat.*;
 import org.biojava.spice.SpiceApplication;
 
 /**This class takes care of the events that are triggered 
@@ -40,7 +43,7 @@ import org.biojava.spice.SpiceApplication;
  */
 public class SpiceMenuListener   
 implements ActionListener,
-SelectedSeqPositionListener
+SequenceListener
 {
     
     static String alloff = "cpk off ; wireframe off ; backbone off; cartoon off ; ribbons off; " ;
@@ -52,6 +55,8 @@ SelectedSeqPositionListener
     SPICEFrame parent ;
     StructurePanelListener structurePanelListener;
     boolean selectionIsLocked;
+    
+    public static Logger logger =  Logger.getLogger("org.biojava.spice");
     
     public SpiceMenuListener (SPICEFrame spice, StructurePanelListener listen) {
         selectionIsLocked = false;
@@ -160,7 +165,13 @@ SelectedSeqPositionListener
     }
     
     public void selectionLocked(boolean flag){
+        logger.info("spicemenulistener selectionLocked " + flag );
         selectionIsLocked = flag;
+    }
+    
+    public void clearSelection(){
+        selectionIsLocked =false;
+        
     }
     
     private boolean isSelectionLocked(){
@@ -170,5 +181,19 @@ SelectedSeqPositionListener
     
     public void selectedSeqRange(int s,int e){}
     public void selectedSeqPosition(int s){}
+
+    public void newSequence(SequenceEvent e) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void newObjectRequested(String accessionCode) {
+        // TODO Auto-generated method stub
+        
+    }
+    
+    
+    
+    
     
 }

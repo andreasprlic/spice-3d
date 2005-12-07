@@ -288,6 +288,22 @@ implements AlignmentListener {
     }
     
     
+    public void clearSelection1(){
+        Iterator iter = sequence1Listeners.iterator();
+        while (iter.hasNext()){
+            SequenceListener li = (SequenceListener)iter.next();
+            li.clearSelection();
+        }
+    }
+    
+    public void clearSelection2(){
+        Iterator iter = sequence2Listeners.iterator();
+        while (iter.hasNext()){
+            SequenceListener li = (SequenceListener)iter.next();
+            li.clearSelection();
+        }
+    }
+    
     public void newSequence1(SequenceEvent e){
         logger.info(panelName+" alignment : new sequence1:" + e.getAccessionCode() + " currently know:"+object1Id+" " + object2Id);
         
@@ -751,6 +767,7 @@ class AlignmentSequenceListener implements SequenceListener{
     int oldend;
     boolean selectionLocked;
     AlignmentManager parent;
+    boolean selectionCleared;
     
     public AlignmentSequenceListener(AlignmentManager parent, int nr){
         this.parent=parent;
@@ -758,16 +775,18 @@ class AlignmentSequenceListener implements SequenceListener{
         oldpos = -1;
         oldend = -1;
         selectionLocked = false;
+        selectionCleared = false;
     }
     
     public void newSequence(SequenceEvent e) {
-        // TODO Auto-generated method stub
+        selectionCleared = false;
         if ( objectNr == 1)
             parent.newSequence1(e);
         else
             parent.newSequence2(e);
     }
     public void selectedSeqPosition(int position) {
+        selectionCleared =false;
         if ( selectionLocked )
             return;
          
@@ -784,6 +803,7 @@ class AlignmentSequenceListener implements SequenceListener{
         
     }
     public void selectedSeqRange(int start, int end) {
+        selectionCleared = false;
        if ( selectionLocked )
            return;
         if (( oldpos == start ) && ( oldend == end)){
@@ -799,6 +819,7 @@ class AlignmentSequenceListener implements SequenceListener{
     }
     
     public void selectionLocked(boolean flag) {
+        selectionCleared=false;
         //System.out.println("AlignmentManager got selectionLocked " + flag + " "+selectionLocked);
         if ( selectionLocked == flag) {
             //System.out.println("not reporting further");
@@ -811,7 +832,7 @@ class AlignmentSequenceListener implements SequenceListener{
     }
     
     public void newObject(Object object) {
-        
+        selectionCleared = false;
         
         if ( objectNr == 1){
             parent.newObject1(object);
@@ -822,7 +843,7 @@ class AlignmentSequenceListener implements SequenceListener{
     }
     
     public void newObjectRequested(String accessionCode) {
-        // TODO Auto-generated method stub
+       
         
         if ( objectNr == 1){
             parent.requestedObject1(accessionCode);
@@ -831,7 +852,19 @@ class AlignmentSequenceListener implements SequenceListener{
             
         }
     }
-    
+
+    public void clearSelection() {
+      if ( selectionCleared )
+          return;
+      selectionCleared = true;
+      if ( objectNr == 1){
+          parent.clearSelection1();
+      } else {
+          parent.clearSelection2();
+            
+      }
+        
+    }
     
     
     
