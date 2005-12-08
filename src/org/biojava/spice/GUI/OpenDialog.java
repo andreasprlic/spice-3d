@@ -55,8 +55,8 @@ extends JDialog
     private static final long serialVersionUID = 2832023723402743924L;
     
     
-    //static final String[] supportedCoords = { "PDB","UniProt","ENSP"};
-    static final String[] supportedCoords = { "PDB","UniProt"};
+    static final String[] supportedCoords = { "PDB","UniProt","ENSP"};
+    //static final String[] supportedCoords = { "PDB","UniProt"};
     static int H_SIZE = 350;
     static int V_SIZE = 150 ;
     SPICEFrame spice       ;

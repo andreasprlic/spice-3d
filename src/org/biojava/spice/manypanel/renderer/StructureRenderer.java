@@ -55,7 +55,19 @@ extends AbstractChainRenderer
     }
 
     
-    
+    public void clearDisplay(){
+        super.clearDisplay();
+        
+        Structure s = new StructureImpl();
+        s.setPDBCode("");
+        Chain c = new ChainImpl();
+        s.addChain(c);
+        
+        DrawableStructure draw = new DrawableStructure("");
+        draw.setStructure(s);
+        setDrawableStructure(draw);
+        
+    }
     
     public void setDrawableStructure(DrawableStructure draw){
         statusPanel.setLoading(false);

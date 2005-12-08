@@ -82,17 +82,15 @@ implements AlignmentListener {
         //alignmentServers = new SpiceDasSource[0];
         object1Listener = new AlignmentSequenceListener(this,1);
         object2Listener = new AlignmentSequenceListener(this,2);
-        alignment = new Alignment();
+        
+        clearAlignment();
+        
         clearSequenceListeners();
         
         clearObjectListeners();
-        object1Id = "";
-        object2Id = "" ;
-        sequence1 = new ChainImpl();
-        sequence2 = new ChainImpl();
         
-       alignmentMap1= new HashMap();
-       alignmentMap2 = new HashMap();
+        
+   
     }
     
     public void clearDasSources(){
@@ -241,7 +239,7 @@ implements AlignmentListener {
         Annotation[] os = alignment.getObjects();
         if ( os.length < 2){
             // something strange is going on here..
-            logger.warning(panelName+" got  alignment of wrong # objects..." + os.length);
+            //logger.warning(panelName+" got  alignment of wrong # objects..." + os.length);
             return;
         }
         Annotation a1 = os[0];
@@ -261,8 +259,8 @@ implements AlignmentListener {
             found2 =true;
         
         if ( ! (found1 && found2)) {
-            logger.info(panelName + " can not create alignmentChain, yet >" + ac1 + "< >" + ac2 + 
-                      "< >" + object1Id + "< >" + object2Id+"<");
+            //logger.info(panelName + " can not create alignmentChain, yet >" + ac1 + "< >" + ac2 + 
+              //        "< >" + object1Id + "< >" + object2Id+"<");
             return;
         }
         
@@ -271,7 +269,7 @@ implements AlignmentListener {
         
         try {
            storeAlignment(alignment);
-           logger.info("stored alignment in manager");
+           //logger.info("stored alignment in manager");
         } catch (Exception e){
             e.printStackTrace();
             logger.warning(e.getMessage());
@@ -422,6 +420,8 @@ implements AlignmentListener {
             return;
         }
 
+        
+        
         SequenceManager sm = new SequenceManager();
         sequence2 = sm.getChainFromString(e.getSequence());
       
@@ -642,6 +642,18 @@ implements AlignmentListener {
         throw new DASException("no >" + objecttype + "< object found as dbSource in alignment!");        
     }
     
+    public void clearAlignment(){
+        object1Id = "" ;
+        object2Id = "" ;
+        alignment = new Alignment();
+        
+        alignmentMap1 = new HashMap();
+        alignmentMap2 = new HashMap();
+        
+        sequence1 = new ChainImpl();
+        sequence2 = new ChainImpl();
+           
+    }
     
     
     /** map from one segment to the other and store this info in chain  

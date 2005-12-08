@@ -26,4 +26,5 @@ public interface AlignmentListener {
 
     public void newAlignment(AlignmentEvent e);
     
+    public void clearAlignment();
 }

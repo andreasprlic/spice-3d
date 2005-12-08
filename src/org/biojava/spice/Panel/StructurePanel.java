@@ -59,7 +59,7 @@ implements JmolStatusListener
     final Rectangle  rectClip    = new Rectangle();
     
     static Logger    logger      = Logger.getLogger("org.biojava.spice");
-    static String    EMPTYCMD = "set echo top center; font echo 22; color echo white;echo \"no structure found\";";
+    static String    EMPTYCMD = "zap; set echo top center; font echo 22; color echo white;echo \"no structure found\";";
     JmolViewer  viewer;
     JmolAdapter adapter;
     
@@ -144,22 +144,17 @@ implements JmolStatusListener
         if ( structure == null ) {
             structure = new StructureImpl();            
         }
-        
-        //if ( structure.size() == 0 ) {
-          //  executeCmd(EMPTYCMD);
-            //notifyAll();
-            //return;
-        
-        
-        String pdbstr = structure.toPDB();
-      
          
-         viewer.openStringInline(pdbstr);
-         if ( structure.size() == 0 ) {
+         if ( structure.size() < 1 ) {
+             logger.info("got structure of size < 1");
+             
              executeCmd(EMPTYCMD);
+             return;
          }
-       
-      
+         
+         String pdbstr = structure.toPDB();
+           
+         viewer.openStringInline(pdbstr);
         
         String strError = viewer.getOpenFileError();
         if (strError != null) {

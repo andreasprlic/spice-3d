@@ -23,17 +23,17 @@
 package org.biojava.spice.manypanel.renderer;
 
 import java.awt.Dimension;
-import java.awt.Point;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import org.biojava.bio.structure.*;
+import org.biojava.spice.Feature.Feature;
+import org.biojava.spice.Feature.FeatureImpl;
 import org.biojava.spice.manypanel.eventmodel.FeatureEvent;
 import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.spice.manypanel.drawable.DrawableDasSource;
@@ -76,6 +76,7 @@ public abstract class AbstractChainRenderer
         this.setOpaque(true);
         setDoubleBuffered(true);
         this.setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+        this.setBorder(BorderFactory.createEmptyBorder());
         
         //clearFeatureRenderers();
         layeredPane = new JLayeredPane();
@@ -165,6 +166,18 @@ public abstract class AbstractChainRenderer
         //this.updateUI();
     }
     
+    
+    public void clearDisplay(){
+               
+        Iterator iter = dasSourcePanels.iterator();
+        while (iter.hasNext()){
+            DasSourcePanel panel = (DasSourcePanel)iter.next();
+            DrawableDasSource ds = panel.getDrawableDasSource();
+            
+            ds.clearDisplay();
+        }
+        
+    }
     
     public void clearDasSources(){
         Iterator iter = dasSourcePanels.iterator();

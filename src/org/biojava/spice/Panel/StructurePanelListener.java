@@ -95,8 +95,9 @@ SpiceFeatureListener
        }
        this.structure=struc;
        structurePanel.setStructure(structure);
-       if ( displayScript)
-           executeCmd(INIT_SELECT);
+       if ( structure.size() > 0)
+           if ( displayScript)
+               executeCmd(INIT_SELECT);
    
       
    }
@@ -141,12 +142,12 @@ SpiceFeatureListener
       
         
         if ( structure == null ) {
-            logger.log(Level.WARNING,"no structure loaded, yet");
+            //logger.log(Level.WARNING,"no structure loaded, yet");
             return null ;
         }
         
         if ( structure.size() < 1 ) {
-            logger.log(Level.WARNING,"structure object is empty, please load new structure");
+            //logger.log(Level.WARNING,"structure object is empty, please load new structure");
             return null ;
         }
         

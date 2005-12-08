@@ -22,13 +22,14 @@
  */
 package org.biojava.spice.manypanel;
 
-import java.net.URL;
+//import java.net.URL;
 import java.util.ArrayList;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
+//import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JSplitPane;
 
@@ -43,9 +44,9 @@ import org.biojava.spice.manypanel.renderer.*;
 import org.biojava.services.das.registry.DasCoordinateSystem;
 import org.biojava.services.das.registry.DasSource;
 
-import javax.swing.BoxLayout;
+//import javax.swing.BoxLayout;
 import java.awt.Dimension;
-import java.awt.event.MouseListener;
+//import java.awt.event.MouseListener;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -313,10 +314,13 @@ ChangeListener
         // uniprot panel gets a little more space, because so many more DAS sources...
         split1.setResizeWeight(0.4);
         
+        split1.setBorder(BorderFactory.createEmptyBorder());
+        
         JSplitPane split2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,split1,enspRenderer);
         split2.setOneTouchExpandable(true);
         // uniprot panel gets more space
         split2.setResizeWeight(0.7);
+        split2.setBorder(BorderFactory.createEmptyBorder());
         
         //Dimension d = new Dimension(DEFAULT_PANE_WIDTH,DEFAULT_PANE_HEIGHT);
         //split2.setPreferredSize(d);
@@ -337,7 +341,7 @@ ChangeListener
         residueSizeSlider.setPaintTicks(false);
         residueSizeSlider.setPaintLabels(false);
         residueSizeSlider.addChangeListener(this);
-        residueSizeSlider.setPreferredSize(new Dimension(100,10));
+        residueSizeSlider.setPreferredSize(new Dimension(100,15));
         Box hBox = Box.createHorizontalBox();
         hBox.add(Box.createHorizontalGlue());
         hBox.add(residueSizeSlider);
@@ -522,6 +526,12 @@ ChangeListener
     
     public void triggerLoadStructure(String pdbcode){
         
+        clearDisplay();
+
+        aligManager.clearAlignment();
+        ensaligManager.clearAlignment();
+        
+        
             Iterator iter = structureListeners.iterator();
             while (iter.hasNext()){
                 ObjectListener li = (ObjectListener) iter.next();
@@ -530,6 +540,9 @@ ChangeListener
     }
     
     public void triggerLoadUniProt(String accessionCode){
+        
+        clearDisplay();
+        
         Iterator iter = uniProtListeners.iterator();
         while (iter.hasNext()){
             ObjectListener li = (ObjectListener) iter.next();
@@ -538,6 +551,9 @@ ChangeListener
     }
     
     public void triggerLoadENSP(String enspCode){
+        
+        clearDisplay();
+        
         Iterator iter = enspListeners.iterator();
         while (iter.hasNext()){
             ObjectListener li = (ObjectListener) iter.next();
@@ -545,6 +561,17 @@ ChangeListener
         }
     }
     
+    
+    public void clearDisplay(){
+
+        aligManager.clearAlignment();
+        ensaligManager.clearAlignment();
+        
+        structureRenderer.clearDisplay();
+        seqRenderer.clearDisplay();
+        enspRenderer.clearDisplay();
+        
+    }
 
    public StructureListener getStructureListener(){
        return strucManager;

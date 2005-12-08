@@ -82,12 +82,12 @@ StructureListener
     
     Map pdbheader;
     
-    JTextField pdbCode ;
-    JTextField spCode  ;    
+    //JTextField pdbCode ;
+    //JTextField spCode  ;    
     JTextField status ;
-    JTextField pdbDescription;
+    //JTextField pdbDescription;
     JTextField seq_pos ;
-    JProgressBar progressBar ;
+    //JProgressBar progressBar ;
     SPICEFrame spice ;
     //Structure structure;
     int currentChainNumber;
@@ -115,7 +115,7 @@ StructureListener
         chain = new ChainImpl();
         structure = new StructureImpl();
         */
-        pdbCode = new JTextField("    ");
+        //pdbCode = new JTextField("    ");
         /*pdbCode.setEditable(false);
         
         pdbCode.setBorder(BorderFactory.createEmptyBorder());
@@ -130,7 +130,7 @@ StructureListener
 
         // pdb description
          */
-        pdbDescription = new JTextField("pdbDesc");
+        //pdbDescription = new JTextField("pdbDesc");
         /* pdbDescription.setBorder(BorderFactory.createEmptyBorder());
         pdbDescription.setEditable(false);
         pdbDescription.setMaximumSize(new Dimension(150,30));
@@ -150,7 +150,7 @@ StructureListener
         sptxt.setMaximumSize(new Dimension(80,20));
         hBox.add(sptxt);
         */
-        spCode = new JTextField("      ");
+        //spCode = new JTextField("      ");
         /*spCode.setBorder(BorderFactory.createEmptyBorder());
         spCode.setEditable(false);
         spCode.setMaximumSize(new Dimension(80,20));
@@ -159,7 +159,7 @@ StructureListener
         spCode.addMouseListener(mousiSp);
         
         hBox.add(spCode);
-        */
+        
         progressBar = new JProgressBar(0,100);
         progressBar.setValue(0);
         progressBar.setStringPainted(false);
@@ -168,7 +168,7 @@ StructureListener
         progressBar.setIndeterminate(false);
         progressBar.setBorder(BorderFactory.createEmptyBorder());
         //hBox.add(progressBar,BorderLayout.EAST);
-        
+        */
         
         seq_pos        = new JTextField();
         // init Seqouece position
@@ -195,7 +195,7 @@ StructureListener
     public void newStructure(StructureEvent event) {
         structure = event.getStructure();
         chain = structure.getChain(0);
-        setPDB(structure.getPDBCode());
+        //setPDB(structure.getPDBCode());
     }
 
 
@@ -211,7 +211,7 @@ StructureListener
 
     public void newObjectRequested(String accessionCode) {
         
-        setLoading(true);
+       // setLoading(true);
     }
 
 
@@ -219,7 +219,7 @@ StructureListener
 
     public void newSequence(SequenceEvent e) {
       
-        setLoading(false);
+        //setLoading(false);
      
     }
     
@@ -240,6 +240,8 @@ StructureListener
     
     public void setStatus(String txt) { status.setText(txt); }
     
+    
+    /*
     public void setLoading(boolean flag){
         progressBar.setIndeterminate(flag);
         
@@ -266,7 +268,7 @@ StructureListener
         pdbDescription.setText(desc);
         pdbDescription.repaint();
     }
-    
+    */
     
    
     private String getToolString(int chainnumber,int seqpos) {

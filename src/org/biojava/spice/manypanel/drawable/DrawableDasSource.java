@@ -83,7 +83,7 @@ FeatureListener{
         super();
         SpiceDasSource sds = SpiceDasSource.fromDasSource(ds);
         this.dasSource = sds;   
-        features = new Feature[0];
+        clearDisplay();
         clearFeatureListeners();
         loading = false;
     }
@@ -151,7 +151,9 @@ FeatureListener{
         return features;
     }
     
-    
+    public void clearDisplay(){
+        features = new FeatureImpl[0];
+    }
 
     /** returns a list of SPICE-Features objects */
     private Feature[] convertMap2Features(Map[] mapfeatures){

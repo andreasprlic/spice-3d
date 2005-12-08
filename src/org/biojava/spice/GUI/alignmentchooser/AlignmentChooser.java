@@ -182,6 +182,10 @@ public class AlignmentChooser {
         // get uniprot seq from spice.
         
         int currentChainNumber = spice.getCurrentChainNumber();
+        if ( currentChainNumber < 0) {
+            logger.warning(" no active chain found ");
+            return;
+        }
         Chain chain = spice.getChain(currentChainNumber);
         String uniprot = chain.getSwissprotId();
         Alignment[] aligs = null ;

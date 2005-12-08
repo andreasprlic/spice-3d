@@ -26,6 +26,7 @@ package org.biojava.spice.manypanel.renderer;
 
 import java.util.Iterator;
 
+import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.ChainImpl;
 import org.biojava.spice.manypanel.drawable.*;
 
@@ -68,6 +69,14 @@ extends AbstractChainRenderer
        
     }
     
+    public void clearDisplay(){
+        super.clearDisplay();
+        
+        DrawableSequence d = new DrawableSequence("");
+        Chain c = new ChainImpl();
+        d.setSequence(c);
+        setDrawableSequence(d);
+    }
     
     
   

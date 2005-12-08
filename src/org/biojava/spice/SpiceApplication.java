@@ -128,7 +128,7 @@ ConfigurationListener
     //StructurePanel structurePanel ;  
     StructurePanelListener structurePanelListener ;
     //JTextField seq_pos ;
-    JList ent_list;   // list available chains
+    JList chainList;   // list available chains
     //SeqFeaturePanel dascanv ;
     //SpiceFeatureViewer dascanv;
     JScrollPane dasPanel ;
@@ -170,6 +170,7 @@ ConfigurationListener
     boolean configLoaded ;
     SpiceMenuListener spiceMenuListener;
     BrowserPane browserPane ;
+    SpiceChainDisplay chainDisplay;
     //String dasServerList;
     //String labelList;
     
@@ -474,15 +475,16 @@ ConfigurationListener
       
         DefaultListModel model = new DefaultListModel();
         model.add(0,"");
-        ent_list=new JList(model);
+        chainList=new JList(model);
         
         
         //ent_list.setPreferredSize(new Dimension(30,30));
         
         
-        JScrollPane chainPanel = new JScrollPane(ent_list);
+        JScrollPane chainPanel = new JScrollPane(chainList);
         chainPanel.setPreferredSize(new Dimension(30,30));
         //chainPanel.setLayout(new BoxLayout(chainPanel,BoxLayout.X_AXIS)); 
+        chainPanel.setBorder(BorderFactory.createEmptyBorder());
         
         browserPane.setBorder(BorderFactory.createEmptyBorder());
         
@@ -508,7 +510,7 @@ ConfigurationListener
         
         mainsharedPanel.setPreferredSize(new Dimension(790, 590));
         
-        mainsharedPanel.setBorder(BorderFactory.createEmptyBorder());
+        //mainsharedPanel.setBorder(BorderFactory.createEmptyBorder());
         //mainsharedPanel.setLayout(new BoxLayout(mainsharedPanel,BoxLayout.Y_AXIS));  
         Box hBox1 =  Box.createHorizontalBox();
         hBox1.add(mainsharedPanel);
@@ -553,9 +555,9 @@ ConfigurationListener
         browserPane.addDasSourceListener(mdsl);
         
         // things related to selecting chains
-        SpiceChainDisplay chainDisplay = new SpiceChainDisplay(ent_list);
+        chainDisplay = new SpiceChainDisplay(chainList);
         browserPane.addStructureListener(chainDisplay);
-        ent_list.addListSelectionListener(chainDisplay);
+        chainList.addListSelectionListener(chainDisplay);
         chainDisplay.addStructureListener(browserPane.getStructureListener());
         
         browserPane.addPDBSequenceListener(spiceMenuListener);
@@ -780,7 +782,7 @@ ConfigurationListener
             
         }
         else if (type.equals("ENSP")) {
-            logger.info("load ENSP not implemented, yet!");
+            loadEnsp(code);
             
         }
         else {
@@ -840,13 +842,13 @@ ConfigurationListener
     
     
     
-    private void resetStatusPanel(){
+    /*private void resetStatusPanel(){
         statusPanel.setPDB("");
         statusPanel.setSP("");
         statusPanel.setLoading(false);
         statusPanel.setPDBDescription("");
         statusPanel.setPDBHeader(new HashMap());
-    }
+    }*/
     
     /** start a new thead that retrieves uniprot sequence, and if available
      protein structure
@@ -861,24 +863,32 @@ ConfigurationListener
             return;
         }
         
-        //currentChain = null;
-        setCurrentChain(null,-1);
-        resetStatusPanel();
-        statusPanel.setSP(uniprot);
-        statusPanel.setLoading(true);
-        
-        
-        //LoadUniProtThread thr = new LoadUniProtThread(this,uniprot) ;
-        //thr.start();
-        pdbMenu.setEnabled(false);
-        upMenu.setEnabled(false);
-        dastyMenu.setEnabled(false);
-        proviewMenu.setEnabled(false);
-        browserPane.triggerLoadUniProt(uniprot);
-
-        
-        
+       clear();
+       
+       browserPane.triggerLoadUniProt(uniprot);
     }
+
+    /** start a new thead that retrieves uniprot sequence, and if available
+    protein structure
+    */
+   public void loadEnsp(String ensp) {
+       logger.info("SpiceApplication loadEnsp" + ensp);
+       
+       if ( config == null){
+           // we have to wait until contacting the DAS registry is finished ...
+           waitingType="Ensp";
+           waitingCode=ensp;
+           return;
+       }
+       
+     
+       clear();
+       browserPane.triggerLoadENSP(ensp);
+       
+       
+   }
+
+   
     
     
     /** starts a new thread that retreives protein structure using the
@@ -909,17 +919,11 @@ ConfigurationListener
         }
         
         
-        this.setLoading(true);
+        //this.setLoading(true);
+        
+        
+        clear();
         pdbcode = pdbcod ;
-        
-        //first_load = true ;
-        resetStatusPanel();
-        statusPanel.setLoading(true);
-        statusPanel.setPDB(pdbcode);
-        //statusPanel.setSP("");
-        
-        //LoadStructureThread thr = new LoadStructureThread(this,pdbcod);
-        //thr.start();
         browserPane.triggerLoadStructure(pdbcode);
         
     }
@@ -941,8 +945,17 @@ ConfigurationListener
     /** clear the displayed data */
     public void clear(){
         
+        
+        setCurrentChain(null,-1);
+        
+        pdbMenu.setEnabled(false);
+        upMenu.setEnabled(false);
+        dastyMenu.setEnabled(false);
+        proviewMenu.setEnabled(false);
         Structure s = new StructureImpl();
-        setStructure(s);
+        
+        structurePanelListener.setStructure(s);
+        
     }
     
     /** return the features */
@@ -1097,7 +1110,7 @@ ConfigurationListener
         
         ff.start() ;
         
-        statusPanel.setLoading(true);
+        //statusPanel.setLoading(true);
         //dascanv.setChain(chain,currentChainNumber);
         
         //dascanv.setBackground(Color.);
@@ -1182,7 +1195,7 @@ ConfigurationListener
         
         this.setLoading(false);
         //first_load = false ;
-        statusPanel.setLoading(false);
+        //statusPanel.setLoading(false);
         
         if ( structure_.size() < 1 ){
             logger.log(Level.INFO,"got no structure");
@@ -1202,7 +1215,7 @@ ConfigurationListener
         
         
         
-        DefaultListModel model = (DefaultListModel) ent_list.getModel() ;
+        DefaultListModel model = (DefaultListModel) chainList.getModel() ;
         synchronized (model) {
             model.clear() ;
             //logger.finest(pdbstr);		
@@ -1229,8 +1242,8 @@ ConfigurationListener
         
         //Map header = structure.getHeader();
         //logger.info("structure header " + header);
-        statusPanel.setPDB(structure.getPDBCode());
-        statusPanel.setPDBHeader(structure.getHeader());
+        //statusPanel.setPDB(structure.getPDBCode());
+        //statusPanel.setPDBHeader(structure.getHeader());
         
         //structurePanelListener.executeCmd(selectcmd);
         //System.out.println("SpiceApplication... setting chain");
@@ -1398,7 +1411,9 @@ ConfigurationListener
     }
     
     public int getCurrentChainNumber() {
-        return currentChainNumber;
+        return chainDisplay.getCurrentChainNumber();
+        //return browserPane.getCurrentChainNumber();
+        //return currentChainNumber;
     }
     
     public void setCurrentChainNumber( int newCurrentChain) {
@@ -1443,18 +1458,18 @@ ConfigurationListener
         if (  ( anno != Annotation.EMPTY_ANNOTATION) && ( anno != null )){
         
             if ( anno.containsProperty("description")){
-                statusPanel.setPDBDescription((String)anno.getProperty("description"));
+                //statusPanel.setPDBDescription((String)anno.getProperty("description"));
                 //logger.info("PDB description of chain: "+(String)anno.getProperty("description") );
                 annotationFound = true ;
             }
         }
         
         if ( ! annotationFound ) {
-            statusPanel.setPDBDescription("no chain description");
+            //statusPanel.setPDBDescription("no chain description");
             //logger.info("not chain data found :-(");
         }
         
-        statusPanel.setSP(sp_id);
+        //statusPanel.setSP(sp_id);
         System.out.println("SpiceApplication statusPanel set: ");
         if (sp_id != null){
             upMenu.setEnabled(true);
@@ -1509,7 +1524,7 @@ ConfigurationListener
     
     public void setLoading(boolean status){
         first_load = status;
-        statusPanel.setLoading(status);
+        //statusPanel.setLoading(status);
        
     }
     
@@ -1520,45 +1535,8 @@ ConfigurationListener
      */
     public Chain getChain(int chainnumber) {
         
-        System.out.println("SpiceApplication... get chain " + chainnumber);
+        return chainDisplay.getChain(chainnumber);
         
-        // speedup
-        if ( chainnumber == currentChainNumber ){
-            if ( currentChain != null)
-                return currentChain;
-        }
-        
-        if ( structure == null ) {
-            //logger.log(Level.WARNING,"no structure loaded, yet");
-            return null ;
-        }
-        
-        if ( structure.size() < 1 ) {
-            //logger.log(Level.WARNING,"structure object is empty, please load new structure");
-            return null ;
-        }
-        
-        if ( chainnumber > structure.size()) {
-            logger.log(Level.WARNING,"requested chain number "+chainnumber+" but structure has size " + structure.size());
-            return null ;
-        }
-        
-        Chain c = structure.getChain(chainnumber);
-        // almost the same as Chain.clone(), here:
-        // browse through all groups and only keep those that are amino acids...
-        ChainImpl n = new ChainImpl() ;
-        //logger.finest(c.getName());
-        //logger.finest(c.getSwissprotId());
-        n.setName(c.getName());
-        n.setSwissprotId(c.getSwissprotId());
-        Annotation anno = c.getAnnotation();
-        n.setAnnotation(anno);
-        ArrayList groups = c.getGroups("amino");
-        for (int i = 0 ; i<groups.size();i++){
-            Group group = (Group) groups.get(i);
-            n.addGroup(group);	    
-        }
-        return n;
     }
     
     /** reset the Jmol panel */
@@ -1630,7 +1608,7 @@ ConfigurationListener
         
         sharedPanel.paint(sharedPanel.getGraphics());
         //leftPanel.paint(leftPanel.getGraphics());
-        ent_list.paint(ent_list.getGraphics());
+        chainList.paint(chainList.getGraphics());
         
         //lcr.paint();
         //ListCellRenderer lcr = ent_list.getCellRenderer();

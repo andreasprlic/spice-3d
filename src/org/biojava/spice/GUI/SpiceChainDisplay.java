@@ -25,6 +25,7 @@ package org.biojava.spice.GUI;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.DefaultListModel;
@@ -32,7 +33,10 @@ import javax.swing.JList;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.biojava.bio.Annotation;
 import org.biojava.bio.structure.Chain;
+import org.biojava.bio.structure.ChainImpl;
+import org.biojava.bio.structure.Group;
 import org.biojava.bio.structure.Structure;
 import org.biojava.spice.manypanel.eventmodel.StructureEvent;
 import org.biojava.spice.manypanel.eventmodel.StructureListener;
@@ -44,6 +48,9 @@ StructureListener {
     JList ent_list;
     Structure structure;
     List structureListeners;
+  
+    int chainNumber;
+    
     static Logger logger = Logger.getLogger("org.biojava.spice");
   
     
@@ -52,6 +59,7 @@ StructureListener {
         
         ent_list = list;
         clearStructureListeners();
+        chainNumber = -1;
     }
     
     public void clearStructureListeners(){
@@ -76,7 +84,7 @@ StructureListener {
         int i  = list.getSelectedIndex();
 
         if ( i < 0) return ; 
-        
+        chainNumber = i;
         
         StructureEvent sevent = new StructureEvent(structure,i);
         
@@ -103,14 +111,60 @@ StructureListener {
           
                
         }
+        chainNumber = 0;
         
     }
     
     public void selectedChain(StructureEvent event) {
+        chainNumber = event.getCurrentChainNumber();
       
         
         
     }
+    
+    public Chain getChain(int chainnumber){
+
+        //System.out.println("SpiceApplication... get chain " + chainnumber);
+                        
+        if ( structure == null ) {
+            //logger.log(Level.WARNING,"no structure loaded, yet");
+            return null ;
+        }
+        
+        if ( structure.size() < 1 ) {
+            //logger.log(Level.WARNING,"structure object is empty, please load new structure");
+            return null ;
+        }
+        
+        if ( chainnumber > structure.size()) {
+            logger.log(Level.WARNING,"requested chain number "+chainnumber+" but structure has size " + structure.size());
+            return null ;
+        }
+        
+        Chain c = structure.getChain(chainnumber);
+        // almost the same as Chain.clone(), here:
+        // browse through all groups and only keep those that are amino acids...
+        ChainImpl n = new ChainImpl() ;
+        //logger.finest(c.getName());
+        //logger.finest(c.getSwissprotId());
+        n.setName(c.getName());
+        n.setSwissprotId(c.getSwissprotId());
+        Annotation anno = c.getAnnotation();
+        n.setAnnotation(anno);
+        ArrayList groups = c.getGroups("amino");
+        for (int i = 0 ; i<groups.size();i++){
+            Group group = (Group) groups.get(i);
+            n.addGroup(group);      
+        }
+        return n;
+        
+    }
+    
+    
+    public int getCurrentChainNumber(){
+        return chainNumber;
+    }
+    
     public void newObjectRequested(String accessionCode) {
         DefaultListModel model = (DefaultListModel) ent_list.getModel() ;
         synchronized (model) {
