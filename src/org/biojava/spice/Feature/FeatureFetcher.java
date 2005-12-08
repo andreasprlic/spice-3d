@@ -69,7 +69,9 @@ public class FeatureFetcher extends Thread
     public static final Color HELIX_COLOR  = new Color(255,51,51);
     public static final Color STRAND_COLOR = new Color(255,204,51);
     public static final Color TURN_COLOR   = new Color(204,204,204); 
+
     SPICEFrame parent ;
+
     boolean finished ;
     String spId ;
     String pdbId ;

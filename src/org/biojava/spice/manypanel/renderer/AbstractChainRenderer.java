@@ -22,6 +22,7 @@
  */
 package org.biojava.spice.manypanel.renderer;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.util.logging.Logger;
 
@@ -75,6 +76,9 @@ public abstract class AbstractChainRenderer
         super();        
         this.setOpaque(true);
         setDoubleBuffered(true);
+
+
+
         this.setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
         this.setBorder(BorderFactory.createEmptyBorder());
         
@@ -83,7 +87,7 @@ public abstract class AbstractChainRenderer
         layeredPane.setBorder(BorderFactory.createEmptyBorder());
         layeredPane.setDoubleBuffered(true);
         layeredPane.setOpaque(true);
-        
+        layeredPane.setBackground(Color.WHITE);
         
         scrollPane = new JScrollPane(layeredPane);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
@@ -142,7 +146,7 @@ public abstract class AbstractChainRenderer
         //logger.info("statusp peanel h " + y);
         featurePanel.setBounds(0,y,width,20);
         featurePanel.setLocation(0,y);
-        
+	
         //cursorPanel.setPreferredSize(new Dimension(600,600));
         cursorPanel.setLocation(0,y);
         //cursorPanel.setOpaque(true);
@@ -410,6 +414,7 @@ public abstract class AbstractChainRenderer
         //statusPanel.setBounds(p.x,0,vw,STATUS_PANEL_HEIGHT);
         //statusPanel.setBounds(0,0,width,STATUS_PANEL_HEIGHT);
         featurePanel.setBounds(0,0,width,h);
+	
         // x .. width
         // y .. height
         // (x1,y1,x2,y2)
@@ -429,7 +434,7 @@ public abstract class AbstractChainRenderer
         //logger.info("updatePanelPosition max: " + width + " "  + h);
         
         cursorPanel.setBounds(0,0,width,h);
-        Dimension totalD = new Dimension(width,h);
+        Dimension totalD = new Dimension(width+20,h);
         
         layeredPane.setPreferredSize(totalD);
         layeredPane.setSize(totalD);

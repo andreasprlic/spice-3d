@@ -71,7 +71,8 @@ public class StatusPanel extends JPanel {
         //this.setBorder(BorderFactory.createEmptyBorder());
         Box hBox =  Box.createHorizontalBox();
         hBox.setOpaque(true);
-        
+        hBox.setBackground(BG_COLOR);
+
         dbName = new JTextField("");
         dbName.setEditable(false);
         dbName.setBorder(BorderFactory.createEmptyBorder());
@@ -128,7 +129,7 @@ public class StatusPanel extends JPanel {
         progressBar.setIndeterminate(false);
         progressBar.setBorder(BorderFactory.createEmptyBorder());
         hBox.add(progressBar);
-   
+	progressBar.setVisible(false);
         this.setLayout(new BoxLayout(this,BoxLayout.X_AXIS));
         this.add(hBox);
     }
@@ -151,6 +152,10 @@ public class StatusPanel extends JPanel {
     
     public void setLoading(boolean flag){
         progressBar.setIndeterminate(flag);
+	if ( flag )
+	    progressBar.setVisible(true);
+	else 
+	    progressBar.setVisible(false);
         progressBar.repaint();
     }
     

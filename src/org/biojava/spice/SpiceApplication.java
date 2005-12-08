@@ -368,8 +368,8 @@ ConfigurationListener
    
     private void initLoggingPanel(){
         LoggingPanel loggingPanel = new LoggingPanel(logger);
-        loggingPanel.getHandler().setLevel(Level.FINEST);	
-        logger.setLevel(Level.FINEST);
+        loggingPanel.getHandler().setLevel(Level.INFO);	
+        logger.setLevel(Level.INFO);
         loggingPanel.show(null);
     }
     
@@ -1069,30 +1069,29 @@ ConfigurationListener
         features.clear();
         //dascanv.clear();
         //dascanv.setSeqLength(chain.getLength());
-        //List l = null;
+
+        
         if ( config != null ){
             // test if a new local DAS source is in params
          
             testAddLocalServer();
             
            
-            //l =config.getAllServers();
+            
+
         }
        
-        //if (l == null){
-            //l = new ArrayList();
-        //}
-        //Iterator iter = l.iterator();
-        //while (iter.hasNext()){
-        //    SpiceDasSource ds = (SpiceDasSource) iter.next();
-        //    logger.info(ds.getNickname() + " " + ds.getStatus());
-        //}
+      
+
         System.out.println("SpiceApplication init feature fetcher");
         logger.finest("init feature fetcher");
+
+
         FeatureFetcher ff = new FeatureFetcher(this,sp_id,pdbcode,chain);
         String disp = startParameters.getDisplay();
         String labe = startParameters.getDisplayLabel();
         logger.info("got " + disp + " " + labe);
+
         
         if (! disp.equals("all")){
             if ( labe.equals("all")){

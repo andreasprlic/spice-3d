@@ -28,6 +28,7 @@ import java.awt.Composite;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -174,24 +175,23 @@ implements FeatureListener,SpiceFeatureListener
             }
         }
         
-        
+        Graphics2D g2D = (Graphics2D) g;
+	g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
         // draw the name of the das source
-        g.setFont(headFont);
-        g.setColor(Color.black);
+        g2D.setFont(headFont);
+        g2D.setColor(Color.black);
         
         String str = dasSource.getDasSource().getNickname();
         //logger.info("paint DasSourcePanel "+str);
         
-        g.drawString(str,2,10);
-        g.setFont(plainFont);
+        g2D.drawString(str,2,10);
+        g2D.setFont(plainFont);
         
         
         // now to the features ...
         
         Feature[] features = dasSource.getFeatures();
-        
-        Graphics2D g2D = (Graphics2D)g;
-        
+                
         int y = FeaturePanel.DEFAULT_Y_START + FeaturePanel.DEFAULT_Y_STEP ;
         //logger.info(dasSource.getDasSource().getNickname() + " " + dasSource.getLoading());
         

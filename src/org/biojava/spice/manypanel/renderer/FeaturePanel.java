@@ -28,8 +28,10 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.util.logging.*;
+import java.util.Map;
 import javax.swing.JPanel;
 import org.biojava.bio.structure.*;
 
@@ -74,7 +76,7 @@ extends JPanel{
     private Image dbImage;
     private Graphics dbg;
     
-    public static final Font seqFont = new Font("SansSerif", Font.BOLD, 10);
+    public static final Font seqFont = new Font("Helvetica", Font.PLAIN, 10);
    
     
     public FeaturePanel() {
@@ -181,7 +183,9 @@ extends JPanel{
         g2D.setColor(SEQUENCE_COLOR);
         
         int l = Math.round(length*scale) ;
-        
+
+
+        g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
         Composite oldComp = g2D.getComposite();
         g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));  
         //logger.info("paint l " + l + " length " + length );

@@ -157,7 +157,7 @@ extends Thread
         if ( persistentconfig != null ) {
             config = persistentconfig ;
             if ( shouldDoUpdate(persistentconfig)){
-                logger.finest("contacting registry server");
+                logger.finest("contacting directory server");
                 doRegistryUpdate(); 
                 saveConfiguration();    
             }       
@@ -300,7 +300,7 @@ extends Thread
     {
            
         
-        logger.log(Level.INFO,"contacting DAS registry server at: " +registryurl);
+        logger.log(Level.INFO,"contacting DAS directory server at: " +registryurl);
         
         //RegistryConfiguration oldconfig = config;
         
@@ -364,7 +364,7 @@ extends Thread
         
         
         
-        progressFrame = new JFrame("contacting registration service");
+        progressFrame = new JFrame("contacting DAS directory server");
         progressFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         /*progressFrame.addWindowListener(new WindowAdapter() {
          public void windowClosing(WindowEvent evt) {

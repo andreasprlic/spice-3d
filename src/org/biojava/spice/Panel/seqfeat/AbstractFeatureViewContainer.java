@@ -52,6 +52,7 @@ extends JPanel{
     }
 
     public void clear(){
+
         featureViews = new ArrayList();
         
     }

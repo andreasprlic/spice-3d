@@ -91,7 +91,7 @@ StructureListener
     SPICEFrame spice ;
     //Structure structure;
     int currentChainNumber;
-    PDBDescMouseListener pdbdescMouseListener;
+    //PDBDescMouseListener pdbdescMouseListener;
     Chain chain;
     Structure structure;
     
@@ -135,7 +135,7 @@ StructureListener
         pdbDescription.setEditable(false);
         pdbDescription.setMaximumSize(new Dimension(150,30));
         */
-        pdbdescMouseListener = new PDBDescMouseListener();
+        //pdbdescMouseListener = new PDBDescMouseListener();
         /*
          * //pdbdescMouseListener.setPDBHeader(new HashMap());
         pdbdescMouseListener.setPDBHeader(pdbheader);
@@ -232,7 +232,7 @@ StructureListener
     }
     public void setPDBHeader(Map header){
         pdbheader = header;
-        pdbdescMouseListener.setPDBHeader(header);
+        //pdbdescMouseListener.setPDBHeader(header);
     }
     public Map getPDBHeader(){
         return pdbheader;

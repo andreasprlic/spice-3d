@@ -32,7 +32,7 @@ import javax.swing.JPanel;
 //import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JSplitPane;
-
+import java.awt.Color;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -101,6 +101,8 @@ ChangeListener
     public static int DEFAULT_PANE_WIDTH  = 600;
     public static int DEFAULT_PANE_HEIGHT = 600;
     
+    static Color BG_COLOR = Color.WHITE;
+
     public BrowserPane(String PDBCOORDSYS, String UNIPROTCOORDSYS, String ENSPCOORDSYS) {
         super();
         JPanel contentPanel = new JPanel();
@@ -133,6 +135,8 @@ ChangeListener
         
         structureRenderer = new StructureRenderer(); 
         structureRenderer.getStatusPanel().setName("PDB");
+	structureRenderer.setBackground(BG_COLOR);
+
         ComponentResizedChainListener strucComponentWidthSetter = new ComponentResizedChainListener(structureRenderer);
         this.addComponentListener(strucComponentWidthSetter);
         
@@ -176,6 +180,8 @@ ChangeListener
         
          seqRenderer = new SequenceRenderer();
          seqRenderer.getStatusPanel().setName("UniProt");
+	 seqRenderer.setBackground(BG_COLOR);
+
          ComponentResizedChainListener seqComponentWidthSetter = new ComponentResizedChainListener(seqRenderer);
          this.addComponentListener(seqComponentWidthSetter);
          
@@ -239,6 +245,8 @@ ChangeListener
          
           enspRenderer = new SequenceRenderer();
           enspRenderer.getStatusPanel().setName("ENSP");
+	  enspRenderer.setBackground(BG_COLOR);
+
           ComponentResizedChainListener enspComponentWidthSetter = new ComponentResizedChainListener(enspRenderer);
           this.addComponentListener(enspComponentWidthSetter);
           
@@ -342,7 +350,10 @@ ChangeListener
         residueSizeSlider.setPaintLabels(false);
         residueSizeSlider.addChangeListener(this);
         residueSizeSlider.setPreferredSize(new Dimension(100,15));
+
+
         Box hBox = Box.createHorizontalBox();
+	hBox.setBackground(BG_COLOR);
         hBox.add(Box.createHorizontalGlue());
         hBox.add(residueSizeSlider);
         hBox.add(Box.createHorizontalGlue());

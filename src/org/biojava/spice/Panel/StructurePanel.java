@@ -38,7 +38,7 @@ import org.biojava.bio.structure.StructureImpl ;
 // logging
 import java.util.logging.*;
 
-import org.openscience.jmol.ui.JmolPopup;
+import org.jmol.popup.JmolPopup;
 import java.awt.event.ActionListener;
 
 /** a Panel that provides a wrapper around the Jmol viewer. Code heavily
@@ -126,12 +126,10 @@ implements JmolStatusListener
      */
     public void executeCmd(String command) {
         
-        
         //TODO: is this needed?
         synchronized(viewer){
             viewer.evalString(command);
         }
-        
         
        
     }

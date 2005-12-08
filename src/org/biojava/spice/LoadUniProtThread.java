@@ -63,6 +63,7 @@ public class LoadUniProtThread
 	    spiceframe.setLoading(true);
 	    
 	    // do something ...
+
 	    RegistryConfiguration config = spiceframe.getConfiguration();
 	    
 	    while ( config == null){

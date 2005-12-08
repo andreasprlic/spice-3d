@@ -120,15 +120,18 @@ public class Spice extends Applet {
          */
         boolean serverFound = testSendToServer(params);
         
+
         if (  serverFound){
             // quit this SPICE instance, 
             // the code is being loaded in SPICE in another instance that is already running ...
             String msg = " sent " + params.getCodetype() + " " + params.getCode() + " to already running spice instance";
+
             System.out.println(msg);
+
             System.exit(0);
         }
         	
-        	// 	start a spice instance
+	// 	start a spice instance
         System.out.println("no spice instance has been found - starting new one for "+ params.getCodetype() + " " + params.getCode());
         SpiceApplication appFrame = new SpiceApplication(params);
         
