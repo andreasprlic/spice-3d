@@ -23,6 +23,10 @@
 package org.biojava.spice.manypanel.renderer;
 
 import java.awt.Cursor;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.util.logging.Logger;
 
 import javax.swing.JComponent;
@@ -36,6 +40,13 @@ import org.biojava.spice.manypanel.eventmodel.SpiceFeatureListener;
 import org.biojava.spice.manypanel.eventmodel.SequenceEvent;
 import org.biojava.spice.manypanel.eventmodel.SequenceListener;
 
+
+/** a class that displays a tooltip if mouse over a feature.
+ * it also copies the current selection to the clipboard
+ * 
+ * @author Andreas Prlic
+ *
+ */
 public class SeqToolTipListener
 implements SequenceListener, SpiceFeatureListener {
 
@@ -44,6 +55,10 @@ implements SequenceListener, SpiceFeatureListener {
     String sequence;
     int oldpos ;
     ToolTipManager toolM;
+    
+    Clipboard clipboard;
+    
+    
     public static Logger logger = Logger.getLogger("org.biojava.spice");
     
     public SeqToolTipListener(JComponent parentPanel) {
@@ -59,6 +74,8 @@ implements SequenceListener, SpiceFeatureListener {
         toolM.setDismissDelay(10000);
         //toolM.setLightWeightPopupEnabled(true);
         
+        
+        clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         
     }
 
@@ -90,8 +107,15 @@ implements SequenceListener, SpiceFeatureListener {
         
     }
 
+    /** stores the text in the clipboard 
+     * 
+     */
     public void selectedSeqRange(int start, int end) {
-       // parent.setToolTipText("");
+
+        String seq = sequence.substring(start, end+1);
+        
+        Transferable transferText = new StringSelection(seq);
+        clipboard.setContents(transferText,null);
         
     }
 

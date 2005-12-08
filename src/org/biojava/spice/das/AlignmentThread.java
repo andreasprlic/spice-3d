@@ -141,7 +141,7 @@ extends Thread{
     }
     
     /** get alignments for a particular uniprot or pdb code */
-    public  Alignment[] getAlignments(String code) {
+    private  Alignment[] getAlignments(String code) {
         logger.finest(logname + "searching for alignments of "+code+" ");
         Alignment[] alignments = new Alignment[0] ;
         

@@ -271,6 +271,7 @@ implements AlignmentListener {
         
         try {
            storeAlignment(alignment);
+           logger.info("stored alignment in manager");
         } catch (Exception e){
             e.printStackTrace();
             logger.warning(e.getMessage());
@@ -279,6 +280,13 @@ implements AlignmentListener {
     }
     
     public void triggerObject1Request(String ac){
+        logger.info("should trigger object 1 request ?" + ac + " " + object1Id);
+        if ( ac.equals(object1Id)) {
+            logger.info("no...");
+            return;
+        }
+        logger.info("yes, do trigger object 1 request " + ac);
+        
         
         Iterator iter = object1Listeners.iterator();
         if  (! coordSys1.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS) )
@@ -291,10 +299,14 @@ implements AlignmentListener {
     }
     
     public void triggerObject2Request(String ac){
+        logger.info("should trigger object 2 request ? " + ac);
+        if ( ac.equals(object2Id))
+            return;
+        
         
         if  (! coordSys2.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS) )
             ac = ac.toUpperCase();
-        logger.info("triggerObject2Request " + ac);
+        logger.info("do triggerObject2Request " + ac);
         
         Iterator iter = object2Listeners.iterator();
         while (iter.hasNext()){
@@ -347,18 +359,29 @@ implements AlignmentListener {
         // a new object, request the data...
         object1Id = ac;
         
-        if ( object2Id == null) {
+        if ( (object2Id == null) || (object2Id.equals(""))) {
             // get first alignment for this sequence..
         
             requestAlignment(object1Id);
         } else {
             requestAlignment(object1Id,object2Id);
         }
+    
+        tryCreateAlignmentChain();
     }
     
     /** request a particular alignment between two objects */
     private void requestAlignment(String query, String subject){
-        logger.info(panelName + " requesting new alignment for " + query + " " + subject);
+        
+        logger.info(panelName + " requesting new alignment for " + query + " and " + subject);
+        if ( ((  query.equals(object1Id) || (query.equals(object2Id))) &&
+                (( subject.equals(object1Id) || ( subject.equals(object2Id))))))
+         {
+            logger.info("already know alignment, not requesting again");
+            return;
+        }
+        
+        
         AlignmentThread thread = null;
         // TODO: find a cleaner solution for this:
         if ( panelName.equals("UP_ENSP"))
@@ -374,7 +397,7 @@ implements AlignmentListener {
      * @param code
      */  
     private void requestAlignment(String code){
-        logger.info(panelName + " requesting new alignment for " + code);
+        logger.info(panelName + " requesting any alignment for " + code);
         AlignmentThread thread = null;
         // TODO: find a cleaner solution for this:
         if ( panelName.equals("UP_ENSP"))
@@ -387,7 +410,8 @@ implements AlignmentListener {
     }
     
     public void newSequence2(SequenceEvent e){
-        logger.info(panelName+" alignment : new sequence2:"+e.getAccessionCode() + " currently know:"+object1Id+" " + object2Id);
+        logger.info(panelName+" alignment : new sequence2:"+e.getAccessionCode() + 
+                " currently know 1: >"+object1Id+"< 2: >" + object2Id + "<");
         
         String ac = e.getAccessionCode().toLowerCase();
         
@@ -403,7 +427,7 @@ implements AlignmentListener {
       
         object2Id = ac;
         
-        if ( object1Id == null) {
+        if ( (object1Id == null)||(object1Id.equals(""))) {
             // get first alignment for this sequence..
         
             requestAlignment(object2Id);
@@ -411,7 +435,7 @@ implements AlignmentListener {
             requestAlignment(object2Id,object1Id);
         }
         
-        
+        tryCreateAlignmentChain();
        
     }
     
