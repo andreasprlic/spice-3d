@@ -31,6 +31,7 @@ import java.util.Iterator;
 
 
 import org.biojava.services.das.registry.*;
+import org.biojava.spice.das.AlignmentParameters;
 import org.biojava.spice.das.AlignmentThread;
 import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.manypanel.eventmodel.*;
@@ -62,6 +63,7 @@ implements AlignmentListener {
     List object2Listeners;
     
     Alignment alignment;
+    Alignment tmpAlignment;
     
     String object1Id;
     String object2Id;
@@ -190,9 +192,6 @@ implements AlignmentListener {
         ac2 = ac2.toLowerCase();
         
         logger.info(panelName+" got new Alignment "+ac1 + " " + ac2+   " currently know:"+object1Id+" " + object2Id);
-  
-        
-        
         
         // we need to find out which of the two objects is object1/object2 ...
         
@@ -204,25 +203,25 @@ implements AlignmentListener {
        
         if ( ac1.equals(object1Id) || 
                 ( (coordSys1.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS)) &&
-                        (ac1.substring(0,4).equals(object1Id)))){
+                        (ac1.substring(0,4).equalsIgnoreCase(object1Id)))){
             // object1 = ac1
            
             triggerObject2Request(ac2);
         } else if ( ac1.equals(object2Id)|| 
                 ((coordSys1.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS)) &&
-                        ( ac1.substring(0,4).equals(object2Id)))){
+                        ( ac1.substring(0,4).equalsIgnoreCase(object2Id)))){
             // object2 = ac1
           
             triggerObject1Request(ac2);
         } else if ( ac2.equals(object1Id)|| 
                 ((coordSys2.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS)) &&
-                ( ac2.substring(0,4).equals(object1Id)))){
+                ( ac2.substring(0,4).equalsIgnoreCase(object1Id)))){
            
             triggerObject2Request(ac1);
             
         } else if ( ac2.equals(object2Id)|| 
                 ((coordSys2.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS)) &&
-                ( ac2.substring(0,4).equals(object2Id)))){
+                ( ac2.substring(0,4).equalsIgnoreCase(object2Id)))){
           
             triggerObject1Request(ac1);
         } else {
@@ -235,11 +234,11 @@ implements AlignmentListener {
     }
     
     private void tryCreateAlignmentChain(){
-        
+        logger.info("tryCreatealignmentChain");
         Annotation[] os = alignment.getObjects();
         if ( os.length < 2){
             // something strange is going on here..
-            //logger.warning(panelName+" got  alignment of wrong # objects..." + os.length);
+            logger.warning(panelName+" got  alignment of wrong # objects..." + os.length);
             return;
         }
         Annotation a1 = os[0];
@@ -259,8 +258,8 @@ implements AlignmentListener {
             found2 =true;
         
         if ( ! (found1 && found2)) {
-            //logger.info(panelName + " can not create alignmentChain, yet >" + ac1 + "< >" + ac2 + 
-              //        "< >" + object1Id + "< >" + object2Id+"<");
+            logger.info(panelName + " can not create alignmentChain, yet >" + ac1 + "< >" + ac2 + 
+                    "< >" + object1Id + "< >" + object2Id+"<");
             return;
         }
         
@@ -284,7 +283,7 @@ implements AlignmentListener {
             return;
         }
         logger.info("yes, do trigger object 1 request " + ac);
-        
+        object1Id =ac;
         
         Iterator iter = object1Listeners.iterator();
         if  (! coordSys1.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS) )
@@ -298,9 +297,11 @@ implements AlignmentListener {
     
     public void triggerObject2Request(String ac){
         logger.info("should trigger object 2 request ? " + ac);
-        if ( ac.equals(object2Id))
+        if ( ac.equals(object2Id)) {
+            logger.info("no...");
             return;
-        
+        }
+        object2Id = ac;
         
         if  (! coordSys2.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS) )
             ac = ac.toUpperCase();
@@ -344,11 +345,15 @@ implements AlignmentListener {
         
        String ac = e.getAccessionCode().toLowerCase();
         
-        if (  object1Id.equals(ac) || object2Id.equals(ac)){
-            // we already go this one, ignore...
-            logger.info("already loaded, skipping");
-            tryCreateAlignmentChain();
-            return;
+        if (  object1Id.equalsIgnoreCase(ac) || object2Id.equalsIgnoreCase(ac)){
+            
+            if ( alignmentIsLoaded(object1Id,object2Id)) {
+                // we already go this one, ignore...
+                logger.info("already loaded, skipping");
+                tryCreateAlignmentChain();
+                return;
+            }
+        
         }
         
         SequenceManager sm = new SequenceManager();
@@ -356,56 +361,149 @@ implements AlignmentListener {
       
         // a new object, request the data...
         object1Id = ac;
+        //object1Id = "";
+        
+        alignment = new Alignment();
+        
+        alignmentMap1 = new HashMap();
+        alignmentMap2 = new HashMap();
         
         if ( (object2Id == null) || (object2Id.equals(""))) {
             // get first alignment for this sequence..
         
-            requestAlignment(object1Id);
+            //requestAlignment(object1Id);
+            AlignmentParameters params = new AlignmentParameters();
+            params.setQuery(object1Id);
+            if ( coordSys1.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS )) {
+                String chainId = getChainIdFromPDBCode(object1Id);
+                if ( chainId != null)
+                    params.setQueryPDBChainId(chainId);
+            }
+            params.setQueryCoordinateSystem(coordSys1);
+            params.setSubjectCoordinateSystem(coordSys2);
+            params.setDasSources(alignmentServers);
+            requestAlignment(params);
+        
         } else {
-            requestAlignment(object1Id,object2Id);
+            String o1 = object1Id;
+            String o2 = object2Id;
+           
+            AlignmentParameters params = new AlignmentParameters();
+            
+            if (! coordSys1.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS ))
+                o1 = o1.toUpperCase();
+            else {
+                String chainId = getChainIdFromPDBCode(object1Id);
+                params.setQueryPDBChainId(chainId);
+            }
+            if (! coordSys2.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS )) 
+                o2 = o2.toUpperCase();
+            else {
+                
+                String chainId = getChainIdFromPDBCode(object2Id);
+                params.setSubjectPDBChainId(chainId);
+            }
+            
+            params.setQuery(o1);
+            params.setSubject(o2);
+            params.setQueryCoordinateSystem(coordSys1);
+            params.setSubjectCoordinateSystem(coordSys2);
+            params.setDasSources(alignmentServers);
+            requestAlignment(params);
+            //requestAlignment(o1,o2,coordSys1);
         }
     
         tryCreateAlignmentChain();
     }
     
-    /** request a particular alignment between two objects */
-    private void requestAlignment(String query, String subject){
-        
+    
+    private boolean alignmentIsLoaded(String query, String subject){
         logger.info(panelName + " requesting new alignment for " + query + " and " + subject);
-        if ( ((  query.equals(object1Id) || (query.equals(object2Id))) &&
-                (( subject.equals(object1Id) || ( subject.equals(object2Id))))))
-         {
-            logger.info("already know alignment, not requesting again");
+        logger.info("o1: " + object1Id + " o2:" + object2Id);
+        
+        // check if alignment is already known
+        Annotation[] os = alignment.getObjects();
+        if ( os.length < 2){
+            // something strange is going on here..
+            //logger.warning(panelName+" got  alignment of wrong # objects..." + os.length);
+            return false;
+        }
+        Annotation a1 = os[0];
+        Annotation a2 = os[1];
+        
+        String ac1 =  (String) a1.getProperty("dbAccessionId");
+        String ac2 =  (String) a2.getProperty("dbAccessionId");
+        
+        ac1 = ac1.toLowerCase();
+        ac2 = ac2.toLowerCase();
+        logger.info("ac1: " + ac1 + " " + ac2);
+        
+
+        
+        if   (query.equals(ac1) || query.equals(ac2)) { 
+            if  ( subject.equals(ac1) ||  subject.equals(ac2))
+            {
+                logger.info("already know alignment, not requesting again");
+                return true;
+            } 
+        }
+        
+        return false;
+        
+    }
+    
+    /** request a particular alignment between two objects *
+    /private void requestAlignment(String query,  String subject,DasCoordinateSystem queryCS){
+        
+        if ( alignmentIsLoaded(query,subject) ) {
             return;
         }
+        logger.info("request alignment " + query + " " + subject);
+        
+        AlignmentParameters para = new AlignmentParameters();
+        para.setQuery(query);
+        para.setSubject(subject);
+        
+        para.setDasSources(alignmentServers);
         
         
         AlignmentThread thread = null;
         // TODO: find a cleaner solution for this:
-        if ( panelName.equals("UP_ENSP"))
-            thread =    new AlignmentThread(panelName,query,subject, alignmentServers,"ensemblpep-human-ncbi35");
-        else
-            thread = new AlignmentThread(panelName,query,subject, alignmentServers);
+        if ( panelName.equals("UP_ENSP")){
+            DasCoordinateSystem ecs = new DasCoordinateSystem();
+            ecs.setName("ensemblpep-human-ncbi35");
+            para.setSubjectCoordinateSystem(ecs); 
+            para.setQueryCoordinateSystem(DasCoordinateSystem.fromString(BrowserPane.DEFAULT_PDBCOORDSYS));
+//          thread =    new AlignmentThread(panelName,query,subject, alignmentServers,"ensemblpep-human-ncbi35");
+            
+        }
+            else   {
+            para.setQueryCoordinateSystem(queryCS);
+            //thread = new AlignmentThread(panelName,query,subject, alignmentServers, queryCS);
+        } 
+        thread = new AlignmentThread(para);
+        thread.addAlignmentListener(this);
+        thread.start();
+    }
+    */
+    /** request the first alignment for a particular accession code 
+    * 
+    * @param params
+    */  
+    private void requestAlignment(AlignmentParameters params){
+        // TODO fix this:
+        // the alignmetn server shoudl use the correct coord sys ...
+        if ( params.getSubjectCoordinateSystem().toString().equals(BrowserPane.DEFAULT_ENSPCOORDSYS.toString())) {
+            DasCoordinateSystem ecs = new DasCoordinateSystem();
+            ecs.setName("ensemblpep-human-ncbi35");
+            params.setSubjectCoordinateSystem(ecs);   
+        }
+        AlignmentThread thread =    new AlignmentThread(params);
         thread.addAlignmentListener(this);
         thread.start();
     }
     
-    /** request the first alignment for a particular accession code 
-     * 
-     * @param code
-     */  
-    private void requestAlignment(String code){
-        logger.info(panelName + " requesting any alignment for " + code);
-        AlignmentThread thread = null;
-        // TODO: find a cleaner solution for this:
-        if ( panelName.equals("UP_ENSP"))
-            thread =    new AlignmentThread(panelName,code, alignmentServers,"ensemblpep-human-ncbi35");
-        else
-            thread = new AlignmentThread(panelName,code, alignmentServers);
-        thread.addAlignmentListener(this);
-        thread.start();
-        
-    }
+    
     
     public void newSequence2(SequenceEvent e){
         logger.info(panelName+" alignment : new sequence2:"+e.getAccessionCode() + 
@@ -413,30 +511,78 @@ implements AlignmentListener {
         
         String ac = e.getAccessionCode().toLowerCase();
         
-        if (  object2Id.equals(ac) || object1Id.equals(ac)){
-            // we already go this one, ignore...
-            logger.info("already loaded, skipping");
-            tryCreateAlignmentChain();
-            return;
+        if (  object2Id.equalsIgnoreCase(ac) || object1Id.equalsIgnoreCase(ac)){
+            if ( alignmentIsLoaded(object1Id,object2Id)) {
+                // we already go this one, ignore...
+                logger.info("already loaded, skipping");
+                tryCreateAlignmentChain();
+                return;
+            }
         }
-
-        
         
         SequenceManager sm = new SequenceManager();
         sequence2 = sm.getChainFromString(e.getSequence());
       
         object2Id = ac;
+        //object1Id = "";
+        
+        alignment = new Alignment();
+        
+        alignmentMap1 = new HashMap();
+        alignmentMap2 = new HashMap();
+        
+            
+                
         
         if ( (object1Id == null)||(object1Id.equals(""))) {
             // get first alignment for this sequence..
         
-            requestAlignment(object2Id);
+            //requestAlignment(object2Id);
+            AlignmentParameters params = new AlignmentParameters();
+            params.setQuery(object2Id);
+            params.setQueryCoordinateSystem(coordSys2);
+            params.setSubjectCoordinateSystem(coordSys1);
+            params.setDasSources(alignmentServers);
+            requestAlignment(params);
+            
         } else {
-            requestAlignment(object2Id,object1Id);
+            String o1 = object1Id;
+            String o2 = object2Id;
+            
+            AlignmentParameters params = new AlignmentParameters();
+            
+            if (! coordSys1.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS))
+                o1 = o1.toUpperCase();
+            else {
+                String chainId = getChainIdFromPDBCode(object1Id);
+                params.setSubjectPDBChainId(chainId);
+            }
+            if (! coordSys2.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS )) 
+                o2 = o2.toUpperCase();
+            else {
+                
+                String chainId = getChainIdFromPDBCode(object2Id);
+                params.setQueryPDBChainId(chainId);
+            }
+            params.setQuery(o2);
+            params.setSubject(o1);
+            params.setQueryCoordinateSystem(coordSys2);
+            params.setSubjectCoordinateSystem(coordSys1);
+            params.setDasSources(alignmentServers);
+            requestAlignment(params);
+            //requestAlignment(o2,o1, coordSys2);
         }
         
         tryCreateAlignmentChain();
        
+    }
+    
+    private String getChainIdFromPDBCode(String code){
+        if ( code.substring(4,5).equals(".")){
+            return code.substring(5,6);
+        }
+        return null;
+        
     }
     
     public void requestedObject1(Object o){

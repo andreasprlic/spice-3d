@@ -47,15 +47,17 @@ implements ObjectManager, StructureListener {
    
     List structureRenderers;
     List structureListeners;
-    
+    int currentChainNr ;
     String pdbCode;
     static Logger logger = Logger.getLogger("org.biojava.spice");
-    
+    Structure structure ;
     public StructureManager() {
         super();
         structureRenderers = new ArrayList();
         pdbCode ="";
         structureListeners = new ArrayList();
+        structure = new StructureImpl();
+        currentChainNr = -1;
     }
     
     public void clearDasSources(){
@@ -86,18 +88,40 @@ implements ObjectManager, StructureListener {
         
         logger.info("newObjectRequested " + accessionCode);
         
+        
         String[] spl = accessionCode.split("\\.");
        String code ="";
-        if ( spl.length < 1)    
+       String chain = " ";
+        if ( spl.length < 2)    
             code = accessionCode;
-        else 
-            code=spl[0];
-                      
-                      
+        else {
+            code = spl[0];
+            chain = spl[1];
+        }        
+              
+        logger.info("accession code " + accessionCode + " co " + code + " ch " + chain +
+                " pdbcode " + pdbCode);
+        
         if ( pdbCode.equals(code)){
-            // this structure is already displayed, do nothing...
+            // this structure is already displayed, 
+            // change the active chain
+            // get the chain number
+            int chainNumber = getActiveChainFromName(chain);
+            logger.info("chainNumber " + chainNumber);
+            if ( chainNumber >= 0 ){
+                StructureEvent event = new StructureEvent(structure, chainNumber);
+                Iterator iter = structureListeners.iterator();
+                while (iter.hasNext()){
+                    StructureListener li = (StructureListener) iter.next();
+                    li.selectedChain(event);
+                }
+            }
             return;
         }
+        logger.info("requesting new structure " + code);
+        // a new structure should be loaded
+        structure = new StructureImpl();
+        
         SpiceDasSource[] sds = toSpiceDasSource(dasSources);
         StructureThread dsh = new StructureThread(code,sds);
         dsh.addStructureListener(this);      
@@ -121,7 +145,23 @@ implements ObjectManager, StructureListener {
     }
     
     
+    public int getActiveChainFromName(String name){
+        List chains = structure.getChains(0);
+        Iterator iter = chains.iterator();
+        int i = 0 ;
+        while (iter.hasNext()){
+            Chain c = (Chain) iter.next();
+            if (c.getName().equals(name) )
+                return i;
+            i++;
+        }
+                
+        return -1;
+        
+    }
+    
     public void newObject(Object object){
+        logger.info("new object " + object);
         if ( object instanceof Structure) {
             Structure s = (Structure)object;
             drawStructure(s);
@@ -137,9 +177,10 @@ implements ObjectManager, StructureListener {
         
         // convert structure to drawable structure ...
         Structure s = event.getStructure();
+        structure = s;
         drawStructure(s);
         Chain c = s.getChain(event.getCurrentChainNumber());
-        
+        currentChainNr = event.getCurrentChainNumber();
         triggerNewSequence(c,event.getPDBCode());
     }
     
@@ -168,8 +209,12 @@ implements ObjectManager, StructureListener {
     }
     
     private void drawStructure(Structure struc){
+        drawStructure(struc,0);
+    }
+    private void drawStructure(Structure struc,int currentChainId){
         DrawableStructure draw = new DrawableStructure(struc.getPDBCode());
         draw.setStructure(struc);
+        draw.setCurrentChainNumber(currentChainId);
         draw.setLoading(false);
         Iterator iter = structureRenderers.iterator();
         
@@ -180,12 +225,20 @@ implements ObjectManager, StructureListener {
     }
     
     public void selectedChain(StructureEvent event) {
+    
         int nr = event.getCurrentChainNumber();
+        logger.info("selected chain " + nr);
+        if ( nr == currentChainNr){
+            logger.info("already selected, ignoring...");
+            return;
+        }
         Structure s = event.getStructure();
         // change the displayed sequence ...
         Chain c = s.getChain(nr);
+        currentChainNr = nr ;
+        drawStructure(s,nr);
         triggerNewSequence(c,event.getPDBCode());
-        
+      
     }
     
     

@@ -125,7 +125,7 @@ StructureListener {
     public Chain getChain(int chainnumber){
 
         //System.out.println("SpiceApplication... get chain " + chainnumber);
-                        
+        logger.info("getChain " + chainnumber);
         if ( structure == null ) {
             //logger.log(Level.WARNING,"no structure loaded, yet");
             return null ;

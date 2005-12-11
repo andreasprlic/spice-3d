@@ -35,6 +35,8 @@ import java.util.zip.GZIPInputStream;
 import java.util.ArrayList;
 import org.biojava.bio.program.das.dasalignment.Alignment;
 import org.biojava.bio.program.das.dasalignment.DASAlignmentCall;
+import org.biojava.services.das.registry.DasCoordinateSystem;
+import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.spice.manypanel.eventmodel.*;
 
 
@@ -46,61 +48,33 @@ import org.biojava.spice.manypanel.eventmodel.*;
 public class AlignmentThread 
 extends Thread{
     
-    SpiceDasSource[] dasSources;
-    String query;
     
     static Logger logger = Logger.getLogger("org.biojava.spice");
     List alignmentListeners;
-    DASAlignmentCall dasalignmentCall;
-    String subjectCoordSys;
+    DASAlignmentCall dasalignmentCall;   
     String logname;
-    String subject;
     
-    public AlignmentThread(String logname,String query, SpiceDasSource[] dss) {
+    AlignmentParameters parameters;
+    
+    String PDB_COORD_SYS = BrowserPane.DEFAULT_PDBCOORDSYS ;
+    
+    public AlignmentThread(AlignmentParameters params) {
         super();
-        dasSources = dss;
-        if (dss == null){
-            dasSources = new SpiceDasSource[0];
-        }
+        this.parameters = params;
+        logname = "";
         
         // if this is a PDB code, check for empty chain.      
         
-        if ( query.substring(4,5).equals(".") ){
-            if ( query.substring(5,6).equals(" ")){
-                // found a PDB code with empty chain.
-                // change to PDB code only.
-                query = query.substring(0,4);
-            }
-        }
         
         
-        this.query = query;
+        
         clearAlignmentListeners();
-    
+        
         dasalignmentCall= new DASAlignmentCall();
-        subjectCoordSys= null;
-        subject=null;
-        this.logname = logname;
-    }
-    
-    public AlignmentThread(String logname,String query, String subject, SpiceDasSource[] dss) {
-        this(logname,query,dss);
-    }
-    
-    public AlignmentThread(String logname,String query, SpiceDasSource[] dss, String subjectCoordSys) {
-        this(logname,query,dss);
-     
-        this.subjectCoordSys = subjectCoordSys;
         
     }
     
-    public AlignmentThread(String logname,String query,String subject, SpiceDasSource[] dss, String subjectCoordSys) {
-        this(logname,query,dss,subjectCoordSys);
-        
-        this.subject = subject;
-        
-        
-    }
+    
     
     
     public void clearAlignmentListeners(){
@@ -112,26 +86,65 @@ extends Thread{
     }
     
     public void run() {
+        
+        DasCoordinateSystem queryCoordSys = parameters.getQueryCoordinateSystem();
+        String query = parameters.getQuery();
+        String subject = parameters.getSubject();
+        
+        if ( queryCoordSys != null ){
+            String qcs = queryCoordSys.toString();
+            logger.info("found queryCS " + qcs + " query " + query + " subject " + subject);
+            
+            if ( qcs.equals (PDB_COORD_SYS) ) {
+                logger.info("looks like a PDB " + qcs + " " + PDB_COORD_SYS);
+                query = query.substring(0,4);
+            }
+        }
+        logger.info("requesting for query " + query);
         Alignment[] aligs = getAlignments(query);
         if ( aligs.length == 0)
             return;
         
-        Alignment finalAlig = aligs[0];
+        Alignment finalAlig =  aligs[0];
         
         // take the right alignment
-        if ( subject != null){
+        if (  subject != null) {
+            logger.info("subject " + subject);
+            if ( parameters.getQueryPDBChainId() != null)
+                query = query +"." + parameters.getQueryPDBChainId();
+            if ( parameters.getSubjectPDBChainId() != null)
+                subject = subject + "." + parameters.getSubjectCoordinateSystem();
+          
+            logger.info("searching for " + query + " " + subject);
+            boolean found = false;
             for ( int i=0; i< aligs.length;i++ ){
                 Alignment a = aligs[i];
+                logger.info("checking alignment " + a.toString());
                 try {
+                    AlignmentTools.getObject(query,a);
                     AlignmentTools.getObject(subject,a);
+                    logger.info("found alignment for "+query + " " + subject);
                     finalAlig = a;
+                    found = true;
                     break;
                 } catch (NoSuchElementException e){
+                    //logger.info(" no such element " + e.getMessage());
                     continue;
                 }
             }
+            
+            if ( ! found){
+                // hum somebdy requested a particular query & subject, but we do not find this.
+                // give him the first alignment for query..
+                if ( parameters.getQueryPDBChainId() != null)
+                    query = query.substring(0,4);
+                finalAlig = getAlignmentFromAligs(aligs,query);
+                
+            }
+        } else {
+            finalAlig = getAlignmentFromAligs(aligs,query);
+            
         }
-        
         Iterator iter = alignmentListeners.iterator();
         while (iter.hasNext()){
             AlignmentListener li = (AlignmentListener ) iter.next();
@@ -140,15 +153,45 @@ extends Thread{
         
     }
     
+    private Alignment getAlignmentFromAligs(Alignment[] aligs,String query){
+
+        //logger.info("subject is null");
+        // check if no subject, but query has a chain id ...
+        if ( parameters.getQueryPDBChainId() != null) {
+            //logger.info("got a pdb chain request");
+            query = query +"." + parameters.getQueryPDBChainId();
+            for ( int i=0; i< aligs.length;i++ ){
+                Alignment a = aligs[i];
+                //logger.info("checking alignment " + a.toString());
+                try {
+                    
+                    //logger.info("searching for " + query );
+                    AlignmentTools.getObject(query,a);
+                    
+                    //logger.info("found alignment for "+query );
+                    //finalAlig = a;
+                    return a;
+                } catch (NoSuchElementException e){
+                    //logger.info(" no such element " + e.getMessage());
+                    continue;
+                }
+            }
+        }
+        return aligs[0];
+    }
+    
     /** get alignments for a particular uniprot or pdb code */
     private  Alignment[] getAlignments(String code) {
         logger.finest(logname + "searching for alignments of "+code+" ");
         Alignment[] alignments = new Alignment[0] ;
-        
+        SpiceDasSource[] dasSources = parameters.getDasSources();
         //List aligservers = config.getServers("alignment");
         logger.finest(logname + "found " + dasSources.length + " alignment servers");
         
         String  dasalignmentcommand = null  ;
+        
+        String subject = parameters.getSubject();
+        DasCoordinateSystem subjectCoordSys = parameters.getSubjectCoordinateSystem();
         
         // loop over all available alignment servers 
         for ( int i =0 ; i < dasSources.length ; i++ ) {
@@ -171,7 +214,13 @@ extends Thread{
             }
             
             if (subjectCoordSys != null ){
-                dasalignmentcommand +="&subjectcoordsys="+subjectCoordSys;
+                // TODO find a nicer solution for this ..
+                String scs = subjectCoordSys.toString();
+                if ( scs.substring(scs.length()-1).equals(",")){
+                    scs = scs.substring(0,scs.length()-1);
+                }
+                
+                dasalignmentcommand +="&subjectcoordsys="+scs;
             }
             logger.info(logname + " contacing alignment server " + dasalignmentcommand);
             //System.out.println("contacing alignment server " + dasalignmentcommand);
@@ -227,38 +276,38 @@ extends Thread{
     }
     
     /** connect to DAS server and return result as an InputStream.
-    *
-    */    
-   private InputStream connectDASServer(URL url) 
+     *
+     */    
+    private InputStream connectDASServer(URL url) 
     throws IOException
-   {
-    InputStream inStream = null ;
-                
-    //System.out.println("opening connection to "+url);
-    HttpURLConnection huc = org.biojava.spice.SpiceApplication.openHttpURLConnection(url);  
-     
-
-    //System.out.println("temporarily disabled: accepting gzip encoding ");
-    // should make communication much faster!
-    huc.setRequestProperty("Accept-Encoding", "gzip");
-    
-    //System.out.println("response code " +huc.getResponseCode());
-    String contentEncoding = huc.getContentEncoding();
-    //System.out.println("getting InputStream");
-    inStream = huc.getInputStream();
-    if (contentEncoding != null) {
-        if (contentEncoding.indexOf("gzip") != -1) {
-        // we have gzip encoding
-        inStream = new GZIPInputStream(inStream);
-        //System.out.println("using gzip encoding!");
+    {
+        InputStream inStream = null ;
+        
+        //System.out.println("opening connection to "+url);
+        HttpURLConnection huc = org.biojava.spice.SpiceApplication.openHttpURLConnection(url);  
+        
+        
+        //System.out.println("temporarily disabled: accepting gzip encoding ");
+        // should make communication much faster!
+        huc.setRequestProperty("Accept-Encoding", "gzip");
+        
+        //System.out.println("response code " +huc.getResponseCode());
+        String contentEncoding = huc.getContentEncoding();
+        //System.out.println("getting InputStream");
+        inStream = huc.getInputStream();
+        if (contentEncoding != null) {
+            if (contentEncoding.indexOf("gzip") != -1) {
+                // we have gzip encoding
+                inStream = new GZIPInputStream(inStream);
+                //System.out.println("using gzip encoding!");
+            }
         }
+        //System.out.println("got InputStream from  DAS Alignment server");
+        //System.out.println("encoding: " + contentEncoding);
+        
+        return inStream;
+        
     }
-    //System.out.println("got InputStream from  DAS Alignment server");
-    //System.out.println("encoding: " + contentEncoding);
-
-    return inStream;
     
-   }
-   
     
 }
