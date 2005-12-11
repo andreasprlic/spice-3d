@@ -29,7 +29,6 @@ import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.Chain;
 import java.util.List;
 import java.net.URL;
-import org.biojava.spice.Panel.seqfeat.SpiceFeatureViewer;
 
 /** an interface that defines methods provided by the master application. 
 

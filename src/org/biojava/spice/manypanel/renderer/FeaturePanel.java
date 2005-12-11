@@ -29,9 +29,9 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.Shape;
+//import java.awt.Shape;
 import java.util.logging.*;
-import java.util.Map;
+//import java.util.Map;
 import javax.swing.JPanel;
 import org.biojava.bio.structure.*;
 
@@ -42,10 +42,10 @@ import org.biojava.spice.Feature.*;
 
 
 import java.awt.Image;
-import java.awt.font.FontRenderContext;
-import java.awt.font.GlyphVector;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
+//import java.awt.font.FontRenderContext;
+//import java.awt.font.GlyphVector;
+//import java.awt.geom.AffineTransform;
+//import java.awt.geom.Rectangle2D;
 
 public class FeaturePanel
 extends JPanel{

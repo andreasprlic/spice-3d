@@ -22,7 +22,7 @@
  */
 package org.biojava.spice.manypanel.renderer;
 
-import java.awt.Cursor;
+//import java.awt.Cursor;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -39,7 +39,7 @@ import org.biojava.spice.Feature.Feature;
 import org.biojava.spice.Feature.FeatureImpl;
 import org.biojava.spice.Feature.Segment;
 import org.biojava.spice.manypanel.drawable.DrawableDasSource;
-import org.biojava.spice.manypanel.eventmodel.FeatureEvent;
+//import org.biojava.spice.manypanel.eventmodel.FeatureEvent;
 import org.biojava.spice.manypanel.eventmodel.SequenceListener;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureEvent;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureListener;

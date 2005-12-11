@@ -24,7 +24,7 @@ package org.biojava.spice.GUI;
 
 import org.biojava.spice.*;
 import org.biojava.spice.Feature.*;
-import org.biojava.spice.Config.*;
+//import org.biojava.spice.Config.*;
 import org.biojava.spice.Feature.Segment;
 //import org.biojava.spice.Panel.seqfeat.FeatureView;
 import org.biojava.spice.das.SpiceDasSource;

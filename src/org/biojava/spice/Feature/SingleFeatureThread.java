@@ -31,7 +31,7 @@ import java.util.logging.*             ;
 import java.util.List             ;
 import java.util.Map;
 import java.net.URL                    ;
-import org.biojava.spice.Config.*;
+//import org.biojava.spice.Config.*;
 //import java.util.Iterator;
 
 /** a thread that connects to a DAS - Feature service

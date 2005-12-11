@@ -25,10 +25,10 @@ package org.biojava.spice.Panel;
 
 import org.biojava.bio.structure.AminoAcid;
 import org.biojava.bio.structure.Chain;
-import org.biojava.bio.structure.ChainImpl;
+//import org.biojava.bio.structure.ChainImpl;
 import org.biojava.bio.structure.Group;
 import org.biojava.bio.structure.Structure;
-import org.biojava.bio.structure.StructureImpl;
+//import org.biojava.bio.structure.StructureImpl;
 import org.biojava.spice.SPICEFrame;
 import org.biojava.spice.Feature.Feature;
 import org.biojava.spice.Feature.Segment;
@@ -44,23 +44,23 @@ import org.biojava.spice.manypanel.eventmodel.StructureListener;
 
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.JEditorPane;
-import javax.swing.BoxLayout;
-import javax.swing.JProgressBar;
-import javax.swing.BorderFactory;
+//import javax.swing.JEditorPane;
+//import javax.swing.BoxLayout;
+//import javax.swing.JProgressBar;
+//import javax.swing.BorderFactory;
 import javax.swing.Box;
 
-import java.awt.Color;
+//import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.BorderLayout;
-import java.awt.event.*;
-import java.net.URL;
+//import java.awt.BorderLayout;
+//import java.awt.event.*;
+//import java.net.URL;
 import java.util.Map;
-import java.util.HashMap;
-import javax.swing.JFrame;
-import java.awt.Component;
-import java.util.*;
-import java.awt.Point;
+//import java.util.HashMap;
+//import javax.swing.JFrame;
+//import java.awt.Component;
+//import java.util.*;
+//import java.awt.Point;
 
 /** a class to display status information 
  * contains 

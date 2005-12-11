@@ -24,18 +24,18 @@ package org.biojava.spice.server;
 import java.lang.reflect.InvocationTargetException;
 import java.net.*;
 import java.util.Arrays;
-import java.util.HashMap;
+//import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
+//import java.util.Map;
 import java.util.logging.Logger;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.*;
 import org.biojava.spice.SpiceStartParameters;
-import org.biojava.spice.Config.ConfigurationException;
+//import org.biojava.spice.Config.ConfigurationException;
 
-import com.sun.jdi.InvocationException;
+//import com.sun.jdi.InvocationException;
 
 /**
  * @author Andreas Prlic
