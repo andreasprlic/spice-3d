@@ -418,8 +418,8 @@ implements AlignmentListener {
     
     
     private boolean alignmentIsLoaded(String query, String subject){
-        logger.info(panelName + " requesting new alignment for " + query + " and " + subject);
-        logger.info("o1: " + object1Id + " o2:" + object2Id);
+        //logger.info(panelName + " requesting new alignment for " + query + " and " + subject);
+        //logger.info("o1: " + object1Id + " o2:" + object2Id);
         
         // check if alignment is already known
         Annotation[] os = alignment.getObjects();
@@ -436,14 +436,14 @@ implements AlignmentListener {
         
         ac1 = ac1.toLowerCase();
         ac2 = ac2.toLowerCase();
-        logger.info("ac1: " + ac1 + " " + ac2);
+        //logger.info("ac1: " + ac1 + " " + ac2);
         
 
         
         if   (query.equals(ac1) || query.equals(ac2)) { 
             if  ( subject.equals(ac1) ||  subject.equals(ac2))
             {
-                logger.info("already know alignment, not requesting again");
+                //logger.info("already know alignment, not requesting again");
                 return true;
             } 
         }
@@ -514,7 +514,7 @@ implements AlignmentListener {
         if (  object2Id.equalsIgnoreCase(ac) || object1Id.equalsIgnoreCase(ac)){
             if ( alignmentIsLoaded(object1Id,object2Id)) {
                 // we already go this one, ignore...
-                logger.info("already loaded, skipping");
+                //logger.info("already loaded, skipping");
                 tryCreateAlignmentChain();
                 return;
             }
@@ -705,7 +705,7 @@ implements AlignmentListener {
     private  void storeAlignment(Alignment ali) 
     throws DASException
     {
-        System.out.println("storing alignment");
+        //System.out.println("storing alignment");
              
         
         // go over all blocks of alignment and join pdb info ...
@@ -716,7 +716,7 @@ implements AlignmentListener {
         String obj1Id = seq_object.getProperty("intObjectId").toString();
         String obj2Id = stru_object.getProperty("intObjectId").toString();
         
-        System.out.println("storing alignment " + obj1Id + " " + obj2Id);
+        //System.out.println("storing alignment " + obj1Id + " " + obj2Id);
         
         //Simple_AminoAcid_Map current_amino = null ;
         List aligMap1 = AlignmentTool.createAlignmentTable(ali,obj1Id);

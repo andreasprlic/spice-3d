@@ -56,6 +56,7 @@ public abstract class AbstractChainRenderer
     public static final int    MAX_SCALE        =  10;
     public static final int STATUS_PANEL_HEIGHT =  20;
     public static final int FEATURE_PANEL_HEIGHT = 20;
+    
     FeaturePanel featurePanel;
     CursorPanel cursorPanel;
     DrawableSequence sequence;
@@ -76,8 +77,6 @@ public abstract class AbstractChainRenderer
         super();        
         this.setOpaque(true);
         setDoubleBuffered(true);
-
-
 
         this.setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
         this.setBorder(BorderFactory.createEmptyBorder());
@@ -311,6 +310,8 @@ public abstract class AbstractChainRenderer
         float scale = featurePanel.getScale();
         
         int aminosize = Math.round(1*scale);
+        if ( aminosize < 1)
+            aminosize = 1;
         int w = l*aminosize + FeaturePanel.DEFAULT_X_START + FeaturePanel.DEFAULT_X_RIGHT_BORDER;
         
         if ( w  < 200){
@@ -429,12 +430,15 @@ public abstract class AbstractChainRenderer
             dsp.setSize(d);
             
             h+= panelHeight;
+            dsp.repaint();
+            dsp.revalidate();
         }
         
         //logger.info("updatePanelPosition max: " + width + " "  + h);
         
         cursorPanel.setBounds(0,0,width,h);
         Dimension totalD = new Dimension(width+20,h);
+        featurePanel.revalidate();
         
         layeredPane.setPreferredSize(totalD);
         layeredPane.setSize(totalD);

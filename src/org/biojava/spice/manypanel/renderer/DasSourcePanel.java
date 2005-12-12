@@ -288,6 +288,8 @@ implements FeatureListener,SpiceFeatureListener
         int start     = segment.getStart() -1 ;
         int end       = segment.getEnd()   -1 ;
         int aminosize = Math.round(1*scale);
+        if ( aminosize < 1)
+            aminosize = 1;
         // hum some people say this if annotation relates to whole seq.
         if (( start == -1) && ( end == -1 )){
             //System.out.println(feature);
@@ -352,6 +354,8 @@ implements FeatureListener,SpiceFeatureListener
         //    g2D.setColor(Color.yellow);
         //}
         int aminosize = Math.round(1*scale);
+        if ( aminosize < 1 )
+            aminosize = 1;
         for (int s=0; s<segments.size();s++){
             Segment segment=(Segment) segments.get(s);
             
@@ -377,6 +381,8 @@ implements FeatureListener,SpiceFeatureListener
         int start     = segment.getStart() -1 ;
         int end       = segment.getEnd()   -1 ;
         int aminosize = Math.round(1*scale);
+        if ( aminosize < 1 )
+            aminosize = 1;
         int xstart =  java.lang.Math.round(start * scale) + FeaturePanel.DEFAULT_X_START;
         int width   = java.lang.Math.round(  end * scale) - xstart +  FeaturePanel.DEFAULT_X_START+aminosize ;
         
@@ -447,6 +453,8 @@ implements FeatureListener,SpiceFeatureListener
         List segments = feature.getSegments() ;
         //int f = featurePos;     
         int aminosize = Math.round(1*scale);
+        if ( aminosize < 1)
+            aminosize = 1;
         //Segment seg0 = (Segment) segments.get(0) ;
         
         //Color col =  seg0.getColor(); 
@@ -499,6 +507,8 @@ implements FeatureListener,SpiceFeatureListener
         //g2D.drawString(feature.getName(), 1,y+DEFAULT_Y_HEIGHT);
         //logger.finest(""+feature.getName());
         int aminosize = Math.round(1*scale);
+        if ( aminosize < 1)
+            aminosize = 1;
         for (int s=0; s<segments.size();s++){
             Segment segment=(Segment) segments.get(s);
             //logger.finest(""+segment);
@@ -684,6 +694,8 @@ implements FeatureListener,SpiceFeatureListener
         List segments = feature.getSegments() ;
         //int f = featurePos;     
         int aminosize = Math.round(1*scale);
+        if ( aminosize < 1)
+            aminosize = 1;
         //Segment seg0 = (Segment) segments.get(0) ;
         
         //Color col =  seg0.getColor(); 
@@ -734,6 +746,9 @@ implements FeatureListener,SpiceFeatureListener
         List segments = feature.getSegments() ;
         //int f = featurePos;     
         int aminosize = Math.round(1*scale);
+        if ( aminosize < 1 )
+            aminosize = 1;
+        
         //Segment seg0 = (Segment) segments.get(0) ;
         
         //Color col =  seg0.getColor(); 

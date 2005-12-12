@@ -80,7 +80,7 @@ public class SpiceLayeredPanel
             sds[i] = SpiceDasSource.fromDasSource(dss[i]);
         }
         browserPane.setDasSources(sds);
-        browserPane.triggerLoadStructure("1boi");
+        browserPane.triggerLoadStructure("1cdg");
       
         //browserPane.triggerLoadUniProt("P50225");
         //browserPane.triggerLoadENSP("ENSP00000346625");

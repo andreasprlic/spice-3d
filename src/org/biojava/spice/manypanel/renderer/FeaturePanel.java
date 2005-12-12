@@ -116,6 +116,7 @@ extends JPanel{
         this.scale=scale;
         //this.update(this.getGraphics());
         this.repaint();
+        this.revalidate();
     }
     
     
@@ -125,6 +126,8 @@ extends JPanel{
         // initialize buffer
         
         int aminosize = Math.round(scale);
+        if ( aminosize < 1)
+            aminosize = 1;
         int requiredWidth = DEFAULT_X_START + (aminosize * chain.getLength()) + DEFAULT_X_RIGHT_BORDER ;
         logger.info("required width " + requiredWidth);
         //if (dbImage == null)
@@ -181,8 +184,10 @@ extends JPanel{
         //g2D.drawString(panelName,10,10);
         
         g2D.setColor(SEQUENCE_COLOR);
-        
-        int l = Math.round(length*scale) ;
+        int aminosize = Math.round(1*scale);
+        if ( aminosize < 1)
+            aminosize = 1;
+        int l = length*aminosize;
 
 
         g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
@@ -226,10 +231,12 @@ extends JPanel{
         g2D.setColor(SCALE_COLOR);
         
         int aminosize = Math.round(1*scale);
+        if ( aminosize < 1)
+            aminosize = 1;
         //y = y + DEFAULT_Y_STEP;
         // the base line:
         
-        int l = Math.round(length*scale) ;
+        int l = length*aminosize;
         
         Rectangle baseline = new Rectangle(DEFAULT_X_START, y, l, 2);
         
