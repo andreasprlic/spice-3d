@@ -304,8 +304,8 @@ implements FeatureListener,SpiceFeatureListener
         //g2D.setColor(col);
         
         
-        int xstart =  java.lang.Math.round(start * scale) + FeaturePanel.DEFAULT_X_START;
-        int width   = java.lang.Math.round(  end * scale) - xstart +  FeaturePanel.DEFAULT_X_START+aminosize ;
+        int xstart =  start * aminosize + FeaturePanel.DEFAULT_X_START;
+        int width   = end * aminosize - xstart +  FeaturePanel.DEFAULT_X_START+aminosize ;
         
         int half = drawHeight / 2 ;
         
@@ -362,8 +362,8 @@ implements FeatureListener,SpiceFeatureListener
             int start     = segment.getStart() -1 ;
             int end       = segment.getEnd()   -1 ;
             
-            int xstart =  java.lang.Math.round(start * scale) + FeaturePanel.DEFAULT_X_START;
-            int width   = java.lang.Math.round(  end * scale) - xstart +  FeaturePanel.DEFAULT_X_START+aminosize ;
+            int xstart =  start * aminosize + FeaturePanel.DEFAULT_X_START;
+            int width   = end * aminosize - xstart +  FeaturePanel.DEFAULT_X_START+aminosize ;
             
             int height = drawHeight;
             g2D.fillRect(xstart,y,aminosize,height);
@@ -383,8 +383,8 @@ implements FeatureListener,SpiceFeatureListener
         int aminosize = Math.round(1*scale);
         if ( aminosize < 1 )
             aminosize = 1;
-        int xstart =  java.lang.Math.round(start * scale) + FeaturePanel.DEFAULT_X_START;
-        int width   = java.lang.Math.round(  end * scale) - xstart +  FeaturePanel.DEFAULT_X_START+aminosize ;
+        int xstart =  start * aminosize + FeaturePanel.DEFAULT_X_START;
+        int width   = end * aminosize - xstart +  FeaturePanel.DEFAULT_X_START+aminosize ;
         
         // Helix is  always red...
         g2D.setColor(Color.red);
@@ -481,8 +481,8 @@ implements FeatureListener,SpiceFeatureListener
             //    g2D.setColor(col);
             //}
             
-            int xstart =  java.lang.Math.round(start * scale) + FeaturePanel.DEFAULT_X_START;
-            int width   = java.lang.Math.round(  end * scale) - xstart +  FeaturePanel.DEFAULT_X_START+aminosize ;
+            int xstart =  start * aminosize + FeaturePanel.DEFAULT_X_START;
+            int width   = end * aminosize - xstart +  FeaturePanel.DEFAULT_X_START+aminosize ;
             
             g2D.drawRect(xstart,y,width,drawHeight);
             //g2D.drawLine(xstart,y,)
@@ -539,8 +539,8 @@ implements FeatureListener,SpiceFeatureListener
                 //g2D.setColor(col);
                 //}
                 
-                int xstart =  java.lang.Math.round(start * scale) + FeaturePanel.DEFAULT_X_START;
-                int width   = java.lang.Math.round(  end * scale) - xstart +  FeaturePanel.DEFAULT_X_START+aminosize ;
+                int xstart =  start * aminosize + FeaturePanel.DEFAULT_X_START;
+                int width   = end * aminosize - xstart +  FeaturePanel.DEFAULT_X_START+aminosize ;
                 
                 int height = drawHeight ;
                 
@@ -724,8 +724,8 @@ implements FeatureListener,SpiceFeatureListener
             //    g2D.setColor(col);
             //}
             
-            int xstart =  java.lang.Math.round(start * scale) + FeaturePanel.DEFAULT_X_START;
-            int width   = java.lang.Math.round(  end * scale) - xstart +  FeaturePanel.DEFAULT_X_START+aminosize ;
+            int xstart =  start * aminosize + FeaturePanel.DEFAULT_X_START;
+            int width   =  end * aminosize - xstart +  FeaturePanel.DEFAULT_X_START+aminosize ;
             
             int height = drawHeight ;
             
@@ -777,8 +777,8 @@ implements FeatureListener,SpiceFeatureListener
             //    g2D.setColor(col);
             //}
             
-            int xstart =  java.lang.Math.round(start * scale) + FeaturePanel.DEFAULT_X_START;
-            int width   = java.lang.Math.round(  end * scale) - xstart +  FeaturePanel.DEFAULT_X_START+aminosize ;
+            int xstart =  start * aminosize + FeaturePanel.DEFAULT_X_START;
+            int width   =  end * aminosize - xstart +  FeaturePanel.DEFAULT_X_START+aminosize ;
             
             //int height = drawHeight ;
             

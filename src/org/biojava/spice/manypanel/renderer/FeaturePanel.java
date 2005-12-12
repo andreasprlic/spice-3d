@@ -211,7 +211,7 @@ extends JPanel{
             
             // display the actual sequence!;
             for ( int i = 0 ; i < length;i++){
-                int xpos = Math.round(i*scale)+DEFAULT_X_START ;
+                int xpos =i*aminosize+DEFAULT_X_START ;
                                 
                 // TODO:
                 // color amino acids by hydrophobicity
@@ -244,7 +244,7 @@ extends JPanel{
         
         // draw the vertical lines
         for (int i =1 ; i<= length ; i++){
-            int xpos = Math.round(i*scale)+DEFAULT_X_START ;
+            int xpos = i*aminosize+DEFAULT_X_START ;
             
             int lineH = 10;
             if ( scale <= 3)
@@ -274,7 +274,7 @@ extends JPanel{
             } 
         }
         
-        int lastPos = Math.round(length*scale)+DEFAULT_X_START + 2;
+        int lastPos = length*aminosize+DEFAULT_X_START + 2;
         g2D.drawString(""+length,lastPos,y+DEFAULT_Y_STEP);
         
         return y ;
