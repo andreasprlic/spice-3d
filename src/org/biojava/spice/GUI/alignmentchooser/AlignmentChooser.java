@@ -22,7 +22,6 @@
  */
 package org.biojava.spice.GUI.alignmentchooser;
 
-import org.biojava.spice.SPICEFrame;
 import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.StructureBuilder;
 import org.biojava.bio.Annotation;
@@ -31,11 +30,16 @@ import org.biojava.bio.seq.FeatureFilter;
 import org.biojava.bio.seq.ProteinTools;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.structure.Chain;
+import org.biojava.bio.structure.ChainImpl;
 import org.biojava.bio.structure.Group;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.spice.das.AlignmentTools;
+import org.biojava.spice.manypanel.eventmodel.ObjectListener;
+import org.biojava.spice.manypanel.eventmodel.SequenceEvent;
+import org.biojava.spice.manypanel.eventmodel.SequenceListener;
+import org.biojava.spice.manypanel.managers.SequenceManager;
 import org.biojava.spice.Feature.FeatureImpl;
 import org.biojava.spice.Panel.SeqFeaturePanel;
 import org.biojava.bio.gui.sequence.BasicFeatureRenderer;
@@ -76,13 +80,15 @@ import java.util.NoSuchElementException;
  * @author Andreas Prlic
  *
  */
-public class AlignmentChooser {
+public class AlignmentChooser implements 
+SequenceListener
+{
     
     
     JProgressBar progressBar;
         
     org.biojava.bio.program.das.dasalignment.Alignment[] alignments;
-    SPICEFrame spice;
+    //SPICEFrame spice;
     AlignmentTools aligTools;
     
     Chain chain ;
@@ -98,15 +104,18 @@ public class AlignmentChooser {
     SequencePanel sequencePanel;
     MultiLineRenderer multiLineRenderer;
     BumpedRenderer bumpR;
+   
+    AligPanelMouseListener mouseListener;
     
     /**
      * @param arg0
      */
-    public AlignmentChooser(SPICEFrame parent) {
+    public AlignmentChooser() {
         logger = Logger.getLogger("org.biojava.spice");
-        spice = parent ;
+        //spice = parent ;
+        chain = new ChainImpl();
         initSequencePanel();
-      
+        
         
     }
 
@@ -129,7 +138,7 @@ public class AlignmentChooser {
         chainMap    = new HashMap();
         
         // needed as helpers for drawing
-        aligTools = new AlignmentTools(spice.getConfiguration());
+        //aligTools = new AlignmentTools(spice.getConfiguration());
         
         struBuild = new StructureBuilder();
         // TODO Auto-generated constructor stub
@@ -157,36 +166,30 @@ public class AlignmentChooser {
         }
     
         // add listeners
-        AligPanelMouseListener svl = new AligPanelMouseListener(spice,sequencePanel);
-        sequencePanel.addSequenceViewerListener(svl);
+        mouseListener = new AligPanelMouseListener(sequencePanel);
+        sequencePanel.addSequenceViewerListener(mouseListener);
         
         //SequenceViewerMotionListener svm = new MySVL(this);
-        sequencePanel.addSequenceViewerMotionListener(svl);
+        sequencePanel.addSequenceViewerMotionListener(mouseListener);
         
         
     }
     
-    /** Returns an ImageIcon, or null if the path was invalid. */
-    protected static ImageIcon createImageIcon(String path) {
-        java.net.URL imgURL = SpiceApplication.class.getResource(path);
-        if (imgURL != null) {
-            return new ImageIcon(imgURL);
-        } else {
-            System.err.println("Couldn't find file: " + path);
-            return null;
-        }
+    public void addObjectListener(ObjectListener li){
+        mouseListener.addObjectListener(li);
     }
     
     public void show(){
         //System.out.println("starting to retreive Alignments");
         // get uniprot seq from spice.
         
-        int currentChainNumber = spice.getCurrentChainNumber();
-        if ( currentChainNumber < 0) {
-            logger.warning(" no active chain found ");
-            return;
-        }
-        Chain chain = spice.getChain(currentChainNumber);
+        //int currentChainNumber = spice.getCurrentChainNumber();
+        //if ( currentChainNumber < 0) {
+          //  logger.warning(" no active chain found ");
+          //  return;
+        //}
+        //Chain chain = spice.getChain(currentChainNumber);
+        
         String uniprot = chain.getSwissprotId();
         Alignment[] aligs = null ;
        
@@ -200,7 +203,7 @@ public class AlignmentChooser {
         JPanel panel = new JPanel();
         panel.setPreferredSize(new Dimension(700,700));
         //	JFrame.setDefaultLookAndFeelDecorated(false);
-        ImageIcon icon = createImageIcon("spice.png");
+        ImageIcon icon = SpiceApplication.createImageIcon("spice.png");
         alignmentFrame.setIconImage(icon.getImage());
        
         Box vBox = Box.createVerticalBox();
@@ -251,8 +254,7 @@ public class AlignmentChooser {
         
         alignmentFrame.setVisible(true);
         
-        AlignmentChooserThread act = new AlignmentChooserThread(uniprot,spice,this,progressBar);
-        act.start();
+        loadAlignments(uniprot);
         
         AligPanelListener apl = new AligPanelListener(this);
         alignmentFrame.addComponentListener(apl);
@@ -266,6 +268,11 @@ public class AlignmentChooser {
     public void setScale(double s){
         sequencePanel.setScale(s);
         
+    }
+    
+    public void loadAlignments(String code){
+        // triger the load of the alignments...
+        //Todo add this...
     }
     
     public void setChain(Chain c,int number) {
@@ -389,9 +396,6 @@ public class AlignmentChooser {
                     labelstring += " description: " + detailstr;
                 }
             }
-            
-            
-            
             
             //filtR.setRenderer(bumpR);
             try {
@@ -532,6 +536,29 @@ public class AlignmentChooser {
         sequencePanel.setSize(d);
         
     }
+
+    public void newObjectRequested(String accessionCode) {
+        chain = new ChainImpl();
+        
+    }
+
+    public void clearSelection() { }
+
+    public void newSequence(SequenceEvent e) {
+        // TODO Auto-generated method stub
+        SequenceManager sm = new SequenceManager();
+        chain = sm.getChainFromString(e.getSequence());
+        chain.setSwissprotId(e.getAccessionCode());
+        
+    }
+
+    public void selectedSeqPosition(int position) { }
+
+    public void selectedSeqRange(int start, int end) {}
+
+    public void selectionLocked(boolean flag) {}
+    
+    
     
     
 }

@@ -66,7 +66,7 @@ SequenceListener
     
     public void actionPerformed(ActionEvent e) {
         //System.out.println(e);
-        System.out.println(">"+e.getActionCommand()+"<");
+        //System.out.println(">"+e.getActionCommand()+"<");
         
         String cmd = e.getActionCommand();
         if ( cmd.equals("Open") ) {
@@ -156,8 +156,10 @@ SequenceListener
             structurePanelListener.executeCmd(dcmd);
         } else if ( cmd.equals("Choose")){
             //System.out.println("pressed alig window open");
-            AlignmentChooser aligc = new AlignmentChooser(parent);
-            aligc.show();
+            //AlignmentChooser aligc = new AlignmentChooser(parent);
+            //aligc.show();
+            
+            // has been moved to BrowserPane !
         } else {
             //System.out.println("unknown menu comand " + cmd);
         }
@@ -165,7 +167,7 @@ SequenceListener
     }
     
     public void selectionLocked(boolean flag){
-        logger.info("spicemenulistener selectionLocked " + flag );
+       // logger.warning("spicemenulistener selectionLocked " + flag );
         selectionIsLocked = flag;
     }
     

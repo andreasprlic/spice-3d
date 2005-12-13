@@ -39,6 +39,7 @@ import org.biojava.bio.structure.*;
 import java.awt.Color;
 import java.util.*;
 import org.biojava.spice.Feature.*;
+import org.biojava.spice.manypanel.managers.AlignmentManager;
 
 
 import java.awt.Image;
@@ -53,7 +54,7 @@ extends JPanel{
     static final long serialVersionUID = 7893248902423l;
     
     public static final int    DEFAULT_X_START          = 70  ;
-    public static final int    DEFAULT_X_RIGHT_BORDER   = 20 ;
+    public static final int    DEFAULT_X_RIGHT_BORDER   = 40 ;
     public static final int    DEFAULT_Y_START          = 0 ;
     public static final int    DEFAULT_Y_STEP           = 10 ;
     public static final int    DEFAULT_Y_HEIGHT         = 8 ;// thes size of the boxs
@@ -64,6 +65,8 @@ extends JPanel{
     public static final Color  SEQUENCE_COLOR           = Color.LIGHT_GRAY;
     public static final Color  SCALE_COLOR              = Color.black;
     public static final Color  TEXT_SCALE_COLOR         = Color.GRAY;
+    
+   
     
     Character[] seqArr;
     
@@ -86,6 +89,7 @@ extends JPanel{
         setDoubleBuffered(true);
         //features = getRandomFeatures();
         seqArr = new Character[0];       
+      
     }
      
     public synchronized void setChain(Chain c){
@@ -119,6 +123,7 @@ extends JPanel{
         this.revalidate();
     }
     
+  
     
     public void update (Graphics g)
     {
@@ -187,7 +192,7 @@ extends JPanel{
         int aminosize = Math.round(1*scale);
         if ( aminosize < 1)
             aminosize = 1;
-        int l = length*aminosize;
+        int l = Math.round(length*scale);
 
 
         g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
@@ -211,7 +216,7 @@ extends JPanel{
             
             // display the actual sequence!;
             for ( int i = 0 ; i < length;i++){
-                int xpos =i*aminosize+DEFAULT_X_START ;
+                int xpos =Math.round(i*scale)+DEFAULT_X_START ;
                                 
                 // TODO:
                 // color amino acids by hydrophobicity
@@ -236,7 +241,7 @@ extends JPanel{
         //y = y + DEFAULT_Y_STEP;
         // the base line:
         
-        int l = length*aminosize;
+        int l = Math.round(length*scale);
         
         Rectangle baseline = new Rectangle(DEFAULT_X_START, y, l, 2);
         
@@ -244,7 +249,7 @@ extends JPanel{
         
         // draw the vertical lines
         for (int i =1 ; i<= length ; i++){
-            int xpos = i*aminosize+DEFAULT_X_START ;
+            int xpos = Math.round(i*scale)+DEFAULT_X_START ;
             
             int lineH = 10;
             if ( scale <= 3)
@@ -274,7 +279,7 @@ extends JPanel{
             } 
         }
         
-        int lastPos = length*aminosize+DEFAULT_X_START + 2;
+        int lastPos = Math.round(length*scale)+DEFAULT_X_START + aminosize;
         g2D.drawString(""+length,lastPos,y+DEFAULT_Y_STEP);
         
         return y ;

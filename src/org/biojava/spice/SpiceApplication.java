@@ -143,11 +143,6 @@ ConfigurationListener
     JMenuItem unlock;
     JMenuItem lockMenu;
     
-    JMenu browseMenu;
-    JMenuItem pdbMenu;
-    JMenuItem upMenu;
-    JMenuItem dastyMenu;
-    JMenuItem proviewMenu;
     
     //JMenuBar menuBar ;
     JTextField getCom ;
@@ -169,6 +164,7 @@ ConfigurationListener
     
     boolean configLoaded ;
     SpiceMenuListener spiceMenuListener;
+    BrowseMenuListener browseMenu;
     BrowserPane browserPane ;
     SpiceChainDisplay chainDisplay;
     //String dasServerList;
@@ -268,14 +264,16 @@ ConfigurationListener
         this.getContentPane().add(vBox);
         this.setLoading(false);
         spiceMenuListener = new SpiceMenuListener(this,structurePanelListener) ;
-        initListeners();
+       
         
         memoryfeatures = new HashMap();
         features = new ArrayList();
         
         JMenuBar menu = initMenu();
         this.setJMenuBar(menu);
-          
+       
+        initListeners();
+        
         this.setTitle("SPICE") ;
         
         //this.show();
@@ -546,23 +544,27 @@ ConfigurationListener
         browserPane.addSpiceFeatureListener(statusPanel);
         browserPane.addPDBPositionListener(statusPanel);
         browserPane.addStructureListener(statusPanel);
-    
+        browserPane.addStructureListener(browseMenu.getPDBListener());
+        browserPane.addUniProtSequenceListener(browseMenu.getUniProtListener());
+        browserPane.addEnspSeqeuenceListener(browseMenu.getEnspListener());
+        
         // listener for das sources
         browserPane.addSpiceFeatureListener(structurePanelListener);
         
         
         MyDasSourceListener mdsl = new MyDasSourceListener(this);
         browserPane.addDasSourceListener(mdsl);
-        
+        browserPane.addPDBSequenceListener(spiceMenuListener);
+            
         // things related to selecting chains
         chainDisplay = new SpiceChainDisplay(chainList);
         browserPane.addStructureListener(chainDisplay);
         chainList.addListSelectionListener(chainDisplay);
         chainDisplay.addStructureListener(browserPane.getStructureListener());
-        
-        browserPane.addPDBSequenceListener(spiceMenuListener);
-    
-        
+        chainDisplay.addStructureListener(structurePanelListener);
+        chainDisplay.addStructureListener(statusPanel);
+        //chainDisplay.addStructureListener(spiceMenuListener);
+            
     }
     
     /**
@@ -645,49 +647,18 @@ ConfigurationListener
         
         
         // Browse menu
-        
-        browseMenu = new JMenu("Browse");
-        browseMenu.setMnemonic(KeyEvent.VK_B);
-        browseMenu.getAccessibleContext().setAccessibleDescription("open links in browser");
-        
+       
+       
         // unique action listener for the browse buttons
-        ActionListener bl = new BrowseMenuListener(this);
-        menu.add(browseMenu);
+        browseMenu = new BrowseMenuListener();
+        JMenu bm = browseMenu.getBrowsermenu();
+        
+        menu.add(bm);
 
-        if (firefoxIcon == null )
-            pdbMenu = new JMenuItem("PDB");
-        else
-            pdbMenu = new JMenuItem("PDB",firefoxIcon);
-        pdbMenu.setMnemonic(KeyEvent.VK_P);
-        pdbMenu.setEnabled(false);
-        pdbMenu.addActionListener(bl);
-        browseMenu.add(pdbMenu);
-        if ( firefoxIcon == null )
-            upMenu = new JMenuItem("UniProt");
-        else 
-            upMenu = new JMenuItem("UniProt",firefoxIcon);
-        upMenu.setMnemonic(KeyEvent.VK_U);
-        upMenu.setEnabled(false);
-        upMenu.addActionListener(bl);
-        browseMenu.add(upMenu);
         
-        JMenu dasclientsMenu = new JMenu("Other DAS clients");
-        dasclientsMenu.setMnemonic(KeyEvent.VK_O);
-        browseMenu.add(dasclientsMenu);
-        
-        dastyMenu = new JMenuItem("Dasty");
-        dastyMenu.setMnemonic(KeyEvent.VK_D);
-        dastyMenu.addActionListener(bl);
-        dasclientsMenu.add(dastyMenu);
-        dastyMenu.setEnabled(false);
-        
-        proviewMenu = new JMenuItem("Proview");
-        proviewMenu.setMnemonic(KeyEvent.VK_P);
-        proviewMenu.addActionListener(bl);
-        dasclientsMenu.add(proviewMenu);
-        proviewMenu.setEnabled(false);
         
         // Alignment submenu
+        /*
         JMenu align = new JMenu("Alignment");
         align.setMnemonic(KeyEvent.VK_A);
         align.getAccessibleContext().setAccessibleDescription("show alignments");
@@ -697,12 +668,23 @@ ConfigurationListener
         
         JMenuItem seqstrucalig;
         if ( chooseIcon ==  null )
-            seqstrucalig = new JMenuItem("Choose");
+            seqstrucalig = new JMenuItem("Choose PDB-UniProt");
         else 
-            seqstrucalig = new JMenuItem("Choose",chooseIcon);
+            seqstrucalig = new JMenuItem("Choose PDB-UniProt",chooseIcon);
         seqstrucalig.addActionListener(ml);
         seqstrucalig.setMnemonic(KeyEvent.VK_C);
         align.add(seqstrucalig);
+        
+        
+        JMenuItem uniprotensp;
+        if ( chooseIcon ==  null )
+            uniprotensp = new JMenuItem("Choose UniProt-Ensp");
+        else 
+            uniprotensp = new JMenuItem("Choose UniProt-Ensp",chooseIcon);
+        seqstrucalig.addActionListener(ml);
+        seqstrucalig.setMnemonic(KeyEvent.VK_C);
+        align.add(seqstrucalig);
+        */
         
         menu.add(Box.createGlue());
         
@@ -945,17 +927,16 @@ ConfigurationListener
     /** clear the displayed data */
     public void clear(){
         
-        
         setCurrentChain(null,-1);
         
-        pdbMenu.setEnabled(false);
-        upMenu.setEnabled(false);
-        dastyMenu.setEnabled(false);
-        proviewMenu.setEnabled(false);
+        //pdbMenu.setEnabled(false);
+        //upMenu.setEnabled(false);
+        //dastyMenu.setEnabled(false);
+        //proviewMenu.setEnabled(false);
         Structure s = new StructureImpl();
         
         structurePanelListener.setStructure(s);
-        
+        browseMenu.clear();
     }
     
     /** return the features */
@@ -977,11 +958,11 @@ ConfigurationListener
         //return dascanv.getFeatures();
     }
     
-    
+    //TODO: remove this method
     /**  update the currently displayed features */
     public void setFeatures(String sp_id, List tmpfeat) {
         //TODO: build up a new dascanv!
-        
+        logger.warning("depreciated method");
         logger.info("setting features");
         
         //first_load = false ;
@@ -1001,13 +982,14 @@ ConfigurationListener
         
         // test if features have a LINK field
         // if yes, add to browse menu
-        registerBrowsableFeatures(tmpfeat);
+        //registerBrowsableFeatures(tmpfeat);
         
         //this.paint(this.getGraphics());
         updateDisplays();
     }
     
     
+    /*
     private void clearBrowsableButtons(){
         int nr = browseMenu.getItemCount();
         //System.out.println("cleaning "+nr+ " menus");
@@ -1051,7 +1033,7 @@ ConfigurationListener
                 knownFeatureLinks.add(link);
             }
         }
-    }
+    } */
 
 
     private  void getNewFeatures(String sp_id) {
@@ -1206,8 +1188,8 @@ ConfigurationListener
         setCurrentChain(null,-1);
         pdbcode = structure.getPDBCode();
         
-        if (pdbcode != null)
-            pdbMenu.setEnabled(true);
+        //if (pdbcode != null)
+          //  pdbMenu.setEnabled(true);
         //if (logger.isLoggable(Level.FINEST)) {
         //System.out.println(structure.toPDB());	    
         //}
@@ -1424,12 +1406,12 @@ ConfigurationListener
         currentChainNumber = chainNumber;
         notifyAll();
     }
-    
+    //todo: remove this method:
     public  void setCurrentChainNumber( int newCurrentChain,boolean getNewFeaturesFlag) {
         //logger.info("setCurrentChainNumber " + newCurrentChain + " " + getNewFeaturesFlag);
         System.out.println("SpiceApplication setCurrentChainNumber " + newCurrentChain);
-        
-        structurePanelListener.setCurrentChainNumber(newCurrentChain);
+        logger.warning("obsolete method!");
+        //structurePanelListener.setCurrentChainNumber(newCurrentChain);
         statusPanel.setCurrentChainNumber(newCurrentChain);
         
         //TODO move this functionality into other class
@@ -1471,14 +1453,14 @@ ConfigurationListener
         //statusPanel.setSP(sp_id);
         System.out.println("SpiceApplication statusPanel set: ");
         if (sp_id != null){
-            upMenu.setEnabled(true);
-            dastyMenu.setEnabled(true);
-            proviewMenu.setEnabled(true);
+            //upMenu.setEnabled(true);
+            //dastyMenu.setEnabled(true);
+            //proviewMenu.setEnabled(true);
             
         } else {
-            upMenu.setEnabled(false);
-            dastyMenu.setEnabled(false);
-            proviewMenu.setEnabled(false);
+            //upMenu.setEnabled(false);
+            //dastyMenu.setEnabled(false);
+            //proviewMenu.setEnabled(false);
             
             logger.info("no UniProt sequence found for"+chain.getName());
         }

@@ -353,10 +353,13 @@ ChangeListener
 
 
         Box hBox = Box.createHorizontalBox();
-	hBox.setBackground(BG_COLOR);
+        hBox.setBackground(BG_COLOR);
         hBox.add(Box.createHorizontalGlue());
         hBox.add(residueSizeSlider);
         hBox.add(Box.createHorizontalGlue());
+        
+        // register the managers
+        registerManagers();
         
         this.add(contentPanel);
         this.add(hBox);
@@ -364,6 +367,24 @@ ChangeListener
         
     }
 
+    public void registerManagers(){
+        //ArrowPanel a1 = structureRenderer.getArrowPanel();
+        
+        //a1.setLowerAlignmentManager(aligManager);
+        
+        ArrowPanel a2 = seqRenderer.getArrowPanel();
+        a2.setUpperAlignmentManager(aligManager);
+        a2.setLowerAlignmentManager(aligManager);
+        a2.setUpperObjectListener(structureRenderer);
+        a2.setLowerObjectListener(seqRenderer);
+        
+        ArrowPanel a3 = enspRenderer.getArrowPanel();
+        a3.setUpperAlignmentManager(ensaligManager);
+        a3.setLowerAlignmentManager(ensaligManager);
+        a3.setUpperObjectListener(seqRenderer);
+        a3.setLowerObjectListener(enspRenderer);
+    }
+    
     public void stateChanged(ChangeEvent e) {
         
         JSlider source = (JSlider)e.getSource();
@@ -509,6 +530,7 @@ ChangeListener
     
     public void addPDBSequenceListener(SequenceListener li){
         strucManager.addSequenceListener(li);
+        aligManager.addSequence1Listener(li);
     }
     
     public void addUniProtListener(ObjectListener li){

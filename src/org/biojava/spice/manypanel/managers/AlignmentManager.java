@@ -81,7 +81,7 @@ implements AlignmentListener {
         this.coordSys1 = coordSys1;
         this.coordSys2 = coordSys2;
         clearDasSources();
-        //alignmentServers = new SpiceDasSource[0];
+   
         object1Listener = new AlignmentSequenceListener(this,1);
         object2Listener = new AlignmentSequenceListener(this,2);
         
@@ -93,6 +93,22 @@ implements AlignmentListener {
         
         
    
+    }
+    
+    public String getId1(){
+        return object1Id;
+    }
+    
+    public String getId2(){
+        return object2Id;
+    }
+    
+    public DasCoordinateSystem getCoordSys1(){
+        return coordSys1;
+    }
+    
+    public DasCoordinateSystem getCoordSys2(){
+        return coordSys2;
     }
     
     public void clearDasSources(){

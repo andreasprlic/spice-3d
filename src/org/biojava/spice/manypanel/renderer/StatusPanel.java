@@ -50,19 +50,25 @@ import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 
 import org.biojava.spice.JNLPProxy;
+import org.biojava.spice.manypanel.managers.AlignmentManager;
 
 public class StatusPanel extends JPanel {
-
+    public static final long serialVersionUID= 309781239871208973l;
+    
     JTextField dbName;
     JTextField accessionCode;
     JTextField description;
     JProgressBar progressBar;
+    ArrowPanel arrowPanel;
     
     public static String PDBLINK     = "http://www.rcsb.org/pdb/cgi/explore.cgi?pdbId=";
     public static String UNIPROTLINK = "http://www.ebi.uniprot.org/uniprot-srv/uniProtView.do?proteinAc=" ;
+    
     public static Logger logger =  Logger.getLogger("org.biojava.spice");
     
     static Color BG_COLOR = Color.WHITE;
+    
+   
     
     public StatusPanel() {
         super();
@@ -81,6 +87,9 @@ public class StatusPanel extends JPanel {
         dbName.setBackground(BG_COLOR);
         hBox.add(dbName);
         
+        arrowPanel = new ArrowPanel();
+        hBox.add(arrowPanel);
+        arrowPanel.setBackground(BG_COLOR);
         
         accessionCode = new JTextField("    ");
         accessionCode.setEditable(false);
@@ -89,6 +98,7 @@ public class StatusPanel extends JPanel {
         accessionCode.setMaximumSize(new Dimension(120,20));
         accessionCode.setPreferredSize(new Dimension(120,20));
         accessionCode.setBackground(BG_COLOR);
+       
         
         MouseListener mousiPdb = new PanelMouseListener(this,PDBLINK);
         // mouse listener         
@@ -129,10 +139,19 @@ public class StatusPanel extends JPanel {
         progressBar.setIndeterminate(false);
         progressBar.setBorder(BorderFactory.createEmptyBorder());
         hBox.add(progressBar);
-	progressBar.setVisible(false);
+        progressBar.setVisible(false);
         this.setLayout(new BoxLayout(this,BoxLayout.X_AXIS));
         this.add(hBox);
+        
+       
     }
+    
+    public ArrowPanel getArrowPanel(){
+        return arrowPanel;
+    }
+    
+  
+    
     
     
     public void setAccessionCode(String ac){

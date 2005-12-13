@@ -160,6 +160,10 @@ public abstract class AbstractChainRenderer
         updatePanelPositions();
     }
   
+    public ArrowPanel getArrowPanel(){
+        return statusPanel.getArrowPanel();
+    }
+    
     public void setComponentWidth(int width){
         componentWidth = width;
         //logger.info("componentWidth" + width);
@@ -312,7 +316,7 @@ public abstract class AbstractChainRenderer
         int aminosize = Math.round(1*scale);
         if ( aminosize < 1)
             aminosize = 1;
-        int w = l*aminosize + FeaturePanel.DEFAULT_X_START + FeaturePanel.DEFAULT_X_RIGHT_BORDER;
+        int w = Math.round(l*scale) + aminosize+  FeaturePanel.DEFAULT_X_START + FeaturePanel.DEFAULT_X_RIGHT_BORDER;
         
         if ( w  < 200){
             w = 200;

@@ -89,23 +89,13 @@ implements ObjectManager ,SequenceListener{
         return dasSources;
     }
 
-    
-    
-    
-    /** triggers DAS requests for each of the DAS sources
-     * 
-     *      * @param accessionCode
-     * @return
-     */
-    //public GFFFeature[] triggerDASRequests(String accessionCode){
-        
-        
-      //  return null;
-    //}
+            
     
     public void addFeatureRenderer(FeatureRenderer rend){
         featureRenderers.add(rend);
     }
+    
+    
     
     
     

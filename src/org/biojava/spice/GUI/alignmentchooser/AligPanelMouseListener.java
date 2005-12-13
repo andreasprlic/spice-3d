@@ -22,6 +22,10 @@
  */
 package org.biojava.spice.GUI.alignmentchooser;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import javax.swing.JToolTip;
 
 import org.biojava.bio.gui.sequence.SequencePanel;
@@ -31,6 +35,7 @@ import org.biojava.bio.gui.sequence.SequenceViewerMotionListener;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.spice.*;
+import org.biojava.spice.manypanel.eventmodel.ObjectListener;
 import org.biojava.bio.Annotation;
 /**
  * @author Andreas Prlic
@@ -41,15 +46,24 @@ implements SequenceViewerListener,
         SequenceViewerMotionListener {
 
     
-    SPICEFrame spice;
+    //SPICEFrame spice;
     SequencePanel seqPanel;
     JToolTip tooltip;
+    List objectListeners;
     
-    public AligPanelMouseListener(SPICEFrame parent,SequencePanel srcxt){
+    public AligPanelMouseListener(SequencePanel srcxt){
         seqPanel = srcxt;
         tooltip = seqPanel.createToolTip();
         tooltip.setEnabled(true);
-        spice = parent;
+       
+        clearObjectListeners();        
+    }
+    public void clearObjectListeners(){
+        objectListeners = new ArrayList();
+    }
+    
+    public void addObjectListener(ObjectListener li){
+        objectListeners.add(li);
     }
     
     public void mouseClicked(SequenceViewerEvent ewt){
@@ -69,16 +83,19 @@ implements SequenceViewerListener,
                 String pdbcode = f.getSource();
                 //System.out.println("from PDB " + pdbcode);
                 
-                System.out.println("loading PDB " + pdbcode.substring(0,4)); 
-//              set focus to spice
-                if ( spice instanceof SpiceApplication){
-                    //System.out.println("requesting focus");
-                    SpiceApplication spiceapp = (SpiceApplication) spice;
-                    spiceapp.requestFocus();
-                }
-                spice.load("PDB",pdbcode.substring(0,4));
+                System.out.println("loading PDB " + pdbcode.substring(0,4));               
+                
+                triggerNewObjectRequested(pdbcode);
                 return;
             }
+        }
+    }
+    
+    public void triggerNewObjectRequested(String code){
+        Iterator iter = objectListeners.iterator();
+        while (iter.hasNext()){
+            ObjectListener li =  (ObjectListener)iter.next();
+            li.newObjectRequested(code);
         }
     }
     

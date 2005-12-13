@@ -24,68 +24,250 @@ package org.biojava.spice.GUI;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import org.biojava.spice.SPICEFrame;
+import java.awt.event.KeyEvent;
 
+import org.biojava.spice.JNLPProxy;
+import org.biojava.spice.SpiceApplication;
+import org.biojava.spice.manypanel.eventmodel.SequenceEvent;
+import org.biojava.spice.manypanel.eventmodel.SequenceListener;
+import org.biojava.spice.manypanel.eventmodel.StructureEvent;
+import org.biojava.spice.manypanel.eventmodel.StructureListener;
+
+import javax.swing.ImageIcon;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.logging.Logger;
 
 /**
  * @author Andreas Prlic
  *
  */
-public class BrowseMenuListener implements ActionListener {
+public class BrowseMenuListener 
+implements ActionListener
+{
 
-    
-    // see also  Panel.StatusPanel
+   // see also  Panel.StatusPanel
     public static String PDBLINK = "http://www.rcsb.org/pdb/cgi/explore.cgi?pdbId=";
     
     public static String UNIPROTLINK = "http://www.ebi.uniprot.org/uniprot-srv/uniProtView.do?proteinAc=" ;
     
     // link to DASTY das client
-    public static String DASTYLINK = "http://www.ebi.ac.uk/das-srv/uniprot/dasty/index.jsp?ID=";
+    public static String DASTYLINK = "http://www.ebi.ac.uk/das-srv/uniprot/dasty/index.jsp?id=";
     
     // link to Proview das client
     public static String PROVIEWLINK = "http://www.efamily.org.uk/perl/proview/proview?id=";
     
+    public static String ENSEMBLLINK = "http://www.ensembl.org/Homo_sapiens/protview?peptide=";
     
+    public static Logger logger =  Logger.getLogger("org.biojava.spice");
     
-    SPICEFrame spice;
+    ImageIcon firefoxIcon ;
+    
+    JMenuItem pdbMenu;
+    JMenuItem upMenu;
+    JMenuItem dastyMenu;
+    JMenuItem proviewMenu;
+    JMenuItem enspMenu;
+    
+    String pdbCode;
+    String upCode;
+    String enspCode;
     URL url;
-    public BrowseMenuListener(SPICEFrame parent){
+    public BrowseMenuListener(){
         url= null;
-        spice = parent;
+        pdbCode = "";
+        upCode = "";
+        enspCode = "";
+        firefoxIcon = SpiceApplication.createImageIcon("firefox.png");
+        
     }
-    public BrowseMenuListener(SPICEFrame parent,URL link){
+    public BrowseMenuListener(URL link){
+        this();
         url=link;
-        spice = parent;
+   
     }
 
+    public JMenu getBrowsermenu(){
+
+        JMenu browseMenu = new JMenu("Browse");
+        browseMenu.setMnemonic(KeyEvent.VK_B);
+        browseMenu.getAccessibleContext().setAccessibleDescription("open links in browser");
+        
+        if (firefoxIcon == null )
+            pdbMenu = new JMenuItem("PDB");
+        else
+            pdbMenu = new JMenuItem("PDB",firefoxIcon);
+        pdbMenu.setMnemonic(KeyEvent.VK_P);
+        pdbMenu.setEnabled(false);
+        pdbMenu.addActionListener(this);
+        browseMenu.add(pdbMenu);
+        if ( firefoxIcon == null )
+            upMenu = new JMenuItem("UniProt");
+        else 
+            upMenu = new JMenuItem("UniProt",firefoxIcon);
+        upMenu.setMnemonic(KeyEvent.VK_U);
+        upMenu.setEnabled(false);
+        upMenu.addActionListener(this);
+        browseMenu.add(upMenu);
+        
+        if ( firefoxIcon == null )
+            enspMenu = new JMenuItem("Ensembl");
+        else 
+            enspMenu = new JMenuItem("Ensembl",firefoxIcon);
+        
+        enspMenu.setMnemonic(KeyEvent.VK_E);
+        enspMenu.setEnabled(false);
+        enspMenu.addActionListener(this);
+        browseMenu.add(enspMenu);
+        
+        JMenu dasclientsMenu = new JMenu("Other DAS clients");
+        dasclientsMenu.setMnemonic(KeyEvent.VK_O);
+        browseMenu.add(dasclientsMenu);
+        
+        dastyMenu = new JMenuItem("Dasty");
+        dastyMenu.setMnemonic(KeyEvent.VK_D);
+        dastyMenu.addActionListener(this);
+        dasclientsMenu.add(dastyMenu);
+        dastyMenu.setEnabled(false);
+        
+        proviewMenu = new JMenuItem("Proview");
+        proviewMenu.setMnemonic(KeyEvent.VK_P);
+        proviewMenu.addActionListener(this);
+        dasclientsMenu.add(proviewMenu);
+        proviewMenu.setEnabled(false);
+        
+        return browseMenu;
+    }
+    
+    
     public void actionPerformed(ActionEvent e){
       JMenuItem source = (JMenuItem)e.getSource();
       String txt = source.getText();
       if (txt.equals("PDB")){
           // open PDB file
-          String u = PDBLINK+spice.getPDBCode();
+          String u = PDBLINK+pdbCode;
           //System.out.println("opening url "+u );
-          spice.showDocument(u);
+          showDocument(u);
       } else if ( txt.equals("UniProt")){
-          String u = UNIPROTLINK+spice.getUniProtCode();
+          String u = UNIPROTLINK+upCode;
           //System.out.println("opening url "+u );
-          spice.showDocument(u);
+          showDocument(u);
       } else if ( txt.equals("Dasty")){
         
-          String d = DASTYLINK+spice.getUniProtCode();
-          spice.showDocument(d);
+          String d = DASTYLINK+upCode;
+          showDocument(d);
           
       } else if ( txt.equals("Proview")){
-          String u = PROVIEWLINK+spice.getUniProtCode();
-          spice.showDocument(u);
-      } else {
-          //String url = txt.substring(16,txt.length());
-          spice.showDocument(url);
+          String u = PROVIEWLINK+upCode;
+          showDocument(u);
+      } else if ( txt.equals("Ensembl")){
+          String t = ENSEMBLLINK + enspCode;
+          showDocument(t);
       }
-      
+      else {
+          //String url = txt.substring(16,txt.length());
+          showDocument(url);
+      }   
     }
+   
+    
+    public void clear(){
+        upCode ="";
+        upMenu.setEnabled(false);
+        pdbCode="";
+        pdbMenu.setEnabled(false);
+        enspCode="";
+        enspMenu.setEnabled(false);
+        proviewMenu.setEnabled(false);
+        dastyMenu.setEnabled(false);
+    }
+    
+    public SequenceListener getUniProtListener(){
+        return new SequenceListener(){
+            public void newSequence(SequenceEvent e) {
+                upCode=e.getAccessionCode();
+                upMenu.setEnabled(true);
+                dastyMenu.setEnabled(true);
+                proviewMenu.setEnabled(true);
+            }
+            public void newObjectRequested(String accessionCode) {
+                upCode = "";
+                upMenu.setEnabled(false);
+                dastyMenu.setEnabled(false);
+                proviewMenu.setEnabled(false);
+            }
+            public void clearSelection() {}
+            public void selectedSeqPosition(int position) { }
+            public void selectedSeqRange(int start, int end) {}
+            public void selectionLocked(boolean flag) {}
+            
+        };
+    }
+    
+    public SequenceListener getEnspListener(){
+        return new SequenceListener(){
+            public void newSequence(SequenceEvent e) {
+                enspCode=e.getAccessionCode();
+                enspMenu.setEnabled(true);
+            }
+            public void newObjectRequested(String accessionCode) {
+                enspCode = "";
+                enspMenu.setEnabled(false);
+            }
+            public void clearSelection() {}
+            public void selectedSeqPosition(int position) {}
+            public void selectedSeqRange(int start, int end) {}
+            public void selectionLocked(boolean flag) { }
+            
+        };
+    }
+    public StructureListener getPDBListener(){
+        return new StructureListener() {
+            public void newStructure(StructureEvent event) {
+                pdbCode = event.getPDBCode();
+                pdbMenu.setEnabled(true);
+            }
+
+            public void selectedChain(StructureEvent event) { }
+
+            public void newObjectRequested(String accessionCode) {
+                pdbCode="";
+                pdbMenu.setEnabled(false);
+            }
+            
+        };
+    }
+    
+    private boolean showDocument(URL url) 
+    {
+        if ( url != null ){
+            boolean success = JNLPProxy.showDocument(url); 
+            if ( ! success)
+                logger.info("could not open URL "+url+" in browser. check your config or browser version.");
+        return success;
+        
+        }
+        else
+            return false;
+    }
+    
+    private boolean showDocument(String urlstring){
+        try{
+            URL url = new URL(urlstring);
+            
+            return showDocument(url);
+        } catch (MalformedURLException e){
+            logger.warning("malformed URL "+urlstring);
+            return false;
+        }
+    }
+   
+    
+    
+    
+    
 }
 

@@ -40,13 +40,15 @@ public class AlignmentChooserThread extends Thread {
     String uniprot;
     AlignmentChooser aligChooser;
     JProgressBar progressBar;
-    SPICEFrame spice;
+    //SPICEFrame spice;
     /**
      * 
      */
-    public AlignmentChooserThread(String up, SPICEFrame parent, AlignmentChooser aP, JProgressBar pB ) {
+    // todo: remove this class ...
+    public AlignmentChooserThread(String up, AlignmentChooser aP, JProgressBar pB ) {
         super();
-        spice = parent;
+        System.err.println("obsolete class!");
+        //spice = parent;
         uniprot = up;
         aligChooser = aP;
         progressBar =pB;
@@ -56,11 +58,12 @@ public class AlignmentChooserThread extends Thread {
     
     public void run() {
         progressBar.setIndeterminate(true);
-        spice.setLoading(true);   
+        //spice.setLoading(true);   
         Alignment[] aligs = null ;
         
         if (uniprot != null) { 
             // get alternative alignments with structure for it
+            /*
             AlignmentTools aligTools = new AlignmentTools(spice.getConfiguration());
             aligs = aligTools.getAlignments(uniprot);
             if ( aligs != null ) {
@@ -68,6 +71,7 @@ public class AlignmentChooserThread extends Thread {
                 aligChooser.setAlignments(aligs);
                 
             }
+            */
            
         }
         
@@ -81,7 +85,7 @@ public class AlignmentChooserThread extends Thread {
         //aligPanel.setSize(d);
         //c.repaint();
         //aligPanel.paint(aligPanel.getGraphics());
-        spice.setLoading(false);
+        //spice.setLoading(false);
         //aligPanel.repaint();
            
     }

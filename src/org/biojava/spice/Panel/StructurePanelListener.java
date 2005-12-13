@@ -112,10 +112,10 @@ SpiceFeatureListener
       
    }
    
-    public synchronized void setCurrentChainNumber(int i){
+    private void setCurrentChainNumber(int i){
         logger.finest("setting current chain in StructurePanelListener " + i);
         currentChainNumber = i;
-        notifyAll();
+        
     }
     
 
@@ -738,17 +738,23 @@ SpiceFeatureListener
     }
 
     public void selectedChain(StructureEvent event) {
-        logger.info("net chain selected");
+        
        int c = event.getCurrentChainNumber();
+       //logger.info("new chain selected " + c);
        setCurrentChainNumber(c);
+       Chain chain = getChain(c);
+       String cmd = "select *:"+chain.getName()+"; set display selected;";
+       //logger.info(cmd);
+       executeCmd(cmd);
         
     }
 
     public void newObjectRequested(String accessionCode) {
-        logger.info("requested new structure " + accessionCode);
+        //logger.info("requested new structure " + accessionCode);
        // clean the Jmol display;
         structure = new StructureImpl();
         setStructure(structure);
+        clearSelection();
         
     }
     
