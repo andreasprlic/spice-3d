@@ -375,14 +375,14 @@ ChangeListener
         ArrowPanel a2 = seqRenderer.getArrowPanel();
         a2.setUpperAlignmentManager(aligManager);
         a2.setLowerAlignmentManager(aligManager);
-        a2.setUpperObjectListener(structureRenderer);
-        a2.setLowerObjectListener(seqRenderer);
+        a2.setUpperObjectListener(strucManager);
+        a2.setLowerObjectListener(seqManager);
         
         ArrowPanel a3 = enspRenderer.getArrowPanel();
         a3.setUpperAlignmentManager(ensaligManager);
         a3.setLowerAlignmentManager(ensaligManager);
-        a3.setUpperObjectListener(seqRenderer);
-        a3.setLowerObjectListener(enspRenderer);
+        a3.setUpperObjectListener(seqManager);
+        a3.setLowerObjectListener(enspManager);
     }
     
     public void stateChanged(ChangeEvent e) {
