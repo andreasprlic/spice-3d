@@ -27,15 +27,23 @@ import org.biojava.bio.program.das.dasalignment.Alignment;
 public class AlignmentEvent {
 
     Alignment alignment ;
-    public AlignmentEvent(Alignment ali) {
+    Alignment[] allAlignments;
+    public AlignmentEvent(Alignment ali,Alignment[] allAlignments) {
         super();
         
         alignment=ali;
+        this.allAlignments = allAlignments;
 
     }
     
+    /** get the first alignment */
     public Alignment getAlignment(){
         return alignment;
+    }
+    
+    /** get all alignments */
+    public Alignment[] getAllAlignments(){
+        return allAlignments;
     }
 
 }

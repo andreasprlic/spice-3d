@@ -145,10 +145,11 @@ extends Thread{
             finalAlig = getAlignmentFromAligs(aligs,query);
             
         }
+        AlignmentEvent event = new AlignmentEvent(finalAlig,aligs); 
         Iterator iter = alignmentListeners.iterator();
         while (iter.hasNext()){
             AlignmentListener li = (AlignmentListener ) iter.next();
-            li.newAlignment (new AlignmentEvent(finalAlig));
+            li.newAlignment(event) ;
         }
         
     }

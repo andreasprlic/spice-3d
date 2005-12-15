@@ -27,6 +27,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.biojava.spice.manypanel.BrowserPane;
+
 /** a class to manage the SPICE statup parameters.
  * display</li>,<li>displayLabel</li>,
      *              <li>rasmolScript</li>,<li>seqSelectStart</li>, 
@@ -55,6 +57,7 @@ public class SpiceStartParameters {
     private String localServerURL = "";
     private String localServerCoordSys = "";
     private String localServerName="";
+    
     private String pdbcoordsys;
     private String uniprotcoordsys;
     private String enspcoordsys;
@@ -71,9 +74,9 @@ public class SpiceStartParameters {
 
     public SpiceStartParameters() {
         super();
-        pdbcoordsys     = "PDBresnum,Protein Structure";
-        uniprotcoordsys = "UniProt,Protein Sequence";
-        enspcoordsys    = "Ensembl,Protein Sequence";
+        pdbcoordsys     = BrowserPane.DEFAULT_PDBCOORDSYS;
+        uniprotcoordsys = BrowserPane.DEFAULT_UNIPROTCOORDSYS;
+        enspcoordsys    = BrowserPane.DEFAULT_ENSPCOORDSYS;
     }
 
     

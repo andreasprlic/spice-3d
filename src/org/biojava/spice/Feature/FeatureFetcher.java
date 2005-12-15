@@ -561,7 +561,7 @@ public class FeatureFetcher extends Thread
     throws Exception 
     {
         
-        ArrayList groups = chain.getGroups();
+        List groups = chain.getGroups();
         
         for (int i=0 ; i<groups.size();i++){
             Group g = (Group)groups.get(i);

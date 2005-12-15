@@ -151,7 +151,7 @@ StructureListener {
         n.setSwissprotId(c.getSwissprotId());
         Annotation anno = c.getAnnotation();
         n.setAnnotation(anno);
-        ArrayList groups = c.getGroups("amino");
+        List groups = c.getGroups("amino");
         for (int i = 0 ; i<groups.size();i++){
             Group group = (Group) groups.get(i);
             n.addGroup(group);      

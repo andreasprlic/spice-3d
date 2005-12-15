@@ -37,7 +37,11 @@ import org.biojava.bio.*                               ;
 import java.util.*                                     ;
 import java.util.logging.*                             ;
 import java.io.*;
+
+import org.biojava.services.das.registry.DasCoordinateSystem;
 import org.biojava.spice.das.AlignmentTools;
+import org.biojava.spice.manypanel.AlignmentTool;
+import org.biojava.spice.manypanel.BrowserPane;
 
 import org.biojava.bio.program.ssbind.AnnotationFactory;
 import org.biojava.utils.ChangeVetoException;
@@ -46,17 +50,23 @@ public class StructureBuilder{
     
     // hard coded - 
     // find a better solution ...
-    static String SEQUENCEDATABASE  = "UniProt,Protein Sequence" ;
-    static String STRUCTUREDATABASE = "PDBresnum,Protein Structure" ;
+    static String SEQUENCEDATABASE  = BrowserPane.DEFAULT_UNIPROTCOORDSYS;
+    static String STRUCTUREDATABASE = BrowserPane.DEFAULT_PDBCOORDSYS ;
+    static String ENSPDATABASE      = BrowserPane.DEFAULT_ENSPCOORDSYS;
+    
+    DasCoordinateSystem coordSys1;
+    DasCoordinateSystem coordSys2;
     
     // for conversion 3code 1code
     SymbolTokenization threeLetter ;
     SymbolTokenization oneLetter ;
     
     Logger logger ;
-    public StructureBuilder(){
+    public StructureBuilder(DasCoordinateSystem cs1, DasCoordinateSystem cs2){
         logger = Logger.getLogger("org.biojava.spice");
-        
+        logger.info("init structureBuilder " + cs1 + " " + cs2);
+        coordSys1 = cs1;
+        coordSys2 = cs2;
         
         // some utils for conversion of 3code to 1code
         Alphabet alpha_prot = ProteinTools.getAlphabet();
@@ -196,13 +206,17 @@ public class StructureBuilder{
             return;
         }
         
+        
+       
+        
+        
         // here is the location where the cigar string shouldbe parsed, if there is any
         // for the moment, nope..... !!!
         
         // coordinate system for sequence is always numeric and linear
         // -> phew!
         
-        logger.finest(" seq segment: " + arr[0].toString());
+        //logger.info(" seq segment: " + arr[0].toString());
         int seqstart = Integer.parseInt((String)arr[0].getProperty("start")); 
         int seqend   = Integer.parseInt((String)arr[0].getProperty("end"));
         
@@ -226,7 +240,11 @@ public class StructureBuilder{
                 logger.finest("requesting wrong coordinate - " + pos + " is larger than chainlength " + chainlength);
                 break;
             }
-            aminosegment[i] = (AminoAcid) chain.getGroup(i+seqstart-1);
+            AminoAcid aa = (AminoAcid) chain.getGroup(i+seqstart-1);
+            if ( aa == null){
+                logger.warning("found null where expected amino acid at " + (i+seqstart-1));
+            }
+            aminosegment[i] = aa;
         }
         
         
@@ -264,11 +282,15 @@ public class StructureBuilder{
             return ;
         }
         
-        //logger.finest("segsize " + segsize);
+        //logger.info("segsize " + segsize);
         for ( int i =0 ; i< segsize; i++) {
             
             String pdbcode = Integer.toString(strustart + i) ;
-            //logger.finest(i + " " + pdbcode);
+            //logger.info(i + " " + pdbcode);
+            if ( aminosegment[i] == null){
+                //logger.info("AARGH " + i + " aminosegment == null ...");
+                continue;
+            }
             aminosegment[i].setPDBCode(pdbcode) ;
         }
         
@@ -282,9 +304,9 @@ public class StructureBuilder{
         logger.finest("addChainAlignment");
         
         // go over all blocks of alignment and join pdb info ...
-        Annotation seq_object   = getAlignmentObject(ali,SEQUENCEDATABASE );
+        Annotation seq_object   = getAlignmentObject(ali,coordSys1 );
         
-        Annotation stru_object  = getAlignmentObject(ali,STRUCTUREDATABASE);
+        Annotation stru_object  = getAlignmentObject(ali,coordSys2);
         
         logger.finest(seq_object.getProperty("intObjectId").toString());
         logger.finest(stru_object.getProperty("intObjectId").toString());
@@ -319,10 +341,15 @@ public class StructureBuilder{
     */
     private String getChainIdFromPDBCode(String pdbcode) {
         //logger.finest("DASAlignment_Handler: getChainFromPDBCode" + pdbcode);
-        String[] spl = pdbcode.split("\\.");
-        String chain = spl[1] ;
+        if (( pdbcode.length() == 6) && (pdbcode.substring(4,5).equals("."))){
+            String[] spl = pdbcode.split("\\.");
+            String chain = spl[1] ;
+            return chain ;
+        }
+        else 
+            return " ";
         //logger.finest("DASAlignment_Handler: getChainFromPDBCode chain:" + chain);
-        return chain ;
+        
     }
     
     
@@ -361,8 +388,8 @@ public class StructureBuilder{
     public Chain  createChain(Alignment ali, String sequence) 
     throws DASException
     {
-        Annotation object     = getAlignmentObject(ali,SEQUENCEDATABASE);
-        Annotation struobject = getAlignmentObject(ali,STRUCTUREDATABASE);
+        Annotation object     = getAlignmentObject(ali,coordSys1);
+        Annotation struobject = getAlignmentObject(ali,coordSys2);
         String swissp_id = (String) object.getProperty("dbAccessionId") ;
         //logger.finest(swissp_id);
         //logger.finest(sequence);
@@ -434,9 +461,12 @@ public class StructureBuilder{
     
     /** retrieve the HashMap for the sequence ... */
     
-    public Annotation getAlignmentObject (Alignment ali,String objecttype) 
+    public Annotation getAlignmentObject (Alignment ali,DasCoordinateSystem coordSys) 
     throws DASException
     {
+        logger.info("got cs " + coordSys);
+        String objecttype = coordSys.toString();
+        
         // go through objects and get sequence one ...
         Annotation[] objects = ali.getObjects();
         //HashMap seq_obj = new HashMap() ;
@@ -458,6 +488,10 @@ public class StructureBuilder{
             }
             if ( objecttype.equals(STRUCTUREDATABASE)){
                 if ( dbCoordSys.equals("PDBresnum"))
+                    return object;
+            }
+            if ( objecttype.equals(ENSPDATABASE)){
+                if ( dbCoordSys.equals("ENSEMBLPEP"))
                     return object;
             }
         }
@@ -537,7 +571,7 @@ public class StructureBuilder{
                 
                 // add hetero atoms and nucleotides ...
                 // they are not matched ...
-                ArrayList groups = c.getGroups();
+                List groups = c.getGroups();
                 for (int gi=0;gi<groups.size();gi++){
                     Group g = (Group)groups.get(gi);
                     if (g.getType().equals("hetatm")

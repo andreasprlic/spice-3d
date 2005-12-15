@@ -22,6 +22,7 @@
  */
 package org.biojava.spice.GUI.alignmentchooser;
 
+import java.awt.Cursor;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -34,6 +35,9 @@ import org.biojava.bio.gui.sequence.SequenceViewerListener;
 import org.biojava.bio.gui.sequence.SequenceViewerMotionListener;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.ProteinTools;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.spice.*;
 import org.biojava.spice.manypanel.eventmodel.ObjectListener;
 import org.biojava.bio.Annotation;
@@ -129,10 +133,14 @@ implements SequenceViewerListener,
                 if ( anno.containsProperty("description")){
                     description = (String) anno.getProperty("description");
                 }
-                seqPanel.setToolTipText("load PDB " + pdbcode  + description);                
+                seqPanel.setToolTipText("load PDB " + pdbcode  + description);  
+                // change mouse cursor ...
+                
+                seqPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             }
             if ( f == null){
                 seqPanel.setToolTipText(null);
+                seqPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             }
         }
     }

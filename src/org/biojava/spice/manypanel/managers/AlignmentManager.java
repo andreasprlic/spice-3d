@@ -86,7 +86,10 @@ implements AlignmentListener {
         object2Listener = new AlignmentSequenceListener(this,2);
         
         clearAlignment();
-        
+        sequence1 =  new ChainImpl();
+        sequence2 = new ChainImpl();
+        object1Id = "";
+        object2Id = "";
         clearSequenceListeners();
         
         clearObjectListeners();
@@ -94,7 +97,15 @@ implements AlignmentListener {
         
    
     }
+    public Chain getSequence1(){
+        //logger.info(" stored seq1:" + sequence1.toString());
+        return sequence1;
+    }
     
+    public Chain getSequence2(){
+        //logger.info(" stored seq2:" +sequence2.toString());
+        return sequence2;
+    }
     public String getId1(){
         return object1Id;
     }
@@ -250,11 +261,11 @@ implements AlignmentListener {
     }
     
     private void tryCreateAlignmentChain(){
-        logger.info("tryCreatealignmentChain");
+        //logger.info("tryCreatealignmentChain");
         Annotation[] os = alignment.getObjects();
         if ( os.length < 2){
             // something strange is going on here..
-            logger.warning(panelName+" got  alignment of wrong # objects..." + os.length);
+            //logger.warning(panelName+" got  alignment of wrong # objects..." + os.length);
             return;
         }
         Annotation a1 = os[0];
@@ -364,19 +375,23 @@ implements AlignmentListener {
         if (  object1Id.equalsIgnoreCase(ac) || object2Id.equalsIgnoreCase(ac)){
             
             if ( alignmentIsLoaded(object1Id,object2Id)) {
+                if ( sequence1.getSequence().equals(e.getSequence())) {
                 // we already go this one, ignore...
-                logger.info("already loaded, skipping");
-                tryCreateAlignmentChain();
-                return;
+                    logger.info("already loaded, skipping");
+                    tryCreateAlignmentChain();
+                    return;
+                }
             }
         
         }
-        
+       
+        //logger.info("setting new sequence 1" + e.getSequence());
         SequenceManager sm = new SequenceManager();
         sequence1 = sm.getChainFromString(e.getSequence());
       
         // a new object, request the data...
         object1Id = ac;
+        sequence1.setSwissprotId(ac);
         //object1Id = "";
         
         alignment = new Alignment();
@@ -523,25 +538,34 @@ implements AlignmentListener {
     
     public void newSequence2(SequenceEvent e){
         logger.info(panelName+" alignment : new sequence2:"+e.getAccessionCode() + 
-                " currently know 1: >"+object1Id+"< 2: >" + object2Id + "<");
+                " currently know 1: >"+object1Id+"< 2: >" + object2Id + "< seq: >" + sequence2.getSequence()+"<");
         
         String ac = e.getAccessionCode().toLowerCase();
         
         if (  object2Id.equalsIgnoreCase(ac) || object1Id.equalsIgnoreCase(ac)){
             if ( alignmentIsLoaded(object1Id,object2Id)) {
-                // we already go this one, ignore...
-                //logger.info("already loaded, skipping");
-                tryCreateAlignmentChain();
-                return;
+                String s2 = sequence2.getSequence();
+                String es = e.getSequence();
+                
+                //logger.info("seq s: " + s2);
+                //logger.info("event s " + es);
+                //logger.info("comp: " + s2.compareTo(es)+"");
+                if ( s2.equals(es)) {
+                    // we already go this one, ignore...
+                    logger.info("already loaded, skipping >" + es+"<");
+                    tryCreateAlignmentChain();
+                    return;
+                }
             }
         }
         
+        logger.info("setting new sequence 2" + e.getSequence());
         SequenceManager sm = new SequenceManager();
         sequence2 = sm.getChainFromString(e.getSequence());
       
         object2Id = ac;
         //object1Id = "";
-        
+        sequence2.setSwissprotId(ac);
         alignment = new Alignment();
         
         alignmentMap1 = new HashMap();
@@ -805,6 +829,7 @@ implements AlignmentListener {
     }
     
     public void clearAlignment(){
+        logger.info("clear alignmenty");
         object1Id = "" ;
         object2Id = "" ;
         alignment = new Alignment();

@@ -99,7 +99,7 @@ extends AbstractChainManager
     public Chain getChainFromString(String sequence){
         Chain chain =  new ChainImpl();
         //chain.setSwissprotId(id);
-        
+      
         for ( int pos = 0 ; pos < sequence.length() ; pos ++ ){
             AminoAcidImpl s_amino = new AminoAcidImpl();
             
@@ -122,7 +122,7 @@ extends AbstractChainManager
             chain.addGroup(s_amino) ;       
             
         }
-        
+        //logger.info("created new chain " + sequence);
         return chain;
     }
     

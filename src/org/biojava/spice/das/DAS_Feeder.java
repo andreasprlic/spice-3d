@@ -24,11 +24,12 @@
 package org.biojava.spice.das;
 
 
+import org.biojava.services.das.registry.DasCoordinateSystem;
 import org.biojava.spice.Config.*;
+import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.spice.*       ;
 
 import org.biojava.bio.Annotation;
-import org.biojava.bio.program.das.dasalignment.DASException ;
 import org.biojava.bio.program.das.dasalignment.*      ;
 import org.biojava.bio.structure.Structure ;
 import org.biojava.bio.structure.StructureImpl ;
@@ -89,6 +90,16 @@ implements SpiceStructureFeeder
         return s ;
     }
     
+    public DasCoordinateSystem getStructureCoordSys(){
+        
+        String cs = BrowserPane.DEFAULT_PDBCOORDSYS;
+        return DasCoordinateSystem.fromString(cs);
+    }
+    
+    public DasCoordinateSystem getUniProtCoordSys(){
+        String cs = BrowserPane.DEFAULT_UNIPROTCOORDSYS;
+        return DasCoordinateSystem.fromString(cs);
+    }
     
     public synchronized Structure loadPDB(String pdbcode)
     throws FileNotFoundException, IOException {
@@ -136,7 +147,7 @@ implements SpiceStructureFeeder
         
         Structure emptyStruc = createEmptyStructure(alignments);
         //logger.info("finished creating empty structure");
-        StructureBuilder sbuilder = new StructureBuilder();
+        StructureBuilder sbuilder = new StructureBuilder(getUniProtCoordSys(),getStructureCoordSys());
         struc = sbuilder.joinStructures(emptyStruc,pdb_structure);
         
         // add alignment annotation data
@@ -177,7 +188,7 @@ implements SpiceStructureFeeder
     /** create an "empty" = no 3D info from the sequences in the alignment*/
     private Structure createEmptyStructure(Alignment[] alignments){
         StructureImpl struc = new StructureImpl();
-        StructureBuilder sbuilder = new StructureBuilder();
+        StructureBuilder sbuilder = new StructureBuilder(getUniProtCoordSys(),getStructureCoordSys());
         
         for ( int i = 0; i < alignments.length; i++){
             Alignment ali = alignments[i];
@@ -310,7 +321,7 @@ implements SpiceStructureFeeder
             
             
             // join the three bits 
-            StructureBuilder strucbuilder = new StructureBuilder();
+            StructureBuilder strucbuilder = new StructureBuilder(getUniProtCoordSys(),getStructureCoordSys());
             //Alignment[] aliarr = new Alignment[1];
             //aliarr[0] = ali;
             struc = strucbuilder.createSpiceStructure(ali, pdb_structure, sequence);
@@ -350,7 +361,7 @@ implements SpiceStructureFeeder
     /** "emergency" procedure to create an "empty" Structure, which represents the sequence to be displayed in SPICE */
     private Structure makeStructureFromSequence(String id,String sequence ) {
         logger.finest("makeStructureFromSequence for " +id);
-        StructureBuilder sbuilder = new StructureBuilder();
+        StructureBuilder sbuilder = new StructureBuilder(getUniProtCoordSys(),getStructureCoordSys());
         Chain chain =  sbuilder.getChainFromSequence(sequence);
         chain.setSwissprotId(id);
         StructureImpl struc = new StructureImpl();

@@ -167,29 +167,14 @@ ConfigurationListener
     BrowseMenuListener browseMenu;
     BrowserPane browserPane ;
     SpiceChainDisplay chainDisplay;
-    //String dasServerList;
-    //String labelList;
     
-    //String rasmolScript =null;
-    //int seqSelectStart = -1;
-    //int seqSelectEnd   = -1;
-    //String pdbSelectStart = null;
-    //String pdbSelectEnd = null;
-    
-    //String displayMessage;
-    //int messageWidth;
-    //int messageHeight;
     SpiceStartParameters startParameters;
     SpiceServer spiceServer;
     
     /** 
      * start the spice appplication
      * 
-     * @param registry_urls an array of URLs that point to DAS - registration servers. only the first that can successfully be contacted will be used.
-     * @param dasServerList  ";" separated list of DAS source ids e.g. DS:101;DS:102;DS:110 to be highlited
-     * @param labelList ";" separated list of labels DAS sources belonging to the labels will be highlited.
-     * @param rasmolScript a rasmol script to be sent to Jmol, after the (first) structure has been loaded.
-     * 
+     * @param the parameters for starting up...
      */
     public SpiceApplication( SpiceStartParameters params) {
         super();

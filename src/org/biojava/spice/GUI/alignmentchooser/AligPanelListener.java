@@ -42,7 +42,7 @@ public class AligPanelListener implements ComponentListener {
     public AligPanelListener(AlignmentChooser panel) {
         super();
         aligPanel = panel;
-        // TODO Auto-generated constructor stub
+       
     }
     
     /* (non-Javadoc)
@@ -61,10 +61,10 @@ public class AligPanelListener implements ComponentListener {
         String seq_str = "" ; 
         if ( chain != null) {
             seq_str = chain.getSequence();    
-            double y = (dim.getWidth() / (double)seq_str.length());
-            System.out.println("old y" + aligPanel.getScale() + "new y " + y);
+            double y = (dim.getWidth() / ((double)seq_str.length() + 50 + 20)); // 50 is the label size
+            //System.out.println("old y" + aligPanel.getScale() + "new y " + y);
             aligPanel.setScale(y);
-            
+            comp.repaint() ;
         }
         
         //aliPanel.setSize(d);
