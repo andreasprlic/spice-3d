@@ -36,7 +36,8 @@ public class SequenceRenderer
 extends AbstractChainRenderer
 {
 
-   
+    public static final long serialVersionUID = 2019458429153091l;
+    
     public SequenceRenderer() {
         super();
         

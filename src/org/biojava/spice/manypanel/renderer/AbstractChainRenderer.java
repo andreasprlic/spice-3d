@@ -33,8 +33,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import org.biojava.bio.structure.*;
-import org.biojava.spice.Feature.Feature;
-import org.biojava.spice.Feature.FeatureImpl;
 import org.biojava.spice.manypanel.eventmodel.FeatureEvent;
 import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.spice.manypanel.drawable.DrawableDasSource;
@@ -56,6 +54,8 @@ public abstract class AbstractChainRenderer
     public static final int    MAX_SCALE        =  10;
     public static final int STATUS_PANEL_HEIGHT =  20;
     public static final int FEATURE_PANEL_HEIGHT = 20;
+    
+   
     
     FeaturePanel featurePanel;
     CursorPanel cursorPanel;

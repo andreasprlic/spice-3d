@@ -108,6 +108,7 @@ extends Thread
             //e.printStackTrace();
             logger.log(Level.WARNING,e.getMessage());
         }
+        
     } 
     
     /** tell all configListeners that a new config has been loaded */
@@ -436,7 +437,7 @@ extends Thread
             PersistentConfig ps = new PersistentConfig();
             ps.save(config);
         }
-        catch ( javax.jnlp.UnavailableServiceException e) {
+        catch ( Exception e) {
             logger.log(Level.WARNING,e.getMessage() + "while saving config locally");
         }
         

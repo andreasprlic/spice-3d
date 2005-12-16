@@ -225,10 +225,7 @@ ChangeListener
          
          structureRenderer.addSequenceListener(pdbList);
          seqRenderer.addSequenceListener(upList);
-         
-         // get the alignment das source
-         
-         
+                 
          aligManager.addObject1Listener(strucManager);
          aligManager.addObject2Listener(seqManager);
          
@@ -243,20 +240,16 @@ ChangeListener
          enspManager = new SequenceManager();
          addEnspListener(enspManager);
          
-          enspRenderer = new SequenceRenderer();
-          enspRenderer.getStatusPanel().setName("ENSP");
-	  enspRenderer.setBackground(BG_COLOR);
-
-          ComponentResizedChainListener enspComponentWidthSetter = new ComponentResizedChainListener(enspRenderer);
-          this.addComponentListener(enspComponentWidthSetter);
+         enspRenderer = new SequenceRenderer();
+         enspRenderer.getStatusPanel().setName("ENSP");
+         enspRenderer.setBackground(BG_COLOR);
+         
+         ComponentResizedChainListener enspComponentWidthSetter = new ComponentResizedChainListener(enspRenderer);
+         this.addComponentListener(enspComponentWidthSetter);
           
-          //JScrollPane enspScroller = new JScrollPane(enspRenderer);
-          //enspScroller.getVerticalScrollBar().setUnitIncrement(FeaturePanel.DEFAULT_Y_STEP);
-          //enspRenderer.setLayout(new BoxLayout(enspRenderer,BoxLayout.Y_AXIS));
-          //box.add(enspScroller);  
-       
-          DasCoordinateSystem enspdcs = DasCoordinateSystem.fromString(ENSPCOORDSYS);
-          enspManager.setCoordinateSystem(enspdcs);
+               
+         DasCoordinateSystem enspdcs = DasCoordinateSystem.fromString(ENSPCOORDSYS);
+         enspManager.setCoordinateSystem(enspdcs);
           
          
           enspManager.addSequenceRenderer(enspRenderer);
@@ -367,22 +360,30 @@ ChangeListener
         
     }
 
-    public void registerManagers(){
-        //ArrowPanel a1 = structureRenderer.getArrowPanel();
-        
-        //a1.setLowerAlignmentManager(aligManager);
-        
+    /** add the managers to the ArrowPanel of the statuspanels...
+     * 
+     *
+     */
+    private void registerManagers(){
+            
+   
         ArrowPanel a2 = seqRenderer.getArrowPanel();
         a2.setUpperAlignmentManager(aligManager);
         a2.setLowerAlignmentManager(aligManager);
         a2.setUpperObjectListener(strucManager);
         a2.setLowerObjectListener(seqManager);
         
+        
         ArrowPanel a3 = enspRenderer.getArrowPanel();
+        
         a3.setUpperAlignmentManager(ensaligManager);
         a3.setLowerAlignmentManager(ensaligManager);
         a3.setUpperObjectListener(seqManager);
         a3.setLowerObjectListener(enspManager);
+       
+        
+   
+        
     }
     
     public void stateChanged(ChangeEvent e) {

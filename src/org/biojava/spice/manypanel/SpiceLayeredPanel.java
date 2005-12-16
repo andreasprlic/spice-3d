@@ -37,28 +37,20 @@ public class SpiceLayeredPanel
     public static String ENSPCOORDSYS    = "Ensembl,Protein Sequence";
     public static  String registry = "http://servlet.sanger.ac.uk/dasregistry/services/das_registry";
     
-    JLayeredPane layeredPane;
-    /*private String[] layerStrings = { "Yellow (0)", "Magenta (1)",
-            "Cyan (2)",   "Red (3)",
-            "Green (4)",  "Blue (5)" };
-    private Color[] layerColors = { Color.yellow, Color.magenta,
-            Color.cyan,   Color.red,
-            Color.green,  Color.blue };
-    */
+    //JLayeredPane layeredPane;
     
-    //CursorPanel cursorPanel ;
     
     public SpiceLayeredPanel() {
         super();
     }
-
-   public static DasSource[] getAllDasSources() throws Exception{
     
-    URL rurl = new URL(registry);
-    DasRegistryAxisClient rclient = new DasRegistryAxisClient(rurl);
-    DasSource[]  allsources = rclient.listServices();
-    return allsources;
-}   
+    public static DasSource[] getAllDasSources() throws Exception{
+        
+        URL rurl = new URL(registry);
+        DasRegistryAxisClient rclient = new DasRegistryAxisClient(rurl);
+        DasSource[]  allsources = rclient.listServices();
+        return allsources;
+    }   
     
     /**
      * Create the GUI and show it.  For thread safety,
@@ -67,25 +59,25 @@ public class SpiceLayeredPanel
      */
     private static void createAndShowGUI() {
         //Make sure we have nice window decorations.
-       JFrame.setDefaultLookAndFeelDecorated(true);
-       
+        JFrame.setDefaultLookAndFeelDecorated(true);
+        
         JFrame spiceFrame = new JFrame("SPICE - devel");
         spiceFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         BrowserPane browserPane = new BrowserPane(PDBCOORDSYS,UNIPROTCOORDSYS,ENSPCOORDSYS);
         try {
-        DasSource[] dss = SpiceLayeredPanel.getAllDasSources();
-        SpiceDasSource[] sds = new SpiceDasSource[dss.length];
-        for (int i =0 ; i < dss.length;i++){
-            sds[i] = SpiceDasSource.fromDasSource(dss[i]);
-        }
-        browserPane.setDasSources(sds);
-        browserPane.triggerLoadStructure("1boi");
-      
-        //browserPane.triggerLoadUniProt("P50225");
-        //browserPane.triggerLoadENSP("ENSP00000346625");
-        browserPane.setPreferredSize(new Dimension(600, 600));
-        //browserPane.setOpaque(true); // contentPanes must be opaque
+            DasSource[] dss = SpiceLayeredPanel.getAllDasSources();
+            SpiceDasSource[] sds = new SpiceDasSource[dss.length];
+            for (int i =0 ; i < dss.length;i++){
+                sds[i] = SpiceDasSource.fromDasSource(dss[i]);
+            }
+            browserPane.setDasSources(sds);
+            browserPane.triggerLoadStructure("1boi");
+            
+            //browserPane.triggerLoadUniProt("P50225");
+            //browserPane.triggerLoadENSP("ENSP00000346625");
+            browserPane.setPreferredSize(new Dimension(600, 600));
+            //browserPane.setOpaque(true); // contentPanes must be opaque
         } catch (Exception e){
             e.printStackTrace();
         }

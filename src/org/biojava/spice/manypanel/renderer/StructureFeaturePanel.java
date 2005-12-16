@@ -22,15 +22,8 @@
  */
 package org.biojava.spice.manypanel.renderer;
 
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Composite;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.util.Iterator;
-import java.util.List;
 
+import java.awt.Color;
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.Group;
 import org.biojava.spice.Feature.FeatureImpl;
@@ -42,6 +35,9 @@ extends FeaturePanel{
 
     public static final Color STRUCTURE_COLOR            = Color.red;
     public static final Color STRUCTURE_BACKGROUND_COLOR = new Color(0.5f, 0.1f, 0.5f, 0.5f);
+
+    public static final long serialVersionUID = 9173629552947296348l;
+    
     // the line where to draw the structure
     //public static final int    DEFAULT_STRUCTURE_Y    = 30 ;
     
@@ -52,12 +48,12 @@ extends FeaturePanel{
         structureFeature = new FeatureImpl();
     }
     
-    public void paint(Graphics g){
+    //public void paint(Graphics g){
     //public void paintComponent(Graphics g){
         //logger.info("paint structureFeaturePanel");
-        super.paint(g);
+     //   super.paint(g);
         //super.paintComponent(g);
-        Graphics2D g2D =(Graphics2D) g;
+       // Graphics2D g2D =(Graphics2D) g;
        
         // draw the structure features ...    
         //int aminosize =  Math.round(1 * scale) ;
@@ -66,9 +62,9 @@ extends FeaturePanel{
      
         //g2D.drawString("structureFeaturePanel",10,30);
         
-    }
+    //}
     
-    
+    /*
     private void drawStruc(Graphics2D g2D, int start, int end, 
             int aminosize,float scale, int y){
         //System.out.println("Structure " + start + " " + end);
@@ -94,8 +90,8 @@ extends FeaturePanel{
         g2D.fill(strucregion);
         g2D.setComposite(origComposite);
     }
-    
-    /** draw structrure covered region as feature */
+    */
+    /** draw structrure covered region as feature 
     private void drawStructureRegion(Graphics2D g2D, int aminosize, float scale,int y){
         // data is coming from chain;
       
@@ -112,7 +108,7 @@ extends FeaturePanel{
             drawStruc(g2D,start,end,aminosize,scale,y);
         }
         
-    }
+    }*/
     
     public void setChain(Chain chn){
         logger.info("StructureFeaturePanel setChain " + chn.getName());

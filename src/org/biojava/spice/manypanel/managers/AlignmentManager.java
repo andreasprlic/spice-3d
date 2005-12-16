@@ -524,7 +524,7 @@ implements AlignmentListener {
     private void requestAlignment(AlignmentParameters params){
         // TODO fix this:
         // the alignmetn server shoudl use the correct coord sys ...
-        if ( params.getSubjectCoordinateSystem().toString().equals(BrowserPane.DEFAULT_ENSPCOORDSYS.toString())) {
+        if ( params.getSubjectCoordinateSystem().toString().equals(BrowserPane.DEFAULT_ENSPCOORDSYS)) {
             DasCoordinateSystem ecs = new DasCoordinateSystem();
             ecs.setName("ensemblpep-human-ncbi35");
             params.setSubjectCoordinateSystem(ecs);   

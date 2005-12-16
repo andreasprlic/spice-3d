@@ -62,6 +62,26 @@ public class SpiceStartParameters {
     private String uniprotcoordsys;
     private String enspcoordsys;
     
+    
+    
+      
+
+
+    public SpiceStartParameters() {
+        super();
+        pdbcoordsys     = BrowserPane.DEFAULT_PDBCOORDSYS;
+        uniprotcoordsys = BrowserPane.DEFAULT_UNIPROTCOORDSYS;
+        enspcoordsys    = BrowserPane.DEFAULT_ENSPCOORDSYS;
+        try {
+            registry = new URL("http://servlet.sanger.ac.uk/dasregistry/services/das_registry");
+        } catch (MalformedURLException e){
+            e.printStackTrace();
+        }
+        registryurls = new URL[0];
+    
+    }
+
+    
     public String getLocalServerName() {
         return localServerName;
     }
@@ -70,15 +90,6 @@ public class SpiceStartParameters {
     public void setLocalServerName(String localServerName) {
         this.localServerName = localServerName;
     }
-
-
-    public SpiceStartParameters() {
-        super();
-        pdbcoordsys     = BrowserPane.DEFAULT_PDBCOORDSYS;
-        uniprotcoordsys = BrowserPane.DEFAULT_UNIPROTCOORDSYS;
-        enspcoordsys    = BrowserPane.DEFAULT_ENSPCOORDSYS;
-    }
-
     
     public String getEnspcoordsys() {
         return enspcoordsys;

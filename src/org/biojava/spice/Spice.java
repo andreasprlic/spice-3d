@@ -27,6 +27,8 @@ package org.biojava.spice ;
 import org.biojava.spice.server.SpiceClient;
 import java.applet.Applet;
 import org.biojava.spice.Config.ConfigurationException;
+
+import java.net.URL;
 import java.util.ArrayList;
 import org.biojava.spice.GUI.AboutDialog;
 import java.util.List;
@@ -56,7 +58,7 @@ public class Spice extends Applet {
     
     private static final long serialVersionUID = 8273923744127087423L;
     
-   
+    
     public static void main(String[] argv) {
         
         Spice app = new Spice();
@@ -71,10 +73,10 @@ public class Spice extends Applet {
         
         for (int i = 0 ; i < argv.length; i++){
             String arg   = argv[i];
-	    String value = argv[i+1];
-	    i++;
+            String value = argv[i+1];
+            i++;
             String[] tmp = {arg,value};
-
+            System.out.println(arg + " " + value);
             
             try {
                 CliTools.configureBean(params, tmp);        
@@ -88,7 +90,7 @@ public class Spice extends Applet {
                 }
             }           
         }
-         
+        
         app.run(params);
         
     } 
@@ -99,20 +101,17 @@ public class Spice extends Applet {
         System.out.println("Welcome to the SPICE - DAS client!");
         System.out.println("SPICE version: " + AboutDialog.VERSION);
         System.out.println("displaying for you: " + params.getCodetype() + " " + params.getCode());
-       
-        //for ( int i =0; i<registryurls.length; i++) {
-        //    System.out.println("debug 2" + registryurls[i]);
-        //}
         
+        /*
+        System.out.println(params.getRegistry() );
         
-        //URL[] regis = params.getAllRegistryURLs();
-        
-        
-        //System.out.println("got " + regis.length + " registries...");
-        //for (int i = 0 ; i< regis.length; i++){
-        //    System.out.println(regis[i]);
-        //}
-        
+        URL[] regis = params.getRegistryurls();
+                
+        System.out.println("got " + regis.length + " registries...");
+        for (int i = 0 ; i< regis.length; i++){
+            System.out.println(regis[i]);
+        }
+        */
         
         /** test if already one instance of SPICE is running
          * if yes the code should be displayed there...
@@ -120,18 +119,18 @@ public class Spice extends Applet {
          */
         boolean serverFound = testSendToServer(params);
         
-
+        
         if (  serverFound){
             // quit this SPICE instance, 
             // the code is being loaded in SPICE in another instance that is already running ...
             String msg = " sent " + params.getCodetype() + " " + params.getCode() + " to already running spice instance";
-
+            
             System.out.println(msg);
-
+            
             System.exit(0);
         }
-        	
-	// 	start a spice instance
+        
+        // 	start a spice instance
         System.out.println("no spice instance has been found - starting new one for "+ params.getCodetype() + " " + params.getCode());
         SpiceApplication appFrame = new SpiceApplication(params);
         
@@ -162,7 +161,7 @@ public class Spice extends Applet {
         
     }
     
-        
+    
 }
 
 

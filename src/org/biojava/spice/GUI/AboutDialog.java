@@ -24,6 +24,7 @@
 package org.biojava.spice.GUI;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Dimension;
 
 import java.awt.event.ActionEvent;
@@ -118,11 +119,19 @@ extends JDialog {
         txt.setEditable(false);
         
         txt.addHyperlinkListener(new HyperlinkListener(){
+            
             public void hyperlinkUpdate(HyperlinkEvent e) {
                 //System.out.println(e);
                 if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                     String href = e.getDescription();
                     spice.showDocument(href);
+                }
+                if ( e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
+                    // change the mouse curor
+                    txt.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                }
+                if (e.getEventType() == HyperlinkEvent.EventType.EXITED) { 
+                    txt.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 }
             }
         });

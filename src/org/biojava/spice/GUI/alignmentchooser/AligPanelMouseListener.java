@@ -35,10 +35,6 @@ import org.biojava.bio.gui.sequence.SequenceViewerListener;
 import org.biojava.bio.gui.sequence.SequenceViewerMotionListener;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureHolder;
-import org.biojava.bio.seq.ProteinTools;
-import org.biojava.bio.seq.Sequence;
-import org.biojava.bio.symbol.IllegalSymbolException;
-import org.biojava.spice.*;
 import org.biojava.spice.manypanel.eventmodel.ObjectListener;
 import org.biojava.bio.Annotation;
 /**
@@ -54,12 +50,15 @@ implements SequenceViewerListener,
     SequencePanel seqPanel;
     JToolTip tooltip;
     List objectListeners;
+    int cursortype ;
+    String tooltiptext;
     
     public AligPanelMouseListener(SequencePanel srcxt){
+        cursortype = 0;
         seqPanel = srcxt;
         tooltip = seqPanel.createToolTip();
         tooltip.setEnabled(true);
-       
+        tooltiptext = "";
         clearObjectListeners();        
     }
     public void clearObjectListeners(){
@@ -70,11 +69,11 @@ implements SequenceViewerListener,
         objectListeners.add(li);
     }
     
-    public void mouseClicked(SequenceViewerEvent ewt){
+    public void mouseReleased(SequenceViewerEvent ewt){
          
-        int pos = ewt.getPos();
-        int seqpos = seqPanel.graphicsToSequence(pos);
-        System.out.println("seqpos "+seqpos);
+        //int pos = ewt.getPos();
+        //int seqpos = seqPanel.graphicsToSequence(pos);
+        //System.out.println("seqpos "+seqpos);
         Object target = ewt.getTarget();
         if ( target instanceof FeatureHolder ){
             FeatureHolder fh = (FeatureHolder) target;
@@ -83,11 +82,11 @@ implements SequenceViewerListener,
             Feature f = null;
             while (iter.hasNext()){
                 f = (Feature)iter.next();
-                System.out.println(f);
+                //System.out.println(f);
                 String pdbcode = f.getSource();
                 //System.out.println("from PDB " + pdbcode);
                 
-                System.out.println("loading PDB " + pdbcode.substring(0,4));               
+                //System.out.println("loading PDB " + pdbcode.substring(0,4));               
                 
                 triggerNewObjectRequested(pdbcode);
                 return;
@@ -107,7 +106,7 @@ implements SequenceViewerListener,
         
     }
     
-    public void mouseReleased(SequenceViewerEvent ewt){
+    public void mouseClicked(SequenceViewerEvent ewt){
         
     }
     
@@ -133,14 +132,25 @@ implements SequenceViewerListener,
                 if ( anno.containsProperty("description")){
                     description = (String) anno.getProperty("description");
                 }
-                seqPanel.setToolTipText("load PDB " + pdbcode  + description);  
+                String newtxt = "load PDB " + pdbcode  + description;
+                if (! tooltiptext.equals(newtxt)) {
+                    //System.out.println("setting new text " + newtxt);
+                    seqPanel.setToolTipText(newtxt);
+                    tooltiptext = newtxt;
+                }
                 // change mouse cursor ...
-                
-                seqPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                if ( cursortype == 0) {
+                    seqPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    cursortype = 1;
+                }
             }
             if ( f == null){
                 seqPanel.setToolTipText(null);
-                seqPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                tooltiptext = "";
+                if ( cursortype == 1) {
+                    seqPanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                    cursortype = 0;
+                }
             }
         }
     }

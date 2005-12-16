@@ -70,12 +70,12 @@ extends JPanel
         upperAlignmentManager = null;
         lowerAlignmentManager = null;
         
-        vBox = Box.createVerticalBox();
+        vBox = Box.createHorizontalBox();
         upperA = SpiceApplication.createImageIcon("1uparrow.png");
         lowerA = SpiceApplication.createImageIcon("1downarrow.png");
         
-        upperLabel = new JLabel("Choose",upperA,JLabel.RIGHT);
-        lowerLabel = new JLabel("Choose",lowerA,JLabel.RIGHT);
+        upperLabel = new JLabel("",upperA,JLabel.RIGHT);
+        lowerLabel = new JLabel("",lowerA,JLabel.RIGHT);
         //vBox.add(upperLabel);
         //vBox.add(lowerLabel);
         ArrowMouseListener aml = new ArrowMouseListener(this,1);
@@ -84,9 +84,12 @@ extends JPanel
         ArrowMouseListener aml2 = new ArrowMouseListener(this,2);
         lowerLabel.addMouseListener(aml2);
                
-        this.add(vBox);
         upperLabel.setEnabled(false);
         lowerLabel.setEnabled(false);
+        //vBox.add(upperLabel);
+        //vBox.add(lowerLabel);
+        this.add(vBox);
+        
         
     }
     
@@ -108,7 +111,8 @@ extends JPanel
         upperAlignmentManager = ma;
         upperLabel.setEnabled(true);
         vBox.add(upperLabel);
-        this.repaint();
+        this.revalidate();
+        
     }
     
     public AlignmentManager getUpperAlignmentManager(){
@@ -119,10 +123,13 @@ extends JPanel
         return lowerAlignmentManager;
     }
     
-    public void setLowerAlignmentManager(AlignmentManager ma){
+    public void setLowerAlignmentManager(AlignmentManager ma){        
+        System.out.println(ma.getCoordSys1() + " " + ma.getCoordSys2());
         lowerAlignmentManager = ma;
         lowerLabel.setEnabled(true);
         vBox.add(lowerLabel);
+        this.revalidate();
+        System.out.println(vBox.getSize());
     }
     
         
@@ -222,7 +229,7 @@ implements MouseListener {
     
     public void mouseClicked(MouseEvent e){
         // trigger load of  structure ...
-        System.out.println("loading structure " + panelNumber);
+        //System.out.println("loading structure " + panelNumber);
         
         
         AlignmentManager aligM = getAlignmentManager();
@@ -237,9 +244,9 @@ implements MouseListener {
             chooser.addObjectListener(li);
             SpiceDasSource[] sources = getDasSources();
             
-            for (int i = 0 ; i< sources.length;i++){
-                System.out.println(sources[i]);
-            }
+            //for (int i = 0 ; i< sources.length;i++){
+            //    System.out.println(sources[i]);
+            //}
             chooser.setDasSources(sources);
             Chain c = getChain();
             //System.out.println(c +" >"+c.getSequence()+"<");
@@ -257,20 +264,20 @@ implements MouseListener {
     }
     
     public void mouseEntered(MouseEvent arg0) {
-        // TODO Auto-generated method stub
+
         String status = "";
         AlignmentManager aligM = getAlignmentManager();
         if (  aligM != null) {
             String code = getId();
-            JLabel upperLabel = getLabel();
+            JLabel label = getLabel();
             if ( code.equals(""))
-                upperLabel.setEnabled(false);
+                label.setEnabled(false);
             else 
-                upperLabel.setEnabled(true);
+                label.setEnabled(true);
             status += "alignments of " + code;
             
             status += " vs. " + getSubjectCoordinateSystem();
-            upperLabel.setToolTipText("click here to load " + status );
+            label.setToolTipText("click here to load " + status );
         }
      
     }

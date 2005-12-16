@@ -31,7 +31,6 @@ import org.biojava.spice.Panel.StructurePanelListener;
 import org.biojava.spice.manypanel.eventmodel.SequenceEvent;
 import org.biojava.spice.manypanel.eventmodel.SequenceListener;
 import org.biojava.spice.SPICEFrame;
-import org.biojava.spice.GUI.alignmentchooser.AlignmentChooser;
 //import org.biojava.spice.Panel.seqfeat.*;
 import org.biojava.spice.SpiceApplication;
 

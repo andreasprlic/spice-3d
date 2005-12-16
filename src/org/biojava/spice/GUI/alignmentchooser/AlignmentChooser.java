@@ -63,6 +63,7 @@ import org.biojava.bio.program.das.dasalignment.*;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -71,6 +72,8 @@ import javax.swing.JTextField;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -149,14 +152,7 @@ AlignmentListener
         
         pdbFeatures = new HashMap();
         chainMap    = new HashMap();
-        
-        // needed as helpers for drawing
-        //aligTools = new AlignmentTools(spice.getConfiguration());
-        
-        //struBuild = new StructureBuilder(queryCoordSys,subjectCoordSys);
-        
-        
-        
+                
         try {
             multiLineRenderer = new MultiLineRenderer();
             SequenceRenderer ruleR = new RulerRenderer();
@@ -194,19 +190,8 @@ AlignmentListener
     }
     
     public void show(){
-        //System.out.println("starting to retreive Alignments");
-        // get uniprot seq from spice.
         
-        //int currentChainNumber = spice.getCurrentChainNumber();
-        //if ( currentChainNumber < 0) {
-        //  logger.warning(" no active chain found ");
-        //  return;
-        //}
-        //Chain chain = spice.getChain(currentChainNumber);
-        
-        String uniprot = chain.getSwissprotId();
-        //Alignment[] aligs = null ;
-        
+        String uniprot = chain.getSwissprotId();            
         
         // display in a new frame
         JFrame alignmentFrame = new JFrame();       
@@ -243,35 +228,30 @@ AlignmentListener
         hBox.add(progressBar,BorderLayout.EAST);
         
         vBox.add(hBox);
-        
-        
-        setChain(chain,currentChainNumber);
-        //setAlignments(aligs);
-        
-        //JScrollPane scroll = new JScrollPane(sequencePanel) ;
-        //scroll.setPreferredSize(new Dimension( 600, 600));
-        //scroll.setPreferredSize(new Dimension(600, 600));;
-        //scroll.setMinimumSize(  new Dimension(30, 30));;
-        
-        //vBox.add(scroll);
-        
+               
         vBox.add(sequencePanel);
-        
-        panel.add(vBox);
-        //panel.add(scroll);
-        //panel.add(aligPanel);
-        
-        //aligPanel.repaint();
-        alignmentFrame.getContentPane().add(panel);
-        alignmentFrame.pack();
-        
-        alignmentFrame.setVisible(true);
         
         loadAlignments(uniprot);
         
         AligPanelListener apl = new AligPanelListener(this);
         alignmentFrame.addComponentListener(apl);
         
+        JButton close = new JButton("Close");
+        
+        MyActionListener myAl = new MyActionListener(alignmentFrame);
+        close.addActionListener(myAl);
+                
+        Box hBoxb = Box.createHorizontalBox();
+        hBoxb.add(Box.createGlue());
+        hBoxb.add(close,BorderLayout.EAST);
+        
+        vBox.add(hBoxb);
+              
+        panel.add(vBox);
+        alignmentFrame.getContentPane().add(panel);
+        alignmentFrame.pack();
+        
+        alignmentFrame.setVisible(true);
         
     }
     
@@ -280,9 +260,9 @@ AlignmentListener
     }
     
     public void setScale(double s){
+        logger.info("alginment chooser setScale " + s);
         sequencePanel.setScale(s);
-        sequencePanel.repaint();
-        
+        //sequencePanel.repaint();
     }
     
     
@@ -313,9 +293,21 @@ AlignmentListener
                 code = code.substring(0,4);
                 param.setQueryPDBChainId(chain);
             }
+        
         param.setQuery(code);
         param.setQueryCoordinateSystem(queryCoordSys);
         param.setSubjectCoordinateSystem(subjectCoordSys);
+        
+        //TODO: clean this up ...
+        DasCoordinateSystem ecs = new DasCoordinateSystem();
+        ecs.setName("ensemblpep-human-ncbi35");
+           
+        if ( queryCoordSys.toString().equals(BrowserPane.DEFAULT_ENSPCOORDSYS)){
+            param.setQueryCoordinateSystem(ecs);               
+        }
+        if ( subjectCoordSys.toString().equals(BrowserPane.DEFAULT_ENSPCOORDSYS)) {
+            param.setSubjectCoordinateSystem(ecs);
+        }
         
         AlignmentThread thread = new AlignmentThread(param);
         thread.addAlignmentListener(this);
@@ -383,6 +375,7 @@ AlignmentListener
             sequencePanel.setSequence(sequence);
             //display the whole Sequence
             sequencePanel.setRange(new RangeLocation(1,sequence.length()));
+            return;
         }
         
        
@@ -464,7 +457,7 @@ AlignmentListener
             Iterator iter = details.iterator();
             while (iter.hasNext()){
                 Annotation detail = (Annotation) iter.next();
-                //logger.info(detail.get("property").toString() + " " + detail.get("detail").toString());
+                logger.info(detail.getProperty("property").toString() + " " + detail.getProperty("detail").toString());
                 String property = (String) detail.getProperty("property");
                 String detailstr   = (String) detail.getProperty("detail");
                 
@@ -482,7 +475,7 @@ AlignmentListener
             
             //filtR.setRenderer(bumpR);
             try {
-                LabelledSequenceRenderer labelsR = new LabelledSequenceRenderer(50,20);
+                LabelledSequenceRenderer labelsR = new LabelledSequenceRenderer(100,20);
                 labelsR.setFillColor(Color.white);
                 labelsR.addLabelString(labelstring);
                 labelsR.setRenderer(bumpR);
@@ -677,3 +670,17 @@ AlignmentListener
     
     
 }
+
+
+class MyActionListener implements
+ActionListener {
+    JFrame parent;
+    public MyActionListener(JFrame alignmentFrame){
+        parent =alignmentFrame;
+    }
+    public void actionPerformed(ActionEvent event) {
+        //dispose();
+        parent.dispose();
+    }
+}
+

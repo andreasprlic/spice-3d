@@ -228,7 +228,7 @@ public class AlignmentTool {
                     continue;
             int gpos = iq.intValue();
             if ( gpos >= length) {
-                System.out.println("out of range exception " + gpos + "(length "+length+")");
+                //System.out.println("out of range exception " + gpos + "(length "+length+")");
                 continue;
             }
             Group g = c.getGroup(iq.intValue());

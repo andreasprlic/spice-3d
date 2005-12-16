@@ -49,7 +49,7 @@ public class AligPanelListener implements ComponentListener {
      * @see java.awt.event.ComponentListener#componentResized(java.awt.event.ComponentEvent)
      */
     public void componentResized(ComponentEvent arg0) {
-        // TODO Auto-generated method stub
+      
         //System.out.println("resized");
         
         Component comp = arg0.getComponent();
@@ -61,10 +61,10 @@ public class AligPanelListener implements ComponentListener {
         String seq_str = "" ; 
         if ( chain != null) {
             seq_str = chain.getSequence();    
-            double y = (dim.getWidth() / ((double)seq_str.length() + 50 + 20)); // 50 is the label size
+            double y = (dim.getWidth() / ((double)seq_str.length() + 100 + 20)); // 100 is the label size
             //System.out.println("old y" + aligPanel.getScale() + "new y " + y);
             aligPanel.setScale(y);
-            comp.repaint() ;
+            //comp.repaint() ;
         }
         
         //aliPanel.setSize(d);

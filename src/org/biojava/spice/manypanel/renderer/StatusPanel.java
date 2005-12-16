@@ -50,7 +50,6 @@ import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 
 import org.biojava.spice.JNLPProxy;
-import org.biojava.spice.manypanel.managers.AlignmentManager;
 
 public class StatusPanel extends JPanel {
     public static final long serialVersionUID= 309781239871208973l;
@@ -90,7 +89,8 @@ public class StatusPanel extends JPanel {
         arrowPanel = new ArrowPanel();
         hBox.add(arrowPanel);
         arrowPanel.setBackground(BG_COLOR);
-        
+        arrowPanel.setMaximumSize(new Dimension (120,20));
+        arrowPanel.setPreferredSize(new Dimension(120,20));
         accessionCode = new JTextField("    ");
         accessionCode.setEditable(false);
         
@@ -135,7 +135,7 @@ public class StatusPanel extends JPanel {
         progressBar.setValue(0);
         progressBar.setStringPainted(false);
         progressBar.setString(""); 
-        progressBar.setMaximumSize(new Dimension(10,10));
+        progressBar.setMaximumSize(new Dimension(10,20));
         progressBar.setIndeterminate(false);
         progressBar.setBorder(BorderFactory.createEmptyBorder());
         hBox.add(progressBar);
@@ -157,16 +157,19 @@ public class StatusPanel extends JPanel {
     public void setAccessionCode(String ac){
         accessionCode.setText(ac);
         accessionCode.repaint();
+        
     }
     
     public void setDescription(String d){
         description.setText(d);
         description.repaint();
+     
     }
     
     public void setName(String n){
         dbName.setText(n);
-        this.repaint();
+        
+       
     }
     
     public void setLoading(boolean flag){
