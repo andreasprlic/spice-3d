@@ -194,6 +194,8 @@
       <fileset dir="${resources.dir}">
         <exclude name="**/CVS/**" />
 	<include name="*.png" />
+	<include name="*.jpg" />
+	<include name="*.gif" />
       </fileset>
     </copy>
 
@@ -201,6 +203,8 @@
       <fileset dir="${icons.dir}">
         <exclude name="**/CVS/**" />
 	<include name="*.png" />
+	<include name="*.jpg" />
+	<include name="*.gif" />
       </fileset>
     </copy>
 
