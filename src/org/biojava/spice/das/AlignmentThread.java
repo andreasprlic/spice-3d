@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -208,7 +209,7 @@ extends Thread{
             char lastChar = url.charAt(url.length()-1);      
             if ( ! (lastChar == '/') ) 
                 url +="/" ;
-            dasalignmentcommand  = url +  "alignment?query="+code ;
+            dasalignmentcommand  =  "alignment?query="+code ;
             
             if ( subject != null){
                 dasalignmentcommand += "&subject="+subject;
@@ -223,8 +224,19 @@ extends Thread{
                 
                 dasalignmentcommand +="&subjectcoordsys="+scs;
             }
+            
+//          protect the command
+            try {
+                dasalignmentcommand = url +  URLEncoder.encode(dasalignmentcommand,"UTF-8");
+            } catch (Exception e){
+            
+            }
+            
             logger.info(logname + " contacing alignment server " + dasalignmentcommand);
             //System.out.println("contacing alignment server " + dasalignmentcommand);
+            
+            
+            
             
             try{
                 //alignments = dasc.getAlignments(code);
