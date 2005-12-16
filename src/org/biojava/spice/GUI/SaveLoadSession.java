@@ -525,7 +525,7 @@ class MyParser
       
             //fv.setDasSource(currentDasSource);
           
-            Feature[] feat = (Feature[])features.toArray(new Feature[features.size()]);
+            //Feature[] feat = (Feature[])features.toArray(new Feature[features.size()]);
      
             //for (int i=0;i<feat.length;i++){
             //    System.out.println(feat[i]);

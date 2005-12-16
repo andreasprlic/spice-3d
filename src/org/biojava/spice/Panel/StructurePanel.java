@@ -219,6 +219,8 @@ implements JmolStatusListener
         logger.finest("showUrl: " +urlString);
     }
     
+    
+    
     /** create a JMenu to be used for interacting with the structure Panel.
      * requires an ActionListener to be called when one of the Menus is being used. */
     public static JMenu createMenu(ActionListener ml){
@@ -288,6 +290,12 @@ implements JmolStatusListener
         display.add(colorchain);
         display.add(colorsec)   ;
         display.add(colorcpk)  ;
+        
+        // add the Jmol menu
+        // TODO: add a menu for Jmol
+        //JMenu jmolM = new JMenu("Jmol");
+        //display.add(jmolM);
+        //jmolM.add(JmolPopup.)
         
         return display;
     }

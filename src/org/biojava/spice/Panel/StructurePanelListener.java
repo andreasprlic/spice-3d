@@ -344,6 +344,7 @@ SpiceFeatureListener
         Map[] stylesheet = e.getDasSource().get3DStylesheet();
         highliteFeature(feat,stylesheet,true);
     }
+    
     public void segmentSelected(SpiceFeatureEvent e){
         Segment seg = (Segment)e.getSegment();
         //System.out.println("StructurePanel: selected segment " + seg);

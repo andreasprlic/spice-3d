@@ -39,7 +39,6 @@ import org.biojava.bio.structure.*;
 import java.awt.Color;
 import java.util.*;
 import org.biojava.spice.Feature.*;
-import org.biojava.spice.manypanel.managers.AlignmentManager;
 
 
 import java.awt.Image;

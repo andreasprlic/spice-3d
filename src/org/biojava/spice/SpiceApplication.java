@@ -26,16 +26,10 @@ package org.biojava.spice ;
 import org.biojava.services.das.registry.DasCoordinateSystem;
 import org.biojava.spice.Panel.*;
 import org.biojava.spice.Config.*;
-import org.biojava.spice.Feature.*;
 import org.biojava.spice.GUI.*;
 
 import java.lang.reflect.*;
-// for protein 3D stuff
 import org.biojava.bio.structure.*;
-//import org.biojava.spice.Panel.seqfeat.SpiceComponentListener;
-//import org.biojava.spice.Panel.seqfeat.DasSourceListener;
-//import org.biojava.spice.Panel.seqfeat.SpiceDasServerConfigListener;
-
 
 // to get config file via http
 import java.net.URL;
@@ -54,7 +48,6 @@ import java.io.IOException;
 import java.util.logging.* ;
 import java.util.Iterator  ;
 
-// relfection for setting HttpURLConnectiontimeouts
 
 // gui
 import java.awt.BorderLayout;
@@ -1054,7 +1047,7 @@ ConfigurationListener
         logger.finest("init feature fetcher");
 
 
-        FeatureFetcher ff = new FeatureFetcher(this,sp_id,pdbcode,chain);
+        
         String disp = startParameters.getDisplay();
         String labe = startParameters.getDisplayLabel();
         logger.info("got " + disp + " " + labe);
@@ -1071,16 +1064,7 @@ ConfigurationListener
                 disp = "";
         logger.finest("got display list: "+ disp );
         
-        ff.setDisplayServers(disp);
-        ff.setDisplayLabels(labe);
         
-        ff.start() ;
-        
-        //statusPanel.setLoading(true);
-        //dascanv.setChain(chain,currentChainNumber);
-        
-        //dascanv.setBackground(Color.);
-        //seqTextPane.setChain(chain,currentChainNumber);
         
     }
 

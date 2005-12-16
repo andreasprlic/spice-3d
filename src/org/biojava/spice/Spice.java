@@ -28,7 +28,7 @@ import org.biojava.spice.server.SpiceClient;
 import java.applet.Applet;
 import org.biojava.spice.Config.ConfigurationException;
 
-import java.net.URL;
+//import java.net.URL;
 import java.util.ArrayList;
 import org.biojava.spice.GUI.AboutDialog;
 import java.util.List;

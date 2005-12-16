@@ -284,18 +284,15 @@ public abstract class AbstractChainRenderer
 
     protected void setScale(float scale) {
         
-        //this.scale=scale;
         featurePanel.setScale(scale);
-        cursorPanel.setScale(scale);
-        
-        
+        cursorPanel.setScale(scale);        
+
         Iterator iter = dasSourcePanels.iterator();
         while (iter.hasNext()){
             DasSourcePanel dsp = (DasSourcePanel)iter.next();
             dsp.setScale(scale);
         }
-        updatePanelPositions();
-        
+        updatePanelPositions();        
     }
 
 
@@ -402,8 +399,6 @@ public abstract class AbstractChainRenderer
         //Point p = scrollPane.getViewport().getViewPosition();
         //logger.info("" +p);
         Dimension viewSize = scrollPane.getViewport().getViewSize();
-        
-        
         
         //logger.info("viewSize " + viewSize.getWidth() + " " + viewSize.getHeight());
         this.setPreferredSize(viewSize);
