@@ -46,7 +46,7 @@ SequenceListener
 {
     
     static String alloff = "cpk off ; wireframe off ; backbone off; cartoon off ; ribbons off; " ;
-    static String reset = "select all; " + alloff;
+    static String reset = "select *; " + alloff;
     static String noselect = "select none; ";
     
     static String SPICEMANUAL = "http://www.sanger.ac.uk/Users/ap3/DAS/SPICE/SPICE_manual.pdf" ;
