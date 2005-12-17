@@ -125,11 +125,12 @@ public class getSequence {
 
 
 	// the methods below are required by the interface but not needed here
-	public void newObjectRequested(String name){}
+	public void newObjectRequested(String accessionCode){}
 	public void selectionLocked(boolean flag){}
 	public void selectedSeqRange(int start, int end){}
 	public void selectedSeqPosition(int position){}
-
+	public void clearSelection(){}
+	public void noObjectFound(String accessionCode){}
 
 
     }

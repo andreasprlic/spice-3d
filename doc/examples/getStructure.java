@@ -110,7 +110,8 @@ public class getStructure  {
 	// the methods below are required by the interface but not needed here
 	public void selectedChain(StructureEvent event){}
 	public void newObjectRequested(String name){}
-	
+	public void noObjectFound(String accessionCode){}
+
     }
 
 }

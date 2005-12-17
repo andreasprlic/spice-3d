@@ -60,9 +60,9 @@ public class getFeatures {
 	    System.setProperty("javax.xml.parsers.SAXParserFactory","org.apache.xerces.jaxp.SAXParserFactoryImpl");
 
 	    // if you are behind a proxy, please uncomment the following lines
-	    System.setProperty("proxySet","true");
-	    System.setProperty("proxyHost","wwwcache.sanger.ac.uk");
-	    System.setProperty("proxyPort","3128");
+	    //System.setProperty("proxySet","true");
+	    //System.setProperty("proxyHost","wwwcache.sanger.ac.uk");
+	    //System.setProperty("proxyPort","3128");
 
 
 	    // get all das sources
