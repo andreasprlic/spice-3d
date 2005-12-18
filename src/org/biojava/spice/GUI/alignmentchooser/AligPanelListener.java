@@ -61,12 +61,13 @@ public class AligPanelListener implements ComponentListener {
         String seq_str = "" ; 
         if ( chain != null) {
             seq_str = chain.getSequence();    
-            double y = (dim.getWidth() / ((double)seq_str.length() + 100 + 20)); // 100 is the label size
+            float y = (float)(dim.getWidth() / ((float)seq_str.length() + 100 + 20)); // 100 is the label size
             //System.out.println("old y" + aligPanel.getScale() + "new y " + y);
             aligPanel.setScale(y);
             //comp.repaint() ;
+           
         }
-        
+        aligPanel.repaint();
         //aliPanel.setSize(d);
         
         

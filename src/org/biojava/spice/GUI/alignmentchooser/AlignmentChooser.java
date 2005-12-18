@@ -25,16 +25,8 @@ package org.biojava.spice.GUI.alignmentchooser;
 import org.biojava.services.das.registry.DasCoordinateSystem;
 import org.biojava.spice.SpiceApplication;
 import org.biojava.bio.Annotation;
-import org.biojava.bio.SimpleAnnotation;
-import org.biojava.bio.seq.FeatureFilter;
-import org.biojava.bio.seq.ProteinTools;
-import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.ChainImpl;
-import org.biojava.bio.structure.Group;
-import org.biojava.bio.symbol.IllegalSymbolException;
-import org.biojava.bio.symbol.Location;
-import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.spice.das.AlignmentParameters;
 import org.biojava.spice.das.AlignmentThread;
 import org.biojava.spice.das.AlignmentTools;
@@ -47,40 +39,37 @@ import org.biojava.spice.manypanel.eventmodel.ObjectListener;
 import org.biojava.spice.manypanel.eventmodel.SequenceEvent;
 import org.biojava.spice.manypanel.eventmodel.SequenceListener;
 import org.biojava.spice.manypanel.managers.SequenceManager;
-import org.biojava.spice.Feature.FeatureImpl;
+import org.biojava.spice.manypanel.renderer.FeaturePanel;
 import org.biojava.spice.Panel.SeqFeaturePanel;
-import org.biojava.bio.gui.sequence.BasicFeatureRenderer;
-import org.biojava.bio.gui.sequence.BumpedRenderer;
-import org.biojava.bio.gui.sequence.FeatureBlockSequenceRenderer;
-import org.biojava.bio.gui.sequence.FilteringRenderer;
-import org.biojava.bio.gui.sequence.LabelledSequenceRenderer;
-import org.biojava.bio.gui.sequence.MultiLineRenderer;
-import org.biojava.bio.gui.sequence.RulerRenderer;
-import org.biojava.bio.gui.sequence.SequenceRenderer;
-import org.biojava.bio.gui.sequence.SequencePanel;
+
 import org.biojava.bio.program.das.dasalignment.*;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.Color;
+import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
-import java.util.HashMap;
+
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
+
 
 /**
  * A class to choose bewteen differen sequence and structure alignments.
@@ -110,13 +99,18 @@ AlignmentListener
     Map pdbFeatures ;
     Map chainMap;
     Logger logger;
-    
+    List aligPanels;
+    Box vBox;
     SpiceDasSource[] dasSources;
-    SequencePanel sequencePanel;
-    MultiLineRenderer multiLineRenderer;
-    BumpedRenderer bumpR;
+    List objectListeners;
+    JScrollPane scroll;
+    //SequencePanel sequencePanel;
+    //MultiLineRenderer multiLineRenderer;
+    //BumpedRenderer bumpR;
     
-    AligPanelMouseListener mouseListener;
+    //AligPanelMouseListener mouseListener;
+    JPanel panel;
+    FeaturePanel featurePanel;
     
     /**
      * @param arg0
@@ -127,85 +121,54 @@ AlignmentListener
         logger.info("new ALignmentChooser " + queryCs + " " + subjectCs);
         //spice = parent ;
         chain = new ChainImpl();
-       
+        
         dasSources = new SpiceDasSource[0];
         queryCoordSys = queryCs;
         subjectCoordSys = subjectCs;
+        objectListeners = new ArrayList();
         
-        initSequencePanel(); 
+        initPanels();
+        //mouseListener = new AligPanelMouseListener(this);
     }
     
     /** a panel to choose a seq-structure alignment
      * 
      */
-    public void initSequencePanel() {
-        //super();
-        //logger = Logger.getLogger("org.biojava.spice");
-        sequencePanel = new SequencePanel();
-        sequencePanel.setDoubleBuffered(true);
-        sequencePanel.setOpaque(true);
-        
-        
-        alignments = null;
-        chain = null;
-        currentChainNumber = -1 ;
-        
-        pdbFeatures = new HashMap();
-        chainMap    = new HashMap();
-                
-        try {
-            multiLineRenderer = new MultiLineRenderer();
-            SequenceRenderer ruleR = new RulerRenderer();
-            multiLineRenderer.addRenderer(ruleR);
-            sequencePanel.setRenderer(multiLineRenderer);
-            // default display first 100 aminos...
-            sequencePanel.setRange(new RangeLocation(1,100));
-            
-            
-            FeatureBlockSequenceRenderer fbr = new FeatureBlockSequenceRenderer();     
-            BasicFeatureRenderer featr = new BasicFeatureRenderer();
-            featr.setOutline(Color.white);
-            //featr.setPaint(Color);
-            fbr.setFeatureRenderer(featr);
-            bumpR = new BumpedRenderer(fbr);        
-            
-            //set the MultiLineRenderer as the SequencePanels renderer
-        } catch (Exception e){
-            logger.warning(e.getMessage());
-        }
-        
-        // add listeners
-        mouseListener = new AligPanelMouseListener(sequencePanel);
-        sequencePanel.addSequenceViewerListener(mouseListener);
-        
-        //SequenceViewerMotionListener svm = new MySVL(this);
-        sequencePanel.addSequenceViewerMotionListener(mouseListener);
-        
-     
-        
-    }
+    
     
     public void addObjectListener(ObjectListener li){
-        mouseListener.addObjectListener(li);
+        //mouseListener.addObjectListener(li);
+        objectListeners.add(li);
+    }
+    
+    public void initPanels(){
+        scroll = new JScrollPane();
+        featurePanel = new FeaturePanel();
+        featurePanel.setPreferredSize(new Dimension(400,30));
+        panel = new JPanel();
+        aligPanels = new ArrayList();
+        vBox = Box.createVerticalBox();
     }
     
     public void show(){
         
         String uniprot = chain.getSwissprotId();            
         
+        float scl = (float)(530 / ((float)chain.getLength() + 100 + 20)); 
+        setScale(scl);
+        
         // display in a new frame
         JFrame alignmentFrame = new JFrame();       
         
         alignmentFrame.setTitle("Choose Alignment");
         alignmentFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        //alignmentFrame.setSize(700, 700);
-        JPanel panel = new JPanel();
-        panel.setPreferredSize(new Dimension(700,700));
+        
+        
         //	JFrame.setDefaultLookAndFeelDecorated(false);
         ImageIcon icon = SpiceApplication.createImageIcon("spice.png");
         alignmentFrame.setIconImage(icon.getImage());
         
-        Box vBox = Box.createVerticalBox();
+        //vBox = Box.createVerticalBox();
         Box hBox = Box.createHorizontalBox();
         
         // visualize these.
@@ -223,13 +186,14 @@ AlignmentListener
         progressBar.setBorder(BorderFactory.createEmptyBorder());
         
         // space filler
-        hBox.add(Box.createGlue());
+        //hBox.add(Box.createGlue());
         
         hBox.add(progressBar,BorderLayout.EAST);
         
         vBox.add(hBox);
-               
-        vBox.add(sequencePanel);
+        
+        
+        vBox.add(featurePanel);
         
         loadAlignments(uniprot);
         
@@ -240,29 +204,64 @@ AlignmentListener
         
         MyActionListener myAl = new MyActionListener(alignmentFrame);
         close.addActionListener(myAl);
-                
+        
         Box hBoxb = Box.createHorizontalBox();
         hBoxb.add(Box.createGlue());
         hBoxb.add(close,BorderLayout.EAST);
         
-        vBox.add(hBoxb);
-              
-        panel.add(vBox);
+        //vBox.add(hBoxb);
+        scroll = new JScrollPane(vBox);  
+        //vBox.setPreferredSize(new Dimension(530,600));
+        panel = new JPanel();
+        panel.setBackground(FeaturePanel.BACKGROUND_COLOR);
+        panel.setLayout(new BoxLayout(panel,BoxLayout.Y_AXIS));
+        panel.setPreferredSize(new Dimension(530,600));
+        panel.add(scroll);
+        panel.add(Box.createGlue());
+        panel.add(hBoxb);
+        
         alignmentFrame.getContentPane().add(panel);
         alignmentFrame.pack();
         
         alignmentFrame.setVisible(true);
+        repaint();
         
     }
     
-    public double getScale() {
-        return sequencePanel.getScale();
+    public float getScale() {
+        return featurePanel.getScale();
     }
     
-    public void setScale(double s){
-        logger.info("alginment chooser setScale " + s);
-        sequencePanel.setScale(s);
+    public void setScale(float s){
+        //logger.info("alginment chooser setScale " + s);
+        featurePanel.setScale(s);
         //sequencePanel.repaint();
+        
+        Iterator iter = aligPanels.iterator();
+        while (iter.hasNext()){
+            ShowAligPanel pan = (ShowAligPanel)iter.next();
+            pan.setScale(s);
+        }
+        repaint();
+    }
+    
+    public void repaint() {
+        Iterator iter = aligPanels.iterator();
+        while (iter.hasNext()){
+            ShowAligPanel pan = (ShowAligPanel)iter.next();
+            pan.repaint();
+        }
+        
+       /* featurePanel.revalidate();
+        featurePanel.repaint();
+        vBox.repaint();
+        vBox.revalidate();
+        scroll.repaint();
+        scroll.revalidate();*/
+        panel.repaint();
+        panel.revalidate();
+        
+   
     }
     
     
@@ -271,12 +270,12 @@ AlignmentListener
     }
     
     /*public void setQueryCoordinateSystem(DasCoordinateSystem ds){
-        queryCoordSys = ds;
-    }
-    
-    public void setSubjectCoordinateSystem(DasCoordinateSystem ds){
-        subjectCoordSys = ds;
-    }*/
+     queryCoordSys = ds;
+     }
+     
+     public void setSubjectCoordinateSystem(DasCoordinateSystem ds){
+     subjectCoordSys = ds;
+     }*/
     
     public void loadAlignments(String code){
         // triger the load of the alignments...
@@ -301,7 +300,7 @@ AlignmentListener
         //TODO: clean this up ...
         DasCoordinateSystem ecs = new DasCoordinateSystem();
         ecs.setName("ensemblpep-human-ncbi35");
-           
+        
         if ( queryCoordSys.toString().equals(BrowserPane.DEFAULT_ENSPCOORDSYS)){
             param.setQueryCoordinateSystem(ecs);               
         }
@@ -320,20 +319,21 @@ AlignmentListener
         chain = c;
         currentChainNumber = number;
         //this.paintComponent(this.getGraphics());
-        String seq_str = chain.getSequence();
-        Sequence sequence ;
-        try {         
-            sequence = ProteinTools.createProteinSequence(seq_str, "prot_1");
-        }
-        catch (IllegalSymbolException e){
-            // can not convert sequence!
-            logger.warning(e.getMessage());
-            notifyAll();
-            return;
-        }
-        sequencePanel.setSequence(sequence);
+        //String seq_str = chain.getSequence();
+        /*Sequence sequence ;
+         try {         
+         sequence = ProteinTools.createProteinSequence(seq_str, "prot_1");
+         }
+         catch (IllegalSymbolException e){
+         // can not convert sequence!
+          logger.warning(e.getMessage());
+          notifyAll();
+          return;
+          }*/
+        featurePanel.setChain(chain);
         
-        sequencePanel.repaint();
+        
+        repaint();
     }
     
     public Chain getChain(){
@@ -342,6 +342,7 @@ AlignmentListener
     
     public void noAlignmentFound(AlignmentEvent event){
         progressBar.setIndeterminate(false);
+        repaint();
     }
     
     /** convert the biojava alignment class into biojava feature objects */
@@ -365,24 +366,13 @@ AlignmentListener
         }
         logger.info("you can choose between " + aligs.length + " alignments");
         String seq_str = chain.getSequence();
-        Sequence sequence ;
-        try {         
-            sequence = ProteinTools.createProteinSequence(seq_str, "prot_1");
-        }
-        catch (IllegalSymbolException e){
-            // can not convert sequence!
-            logger.warning(e.getMessage());
-            notifyAll();
-            return;
-        }
+        
         if ( alignments == null) {
-            sequencePanel.setSequence(sequence);
-            //display the whole Sequence
-            sequencePanel.setRange(new RangeLocation(1,sequence.length()));
+            
             return;
         }
         
-       
+        
         for ( int i=0 ; i < alignments.length; i++ ){
             org.biojava.bio.program.das.dasalignment.Alignment ali = alignments[i];
             
@@ -397,16 +387,7 @@ AlignmentListener
             String queryId = getQueryId();
             String subjectId = getSubjectId(ali);
             
-            
-            
-            //logger.info(queryId + " " + a1.getProperty("type"));
-            //logger.info(subjectId + " " + a2.getProperty("type"));
-            
-            // get the 
-           
-            
-            //String PDBcode = AlignmentTools.getPDBCodeFromAlignment(ali);
-            logger.info("alignments for "+ queryId + " " + subjectId );
+            //logger.info("alignments for "+ queryId + " " + subjectId );
             
             
             Chain currentChain = null;
@@ -420,142 +401,33 @@ AlignmentListener
                 continue;
             }
             
+            ShowAligPanel pan = new ShowAligPanel(ali);
             
-            Annotation object = AlignmentTools.getObject(subjectId,ali);
-            paintSequence(sequence,currentChain,queryId,subjectId,object);
+            pan.setChain(currentChain);
+            pan.setScale(featurePanel.getScale());
+            vBox.add(pan);
+            aligPanels.add(pan);
+            
+            pan.addMouseListener(new MyMouseListener(currentChain.getSwissprotId(),this,pan));
+            this.setScale(getScale());
+            repaint();
+            
+            
+            
         }
-        
+        vBox.add(Box.createGlue());
+        repaint();
     }
     
     
-    private void paintSequence( Sequence sequence, Chain currentChain, String queryId,String subjectId, Annotation subjectAnnotation ){
-            // create features from this chain, 
-            List features = getStructureFeatures(currentChain,subjectId);
-            //logger.log(Level.FINEST, "nr features: " +features.size()); 
-            
-            // convert them to display...
-            // template for feature.
-            org.biojava.bio.seq.Feature.Template temp = new org.biojava.bio.seq.Feature.Template();
-            
-            temp.source = subjectId;
-            temp.type = "Protein Structure";
-            
-            FeatureFilter ff = new FeatureFilter.BySource(subjectId); 
-            //logger.log(Level.INFO,"filtering by "+PDBcode);
-            
-            
-            FilteringRenderer filtR = new FilteringRenderer();
-            
-            // build up label ...
-            String labelstring = subjectId;
-            //Annotation object = AlignmentTools.getObject(subjectId,ali);
-            Annotation object =subjectAnnotation;
-            List details = new ArrayList();
-            
-            try {
-                details = (List) object.getProperty("details");
-            } catch (NoSuchElementException e){
-                // details are not provided
-                logger.info("alignment does not contain details");
-            }
-            Iterator iter = details.iterator();
-            while (iter.hasNext()){
-                Annotation detail = (Annotation) iter.next();
-                logger.info(detail.getProperty("property").toString() + " " + detail.getProperty("detail").toString());
-                String property = (String) detail.getProperty("property");
-                String detailstr   = (String) detail.getProperty("detail");
-                
-                if ( property.equals("resolution")){
-                    if ( detailstr != null )
-                        labelstring += " " + detailstr + "A" ; 
-                }
-                if ( property.equals("experiment_type")){
-                    labelstring += " " + detailstr ;
-                }
-                if ( property.equals("molecule description")){
-                    labelstring += " description: " + detailstr;
-                }
-            }
-            
-            //filtR.setRenderer(bumpR);
-            try {
-                LabelledSequenceRenderer labelsR = new LabelledSequenceRenderer(100,20);
-                labelsR.setFillColor(Color.white);
-                labelsR.addLabelString(labelstring);
-                labelsR.setRenderer(bumpR);
-                //multiLineRenderer.addRenderer(labelsR);
-                //labelsR.addLabelString(PDBcode);
-                filtR.setRenderer(labelsR);
-                filtR.setFilter(ff);           
-                //filtR.setRenderer(bumpR);
-                
-                multiLineRenderer.addRenderer(filtR);
-                
-                //StackedFeatureRenderer stackR = new StackedFeatureRenderer();
-                //stackR.addRenderer(labelR);
-                //stackR.addRenderer(filtR);
-                //multiLineRenderer.addRenderer(stackR);
-            } catch ( Exception e) {
-                logger.warning(e.getMessage());
-                e.printStackTrace();
-                
-                return;
-            }  
-            
-            
-            // iterate over all features
-            for (int ai=0; ai< features.size(); ai++) {
-                org.biojava.spice.Feature.Feature feat = 
-                    (org.biojava.spice.Feature.Feature)features.get(ai);
-                
-                //String source = feat.getSource();
-                //temp.source=source;
-                //System.out.println(source);
-                
-                // and create Biojav Feature  object
-                temp.type=feat.getType();
-                Annotation anno = new SimpleAnnotation();
-                try {
-                    anno.setProperty("name",feat.getName());
-                    anno.setProperty("description",labelstring);
-                } catch (Exception e){
-                    logger.warning(e.getMessage());
-                }
-                temp.annotation = anno;
-                List segments = feat.getSegments();
-                for ( int s =0; s< segments.size();s++){
-                    org.biojava.spice.Feature.Segment segment = 
-                        (org.biojava.spice.Feature.Segment) segments.get(s);
-                    int start = segment.getStart();
-                    int end = segment.getEnd();
-                    
-                    
-                    Location l = new RangeLocation(start,end);
-                    temp.location = l;
-                    //org.biojava.bio.seq.Feature f ;
-                    try {
-                        sequence.createFeature(temp);                        
-                        
-                    } catch (Exception e){
-                        logger.warning(e.getMessage());
-                    }   
-                }   
-            }
     
-    
-        // now set the new sequence ...
-        //      set the Sequence to Render
-        sequencePanel.setSequence(sequence);
-        
-        //display the whole Sequence
-        sequencePanel.setRange(new RangeLocation(1,sequence.length()));
-        //sequencePanel.setSize(sequencePanel.getSize());      
-        //System.out.println("alignments have been set");
-       
-        //sequencePanel.getParent().repaint();
+    public void triggerNewObjectRequested(String code){
+        Iterator iter = objectListeners.iterator();
+        while (iter.hasNext()){
+            ObjectListener li =  (ObjectListener)iter.next();
+            li.newObjectRequested(code);
+        }
     }
-    
-    
     
     private String getQueryId(){
         
@@ -585,52 +457,6 @@ AlignmentListener
         
     }
     
-    public List getStructureFeatures(Chain chain,String pdbcode){
-        ArrayList features = new ArrayList();
-        
-        
-        int start = -1;
-        int end   = -1;
-        
-        for ( int i=0 ; i< chain.getLength() ; i++ ) {
-            Group g = chain.getGroup(i);
-            String aminopdb = g.getPDBCode();
-            
-            if ( aminopdb != null ){
-                if ( start == -1){
-                    start = i;
-                }
-                end = i;
-            } else {
-                if ( start > -1) {
-                    FeatureImpl f = makeFeat(start,end,pdbcode);
-                    features.add(f);
-                    start = -1 ;
-                }
-            }
-        }
-        // finish
-        if ( start > -1){
-            FeatureImpl f = makeFeat(start,end,pdbcode);
-            features.add(f);
-        }
-        
-        
-        return features;
-    }
-    
-    /** create a feature */
-    public FeatureImpl makeFeat(int start, int end, String pdbcode){
-        
-        FeatureImpl f = new FeatureImpl();
-        f.setName(pdbcode);
-        String txt ="sequence covered with structure (PDB code "+ pdbcode +")";
-        f.addSegment(start,end,txt);
-        f.setMethod("retreived from a DAS Alignmet server ");
-        f.setSource("");
-        
-        return f;
-    }
     
     /** overwrite resize, to change the scale of the displayed sequence */
     public void setSize(Dimension d){
@@ -640,18 +466,19 @@ AlignmentListener
         String seq_str = "" ; 
         if ( chain != null) {
             seq_str = chain.getSequence();    
-            double y = (d.getWidth() / (double)seq_str.length());
+            float y = (float)(d.getWidth() / (float)seq_str.length());
             //System.out.println("old y" + this.getScale() + "new y " + y);
-            sequencePanel.setScale(y);
+            featurePanel.setScale(y);
         }
-        
-        sequencePanel.setSize(d);
+        repaint();
+        //sequencePanel.setSize(d);
         
     }
     
     public void newObjectRequested(String accessionCode) {
-        chain = new ChainImpl();
-        
+        // chain = new ChainImpl();
+        // featurePanel.setChain(chain);
+        // featurePanel.repaint();
     }
     
     public void noObjectFound(String accessionCode){
@@ -661,16 +488,19 @@ AlignmentListener
     public void clearAlignment(){
         chain = new ChainImpl();
         progressBar.setIndeterminate(false);
-    
+        vBox.repaint();
+        featurePanel.repaint();
+        
     }
     public void clearSelection() { }
     
     public void newSequence(SequenceEvent e) {
-       
+        
         SequenceManager sm = new SequenceManager();
         chain = sm.getChainFromString(e.getSequence());
         chain.setSwissprotId(e.getAccessionCode());
-        
+        featurePanel.setChain(chain);
+        repaint();
     }
     
     public void selectedSeqPosition(int position) { }
@@ -697,3 +527,38 @@ ActionListener {
     }
 }
 
+class MyMouseListener implements MouseListener
+{
+    String code;
+    AlignmentChooser parent;
+    ShowAligPanel pan;
+    
+    public MyMouseListener(String accessionCode, AlignmentChooser parent, ShowAligPanel pan){
+        code = accessionCode;
+        this.parent = parent;
+        this.pan = pan;
+    }
+    public void mouseClicked(MouseEvent arg0) {
+        
+        parent.triggerNewObjectRequested(code);
+        
+    }
+    
+    public void mouseEntered(MouseEvent arg0) {
+        pan.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        
+    }
+    
+    public void mouseExited(MouseEvent arg0) {
+        pan.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+    }
+    
+    public void mousePressed(MouseEvent arg0) {
+        
+    }
+    
+    public void mouseReleased(MouseEvent arg0) {
+        
+    }
+    
+}
