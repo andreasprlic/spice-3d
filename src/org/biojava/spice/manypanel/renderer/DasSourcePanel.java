@@ -282,6 +282,10 @@ implements FeatureListener,SpiceFeatureListener
         }
     }
     
+    private int getDrawPos(int p){
+        return Math.round(p *scale ) + FeaturePanel.DEFAULT_X_START;
+    }
+    
     private void drawArrowSegment(Segment segment, int drawHeight,Graphics g, int y){
         //logger.finest("drawArrowsegment");
         Graphics2D g2D =(Graphics2D) g;
@@ -304,8 +308,10 @@ implements FeatureListener,SpiceFeatureListener
         //g2D.setColor(col);
         
         
-        int xstart =  start * aminosize + FeaturePanel.DEFAULT_X_START;
-        int width   = end * aminosize - xstart +  FeaturePanel.DEFAULT_X_START+aminosize ;
+        int xstart =  getDrawPos(start);
+        //start * aminosize + FeaturePanel.DEFAULT_X_START;
+        int width   = getDrawPos(end) -xstart + aminosize;
+        //* aminosize - xstart +  FeaturePanel.DEFAULT_X_START+aminosize ;
         
         int half = drawHeight / 2 ;
         
@@ -362,8 +368,11 @@ implements FeatureListener,SpiceFeatureListener
             int start     = segment.getStart() -1 ;
             int end       = segment.getEnd()   -1 ;
             
-            int xstart =  start * aminosize + FeaturePanel.DEFAULT_X_START;
-            int width   = end * aminosize - xstart +  FeaturePanel.DEFAULT_X_START+aminosize ;
+            int xstart = getDrawPos(start); 
+                //
+                //start * aminosize + FeaturePanel.DEFAULT_X_START;
+            int width   = getDrawPos(end) - xstart + aminosize;
+                //end * aminosize - xstart +  FeaturePanel.DEFAULT_X_START+aminosize ;
             
             int height = drawHeight;
             g2D.fillRect(xstart,y,aminosize,height);
@@ -383,8 +392,10 @@ implements FeatureListener,SpiceFeatureListener
         int aminosize = Math.round(1*scale);
         if ( aminosize < 1 )
             aminosize = 1;
-        int xstart =  start * aminosize + FeaturePanel.DEFAULT_X_START;
-        int width   = end * aminosize - xstart +  FeaturePanel.DEFAULT_X_START+aminosize ;
+        int xstart = getDrawPos(start);  
+            //start * aminosize + FeaturePanel.DEFAULT_X_START;
+        int width   = getDrawPos(end) - xstart + aminosize;
+            //end * aminosize - xstart +  FeaturePanel.DEFAULT_X_START+aminosize ;
         
         // Helix is  always red...
         g2D.setColor(Color.red);
@@ -481,8 +492,10 @@ implements FeatureListener,SpiceFeatureListener
             //    g2D.setColor(col);
             //}
             
-            int xstart =  start * aminosize + FeaturePanel.DEFAULT_X_START;
-            int width   = end * aminosize - xstart +  FeaturePanel.DEFAULT_X_START+aminosize ;
+            int xstart = getDrawPos(start);  
+                //start * aminosize + FeaturePanel.DEFAULT_X_START;
+            int width   = getDrawPos(end) - xstart + aminosize; 
+                //end * aminosize - xstart +  FeaturePanel.DEFAULT_X_START+aminosize ;
             
             g2D.drawRect(xstart,y,width,drawHeight);
             //g2D.drawLine(xstart,y,)
@@ -539,8 +552,10 @@ implements FeatureListener,SpiceFeatureListener
                 //g2D.setColor(col);
                 //}
                 
-                int xstart =  start * aminosize + FeaturePanel.DEFAULT_X_START;
-                int width   = end * aminosize - xstart +  FeaturePanel.DEFAULT_X_START+aminosize ;
+                int xstart = getDrawPos(start); 
+                    // start * aminosize + FeaturePanel.DEFAULT_X_START;
+                int width   = getDrawPos(end) - xstart + aminosize; 
+                    // end * aminosize - xstart +  FeaturePanel.DEFAULT_X_START+aminosize ;
                 
                 int height = drawHeight ;
                 
@@ -724,8 +739,10 @@ implements FeatureListener,SpiceFeatureListener
             //    g2D.setColor(col);
             //}
             
-            int xstart =  start * aminosize + FeaturePanel.DEFAULT_X_START;
-            int width   =  end * aminosize - xstart +  FeaturePanel.DEFAULT_X_START+aminosize ;
+            int xstart =  getDrawPos(start);
+            //start * aminosize + FeaturePanel.DEFAULT_X_START;
+            int width   = getDrawPos(end) - xstart +aminosize;
+            // end * aminosize - xstart +  FeaturePanel.DEFAULT_X_START+aminosize ;
             
             int height = drawHeight ;
             
@@ -777,8 +794,10 @@ implements FeatureListener,SpiceFeatureListener
             //    g2D.setColor(col);
             //}
             
-            int xstart =  start * aminosize + FeaturePanel.DEFAULT_X_START;
-            int width   =  end * aminosize - xstart +  FeaturePanel.DEFAULT_X_START+aminosize ;
+            int xstart = getDrawPos(start);
+            // start * aminosize + FeaturePanel.DEFAULT_X_START;
+            int width   = getDrawPos(end)-xstart + aminosize;
+            //end * aminosize - xstart +  FeaturePanel.DEFAULT_X_START+aminosize ;
             
             //int height = drawHeight ;
             
