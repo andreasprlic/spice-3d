@@ -199,6 +199,12 @@ implements ActionListener
                 dastyMenu.setEnabled(false);
                 proviewMenu.setEnabled(false);
             }
+            public void noObjectFound(String accessionCode){
+                upCode = "";
+                upMenu.setEnabled(false);
+                dastyMenu.setEnabled(false);
+                proviewMenu.setEnabled(false);
+            }
             public void clearSelection() {}
             public void selectedSeqPosition(int position) { }
             public void selectedSeqRange(int start, int end) {}
@@ -215,6 +221,10 @@ implements ActionListener
             }
             public void newObjectRequested(String accessionCode) {
                 enspCode = "";
+                enspMenu.setEnabled(false);
+            }
+            public void noObjectFound(String accessionCode){
+                enspCode="";
                 enspMenu.setEnabled(false);
             }
             public void clearSelection() {}
@@ -234,6 +244,10 @@ implements ActionListener
             public void selectedChain(StructureEvent event) { }
 
             public void newObjectRequested(String accessionCode) {
+                pdbCode="";
+                pdbMenu.setEnabled(false);
+            }
+            public void noObjectFound(String accessionCode){
                 pdbCode="";
                 pdbMenu.setEnabled(false);
             }

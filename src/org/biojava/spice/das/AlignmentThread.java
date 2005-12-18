@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -34,8 +35,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.ArrayList;
+
+import org.biojava.bio.Annotation;
 import org.biojava.bio.program.das.dasalignment.Alignment;
 import org.biojava.bio.program.das.dasalignment.DASAlignmentCall;
+import org.biojava.bio.program.ssbind.AnnotationFactory;
 import org.biojava.services.das.registry.DasCoordinateSystem;
 import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.spice.manypanel.eventmodel.*;
@@ -65,9 +69,6 @@ extends Thread{
         logname = "";
         
         // if this is a PDB code, check for empty chain.      
-        
-        
-        
         
         clearAlignmentListeners();
         
@@ -103,8 +104,10 @@ extends Thread{
         }
         logger.info("requesting for query " + query);
         Alignment[] aligs = getAlignments(query);
-        if ( aligs.length == 0)
+        if ( aligs.length == 0) {
+            triggerNoAlignmentFound(query,subject);
             return;
+        }
         
         Alignment finalAlig =  aligs[0];
         
@@ -256,7 +259,7 @@ extends Thread{
         
         
         
-        logger.log(Level.SEVERE,logname +" no  alignment found!");
+        // logger.log(Level.SEVERE,logname +" no  alignment found!");
         
         
         
@@ -322,5 +325,51 @@ extends Thread{
         
     }
     
-    
+    private void triggerNoAlignmentFound(String q, String s){
+        Alignment a = new Alignment();
+        
+        String objectVersion    = "";
+        String intObjectId      = "";
+       
+        String dbSource         = "";
+        String dbVersion        = "";
+        String dbCoordSys       = "";
+        
+        HashMap object1 = new HashMap() ;
+        object1.put("dbAccessionId" ,q);
+        object1.put("objectVersion" ,objectVersion);
+        object1.put("intObjectId"   ,intObjectId);
+        ArrayList details = new ArrayList();
+        object1.put("details",details);
+        object1.put("dbVersion"     ,dbVersion) ;
+        object1.put("dbSource"      ,dbSource) ;
+        object1.put("dbCoordSys"    , dbCoordSys);
+        
+        HashMap object2 = new HashMap() ;
+        object2.put("dbAccessionId" ,s);
+        object2.put("objectVersion" ,objectVersion);
+        object2.put("intObjectId"   ,intObjectId);
+        object2.put("dbCoordSys"    , dbCoordSys);
+        
+        object2.put("details",details);
+        object2.put("dbVersion"     ,dbVersion) ;
+        object2.put("dbSource"      ,dbSource) ;
+        
+         
+        Annotation ob1 = AnnotationFactory.makeAnnotation(object1) ;
+        Annotation ob2 = AnnotationFactory.makeAnnotation(object2) ;
+        try {
+            a.addObject(ob1);
+            a.addObject(ob2);
+        } catch (Exception e) {
+            
+        }
+        
+        AlignmentEvent event = new AlignmentEvent(a,new Alignment[0]); 
+        Iterator iter = alignmentListeners.iterator();
+        while (iter.hasNext()){
+            AlignmentListener li = (AlignmentListener ) iter.next();
+            li.noAlignmentFound(event) ;
+        }
+    }
 }

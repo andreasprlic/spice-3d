@@ -753,10 +753,18 @@ SpiceFeatureListener
     public void newObjectRequested(String accessionCode) {
         //logger.info("requested new structure " + accessionCode);
        // clean the Jmol display;
+        
+        clearStructure();
+    }
+    
+    private void clearStructure(){
         structure = new StructureImpl();
         setStructure(structure);
         clearSelection();
-        
+    }
+    public void noObjectFound(String accessionCode){
+       
+       clearStructure();
     }
     
     

@@ -340,6 +340,10 @@ AlignmentListener
         return chain;
     }
     
+    public void noAlignmentFound(AlignmentEvent event){
+        progressBar.setIndeterminate(false);
+    }
+    
     /** convert the biojava alignment class into biojava feature objects */
     
     public synchronized void newAlignment(AlignmentEvent event){
@@ -649,7 +653,16 @@ AlignmentListener
         chain = new ChainImpl();
         
     }
-    public void clearAlignment(){}
+    
+    public void noObjectFound(String accessionCode){
+        clearAlignment();
+    }
+    
+    public void clearAlignment(){
+        chain = new ChainImpl();
+        progressBar.setIndeterminate(false);
+    
+    }
     public void clearSelection() { }
     
     public void newSequence(SequenceEvent e) {

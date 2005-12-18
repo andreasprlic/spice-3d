@@ -111,7 +111,7 @@ extends FeaturePanel{
     }*/
     
     public void setChain(Chain chn){
-        logger.info("StructureFeaturePanel setChain " + chn.getName());
+        //logger.info("StructureFeaturePanel setChain " + chn.getName());
         super.setChain(chn);
         chain = chn;
         structureFeature = new FeatureImpl();

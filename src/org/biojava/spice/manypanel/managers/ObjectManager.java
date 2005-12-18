@@ -41,20 +41,11 @@ public interface ObjectManager {
          */
         public void setDasSources(DasSource[] dasSources);
         
-        /** list of available Reference DAS servers 
+        /** get the list of available Reference DAS servers 
          * 
-         * @return
+         * @return 
          */
-        
         
         public DrawableDasSource[] getDasSources();
-            
-
-        /** do a DAS request and retreive the reference object 
-         * 
-         * @param accessionCode
-         * @return
-         */
-        //public Object getReferenceObject(String accessionCode);
-        
+               
 }

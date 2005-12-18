@@ -176,7 +176,7 @@ implements FeatureListener,SpiceFeatureListener
         }
         
         Graphics2D g2D = (Graphics2D) g;
-	g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+        g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
         // draw the name of the das source
         g2D.setFont(headFont);
         g2D.setColor(Color.black);

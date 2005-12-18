@@ -163,7 +163,9 @@ implements ObjectManager ,SequenceListener{
         
     }
 
-    
+    public void noObjectFound(String accessionCode){
+        
+    }
     /** triggers DAS requests for each of the DAS sources
      * 
      *      * @param accessionCode

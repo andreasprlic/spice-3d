@@ -184,12 +184,15 @@ SequenceListener
     public void selectedSeqPosition(int s){}
 
     public void newSequence(SequenceEvent e) {
-        // TODO Auto-generated method stub
+
         
     }
 
     public void newObjectRequested(String accessionCode) {
-        // TODO Auto-generated method stub
+   
+        
+    }
+    public void noObjectFound(String accessionCode) {
         
     }
     

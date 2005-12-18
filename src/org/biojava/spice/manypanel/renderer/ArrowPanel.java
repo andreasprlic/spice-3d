@@ -124,12 +124,12 @@ extends JPanel
     }
     
     public void setLowerAlignmentManager(AlignmentManager ma){        
-        System.out.println(ma.getCoordSys1() + " " + ma.getCoordSys2());
+        //System.out.println(ma.getCoordSys1() + " " + ma.getCoordSys2());
         lowerAlignmentManager = ma;
         lowerLabel.setEnabled(true);
         vBox.add(lowerLabel);
         this.revalidate();
-        System.out.println(vBox.getSize());
+        //System.out.println(vBox.getSize());
     }
     
         

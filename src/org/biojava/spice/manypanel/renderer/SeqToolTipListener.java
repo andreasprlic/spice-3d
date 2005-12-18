@@ -124,11 +124,12 @@ implements SequenceListener, SpiceFeatureListener {
         
     }
 
-    public void newObjectRequested(String accessionCode) {
-        // TODO Auto-generated method stub
-        
+    public void newObjectRequested(String accessionCode) {}
+    public void noObjectFound(String accessionCode){
+        sequence = "";
+        length = 0;
     }
-
+    
     public void featureSelected(SpiceFeatureEvent e) {
         //logger.info("toolTipper feature selected ");
         parent.setToolTipText(e.getFeature().toString());
@@ -138,7 +139,6 @@ implements SequenceListener, SpiceFeatureListener {
     
     
     public void clearSelection() {
-        // TODO Auto-generated method stub
         parent.setToolTipText("");
     }
 

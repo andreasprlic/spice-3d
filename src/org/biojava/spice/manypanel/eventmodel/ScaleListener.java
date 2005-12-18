@@ -17,29 +17,12 @@
  *
  *      http://www.biojava.org/
  * 
- * Created on Nov 1, 2005
+ * Created on Dec 18, 2005
  *
  */
 package org.biojava.spice.manypanel.eventmodel;
 
-/** an interface for the listeners of new PDB code requested / new Uniprot code requested
- * 
- * @author Andreas Prlic
- *
- */
-public interface ObjectListener {
+public interface ScaleListener {
     
-    /** a new object has been requested 
-     * 
-     * @param accessionCode
-     */
-    public void newObjectRequested(String accessionCode);
-    
-    /** no object with that accessionCode has been found
-     * 
-     * @param accessionCode
-     */
-    public void noObjectFound(String accessionCode);
-    
-   
+       public void scaleChanged(ScaleEvent event);
 }

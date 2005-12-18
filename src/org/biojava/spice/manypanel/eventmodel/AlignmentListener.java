@@ -25,6 +25,6 @@ package org.biojava.spice.manypanel.eventmodel;
 public interface AlignmentListener {
 
     public void newAlignment(AlignmentEvent e);
-    
+    public void noAlignmentFound(AlignmentEvent e);
     public void clearAlignment();
 }

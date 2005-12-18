@@ -172,6 +172,12 @@ StructureListener {
         }
         
     }
+    public void noObjectFound(String accessionCode){
+        DefaultListModel model = (DefaultListModel) ent_list.getModel() ;
+        synchronized (model) {
+            model.clear() ;
+        }
+    }
     
     
     

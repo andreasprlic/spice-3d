@@ -22,8 +22,9 @@
  */
 package org.biojava.spice.manypanel.renderer;
 
-import java.awt.Color;
+
 import java.awt.Dimension;
+import java.awt.event.AdjustmentListener;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -63,6 +64,9 @@ public abstract class AbstractChainRenderer
     static Logger logger = Logger.getLogger("org.biojava.spice");
     
     List dasSourcePanels;
+    List scaleChangeListeners;
+   
+    
     SeqToolTipListener toolTipper;
     ChainRendererMouseListener mouseListener;
     
@@ -72,6 +76,7 @@ public abstract class AbstractChainRenderer
     StatusPanel statusPanel;
     JLayeredPane layeredPane;
     JScrollPane scrollPane;
+    AdjustmentListener adjustmentListener;
     
     public AbstractChainRenderer() {
         super();        
@@ -86,7 +91,7 @@ public abstract class AbstractChainRenderer
         layeredPane.setBorder(BorderFactory.createEmptyBorder());
         layeredPane.setDoubleBuffered(true);
         layeredPane.setOpaque(true);
-        layeredPane.setBackground(Color.WHITE);
+        layeredPane.setBackground(FeaturePanel.BACKGROUND_COLOR);
         
         scrollPane = new JScrollPane(layeredPane);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
@@ -95,6 +100,9 @@ public abstract class AbstractChainRenderer
         
         
         dasSourcePanels = new ArrayList();
+        scaleChangeListeners = new ArrayList();
+        
+        
         mouseListener = new ChainRendererMouseListener(this);
         toolTipper = new SeqToolTipListener(layeredPane);
         mouseListener.addSequenceListener(toolTipper);
@@ -120,9 +128,17 @@ public abstract class AbstractChainRenderer
         this.add(statusPanel);
         this.add(scrollPane);
     }
+    
+    
+    /** add an adjustmentListener to the horizontal scrollbar
+     * 
+     * @param li
+     */
+    public void addAdjustmentListener(AdjustmentListener li){
+        scrollPane.getHorizontalScrollBar().addAdjustmentListener(li);
+    }
 
     protected void initPanels(){
-        
         
         layeredPane.addMouseMotionListener(mouseListener);
         layeredPane.addMouseListener(mouseListener);
@@ -195,6 +211,10 @@ public abstract class AbstractChainRenderer
         dasSourcePanels.clear();
     }
     
+    public JScrollPane getScrollPane(){
+        return scrollPane;
+    }
+    
     public List getDasSourcePanels(){
         return dasSourcePanels;
     }
@@ -223,6 +243,9 @@ public abstract class AbstractChainRenderer
         mouseListener.addSequenceListener(li);
     }
    
+    public void addScaleChangeListener(ScaleListener li){
+        scaleChangeListeners.add(li);
+    }
   
     /** calculate the float that is used for display.
      * 1 * scale = size of 1 amino acid (in pixel).
@@ -292,6 +315,14 @@ public abstract class AbstractChainRenderer
             DasSourcePanel dsp = (DasSourcePanel)iter.next();
             dsp.setScale(scale);
         }
+        
+        ScaleEvent event = new ScaleEvent(scale);
+        Iterator iter2 = scaleChangeListeners.iterator();
+        while (iter2.hasNext()){
+            ScaleListener li = (ScaleListener) iter2.next();
+            li.scaleChanged(event);
+        }
+        
         updatePanelPositions();        
     }
 
@@ -498,14 +529,6 @@ public abstract class AbstractChainRenderer
         }
         
     }
-
-    
- 
-    
-    
-    
-
-   
-  
     
 }
+

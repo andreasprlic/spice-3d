@@ -52,8 +52,7 @@ SpiceFeatureListener
     int chainLength;
     
     boolean selectionLocked;
-    boolean dragging;
-    int draggingStart;
+   
     
     List sequenceListeners;
     
@@ -66,8 +65,7 @@ SpiceFeatureListener
         super(); 
         this.setOpaque(false);
         setDoubleBuffered(true);
-        dragging = false;
-        draggingStart = -1;        
+             
         selectionLocked = false;
     }
     
@@ -124,6 +122,10 @@ SpiceFeatureListener
         
     }
    
+    public void noObjectFound(String accessionCode){
+        chain = new ChainImpl();
+        chainLength = 0;
+    }
    
     private void setSelectionStart(int start){
         if ( start < 0 )
@@ -212,6 +214,7 @@ SpiceFeatureListener
         if (  ( selectionStart < 0) && (selectionEnd < 0)){
             return;
         }
+        
         int tmpSelectionStart = selectionStart;
         if (( selectionStart < 0 ) && ( selectionEnd >=0)) {
             tmpSelectionStart = 0;
@@ -226,8 +229,8 @@ SpiceFeatureListener
         
         int startX = Math.round(tmpSelectionStart *scale) + FeaturePanel.DEFAULT_X_START;
         int endX   = Math.round((selectionEnd-tmpSelectionStart+1)*scale) ;
-        if (endX <1)
-            endX = 1;
+        if (endX <0)
+            endX = 0;
         //logger.info("selection " + selectionStart + " " + selectionEnd + 
         //        " startX " + startX + " endX " + endX);
         g2D.fillRect(startX,0,endX,getHeight());

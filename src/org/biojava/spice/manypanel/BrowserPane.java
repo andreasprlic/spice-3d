@@ -29,9 +29,10 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
-//import javax.swing.JScrollPane;
+import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JSplitPane;
+
 import java.awt.Color;
 import java.util.*;
 import java.util.logging.Logger;
@@ -46,6 +47,7 @@ import org.biojava.services.das.registry.DasSource;
 
 //import javax.swing.BoxLayout;
 import java.awt.Dimension;
+
 //import java.awt.event.MouseListener;
 
 import javax.swing.event.ChangeEvent;
@@ -77,7 +79,7 @@ ChangeListener
     public static String DEFAULT_PDBCOORDSYS     = "PDBresnum,Protein Structure";
     public static String DEFAULT_UNIPROTCOORDSYS = "UniProt,Protein Sequence";
     public static String DEFAULT_ENSPCOORDSYS    = "Ensembl,Protein Sequence";
- 
+    
     List allsources ; // a list of DasSource[] 
     
     List structureListeners;
@@ -102,7 +104,7 @@ ChangeListener
     public static int DEFAULT_PANE_HEIGHT = 600;
     
     static Color BG_COLOR = Color.WHITE;
-
+    
     public BrowserPane(String PDBCOORDSYS, String UNIPROTCOORDSYS, String ENSPCOORDSYS) {
         super();
         JPanel contentPanel = new JPanel();
@@ -111,7 +113,7 @@ ChangeListener
         
         //JScrollPane scroll = new JScrollPane(contentPanel);
         //Dimension d = new Dimension(DEFAULT_PANE_WIDTH,DEFAULT_PANE_HEIGHT);
-      
+        
         //contentPanel.setPreferredSize(d);
         //contentPanel.setSize(d);
         
@@ -127,7 +129,7 @@ ChangeListener
         enspListeners      = new ArrayList();
         allsources         = new ArrayList();
         
-       
+        
         this.setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
         
         strucManager = new StructureManager();
@@ -135,8 +137,8 @@ ChangeListener
         
         structureRenderer = new StructureRenderer(); 
         structureRenderer.getStatusPanel().setName("PDB");
-	structureRenderer.setBackground(BG_COLOR);
-
+        structureRenderer.setBackground(BG_COLOR);
+        
         ComponentResizedChainListener strucComponentWidthSetter = new ComponentResizedChainListener(structureRenderer);
         this.addComponentListener(strucComponentWidthSetter);
         
@@ -145,11 +147,11 @@ ChangeListener
         
         
         strucManager.addStructureRenderer(structureRenderer);
-       
+        
         DasCoordinateSystem dcs = DasCoordinateSystem.fromString(PDBCOORDSYS);
         strucManager.setCoordinateSystem(dcs);
         
-                        
+        
         pdbFeatureManager = new FeatureManager();
         pdbFeatureManager.setCoordinateSystem(dcs);
         pdbFeatureManager.addDasSourceListener(structureRenderer);
@@ -168,9 +170,9 @@ ChangeListener
         //strucManager.setFeatureManager(fm);
         strucManager.addSequenceListener(pdbFeatureManager);
         //structureSequencePane.set
-      
         
-
+        
+        
         ///////////////
         // now add the UniProt
         //////////////
@@ -178,146 +180,191 @@ ChangeListener
         seqManager = new SequenceManager();
         addUniProtListener(seqManager);
         
-         seqRenderer = new SequenceRenderer();
-         seqRenderer.getStatusPanel().setName("UniProt");
-	 seqRenderer.setBackground(BG_COLOR);
-
-         ComponentResizedChainListener seqComponentWidthSetter = new ComponentResizedChainListener(seqRenderer);
-         this.addComponentListener(seqComponentWidthSetter);
-         
-         
-         //JScrollPane seqScroller = new JScrollPane(seqRenderer);
-         //seqScroller.getVerticalScrollBar().setUnitIncrement(FeaturePanel.DEFAULT_Y_STEP);
-         //seqRenderer.setLayout(new BoxLayout(seqRenderer,BoxLayout.Y_AXIS));
-         //box.add(seqScroller);  
-         
-         DasCoordinateSystem seqdcs = DasCoordinateSystem.fromString(UNIPROTCOORDSYS);
-         seqManager.setCoordinateSystem(seqdcs);
-         
+        seqRenderer = new SequenceRenderer();
+        seqRenderer.getStatusPanel().setName("UniProt");
+        seqRenderer.setBackground(BG_COLOR);
         
-         seqManager.addSequenceRenderer(seqRenderer);
-                 
-         upFeatureManager = new FeatureManager();
-         upFeatureManager.setCoordinateSystem(seqdcs);
-         upFeatureManager.addDasSourceListener(seqRenderer);
-         addUniProtListener(upFeatureManager);
-         FeatureRenderer seqFeatureRenderer = new FeatureRenderer();
-         upFeatureManager.addFeatureRenderer(seqFeatureRenderer);
-         
-         
-       
-         
-         //seqManager.setFeatureManager(seqfm);
-         seqManager.addSequenceListener(upFeatureManager);
-         
-         
-         ///////////////
-         // now add the Alignment PDB to UniProt
-         //////////////
-         
-         aligManager = new AlignmentManager("PDB_UP",dcs,seqdcs);
-         
-         SequenceListener pdbList = aligManager.getSeq1Listener();
-         SequenceListener upList = aligManager.getSeq2Listener();
-         
-         strucManager.addSequenceListener(pdbList);
-         seqManager.addSequenceListener(upList);
-         
-         structureRenderer.addSequenceListener(pdbList);
-         seqRenderer.addSequenceListener(upList);
-                 
-         aligManager.addObject1Listener(strucManager);
-         aligManager.addObject2Listener(seqManager);
-         
-         aligManager.addSequence1Listener(structureRenderer.getCursorPanel());         
-         aligManager.addSequence2Listener(seqRenderer.getCursorPanel());
-         
-         ///////////////
-         // now add the ENSP
-         //////////////
-         
-
-         enspManager = new SequenceManager();
-         addEnspListener(enspManager);
-         
-         enspRenderer = new SequenceRenderer();
-         enspRenderer.getStatusPanel().setName("ENSP");
-         enspRenderer.setBackground(BG_COLOR);
-         
-         ComponentResizedChainListener enspComponentWidthSetter = new ComponentResizedChainListener(enspRenderer);
-         this.addComponentListener(enspComponentWidthSetter);
-          
-               
-         DasCoordinateSystem enspdcs = DasCoordinateSystem.fromString(ENSPCOORDSYS);
-         enspManager.setCoordinateSystem(enspdcs);
-          
-         
-          enspManager.addSequenceRenderer(enspRenderer);
-                  
-          enspFeatureManager = new FeatureManager();
-          enspFeatureManager.setCoordinateSystem(enspdcs);
-          enspFeatureManager.addDasSourceListener(enspRenderer);
-          addEnspListener(enspFeatureManager);
-          FeatureRenderer enspFeatureRenderer = new FeatureRenderer();
-          enspFeatureManager.addFeatureRenderer(enspFeatureRenderer);
-          
-          
-          DasSource[]enspfeatservs = getServers("features",enspdcs);
-         
-          
-          enspFeatureManager.setDasSources(enspfeatservs);
-          
-          //enspManager.setFeatureManager(enspfm);
-          enspManager.addSequenceListener(enspFeatureManager);
-         
-         
-          
-          ///////////////
-          // now add the Alignment ENSP to UniProt
-          //////////////
-          
-          ensaligManager = new AlignmentManager("UP_ENSP",seqdcs,enspdcs);
-          
-          SequenceListener upenspList = ensaligManager.getSeq1Listener();
-          SequenceListener enspList   = ensaligManager.getSeq2Listener();
-          
-          seqRenderer.addSequenceListener(upenspList);
-          enspRenderer.addSequenceListener(enspList);
-          
-          //strucManager.addSequenceListener(pdbList);
-          seqManager.addSequenceListener(upenspList);
-          enspManager.addSequenceListener(enspList);
-          
-         
-          
-          ensaligManager.addObject1Listener(seqManager);
-          ensaligManager.addObject2Listener(enspManager);
-          
-          ensaligManager.addSequence1Listener(seqRenderer.getCursorPanel());
-          ensaligManager.addSequence2Listener(enspRenderer.getCursorPanel());
-          ensaligManager.addSequence1Listener(upList);
-          
-          aligManager.addSequence2Listener(upenspList);
+        ComponentResizedChainListener seqComponentWidthSetter = new ComponentResizedChainListener(seqRenderer);
+        this.addComponentListener(seqComponentWidthSetter);
+        
+        
+        //JScrollPane seqScroller = new JScrollPane(seqRenderer);
+        //seqScroller.getVerticalScrollBar().setUnitIncrement(FeaturePanel.DEFAULT_Y_STEP);
+        //seqRenderer.setLayout(new BoxLayout(seqRenderer,BoxLayout.Y_AXIS));
+        //box.add(seqScroller);  
+        
+        DasCoordinateSystem seqdcs = DasCoordinateSystem.fromString(UNIPROTCOORDSYS);
+        seqManager.setCoordinateSystem(seqdcs);
+        
+        
+        seqManager.addSequenceRenderer(seqRenderer);
+        
+        upFeatureManager = new FeatureManager();
+        upFeatureManager.setCoordinateSystem(seqdcs);
+        upFeatureManager.addDasSourceListener(seqRenderer);
+        addUniProtListener(upFeatureManager);
+        FeatureRenderer seqFeatureRenderer = new FeatureRenderer();
+        upFeatureManager.addFeatureRenderer(seqFeatureRenderer);
+        
+        
+        
+        
+        //seqManager.setFeatureManager(seqfm);
+        seqManager.addSequenceListener(upFeatureManager);
+        
+        
+        ///////////////
+        // now add the Alignment PDB to UniProt
+        //////////////
+        
+        aligManager = new AlignmentManager("PDB_UP",dcs,seqdcs);
+        
+        SequenceListener pdbList = aligManager.getSeq1Listener();
+        SequenceListener upList = aligManager.getSeq2Listener();
+        
+        strucManager.addSequenceListener(pdbList);
+        seqManager.addSequenceListener(upList);
+        
+        structureRenderer.addSequenceListener(pdbList);
+        seqRenderer.addSequenceListener(upList);
+        
+        aligManager.addObject1Listener(strucManager);
+        aligManager.addObject2Listener(seqManager);
+        
+        aligManager.addSequence1Listener(structureRenderer.getCursorPanel());         
+        aligManager.addSequence2Listener(seqRenderer.getCursorPanel());
+        
+        AlignmentRenderer seqAligRenderer = new AlignmentRenderer();
+        aligManager.addAlignmentRenderer(seqAligRenderer);
+        
+        structureRenderer.addScaleChangeListener(seqAligRenderer.getSeq1ScaleListener());
+        seqRenderer.addScaleChangeListener(seqAligRenderer.getSeq2ScaleListener());
+        
+        structureRenderer.addSequenceListener(seqAligRenderer.getSequenceListener1());
+        seqRenderer.addSequenceListener(seqAligRenderer.getSequenceListener2());
+        aligManager.addSequence1Listener(seqAligRenderer.getSequenceListener1());
+        aligManager.addSequence2Listener(seqAligRenderer.getSequenceListener2());
+        
+        structureRenderer.addAdjustmentListener(seqAligRenderer.getAdjust1());
+        seqRenderer.addAdjustmentListener(seqAligRenderer.getAdjust2());
+        
+        
+        
+        
+        ///////////////
+        // now add the ENSP
+        //////////////
+        
+        
+        enspManager = new SequenceManager();
+        addEnspListener(enspManager);
+        
+        enspRenderer = new SequenceRenderer();
+        enspRenderer.getStatusPanel().setName("ENSP");
+        enspRenderer.setBackground(BG_COLOR);
+        
+        ComponentResizedChainListener enspComponentWidthSetter = new ComponentResizedChainListener(enspRenderer);
+        this.addComponentListener(enspComponentWidthSetter);
+        
+        
+        DasCoordinateSystem enspdcs = DasCoordinateSystem.fromString(ENSPCOORDSYS);
+        enspManager.setCoordinateSystem(enspdcs);
+        
+        
+        enspManager.addSequenceRenderer(enspRenderer);
+        
+        enspFeatureManager = new FeatureManager();
+        enspFeatureManager.setCoordinateSystem(enspdcs);
+        enspFeatureManager.addDasSourceListener(enspRenderer);
+        addEnspListener(enspFeatureManager);
+        FeatureRenderer enspFeatureRenderer = new FeatureRenderer();
+        enspFeatureManager.addFeatureRenderer(enspFeatureRenderer);
+        
+        
+        DasSource[]enspfeatservs = getServers("features",enspdcs);
+        
+        
+        enspFeatureManager.setDasSources(enspfeatservs);
+        
+        //enspManager.setFeatureManager(enspfm);
+        enspManager.addSequenceListener(enspFeatureManager);
+        
+        
+        
+        ///////////////
+        // now add the Alignment ENSP to UniProt
+        //////////////
+        
+        ensaligManager = new AlignmentManager("UP_ENSP",seqdcs,enspdcs);
+        
+        SequenceListener upenspList = ensaligManager.getSeq1Listener();
+        SequenceListener enspList   = ensaligManager.getSeq2Listener();
+        
+        seqRenderer.addSequenceListener(upenspList);
+        enspRenderer.addSequenceListener(enspList);
+        
+        //strucManager.addSequenceListener(pdbList);
+        seqManager.addSequenceListener(upenspList);
+        enspManager.addSequenceListener(enspList);
+        
+        
+        
+        ensaligManager.addObject1Listener(seqManager);
+        ensaligManager.addObject2Listener(enspManager);
+        
+        ensaligManager.addSequence1Listener(seqRenderer.getCursorPanel());
+        ensaligManager.addSequence2Listener(enspRenderer.getCursorPanel());
+        ensaligManager.addSequence1Listener(upList);
+        
+        aligManager.addSequence2Listener(upenspList);
+        
+        
+        AlignmentRenderer enspAligRenderer = new AlignmentRenderer();
+        ensaligManager.addAlignmentRenderer(enspAligRenderer);
+        
+        seqRenderer.addScaleChangeListener(enspAligRenderer.getSeq1ScaleListener());
+        enspRenderer.addScaleChangeListener(enspAligRenderer.getSeq2ScaleListener());
+        
+        seqRenderer.addSequenceListener(enspAligRenderer.getSequenceListener1());
+        enspRenderer.addSequenceListener(enspAligRenderer.getSequenceListener2());
+        aligManager.addSequence2Listener(enspAligRenderer.getSequenceListener1());
+        ensaligManager.addSequence1Listener(enspAligRenderer.getSequenceListener1());
+        ensaligManager.addSequence2Listener(enspAligRenderer.getSequenceListener2());
+        ensaligManager.addSequence1Listener(seqAligRenderer.getSequenceListener2());
         //browserPane.addPane(structureSequencePane);
         
+        seqRenderer.addAdjustmentListener(enspAligRenderer.getAdjust1());
+        enspRenderer.addAdjustmentListener(enspAligRenderer.getAdjust2());
         
-          // reset all the DAS sources...
-          clearDasSources();
-          
-          
+        // reset all the DAS sources...
+        clearDasSources();
+        
+        
         //
         // build up the display from the components:
         //
-          
-          
-        JSplitPane split1 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,structureRenderer,seqRenderer);
+        JPanel p1 = new JPanel();
+        p1.setLayout(new BoxLayout(p1,BoxLayout.Y_AXIS));
+        p1.add(structureRenderer);
+        p1.add(seqAligRenderer);
+        
+        
+        JSplitPane split1 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,p1,seqRenderer);
         split1.setOneTouchExpandable(true);
         // uniprot panel gets a little more space, because so many more DAS sources...
         split1.setResizeWeight(0.4);
         
         split1.setBorder(BorderFactory.createEmptyBorder());
         
-        JSplitPane split2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,split1,enspRenderer);
+       
+        
+        
+        JPanel p2 = new JPanel();
+        p2.setLayout(new BoxLayout(p2,BoxLayout.Y_AXIS));
+        p2.add(enspAligRenderer);
+        p2.add(enspRenderer);
+        
+        JSplitPane split2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,split1,p2);
         split2.setOneTouchExpandable(true);
         // uniprot panel gets more space
         split2.setResizeWeight(0.7);
@@ -326,7 +373,7 @@ ChangeListener
         //Dimension d = new Dimension(DEFAULT_PANE_WIDTH,DEFAULT_PANE_HEIGHT);
         //split2.setPreferredSize(d);
         contentPanel.add(split2);
-         
+        
         
         /// and now ...
         
@@ -343,8 +390,8 @@ ChangeListener
         residueSizeSlider.setPaintLabels(false);
         residueSizeSlider.addChangeListener(this);
         residueSizeSlider.setPreferredSize(new Dimension(100,15));
-
-
+        
+        
         Box hBox = Box.createHorizontalBox();
         hBox.setBackground(BG_COLOR);
         hBox.add(Box.createHorizontalGlue());
@@ -359,14 +406,14 @@ ChangeListener
         
         
     }
-
+    
     /** add the managers to the ArrowPanel of the statuspanels...
      * 
      *
      */
     private void registerManagers(){
-            
-   
+        
+        
         ArrowPanel a2 = seqRenderer.getArrowPanel();
         a2.setUpperAlignmentManager(aligManager);
         a2.setLowerAlignmentManager(aligManager);
@@ -380,9 +427,9 @@ ChangeListener
         a3.setLowerAlignmentManager(ensaligManager);
         a3.setUpperObjectListener(seqManager);
         a3.setLowerObjectListener(enspManager);
-       
         
-   
+        
+        
         
     }
     
@@ -407,22 +454,22 @@ ChangeListener
         }
     }
     
-       
-
     
-
+    
+    
+    
     public void disableDasSource(DasSourceEvent dsEvent) {
-      
+        
         
     }
-
+    
     public void enableDasSource(DasSourceEvent dsEvent) {
         
         
     }
-
-    public void newDasSource(DasSourceEvent dsEvent) {
     
+    public void newDasSource(DasSourceEvent dsEvent) {
+        
         //DrawableDasSource dds = dsEvent.getDasSource();
         // filer ds
         //SpiceDasSource ds = dds.getDasSource();
@@ -449,7 +496,7 @@ ChangeListener
         }
         
         // this are the coord.sys.
-       
+        
         DasCoordinateSystem dcs     = strucManager.getCoordinateSystem();
         DasCoordinateSystem seqdcs  = seqManager.getCoordinateSystem();
         DasCoordinateSystem enspdcs = enspManager.getCoordinateSystem();
@@ -458,7 +505,7 @@ ChangeListener
         // set the reference servers 
         DasSource[]strucservs = getServers("structure",dcs);
         strucManager.setDasSources(strucservs);
-                        
+        
         DasSource[]seqservs = getServers("sequence",seqdcs);        
         seqManager.setDasSources(seqservs);
         
@@ -486,7 +533,7 @@ ChangeListener
         ensaligManager.setAlignmentServers(enspupaligs);
         
     }
-
+    
     
     public void clearDasSources() {
         allsources = new ArrayList();
@@ -502,7 +549,7 @@ ChangeListener
     
     
     public void selectedDasSource(DasSourceEvent ds) {
-       
+        
         
     }
     
@@ -550,9 +597,9 @@ ChangeListener
     }
     
     public void addDasSourceListener(DasSourceListener li){
-         pdbFeatureManager.addDasSourceListener(li);
-         upFeatureManager.addDasSourceListener(li);
-         enspFeatureManager.addDasSourceListener(li);
+        pdbFeatureManager.addDasSourceListener(li);
+        upFeatureManager.addDasSourceListener(li);
+        enspFeatureManager.addDasSourceListener(li);
     }
     
     
@@ -561,16 +608,16 @@ ChangeListener
     public void triggerLoadStructure(String pdbcode){
         
         clearDisplay();
-
+        
         aligManager.clearAlignment();
         ensaligManager.clearAlignment();
         
         
-            Iterator iter = structureListeners.iterator();
-            while (iter.hasNext()){
-                ObjectListener li = (ObjectListener) iter.next();
-                li.newObjectRequested(pdbcode);
-            }
+        Iterator iter = structureListeners.iterator();
+        while (iter.hasNext()){
+            ObjectListener li = (ObjectListener) iter.next();
+            li.newObjectRequested(pdbcode);
+        }
     }
     
     public void triggerLoadUniProt(String accessionCode){
@@ -597,7 +644,7 @@ ChangeListener
     
     
     public void clearDisplay(){
-
+        
         aligManager.clearAlignment();
         ensaligManager.clearAlignment();
         
@@ -606,11 +653,11 @@ ChangeListener
         enspRenderer.clearDisplay();
         
     }
-
-   public StructureListener getStructureListener(){
-       return strucManager;
-       
-   }
+    
+    public StructureListener getStructureListener(){
+        return strucManager;
+        
+    }
     
     
     /** test if a server is a UniProt vs PDBresnum alignment server */
@@ -623,19 +670,19 @@ ChangeListener
         for ( int i = 0; i< sources.size();i++){
             
             if ( ! hasCapability("alignment", (DasSource)sources.get(i)))
-                    continue;
+                continue;
             SpiceDasSource source = (SpiceDasSource)sources.get(i);
             
             boolean uniprotflag = false ;
             boolean pdbflag     = false ;
-        
+            
             pdbflag     =  hasCoordSys(cs1,source) ;
             uniprotflag =  hasCoordSys(cs2,source)   ;
             //System.out.println(pdbflag + " " + uniprotflag);
             if (( uniprotflag == true) && ( pdbflag == true)) {
                 aligservers.add(source);
             }
-        
+            
         }
         
         return (SpiceDasSource[]) aligservers.toArray(new SpiceDasSource[aligservers.size()]);
@@ -691,34 +738,36 @@ ChangeListener
         for ( int i = 0 ; i < allsources.size() ; i++ ) {
             DasSource ds = (DasSource) allsources.get(i);
             if ( hasCapability(capability,ds)){
-          
-            
+                
+                
                 retservers.add(ds);
-                  
-                    
+                
+                
             }
         }
         
         
         return (DasSource[])retservers.toArray(new DasSource[retservers.size()]) ;
     }
-
+    
     public void loadingFinished(DasSourceEvent ds) {
-       logger.info("loading finished");
+        logger.info("loading finished");
         
     }
-
+    
     public void loadingStarted(DasSourceEvent ds) {
         // TODO Auto-generated method stub
         
     }
     
     /*
-    public void paintComponent(Graphics g){
-        super.paintComponent(g);
-        
-        g.drawString("browserPane",10,10);
-        
-    }*/
+     public void paintComponent(Graphics g){
+     super.paintComponent(g);
+     
+     g.drawString("browserPane",10,10);
+     
+     }*/
     
 }
+
+

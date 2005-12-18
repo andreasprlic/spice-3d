@@ -41,7 +41,7 @@ extends AbstractChainRenderer
     public SequenceRenderer() {
         super();
         
-        logger.info("init sequenceRenderer");
+        //logger.info("init sequenceRenderer");
         
         sequence = new DrawableSequence("",new ChainImpl());
         featurePanel = new FeaturePanel();
@@ -53,7 +53,7 @@ extends AbstractChainRenderer
 
     public void setDrawableSequence(DrawableSequence sequence) {
         statusPanel.setLoading(false);
-        logger.info("setting drawable sequence ");
+        //logger.info("setting drawable sequence ");
         this.sequence=sequence;
         statusPanel.setAccessionCode(sequence.getAccessionCode());
         featurePanel.setChain(sequence.getSequence());

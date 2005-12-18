@@ -64,7 +64,7 @@ extends JPanel{
     public static final Color  SEQUENCE_COLOR           = Color.LIGHT_GRAY;
     public static final Color  SCALE_COLOR              = Color.black;
     public static final Color  TEXT_SCALE_COLOR         = Color.GRAY;
-    
+    public static final Color  BACKGROUND_COLOR         = Color.white;
    
     
     Character[] seqArr;
@@ -83,7 +83,7 @@ extends JPanel{
     
     public FeaturePanel() {
         super();
-        this.setBackground(Color.white);
+        this.setBackground(BACKGROUND_COLOR);
         chain = new ChainImpl();
         setDoubleBuffered(true);
         //features = getRandomFeatures();

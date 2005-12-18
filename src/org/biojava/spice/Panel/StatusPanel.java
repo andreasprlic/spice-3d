@@ -25,6 +25,8 @@ package org.biojava.spice.Panel;
 
 import org.biojava.bio.structure.AminoAcid;
 import org.biojava.bio.structure.Chain;
+import org.biojava.bio.structure.ChainImpl;
+import org.biojava.bio.structure.StructureImpl;
 //import org.biojava.bio.structure.ChainImpl;
 import org.biojava.bio.structure.Group;
 import org.biojava.bio.structure.Structure;
@@ -184,12 +186,16 @@ StructureListener
         
         hBox.add(seq_pos);
         //vBox.add(seq_pos);
+        resetStructure();
         
         this.add(hBox);	
         
     }
     
-    
+    private void resetStructure(){
+        structure = new StructureImpl();
+        chain = new ChainImpl();
+    }
     
     
     public void newStructure(StructureEvent event) {
@@ -214,6 +220,9 @@ StructureListener
        // setLoading(true);
     }
 
+    public void noObjectFound(String accessionCode){
+        resetStructure();
+    }
 
 
 

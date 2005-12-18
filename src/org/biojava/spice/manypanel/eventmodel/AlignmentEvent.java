@@ -28,6 +28,7 @@ public class AlignmentEvent {
 
     Alignment alignment ;
     Alignment[] allAlignments;
+    
     public AlignmentEvent(Alignment ali,Alignment[] allAlignments) {
         super();
         

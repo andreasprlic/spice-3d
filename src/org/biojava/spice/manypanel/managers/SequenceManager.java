@@ -201,6 +201,20 @@ extends AbstractChainManager
         
         
     }
+    
+    public void noObjectFound(String accessionCode){
+        // clear the display...
+        
+        DrawableSequence ds = fromString("","");
+        Iterator iter = seqRenderers.iterator();
+        
+        while (iter.hasNext()){
+            SequenceRenderer renderer = (SequenceRenderer)iter.next();
+            
+            renderer.setDrawableSequence(ds);          
+            renderer.clearDisplay();
+        }
+    }
 
 
     public void newSequence(SequenceEvent e) {
