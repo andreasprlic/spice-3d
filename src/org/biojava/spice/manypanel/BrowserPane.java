@@ -103,25 +103,14 @@ ChangeListener
     public static int DEFAULT_PANE_HEIGHT = 600;
     
     static Color BG_COLOR = Color.WHITE;
+    JPanel contentPanel;
     
     public BrowserPane(String PDBCOORDSYS, String UNIPROTCOORDSYS, String ENSPCOORDSYS) {
         super();
-        JPanel contentPanel = new JPanel();
+        contentPanel = new JPanel();
         
         contentPanel.setLayout(new BoxLayout(contentPanel,BoxLayout.X_AXIS));
         
-        //JScrollPane scroll = new JScrollPane(contentPanel);
-        //Dimension d = new Dimension(DEFAULT_PANE_WIDTH,DEFAULT_PANE_HEIGHT);
-        
-        //contentPanel.setPreferredSize(d);
-        //contentPanel.setSize(d);
-        
-        //scroll.setPreferredSize(d);
-        //scroll.setSize(d);
-        
-        //this.add(scroll);
-        
-        this.setOpaque(true);
         
         structureListeners = new ArrayList();
         uniProtListeners   = new ArrayList();
@@ -129,7 +118,7 @@ ChangeListener
         allsources         = new ArrayList();
         
         
-        this.setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+        
         
         strucManager = new StructureManager();
         addStructureListener(strucManager);
@@ -139,12 +128,9 @@ ChangeListener
         structureRenderer.setBackground(BG_COLOR);
         
         ComponentResizedChainListener strucComponentWidthSetter = new ComponentResizedChainListener(structureRenderer);
-        this.addComponentListener(strucComponentWidthSetter);
+        contentPanel.addComponentListener(strucComponentWidthSetter);
         
-        //JScrollPane structureScroller = new JScrollPane(structureRenderer);
-        //structureScroller.getVerticalScrollBar().setUnitIncrement(FeaturePanel.DEFAULT_Y_STEP);
-        
-        
+            
         strucManager.addStructureRenderer(structureRenderer);
         
         DasCoordinateSystem dcs = DasCoordinateSystem.fromString(PDBCOORDSYS);
@@ -184,7 +170,7 @@ ChangeListener
         seqRenderer.setBackground(BG_COLOR);
         
         ComponentResizedChainListener seqComponentWidthSetter = new ComponentResizedChainListener(seqRenderer);
-        this.addComponentListener(seqComponentWidthSetter);
+        contentPanel.addComponentListener(seqComponentWidthSetter);
         
         
         //JScrollPane seqScroller = new JScrollPane(seqRenderer);
@@ -263,7 +249,7 @@ ChangeListener
         enspRenderer.setBackground(BG_COLOR);
         
         ComponentResizedChainListener enspComponentWidthSetter = new ComponentResizedChainListener(enspRenderer);
-        this.addComponentListener(enspComponentWidthSetter);
+        contentPanel.addComponentListener(enspComponentWidthSetter);
         
         
         DasCoordinateSystem enspdcs = DasCoordinateSystem.fromString(ENSPCOORDSYS);
@@ -342,28 +328,38 @@ ChangeListener
         //
         // build up the display from the components:
         //
-        JPanel p1 = new JPanel();
-        p1.setLayout(new BoxLayout(p1,BoxLayout.Y_AXIS));
-        p1.add(structureRenderer);
-        p1.add(seqAligRenderer);
+//        JPanel p1 = new JPanel();
+//        p1.setLayout(new BoxLayout(p1,BoxLayout.Y_AXIS));
+//        p1.add(structureRenderer);
+//        p1.add(seqAligRenderer);
+//        
+        JSplitPane splito = new JSplitPane(JSplitPane.VERTICAL_SPLIT,structureRenderer,seqAligRenderer);
+        splito.setOneTouchExpandable(true);
+        splito.setResizeWeight(1.0);
+        splito.setBorder(BorderFactory.createEmptyBorder());
         
         
-        JSplitPane split1 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,p1,seqRenderer);
+        JSplitPane split1 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,splito,seqRenderer);
         split1.setOneTouchExpandable(true);
         // uniprot panel gets a little more space, because so many more DAS sources...
-        split1.setResizeWeight(0.4);
+        split1.setResizeWeight(0.5);
         
         split1.setBorder(BorderFactory.createEmptyBorder());
         
        
         
         
-        JPanel p2 = new JPanel();
-        p2.setLayout(new BoxLayout(p2,BoxLayout.Y_AXIS));
-        p2.add(enspAligRenderer);
-        p2.add(enspRenderer);
+//        JPanel p2 = new JPanel();
+//        p2.setLayout(new BoxLayout(p2,BoxLayout.Y_AXIS));
+//        p2.add(enspAligRenderer);
+//        p2.add(enspRenderer);
         
-        JSplitPane split2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,split1,p2);
+        JSplitPane splitb = new JSplitPane(JSplitPane.VERTICAL_SPLIT,enspAligRenderer,enspRenderer);
+        splitb.setOneTouchExpandable(true);
+        splitb.setResizeWeight(0);
+        splitb.setBorder(BorderFactory.createEmptyBorder());
+        
+        JSplitPane split2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,split1,splitb);
         split2.setOneTouchExpandable(true);
         // uniprot panel gets more space
         split2.setResizeWeight(0.7);
@@ -399,6 +395,9 @@ ChangeListener
         
         // register the managers
         registerManagers();
+        
+        this.setOpaque(true);
+        this.setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
         
         this.add(contentPanel);
         this.add(hBox);
@@ -441,8 +440,10 @@ ChangeListener
             structureRenderer.calcScale(residueSize);
             seqRenderer.calcScale(residueSize);
             enspRenderer.calcScale(residueSize);
-            //this.repaint();
-            //this.revalidate();
+            contentPanel.repaint();
+            
+            this.repaint();
+            this.revalidate();
             //this.updateUI();
             //int width = getTotalWidth();
             //int height = getTotalHeight();
@@ -483,7 +484,7 @@ ChangeListener
      * 
      * @param sources
      */
-    public void setDasSources(SpiceDasSource[] sources){
+    public  void setDasSources(SpiceDasSource[] sources){
         
         // clear the das sources ...
         clearDasSources();
@@ -531,10 +532,11 @@ ChangeListener
         SpiceDasSource[] enspupaligs = getAlignmentServers(allsources,seqdcs,enspdcs);
         ensaligManager.setAlignmentServers(enspupaligs);
         
+        
     }
     
     
-    public void clearDasSources() {
+    public  void clearDasSources() {
         allsources = new ArrayList();
         ensaligManager.clearDasSources();
         aligManager.clearDasSources();
@@ -543,6 +545,8 @@ ChangeListener
         seqManager.clearDasSources();
         pdbFeatureManager.clearDasSources();
         strucManager.clearDasSources();
+        
+       
         
     }
     

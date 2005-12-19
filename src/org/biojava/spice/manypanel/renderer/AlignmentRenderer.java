@@ -24,7 +24,6 @@ package org.biojava.spice.manypanel.renderer;
 
 
 import java.awt.Adjustable;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
@@ -73,13 +72,13 @@ extends JPanel {
         this.setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
         this.setBorder(BorderFactory.createEmptyBorder());
         
-        this.setBackground(Color.blue);
+        this.setBackground(FeaturePanel.BACKGROUND_COLOR);
         
         layeredPane = new JLayeredPane();
         layeredPane.setBorder(BorderFactory.createEmptyBorder());
         layeredPane.setDoubleBuffered(true);
         layeredPane.setOpaque(true);
-        layeredPane.setBackground(Color.yellow);
+        layeredPane.setBackground(FeaturePanel.BACKGROUND_COLOR);
         
         scrollPane = new JScrollPane(layeredPane);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
@@ -130,8 +129,7 @@ extends JPanel {
     }
     
     public AlignmentCursorPanel getCursorPanel(){
-        return cursorPanel;
-        
+        return cursorPanel;        
     }
     
     public AdjustmentListener getAdjust1(){
@@ -286,8 +284,10 @@ class MySequenceListener implements SequenceListener {
     
     public void newObjectRequested(String accessionCode) {
         AlignmentCursorPanel c = getCursorPanel();
-        if ( pos == 1)
+        if ( pos == 1) {
             c.newObjectRequested1(accessionCode);
+         
+        }
         else
             c.newObjectRequested2(accessionCode);
         c.repaint();
@@ -300,6 +300,7 @@ class MySequenceListener implements SequenceListener {
             c.noObjectFound1(accessionCode);
         else
             c.noObjectFound2(accessionCode);
+        parent.clearAlignment();
         c.repaint();
         
     }

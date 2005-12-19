@@ -41,6 +41,11 @@ import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.ChainImpl;
 
 public class AlignmentPanel extends JPanel {
+    
+    public static Color COLOR_ONE = new Color(0,153,255);
+    public static Color COLOR_TWO = new Color(0,51,255);
+    
+    
     Chain sequence1;
     Chain sequence2;
     float scale1;
@@ -55,6 +60,7 @@ public class AlignmentPanel extends JPanel {
     int scrollLeftX2 ;
     
     final static long serialVersionUID = 98567459640964908l;
+    
     
     static Logger logger = Logger.getLogger("org.biojava.spice");
     
@@ -111,9 +117,11 @@ public class AlignmentPanel extends JPanel {
     
     public void setScale1(float scale){
         scale1 =scale;
+        this.repaint();
     }
     public void setScale2(float scale){
         scale2=scale;
+        this.repaint();
     }
     
    
@@ -177,16 +185,16 @@ public class AlignmentPanel extends JPanel {
             int p2 = Math.round(h2*scale2) + FeaturePanel.DEFAULT_X_START - scrollLeftX2;
             
             if (h1 % 2 == 0)
-                g2D.setColor(Color.green);
+                g2D.setColor(COLOR_ONE);
             else
-                g2D.setColor(Color.blue);
+                g2D.setColor(COLOR_TWO);
             
             Polygon pol = new Polygon();
             
             pol.addPoint(p1,0);
             pol.addPoint(p2,20);
-            pol.addPoint(p2+aminosize2,20);
-            pol.addPoint(p1+aminosize1,0);
+            pol.addPoint(p2+aminosize2+1,20);
+            pol.addPoint(p1+aminosize1+1,0);
             g2D.fill(pol);
         }
         g2D.setComposite(oldComp);

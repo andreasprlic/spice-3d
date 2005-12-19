@@ -171,76 +171,59 @@ ConfigurationListener
      */
     public SpiceApplication( SpiceStartParameters params) {
         super();
+        
         startParameters = params;
+        
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
-        
-        //this.rasmolScript = rasmolScript;
-        //this.dasServerList = dasServerList;
-        //this.labelList = labelList;
-        //this.seqSelectStart = sSelectStart;
+              
         
         // a few error checks.
         checkStartParameters();
-        
-        //displayMessage = message;
-        //this.messageWidth = messageWidth;
-        //this.messageHeight = messageHeight;
-        
-        // selection is possible at the start ;
-        selectionLocked = false ;
-        configLoaded = false;
-        
+       
+       
+        // init variables ...
         setCurrentChain(null,-1);
-        //currentChainNumber = -1 ;
-        //currentChain = null;
+        selectionLocked = false ;
+        configLoaded    = false;        
+        structure       = null ;
+        pdbcode         = null ;
+        pdbcode2        = null ;
         
-        // init logging related stuff
+        structureAlignmentMode = false ; 
+        
+        // init logging related things
         initLoggingPanel();
         
         // set some system properties
-        setSystemProperties();
-
-        //REGISTRY_URLS = registry_urls ;
+        setSystemProperties();     
         
-        // first thing is to start communication
-        URL[] registries = getAllRegistryURLs();
-        
+        // init the 2D display
         browserPane = new BrowserPane(params.getPdbcoordsys(),params.getUniprotcoordsys(), params.getEnspcoordsys());
         
+        // first thing is to start das - registry communication
+        URL[] registries = getAllRegistryURLs();
         RegistryConfigIO regi = new RegistryConfigIO(registries);
         regi.addConfigListener(this);
         regi.run();
         
-        structure = null ;
-        pdbcode   = null ;
-        pdbcode2  = null ;
-               
-        //first_load = false ;
-        
-        structureAlignmentMode = false ;
+              
         StructurePanel structurePanel = new StructurePanel(this);	
         structurePanelListener = new StructurePanelListener(structurePanel);
-        
-        // add the Menu
-        
+         
         
         // init all panels, etc..
         statusPanel    = new StatusPanel(this);
-        //seq_pos        = new JTextField();
-        
-        //dascanv        = new SpiceFeatureViewer();
-        //SpiceDasServerConfigListener sdsl = new SpiceDasServerConfigListener(this);
-        //dascanv.addDasServerConfigListener(sdsl);
+        statusPanel.setBorder(BorderFactory.createEmptyBorder());
         
         strucommand    = new StructureCommandPanel(structurePanelListener);
-        //strucommand    = new JTextField()  ;
         
         Box vBox = arrangePanels(statusPanel,structurePanel,browserPane,strucommand,"left"); 
         
         this.getContentPane().setLayout(new BoxLayout(this.getContentPane(),BoxLayout.X_AXIS));
         this.getContentPane().add(vBox);
         this.setLoading(false);
+       
         spiceMenuListener = new SpiceMenuListener(this,structurePanelListener) ;
        
         
@@ -253,10 +236,7 @@ ConfigurationListener
         initListeners();
         
         this.setTitle("SPICE") ;
-        
-        //this.show();
-        
-        //this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+             
         JFrame.setDefaultLookAndFeelDecorated(false);
 	
         firefoxIcon = createImageIcon("firefox.png");
@@ -297,6 +277,11 @@ ConfigurationListener
         return regis;
     }
     
+    
+    /** do some check to avoid garbage input
+     * 
+     *
+     */
     private void checkStartParameters(){
 
         int seqSelectStart = startParameters.getSeqSelectStart();
@@ -320,6 +305,11 @@ ConfigurationListener
             startParameters.setPdbSelectEnd(null);;
         }
     }
+    
+    /** launch the Server that listens to a port for requests from other instances of SPICE
+     * 
+     *
+     */
     private void initSpiceServer(){
         
         spiceServer = new SpiceServer(this);
@@ -467,7 +457,7 @@ ConfigurationListener
         sharedPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                 chainPanel, browserPane);
         sharedPanel.setOneTouchExpandable(true);
-        
+        sharedPanel.setResizeWeight(0);
         //sharedPanel.setPreferredSize(new Dimension(400, 400));
         //sharedPanel.setLayout(new BoxLayout(sharedPanel,BoxLayout.Y_AXIS)); 
         sharedPanel.setBorder(BorderFactory.createEmptyBorder());
@@ -482,7 +472,7 @@ ConfigurationListener
             mainsharedPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, sharedPanel,vBox2);
         
         mainsharedPanel.setOneTouchExpandable(true);
-        mainsharedPanel.setResizeWeight(0.6);
+        mainsharedPanel.setResizeWeight(0.5);
         
         mainsharedPanel.setPreferredSize(new Dimension(790, 590));
         
@@ -1134,7 +1124,7 @@ ConfigurationListener
      * color structure 
      * @param structure_ a Biojava structure object
      */
-    
+    /*
     public  void setStructure(Structure structure_ ) {
         logger.warning("depreciated method!");
         if (logger.isLoggable(Level.FINER)) {
@@ -1198,7 +1188,7 @@ ConfigurationListener
         //structurePanelListener.executeCmd(selectcmd);
         //System.out.println("SpiceApplication... setting chain");
         logger.finest("setting chain...");
-        setCurrentChainNumber(0);
+        //setCurrentChainNumber(0);
         //System.out.println("SpiceApplication... requesting getChain");
         //Chain chain = getChain(currentChainNumber) ;
         
@@ -1260,7 +1250,7 @@ ConfigurationListener
         //notifyAll();
                 
     }
-    
+    */
     
     /** display a dialog with a message... 
      * 
@@ -1364,17 +1354,20 @@ ConfigurationListener
         return chainDisplay.getCurrentChainNumber();
         //return browserPane.getCurrentChainNumber();
         //return currentChainNumber;
-    }
+   }
     
+    /*
     public void setCurrentChainNumber( int newCurrentChain) {
         setCurrentChainNumber(newCurrentChain,true);
-    }
+    }*/
     
     public synchronized void setCurrentChain(Chain c, int chainNumber){
         currentChain = c;
         currentChainNumber = chainNumber;
         notifyAll();
     }
+    
+    /*
     //todo: remove this method:
     public  void setCurrentChainNumber( int newCurrentChain,boolean getNewFeaturesFlag) {
         //logger.info("setCurrentChainNumber " + newCurrentChain + " " + getNewFeaturesFlag);
@@ -1467,10 +1460,11 @@ ConfigurationListener
             seqTextPane.setChain(chain,currentChainNumber);
             //updateDisplays();
         }
-        */
+        
         
         
     }
+*/
     
     public void setLoading(boolean status){
         first_load = status;
@@ -1519,22 +1513,33 @@ ConfigurationListener
             i++;
         }
         
+        // add das sources from arguments ...
+        //TODO; add them
+        
         browserPane.clearDasSources();
         browserPane.setDasSources(sources);
         
-        // trigger queued requests
         
+        triggerQueuedRequests();
+        notifyAll();
+    }
+    
+    public  void triggerQueuedRequests(){
+        // trigger queued requests
+        logger.info("triggerQueuedRequest");
+               
         if ( waitingType != null){
-            if ( waitingType.equals("PDB"))
-                loadStructure(waitingCode);
-            else if (waitingType.equals("UniProt"))
-                loadUniprot(waitingCode);
+            //MyLoadingThread thr = new MyLoadingThread(waitingType,waitingCode,this);
+            //thr.start();
+            load(waitingType,waitingCode);
+            
             waitingType = null;
             waitingCode = null;
+            
         }
         
-        
-        notifyAll();
+      
+       
     }
     
     public void showConfig() {
@@ -1742,12 +1747,29 @@ class MyDasSourceListener implements DasSourceListener{
         
     }
     public void newDasSource(DasSourceEvent ds) {
-       
         
     }
-  
-   
     
+}
+
+class MyLoadingThread extends Thread{
+    
+    SpiceApplication parent;
+    String type;
+    String code;
+    
+    public MyLoadingThread(String type, String code, SpiceApplication parent){
+        System.out.println("init MyLoadingThread");
+        this.parent = parent;
+        this.type = type;
+        this.code=code;
+    }
+    
+    public void run(){
+        System.out.println("started new MyLoadingThread " + type + " " +code);
+        parent.load(type,code);
+        
+    }
 }
 
 

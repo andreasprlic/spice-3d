@@ -58,7 +58,7 @@ public interface SPICEFrame
      * to color structure
      * @param structure a Biojava structure object
      */
-    public void   setStructure(Structure structure );
+    //public void   setStructure(Structure structure );
 
     
     
@@ -73,10 +73,10 @@ public interface SPICEFrame
     
     
     /** set the chain nr chainnr as the active one */
-    public void setCurrentChainNumber(int chainnr);
+    //public void setCurrentChainNumber(int chainnr);
     
     /** get the chain nr of the currently active chain */
-    public int getCurrentChainNumber() ;
+    //public int getCurrentChainNumber() ;
   
     /** reset the display, but do not change data */
     public void resetDisplay();

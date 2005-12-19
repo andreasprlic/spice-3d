@@ -410,12 +410,14 @@ class MyParser
         }
         */
        
+        
+        // TODO: set structure and chain in spice somehow ...
         //logger.info("setting structure");
-        spice.setStructure(s);
+        //spice.setStructure(s);
         //spice.setCurrentChainNumber(currentChain);
         //logger.info("setting current chain" + currentChainNumber);
         
-        spice.setCurrentChainNumber(currentChainNumber,false);
+        //spice.setCurrentChainNumber(currentChainNumber,false);
        
         //logger.info("setting feature views");
         // todo do differently...

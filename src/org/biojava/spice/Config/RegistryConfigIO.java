@@ -35,6 +35,7 @@ import java.util.List                      ;
 // for DAS registration server:
 import org.biojava.services.das.registry.* ;
 import org.biojava.spice.das.SpiceDasSource;
+import org.biojava.spice.manypanel.renderer.FeaturePanel;
 
 //for logging
 import java.util.logging.*                 ;
@@ -108,6 +109,7 @@ extends Thread
             //e.printStackTrace();
             logger.log(Level.WARNING,e.getMessage());
         }
+
         
     } 
     
@@ -296,7 +298,7 @@ extends Thread
     }
     
     /** contact DAS registry and update sources ... */
-    public  RegistryConfiguration doRegistryUpdate(URL registryurl)
+    private  RegistryConfiguration doRegistryUpdate(URL registryurl)
     throws ConfigurationException
     {
            
@@ -376,7 +378,7 @@ extends Thread
          });
          */
         
-        ImageIcon icon = ConfigGui.createImageIcon("spice.png");
+        ImageIcon icon = ConfigGui.createImageIcon("spice16x16.gif");
         if (icon != null) {
             progressFrame.setIconImage(icon.getImage());
         }
@@ -384,6 +386,7 @@ extends Thread
         //progressFrame.setUndecorated(true);
         
         JPanel panel = new JPanel();
+        panel.setBackground(FeaturePanel.BACKGROUND_COLOR);
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         
         Box vbox = Box.createVerticalBox();
