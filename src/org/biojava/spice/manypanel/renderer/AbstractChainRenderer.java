@@ -182,10 +182,10 @@ public abstract class AbstractChainRenderer
     
     public void setComponentWidth(int width){
         componentWidth = width;
-        //logger.info("componentWidth" + width);
+        logger.info("componentWidth" + width);
         calcScale(zoomFactor);
         this.revalidate();
-        //this.repaint();
+        this.repaint();
         //this.updateUI();
     }
     
@@ -349,7 +349,7 @@ public abstract class AbstractChainRenderer
         if ( w  < 200){
             w = 200;
         }
-        //logger.info("displayWidth " + w + " scale" +scale + " length"+ l);
+        logger.info("displayWidth " + w + " scale" +scale + " length"+ l);
         return w;
     }
     public int getDisplayHeight(){
@@ -423,7 +423,13 @@ public abstract class AbstractChainRenderer
         int h = FEATURE_PANEL_HEIGHT;
         int width = getDisplayWidth();
         
-        //logger.info("update panel positions " + width + " " + h + " " + sequence.getSequence().getLength());
+        //int maxsize =  Math.round(featurePanel.getScale()*sequence.getSequence().getLength());
+        
+        //logger.info("update panel positions " + width + 
+         //       " " + featurePanel.getScale() + " " +
+          //      sequence.getSequence().getLength() +
+           //     " check " + maxsize);
+        
         //logger.info("status panel size " + statusPanel.getHeight() + " " + statusPanel.getWidth());
         
         // put statuspanel on top of visible area
@@ -431,10 +437,14 @@ public abstract class AbstractChainRenderer
         //logger.info("" +p);
         Dimension viewSize = scrollPane.getViewport().getViewSize();
         
-        //logger.info("viewSize " + viewSize.getWidth() + " " + viewSize.getHeight());
+        //logger.info("viewSize w" + viewSize.getWidth() + " " + viewSize.getHeight());
+        if (viewSize.getWidth() > width )
+            viewSize = new Dimension(width,viewSize.height);
+        //logger.info(viewSize+"");
         this.setPreferredSize(viewSize);
         this.setSize(viewSize);
         scrollPane.setPreferredSize(viewSize);
+        
         //   scrollPane.setSize(viewSize);
         
         

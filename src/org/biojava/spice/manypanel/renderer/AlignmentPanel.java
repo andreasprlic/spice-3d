@@ -131,7 +131,9 @@ public class AlignmentPanel extends JPanel {
         //super.paintComponent(g);
         super.paint(g);
         
-        //logger.info("paintComponent " + length1 + " " + this.getHeight() );
+        //logger.info("paint " + length1 + " " +
+        //        scale1 + " " + scale2 + " " +
+        //        this.getWidth() );
         Graphics2D g2D = (Graphics2D) g;
         
      

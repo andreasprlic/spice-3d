@@ -24,7 +24,6 @@ package org.biojava.spice.manypanel.renderer;
 
 
 import java.awt.Adjustable;
-import java.awt.Dimension;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.util.Map;
@@ -37,10 +36,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import org.biojava.bio.structure.Chain;
+import org.biojava.bio.structure.ChainImpl;
 import org.biojava.spice.manypanel.eventmodel.ScaleEvent;
 import org.biojava.spice.manypanel.eventmodel.ScaleListener;
 import org.biojava.spice.manypanel.eventmodel.SequenceEvent;
 import org.biojava.spice.manypanel.eventmodel.SequenceListener;
+import org.biojava.spice.manypanel.managers.SequenceManager;
 
 public class AlignmentRenderer 
 extends JPanel {
@@ -62,7 +63,11 @@ extends JPanel {
     AdjustmentListener adjust1;
     AdjustmentListener adjust2;
     
-
+    Chain seq1;
+    Chain seq2;
+    float scale1;
+    float scale2;
+    
     
     public AlignmentRenderer(){
         
@@ -108,16 +113,26 @@ extends JPanel {
         adjust1 = new MyAdjustmentListener(1,this);
         adjust2 = new MyAdjustmentListener(2,this);
         
+        seq1 = new ChainImpl();
+        seq2 = new ChainImpl();
+        scale1 = 1.0f;
+        scale2 = 1.0f;
+        
         updatePanelPositions();
         
-        this.setMinimumSize(new Dimension(Short.MAX_VALUE,30));
-        this.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
-        this.setSize(new Dimension(Short.MAX_VALUE,30));
+        //this.setMinimumSize(new Dimension(Short.MAX_VALUE,30));
+        //this.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
+        //this.setSize(new Dimension(Short.MAX_VALUE,30));
+        
+        
+        
     }
     
     
     public void clearAlignment(){
         alignmentPanel.clearAlignment();
+        seq1 = new ChainImpl();
+        seq2 = new ChainImpl();
     }
     
     public SequenceListener getSequenceListener1(){
@@ -140,15 +155,57 @@ extends JPanel {
         return adjust2;
     }
     
-    public void updatePanelPositions(){
+    
+    
+    private int getDisplayWidth() {
         
-        cursorPanel.setBounds(0,0,this.getWidth(),30);
+    
+        int l1 = seq1.getLength();
+        int l2 = seq2.getLength();
+        
+        float scale = scale1;
+        int l = l1;
+        if ( l2 > l1){
+            scale = scale2;
+            l = l2;
+        }
+        
+        
+        int aminosize = Math.round(1*scale);
+        if ( aminosize < 1)
+            aminosize = 1;
+        int w = Math.round(l*scale) + aminosize+  FeaturePanel.DEFAULT_X_START + FeaturePanel.DEFAULT_X_RIGHT_BORDER;
+        
+        if ( w  < 200){
+            w = 200;
+        }
+       // logger.info("displayWidth " + w + " scale" +scale + " length"+ l + " check: " + (scale * l));
+        return w;
+    }
+    
+    public void updatePanelPositions(){
+        int w = getDisplayWidth();
+        cursorPanel.setBounds(0,0,w,30);
         cursorPanel.setLocation(0,0);
       
-        alignmentPanel.setBounds(0,0,this.getWidth(),30);
+        alignmentPanel.setBounds(0,0,w,30);
         alignmentPanel.setLocation(0,0);
        
+        //Dimension viewSize = scrollPane.getViewport().getViewSize();
+        
+        //logger.info("viewSize w " + viewSize.getWidth() + " h " + viewSize.getHeight() + " panel w " + w);
+        //scrollPane/
+        //logger.info("cursorPanel " + cursorPanel.getWidth());
+        //logger.info("alignmentPanel" + alignmentPanel.getWidth());
+        
+        //this.setPreferredSize(viewSize);
+        //this.setSize(viewSize);
+        //scrollPane.setPreferredSize(viewSize);
+        //cursorPanel.setPreferredSize(viewSize);
+        //alignmentPanel.setPreferredSize(viewSize);
         this.repaint();
+        this.revalidate();
+      
     }
     
     public ScaleListener getSeq1ScaleListener(){
@@ -160,17 +217,22 @@ extends JPanel {
     public void setSequence1(Chain c){
         alignmentPanel.setSequence1(c);
         
-        cursorPanel.setChain1(c);
+        cursorPanel.setChain1(c);        
+        seq1 = c;
+        
         updatePanelPositions();
-        this.repaint();
+       
         
     }
     
     public void setSequence2(Chain c){
         alignmentPanel.setSequence2(c);
         cursorPanel.setChain2(c);
+        seq2 = c;
+        
         updatePanelPositions();
-        this.repaint();
+    
+       
         
     }
     
@@ -180,7 +242,7 @@ extends JPanel {
     }
     public void setAlignmentMap2(Map m){
         alignmentPanel.setAlignmentMap2(m);
-    this.repaint();
+        this.repaint();
     }
     
     
@@ -189,16 +251,20 @@ extends JPanel {
         //logger.info("scale1 " + scale);
         alignmentPanel.setScale1(scale);
         cursorPanel.setScale1(scale);
+        scale1 = scale;
+        
         updatePanelPositions();
-        this.repaint();
+        
         
     }
     public void setScale2(float scale){
         //logger.info("scale2 "+ scale);
         alignmentPanel.setScale2(scale);
         cursorPanel.setScale2(scale);
+        
+        scale2 =scale;
         updatePanelPositions();
-        this.repaint();
+        
         
     }
     
@@ -249,11 +315,16 @@ class MySequenceListener implements SequenceListener {
     
     public void newSequence(SequenceEvent e) {
         AlignmentCursorPanel c = getCursorPanel();
-        if ( pos == 1)
-            c.newSequence1(e);
-        else
+        SequenceManager sm = new SequenceManager();
+        Chain cn = sm.getChainFromString(e.getSequence());
+        if ( pos == 1) {
+            c.newSequence1(e);             
+            parent.setSequence1(cn);
+        }
+        else {
             c.newSequence2(e);
-        
+            parent.setSequence2(cn);
+        }
         c.repaint();
     }
     

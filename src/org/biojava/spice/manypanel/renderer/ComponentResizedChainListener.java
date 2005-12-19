@@ -39,7 +39,7 @@ public class ComponentResizedChainListener implements ComponentListener {
     public void componentResized(ComponentEvent event) {
        Component comp = event.getComponent();
       //System.out.println(comp);
-       //System.out.println("component resized " + " " + comp.getWidth());
+       System.out.println("component resized " + " " + comp.getWidth());
        parent.setComponentWidth(comp.getWidth());
        parent.repaint();
        parent.revalidate();

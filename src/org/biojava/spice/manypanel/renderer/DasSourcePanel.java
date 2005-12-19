@@ -193,7 +193,7 @@ implements FeatureListener,SpiceFeatureListener
         Feature[] features = dasSource.getFeatures();
                 
         int y = FeaturePanel.DEFAULT_Y_START + FeaturePanel.DEFAULT_Y_STEP ;
-        //logger.info(dasSource.getDasSource().getNickname() + " " + dasSource.getLoading());
+        //logger.info(dasSource.getDasSource().getNickname() + " " + dasSource.getLoading() + " " + this.getWidth());
         
         //Composite oldComp = g2D.getComposite();
         //g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));        

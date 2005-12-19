@@ -752,54 +752,14 @@ ConfigurationListener
     }
     
     
-    
-    
-    public void show(){
-        super.show();
-        //logger.finest("SpiceApplication show() : getting Structure data from new thread");
-        // and now load data ...
-        
-        // need to call showduring init, to make sure das registry frame and threads can set status.
-        // threads can only be started once the config is loaded from registry 
-        /*
-        if ( config == null ) {
-            return ;
-        }
-        if ( pdbcode == null){
-            return;
-        }
-        if ( ! structureAlignmentMode ) {
-            //logger.finest("not in alignment mode");
-            loadStructure(pdbcode);
-        } else {
-            //showStatus("Loading...Wait...",Color.red);
-            
-            LoadStructureAlignmentThread thr = new 
-            LoadStructureAlignmentThread(this,
-                    pdbcode,
-                    pdbcode2);
-            thr.start();
-            
-        }
-        */
-        
-    }
-       
+         
     
     public RegistryConfiguration getConfiguration() {
         return config ;
     }
     
     
-    
-    /*private void resetStatusPanel(){
-        statusPanel.setPDB("");
-        statusPanel.setSP("");
-        statusPanel.setLoading(false);
-        statusPanel.setPDBDescription("");
-        statusPanel.setPDBHeader(new HashMap());
-    }*/
-    
+       
     /** start a new thead that retrieves uniprot sequence, and if available
      protein structure
      */
@@ -957,52 +917,6 @@ ConfigurationListener
     }
     
     
-    /*
-    private void clearBrowsableButtons(){
-        int nr = browseMenu.getItemCount();
-        //System.out.println("cleaning "+nr+ " menus");
-        for ( int i = nr-2; i > 1; i--){
-            browseMenu.remove(i);
-        }
-        knownFeatureLinks = new ArrayList();
-    }
-
-
-    private void registerBrowsableFeatures(List feats){
-        Iterator iter = feats.iterator();
-        // add to menu
-        
-    
-        clearBrowsableButtons();
-        while (iter.hasNext()){
-            FeatureImpl f = (FeatureImpl)iter.next();
-            //System.out.println(f);
-            String link =f.getLink();
-            if ( link != null){
-                if ( knownFeatureLinks.contains(link))
-                    continue ;
-                JMenuItem item;
-                if ( firefoxIcon == null)
-                     item = new JMenuItem("open in browser "+ f.getMethod());
-                else
-                    item = new JMenuItem("open in browser "+ f.getMethod(), firefoxIcon);
-                URL u;
-                try {
-                    u = new URL(link);
-                } catch (MalformedURLException e){
-                    // if somebody e.g. provides the accession code 
-                    // instead of a proper url in the link field...
-                    continue;
-                }
-                ActionListener bl = new BrowseMenuListener(this,u);                    
-                item.addActionListener(bl);
-                
-                browseMenu.add(item,(browseMenu.getItemCount()-1));
-                knownFeatureLinks.add(link);
-            }
-        }
-    } */
-
 
     private  void getNewFeatures(String sp_id) {
         //logger.("SpiceApplication get new Features " + sp_id);
@@ -1086,38 +1000,6 @@ ConfigurationListener
         }
     }
     
-    /*
-    // store all features in memory -> speed up
-    private ArrayList getFeaturesFromMemory(String mem_id) {
-        logger.entering(this.getClass().getName(), "getFeaturesFromMemory()",  new Object[]{mem_id});
-        //logger.finest("getFeaturesFromMemory");
-        ArrayList arr = new ArrayList() ;
-        
-        for (Iterator ti = memoryfeatures.keySet().iterator(); ti.hasNext(); ) {
-            String key = (String) ti.next() ;
-            logger.finest("in mem: " + key);
-            //logger.finest(key);
-            if ( key == null) { continue; }
-            
-            if (key.equals(mem_id)) {
-                logger.finest("found features in memory for spi_id " + mem_id);
-                
-                arr = (ArrayList) memoryfeatures.get(mem_id) ;
-                
-                for ( int i = 0 ; i < arr.size() ; i++ ) {
-                    FeatureImpl f = (FeatureImpl) arr.get(i);
-                    logger.finest(" got memory feature " + f.toString());
-                }
-                return arr ;
-            }
-        }
-        
-        return arr ;
-    }
-    
-    
-    */
-   
     
     
     /** set a structure to be displayed and sends a script command to
