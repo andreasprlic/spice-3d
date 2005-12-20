@@ -50,7 +50,7 @@ extends JDialog {
     
     public static final String VERSION = 
 
-        "0.8.0-devel";
+        "0.8.0";
 
     
     static final String AUTHORS = 

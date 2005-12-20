@@ -122,7 +122,7 @@ public class AlignmentTools {
         for (int i =0 ; i<objects.length;i++) {
     	    		Annotation object = objects[i];
     	    		String id = (String) object.getProperty("dbAccessionId");
-                    System.out.println("comparing ignorecase " + id + " " + objectid);
+			//System.out.println("comparing ignorecase " + id + " " + objectid);
     	    		if ( id.equalsIgnoreCase (objectid)){
     	    		    return object;
     	    		}

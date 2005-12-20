@@ -344,7 +344,7 @@ ChangeListener
         splito.setResizeWeight(1.0);
         splito.setBorder(BorderFactory.createEmptyBorder());
         
-        MyPropertyChangeListener mpcl = new MyPropertyChangeListener(seqAligRenderer,this);
+        MyPropertyChangeListener mpcl = new MyPropertyChangeListener(seqAligRenderer,this,splito,"bottom");
         splito.addPropertyChangeListener("dividerLocation", mpcl );
         
         JSplitPane split1 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,splito,seqRenderer);
@@ -371,7 +371,7 @@ ChangeListener
         
         //splitb.addComponentListener(mycompo2);
         
-        MyPropertyChangeListener mpcl2 = new MyPropertyChangeListener(enspAligRenderer,this);
+        MyPropertyChangeListener mpcl2 = new MyPropertyChangeListener(enspAligRenderer,this,splitb,"top");
         splitb.addPropertyChangeListener("dividerLocation",mpcl2);
         
         JSplitPane split2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,split1,splitb);
@@ -788,26 +788,41 @@ class MyPropertyChangeListener
 implements PropertyChangeListener{
     AlignmentRenderer re;
     BrowserPane parent;
-    
-    public MyPropertyChangeListener( AlignmentRenderer re, BrowserPane par){
+    JSplitPane split;
+    String position;
+    public MyPropertyChangeListener( AlignmentRenderer re, BrowserPane par, JSplitPane split, String position){
         this.re=re;
-        parent = par;
+        this.parent = par;
+	this.split = split;
+	this.position = position;
         
     }
     public void propertyChange(PropertyChangeEvent e) {
-        //System.out.println("position changed " + re.getHeight());
+        
         Number newH = (Number) e.getNewValue();
-        re.setPreferredSize(new Dimension(re.getWidth(),newH.intValue()));
-        
+	int sH = split.getHeight();
+	//System.out.println("-- position changed " + " lowerH" + re.getHeight() + " totalH " + sH);
+
+	int preferredH = sH - newH.intValue();
+	if ( position.equals("top")) {
+	    //System.out.println("at top");
+	    preferredH = newH.intValue();
+	} else {
+	    //System.out.println("at bottom");
+	}
+	
+        re.setPreferredSize(new Dimension(re.getWidth(),preferredH));
+        re.setSize(new Dimension(re.getWidth(),preferredH));
         parent.repaint();
-        parent.revalidate();
+	parent.revalidate();
         
-        //System.out.println("" + e.getNewValue() + " " + e.getOldValue());
-       
+        //System.out.println("divider position new " + e.getNewValue() + " old " + e.getOldValue() + " prefH " + preferredH);
+
+	re.repaint();
+        re.revalidate();
         
         re.updatePanelPositions();
-        re.repaint();
-        re.revalidate();
-        //System.out.println("position changed " + re.getHeight());
+        
+        //System.out.println("new height:position changed " + re.getHeight());
     }
 }

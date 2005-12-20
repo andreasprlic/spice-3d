@@ -226,9 +226,10 @@ public class AlignmentCursorPanel extends JPanel
         
         Graphics2D g2D =(Graphics2D) g;
         
-        g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+        g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+			     RenderingHints.VALUE_ANTIALIAS_ON);
         Composite oldComp = g2D.getComposite();
-        //g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));        
+        g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));        
         
         g2D.setColor(CursorPanel.SELECTION_COLOR);
         

@@ -153,7 +153,7 @@ public class AlignmentPanel extends JPanel {
         
         g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
         Composite oldComp = g2D.getComposite();
-        //g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));  
+        g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));  
         
        // logger.info("paint l " + aminosize1 + " length " + length1 + " " + scale1 + " " + scrollLeftX1 );
         

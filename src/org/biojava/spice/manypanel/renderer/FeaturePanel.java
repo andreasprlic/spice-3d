@@ -193,8 +193,10 @@ extends JPanel{
             aminosize = 1;
         int l = Math.round(length*scale);
 
-
-        g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+        g2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+			     RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+			     RenderingHints.VALUE_ANTIALIAS_ON);
         Composite oldComp = g2D.getComposite();
         g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));  
         //logger.info("paint l " + l + " length " + length );

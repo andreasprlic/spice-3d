@@ -219,7 +219,7 @@ implements AlignmentListener {
         if ( os.length < 2){
             // something strange is going on here..
             // perhaps a crazy server
-            logger.warning(panelName+" got  alignment of wrong # objects...");
+            //logger.warning(panelName+" got  alignment of wrong # objects...");
             return;
         }
         alignment = event.getAlignment();

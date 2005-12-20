@@ -117,7 +117,7 @@ AlignmentListener
     public AlignmentChooser(DasCoordinateSystem queryCs, DasCoordinateSystem subjectCs) {
         logger = Logger.getLogger("org.biojava.spice");
         
-        logger.info("new ALignmentChooser " + queryCs + " " + subjectCs);
+        //logger.info("new ALignmentChooser " + queryCs + " " + subjectCs);
         //spice = parent ;
         chain = new ChainImpl();
         
@@ -164,7 +164,7 @@ AlignmentListener
         
         
         //	JFrame.setDefaultLookAndFeelDecorated(false);
-        ImageIcon icon = SpiceApplication.createImageIcon("spice.png");
+        ImageIcon icon = SpiceApplication.createImageIcon("spice16x16.gif");
         alignmentFrame.setIconImage(icon.getImage());
         
         //vBox = Box.createVerticalBox();
@@ -280,7 +280,7 @@ AlignmentListener
         // triger the load of the alignments...
         //Todo add this...
         
-        logger.info("loading  " + code);
+        //logger.info("loading  " + code);
         AlignmentParameters param = new AlignmentParameters();
         
         param.setDasSources(dasSources);
@@ -314,7 +314,7 @@ AlignmentListener
     
     public void setChain(Chain c,int number) {
         
-        logger.info("set Chain " + c.getSwissprotId() + " " + number + " >" + c.getSequence()+"<");
+        //logger.info("set Chain " + c.getSwissprotId() + " " + number + " >" + c.getSequence()+"<");
         chain = c;
         currentChainNumber = number;
         //this.paintComponent(this.getGraphics());
@@ -347,7 +347,7 @@ AlignmentListener
     /** convert the biojava alignment class into biojava feature objects */
     
     public synchronized void newAlignment(AlignmentEvent event){
-        logger.info("AllignmentChooser got new Alignments");
+        //logger.info("AllignmentChooser got new Alignments");
         
         progressBar.setIndeterminate(false);
         Alignment[] aligs = event.getAllAlignments();

@@ -168,7 +168,7 @@ SpiceFeatureListener
      * @param command - a String containing a RASMOL like command. e.g. "select protein; cartoon on;"
      */
     public void executeCmd(String command) {
-        //System.out.println("StructurePanel: " + command);
+        System.out.println("sending StructurePanel: " + command);
         structurePanel.executeCmd(command);
     }
     
@@ -246,6 +246,7 @@ SpiceFeatureListener
         
         while ( (startpos >= 0 ) && (startpos < chain.getLength())){
             Group g = chain.getGroup(startpos);	
+	    //System.out.println("checking " + startpos + " " + g );
             if (g.has3D()){
                 return g ;
             }
@@ -448,11 +449,13 @@ SpiceFeatureListener
                 
             } else {
                 
-                Group gs = getGroupNext( currentChainNumber,(start),"incr");
+                Group gs = getGroupNext( currentChainNumber,start,"incr");
                 //Group gs = chain.getGroup(start-1);	
-                Group ge = getGroupNext( currentChainNumber,(end),"decr");
+                Group ge = getGroupNext( currentChainNumber,end,"decr");
                 //= chain.getGroup(end-1);	
                 //logger.finest("gs: "+gs+" ge: "+ge);
+		//System.out.println("gs: "+gs+" ge: "+ge);
+		//TODO: fix bug with 1a4a.A and Metal features ...
                 if (( gs == null) || (ge == null) ) {
                     continue;
                 }
@@ -569,9 +572,9 @@ SpiceFeatureListener
                 
             } else {
                 
-                Group gs = getGroupNext( currentChainNumber,(start),"incr");
+                Group gs = getGroupNext( currentChainNumber,start,"incr");
                 //Group gs = chain.getGroup(start-1);	
-                Group ge = getGroupNext( currentChainNumber,(end),"decr");
+                Group ge = getGroupNext( currentChainNumber,end,"decr");
                 //= chain.getGroup(end-1);	
                 //logger.finest("gs: "+gs+" ge: "+ge);
                 if (( gs == null) || (ge == null) ) {
@@ -773,6 +776,7 @@ SpiceFeatureListener
         logger.info("got new structure");
         Structure s = event.getStructure();
         setStructure(s);
+	setCurrentChainNumber(0);
         
     }
 
