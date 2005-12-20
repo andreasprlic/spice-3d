@@ -74,6 +74,8 @@ extends JPanel {
         this.setOpaque(true);
         setDoubleBuffered(true);
         
+        
+        
         this.setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
         this.setBorder(BorderFactory.createEmptyBorder());
         
@@ -160,8 +162,7 @@ extends JPanel {
     
     
     private int getDisplayWidth() {
-        
-    
+            
         int l1 = seq1.getLength();
         int l2 = seq2.getLength();
         
@@ -171,8 +172,7 @@ extends JPanel {
             scale = scale2;
             l = l2;
         }
-        
-        
+                
         int aminosize = Math.round(1*scale);
         if ( aminosize < 1)
             aminosize = 1;
@@ -206,6 +206,12 @@ extends JPanel {
         //scrollPane.setPreferredSize(viewSize);
         //cursorPanel.setPreferredSize(viewSize);
         //alignmentPanel.setPreferredSize(viewSize);
+        alignmentPanel.repaint();
+        alignmentPanel.revalidate();
+        cursorPanel.repaint();
+        cursorPanel.revalidate();
+        layeredPane.repaint();
+        layeredPane.revalidate();
         this.repaint();
         this.revalidate();
       
@@ -249,7 +255,13 @@ extends JPanel {
     }
     
     
+    public float getScale1(){
+        return scale1;
+    }
     
+    public float getScale2(){
+        return scale2;
+    }
     public void setScale1(float scale){
         //logger.info("scale1 " + scale);
         alignmentPanel.setScale1(scale);

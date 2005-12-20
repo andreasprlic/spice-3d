@@ -46,6 +46,8 @@ import org.biojava.services.das.registry.DasSource;
 
 //import javax.swing.BoxLayout;
 import java.awt.Dimension;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 //import java.awt.event.MouseListener;
 
@@ -237,6 +239,7 @@ ChangeListener
         structureRenderer.addAdjustmentListener(seqAligRenderer.getAdjust1());
         seqRenderer.addAdjustmentListener(seqAligRenderer.getAdjust2());
         
+        seqAligRenderer.setPreferredSize(new Dimension(400,20));
         
         
         
@@ -321,6 +324,8 @@ ChangeListener
         ensaligManager.addSequence2Listener(enspAligRenderer.getSequenceListener2());
         ensaligManager.addSequence1Listener(seqAligRenderer.getSequenceListener2());
         //browserPane.addPane(structureSequencePane);
+        enspAligRenderer.setPreferredSize(new Dimension(400,20));
+        
         
         seqRenderer.addAdjustmentListener(enspAligRenderer.getAdjust1());
         enspRenderer.addAdjustmentListener(enspAligRenderer.getAdjust2());
@@ -332,16 +337,15 @@ ChangeListener
         //
         // build up the display from the components:
         //
-//        JPanel p1 = new JPanel();
-//        p1.setLayout(new BoxLayout(p1,BoxLayout.Y_AXIS));
-//        p1.add(structureRenderer);
-//        p1.add(seqAligRenderer);
-//        
+
+        
         JSplitPane splito = new JSplitPane(JSplitPane.VERTICAL_SPLIT,structureRenderer,seqAligRenderer);
         splito.setOneTouchExpandable(true);
         splito.setResizeWeight(1.0);
         splito.setBorder(BorderFactory.createEmptyBorder());
         
+        MyPropertyChangeListener mpcl = new MyPropertyChangeListener(seqAligRenderer,this);
+        splito.addPropertyChangeListener("dividerLocation", mpcl );
         
         JSplitPane split1 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,splito,seqRenderer);
         split1.setOneTouchExpandable(true);
@@ -362,6 +366,13 @@ ChangeListener
         splitb.setOneTouchExpandable(true);
         splitb.setResizeWeight(0);
         splitb.setBorder(BorderFactory.createEmptyBorder());
+        
+        //MyComponentListener mycompo2 = new MyComponentListener(enspAligRenderer,enspRenderer);
+        
+        //splitb.addComponentListener(mycompo2);
+        
+        MyPropertyChangeListener mpcl2 = new MyPropertyChangeListener(enspAligRenderer,this);
+        splitb.addPropertyChangeListener("dividerLocation",mpcl2);
         
         JSplitPane split2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,split1,splitb);
         split2.setOneTouchExpandable(true);
@@ -438,7 +449,7 @@ ChangeListener
     public void stateChanged(ChangeEvent e) {
         
         JSlider source = (JSlider)e.getSource();
-        if (!source.getValueIsAdjusting()) {
+        //if (!source.getValueIsAdjusting()) {
             //System.out.println("slider at " +source.getValue());
             int residueSize = (int)source.getValue();
             structureRenderer.calcScale(residueSize);
@@ -455,7 +466,7 @@ ChangeListener
             //logger.info("setting preferred size" + width + " " + height);
             //this.setPreferredSize(d);
             //this.setSize(d);
-        }
+       // }
     }
     
     
@@ -767,18 +778,36 @@ ChangeListener
     }
     
     public void loadingStarted(DasSourceEvent ds) {
-        // TODO Auto-generated method stub
-        
+              
     }
     
-    /*
-     public void paintComponent(Graphics g){
-     super.paintComponent(g);
-     
-     g.drawString("browserPane",10,10);
-     
-     }*/
     
 }
 
-
+class MyPropertyChangeListener 
+implements PropertyChangeListener{
+    AlignmentRenderer re;
+    BrowserPane parent;
+    
+    public MyPropertyChangeListener( AlignmentRenderer re, BrowserPane par){
+        this.re=re;
+        parent = par;
+        
+    }
+    public void propertyChange(PropertyChangeEvent e) {
+        //System.out.println("position changed " + re.getHeight());
+        Number newH = (Number) e.getNewValue();
+        re.setPreferredSize(new Dimension(re.getWidth(),newH.intValue()));
+        
+        parent.repaint();
+        parent.revalidate();
+        
+        //System.out.println("" + e.getNewValue() + " " + e.getOldValue());
+       
+        
+        re.updatePanelPositions();
+        re.repaint();
+        re.revalidate();
+        //System.out.println("position changed " + re.getHeight());
+    }
+}

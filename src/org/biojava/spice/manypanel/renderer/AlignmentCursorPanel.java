@@ -27,6 +27,8 @@ import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
+import java.awt.RenderingHints;
+import java.awt.geom.GeneralPath;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -224,8 +226,9 @@ public class AlignmentCursorPanel extends JPanel
         
         Graphics2D g2D =(Graphics2D) g;
         
+        g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
         Composite oldComp = g2D.getComposite();
-        g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));        
+        //g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));        
         
         g2D.setColor(CursorPanel.SELECTION_COLOR);
         
@@ -251,14 +254,22 @@ public class AlignmentCursorPanel extends JPanel
         
         //logger.info(startX1 +  " " + endX1 + " " + startX2  + " " +endX2);
         
-        Polygon pol = new Polygon();
-        pol.addPoint(startX1,0);
-        pol.addPoint(startX2,h);
-        pol.addPoint(endX2,h);
-        pol.addPoint(endX1,0);
+//        Polygon pol = new Polygon();
+//        pol.addPoint(startX1,0);
+//        pol.addPoint(startX2,h);
+//        pol.addPoint(endX2,h);
+//        pol.addPoint(endX1,0);
+//        g2D.fill(pol);
         
+        GeneralPath path = new GeneralPath();
+        path.moveTo(startX1,0);            
+        path.lineTo(startX2,h);
+        path.lineTo(endX2,h);
+        path.lineTo(endX1,0);
+        path.lineTo(startX1,0);
         
-        g2D.fill(pol);
+        g2D.fill(path);
+        
         
         g2D.setComposite(oldComp);
         

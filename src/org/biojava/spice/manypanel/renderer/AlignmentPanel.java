@@ -29,6 +29,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.RenderingHints;
+import java.awt.geom.GeneralPath;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -152,7 +153,7 @@ public class AlignmentPanel extends JPanel {
         
         g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
         Composite oldComp = g2D.getComposite();
-        g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));  
+        //g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));  
         
        // logger.info("paint l " + aminosize1 + " length " + length1 + " " + scale1 + " " + scrollLeftX1 );
         
@@ -191,13 +192,22 @@ public class AlignmentPanel extends JPanel {
             else
                 g2D.setColor(COLOR_TWO);
             
-            Polygon pol = new Polygon();
+//            Polygon pol = new Polygon();
+//            
+//            pol.addPoint(p1,0);
+//            pol.addPoint(p2,h);
+//            pol.addPoint(p2+aminosize2+1,h);
+//            pol.addPoint(p1+aminosize1+1,0);
+//            g2D.fill(pol);
             
-            pol.addPoint(p1,0);
-            pol.addPoint(p2,h);
-            pol.addPoint(p2+aminosize2+1,h);
-            pol.addPoint(p1+aminosize1+1,0);
-            g2D.fill(pol);
+            GeneralPath path = new GeneralPath();
+            path.moveTo(p1,0);            
+            path.lineTo(p2,h);
+            path.lineTo(p2+aminosize2+1,h);
+            path.lineTo(p1+aminosize1+1,0);
+            path.lineTo(p1,0);
+            g2D.fill(path);
+            
         }
         g2D.setComposite(oldComp);
     }

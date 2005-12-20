@@ -1632,26 +1632,6 @@ class MyDasSourceListener implements DasSourceListener{
     
 }
 
-class MyLoadingThread extends Thread{
-    
-    SpiceApplication parent;
-    String type;
-    String code;
-    
-    public MyLoadingThread(String type, String code, SpiceApplication parent){
-        System.out.println("init MyLoadingThread");
-        this.parent = parent;
-        this.type = type;
-        this.code=code;
-    }
-    
-    public void run(){
-        System.out.println("started new MyLoadingThread " + type + " " +code);
-        parent.load(type,code);
-        
-    }
-}
-
 
 
 
