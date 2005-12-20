@@ -26,7 +26,9 @@ import java.net.*;
 import java.io.*;
 import org.biojava.spice.*;
 
-/**
+/** A thread that listens to a port and a sends incomming messages
+ * to the SpiceProtocol
+ * 
  * @author Andreas Prlic
  *
  */
@@ -42,7 +44,7 @@ extends Thread {
      */
     public SpiceMultiServerThread(Socket socket,SPICEFrame spice) {
         super("SpiceMultServerThread");
-        System.out.println("new SpiceMultiServerThread");
+
         this.socket=socket;
         this.spice = spice;
     }

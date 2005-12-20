@@ -34,15 +34,17 @@ import java.util.Map;
 import org.biojava.spice.*;
 import java.util.logging.*;
 
-/**
+/** a class that defines the protocol how two
+ * instances of spice can communicate with each other.
+ * 
  * @author Andreas Prlic
  *
  */
 public class SpiceProtocol {
     // the response
-    public final static String SPICE_OK = "SPICE: OK";
-    public final static String SPICE_WHAT = "SPICE: WHAT?";
-    public final static String SPICE_ERROR = "SPICE: ERROR";
+    public final static String SPICE_OK         = "SPICE: OK";
+    public final static String SPICE_WHAT       = "SPICE: WHAT?";
+    public final static String SPICE_ERROR      = "SPICE: ERROR";
     public final static String NO_RUNNING_SPICE = "NO SPICE!";
     
     Logger logger = Logger.getLogger("org.biojava.spice");
@@ -100,6 +102,11 @@ public class SpiceProtocol {
      * @return
      */
     public String processInput(String str,SPICEFrame spice){
+        
+        if ( str.length() < 11) {
+            logger.warning("do not understand command >" + str + "<");
+            return SPICE_WHAT;
+        }
         
         try {
             String start = str.substring(0,11);

@@ -133,6 +133,8 @@ extends JPanel {
         alignmentPanel.clearAlignment();
         seq1 = new ChainImpl();
         seq2 = new ChainImpl();
+        cursorPanel.clearSelection();
+       
     }
     
     public SequenceListener getSequenceListener1(){
@@ -185,10 +187,11 @@ extends JPanel {
     
     public void updatePanelPositions(){
         int w = getDisplayWidth();
-        cursorPanel.setBounds(0,0,w,30);
+        int h = this.getHeight();
+        cursorPanel.setBounds(0,0,w,h);
         cursorPanel.setLocation(0,0);
       
-        alignmentPanel.setBounds(0,0,w,30);
+        alignmentPanel.setBounds(0,0,w,h);
         alignmentPanel.setLocation(0,0);
        
         //Dimension viewSize = scrollPane.getViewport().getViewSize();
@@ -275,6 +278,7 @@ extends JPanel {
         alignmentPanel.setScrolled1(value);
         cursorPanel.setScrolled1(value);
         this.repaint();
+       
         
     }
     
@@ -326,6 +330,7 @@ class MySequenceListener implements SequenceListener {
             parent.setSequence2(cn);
         }
         c.repaint();
+        parent.repaint();
     }
     
     public void selectedSeqPosition(int position) {
@@ -335,6 +340,7 @@ class MySequenceListener implements SequenceListener {
         else
             c.selectedSeqPosition2(position);
         c.repaint();
+       //parent.repaint
     }
     
     public void selectedSeqRange(int start, int end) {
@@ -344,6 +350,8 @@ class MySequenceListener implements SequenceListener {
         else
             c.selectedSeqRange2(start,end);
         c.repaint();
+        //parent.repaint();
+       
         
     }
     
@@ -351,6 +359,7 @@ class MySequenceListener implements SequenceListener {
         AlignmentCursorPanel c = getCursorPanel();
         c.selectionLocked(flag);
         c.repaint();
+        //parent.repaint();
     }
     
     public void newObjectRequested(String accessionCode) {
@@ -362,6 +371,7 @@ class MySequenceListener implements SequenceListener {
         else
             c.newObjectRequested2(accessionCode);
         c.repaint();
+        //parent.repaint();
         
     }
     
@@ -373,6 +383,7 @@ class MySequenceListener implements SequenceListener {
             c.noObjectFound2(accessionCode);
         parent.clearAlignment();
         c.repaint();
+        //parent.repaint();
         
     }
     
@@ -420,10 +431,11 @@ class MyAdjustmentListener implements AdjustmentListener {
 
         // getValueIsAdjusting() returns true if the user is currently
         // dragging the scrollbar's knob and has not picked a final value
-        if (evt.getValueIsAdjusting()) {
+        //if (evt.getValueIsAdjusting()) {
             // The user is dragging the knob
-            return;
-        }
+            // do not return...
+            //return;
+        //}
 
         // Determine which scrollbar fired the event
         int orient = source.getOrientation();

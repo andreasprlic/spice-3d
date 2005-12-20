@@ -27,7 +27,6 @@ package org.biojava.spice;
 import org.biojava.spice.Config.*;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.Chain;
-import java.util.List;
 import java.net.URL;
 
 /** an interface that defines methods provided by the master application. 
@@ -50,7 +49,7 @@ public interface SPICEFrame
     /** returns a flag if data is being loaded using DAS. This is
      * needed for the differnt sub-frames to prevent them from having
      * problems with the loading threads  */    
-    public boolean isLoading() ;
+    //public boolean isLoading() ;
 
    
 
@@ -66,10 +65,10 @@ public interface SPICEFrame
     	public Structure getStructure();
     	
     /** set the new features to be displayed in sequence panels */
-    public void setFeatures(String sp_id, List features);
+    //public void setFeatures(String sp_id, List features);
 
     /** get the displayed features */
-    	public List getFeatures();
+    	//public List getFeatures();
     
     
     /** set the chain nr chainnr as the active one */
@@ -95,11 +94,11 @@ public interface SPICEFrame
 
 
     /** set the configuration from outside */
-    public void setConfiguration(RegistryConfiguration conf);
+    //public void setConfiguration(RegistryConfiguration conf);
 
     /** specify from outside whether spice should display that it is 
      * loading data */
-    public void setLoading(boolean status);
+    //public void setLoading(boolean status);
     
   
     

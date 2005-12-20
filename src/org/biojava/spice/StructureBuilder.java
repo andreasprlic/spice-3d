@@ -40,7 +40,6 @@ import java.io.*;
 
 import org.biojava.services.das.registry.DasCoordinateSystem;
 import org.biojava.spice.das.AlignmentTools;
-import org.biojava.spice.manypanel.AlignmentTool;
 import org.biojava.spice.manypanel.BrowserPane;
 
 import org.biojava.bio.program.ssbind.AnnotationFactory;

@@ -159,7 +159,7 @@ public class AlignmentPanel extends JPanel {
         
         // paint alignment
         
-        
+        int h = this.getHeight();
         
         Set keys1=  alignmentMap1.keySet();
         Iterator iter = keys1.iterator();
@@ -194,8 +194,8 @@ public class AlignmentPanel extends JPanel {
             Polygon pol = new Polygon();
             
             pol.addPoint(p1,0);
-            pol.addPoint(p2,20);
-            pol.addPoint(p2+aminosize2+1,20);
+            pol.addPoint(p2,h);
+            pol.addPoint(p2+aminosize2+1,h);
             pol.addPoint(p1+aminosize1+1,0);
             g2D.fill(pol);
         }

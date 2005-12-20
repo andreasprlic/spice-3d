@@ -1036,7 +1036,7 @@ implements AlignmentListener {
     }
     
     public void clearAlignment(){
-        logger.info("clear alignmenty");
+        //logger.info("clear alignmenty");
         object1Id = "" ;
         object2Id = "" ;
         alignment = new Alignment();

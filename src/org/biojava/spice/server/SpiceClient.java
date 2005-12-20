@@ -120,8 +120,8 @@ public class SpiceClient {
     
     private String sendParameter(PrintWriter out, BufferedReader in, String name, String value){
 
-        String command = "SPICE: param " + name;
-        command += " " + value; 
+        String command = "SPICE: param " + name.trim();
+        command += " " + value.trim(); 
         //command += ";";
           
          logger.info("sending request "+command);

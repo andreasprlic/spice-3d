@@ -200,6 +200,10 @@ public abstract class AbstractChainRenderer
             ds.clearDisplay();
         }
         
+       setScale(1.0f);
+       cursorPanel.clearSelection();
+       
+        
     }
     
     public void clearDasSources(){
@@ -349,7 +353,7 @@ public abstract class AbstractChainRenderer
         if ( w  < 200){
             w = 200;
         }
-        logger.info("displayWidth " + w + " scale" +scale + " length"+ l);
+        //logger.info("displayWidth " + w + " scale" +scale + " length"+ l);
         return w;
     }
     public int getDisplayHeight(){

@@ -194,10 +194,10 @@ implements ActionListener{
         }
         else if ( cmd.equals("Open"))
         {
-            if ( spice.isLoading() ) {
-                parent.getCom.setText("please wait, already loading");
-                return  ;
-            }
+            //if ( spice.isLoading() ) {
+            //    parent.getCom.setText("please wait, already loading");
+            //    return  ;
+            //}
             //System.out.println("open");
             String type = (String)parent.list.getSelectedItem() ;
             String code = parent.getCom.getText();

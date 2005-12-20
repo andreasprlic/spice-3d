@@ -220,6 +220,7 @@ public class AlignmentCursorPanel extends JPanel
             return;
         }
         
+        int h = this.getHeight();
         
         Graphics2D g2D =(Graphics2D) g;
         
@@ -252,8 +253,8 @@ public class AlignmentCursorPanel extends JPanel
         
         Polygon pol = new Polygon();
         pol.addPoint(startX1,0);
-        pol.addPoint(startX2,20);
-        pol.addPoint(endX2,20);
+        pol.addPoint(startX2,h);
+        pol.addPoint(endX2,h);
         pol.addPoint(endX1,0);
         
         

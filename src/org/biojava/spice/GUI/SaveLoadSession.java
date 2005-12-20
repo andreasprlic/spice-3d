@@ -152,16 +152,16 @@ public class SaveLoadSession {
             File file = chooser.getSelectedFile();
             logger.info("you requested to load file "+ file.getAbsolutePath());
             oldfile = file;
-            spice.setLoading(true);
+            
             try  {
                 fromXML(file);
             } catch (Exception e){
                 e.printStackTrace();
                 logger.warning("Could not load file. "+e.getMessage());
-                spice.setLoading(false);
+               
                 return;
             }
-            spice.setLoading(false);
+          
             logger.info("restored session from " + file.getAbsolutePath());
         }
     }
@@ -385,7 +385,7 @@ class MyParser
         // otherwise SPICE does not know where the features belong to...
         
         //System.out.println("getting structure");
-        Structure s = sxs.getStructure();
+        //Structure s = sxs.getStructure();
         
         
         // spice.setStructure set loading to false;

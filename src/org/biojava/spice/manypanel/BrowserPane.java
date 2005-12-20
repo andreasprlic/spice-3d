@@ -105,6 +105,9 @@ ChangeListener
     static Color BG_COLOR = Color.WHITE;
     JPanel contentPanel;
     
+    
+    JSlider residueSizeSlider;
+    
     public BrowserPane(String PDBCOORDSYS, String UNIPROTCOORDSYS, String ENSPCOORDSYS) {
         super();
         contentPanel = new JPanel();
@@ -376,7 +379,7 @@ ChangeListener
         int RES_MIN  = 1;
         int RES_MAX  = 100;
         int RES_INIT = 100;
-        JSlider residueSizeSlider = new JSlider(JSlider.HORIZONTAL,
+        residueSizeSlider = new JSlider(JSlider.HORIZONTAL,
                 RES_MIN, RES_MAX, RES_INIT);
         residueSizeSlider.setInverted(true);
         //residueSizeSlider.setMajorTickSpacing(5);
@@ -470,12 +473,6 @@ ChangeListener
     
     public void newDasSource(DasSourceEvent dsEvent) {
         
-        //DrawableDasSource dds = dsEvent.getDasSource();
-        // filer ds
-        //SpiceDasSource ds = dds.getDasSource();
-        //DasCoordinateSystem[] css =  ds.getCoordinateSystem();
-        
-        // TODO: enable and filter the new DAS source in the appropriate Manager
         allsources.add(dsEvent.getDasSource().getDasSource());
     }
     
@@ -649,11 +646,14 @@ ChangeListener
     public void clearDisplay(){
         
         aligManager.clearAlignment();
+        
         ensaligManager.clearAlignment();
         
         structureRenderer.clearDisplay();
         seqRenderer.clearDisplay();
         enspRenderer.clearDisplay();
+        
+        residueSizeSlider.setValue(100);
         
     }
     

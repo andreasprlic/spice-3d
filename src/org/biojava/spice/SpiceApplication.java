@@ -53,7 +53,6 @@ import java.util.Iterator  ;
 import java.awt.BorderLayout;
 import java.awt.Dimension                       ;
 import java.awt.Color                           ;
-import java.awt.Event                           ;
 import java.awt.event.*                         ;
 
 import javax.swing.Box                          ;
@@ -73,7 +72,7 @@ import javax.swing.BorderFactory                ;
 import javax.swing.JMenuBar                     ;
 import javax.swing.JMenu                        ;
 import javax.swing.JMenuItem                    ;
-import org.biojava.bio.Annotation               ;
+
 //import java.util.Map;
 import javax.swing.JDialog;
 import java.awt.Container;
@@ -200,17 +199,19 @@ ConfigurationListener
         
         // init the 2D display
         browserPane = new BrowserPane(params.getPdbcoordsys(),params.getUniprotcoordsys(), params.getEnspcoordsys());
-        
+              
+        StructurePanel structurePanel = new StructurePanel(this);	
+        structurePanelListener = new StructurePanelListener(structurePanel);
+       
         // first thing is to start das - registry communication
+        
         URL[] registries = getAllRegistryURLs();
         RegistryConfigIO regi = new RegistryConfigIO(registries);
         regi.addConfigListener(this);
         regi.run();
         
-              
-        StructurePanel structurePanel = new StructurePanel(this);	
-        structurePanelListener = new StructurePanelListener(structurePanel);
-         
+        
+        
         
         // init all panels, etc..
         statusPanel    = new StatusPanel(this);
@@ -222,7 +223,7 @@ ConfigurationListener
         
         this.getContentPane().setLayout(new BoxLayout(this.getContentPane(),BoxLayout.X_AXIS));
         this.getContentPane().add(vBox);
-        this.setLoading(false);
+       
        
         spiceMenuListener = new SpiceMenuListener(this,structurePanelListener) ;
        
@@ -703,7 +704,9 @@ ConfigurationListener
     
     public void setSpiceStartParameters(SpiceStartParameters parameters){
         startParameters = parameters;        
+        dealWithStartParameters();
         testAddLocalServer();
+        setDasSources();
     }
     
     
@@ -746,12 +749,6 @@ ConfigurationListener
     }
     
     
-    
-    public boolean isLoading() {
-        return first_load;
-    }
-    
-    
          
     
     public RegistryConfiguration getConfiguration() {
@@ -763,7 +760,7 @@ ConfigurationListener
     /** start a new thead that retrieves uniprot sequence, and if available
      protein structure
      */
-    public void loadUniprot(String uniprot) {
+    private void loadUniprot(String uniprot) {
         logger.info("SpiceApplication loadUniprot " + uniprot);
         
         if ( config == null){
@@ -781,7 +778,7 @@ ConfigurationListener
     /** start a new thead that retrieves uniprot sequence, and if available
     protein structure
     */
-   public void loadEnsp(String ensp) {
+   private void loadEnsp(String ensp) {
        logger.info("SpiceApplication loadEnsp" + ensp);
        
        if ( config == null){
@@ -805,7 +802,7 @@ ConfigurationListener
      DAS structure command from some other server this thread will
      call the setStructure method to set the protein structure.
      */
-    public void loadStructure(String pdbcod) {
+    private void loadStructure(String pdbcod) {
         
                
         
@@ -837,21 +834,9 @@ ConfigurationListener
         browserPane.triggerLoadStructure(pdbcode);
         
     }
-    
-    
+      
 
-    private String makeFeatureMemoryCode(String sp_id){
-        int i = getCurrentChainNumber();
-        // test if not PDB structure has been loaded (e.g. no network connection, 
-        // seq not mapped to PDB, etc.).
-        if ( i == -1 )
-            return sp_id;
-        Chain c = getChain(i); 
-        String mem_id = sp_id +","+pdbcode + c.getName() ;
-        return mem_id;
-    }
-
-    
+       
     /** clear the displayed data */
     public void clear(){
         
@@ -867,27 +852,10 @@ ConfigurationListener
         browseMenu.clear();
     }
     
-    /** return the features */
-    public List getFeatures(){
-        /*FeatureView[] fvs = dascanv.getFeatureViews();
-        
-        List features = new ArrayList();
-        for ( int i = 0 ; i < fvs.length ; i++){
-            FeatureView fv = fvs[i];
-            Feature[] feats =fv.getFeatures();
-            for ( int f = 0 ; f< feats.length;f++){
-                Feature feat =feats[f];
-                features.add(feat);
-            }
-        }
-        */
-        return null;
-        //return features;
-        //return dascanv.getFeatures();
-    }
+    
     
     //TODO: remove this method
-    /**  update the currently displayed features */
+    /**  update the currently displayed features 
     public void setFeatures(String sp_id, List tmpfeat) {
         //TODO: build up a new dascanv!
         logger.warning("depreciated method");
@@ -914,11 +882,11 @@ ConfigurationListener
         
         //this.paint(this.getGraphics());
         updateDisplays();
-    }
+    }*/
     
     
 
-    private  void getNewFeatures(String sp_id) {
+   /* private  void getNewFeatures(String sp_id) {
         //logger.("SpiceApplication get new Features " + sp_id);
         //ArrayList featureservers = getFeatureServers() ;
         logger.finest(" getNewFeatures" + sp_id);
@@ -970,8 +938,13 @@ ConfigurationListener
         
         
         
-    }
+    } */
 
+    
+    
+    /** test if a local DAS source is defined in the startup parameters
+     * If yes, add it to the list of servers in config
+     */
     private void testAddLocalServer(){
         if ( config == null){
             return ;
@@ -1052,12 +1025,7 @@ ConfigurationListener
         
         //System.out.println("SpiceApplication... setting structure in Jmol");
         
-        if ( startParameters.getDisplayMessage() != null) {
-            boolean displayScript = false; 
-            structurePanelListener.setStructure(structure,displayScript);
-        } else {
-            structurePanelListener.setStructure(structure);
-        }
+        
         
         //System.out.println("SpiceApplication... back in main spice");
         logger.finest("back in main spice ...");
@@ -1082,7 +1050,9 @@ ConfigurationListener
         
         //if ( chain != null) 
             //seqTextPane.setChain(chain,0);
-        
+        */
+
+    private void dealWithStartParameters(){
         
         if ( startParameters.getRasmolScript() != null){
             // only execute the rasmol script command the first time.
@@ -1128,11 +1098,11 @@ ConfigurationListener
         
       
         
-        updateDisplays();
+        //updateDisplays();
         //notifyAll();
                 
     }
-    */
+    
     
     /** display a dialog with a message... 
      * 
@@ -1210,6 +1180,7 @@ ConfigurationListener
         return chain.getSwissprotId();
     }
     
+    /*
     public void setConfiguration(RegistryConfiguration reg) {
         logger.info("setting configuration");
         config = reg;
@@ -1232,6 +1203,7 @@ ConfigurationListener
         
     }
     
+    */
     public int getCurrentChainNumber() {
         return chainDisplay.getCurrentChainNumber();
         //return browserPane.getCurrentChainNumber();
@@ -1258,8 +1230,7 @@ ConfigurationListener
         //structurePanelListener.setCurrentChainNumber(newCurrentChain);
         statusPanel.setCurrentChainNumber(newCurrentChain);
         
-        //TODO move this functionality into other class
-        // move to SpiceDasServerConfigListener ???
+    
         // update features to be displayed ...
         Chain chain = getChain(newCurrentChain) ;
         System.out.println("SpiceApplication got chain " );
@@ -1348,11 +1319,6 @@ ConfigurationListener
     }
 */
     
-    public void setLoading(boolean status){
-        first_load = status;
-        //statusPanel.setLoading(status);
-       
-    }
     
  
     
@@ -1377,16 +1343,15 @@ ConfigurationListener
         return showDocument(url);
     }
     
-       
-    public synchronized void newConfigRetrieved(RegistryConfiguration conf){
-        logger.info("received new config " );
-        config = conf;
-        configLoaded =true;
-        
-        List l = config.getAllServers();
-        logger.finest("got " + l.size() + " servers");
+    
+    private SpiceDasSource[] filterSourcesWithStartupData(List l){
+
+     
         Iterator iter = l.iterator();
+            
+        
         SpiceDasSource[] sources = new SpiceDasSource[l.size()];
+        
         int i = 0;
         while (iter.hasNext()){
             SpiceDasSource ds = (SpiceDasSource) iter.next();
@@ -1395,14 +1360,37 @@ ConfigurationListener
             i++;
         }
         
-        // add das sources from arguments ...
-        //TODO; add them
+        StartParametereFilter filter = new StartParametereFilter(startParameters);
         
+        return filter.filterSources(sources);
+    }
+    
+    
+    
+    private void setDasSources(){
+
+        List l = config.getAllServers();
+        logger.finest("got " + l.size() + " servers");
+        
+       
+        SpiceDasSource[] sources = filterSourcesWithStartupData(l);
+         
         browserPane.clearDasSources();
         browserPane.setDasSources(sources);
         
+    }
+    
+       
+    public synchronized void newConfigRetrieved(RegistryConfiguration conf){
+        logger.info("received new config " );
+        config = conf;
+        configLoaded =true;
         
+        testAddLocalServer();
+        setDasSources();
+                
         triggerQueuedRequests();
+        dealWithStartParameters();
         notifyAll();
     }
     
@@ -1510,7 +1498,7 @@ ConfigurationListener
     }
     
     
-    /** Event handling */
+    /** Event handling 
     public boolean handleEvent(Event event) 
     {
         //logger.finest("EVENT!");
@@ -1528,7 +1516,7 @@ ConfigurationListener
         
         return true ;
         
-    }    
+    }    */
     
     public boolean showDocument(URL url) 
     {
