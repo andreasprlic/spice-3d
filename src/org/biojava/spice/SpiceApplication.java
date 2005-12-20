@@ -387,7 +387,8 @@ ConfigurationListener
         }
         if (logger.isLoggable(Level.FINEST)) {
             logger.finest("using Proxy:" + System.getProperty("proxySet"));
-        }  
+        }
+        
     }
     
     /** Constructor for structure alignment visualization 
@@ -1056,7 +1057,7 @@ ConfigurationListener
         
         if ( startParameters.getRasmolScript() != null){
             // only execute the rasmol script command the first time.
-            structurePanelListener.executeCmd(startParameters.getRasmolScript());
+            structurePanelListener.setRasmolScript(startParameters.getRasmolScript());
             startParameters.setRasmolScript( null);
         }
       
@@ -1072,27 +1073,36 @@ ConfigurationListener
         
         if ( seqSelectStart >=0 ){
             //dascanv.selectedSeqRange(seqSelectStart, seqSelectEnd);
-            structurePanelListener.selectedSeqRange(seqSelectStart, seqSelectEnd);
+            //structurePanelListener.selectedSeqRange(seqSelectStart, seqSelectEnd);
             //seqTextPane.selectedSeqRange(seqSelectStart, seqSelectEnd);
+            
+            browserPane.setSeqSelection(seqSelectStart,seqSelectEnd);
             
             // lock selectiion
             //dascanv.selectionLocked(true);
-            structurePanelListener.selectionLocked(true);
+            //structurePanelListener.selectionLocked(true);
             //seqTextPane.selectionLocked(true);
             
             //reset...
             seqSelectStart = -1;
             seqSelectEnd = -1;
+            startParameters.setSeqSelectStart(-1);
+            startParameters.setSeqSelectEnd(-1);
         } else {
             // perhaps a PDB range has been provided
-            String pdbSelectStart = startParameters.getPdbSelectEnd();
+            String pdbSelectStart = startParameters.getPdbSelectStart();
             String pdbSelectEnd   = startParameters.getPdbSelectEnd();
             
             if ( pdbSelectStart != null){
-                String cmd = "select " + pdbSelectStart + " - " + pdbSelectEnd + "; set displaySelected";
-                structurePanelListener.executeCmd(cmd);
+                //String cmd = "select " + pdbSelectStart + " - " + pdbSelectEnd + "; set displaySelected";
+                //structurePanelListener.executeCmd(cmd);
+                structurePanelListener.setPDBSelectStart(pdbSelectStart);
+                structurePanelListener.setPDBSelectEnd(pdbSelectEnd);
+                
                 pdbSelectStart = null;
                 pdbSelectEnd = null;
+                startParameters.setPdbSelectStart(null);
+                startParameters.setPdbSelectEnd(null);
             }
         }
         

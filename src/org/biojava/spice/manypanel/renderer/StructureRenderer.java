@@ -40,6 +40,7 @@ extends AbstractChainRenderer
     //StructureFeaturePanel featurePanel;
     static Logger logger = Logger.getLogger("org.biojava.spice");
     
+   
     
     public StructureRenderer() {
         //super();
@@ -52,6 +53,10 @@ extends AbstractChainRenderer
         statusPanel.setName("PDB");
         
         initPanels();
+        
+       
+        
+        
     }
 
     
@@ -69,6 +74,7 @@ extends AbstractChainRenderer
         
     }
     
+       
     public void setDrawableStructure(DrawableStructure draw){
         statusPanel.setLoading(false);
         //logger.info("got new DrawableStructure");

@@ -65,6 +65,11 @@ SpiceFeatureListener
     static Logger    logger      = Logger.getLogger("org.biojava.spice");
     int oldpos ;
     boolean selectionIsLocked ;
+    
+    String  pdbSelectStart;
+    String  pdbSelectEnd;
+    String   rasmolScript;
+    
     /**
      * 
      */
@@ -75,6 +80,9 @@ SpiceFeatureListener
         //int oldpos = -1;
         selectionIsLocked =false;
         structure = new StructureImpl();
+        pdbSelectStart = null;
+        pdbSelectEnd = null;
+        rasmolScript = null;
     }
     
     /** display a new PDB structure in Jmol 
@@ -100,8 +108,38 @@ SpiceFeatureListener
                executeCmd(INIT_SELECT);
    
       
+       if ( pdbSelectStart != null) {
+           String cmd = ""; 
+           if ( rasmolScript != null) {
+               cmd += rasmolScript;
+           }           
+           cmd +=  "select " + pdbSelectStart + " - " + pdbSelectEnd + "; set displaySelected";
+           
+           executeCmd(cmd);
+           pdbSelectStart = null;
+           pdbSelectEnd = null;
+           rasmolScript = null;
+       }
+       
+       if ( rasmolScript != null){
+           executeCmd(rasmolScript);
+       }
+       
    }
    
+
+    public void setPDBSelectStart(String start){
+        pdbSelectStart = start;
+
+    } 
+    public void setPDBSelectEnd(String end){
+        pdbSelectEnd = end;
+    }
+    
+    public void setRasmolScript(String script){
+        rasmolScript = script;
+    }
+        
    /** display a new PDB structure in Jmol 
     * @param structure a Biojava structure object    
     *

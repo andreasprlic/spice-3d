@@ -60,6 +60,8 @@ SpiceFeatureListener
     
     //private BufferedImage imbuf;
     
+    int storeStart ;
+    int storeEnd ; 
     
     public CursorPanel() {
         super(); 
@@ -67,15 +69,16 @@ SpiceFeatureListener
         setDoubleBuffered(true);
              
         selectionLocked = false;
+        
+        storeStart = -1;
+         storeEnd  = -1;
+        
     }
-    
-   
-    
-    
+     
     
     
     public void newSequence(SequenceEvent e) {
-    
+       
         
     }
     
@@ -86,6 +89,16 @@ SpiceFeatureListener
         setSelectionEnd(-1);
         
         this.repaint();
+    }
+    
+    /** this selection will be auto-selected when the next sequence is loaded
+     * 
+     * @param start
+     * @param end
+     */
+    public void setSeqSelection(int start, int end){
+        storeStart = start;
+        storeEnd   = end;
     }
     
     public void selectedSeqPosition(int position) {
@@ -153,6 +166,13 @@ SpiceFeatureListener
     public void setChain(Chain c){
         chain = c;
         chainLength = c.getLength();
+        
+        if ( storeStart > -1){
+            selectedSeqRange(storeStart,storeEnd);
+            storeStart = -1;
+            storeEnd   = -1;
+        }
+        
     }
     
     

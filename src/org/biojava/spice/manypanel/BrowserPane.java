@@ -88,6 +88,8 @@ ChangeListener
     SequenceRenderer seqRenderer;
     SequenceRenderer enspRenderer;
     
+    int storeStart;
+    int storeEnd;
     
     StructureManager strucManager;
     SequenceManager seqManager;
@@ -121,8 +123,7 @@ ChangeListener
         allsources         = new ArrayList();
         
         
-        
-        
+              
         strucManager = new StructureManager();
         addStructureListener(strucManager);
         
@@ -661,6 +662,13 @@ ChangeListener
         return strucManager;
         
     }
+    
+    public void setSeqSelection(int start, int end){
+       seqRenderer.getCursorPanel().setSeqSelection(start,end);
+       
+    }
+    
+  
     
     
     /** test if a server is a UniProt vs PDBresnum alignment server */
