@@ -61,7 +61,7 @@ public class StartParametereFilter {
      * @param spiceargument
      */
     private void setDisplayServers(String spiceargument){
-        logger.info("SpiceParameterFilter  " + spiceargument);
+        //logger.info("SpiceParameterFilter  " + spiceargument);
         if ( spiceargument == null )
             if ((displayLabels == null ) || ( displayLabels.length == 0)) {
                 displayDASServers = new String[0];

@@ -144,7 +144,7 @@ implements JmolStatusListener
         }
          
          if ( structure.size() < 1 ) {
-             logger.info("got structure of size < 1");
+             //logger.info("got structure of size < 1");
              
              executeCmd(EMPTYCMD);
              return;

@@ -133,7 +133,7 @@ extends JPanel{
         if ( aminosize < 1)
             aminosize = 1;
         int requiredWidth = DEFAULT_X_START + (aminosize * chain.getLength()) + DEFAULT_X_RIGHT_BORDER ;
-        logger.info("required width " + requiredWidth);
+        //logger.info("required width " + requiredWidth);
         //if (dbImage == null)
         //{
            

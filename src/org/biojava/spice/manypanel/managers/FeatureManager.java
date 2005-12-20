@@ -104,7 +104,7 @@ implements ObjectManager ,SequenceListener{
     }
 
     public void setDasSources(DasSource[] dasSourcs) {
-        logger.info("got " + dasSourcs.length + "feature sources for coordSYs " + coordSys);
+        //logger.info("got " + dasSourcs.length + "feature sources for coordSYs " + coordSys);
         
         Iterator iter = featureRenderers.iterator();
         while (iter.hasNext()){

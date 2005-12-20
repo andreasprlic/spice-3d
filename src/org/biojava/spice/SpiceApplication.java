@@ -1392,7 +1392,7 @@ ConfigurationListener
     
        
     public synchronized void newConfigRetrieved(RegistryConfiguration conf){
-        logger.info("received new config " );
+        //logger.info("received new config " );
         config = conf;
         configLoaded =true;
         
@@ -1406,7 +1406,7 @@ ConfigurationListener
     
     public  void triggerQueuedRequests(){
         // trigger queued requests
-        logger.info("triggerQueuedRequest");
+        //logger.info("triggerQueuedRequest");
                
         if ( waitingType != null){
             //MyLoadingThread thr = new MyLoadingThread(waitingType,waitingCode,this);
@@ -1435,7 +1435,7 @@ ConfigurationListener
     
     /** update the DIsplays of the subpanes */
     public void updateDisplays() {
-        logger.finest("updateDisplays + features size: " + features.size());
+        //logger.finest("updateDisplays + features size: " + features.size());
         //SeqFeatureCanvas dascanv = daspanel.getCanv();
         
         browserPane.repaint();

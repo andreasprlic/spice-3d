@@ -198,7 +198,7 @@ implements AlignmentListener {
     }
     
     public void setAlignmentServers(SpiceDasSource[] servers){
-        logger.info(panelName+ " got "+servers.length+"  alignmentservers");
+        //logger.info(panelName+ " got "+servers.length+"  alignmentservers");
         alignmentServers = servers;
     }
     public SequenceListener getSeq1Listener(){
@@ -214,7 +214,7 @@ implements AlignmentListener {
      * 
      */
     public void noAlignmentFound(AlignmentEvent event){
-        logger.info("no alignment found!");
+        //logger.info("no alignment found!");
         Annotation[] os = event.getAlignment().getObjects();
         if ( os.length < 2){
             // something strange is going on here..
@@ -228,7 +228,7 @@ implements AlignmentListener {
         Annotation a2 = os[1];
         String ac1 =  (String) a1.getProperty("dbAccessionId");
         String ac2 =  (String) a2.getProperty("dbAccessionId");
-        logger.info("no alignment for " + ac1 + " " + ac2);
+        //logger.info("no alignment for " + ac1 + " " + ac2);
         if ( ac1.equalsIgnoreCase(object1Id)) {
             triggerNoObject2(ac2 );
         }
@@ -249,7 +249,7 @@ implements AlignmentListener {
         if ( os.length < 2){
             // something strange is going on here..
             // perhaps a crazy server
-            logger.warning(panelName+" got  alignment of wrong # objects...");
+            //logger.warning(panelName+" got  alignment of wrong # objects...");
             return;
         }
         alignment = event.getAlignment();
@@ -263,7 +263,7 @@ implements AlignmentListener {
         ac1 = ac1.toLowerCase();
         ac2 = ac2.toLowerCase();
         
-        logger.info(panelName+" got new Alignment "+ac1 + " " + ac2+   " currently know:"+object1Id+" " + object2Id);
+        //logger.info(panelName+" got new Alignment "+ac1 + " " + ac2+   " currently know:"+object1Id+" " + object2Id);
         
         // we need to find out which of the two objects is object1/object2 ...
         
@@ -330,8 +330,8 @@ implements AlignmentListener {
             found2 =true;
         
         if ( ! (found1 && found2)) {
-            logger.info(panelName + " can not create alignmentChain, yet >" + ac1 + "< >" + ac2 + 
-                    "< >" + object1Id + "< >" + object2Id+"<");
+            //logger.info(panelName + " can not create alignmentChain, yet >" + ac1 + "< >" + ac2 + 
+            //        "< >" + object1Id + "< >" + object2Id+"<");
             return;
         }
         
@@ -343,13 +343,13 @@ implements AlignmentListener {
            //logger.info("stored alignment in manager");
         } catch (Exception e){
             e.printStackTrace();
-            logger.warning(e.getMessage());
+            //logger.warning(e.getMessage());
         }
         
     }
     
     public void triggerNoObject1(String ac){
-        logger.info("trigger no object 1");
+        //logger.info("trigger no object 1");
         Iterator iter = object1Listeners.iterator();
         if  (! coordSys1.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS) )
             ac = ac.toUpperCase();
@@ -362,7 +362,7 @@ implements AlignmentListener {
     
 
     public void triggerNoObject2(String ac){
-        logger.info("trigger no object 2");
+        //logger.info("trigger no object 2");
         Iterator iter = object2Listeners.iterator();
         if  (! coordSys2.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS) )
             ac = ac.toUpperCase();
@@ -375,12 +375,12 @@ implements AlignmentListener {
     
     
     public void triggerObject1Request(String ac){
-        logger.info("should trigger object 1 request ?" + ac + " " + object1Id);
+        //logger.info("should trigger object 1 request ?" + ac + " " + object1Id);
         if ( ac.equals(object1Id)) {
-            logger.info("no...");
+            //logger.info("no...");
             return;
         }
-        logger.info("yes, do trigger object 1 request " + ac);
+        //logger.info("yes, do trigger object 1 request " + ac);
         object1Id =ac;
         
         Iterator iter = object1Listeners.iterator();
@@ -394,16 +394,16 @@ implements AlignmentListener {
     }
     
     public void triggerObject2Request(String ac){
-        logger.info("should trigger object 2 request ? " + ac);
+        //logger.info("should trigger object 2 request ? " + ac);
         if ( ac.equals(object2Id)) {
-            logger.info("no...");
+            //logger.info("no...");
             return;
         }
         object2Id = ac;
         
         if  (! coordSys2.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS) )
             ac = ac.toUpperCase();
-        logger.info("do triggerObject2Request " + ac);
+        //logger.info("do triggerObject2Request " + ac);
         
         Iterator iter = object2Listeners.iterator();
         while (iter.hasNext()){
@@ -439,17 +439,17 @@ implements AlignmentListener {
     }
     
     public void newSequence1(SequenceEvent e){
-        logger.info(panelName+" alignment : new sequence1:" + e.getAccessionCode() + " currently know:"+object1Id+" " + object2Id);
+        //logger.info(panelName+" alignment : new sequence1:" + e.getAccessionCode() + " currently know:"+object1Id+" " + object2Id);
         
        String ac = e.getAccessionCode().toLowerCase();
        SequenceManager sm = new SequenceManager();
         if (  object1Id.equalsIgnoreCase(ac) || object2Id.equalsIgnoreCase(ac)){
             
             if ( alignmentIsLoaded(object1Id,object2Id)) {
-                logger.info("we got the alignment, now checking sequences");
+                //logger.info("we got the alignment, now checking sequences");
                 if ( sequence1.getSequence().equals(e.getSequence())) {
                 // we already go this one, ignore...
-                    logger.info("already loaded, skipping");
+                    //logger.info("already loaded, skipping");
                     tryCreateAlignmentChain();
                     return;
                 } else {
@@ -578,40 +578,7 @@ implements AlignmentListener {
         
     }
     
-    /** request a particular alignment between two objects *
-    /private void requestAlignment(String query,  String subject,DasCoordinateSystem queryCS){
-        
-        if ( alignmentIsLoaded(query,subject) ) {
-            return;
-        }
-        logger.info("request alignment " + query + " " + subject);
-        
-        AlignmentParameters para = new AlignmentParameters();
-        para.setQuery(query);
-        para.setSubject(subject);
-        
-        para.setDasSources(alignmentServers);
-        
-        
-        AlignmentThread thread = null;
-        // TODO: find a cleaner solution for this:
-        if ( panelName.equals("UP_ENSP")){
-            DasCoordinateSystem ecs = new DasCoordinateSystem();
-            ecs.setName("ensemblpep-human-ncbi35");
-            para.setSubjectCoordinateSystem(ecs); 
-            para.setQueryCoordinateSystem(DasCoordinateSystem.fromString(BrowserPane.DEFAULT_PDBCOORDSYS));
-//          thread =    new AlignmentThread(panelName,query,subject, alignmentServers,"ensemblpep-human-ncbi35");
-            
-        }
-            else   {
-            para.setQueryCoordinateSystem(queryCS);
-            //thread = new AlignmentThread(panelName,query,subject, alignmentServers, queryCS);
-        } 
-        thread = new AlignmentThread(para);
-        thread.addAlignmentListener(this);
-        thread.start();
-    }
-    */
+    
     /** request the first alignment for a particular accession code 
     * 
     * @param params
@@ -632,15 +599,15 @@ implements AlignmentListener {
     
     
     public void newSequence2(SequenceEvent e){
-        logger.info(panelName+" alignment : new sequence2:"+e.getAccessionCode() + 
-                " currently know 1: >"+object1Id+"< 2: >" + object2Id + "< seq: >" + sequence2.getSequence()+"<");
+        //logger.info(panelName+" alignment : new sequence2:"+e.getAccessionCode() + 
+           //     " currently know 1: >"+object1Id+"< 2: >" + object2Id + "< seq: >" + sequence2.getSequence()+"<");
         
         String ac = e.getAccessionCode().toLowerCase();
         
         SequenceManager sm = new SequenceManager();
         if (  object2Id.equalsIgnoreCase(ac) || object1Id.equalsIgnoreCase(ac)){
             if ( alignmentIsLoaded(object1Id,object2Id)) {
-                logger.info("we got the alignment, now checking sequences");
+                //logger.info("we got the alignment, now checking sequences");
                 String s2 = sequence2.getSequence();
                 String es = e.getSequence();
                 
@@ -649,7 +616,7 @@ implements AlignmentListener {
                 //logger.info("comp: " + s2.compareTo(es)+"");
                 if ( s2.equals(es)) {
                     // we already go this one, ignore...
-                    logger.info("already loaded, skipping >" + es+"<");
+                    //logger.info("already loaded, skipping >" + es+"<");
                     tryCreateAlignmentChain();
                     return;
                 } else {
@@ -669,7 +636,7 @@ implements AlignmentListener {
             }
         }
         
-        logger.info("setting new sequence 2" + e.getSequence());
+        //logger.info("setting new sequence 2" + e.getSequence());
         
         sequence2 = sm.getChainFromString(e.getSequence());
       
@@ -743,7 +710,7 @@ implements AlignmentListener {
     }
     
     public void requestedObject1(String o){
-        logger.info("a new object1 has been requested");
+        //logger.info("a new object1 has been requested");
         Iterator iter = sequence1Listeners.iterator();
         while (iter.hasNext()){
             SequenceListener li = (SequenceListener )iter.next();
@@ -752,7 +719,7 @@ implements AlignmentListener {
     }
     
     public void requestedObject2(String o){
-        logger.info("a new object2 has been requested");
+        //logger.info("a new object2 has been requested");
         Iterator iter = sequence2Listeners.iterator();
         while (iter.hasNext()){
             SequenceListener li = (SequenceListener )iter.next();
@@ -802,7 +769,7 @@ implements AlignmentListener {
      */
     private int getNextPosition1(int pos2, int searchdirection){
         int i = pos2;
-        logger.info("searching for next position1 of " + i + " " + searchdirection);
+        //logger.info("searching for next position1 of " + i + " " + searchdirection);
                                
         while ( (i >=-1 ) && ( i < sequence2.getLength())){
             Integer p = new Integer(i);
@@ -810,7 +777,7 @@ implements AlignmentListener {
             if ( alignmentMap2.containsKey(p)){
                 //System.out.println(alignmentMap2.get(p));
                 Integer spos1 = (Integer) alignmentMap2.get(p);
-                logger.info("found " + p);
+                //logger.info("found " + p);
                 return spos1.intValue();
             }
             
@@ -831,7 +798,7 @@ implements AlignmentListener {
      */
     private int getNextPosition2(int pos1, int searchdirection){
         int i = pos1;
-        logger.info("get next position 2 " + pos1 + " " + searchdirection);
+        //logger.info("get next position 2 " + pos1 + " " + searchdirection);
                           
         while ( (i >=-1 ) && ( i < sequence1.getLength())){
             Integer p = new Integer(i);
@@ -839,7 +806,7 @@ implements AlignmentListener {
             if ( alignmentMap1.containsKey(p)){
                 //System.out.println(alignmentMap2.get(p));
                 Integer spos2 = (Integer) alignmentMap1.get(p);
-                logger.info("found " + p);
+               // logger.info("found " + p);
                 return spos2.intValue();
             }
             

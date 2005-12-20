@@ -31,7 +31,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.ArrayList;
@@ -95,14 +94,14 @@ extends Thread{
         
         if ( queryCoordSys != null ){
             String qcs = queryCoordSys.toString();
-            logger.info("found queryCS " + qcs + " query " + query + " subject " + subject);
+            //logger.info("found queryCS " + qcs + " query " + query + " subject " + subject);
             
             if ( qcs.equals (PDB_COORD_SYS) ) {
-                logger.info("looks like a PDB " + qcs + " " + PDB_COORD_SYS);
+                //logger.info("looks like a PDB " + qcs + " " + PDB_COORD_SYS);
                 query = query.substring(0,4);
             }
         }
-        logger.info("requesting for query " + query);
+        //logger.info("requesting for query " + query);
         Alignment[] aligs = getAlignments(query);
         if ( aligs.length == 0) {
             triggerNoAlignmentFound(query,subject);
@@ -113,21 +112,21 @@ extends Thread{
         
         // take the right alignment
         if (  subject != null) {
-            logger.info("subject " + subject);
+            //logger.info("subject " + subject);
             if ( parameters.getQueryPDBChainId() != null)
                 query = query +"." + parameters.getQueryPDBChainId();
             if ( parameters.getSubjectPDBChainId() != null)
                 subject = subject + "." + parameters.getSubjectCoordinateSystem();
           
-            logger.info("searching for " + query + " " + subject);
+            //logger.info("searching for " + query + " " + subject);
             boolean found = false;
             for ( int i=0; i< aligs.length;i++ ){
                 Alignment a = aligs[i];
-                logger.info("checking alignment " + a.toString());
+                //logger.info("checking alignment " + a.toString());
                 try {
                     AlignmentTools.getObject(query,a);
                     AlignmentTools.getObject(subject,a);
-                    logger.info("found alignment for "+query + " " + subject);
+                    //logger.info("found alignment for "+query + " " + subject);
                     finalAlig = a;
                     found = true;
                     break;
@@ -187,7 +186,7 @@ extends Thread{
     
     /** get alignments for a particular uniprot or pdb code */
     private  Alignment[] getAlignments(String code) {
-        logger.finest(logname + "searching for alignments of "+code+" ");
+        //logger.finest(logname + "searching for alignments of "+code+" ");
         Alignment[] alignments = new Alignment[0] ;
         SpiceDasSource[] dasSources = parameters.getDasSources();
         //List aligservers = config.getServers("alignment");
@@ -235,7 +234,7 @@ extends Thread{
             
             }
             
-            logger.info(logname + " contacing alignment server " + dasalignmentcommand);
+            //logger.info(logname + " contacing alignment server " + dasalignmentcommand);
             //System.out.println("contacing alignment server " + dasalignmentcommand);
             
             
@@ -245,7 +244,7 @@ extends Thread{
                 //alignments = dasc.getAlignments(code);
                 alignments= retreiveAlignments(dasalignmentcommand);
                 
-                logger.finest(logname + " DASAlignmentHandler: got "+ alignments.length +" alignment(s):");
+                //logger.finest(logname + " DASAlignmentHandler: got "+ alignments.length +" alignment(s):");
                 if ( alignments.length == 0 ) {
                     // check next alignment server ...
                     continue ;
@@ -269,6 +268,8 @@ extends Thread{
     private Alignment[] retreiveAlignments(String url)
     throws IOException
     {
+        
+        logger.info("requesting alignment " + url);
         /* now connect to DAS server */
         
         URL dasUrl = null ;

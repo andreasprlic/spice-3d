@@ -176,11 +176,6 @@ SpiceFeatureListener
     }
     
     
-    
-    
-    
-    
-    
     public void featureSelected(SpiceFeatureEvent e) {
    
         //setToolTipText(e.getFeature().toString());

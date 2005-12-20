@@ -78,14 +78,14 @@ import java.net.URL;
  *
  */
 public class ConfigGui {
-    SPICEFrame spice;
+    SpiceApplication spice;
     RegistryConfiguration config ;
     /**
      * 
      */
-    public ConfigGui(SPICEFrame spicef) {
+    public ConfigGui(SpiceApplication spicef) {
         super();
-        // TODO Auto-generated constructor stub
+        
         spice =spicef;
         config = spice.getConfiguration();
     }
@@ -160,7 +160,7 @@ public class ConfigGui {
             }	    
         }
     }
-
+    
 }
 
 
@@ -238,7 +238,7 @@ implements ActionListener
             
             
         }
-        }
+    }
 }
 
 
@@ -263,13 +263,13 @@ class ConfigPanel extends JPanel implements ConfigurationListener {
     JComboBox updateBehaveList         ;
     
     int selectMoveStartPosition        ;
-    SPICEFrame spice                   ;
+    SpiceApplication spice                   ;
     static Logger    logger      = Logger.getLogger("org.biojava.spice");
     
     static String PDBCOORDSYS     = "PDBresnum,Protein Structure";
     static String UNIPROTCOORDSYS = "UniProt,Protein Sequence";
-
-    public ConfigPanel(SPICEFrame spice_,RegistryConfiguration conf) {
+    
+    public ConfigPanel(SpiceApplication spice_,RegistryConfiguration conf) {
         super(new GridLayout(1, 1));
         spice = spice_;
         config = conf;
@@ -378,7 +378,7 @@ class ConfigPanel extends JPanel implements ConfigurationListener {
         JButton contactRegistryNow = new JButton ("Now");
         ConfigActionListener cal = new ConfigActionListener(spice,config,this);
         contactRegistryNow.addActionListener(cal);
-     
+        
         
         Box h = Box.createHorizontalBox();
         JTextField txt2 = new JTextField("detect available servers") ;
@@ -720,7 +720,7 @@ class ConfigPanel extends JPanel implements ConfigurationListener {
         
         
         MouseListener popupListener = new PopupListener(tablePopup,dasSourceTable,config);
-      
+        
         dasSourceTable.addMouseListener(popupListener);
         
         // Add the table to a scrolling pane
@@ -835,7 +835,7 @@ class ConfigPanel extends JPanel implements ConfigurationListener {
         int pos = tabbedPane.getSelectedIndex();
         //System.out.println("active tab: " + pos);
         
-            
+        
         
         // add a new local DAS source ...
         if ( pos == 1 ) {	    
@@ -879,11 +879,11 @@ class ConfigPanel extends JPanel implements ConfigurationListener {
             
             
             String [] coordSys = (String[]) formdata.get("coordinateSystems");
-	    DasCoordinateSystem[] dcss = new DasCoordinateSystem[coordSys.length];
-	    for ( int i = 0 ; i< coordSys.length;i++) {
-		DasCoordinateSystem dcs = DasCoordinateSystem.fromString(coordSys[i]);
-		dcss[i] = dcs;
-	    }
+            DasCoordinateSystem[] dcss = new DasCoordinateSystem[coordSys.length];
+            for ( int i = 0 ; i< coordSys.length;i++) {
+                DasCoordinateSystem dcs = DasCoordinateSystem.fromString(coordSys[i]);
+                dcss[i] = dcs;
+            }
             sds.setCoordinateSystem(dcss);
             
             String[] capabs =  (String[]) formdata.get("capabilities") ;	    
@@ -911,10 +911,10 @@ class ConfigPanel extends JPanel implements ConfigurationListener {
             sds.setDescription("Access PDB files from local installation. If file not found, retreive from public DAS server");
             //String[] coordSys = new String[] { "PDBresnum", };
             String[] capabs   = new String[] { "structure", };
-
-	    DasCoordinateSystem dcs = DasCoordinateSystem.fromString(PDBCOORDSYS);
-	    DasCoordinateSystem[] dcss = new DasCoordinateSystem[1];
-	    dcss[0] = dcs;
+            
+            DasCoordinateSystem dcs = DasCoordinateSystem.fromString(PDBCOORDSYS);
+            DasCoordinateSystem[] dcss = new DasCoordinateSystem[1];
+            dcss[0] = dcs;
             sds.setCoordinateSystem(dcss);
             sds.setCapabilities(capabs);
             config.addServer(sds);
@@ -937,6 +937,7 @@ class ConfigPanel extends JPanel implements ConfigurationListener {
         uarr[0] = registryurl;
         RegistryConfigIO registryIO = new RegistryConfigIO(uarr);
         registryIO.setConfiguration(config);
+        registryIO.addConfigListener(spice);
         registryIO.saveConfiguration();
         
     }
@@ -1135,11 +1136,11 @@ class ConfigActionListener implements ActionListener{
     ConfigPanel parent;
     static Logger    logger      = Logger.getLogger("org.biojava.spice");
     
-    	public ConfigActionListener(SPICEFrame spice_, RegistryConfiguration config_, ConfigPanel tpd){
-    	    spice = spice_;
-    	    config = config_;
-    	    parent = tpd;
-    	}
+    public ConfigActionListener(SPICEFrame spice_, RegistryConfiguration config_, ConfigPanel tpd){
+        spice = spice_;
+        config = config_;
+        parent = tpd;
+    }
     
     public void actionPerformed(ActionEvent e) {
         try {

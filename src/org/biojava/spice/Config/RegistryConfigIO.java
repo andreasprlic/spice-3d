@@ -444,7 +444,7 @@ extends Thread
             logger.log(Level.WARNING,e.getMessage() + "while saving config locally");
         }
         
-	notifyConfigListeners();
+        notifyConfigListeners();
         
     }
     

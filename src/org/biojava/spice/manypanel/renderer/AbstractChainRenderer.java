@@ -182,7 +182,7 @@ public abstract class AbstractChainRenderer
     
     public void setComponentWidth(int width){
         componentWidth = width;
-        logger.info("componentWidth" + width);
+        //logger.info("componentWidth" + width);
         calcScale(zoomFactor);
         this.revalidate();
         this.repaint();
