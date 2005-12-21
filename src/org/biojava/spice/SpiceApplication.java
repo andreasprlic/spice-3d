@@ -511,7 +511,7 @@ ConfigurationListener
         browserPane.addUniProtSequenceListener(statusPanel);
         browserPane.addStructureListener(structurePanelListener);
         browserPane.addPDBPositionListener(structurePanelListener);
-        browserPane.addSpiceFeatureListener(statusPanel);
+        browserPane.addPDBSpiceFeatureListener(statusPanel);
         browserPane.addPDBPositionListener(statusPanel);
         browserPane.addStructureListener(statusPanel);
         browserPane.addStructureListener(browseMenu.getPDBListener());
@@ -519,7 +519,7 @@ ConfigurationListener
         browserPane.addEnspSeqeuenceListener(browseMenu.getEnspListener());
         
         // listener for das sources
-        browserPane.addSpiceFeatureListener(structurePanelListener);
+        browserPane.addPDBSpiceFeatureListener(structurePanelListener);
         
         
         MyDasSourceListener mdsl = new MyDasSourceListener(this);

@@ -125,7 +125,7 @@ ChangeListener
         allsources         = new ArrayList();
         
         
-              
+        
         strucManager = new StructureManager();
         addStructureListener(strucManager);
         
@@ -136,7 +136,7 @@ ChangeListener
         ComponentResizedChainListener strucComponentWidthSetter = new ComponentResizedChainListener(structureRenderer);
         contentPanel.addComponentListener(strucComponentWidthSetter);
         
-            
+        
         strucManager.addStructureRenderer(structureRenderer);
         
         DasCoordinateSystem dcs = DasCoordinateSystem.fromString(PDBCOORDSYS);
@@ -337,7 +337,7 @@ ChangeListener
         //
         // build up the display from the components:
         //
-
+        
         
         JSplitPane splito = new JSplitPane(JSplitPane.VERTICAL_SPLIT,structureRenderer,seqAligRenderer);
         splito.setOneTouchExpandable(true);
@@ -354,13 +354,13 @@ ChangeListener
         
         split1.setBorder(BorderFactory.createEmptyBorder());
         
-       
         
         
-//        JPanel p2 = new JPanel();
-//        p2.setLayout(new BoxLayout(p2,BoxLayout.Y_AXIS));
-//        p2.add(enspAligRenderer);
-//        p2.add(enspRenderer);
+        
+//      JPanel p2 = new JPanel();
+//      p2.setLayout(new BoxLayout(p2,BoxLayout.Y_AXIS));
+//      p2.add(enspAligRenderer);
+//      p2.add(enspRenderer);
         
         JSplitPane splitb = new JSplitPane(JSplitPane.VERTICAL_SPLIT,enspAligRenderer,enspRenderer);
         splitb.setOneTouchExpandable(true);
@@ -450,23 +450,23 @@ ChangeListener
         
         JSlider source = (JSlider)e.getSource();
         //if (!source.getValueIsAdjusting()) {
-            //System.out.println("slider at " +source.getValue());
-            int residueSize = (int)source.getValue();
-            structureRenderer.calcScale(residueSize);
-            seqRenderer.calcScale(residueSize);
-            enspRenderer.calcScale(residueSize);
-            contentPanel.repaint();
-            
-            this.repaint();
-            this.revalidate();
-            //this.updateUI();
-            //int width = getTotalWidth();
-            //int height = getTotalHeight();
-            //Dimension d = new Dimension(width,height);
-            //logger.info("setting preferred size" + width + " " + height);
-            //this.setPreferredSize(d);
-            //this.setSize(d);
-       // }
+        //System.out.println("slider at " +source.getValue());
+        int residueSize = (int)source.getValue();
+        structureRenderer.calcScale(residueSize);
+        seqRenderer.calcScale(residueSize);
+        enspRenderer.calcScale(residueSize);
+        contentPanel.repaint();
+        
+        this.repaint();
+        this.revalidate();
+        //this.updateUI();
+        //int width = getTotalWidth();
+        //int height = getTotalHeight();
+        //Dimension d = new Dimension(width,height);
+        //logger.info("setting preferred size" + width + " " + height);
+        //this.setPreferredSize(d);
+        //this.setSize(d);
+        // }
     }
     
     
@@ -555,7 +555,7 @@ ChangeListener
         pdbFeatureManager.clearDasSources();
         strucManager.clearDasSources();
         
-       
+        
         
     }
     
@@ -572,13 +572,26 @@ ChangeListener
         aligManager.addSequence1Listener(li);
     }
     
-    public void addSpiceFeatureListener(SpiceFeatureListener li){
+    public void addPDBSpiceFeatureListener(SpiceFeatureListener li){
         ChainRendererMouseListener mouser = structureRenderer.getChainRendererMouseListener();
         mouser.addSpiceFeatureListener(li);
         
+        
+        // problem: if we do this we trigger the events in the wrong coordSys.
+        //ChainRendererMouseListener seqmouser = seqRenderer.getChainRendererMouseListener();
+        //seqmouser.addSpiceFeatureListener(li);
+        
+        //ChainRendererMouseListener enspmouser = enspRenderer.getChainRendererMouseListener();
+        //enspmouser.addSpiceFeatureListener(li);
+    }
+    
+    public void addUniProtSpiceFeatureListener(SpiceFeatureListener li){
         ChainRendererMouseListener seqmouser = seqRenderer.getChainRendererMouseListener();
         seqmouser.addSpiceFeatureListener(li);
         
+    }
+    
+    public void addEnspSpiceFeatureListener(SpiceFeatureListener li){
         ChainRendererMouseListener enspmouser = enspRenderer.getChainRendererMouseListener();
         enspmouser.addSpiceFeatureListener(li);
     }
@@ -675,11 +688,11 @@ ChangeListener
     }
     
     public void setSeqSelection(int start, int end){
-       seqRenderer.getCursorPanel().setSeqSelection(start,end);
-       
+        seqRenderer.getCursorPanel().setSeqSelection(start,end);
+        
     }
     
-  
+    
     
     
     /** test if a server is a UniProt vs PDBresnum alignment server */
@@ -778,7 +791,7 @@ ChangeListener
     }
     
     public void loadingStarted(DasSourceEvent ds) {
-              
+        
     }
     
     
@@ -793,32 +806,32 @@ implements PropertyChangeListener{
     public MyPropertyChangeListener( AlignmentRenderer re, BrowserPane par, JSplitPane split, String position){
         this.re=re;
         this.parent = par;
-	this.split = split;
-	this.position = position;
+        this.split = split;
+        this.position = position;
         
     }
     public void propertyChange(PropertyChangeEvent e) {
         
         Number newH = (Number) e.getNewValue();
-	int sH = split.getHeight();
-	//System.out.println("-- position changed " + " lowerH" + re.getHeight() + " totalH " + sH);
-
-	int preferredH = sH - newH.intValue();
-	if ( position.equals("top")) {
-	    //System.out.println("at top");
-	    preferredH = newH.intValue();
-	} else {
-	    //System.out.println("at bottom");
-	}
-	
+        
+        int sH = split.getHeight();
+        
+        int preferredH = sH - newH.intValue();
+        if ( position.equals("top")) {
+            
+            preferredH = newH.intValue();
+        } else {
+            
+        }
+        
         re.setPreferredSize(new Dimension(re.getWidth(),preferredH));
         re.setSize(new Dimension(re.getWidth(),preferredH));
-        parent.repaint();
-	parent.revalidate();
         
-        //System.out.println("divider position new " + e.getNewValue() + " old " + e.getOldValue() + " prefH " + preferredH);
-
-	re.repaint();
+        parent.repaint();
+        parent.revalidate();
+        
+        
+        re.repaint();
         re.revalidate();
         
         re.updatePanelPositions();
