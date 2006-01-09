@@ -1,3 +1,14 @@
+0.8.0 - Dec 20, 2005
+
+* SPICE now contains three panels to display annotations
+  for PDB, UniProt and ENSP sequences.
+* the alignment between these is visualized
+* new way to choose between alternative alignments
+* overall improvement of the design/layout
+* it is now possible to attach DAS sources, which are running locally
+* many other small things.
+
+
 0.7.5 - Oct 26, 2005
 
 * the keyword search now suggests correct words,
