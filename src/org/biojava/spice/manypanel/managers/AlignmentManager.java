@@ -349,7 +349,7 @@ implements AlignmentListener {
     }
     
     public void triggerNoObject1(String ac){
-        //logger.info("trigger no object 1");
+        logger.info("trigger no object 1");
         Iterator iter = object1Listeners.iterator();
         if  (! coordSys1.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS) )
             ac = ac.toUpperCase();
@@ -362,7 +362,7 @@ implements AlignmentListener {
     
 
     public void triggerNoObject2(String ac){
-        //logger.info("trigger no object 2");
+        logger.info("trigger no object 2");
         Iterator iter = object2Listeners.iterator();
         if  (! coordSys2.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS) )
             ac = ac.toUpperCase();
@@ -1111,7 +1111,7 @@ class AlignmentSequenceListener implements SequenceListener{
     }
     
     public void newObjectRequested(String accessionCode) {
-       
+     
         
         if ( objectNr == 1){
             parent.requestedObject1(accessionCode);

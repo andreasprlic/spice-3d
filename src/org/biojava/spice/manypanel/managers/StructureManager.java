@@ -51,6 +51,11 @@ implements ObjectManager, StructureListener {
     String pdbCode;
     static Logger logger = Logger.getLogger("org.biojava.spice");
     Structure structure ;
+    
+    String code;
+    String chain;
+    String requestedCode;
+    
     public StructureManager() {
         super();
         structureRenderers = new ArrayList();
@@ -58,6 +63,9 @@ implements ObjectManager, StructureListener {
         structureListeners = new ArrayList();
         structure = new StructureImpl();
         currentChainNr = -1;
+        code = "";
+        chain = "";
+        requestedCode = "" ;
     }
     
     public void clearDasSources(){
@@ -86,23 +94,29 @@ implements ObjectManager, StructureListener {
      */
     public void newObjectRequested(String accessionCode) {
         
-       // logger.info("newObjectRequested " + accessionCode);
+       logger.info("newObjectRequested " + accessionCode);
         
         
         String[] spl = accessionCode.split("\\.");
-       String code ="";
-       String chain = " ";
+        code ="";
+        String oldchain = chain;
+        chain = " ";
         if ( spl.length < 2)    
             code = accessionCode;
         else {
             code = spl[0];
             chain = spl[1];
         }        
-              
-        //logger.info("accession code " + accessionCode + " co " + code + " ch " + chain +
-         //       " pdbcode " + pdbCode);
+           
+        if ( code.equalsIgnoreCase(requestedCode)){
+            chain = oldchain;
+            return ;
+        }
+        requestedCode = code;
+        logger.info("accession code " + accessionCode + " co " + code + " ch " + chain +
+               " pdbcode " + pdbCode);
         
-        if ( pdbCode.equals(code)){
+        if ( pdbCode.equalsIgnoreCase(code)){
             // this structure is already displayed, 
             // change the active chain
             // get the chain number
@@ -152,7 +166,7 @@ implements ObjectManager, StructureListener {
         int i = 0 ;
         while (iter.hasNext()){
             Chain c = (Chain) iter.next();
-            if (c.getName().equals(name) )
+            if (c.getName().equalsIgnoreCase(name) )
                 return i;
             i++;
         }
@@ -174,14 +188,31 @@ implements ObjectManager, StructureListener {
      */
     public void newStructure(StructureEvent event) {
         
-        //logger.info("got new structure " + event.getPDBCode());
+        if ( event.getPDBCode().equalsIgnoreCase(pdbCode)) {
+            // we already have got this one ...
+            return;
+        }
+            
+        logger.info("got new structure " + event.getPDBCode() + " old " + pdbCode);
         
         // convert structure to drawable structure ...
         Structure s = event.getStructure();
         structure = s;
         drawStructure(s);
-        Chain c = s.getChain(event.getCurrentChainNumber());
+        
+        
         currentChainNr = event.getCurrentChainNumber();
+        if ( s.getPDBCode().equalsIgnoreCase(code)){
+            if ( ! chain.equals("")){
+                currentChainNr = getActiveChainFromName(chain);
+            }
+        }
+        code = "";
+        chain = "";
+        if ( currentChainNr == -1)
+            currentChainNr = 0;
+        Chain c = s.getChain(currentChainNr);
+        logger.info("got new structure - displaying chain " + c.getName());
         triggerNewSequence(c,event.getPDBCode());
     }
     

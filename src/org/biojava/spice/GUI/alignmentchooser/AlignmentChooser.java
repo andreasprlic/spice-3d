@@ -280,14 +280,15 @@ AlignmentListener
         // triger the load of the alignments...
         //Todo add this...
         
-        //logger.info("loading  " + code);
+        logger.info("loading  " + code + queryCoordSys);
         AlignmentParameters param = new AlignmentParameters();
         
         param.setDasSources(dasSources);
-        if ( queryCoordSys.equals(BrowserPane.DEFAULT_PDBCOORDSYS ))
+        if ( queryCoordSys.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS ))
             if ( code.length() == 6) {
                 
-                String chain = code.substring(5,6);
+                String chain = code.substring(5,6).toUpperCase();
+                logger.info("setting query pdb chain "+chain);
                 code = code.substring(0,4);
                 param.setQueryPDBChainId(chain);
             }
@@ -386,7 +387,7 @@ AlignmentListener
             String queryId = getQueryId();
             String subjectId = getSubjectId(ali);
             
-            //logger.info("alignments for "+ queryId + " " + subjectId );
+            logger.info("alignments for query: "+ queryId + " subject:" + subjectId );
             
             
             Chain currentChain = null;
@@ -394,7 +395,7 @@ AlignmentListener
                 // project the alignment on the sequence...
                 //currentChain = struBuild.createChain(ali,seq_str);
                 currentChain = AlignmentTool.createChain(ali,seq_str,queryId,subjectId);
-                //System.out.println()
+                //System.out.println(currentChain);
             } catch ( Exception e){
                 e.printStackTrace();
                 continue;
@@ -449,8 +450,10 @@ AlignmentListener
         String query = getQueryId();
         String s1 =  (String) a1.getProperty("dbAccessionId");
         String s2 =  (String) a2.getProperty("dbAccessionId");        
-        if ( s1.equals(query))
+        if ( s1.equalsIgnoreCase(query))
             return s2;
+        else if ( s2.equalsIgnoreCase(query))
+            return s1;
         else
             return s1;
         
@@ -531,14 +534,14 @@ class MyMouseListener implements MouseListener
     String code;
     AlignmentChooser parent;
     ShowAligPanel pan;
-    
+    static Logger logger = Logger.getLogger("org.biojava.spice");
     public MyMouseListener(String accessionCode, AlignmentChooser parent, ShowAligPanel pan){
         code = accessionCode;
         this.parent = parent;
         this.pan = pan;
     }
     public void mouseClicked(MouseEvent arg0) {
-        
+        logger.info("requested new object " + code);
         parent.triggerNewObjectRequested(code);
         
     }

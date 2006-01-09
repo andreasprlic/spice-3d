@@ -113,10 +113,10 @@ extends JDialog
                 String type = (String)list.getSelectedItem() ;
                 System.out.println("open " + code + " " + type);
                 if ( type.equals("PDB")){
-                    if ( code.length() == 4 ) {
-                        spice.load(type,code);
-                        dispose();	
-                    }
+                    
+                    spice.load(type,code);
+                    dispose();	
+                    
                 } 
                 else if ( type.equals("ENSP") ||
                         type.equals("UniProt")){

@@ -723,11 +723,9 @@ ConfigurationListener
         System.out.println(msg);
         logger.finest(msg);
         if (type.equals("PDB")){
-            if ( code.length() == 4 ) 
-                this.loadStructure(code);
-            else  
-                logger.info("please provide only 4 characters for the PDB code.");
             
+            this.loadStructure(code);
+           
         }
         else if (type.equals("UniProt")) {
             //logger.info("got uniprot");

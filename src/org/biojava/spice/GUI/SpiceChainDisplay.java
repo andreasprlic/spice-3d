@@ -53,6 +53,9 @@ StructureListener {
     
     static Logger logger = Logger.getLogger("org.biojava.spice");
   
+    String code;
+    String chain;
+    String requestedCode;
     
     public SpiceChainDisplay(JList list) {
         super();
@@ -60,6 +63,9 @@ StructureListener {
         ent_list = list;
         clearStructureListeners();
         chainNumber = -1;
+        code = "";
+        chain = "";
+        requestedCode = "";
     }
     
     public void clearStructureListeners(){
@@ -86,7 +92,14 @@ StructureListener {
         if ( i < 0) return ; 
         chainNumber = i;
         
-        StructureEvent sevent = new StructureEvent(structure,i);
+        triggerSelectedChain(structure,i);
+    }
+    
+    private void triggerSelectedChain(Structure s, int chainNumber){
+        logger.info("trigger new chain " + chainNumber);
+        int i = chainNumber;
+        
+        StructureEvent sevent = new StructureEvent(s,i);
         
         Iterator iter = structureListeners.iterator();
         while (iter.hasNext()){
@@ -112,7 +125,28 @@ StructureListener {
                
         }
         chainNumber = 0;
+        logger.info("got code " + code + " chain >" + chain+"< >" +structure.getPDBCode() +"<");
         
+        if ( code.equalsIgnoreCase(structure.getPDBCode())){
+            if ( ! (chain.equals(""))) {
+                List chains = structure.getChains(0);
+                Iterator iter = chains.iterator();
+                int i = -1;
+                while (iter.hasNext()){
+                    i++;
+                    Chain c = (Chain) iter.next();
+                    String cId = c.getName();
+                    if ( cId.equals(chain)){
+                        triggerSelectedChain(structure,i);
+                     
+                        break;
+                    }
+                }
+            }
+        }
+        
+        code = "";
+        chain = "";
     }
     
     public void selectedChain(StructureEvent event) {
@@ -170,6 +204,29 @@ StructureListener {
         synchronized (model) {
             model.clear() ;
         }
+        
+        // try to see if the accessioncode is with chain ...
+       
+        logger.info("reqeuested new structure " + accessionCode);
+        String[] spl = accessionCode.split("\\.");
+        
+        String oldchain = chain;
+        code ="";
+        chain = "";
+        
+        
+        if ( spl.length < 2)    
+             code = accessionCode;
+         else {
+             code = spl[0];
+             chain = spl[1];
+         }        
+        
+        if ( code.equalsIgnoreCase(requestedCode)){
+            chain = oldchain;
+            return;
+        }
+        requestedCode = code;
         
     }
     public void noObjectFound(String accessionCode){
