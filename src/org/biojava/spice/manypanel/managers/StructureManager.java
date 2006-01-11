@@ -113,8 +113,8 @@ implements ObjectManager, StructureListener {
             return ;
         }
         requestedCode = code;
-        logger.info("accession code " + accessionCode + " co " + code + " ch " + chain +
-               " pdbcode " + pdbCode);
+        //logger.info("accession code " + accessionCode + " co " + code + " ch " + chain +
+        //       " pdbcode " + pdbCode);
         
         if ( pdbCode.equalsIgnoreCase(code)){
             // this structure is already displayed, 
@@ -193,7 +193,7 @@ implements ObjectManager, StructureListener {
             return;
         }
             
-        logger.info("got new structure " + event.getPDBCode() + " old " + pdbCode);
+        //logger.info("got new structure " + event.getPDBCode() + " old " + pdbCode);
         
         // convert structure to drawable structure ...
         Structure s = event.getStructure();
@@ -212,7 +212,7 @@ implements ObjectManager, StructureListener {
         if ( currentChainNr == -1)
             currentChainNr = 0;
         Chain c = s.getChain(currentChainNr);
-        logger.info("got new structure - displaying chain " + c.getName());
+        //logger.info("got new structure - displaying chain " + c.getName());
         triggerNewSequence(c,event.getPDBCode());
     }
     
@@ -281,7 +281,19 @@ implements ObjectManager, StructureListener {
         currentChainNr = nr ;
         drawStructure(s,nr);
         triggerNewSequence(c,event.getPDBCode());
+        
+        triggerChainSelected(event);
       
+    }
+    
+    private void triggerChainSelected(StructureEvent event){
+        Iterator iter = structureListeners.iterator();
+        while (iter.hasNext()){
+            StructureListener li = (StructureListener)iter.next();
+            li.selectedChain(event);
+            
+        }
+        
     }
     
     

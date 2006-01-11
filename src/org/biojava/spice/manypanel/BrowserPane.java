@@ -210,6 +210,7 @@ ChangeListener
         
         aligManager = new AlignmentManager("PDB_UP",dcs,seqdcs);
         
+        strucManager.addStructureListener(aligManager);
         SequenceListener pdbList = aligManager.getSeq1Listener();
         SequenceListener upList = aligManager.getSeq2Listener();
         

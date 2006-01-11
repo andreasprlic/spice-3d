@@ -153,6 +153,20 @@ SequenceListener
             else
                 dcmd = "select all; color cpk;" +noselect;
             structurePanelListener.executeCmd(dcmd);
+        } else if ( cmd.substring(0,8).equals("Color - ") ) {
+            String color = cmd.substring(8,cmd.length());
+            String dcmd;
+            if (isSelectionLocked())
+                dcmd = "color " + color + ";";
+            else
+                dcmd = "select all; color " + color +";" +noselect;
+            structurePanelListener.executeCmd(dcmd);
+        } else if ( cmd.substring(0,9).equals("Select - ")){
+            String sel = cmd.substring(9,cmd.length());
+            String dcmd = "select " + sel ;
+            structurePanelListener.executeCmd(dcmd);
+            
+        
         } else if ( cmd.equals("Choose")){
             //System.out.println("pressed alig window open");
             //AlignmentChooser aligc = new AlignmentChooser(parent);
@@ -180,7 +194,9 @@ SequenceListener
     }
     
     
-    public void selectedSeqRange(int s,int e){}
+    public void selectedSeqRange(int s,int e){
+        
+    }
     public void selectedSeqPosition(int s){}
 
     public void newSequence(SequenceEvent e) {

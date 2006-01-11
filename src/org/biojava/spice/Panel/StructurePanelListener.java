@@ -312,7 +312,7 @@ SpiceFeatureListener
     public void selectedSeqRange(int start, int end) {
         //System.out.println("selected " + start + " " + end);
         //highlite(currentChainNumber,start,end,"");
-        String cmd = getSelectStr(currentChainNumber,start,end);
+        String cmd = getSelectStr(currentChainNumber,start+1,end+1);
         cmd += " set display selected;";
         if ( ! cmd.equals(""))
             executeCmd(cmd);
@@ -379,7 +379,7 @@ SpiceFeatureListener
     public void featureSelected(SpiceFeatureEvent e){
         
         Feature feat = (Feature) e.getFeature();
-        logger.info("selected feature " + feat);
+        //logger.info("selected feature " + feat);
         //System.out.println("StructurePanel selected feature " + feat);
         Map[] stylesheet = e.getDasSource().get3DStylesheet();
         highliteFeature(feat,stylesheet,true);
@@ -486,7 +486,7 @@ SpiceFeatureListener
                     //logger.finest(" style:" + s);
                     String styleType = (String) s.get("type");
                     if ( styleType.equals(type)){
-                        logger.finest("coloring 3D stylesheet");
+                        //logger.finest("coloring 3D stylesheet");
                         cmdSet = true;
                         String display = (String)s.get("display");
                         for ( int d = 0 ; d< displayTypes.length; d++){
@@ -532,7 +532,7 @@ SpiceFeatureListener
                     //cmd += " color " + segment.getTxtColor() +";";
                 }
                 
-                logger.finest("no 3D stylesheet found");
+                //logger.finest("no 3D stylesheet found");
                 if ( ( feature.getType().equals("METAL")) ||
                         ( feature.getType().equals("SITE"))  ||
                         ( feature.getType().equals("ACT_SITE")) 	     
@@ -599,7 +599,7 @@ SpiceFeatureListener
         
         //logger.finest("cmd: "+cmd);
         cmd += "; set display selected;";
-        logger.info(cmd);
+        //logger.info(cmd);
         executeCmd(cmd);
         
         

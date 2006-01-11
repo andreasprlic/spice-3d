@@ -34,6 +34,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import org.biojava.bio.structure.*;
+import org.biojava.spice.Feature.Feature;
+import org.biojava.spice.Feature.FeatureImpl;
+import org.biojava.spice.Feature.Segment;
 import org.biojava.spice.manypanel.eventmodel.FeatureEvent;
 import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.spice.manypanel.drawable.DrawableDasSource;
@@ -515,20 +518,110 @@ public abstract class AbstractChainRenderer
         
     }
 
+    /** when new features are  loaded the panel positions need to be recalculated.
+     * this method is triggered by the DrawableDasSource, once it has got new features.
+     */
     public void newFeatures(FeatureEvent e) {
         updatePanelPositions();
         
     }
 
+    
+    private Feature mapPDBFeature2Seq(Feature f){
+        Feature newF = new FeatureImpl();
+        newF.setMethod(f.getMethod());
+        newF.setName(f.getName());
+        newF.setNote(f.getNote());
+        newF.setScore(f.getScore());
+        newF.setSource(f.getSource());
+        newF.setType(f.getType());
+        
+        newF.setLink(f.getLink());
+        List segments = f.getSegments();
+        
+        
+        
+        Iterator iter = segments.iterator();
+        while (iter.hasNext()){
+            Segment s = (Segment)iter.next();
+            Segment newS =(Segment) s.clone();
+            // and now re-label the positions!
+            int startOld = s.getStart();
+            int seqPos = getGroupPosByPDBPos(startOld+"");
+            newS.setStart(seqPos);
+            int endOld = s.getEnd();
+            int seqePos = getGroupPosByPDBPos(endOld+"");
+            newS.setEnd(seqePos);
+            newF.addSegment(newS);
+        }
+        return newF;
+        
+        
+    }
+    
+    private int getGroupPosByPDBPos(String pdbPos){
+        Chain c = sequence.getSequence();
+    
+        List groups = c.getGroups();
+        
+        // now iterate over all groups in this chain.
+        // in order to find the amino acid that has this pdbRenum.               
+        
+        Iterator giter = groups.iterator();
+        int i = 0;
+        while (giter.hasNext()){
+            i++;
+        
+            Group g = (Group) giter.next();
+            String rnum = g.getPDBCode();
+            if ( rnum.equals(pdbPos)) {
+                //System.out.println(i + " = " + rnum);
+                return i;
+            }
+        }    
+        //logger.warning("could not map pdb pos " + pdbPos + " to sequence!");
+        return -1;
+    }
+    
+    
+    private void mapPDBPos2Seq(DrawableDasSource ds){
+        
+        Feature[] feats = ds.getFeatures();
+        List newFeats = new ArrayList();
+        for (int i=0 ; i < feats.length; i++){
+            Feature f = feats[i];
+            Feature newF = mapPDBFeature2Seq(f);
+            newFeats.add(newF);
+        }
+        
+        Feature[] nfeats = (Feature[])newFeats.toArray(new Feature[newFeats.size()]);
+        ds.setFeatures(nfeats);
+        
+    }
+    
+    /** set that loading has been finised
+     * and re-lable the coordinates for protein structure codes...
+     */
     public void loadingFinished(DasSourceEvent ds) {
-        //logger.info("loading finished");
+        //logger.info("loading finished " + ds);
         Iterator iter = dasSourcePanels.iterator();
         DrawableDasSource eventSource = ds.getDasSource();
         while (iter.hasNext()){
             DasSourcePanel dsp = (DasSourcePanel)iter.next();
             DrawableDasSource thisSource = dsp.getDrawableDasSource();
-            if ( eventSource.equals(thisSource))
+            
+            //todo: add the coordinate system of each implementation and
+            // teplace this...
+           
+            
+            if ( eventSource.equals(thisSource)) {
+                if ( this instanceof StructureRenderer ) {
+                    //logger.info("mapping pdb to seq!");
+                    mapPDBPos2Seq(thisSource);
+                    
+                }
                 dsp.setLoading(false);
+            }
         }
     }
 

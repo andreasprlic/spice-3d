@@ -149,7 +149,7 @@ public class SpiceProtocol {
                 }
                 String type = split[2];
                 String accessionCode = split[3];
-                System.out.println("SpiceProtocol recieved request to display " +type+ " " + accessionCode);
+                //System.out.println("SpiceProtocol recieved request to display " +type+ " " + accessionCode);
                 
                 if (  (type.equals("PDB")    ) || 
                         (type.equals("UniProt")) ) {
@@ -191,8 +191,8 @@ public class SpiceProtocol {
     private void testSetParameter( String parameterName, String parameterValue) 
         throws InvocationTargetException,IllegalAccessException {
         
-        System.out.println("setting " + parameterName + " " + parameterValue);
-        logger.info("setting " + parameterName + " " + parameterValue);
+        //System.out.println("setting " + parameterName + " " + parameterValue);
+        //logger.info("setting " + parameterName + " " + parameterValue);
         if ( parameterName.equals("backupRegistry")){
             String[] urls = new String[1];
             urls[0] = parameterValue;
@@ -202,7 +202,7 @@ public class SpiceProtocol {
             Class propType = pd.getPropertyType();
             if (propType == Integer.TYPE) {
                 int intValue = Integer.parseInt(parameterValue);
-                logger.info("parsed integer " + intValue);
+                //logger.info("parsed integer " + intValue);
                 pd.getWriteMethod().invoke(params, new Object[] {new Integer(intValue)});
             } 
             

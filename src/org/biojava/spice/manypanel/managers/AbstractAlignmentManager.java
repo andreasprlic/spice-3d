@@ -23,6 +23,7 @@
 package org.biojava.spice.manypanel.managers;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -32,8 +33,10 @@ import org.biojava.bio.program.das.dasalignment.Alignment;
 import org.biojava.bio.program.das.dasalignment.DASException;
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.ChainImpl;
+import org.biojava.bio.structure.Group;
 import org.biojava.services.das.registry.DasCoordinateSystem;
 import org.biojava.spice.manypanel.AlignmentTool;
+import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.spice.manypanel.eventmodel.AlignmentEvent;
 import org.biojava.spice.manypanel.eventmodel.AlignmentListener;
 
@@ -255,18 +258,65 @@ implements AlignmentListener{
             //System.out.println("2:"+m2);
             Object s1 =  m1.get("seqpos");
             Object s2 =  m2.get("seqpos");
-            
+            //logger.info("s1 " + s1 + " s2" + s2);
             if (( s1 == null ) || (s2 == null)) {
                 // this sequence position is not aligned ...
                 continue;
             }
-            //logger.info("aligned : "+ s1 + " " +s2);
+            
+            if ( coordSys1.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS)) {
+                
+                int snew = getSeqPosForPDB(sequence1, s1.toString());
+                s1 = new Integer(snew);
+            }
+             
+            if ( coordSys2.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS)) {
+                
+                int snew = getSeqPosForPDB(sequence2, s2.toString());
+                s2 = new Integer(snew);
+            }
+            
+            
+           
             alignmentMap1.put(s1,s2);
             alignmentMap2.put(s2,s1);
             
         }
       
     }
+    private int getSeqPosForPDB(Chain seq, String pdbPos){
+            if ( seq == null) {
+                logger.warning("seq == null");
+                return -1;
+            }
+            Chain c = seq;
+            
+            List groups = c.getGroups();
+            
+            // now iterate over all groups in this chain.
+            // in order to find the amino acid that has this pdbRenum.               
+            
+            Iterator giter = groups.iterator();
+            int i = 0;
+            while (giter.hasNext()){
+                i++;
+            
+                Group g = (Group) giter.next();
+                String rnum = g.getPDBCode();
+                
+                if ( rnum == null) {
+                    //System.out.println(c.getName() + " " + g.getPDBName());
+                    continue;
+                }
+                if ( rnum.equals(pdbPos)) {
+                    //System.out.println(i + " = " + rnum);
+                    return i;
+                }
+            }    
+            //logger.warning("could not map pdb pos " + pdbPos + " to sequence!");
+            return -1;
+    }
+    
     
     public void noAlignmentFound(AlignmentEvent event){
         alignment = event.getAlignment();

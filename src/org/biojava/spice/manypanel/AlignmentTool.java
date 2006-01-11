@@ -106,7 +106,7 @@ public class AlignmentTool {
                     String sintObjectId = (String)segment.getProperty("intObjectId");
                     if ( sintObjectId.equals(code)) {
                         arraypos++ ;
-                        
+                        //System.out.println(segment);
                         // get start, end of segment
                         String sstart = (String)segment.getProperty("start");
                         String send   = (String)segment.getProperty("end");
@@ -122,8 +122,13 @@ public class AlignmentTool {
                             map.put("seqpos",sstart);
                             mapList.add(map);
                             continue;
-                        }
+                        }   
+                            
+                       // if ( start < 50)
+                         //   System.out.println(code + " start " + start + " end " + end);
                         for ( int k=start; k<=end;k++) {
+                            //if ( k < 50)
+                                //System.out.println(code + " aligned seqpos " + k);
                             Map map = new HashMap();
                             map.put("arraypos", new Integer(arraypos));
                             map.put("seqpos"  , new Integer(k));

@@ -132,12 +132,23 @@ FeatureListener{
     }
 
     
+    /** a way to set Features from the outside 
+     * 
+     * @param feats
+     */
+    public void setFeatures(Feature[] feats){
+        features = feats;
+    }
+    
     public void newFeatures(FeatureEvent e){
         Map[] feats = e.getFeatures();
         //logger.info("go " + feats.length + " features " +
          //       featureListeners.size() + " featureListeners");
         features = convertMap2Features(feats);
         
+        // AbstractChainRenderer is listening to this and
+        // needs to resize itself
+        //TODO: this should not be part of the Drawable code by of the DasSourcePanel code...
         Iterator iter = featureListeners.iterator();
         while (iter.hasNext()){
             FeatureListener featL = (FeatureListener)iter.next();

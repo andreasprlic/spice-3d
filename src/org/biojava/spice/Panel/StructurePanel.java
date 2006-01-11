@@ -125,7 +125,7 @@ implements JmolStatusListener
      * @param command - a String containing a RASMOL like command. e.g. "select protein; cartoon on;"
      */
     public void executeCmd(String command) {
-        
+        //logger.info(command);
         //TODO: is this needed?
         synchronized(viewer){
             viewer.evalString(command);
@@ -236,6 +236,51 @@ implements JmolStatusListener
             reset   = new JMenuItem("Reset",resetIcon);
         reset.setMnemonic(KeyEvent.VK_R);
         
+        JMenu select = new JMenu("Select");
+        select.setMnemonic(KeyEvent.VK_S);
+        
+        JMenuItem selall = new JMenuItem("Select - All");
+        JMenuItem selnon = new JMenuItem("Select - None");
+        JMenuItem selami = new JMenuItem("Select - Amino");
+        JMenuItem selnuc = new JMenuItem("Select - Nucleic");
+        JMenuItem selhet = new JMenuItem("Select - Hetero");
+        JMenuItem selh20 = new JMenuItem("Select - Water");
+        JMenuItem selhyd = new JMenuItem("Select - Hydrogen");
+        JMenuItem selcar = new JMenuItem("Select - Carbon");
+        JMenuItem selnit = new JMenuItem("Select - Nitrogen");
+        JMenuItem seloxy = new JMenuItem("Select - Oxygen");
+        JMenuItem selpho = new JMenuItem("Select - Phosphorus");
+        JMenuItem selsul = new JMenuItem("Select - Sulphur");
+        
+        selall.addActionListener(ml);
+        selnon.addActionListener(ml);
+        selami.addActionListener(ml);
+        selnuc.addActionListener(ml);
+        selhet.addActionListener(ml);
+        selh20.addActionListener(ml);
+        selhyd.addActionListener(ml);
+        selcar.addActionListener(ml);
+        selnit.addActionListener(ml);
+        seloxy.addActionListener(ml);
+        selpho.addActionListener(ml);
+        selsul.addActionListener(ml);
+        
+        select.add(selall);
+        select.add(selnon);
+        select.addSeparator();
+        
+        select.add(selami);
+        select.add(selnuc);
+        select.add(selhet);
+        select.add(selh20);
+        select.addSeparator();
+        select.add(selhyd);
+        select.add(selcar);
+        select.add(selnit);
+        select.add(seloxy);
+        select.add(selpho);
+        select.add(selsul);
+        
         /*
          * ImageIcon lockIcon = createImageIcon("lock.png");
          
@@ -260,9 +305,17 @@ implements JmolStatusListener
         JMenuItem ballnstick = new JMenuItem("Ball and Stick");
         JMenuItem spacefill  = new JMenuItem("Spacefill");
         
+        
+        JMenu colorsub  = new JMenu("Color");
+        colorsub.setMnemonic(KeyEvent.VK_C);
+        
         JMenuItem colorchain = new JMenuItem("Color - chain");
         JMenuItem colorsec   = new JMenuItem("Color - secondary");
         JMenuItem colorcpk   = new JMenuItem("Color - cpk");
+        JMenuItem colorred   = new JMenuItem("Color - red");
+        JMenuItem colorblue  = new JMenuItem("Color - blue");
+        JMenuItem colorgreen = new JMenuItem("Color - green");
+        JMenuItem coloryellow = new JMenuItem("Color - yellow");
         
         reset.addActionListener     ( ml );
         //lockMenu.addActionListener    ( ml );
@@ -274,10 +327,16 @@ implements JmolStatusListener
         colorchain.addActionListener( ml );
         colorsec.addActionListener  ( ml );
         colorcpk.addActionListener  ( ml );
+        colorred.addActionListener (ml);
+        colorblue.addActionListener(ml);
+        colorgreen.addActionListener(ml);
+        coloryellow.addActionListener(ml);
         
         
         display.add( reset   );
         //display.add( lockMenu  );
+        display.addSeparator();
+        display.add(select);
         display.addSeparator();
         
         display.add( backbone   );
@@ -287,9 +346,14 @@ implements JmolStatusListener
         display.add( spacefill  );
         display.addSeparator();
         
-        display.add(colorchain);
-        display.add(colorsec)   ;
-        display.add(colorcpk)  ;
+        display.add(colorsub);
+        colorsub.add(colorchain);
+        colorsub.add(colorsec)   ;
+        colorsub.add(colorcpk)  ;
+        colorsub.add(colorred);
+        colorsub.add(colorblue);
+        colorsub.add(colorgreen);
+        colorsub.add(coloryellow);
         
         // add the Jmol menu
         // TODO: add a menu for Jmol

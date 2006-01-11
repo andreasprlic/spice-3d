@@ -91,7 +91,7 @@ extends Thread{
 
         Alignment finalAlig = aligs[0];
         
-        logger.info("subject " + subject);
+       // logger.info("subject " + subject);
 //        if ( parameters.getQueryPDBChainId() != null) {
 //            query = query +"." + parameters.getQueryPDBChainId();
 //            logger.info("query with chain " + query);
@@ -99,7 +99,7 @@ extends Thread{
         if ( parameters.getSubjectPDBChainId() != null)
             subject = subject + "." + parameters.getSubjectCoordinateSystem();
       
-        logger.info("searching for " + query + " " + subject);
+        //logger.info("searching for " + query + " " + subject);
         boolean found = false;
         for ( int i=0; i< aligs.length;i++ ){
             Alignment a = aligs[i];
@@ -135,7 +135,7 @@ extends Thread{
         
         if ( queryCoordSys != null ){
             String qcs = queryCoordSys.toString();
-            logger.info("found queryCS " + qcs + " query " + query + " subject " + subject);
+            //logger.info("found queryCS " + qcs + " query " + query + " subject " + subject);
             
             if ( qcs.equals (PDB_COORD_SYS) ) {
                 //logger.info("looks like a PDB " + qcs + " " + PDB_COORD_SYS);
@@ -216,17 +216,17 @@ extends Thread{
         if ( parameters.getQueryPDBChainId() != null) {
             //logger.info("got a pdb chain request");
             query = query +"." + parameters.getQueryPDBChainId();
-            logger.info("get query " + query);
+            //logger.info("get query " + query);
             
             for ( int i=0; i< aligs.length;i++ ){
                 Alignment a = aligs[i];
-                logger.info("checking alignment " + a.toString());
+                //logger.info("checking alignment " + a.toString());
                 try {
                     
                     //logger.info("searching for " + query );
                     AlignmentTools.getObject(query,a);
                     
-                    logger.info("found alignment for "+query );
+                    //logger.info("found alignment for "+query );
                     //finalAlig = a;
                     return a;
                 } catch (NoSuchElementException e){

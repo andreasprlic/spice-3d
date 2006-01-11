@@ -228,7 +228,6 @@ extends AbstractChainManager
             
             renderer.setDrawableSequence(ds);          
         }
-    
         
         SequenceEvent sevent = new SequenceEvent(e.getAccessionCode(),sequence);
         iter = sequenceListeners.iterator();

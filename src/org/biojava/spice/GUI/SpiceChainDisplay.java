@@ -96,7 +96,7 @@ StructureListener {
     }
     
     private void triggerSelectedChain(Structure s, int chainNumber){
-        logger.info("trigger new chain " + chainNumber);
+        //logger.info("trigger new chain " + chainNumber);
         int i = chainNumber;
         
         StructureEvent sevent = new StructureEvent(s,i);
@@ -125,7 +125,7 @@ StructureListener {
                
         }
         chainNumber = 0;
-        logger.info("got code " + code + " chain >" + chain+"< >" +structure.getPDBCode() +"<");
+        //logger.info("got code " + code + " chain >" + chain+"< >" +structure.getPDBCode() +"<");
         
         if ( code.equalsIgnoreCase(structure.getPDBCode())){
             if ( ! (chain.equals(""))) {
@@ -159,7 +159,7 @@ StructureListener {
     public Chain getChain(int chainnumber){
 
         //System.out.println("SpiceApplication... get chain " + chainnumber);
-        logger.info("getChain " + chainnumber);
+        //logger.info("getChain " + chainnumber);
         if ( structure == null ) {
             //logger.log(Level.WARNING,"no structure loaded, yet");
             return null ;
@@ -207,7 +207,7 @@ StructureListener {
         
         // try to see if the accessioncode is with chain ...
        
-        logger.info("reqeuested new structure " + accessionCode);
+        //logger.info("reqeuested new structure " + accessionCode);
         String[] spl = accessionCode.split("\\.");
         
         String oldchain = chain;

@@ -44,10 +44,12 @@ import org.biojava.bio.program.das.dasalignment.Alignment;
 import org.biojava.bio.program.das.dasalignment.DASException;
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.ChainImpl;
+import org.biojava.bio.structure.Structure;
 
 
 public class AlignmentManager 
-extends AbstractAlignmentManager {
+extends AbstractAlignmentManager 
+implements StructureListener{
     
     
     
@@ -454,7 +456,7 @@ extends AbstractAlignmentManager {
     }
     
     public void newSequence1(SequenceEvent e){
-        //logger.info(panelName+" alignment : new sequence1:" + e.getAccessionCode() + " currently know:"+object1Id+" " + object2Id);
+        logger.info(panelName+" alignment : new sequence1:" + e.getAccessionCode() + " currently know:"+object1Id+" " + object2Id);
         
        String ac = e.getAccessionCode().toLowerCase();
        SequenceManager sm = new SequenceManager();
@@ -468,6 +470,7 @@ extends AbstractAlignmentManager {
                     tryCreateAlignmentChain();
                     return;
                 } else {
+                    
                     sequence1 = sm.getChainFromString(e.getSequence());
                     object1Id = ac;
                     //object1Id = "";
@@ -516,6 +519,8 @@ extends AbstractAlignmentManager {
                 String chainId = getChainIdFromPDBCode(object1Id);
                 if ( chainId != null)
                     params.setQueryPDBChainId(chainId);
+            } else {
+                params.setQuery(object1Id.toUpperCase());
             }
             params.setQueryCoordinateSystem(coordSys1);
             params.setSubjectCoordinateSystem(coordSys2);
@@ -681,7 +686,10 @@ extends AbstractAlignmentManager {
             // get first alignment for this sequence..
                 
             AlignmentParameters params = new AlignmentParameters();
-            params.setQuery(object2Id);
+            if (! coordSys2.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS))
+                params.setQuery(object2Id.toUpperCase());
+            else 
+                params.setQuery(object2Id);
             params.setQueryCoordinateSystem(coordSys2);
             params.setSubjectCoordinateSystem(coordSys1);
             params.setDasSources(alignmentServers);
@@ -884,6 +892,54 @@ extends AbstractAlignmentManager {
     public SpiceFeatureListener[] getSeq2FeatureListeners(){
         return (SpiceFeatureListener[]) seq2FeatureListener.toArray(new SpiceFeatureListener[seq2FeatureListener.size()]);
     }
+
+    public void newStructure(StructureEvent event) {
+       
+        //logger.info("alig manager got new structure");
+        if ( coordSys1.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS)){
+            Structure s = event.getStructure();
+            int numb =0;
+            sequence1 = s.getChain(numb);
+            Iterator iter = alignmentRenderers.iterator();
+            while (iter.hasNext()){
+                AlignmentRenderer re = (AlignmentRenderer)iter.next();
+                re.setSequence1(sequence1);
+            }
+            
+            tryCreateAlignmentChain();
+        }
+        
+    }
+
+    public void selectedChain(StructureEvent event) {
+        //logger.info("sected chain in aligmanager ");
+       if ( coordSys1.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS)){
+           Structure s = event.getStructure();
+           int numb = event.getCurrentChainNumber();
+           sequence1 = s.getChain(numb);
+           Iterator iter = alignmentRenderers.iterator();
+           while (iter.hasNext()){
+               AlignmentRenderer re = (AlignmentRenderer)iter.next();
+               re.setSequence1(sequence1);
+           }
+           
+           tryCreateAlignmentChain();
+       }
+        
+    }
+
+    public void newObjectRequested(String accessionCode) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void noObjectFound(String accessionCode) {
+        // TODO Auto-generated method stub
+        
+    }
+    
+    
+    
     
 }
 
@@ -925,7 +981,7 @@ class MyFeatureTranslator implements SpiceFeatureListener {
             if (f.equals(currentFeatureCL))
                 return;
         }
-        logger.info("feature selected " + pos + " " + f);
+        //logger.info("feature selected " + pos + " " + f);
         currentFeatureCL =f;
         currentFeatureMO = null;
         Feature newF = convertFeature(f);
@@ -978,7 +1034,7 @@ class MyFeatureTranslator implements SpiceFeatureListener {
             if ( s.equals(currentSegmentMO))
                return; 
         }
-        logger.info("mouse over segment " + s + " " + currentSegmentMO);
+        //logger.info("mouse over segment " + s + " " + currentSegmentMO);
         currentSegmentMO = s;
         currentSegmentCL = null;
         
@@ -990,15 +1046,15 @@ class MyFeatureTranslator implements SpiceFeatureListener {
     
     private Segment convertSegment(Segment seg){
         Segment s = (Segment)seg.clone();
-        int st = s.getStart();
-        int en = s.getEnd();
+        int st = s.getStart()-1;
+        int en = s.getEnd()-1;
         
         if ( pos == 1){
-            s.setStart(parent.getNextPosition2(st,AbstractAlignmentManager.SEARCH_DIRECTION_INCREASE,en));
-            s.setEnd(  parent.getNextPosition2(en,AbstractAlignmentManager.SEARCH_DIRECTION_DECREASE,st));
+            s.setStart(parent.getNextPosition2(st,AbstractAlignmentManager.SEARCH_DIRECTION_INCREASE,en)+1);
+            s.setEnd(  parent.getNextPosition2(en,AbstractAlignmentManager.SEARCH_DIRECTION_DECREASE,st)+1);
         } else {
-            s.setStart(parent.getNextPosition1(st,AbstractAlignmentManager.SEARCH_DIRECTION_INCREASE,en));
-            s.setEnd(  parent.getNextPosition1(en,AbstractAlignmentManager.SEARCH_DIRECTION_DECREASE,st));            
+            s.setStart(parent.getNextPosition1(st,AbstractAlignmentManager.SEARCH_DIRECTION_INCREASE,en)+1);
+            s.setEnd(  parent.getNextPosition1(en,AbstractAlignmentManager.SEARCH_DIRECTION_DECREASE,st)+1);            
         }
         
         return s;
@@ -1056,10 +1112,10 @@ class MyFeatureTranslator implements SpiceFeatureListener {
         
         SpiceFeatureListener[] sfl;
         if ( pos == 2){
-            logger.info("triggerFeatureSelected in panel 1" );
+            //logger.info("triggerFeatureSelected in panel 1" );
             sfl = parent.getSeq1FeatureListeners();
         } else {
-            logger.info("triggerFeatureSelected in panel 2" );
+            //logger.info("triggerFeatureSelected in panel 2" );
             sfl = parent.getSeq2FeatureListeners();
         }
         
