@@ -175,8 +175,8 @@ implements JmolStatusListener
     public void notifyAtomPicked(int atomIndex, String strInfo){
         logger.finest("notifyAtomPicked "  + atomIndex + " " + strInfo);
         logger.finest("atomName:" + viewer.getAtomName(atomIndex));
-        java.util.Properties props = viewer.getModelProperties(atomIndex);
-        logger.finest(props.toString());
+        //java.util.Properties props = viewer.getModelProperties(atomIndex);
+        //logger.finest(props.toString());
     }
     
   

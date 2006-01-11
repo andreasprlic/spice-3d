@@ -1006,7 +1006,7 @@ implements FeatureListener,SpiceFeatureListener
                 if ( ! found){
                     continue;
                 }
-                logger.info("setting feature pos "  + i);
+                //logger.info("setting feature pos "  + i);
                 selectedFeaturePos = i;
                 featureOnThisPanel = true;
                 featureSelected = true;

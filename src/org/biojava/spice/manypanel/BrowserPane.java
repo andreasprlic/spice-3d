@@ -236,6 +236,8 @@ ChangeListener
         aligManager.addSequence1Listener(seqAligRenderer.getSequenceListener1());
         aligManager.addSequence2Listener(seqAligRenderer.getSequenceListener2());
         
+        
+        
         structureRenderer.addAdjustmentListener(seqAligRenderer.getAdjust1());
         seqRenderer.addAdjustmentListener(seqAligRenderer.getAdjust2());
         
@@ -334,6 +336,9 @@ ChangeListener
         clearDasSources();
         
         
+        registerEventTranslators();
+        
+        
         //
         // build up the display from the components:
         //
@@ -420,6 +425,40 @@ ChangeListener
         
     }
     
+
+    /** make sure that feature events are correctly translated from one coord sys (panel) to another 
+     * 
+     *
+     */ 
+    private void registerEventTranslators(){
+
+        
+        ChainRendererMouseListener mouserPdb = structureRenderer.getChainRendererMouseListener();
+        ChainRendererMouseListener mouserUp   = seqRenderer.getChainRendererMouseListener();
+        ChainRendererMouseListener mouserEnsp = enspRenderer.getChainRendererMouseListener();
+        
+        
+        SpiceFeatureListener li1 = aligManager.getFeatureTranslator1();
+        SpiceFeatureListener li2 = aligManager.getFeatureTranslator2();
+        
+        SpiceFeatureListener li3 = ensaligManager.getFeatureTranslator1();
+        SpiceFeatureListener li4 = ensaligManager.getFeatureTranslator2();
+        
+        
+        mouserPdb.addSpiceFeatureListener(li1);
+        mouserUp.addSpiceFeatureListener(li2);
+        mouserUp.addSpiceFeatureListener(li3);        
+        mouserEnsp.addSpiceFeatureListener(li4);
+        
+        // and register the cursor panels ...
+                
+        //aligManager.addSeq1FeatureListener(li1);
+        aligManager.addSeq2FeatureListener(li3);
+//               
+        ensaligManager.addSeq1FeatureListener(li2);        
+//        ensaligManager.addSeq2FeatureListener(li4);
+    }
+    
     /** add the managers to the ArrowPanel of the statuspanels...
      * 
      *
@@ -441,7 +480,7 @@ ChangeListener
         a3.setUpperObjectListener(seqManager);
         a3.setLowerObjectListener(enspManager);
         
-        
+     
         
         
     }
@@ -576,24 +615,31 @@ ChangeListener
         ChainRendererMouseListener mouser = structureRenderer.getChainRendererMouseListener();
         mouser.addSpiceFeatureListener(li);
         
-        
+        aligManager.addSeq1FeatureListener(li);
         // problem: if we do this we trigger the events in the wrong coordSys.
         //ChainRendererMouseListener seqmouser = seqRenderer.getChainRendererMouseListener();
         //seqmouser.addSpiceFeatureListener(li);
         
         //ChainRendererMouseListener enspmouser = enspRenderer.getChainRendererMouseListener();
         //enspmouser.addSpiceFeatureListener(li);
+        
+        // solution
+        // use SpiceFeatureEventTranslator class..
     }
     
     public void addUniProtSpiceFeatureListener(SpiceFeatureListener li){
         ChainRendererMouseListener seqmouser = seqRenderer.getChainRendererMouseListener();
         seqmouser.addSpiceFeatureListener(li);
         
+        aligManager.addSeq2FeatureListener(li);
+        ensaligManager.addSeq1FeatureListener(li);
+        
     }
     
     public void addEnspSpiceFeatureListener(SpiceFeatureListener li){
         ChainRendererMouseListener enspmouser = enspRenderer.getChainRendererMouseListener();
         enspmouser.addSpiceFeatureListener(li);
+        ensaligManager.addSeq2FeatureListener(li);
     }
     
     public void addStructureListener(StructureListener li){

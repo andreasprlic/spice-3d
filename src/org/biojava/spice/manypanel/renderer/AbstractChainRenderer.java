@@ -390,6 +390,8 @@ public abstract class AbstractChainRenderer
         dds.addFeatureListener(this);        
         
         mouseListener.addSpiceFeatureListener(dspanel);
+        
+
         //dspanel.addMouseListener(mouseListener);
         //dspanel.addMouseMotionListener(mouseListener);
         //SeqToolTipListener toolTipper = new SeqToolTipListener(dspanel);

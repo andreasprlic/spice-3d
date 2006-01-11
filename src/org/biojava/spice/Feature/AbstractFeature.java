@@ -58,8 +58,12 @@ public abstract class AbstractFeature implements Feature {
     public String toString() {
 	String str = "Feature: method: " + method +" type: " + type ;
 	if (( note != null) && (! note.equals("null")))
+    {
+        if (note.length() > 40)
+            str += "note: " +note.substring(0,39) + "...";
+        else
 	        str += " note: "+note;
-	
+    }
 	//str += segments ;
 	return str ;
     }

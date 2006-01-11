@@ -116,6 +116,11 @@ implements SequenceListener, SpiceFeatureListener {
             // requested wrong range...
             return;
         }
+        if  ( ( start < 0) || ( end < 0))
+            // requested wrong range
+            return;
+        
+        
         String seq = sequence.substring(start, end+1);
         
         Transferable transferText = new StringSelection(seq);

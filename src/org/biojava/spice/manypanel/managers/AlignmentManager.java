@@ -25,18 +25,19 @@ package org.biojava.spice.manypanel.managers;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 import java.util.Iterator;
 
 
 import org.biojava.services.das.registry.*;
+import org.biojava.spice.Feature.Feature;
+import org.biojava.spice.Feature.FeatureImpl;
+import org.biojava.spice.Feature.Segment;
 import org.biojava.spice.das.AlignmentParameters;
 import org.biojava.spice.das.AlignmentThread;
 import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.manypanel.eventmodel.*;
 import org.biojava.spice.manypanel.renderer.AlignmentRenderer;
-import org.biojava.spice.manypanel.AlignmentTool;
 import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.program.das.dasalignment.Alignment;
@@ -46,12 +47,11 @@ import org.biojava.bio.structure.ChainImpl;
 
 
 public class AlignmentManager 
-implements AlignmentListener {
+extends AbstractAlignmentManager {
     
     
     
-    DasCoordinateSystem coordSys1;
-    DasCoordinateSystem coordSys2;
+   
     SpiceDasSource[] refservers1;
     SpiceDasSource[] refservers2;
     SpiceDasSource[] alignmentServers;
@@ -64,20 +64,19 @@ implements AlignmentListener {
     List object2Listeners;
     List alignmentRenderers;
     
-    Alignment alignment;
+   List alignmentListeners;
         
     String object1Id;
     String object2Id;
-    Chain sequence1;
-    Chain sequence2;
-    Map alignmentMap1;
-    Map alignmentMap2;
+ 
+    List seq1FeatureListener;
+    List seq2FeatureListener;
     
     static Logger logger = Logger.getLogger("org.biojava.spice");
     String panelName;
     
-    private static int SEARCH_DIRECTION_INCREASE = 1;
-    private static int SEARCH_DIRECTION_DECREASE = 2;
+    MyFeatureTranslator translator1;
+    MyFeatureTranslator translator2;
     
     
     public AlignmentManager(String panelName,DasCoordinateSystem coordSys1, DasCoordinateSystem coordSys2){
@@ -98,14 +97,31 @@ implements AlignmentListener {
         sequence2 = new ChainImpl();
         object1Id = "";
         object2Id = "";
+        seq1FeatureListener = new ArrayList();
+        seq2FeatureListener = new ArrayList();
         
         clearSequenceListeners();
         
         clearObjectListeners();
         
-        
+        alignmentListeners = new ArrayList();
    
+        translator1 = new MyFeatureTranslator(1,this);
+        translator2 = new MyFeatureTranslator(2,this);
     }
+    
+    public SpiceFeatureListener getFeatureTranslator1(){
+        return translator1;
+    }
+    
+    public SpiceFeatureListener getFeatureTranslator2(){
+        return translator2;
+    }
+    
+    public void addAlignmentListener(AlignmentListener li){
+        alignmentListeners.add(li);
+    }
+    
     public Chain getSequence1(){
         //logger.info(" stored seq1:" + sequence1.toString());
         return sequence1;
@@ -243,8 +259,6 @@ implements AlignmentListener {
     }
     
     public void newAlignment(AlignmentEvent event){
-        
-        
         Annotation[] os = event.getAlignment().getObjects();
         if ( os.length < 2){
             // something strange is going on here..
@@ -252,8 +266,9 @@ implements AlignmentListener {
             //logger.warning(panelName+" got  alignment of wrong # objects...");
             return;
         }
-        alignment = event.getAlignment();
         
+        super.newAlignment(event);
+         
        
         Annotation a1 = os[0];
         Annotation a2 = os[1];
@@ -593,6 +608,11 @@ implements AlignmentListener {
         }
         AlignmentThread thread =    new AlignmentThread(params);
         thread.addAlignmentListener(this);
+        Iterator iter = alignmentListeners.iterator();
+        while (iter.hasNext()){
+            AlignmentListener li = (AlignmentListener) iter.next();
+            thread.addAlignmentListener(li);
+        }
         thread.start();
     }
     
@@ -727,97 +747,8 @@ implements AlignmentListener {
         }
     }
     
-    // get the position of the second object ...
-    private int getPosition2(int pos1){
-        int pos2 = -1;
-        //TODO add support for insertion codes...
-        try {
-            //System.out.println(alignmentMap1);
-            Integer p = new Integer(pos1);
-            if ( alignmentMap1.containsKey(p)){
-                //System.out.println(alignmentMap1.get(p));
-                Integer spos2 = (Integer) alignmentMap1.get(p);
-                pos2 = spos2.intValue();
-            }
-        } catch (Exception e){ e.printStackTrace();}
-            
-        return pos2;
-        
-    }
+  
     
-    private int getPosition1(int pos2){
-        
-        int pos1 = -1;
-        try {
-           //System.out.println(alignmentMap2);
-            Integer p = new Integer(pos2);
-            if ( alignmentMap2.containsKey(p)){
-                //System.out.println(alignmentMap2.get(p));
-                Integer spos1 = (Integer) alignmentMap2.get(p);
-                pos1 = spos1.intValue();
-            }
-        } catch (Exception e){}
-        return pos1;
-        
-    }
-    
-    /** find the position in the other sequence closest to pos2
-     * 
-     * @param pos2
-     * @param searchdirection
-     * @return
-     */
-    private int getNextPosition1(int pos2, int searchdirection){
-        int i = pos2;
-        //logger.info("searching for next position1 of " + i + " " + searchdirection);
-                               
-        while ( (i >=-1 ) && ( i < sequence2.getLength())){
-            Integer p = new Integer(i);
-            //logger.info("testing " + p);
-            if ( alignmentMap2.containsKey(p)){
-                //System.out.println(alignmentMap2.get(p));
-                Integer spos1 = (Integer) alignmentMap2.get(p);
-                //logger.info("found " + p);
-                return spos1.intValue();
-            }
-            
-            if ( searchdirection == SEARCH_DIRECTION_INCREASE)
-                i += 1;
-            else 
-                i -= 1;
-        }
-        
-        return -1 ;
-    }
-    
-    /** find the position in the other sequence closest to pos1
-     * 
-     * @param pos1
-     * @param searchdirection
-     * @return
-     */
-    private int getNextPosition2(int pos1, int searchdirection){
-        int i = pos1;
-        //logger.info("get next position 2 " + pos1 + " " + searchdirection);
-                          
-        while ( (i >=-1 ) && ( i < sequence1.getLength())){
-            Integer p = new Integer(i);
-            //logger.info("testing " + p);
-            if ( alignmentMap1.containsKey(p)){
-                //System.out.println(alignmentMap2.get(p));
-                Integer spos2 = (Integer) alignmentMap1.get(p);
-               // logger.info("found " + p);
-                return spos2.intValue();
-            }
-            
-            if ( searchdirection == SEARCH_DIRECTION_INCREASE)
-                i += 1;
-            else 
-                i -= 1;
-        }
-        
-        return -1 ;
-    }
     
     
     public void selectedSeqPosition1(int pos){
@@ -845,11 +776,11 @@ implements AlignmentListener {
         int s = getPosition2(start);
         
         if ( s == -1)
-            s = getNextPosition2(start,SEARCH_DIRECTION_INCREASE);
+            s = getNextPosition2(start,SEARCH_DIRECTION_INCREASE,end);
        
         int e = getPosition2(end);
         if ( e == -1)
-            e = getNextPosition2(end,SEARCH_DIRECTION_DECREASE);
+            e = getNextPosition2(end,SEARCH_DIRECTION_DECREASE,start);
         
         Iterator iter = sequence2Listeners.iterator();
         while (iter.hasNext()){
@@ -863,11 +794,11 @@ implements AlignmentListener {
         int s = getPosition1(start);
         
         if ( s == -1)
-            s = getNextPosition1(start,SEARCH_DIRECTION_INCREASE);
+            s = getNextPosition1(start,SEARCH_DIRECTION_INCREASE,end);
         
         int e = getPosition1(end);
         if ( e == -1)
-            e = getNextPosition1(end, SEARCH_DIRECTION_DECREASE);
+            e = getNextPosition1(end, SEARCH_DIRECTION_DECREASE,start);
         
         Iterator iter = sequence1Listeners.iterator();
         while (iter.hasNext()){
@@ -910,109 +841,24 @@ implements AlignmentListener {
     }
     
 
-    private  void storeAlignment(Alignment ali) 
-    throws DASException
-    {
-        //System.out.println("storing alignment");
-             
+    protected void storeAlignment(Alignment ali) throws DASException {
+        super.storeAlignment(ali);
         
-        // go over all blocks of alignment and join pdb info ...
-        Annotation seq_object   = getAlignmentObject(ali,coordSys1.toString() );
-        
-        Annotation stru_object  = getAlignmentObject(ali,coordSys2.toString());
-        
-        String obj1Id = seq_object.getProperty("intObjectId").toString();
-        String obj2Id = stru_object.getProperty("intObjectId").toString();
-        
-        //System.out.println("storing alignment " + obj1Id + " " + obj2Id);
-        
-        //Simple_AminoAcid_Map current_amino = null ;
-        List aligMap1 = AlignmentTool.createAlignmentTable(ali,obj1Id);
-        List aligMap2 = AlignmentTool.createAlignmentTable(ali,obj2Id);
-               
-      
-        // the two maps MUST have the same size!
-        //if ( aligMap1.size() != aligMap2.size()){
-        //    logger.warning("can ")
-        //    return
-        //}
-                       
-        // resolve the alignment maps
-        alignmentMap1 = new HashMap();
-        alignmentMap2 = new HashMap();
-        
-        for ( int pos = 0 ; pos < aligMap1.size(); pos++ ) {
-            Map m1 = (Map) aligMap1.get(pos);
-            Map m2 = (Map) aligMap2.get(pos);
-            //System.out.println("1:"+m1);
-            //System.out.println("2:"+m2);
-            Object s1 =  m1.get("seqpos");
-            Object s2 =  m2.get("seqpos");
-            
-            if (( s1 == null ) || (s2 == null)) {
-                // this sequence position is not aligned ...
-                continue;
-            }
-            //logger.info("aligned : "+ s1 + " " +s2);
-            alignmentMap1.put(s1,s2);
-            alignmentMap2.put(s2,s1);
-            
+        Iterator iter = alignmentRenderers.iterator();
+        while (iter.hasNext()){
+            AlignmentRenderer re = (AlignmentRenderer)iter.next();
+            re.setAlignmentMap1(alignmentMap1);
+            re.setAlignmentMap2(alignmentMap2);
         }
-       Iterator iter = alignmentRenderers.iterator();
-       while (iter.hasNext()){
-           AlignmentRenderer re = (AlignmentRenderer)iter.next();
-           re.setAlignmentMap1(alignmentMap1);
-           re.setAlignmentMap2(alignmentMap2);
-       }
-    }
-    
-    
-    private Annotation getAlignmentObject (Alignment ali,String objecttype) 
-    throws DASException
-    {
-        // go through objects and get sequence one ...
-        Annotation[] objects = ali.getObjects();
-        //HashMap seq_obj = new HashMap() ;
-        
-        for (int i =0 ; i<objects.length;i++) {
-            Annotation object = objects[i];
-            String dbCoordSys = (String)object.getProperty("dbCoordSys");
-            
-            
-            if ( dbCoordSys.equals(objecttype) ) {      
-                return object ;
-            }
-            
-            /** TODO: fix this */
-            // tmp fix until Alignment server returns the same coordsystems as the registry contains ... :-/
-            if ( objecttype.equals("UniProt,Protein Sequence")){
-                if ( dbCoordSys.equals("UniProt"))
-                    return object;
-            }
-            if ( objecttype.equals("PDBresnum,Protein Structure")){
-                if ( dbCoordSys.equals("PDBresnum"))
-                    return object;
-            }
-            if ( objecttype.equals("Ensembl,Protein Sequence")){
-                if ( dbCoordSys.equals("ENSEMBLPEP"))
-                    return object;
-            }
-        }      
-        
-        throw new DASException("no >" + objecttype + "< object found as dbSource in alignment!");        
     }
     
     public void clearAlignment(){
         //logger.info("clear alignmenty");
+        
+        super.clearAlignment();
         object1Id = "" ;
         object2Id = "" ;
-        alignment = new Alignment();
         
-        alignmentMap1 = new HashMap();
-        alignmentMap2 = new HashMap();
-        
-        sequence1 = new ChainImpl();
-        sequence2 = new ChainImpl();
            
         Iterator iter = alignmentRenderers.iterator();
         while (iter.hasNext()){
@@ -1022,7 +868,227 @@ implements AlignmentListener {
     }
     
     
+    public void addSeq1FeatureListener(SpiceFeatureListener li){
+        seq1FeatureListener.add(li);   
+    }
+    
+    public void addSeq2FeatureListener(SpiceFeatureListener li){
+        seq2FeatureListener.add(li);
+    }
+    
+    public SpiceFeatureListener[] getSeq1FeatureListeners(){
+        
+        return (SpiceFeatureListener[]) seq1FeatureListener.toArray(new SpiceFeatureListener[seq1FeatureListener.size()]);
+    }
+    
+    public SpiceFeatureListener[] getSeq2FeatureListeners(){
+        return (SpiceFeatureListener[]) seq2FeatureListener.toArray(new SpiceFeatureListener[seq2FeatureListener.size()]);
+    }
+    
 }
+
+
+
+class MyFeatureTranslator implements SpiceFeatureListener {
+    
+    int pos; // where the event occured - the other one should be triggered
+    AlignmentManager parent;
+    
+    static Logger logger = Logger.getLogger("org.biojava.spice");
+    
+    Segment currentSegmentMO;
+    Segment currentSegmentCL;
+    
+    Feature currentFeatureMO;
+    Feature currentFeatureCL;
+    
+    public MyFeatureTranslator(int nr, AlignmentManager parent){
+        this.parent = parent;
+        pos = nr ;
+    }
+    public void clearSelection() {
+        currentSegmentMO = null;
+        currentFeatureMO = null;
+        currentSegmentCL = null;
+        currentFeatureCL = null;
+        
+    }
+    
+    /** a feature in one panel has been selected, translate into coordinates of other panel ...
+     * and trigger event for these...
+     * 
+     */
+    public void featureSelected(SpiceFeatureEvent e) {
+       
+        Feature f = e.getFeature();
+        if ( currentFeatureCL != null ) {
+            if (f.equals(currentFeatureCL))
+                return;
+        }
+        logger.info("feature selected " + pos + " " + f);
+        currentFeatureCL =f;
+        currentFeatureMO = null;
+        Feature newF = convertFeature(f);
+       
+        SpiceFeatureEvent event = new SpiceFeatureEvent(e.getDasSource(),newF);
+        triggerFeatureSelected(event);
+    }
+
+    public void mouseOverFeature(SpiceFeatureEvent e) {
+        //logger.info("mouse over feature " + e);
+        Feature f = e.getFeature();
+        
+        if ( currentFeatureMO != null ) {
+            if (f.equals(currentFeatureMO))
+                return;
+        }
+        currentFeatureMO = f;
+        currentFeatureCL = null;
+        Feature newF = convertFeature(f);
+        SpiceFeatureEvent event = new SpiceFeatureEvent(e.getDasSource(),newF);
+        triggerMouseOverFeature(event);
+    }
+    
+    private Feature convertFeature(Feature f){
+        
+        Feature newF = new FeatureImpl();
+        newF.setLink(f.getLink());
+        newF.setMethod(f.getMethod());
+        newF.setNote(f.getNote());
+        newF.setScore(f.getScore());
+        newF.setType(f.getType());
+        newF.setName(f.getName());
+        newF.setSource(f.getSource());
+        
+        List segments = f.getSegments();
+        Iterator iter = segments.iterator();
+        while (iter.hasNext()){
+            Segment oldS = (Segment) iter.next();
+            Segment newS = convertSegment(oldS);
+            newF.addSegment(newS);
+        }
+        return newF;
+    }
+
+    public void mouseOverSegment(SpiceFeatureEvent e) {
+           
+        Segment s = e.getSegment();
+      
+        if ( currentSegmentMO != null){
+            if ( s.equals(currentSegmentMO))
+               return; 
+        }
+        logger.info("mouse over segment " + s + " " + currentSegmentMO);
+        currentSegmentMO = s;
+        currentSegmentCL = null;
+        
+        s = convertSegment(s);
+        SpiceFeatureEvent event = new SpiceFeatureEvent(e.getDasSource(),e.getFeature(),s);
+        triggerMouseOverSegment(event);
+    }
+
+    
+    private Segment convertSegment(Segment seg){
+        Segment s = (Segment)seg.clone();
+        int st = s.getStart();
+        int en = s.getEnd();
+        
+        if ( pos == 1){
+            s.setStart(parent.getNextPosition2(st,AbstractAlignmentManager.SEARCH_DIRECTION_INCREASE,en));
+            s.setEnd(  parent.getNextPosition2(en,AbstractAlignmentManager.SEARCH_DIRECTION_DECREASE,st));
+        } else {
+            s.setStart(parent.getNextPosition1(st,AbstractAlignmentManager.SEARCH_DIRECTION_INCREASE,en));
+            s.setEnd(  parent.getNextPosition1(en,AbstractAlignmentManager.SEARCH_DIRECTION_DECREASE,st));            
+        }
+        
+        return s;
+        
+        
+    }
+    
+    public void segmentSelected(SpiceFeatureEvent e) {
+        
+        Segment s = e.getSegment();
+        
+        if ( currentSegmentCL != null){
+            if ( s.equals(currentSegmentCL))
+               return; 
+        }
+        //logger.info("segment selected " + s + " " + currentSegmentCL);
+        currentSegmentCL = s;
+        currentSegmentMO = null;
+        
+        s = convertSegment(s);
+        SpiceFeatureEvent event = new SpiceFeatureEvent(e.getDasSource(),e.getFeature(),s);
+        
+        triggerSegmentSelected(event);
+    }
+    
+    private void triggerMouseOverSegment(SpiceFeatureEvent e){
+        SpiceFeatureListener[] sfl;
+        if ( pos == 2){
+            sfl = parent.getSeq1FeatureListeners();
+        } else {
+            sfl = parent.getSeq2FeatureListeners();
+        }
+        
+        for ( int i=0 ; i< sfl.length;i++){
+            SpiceFeatureListener li = sfl[i];
+            li.mouseOverSegment(e);
+        }
+    }
+    
+    private void triggerMouseOverFeature(SpiceFeatureEvent e){
+        SpiceFeatureListener[] sfl;
+        if ( pos == 2){
+            sfl = parent.getSeq1FeatureListeners();
+        } else {
+            sfl = parent.getSeq2FeatureListeners();
+        }
+        
+        for ( int i=0 ; i< sfl.length;i++){
+            SpiceFeatureListener li = sfl[i];
+            li.mouseOverFeature(e);
+        }
+    }
+    
+    private void triggerFeatureSelected(SpiceFeatureEvent e){
+        
+        SpiceFeatureListener[] sfl;
+        if ( pos == 2){
+            logger.info("triggerFeatureSelected in panel 1" );
+            sfl = parent.getSeq1FeatureListeners();
+        } else {
+            logger.info("triggerFeatureSelected in panel 2" );
+            sfl = parent.getSeq2FeatureListeners();
+        }
+        
+        for ( int i=0 ; i< sfl.length;i++){
+            SpiceFeatureListener li = sfl[i];
+            li.featureSelected(e);
+        }
+    }
+    
+    private void triggerSegmentSelected(SpiceFeatureEvent e){
+        //logger.info("triggerSegmentSelected " + e);
+        
+        SpiceFeatureListener[] sfl;
+        if ( pos == 2){
+            sfl = parent.getSeq1FeatureListeners();
+        } else {
+            sfl = parent.getSeq2FeatureListeners();
+        }
+        
+        for ( int i=0 ; i< sfl.length;i++){
+            SpiceFeatureListener li = sfl[i];
+            li.segmentSelected(e);
+        }
+            
+    }
+    
+}
+
+
 
 
 class AlignmentSequenceListener implements SequenceListener{

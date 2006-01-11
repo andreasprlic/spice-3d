@@ -168,7 +168,7 @@ SpiceFeatureListener
      * @param command - a String containing a RASMOL like command. e.g. "select protein; cartoon on;"
      */
     public void executeCmd(String command) {
-        System.out.println("sending StructurePanel: " + command);
+        //System.out.println("sending StructurePanel: " + command);
         structurePanel.executeCmd(command);
     }
     
@@ -379,6 +379,7 @@ SpiceFeatureListener
     public void featureSelected(SpiceFeatureEvent e){
         
         Feature feat = (Feature) e.getFeature();
+        logger.info("selected feature " + feat);
         //System.out.println("StructurePanel selected feature " + feat);
         Map[] stylesheet = e.getDasSource().get3DStylesheet();
         highliteFeature(feat,stylesheet,true);

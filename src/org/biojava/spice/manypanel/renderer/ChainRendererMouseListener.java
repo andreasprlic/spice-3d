@@ -387,7 +387,7 @@ MouseMotionListener
                         Segment s = (Segment)iter.next();
                         if ( (pos >= s.getStart()) && ( pos <= s.getEnd())) {
                             spiceEvent.setSegment(s);
-                            triggerSegmentSelected(spiceEvent);
+                            //triggerSegmentSelected(spiceEvent);
                             triggerNewSequenceRange(s.getStart()-1,s.getEnd()-1);
                             triggerSelectionLocked(true);
                             somethingTriggered = true;
@@ -470,7 +470,7 @@ MouseMotionListener
         
         if (feature == null){
             return;
-            }
+        }
         
         
         
