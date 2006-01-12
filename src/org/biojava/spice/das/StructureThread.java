@@ -55,14 +55,23 @@ extends Thread{
 	dss[0] = ds;
 	dasSources = dss;
 	this.accessionCode = accessionCode;
-        structureListeners = new ArrayList();
+	structureListeners = new ArrayList();
     }
 
 
     public StructureThread(String accessionCode, SpiceDasSource[] dss) {
         super();
         dasSources = dss;
-        this.accessionCode = accessionCode;
+        
+        // if the accessioncode has a chain, remove it ...
+        String code;
+        String[] spl = accessionCode.split("\\.");
+        if ( spl.length < 2)    
+            code = accessionCode;
+        else {
+            code = spl[0];            
+        }        
+        this.accessionCode = code;
         structureListeners = new ArrayList();
     }
     
