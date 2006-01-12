@@ -262,6 +262,7 @@ SpiceFeatureListener
      * coordinates are uniprot position
      * */
     private String getSelectStr(int chain_number, int start, int end) {
+        //logger.info("getSelectStr " + start + " " + end);
         Chain chain = getChain(chain_number) ;
         if ( chain == null) return "" ;
         String chainid = chain.getName() ;

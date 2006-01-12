@@ -70,19 +70,19 @@ implements AlignmentListener{
           
         
         // test the max and min boundaries
-        if ( pos2 > sequence2.getLength())
+        if ( pos2 > sequence2.getLengthAminos())
             if ( ( searchdirection == SEARCH_DIRECTION_DECREASE) &&
-                    ( stop < sequence2.getLength()))
-                i = sequence2.getLength()-1;
+                    ( stop < sequence2.getLengthAminos()))
+                i = sequence2.getLengthAminos()-1;
         
         if ( pos2 < 0 )
             if ( ( searchdirection == SEARCH_DIRECTION_INCREASE) &&
-                ( stop < sequence2.getLength()) )
+                ( stop < sequence2.getLengthAminos()) )
                 i =0;
         
-        if ( stop > sequence2.getLength()){
+        if ( stop > sequence2.getLengthAminos()){
             if ( (searchdirection == SEARCH_DIRECTION_DECREASE))
-                stop = sequence2.getLength()-1;
+                stop = sequence2.getLengthAminos()-1;
         }
         if ( stop < 0) {
             if (    ( searchdirection == SEARCH_DIRECTION_INCREASE) &&
@@ -91,7 +91,7 @@ implements AlignmentListener{
         }
         
         
-        while ( (i >=-1 ) && ( i < sequence2.getLength())){
+        while ( (i >=-1 ) && ( i < sequence2.getLengthAminos())){
             Integer p = new Integer(i);
             //logger.info("testing " + p);
             if ( alignmentMap2.containsKey(p)){
@@ -115,21 +115,22 @@ implements AlignmentListener{
         
         //logger.info("i " + i + " pos2 " + pos2 + " stop " + stop + " direction " + searchdirection);
        
-        if ( i >= sequence2.getLength())
-            return sequence1.getLength();
+        if ( i >= sequence2.getLengthAminos())
+            return sequence1.getLengthAminos()-1;
             
         if ( i < 0)
             return -1;
         
         int newstop = 0;
         if (( searchdirection == SEARCH_DIRECTION_INCREASE) )
-                newstop = sequence2.getLength()-1;
+                newstop = sequence2.getLengthAminos()-1;
         
         
         int afterpos = getNextPosition1(i,searchdirection,newstop);
-        //logger.info("afterpos 1 " +afterpos);
-        if ( afterpos > 0 ) {               
-            return sequence1.getLength() ;
+       // logger.info("afterpos 1 " +afterpos);
+        if ( afterpos > 0 ) {     
+           return afterpos;
+            
         }
         return -1;
   
@@ -144,31 +145,32 @@ implements AlignmentListener{
     protected int getNextPosition2(int pos1, int searchdirection, int stop){
         int i = pos1;
         //logger.info("get next position 2 " + pos1 + " " + searchdirection + " " + stop);
-        if ( pos1 > sequence1.getLength())
+        if ( pos1 > sequence1.getLengthAminos())
             if ( ( searchdirection == SEARCH_DIRECTION_DECREASE) &&
-                    ( stop < sequence1.getLength()))
-                i = sequence1.getLength()-1;
+                    ( stop < sequence1.getLengthAminos()))
+                i = sequence1.getLengthAminos()-1;
         if ( pos1 < 0 )
             if ( ( searchdirection == SEARCH_DIRECTION_INCREASE) &&
-                ( stop < sequence1.getLength()) )
+                ( stop < sequence1.getLengthAminos()) )
                 i =0;
         
-        if ( stop > sequence1.getLength()){
+        if ( stop > sequence1.getLengthAminos()){
             if ( (searchdirection == SEARCH_DIRECTION_DECREASE))
-                stop = sequence1.getLength()-1;
+                stop = sequence1.getLengthAminos()-1;
         }
         if ( stop < 0) {
             if (    ( searchdirection == SEARCH_DIRECTION_INCREASE) &&
                     ( pos1 > -1 )    ) 
                 stop = 0;
         }
-        while ( (i >=-1 ) && ( i < sequence1.getLength())){ 
+        while ( (i >=-1 ) && ( i < sequence1.getLengthAminos())){ 
             Integer p = new Integer(i);
             //logger.info("testing " + p);
+            
             if ( alignmentMap1.containsKey(p)){
                 //System.out.println(alignmentMap2.get(p));
                 Integer spos2 = (Integer) alignmentMap1.get(p);
-               // logger.info("found " + p);
+                //logger.info("found " + p);
                 return spos2.intValue();
             }
             
@@ -184,20 +186,22 @@ implements AlignmentListener{
             }
         }
         
-       // logger.info("i " + i + " pos1 " + pos1 + " stop " + stop + " direction " + searchdirection);
+       //logger.info("i " + i + " pos1 " + pos1 + " stop " + stop + " direction " + 
+       //        searchdirection + " l " + sequence1.getLengthAminos());
         
-        if ( i >= sequence1.getLength())
-            return sequence2.getLength();
+        if ( i >= sequence1.getLengthAminos())
+            return sequence2.getLengthAminos()-1;
         if ( i < 0)
             return -1;
         int newstop = 0;
         if (( searchdirection == SEARCH_DIRECTION_INCREASE))
-                newstop = sequence1.getLength()-1;
+                newstop = sequence1.getLengthAminos()-1;
             
         int afterpos = getNextPosition2(i,searchdirection,newstop);
         //logger.info("afterpos 2 " + afterpos);
-        if ( afterpos > 0 )
-            return sequence2.getLength() ;
+        if ( afterpos > 0 ) {
+           return afterpos;
+        }
         else
             return -1;
         

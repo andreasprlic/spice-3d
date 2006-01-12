@@ -790,6 +790,13 @@ implements StructureListener{
         if ( e == -1)
             e = getNextPosition2(end,SEARCH_DIRECTION_DECREASE,start);
         
+        if ( s < 0)
+            s = 0;
+        if ( e > sequence2.getLength()-1)
+            e = sequence2.getLength()-1;
+        
+        
+        //logger.info("s " + s + " e " + e);
         Iterator iter = sequence2Listeners.iterator();
         while (iter.hasNext()){
             SequenceListener li = (SequenceListener)iter.next();
@@ -807,6 +814,11 @@ implements StructureListener{
         int e = getPosition1(end);
         if ( e == -1)
             e = getNextPosition1(end, SEARCH_DIRECTION_DECREASE,start);
+        
+        if ( s < 0)
+            s = 0;
+        if ( e > sequence1.getLength()-1)
+            e = sequence1.getLength()-1;
         
         Iterator iter = sequence1Listeners.iterator();
         while (iter.hasNext()){
@@ -1049,14 +1061,26 @@ class MyFeatureTranslator implements SpiceFeatureListener {
         int st = s.getStart()-1;
         int en = s.getEnd()-1;
         
-        if ( pos == 1){
-            s.setStart(parent.getNextPosition2(st,AbstractAlignmentManager.SEARCH_DIRECTION_INCREASE,en)+1);
-            s.setEnd(  parent.getNextPosition2(en,AbstractAlignmentManager.SEARCH_DIRECTION_DECREASE,st)+1);
+        int newS;
+        int newE;
+        int length;
+        if ( pos == 1){            
+            newS = parent.getNextPosition2(st,AbstractAlignmentManager.SEARCH_DIRECTION_INCREASE,en)+1;
+            newE = parent.getNextPosition2(en,AbstractAlignmentManager.SEARCH_DIRECTION_DECREASE,st)+1;
+            length = parent.sequence2.getLength();
         } else {
-            s.setStart(parent.getNextPosition1(st,AbstractAlignmentManager.SEARCH_DIRECTION_INCREASE,en)+1);
-            s.setEnd(  parent.getNextPosition1(en,AbstractAlignmentManager.SEARCH_DIRECTION_DECREASE,st)+1);            
+            newS = parent.getNextPosition1(st,AbstractAlignmentManager.SEARCH_DIRECTION_INCREASE,en)+1;
+            newE = parent.getNextPosition1(en,AbstractAlignmentManager.SEARCH_DIRECTION_DECREASE,st)+1;
+            length = parent.sequence1.getLength();
         }
+        if ( newS < 1)
+            newS = 1;
+        if ( newE > (length-1))
+            newE = length-1;
         
+        s.setStart(newS);
+        s.setEnd(newE);
+        logger.info("new segment " + s);
         return s;
         
         
@@ -1109,7 +1133,7 @@ class MyFeatureTranslator implements SpiceFeatureListener {
     }
     
     private void triggerFeatureSelected(SpiceFeatureEvent e){
-        
+        //logger.info("triggerFeatureSelected " +e.getFeature());
         SpiceFeatureListener[] sfl;
         if ( pos == 2){
             //logger.info("triggerFeatureSelected in panel 1" );
@@ -1126,7 +1150,7 @@ class MyFeatureTranslator implements SpiceFeatureListener {
     }
     
     private void triggerSegmentSelected(SpiceFeatureEvent e){
-        //logger.info("triggerSegmentSelected " + e);
+        //logger.info("triggerSegmentSelected " + e.getSegment());
         
         SpiceFeatureListener[] sfl;
         if ( pos == 2){
