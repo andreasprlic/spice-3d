@@ -1080,7 +1080,7 @@ class MyFeatureTranslator implements SpiceFeatureListener {
         
         s.setStart(newS);
         s.setEnd(newE);
-        logger.info("new segment " + s);
+        //logger.info("new segment " + s);
         return s;
         
         
