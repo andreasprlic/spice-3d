@@ -70,6 +70,9 @@ extends AbstractChainManager
         }
 
     }
+
+    
+   
     
     public void clearDasSources(){
         super.clearDasSources();
@@ -213,12 +216,14 @@ extends AbstractChainManager
             
             renderer.setDrawableSequence(ds);          
             renderer.clearDisplay();
+            
         }
     }
 
 
     public void newSequence(SequenceEvent e) {
         String sequence = e.getSequence();
+        
         DrawableSequence ds = fromString(e.getAccessionCode(),sequence);
         
         Iterator iter = seqRenderers.iterator();

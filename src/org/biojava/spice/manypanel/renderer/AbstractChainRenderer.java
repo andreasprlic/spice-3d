@@ -202,7 +202,7 @@ public abstract class AbstractChainRenderer
             
             ds.clearDisplay();
         }
-        
+        getStatusPanel().setLoading(false);
        setScale(1.0f);
        cursorPanel.clearSelection();
        

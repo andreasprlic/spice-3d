@@ -87,8 +87,6 @@ implements JmolStatusListener
     
     
     
-    
-    
     /** returns the JmolViewer */
     public JmolViewer getViewer() {
         return viewer;
@@ -155,22 +153,22 @@ implements JmolStatusListener
          viewer.openStringInline(pdbstr);
         
         String strError = viewer.getOpenFileError();
+        
         if (strError != null) {
             if (logger.isLoggable(Level.WARNING)) {
                 logger.severe("could not open PDB file in viewer "+ strError);
             }
         }
+        
         jmolpopup.updateComputedMenus();
+        
         if ( pdbstr.equals("")){
             executeCmd(EMPTYCMD);
         }
+        
         logger.finest("end of setStructure");
         //notifyAll();
     }
-    
-    
-    
-    
     
     public void notifyAtomPicked(int atomIndex, String strInfo){
         logger.finest("notifyAtomPicked "  + atomIndex + " " + strInfo);

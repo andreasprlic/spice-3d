@@ -456,7 +456,7 @@ implements StructureListener{
     }
     
     public void newSequence1(SequenceEvent e){
-        logger.info(panelName+" alignment : new sequence1:" + e.getAccessionCode() + " currently know:"+object1Id+" " + object2Id);
+        //logger.info(panelName+" alignment : new sequence1:" + e.getAccessionCode() + " currently know:"+object1Id+" " + object2Id);
         
        String ac = e.getAccessionCode().toLowerCase();
        SequenceManager sm = new SequenceManager();
@@ -910,7 +910,10 @@ implements StructureListener{
         //logger.info("alig manager got new structure");
         if ( coordSys1.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS)){
             Structure s = event.getStructure();
-            int numb =0;
+            if ( s.size() < 1){
+                return;
+            }
+            int numb = event.getCurrentChainNumber();
             sequence1 = s.getChain(numb);
             Iterator iter = alignmentRenderers.iterator();
             while (iter.hasNext()){

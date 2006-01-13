@@ -53,6 +53,11 @@ implements ObjectManager {
         clearSequenceListeners();
         clearDasSources();
     }
+    
+    public void clear() {
+        
+    }
+    
     public void clearSequenceListeners(){
         sequenceListeners = new ArrayList();
     }

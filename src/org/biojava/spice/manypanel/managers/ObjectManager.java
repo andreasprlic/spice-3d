@@ -34,6 +34,11 @@ public interface ObjectManager {
         
         public DasCoordinateSystem getCoordinateSystem();
         
+        /** clear the current reference object
+         * 
+         *
+         */
+        public void clear();
         
         /** list of available Reference DAS servers 
          * 

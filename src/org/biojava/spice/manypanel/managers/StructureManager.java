@@ -63,9 +63,15 @@ implements ObjectManager, StructureListener {
         structureListeners = new ArrayList();
         structure = new StructureImpl();
         currentChainNr = -1;
+        clear();
+    }
+    
+    public void clear() {
+        requestedCode = "";
+        pdbCode = "";
         code = "";
         chain = "";
-        requestedCode = "" ;
+       
     }
     
     public void clearDasSources(){
@@ -154,8 +160,6 @@ implements ObjectManager, StructureListener {
             StructureRenderer re = (StructureRenderer)iter2.next();
             re.getStatusPanel().setLoading(true);
         }
-        
-        
     }
     
    
@@ -187,8 +191,21 @@ implements ObjectManager, StructureListener {
      * 
      */
     public void newStructure(StructureEvent event) {
+        String p = event.getPDBCode();
         
-        if ( event.getPDBCode().equalsIgnoreCase(pdbCode)) {
+        if ( p == null) {
+            clear();
+            Iterator iter = structureRenderers.iterator();
+            
+            while (iter.hasNext()){
+                StructureRenderer renderer = (StructureRenderer)iter.next();
+                renderer.getStatusPanel().setLoading(false);
+            }
+            
+            return;
+        }
+            
+        if ( p.equalsIgnoreCase(pdbCode)) {
             // we already have got this one ...
             return;
         }
@@ -263,7 +280,8 @@ implements ObjectManager, StructureListener {
         
         while (iter.hasNext()){
             StructureRenderer renderer = (StructureRenderer)iter.next();
-            renderer.setDrawableStructure(draw);         
+            renderer.setDrawableStructure(draw);       
+           
         }
     }
     

@@ -617,15 +617,7 @@ ChangeListener
         mouser.addSpiceFeatureListener(li);
         
         aligManager.addSeq1FeatureListener(li);
-        // problem: if we do this we trigger the events in the wrong coordSys.
-        //ChainRendererMouseListener seqmouser = seqRenderer.getChainRendererMouseListener();
-        //seqmouser.addSpiceFeatureListener(li);
         
-        //ChainRendererMouseListener enspmouser = enspRenderer.getChainRendererMouseListener();
-        //enspmouser.addSpiceFeatureListener(li);
-        
-        // solution
-        // use SpiceFeatureEventTranslator class..
     }
     
     public void addUniProtSpiceFeatureListener(SpiceFeatureListener li){
@@ -657,6 +649,7 @@ ChangeListener
         uniProtListeners.add(li);
         
     }
+    
     public void addUniProtSequenceListener(SequenceListener li ){
         seqManager.addSequenceListener(li);
     }
@@ -664,6 +657,7 @@ ChangeListener
     public void addEnspListener(ObjectListener li){
         enspListeners.add(li);
     }
+    
     public void addEnspSeqeuenceListener(SequenceListener li){
         enspManager.addSequenceListener(li);
     }
@@ -719,7 +713,10 @@ ChangeListener
         
         aligManager.clearAlignment();
         
+        
         ensaligManager.clearAlignment();
+        
+        strucManager.clear();
         
         structureRenderer.clearDisplay();
         seqRenderer.clearDisplay();

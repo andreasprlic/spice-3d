@@ -26,8 +26,11 @@ package org.biojava.spice.GUI;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.JPanel;
 import javax.swing.JFrame;
@@ -99,6 +102,17 @@ extends JDialog
         list.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
         list.setSelectedIndex(startpos);
         
+        list.addActionListener(new ActionListener() {
+        
+            public void actionPerformed(ActionEvent arg0) {
+                System.out.println("action performed");
+                setHelpToolTip();     
+        
+            }        
+        });
+        
+        
+        
         hBox1.add(list);
         
         
@@ -111,20 +125,18 @@ extends JDialog
                 
                 String code = getCom.getText();
                 String type = (String)list.getSelectedItem() ;
-                System.out.println("open " + code + " " + type);
-                if ( type.equals("PDB")){
-                    
-                    spice.load(type,code);
-                    dispose();	
-                    
-                } 
-                else if ( type.equals("ENSP") ||
+
+                
+                if (    type.equals("PDB") ||
+                        type.equals("ENSP") ||
                         type.equals("UniProt")){
                     spice.load(type,code);
                     dispose();			    
                 }
             }
         });
+        
+      
         
         hBox1.add(getCom);
        
@@ -137,15 +149,13 @@ extends JDialog
         
         hBox1.add(openB);
         hBox3.add(cancelB);
-        
+        setHelpToolTip();
         
         kwsearch = new JTextField(10);
         kwsearch.addActionListener(new ActionListener()  {
             public void actionPerformed(ActionEvent e) {
-                String kw  = kwsearch.getText();
-                //System.out.println("search kw " + kw);
-                new MSDWindow(spice,kw);
-              
+                String kw  = kwsearch.getText();            
+                new MSDWindow(spice,kw);              
                 dispose();			    
             }
             
@@ -167,6 +177,19 @@ extends JDialog
         this.getContentPane().add(p);
         
         this.setSize(H_SIZE, V_SIZE);
+    }
+    
+    private void setHelpToolTip(){
+        String type = (String) list.getSelectedItem();
+        if ( type.equals("PDB")){
+            getCom.setToolTipText("enter PDB code or PDB code + chain. e.g. 1tim.B");
+        } else if ( type.equals("UniProt")){
+            getCom.setToolTipText("enter UniProt accession code e.g. P50225");            
+        } else if ( type.equals("ENSP")){
+            getCom.setToolTipText("enter Ensembl peptide accession code e.g. ENSP00000334713");
+        }
+        
+            
     }
     
 }
@@ -193,21 +216,13 @@ implements ActionListener{
             return ;
         }
         else if ( cmd.equals("Open"))
-        {
-            //if ( spice.isLoading() ) {
-            //    parent.getCom.setText("please wait, already loading");
-            //    return  ;
-            //}
-            //System.out.println("open");
+        { 
             String type = (String)parent.list.getSelectedItem() ;
             String code = parent.getCom.getText();
-            //System.out.println("open" + type + " " + code);
-            if ( code.length() == 4 ) {
-                spice.load("PDB",code);
-                parent.dispose();
-            }
-            else if ( type.equals("ENSP") ||
-                    type.equals("UniProt")){
+          
+            if ( type.equals("PDB")  ||
+                    type.equals("ENSP") ||
+                    type.equals("UniProt") ){
                 spice.load(type,code);
                 parent.dispose();			    
             }
@@ -215,10 +230,9 @@ implements ActionListener{
         }
         else if ( cmd.equals("Search")){
             String kw  = parent.kwsearch.getText();
-	    
-            //System.out.println("search kw " + kw);
-            new MSDWindow(spice,kw);
-    		   parent.dispose();
+	             
+            new MSDWindow(spice,kw);    
+            parent.dispose();
         }  
     } 
 }

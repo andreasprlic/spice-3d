@@ -58,11 +58,18 @@ implements ObjectManager ,SequenceListener{
     public FeatureManager() {
         super();
         
-        currentAccessionCode = "";
+        
         featureRenderers = new ArrayList();
         dasSourceListeners = new ArrayList();
+        
+        clear();
         clearDasSources();
         //dasSources = new DrawableDasSource[0];
+    }
+    
+    public void clear() {
+        currentAccessionCode = "";
+       
     }
     
     public void clearDasSources(){

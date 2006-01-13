@@ -105,13 +105,8 @@ extends Thread {
                 gotSequence = true ;
                 // set the sequence ...
                 
-                Iterator iter = seqListeners.iterator();
-                while (iter.hasNext()){
-                   SequenceListener li = (SequenceListener)iter.next();
-                    //SequenceEvent event = new SequenceEvent(sequence);
-                   SequenceEvent event = new SequenceEvent(sp_accession,sequence); 
-                   li.newSequence(event);
-                }
+                triggerNewSequence(sp_accession,sequence);
+                
                 
                 return;
             }
@@ -125,10 +120,31 @@ extends Thread {
         
         logger.log(Level.WARNING,"could not retreive UniProt sequence from any available DAS sequence server");
         
-        
+        triggerNoSequence(sp_accession);
         
     }
     
+    
+    private void triggerNewSequence(String sp_accession,String sequence){
+
+        Iterator iter = seqListeners.iterator();
+        while (iter.hasNext()){
+           SequenceListener li = (SequenceListener)iter.next();
+            //SequenceEvent event = new SequenceEvent(sequence);
+           SequenceEvent event = new SequenceEvent(sp_accession,sequence); 
+           li.newSequence(event);
+        }
+    }
+    
+    private void triggerNoSequence(String ac){
+
+        Iterator iter = seqListeners.iterator();
+        while (iter.hasNext()){
+            SequenceListener li = (SequenceListener)iter.next();
+            li.noObjectFound(ac);
+        }
+    
+    }
     
     /** retrieve the Sequence from a DAS server.  
      * 

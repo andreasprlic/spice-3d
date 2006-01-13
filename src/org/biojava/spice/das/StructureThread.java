@@ -64,14 +64,13 @@ extends Thread{
         dasSources = dss;
         
         // if the accessioncode has a chain, remove it ...
-        String code;
-        String[] spl = accessionCode.split("\\.");
-        if ( spl.length < 2)    
-            code = accessionCode;
-        else {
-            code = spl[0];            
-        }        
-        this.accessionCode = code;
+        int pos = accessionCode.indexOf(".");
+        System.out.println("ac " +  accessionCode +" " + pos);
+        if ( pos > 0)                 
+            this.accessionCode = accessionCode.substring(0,pos);
+        else
+            this.accessionCode = accessionCode;
+        
         structureListeners = new ArrayList();
     }
     
