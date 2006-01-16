@@ -28,6 +28,7 @@ import org.xml.sax.Attributes;
 
 import java.util.ArrayList ;
 import java.util.HashMap ;
+import java.util.List;
 
 /**
  * a class to parse the response of a DAS - Feature request
@@ -39,29 +40,36 @@ public class DAS_Feature_Handler  extends DefaultHandler{
 	/**
 	 * 
 	 */
-    ArrayList features ;
+    List features ;
     boolean first_flag ;
     HashMap feature ;
     String featurefield ;
     String characterdata ;
     String dasCommand ;
     
+    int comeBackLater ;
+    
 	public DAS_Feature_Handler() {
 		super();
-		// TODO Auto-generated constructor stub
+	
 		features= new ArrayList() ;
 		first_flag = true ;
 		featurefield = "" ;
 		characterdata = "";
 		dasCommand = "" ;
+        comeBackLater = -1; 
 	}
 
     public void setDASCommand(String cmd) { dasCommand = cmd ;}
     public String getDASCommand() { return dasCommand; }
 
-	public ArrayList get_features() {
+	public List get_features() {
 		return features ;
 	}
+    
+    public int getComBackLater(){
+        return comeBackLater;
+    }
 	
 	void start_feature(String uri, String name, String qName, Attributes atts) {
 	    feature = new HashMap() ;

@@ -29,6 +29,7 @@ import org.biojava.spice.manypanel.drawable.*;
 import org.biojava.spice.manypanel.eventmodel.*;
 import java.util.logging.*             ;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List             ;
 import java.util.Map;
@@ -46,6 +47,12 @@ public class SingleFeatureThread
 extends Thread 
 
 {
+    /** number of times the client tries to reconnect to the server if a "come back later" is returned.
+     * the server should provide a reasonable estimation how long it will take him to create results.
+     * if this number of requests is still not successfull, give up.
+     */
+    public static int MAX_COME_BACK_ITERATIONS = 5;
+    
     URL dascommand ;    
   
     
@@ -136,6 +143,30 @@ extends Thread
                 
         //logger.finer("opening " + dascommand);
         DAS_FeatureRetrieve ftmp = new DAS_FeatureRetrieve(dascommand);
+        
+        
+        int comeBackLater = ftmp.getComeBackLater();
+        int securityCounter = 0;
+        while ( comeBackLater > 0 ) {
+            securityCounter++;
+            if ( securityCounter >= MAX_COME_BACK_ITERATIONS){
+                comeBackLater = -1; 
+                break;
+                
+            }
+            notifyComeBackLater(comeBackLater);
+            // server is still calculating - asks us to come back later
+            try {
+                wait (comeBackLater);
+            } catch (InterruptedException e){
+                comeBackLater = -1;
+                break;
+            }
+                
+            ftmp.reload();
+            comeBackLater = ftmp.getComeBackLater(); 
+        }
+        
         List features = ftmp.get_features();
         
         // a fallback mechanism to prevent DAS sources from bringing down spice
@@ -150,23 +181,42 @@ extends Thread
         Map[] feats = (Map[])features.toArray(new Map[features.size()]);
         notifyFeatureListeners(feats);
                 
-        // now with support for stylesheets.
-        
+        // now with support for stylesheets.        
         Map[] typeStyle = dasSource.getStylesheet();
         // is null if no stylesheet has been loaded ...
         if ( typeStyle == null){
+            doStyleSheetRequest();
             
-            dasSource.loadStylesheet();
-            typeStyle = dasSource.getStylesheet();
-            for ( int m=0; m< typeStyle.length;m++){
-                logger.finest("got stylesheet: " + typeStyle[m]);    
-            }
         }
                
         
         notifyLoadingFinished();
     }
+        
  
+    private void doStyleSheetRequest(){
+
+        dasSource.loadStylesheet();
+        Map[] typeStyle = dasSource.getStylesheet();
+        for ( int m=0; m< typeStyle.length;m++){
+            logger.finest("got stylesheet: " + typeStyle[m]);    
+        }
+    }
+    
+    /** the Annotation server requested to be queried again in a while
+     * 
+     * @param comeBackLater
+     */
+    private void notifyComeBackLater(int comeBackLater){
+        FeatureEvent event = new FeatureEvent(new HashMap[0],dasSource);
+        event.setComeBackLater(comeBackLater);
+        Iterator fiter = featureListeners.iterator();
+        while (fiter.hasNext()){
+            FeatureListener fi = (FeatureListener)fiter.next();
+            fi.comeBackLater(event);
+        }
+        
+    }
     
     private void notifyFeatureListeners(Map[] feats){
 
