@@ -525,6 +525,12 @@ public abstract class AbstractChainRenderer
         updatePanelPositions();
         
     }
+    
+    public void comeBackLater(FeatureEvent e){
+        //TODO: do something here
+    }
+    
+    
 
     
     private Feature mapPDBFeature2Seq(Feature f){

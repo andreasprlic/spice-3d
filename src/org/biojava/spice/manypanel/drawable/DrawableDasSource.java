@@ -157,6 +157,10 @@ FeatureListener{
         }
         
     }
+    
+    public void comeBackLater(FeatureEvent e){
+        //TODO: display that the server is calculating ...
+    }
  
     public Feature[] getFeatures(){
         return features;

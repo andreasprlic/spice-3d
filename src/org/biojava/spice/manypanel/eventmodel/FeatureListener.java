@@ -30,9 +30,17 @@ package org.biojava.spice.manypanel.eventmodel;
  */
 public interface FeatureListener {
     
+    /** new features have been returned from the Annotation server 
+     * 
+     * @param e
+     */
     public void newFeatures(FeatureEvent e);
     
-
+    /** the server says that he is busy and we should try again in x seconds
+     * 
+     * @param e
+     */
+    public void comeBackLater(FeatureEvent e);
     
 }
 

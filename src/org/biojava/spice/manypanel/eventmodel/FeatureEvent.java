@@ -28,13 +28,22 @@ public class FeatureEvent {
     
     Map[] features;
     SpiceDasSource dasSource;
+    int comeBackLater;
     
     public FeatureEvent(Map[] features,SpiceDasSource dasSource) {
         super();
         this.features =features;
         this.dasSource = dasSource;
+        comeBackLater = -1;
     }
     
+    public int getComeBackLater(){
+        return comeBackLater;
+    }
+    
+    public void setComeBackLater(int comeBackLater){
+        this.comeBackLater = comeBackLater;
+    }
     
     
     /** get the features that have been found.

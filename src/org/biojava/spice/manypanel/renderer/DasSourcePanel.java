@@ -258,6 +258,11 @@ implements FeatureListener,SpiceFeatureListener
     }
     
     
+    public void comeBackLater(FeatureEvent e){
+        // TODO do something here...
+    }
+    
+    
     
     private void drawArrowFeature(Feature feature,int featurePos, int drawHeight,Graphics g,int y) 
     {
