@@ -76,7 +76,7 @@ extends AbstractChainManager
     
     public void clearDasSources(){
         super.clearDasSources();
-        logger.info("clear sequence manager das sources");
+        //logger.info("clear sequence manager das sources");
         if ( seqRenderers == null){
             return;
         }

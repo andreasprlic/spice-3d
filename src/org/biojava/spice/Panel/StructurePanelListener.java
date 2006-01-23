@@ -289,7 +289,7 @@ SpiceFeatureListener
         String cmd =  "select "+startpdb+"-"+endpdb;
         if ( ! chainid.equals(" ")) 
             cmd += ":" +chainid;
-        cmd +=";";
+        cmd +=" and protein;";
         return cmd ;
     }
     
@@ -413,7 +413,7 @@ SpiceFeatureListener
             return "" ;
         }
         
-        String cmd = "select " + pdbdat + ";";
+        String cmd = "select " + pdbdat + " and protein;";
         return cmd ;
         
     }
@@ -452,7 +452,7 @@ SpiceFeatureListener
             if ( feature.getType().equals("DISULFID")){
             
                 String c = getDisulfidSelect(start,end);
-                cmd += "select " + c;
+                cmd += "select " + c + " and protein";
                 
             } else {
                 
@@ -474,7 +474,7 @@ SpiceFeatureListener
 
            
                 c += startpdb + " - " + endpdb + chainselect ; 
-                cmd += "select "+  c;
+                cmd += "select "+  c + " and protein";
             } 
             cmd +=";";
             
@@ -574,7 +574,7 @@ SpiceFeatureListener
             if ( feature.getType().equals("DISULFID")){
             
                 String c = getDisulfidSelect(start,end);
-                cmd +="select " + c;
+                cmd +="select " + c + " and protein";
 
                 
             } else {
@@ -599,7 +599,7 @@ SpiceFeatureListener
                 }
                 first = false;
                 c += startpdb + " - " + endpdb +chainselect; 
-                cmd +=  c;
+                cmd +=  c + " and protein";
             } 
         }
         

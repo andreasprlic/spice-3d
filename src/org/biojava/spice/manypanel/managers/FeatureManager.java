@@ -230,7 +230,7 @@ implements ObjectManager ,SequenceListener{
     }
     
     private void triggerFeatureRequest(String accessionCode, SpiceDasSource sds, DrawableDasSource ds){
-        logger.info("triggering Feature request for" + accessionCode + "  from " + sds);
+        //logger.info("triggering Feature request for" + accessionCode + "  from " + sds);
         SingleFeatureThread thread = new SingleFeatureThread(accessionCode, sds);
         Iterator iter = dasSourceListeners.iterator();
         while (iter.hasNext()){

@@ -147,7 +147,7 @@ implements ObjectManager {
     }
     
     public void clearDasSources(){
-        logger.info("abstrachChainManager clearDasSources");
+        //logger.info("abstrachChainManager clearDasSources");
         dasSources = new SpiceDasSource[0];
     }
     

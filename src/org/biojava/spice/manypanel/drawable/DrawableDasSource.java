@@ -143,11 +143,11 @@ FeatureListener{
     
     public void newFeatures(FeatureEvent e){
         Map[] feats = e.getFeatures();
-        logger.info("got " + feats.length + " features " +
-               featureListeners.size() + " featureListeners");
+        //logger.info("got " + feats.length + " features " +
+        //       featureListeners.size() + " featureListeners");
         features = convertMap2Features(feats);
         
-        logger.finest("joined to " + features.length + " features -check:"+feats.length  );
+        //logger.finest("joined to " + features.length + " features -check:"+feats.length  );
         // AbstractChainRenderer is listening to this and
         // needs to resize itself
         //TODO: this should not be part of the Drawable code by of the DasSourcePanel code...
