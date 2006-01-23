@@ -71,7 +71,7 @@ implements FeatureListener,SpiceFeatureListener
     public static final int linkIconWidth = 10;
     public static final Color SELECTED_FEATURE_COLOR  = Color.yellow;
     
-    DrawableDasSource dasSource;
+    DrawableDasSource drawableDasSource;
     
     float scale;
     static Logger logger = Logger.getLogger("org.biojava.spice");
@@ -81,14 +81,14 @@ implements FeatureListener,SpiceFeatureListener
     boolean featureSelected;
     int selectedFeaturePos;
     ImageIcon linkIcon ;
-    
+    ImageIcon infoIcon;
     int chainLength;
     boolean progressThreadRunning;
     ProgressThread progressThread;
     
     public DasSourcePanel(DrawableDasSource ds) {
         super();
-        dasSource = ds;
+        drawableDasSource = ds;
         scale = 1.0f;
         setOpaque(true);
         bar = new JProgressBar();
@@ -104,6 +104,7 @@ implements FeatureListener,SpiceFeatureListener
         selected = false;
         chainLength = 0;
         linkIcon = createImageIcon("firefox10x10.png");
+        infoIcon = createImageIcon("messagebox_info16x16.png");
         progressThreadRunning = false;
     }
     
@@ -113,7 +114,11 @@ implements FeatureListener,SpiceFeatureListener
      * @return
      */
     public DrawableDasSource getDrawableDasSource(){
-        return dasSource;
+        return drawableDasSource;
+    }
+    
+    public void setDrawableDasSource(DrawableDasSource ds){
+        drawableDasSource = ds;
     }
     
     public void setChain(Chain chain){
@@ -127,15 +132,15 @@ implements FeatureListener,SpiceFeatureListener
     }
     
     public int getDisplayHeight(){
-        int h = FeaturePanel.DEFAULT_Y_START + FeaturePanel.DEFAULT_Y_STEP + FeaturePanel.LINE_HEIGHT;
-        h += (dasSource.getFeatures().length +1 ) * FeaturePanel.DEFAULT_Y_STEP ;
+        int h = ScalePanel.DEFAULT_Y_START + ScalePanel.DEFAULT_Y_STEP + ScalePanel.LINE_HEIGHT;
+        h += (drawableDasSource.getFeatures().length +1 ) * ScalePanel.DEFAULT_Y_STEP ;
         //logger.info(dasSource.getDasSource().getNickname() + " height:" + h);
         return h;
     }
     
     
     public void setLoading(boolean flag){
-        dasSource.setLoading(flag);
+        drawableDasSource.setLoading(flag);
     }
     
     
@@ -154,8 +159,8 @@ implements FeatureListener,SpiceFeatureListener
     
     public void paint(Graphics g){
         super.paint(g);
-        
-        if (dasSource.getLoading()){
+        //System.out.println("painting das source " +dasSource.getDasSource().getNickname());
+        if (drawableDasSource.getLoading()){
             //logger.info(" draw loading bar");
             // add a progressbar           
             if (!  progressThreadRunning ) {
@@ -181,18 +186,18 @@ implements FeatureListener,SpiceFeatureListener
         g2D.setFont(headFont);
         g2D.setColor(Color.black);
         
-        String str = dasSource.getDasSource().getNickname();
+        String str = drawableDasSource.getDasSource().getNickname();
         //logger.info("paint DasSourcePanel "+str);
-        
-        g2D.drawString(str,2,10);
+        infoIcon.paintIcon(null, g, 1,0);        
+        g2D.drawString(str,16,11);
         g2D.setFont(plainFont);
         
         
         // now to the features ...
         
-        Feature[] features = dasSource.getFeatures();
+        Feature[] features = drawableDasSource.getFeatures();
                 
-        int y = FeaturePanel.DEFAULT_Y_START + FeaturePanel.DEFAULT_Y_STEP ;
+        int y = ScalePanel.DEFAULT_Y_START + ScalePanel.DEFAULT_Y_STEP ;
         //logger.info(dasSource.getDasSource().getNickname() + " " + dasSource.getLoading() + " " + this.getWidth());
         
         //Composite oldComp = g2D.getComposite();
@@ -227,7 +232,7 @@ implements FeatureListener,SpiceFeatureListener
         if ( features == null) 
             return y;
         
-        SpiceDasSource ds = dasSource.getDasSource();
+        SpiceDasSource ds = drawableDasSource.getDasSource();
         Map[] styleSheetMap = ds.getStylesheet() ;
         if (( styleSheetMap == null) || (styleSheetMap.length == 0) ) {
             //logger.info(parent.getDasSource().getNickname() + " did not provide stylesheet");
@@ -245,7 +250,8 @@ implements FeatureListener,SpiceFeatureListener
     
     
     public void newFeatures(FeatureEvent e) {
-        //logger.info(" dassourcepanel: drawable das source got new features, repaint!");
+
+        logger.finest(" dassourcepanel:  das source >" + drawableDasSource.getDasSource().getNickname()+"< got new ("+ drawableDasSource.getFeatures().length + ") features, repaint!");
         int panelWidth = getWidth();
         int panelHeight = getDisplayHeight();
         Dimension d = new Dimension(panelWidth,panelHeight);
@@ -288,7 +294,7 @@ implements FeatureListener,SpiceFeatureListener
     }
     
     private int getDrawPos(int p){
-        return Math.round(p *scale ) + FeaturePanel.DEFAULT_X_START;
+        return Math.round(p *scale ) + ScalePanel.DEFAULT_X_START;
     }
     
     private void drawArrowSegment(Segment segment, int drawHeight,Graphics g, int y){
@@ -325,7 +331,7 @@ implements FeatureListener,SpiceFeatureListener
             g2D.fillRect(xstart,y+half-2,width-4,drawHeight-half);
             // draw arrow head
             int x1 = xstart + width -4  ; int y1 = y ;
-            int x2 = xstart + width -4  ; int y2 = y + FeaturePanel.DEFAULT_Y_HEIGHT;
+            int x2 = xstart + width -4  ; int y2 = y + ScalePanel.DEFAULT_Y_HEIGHT;
             int x3 = xstart + width     ; int y3 = y + half ; 
             int[] xPoints =  { x1,x2,x3};
             int[] yPoints =  { y1,y2,y3};
@@ -597,9 +603,9 @@ implements FeatureListener,SpiceFeatureListener
                 //Dimension dstruc = this.getSize();
                 g2D.setColor(SELECTED_FEATURE_COLOR);
                 Composite oldComp = g2D.getComposite();
-                int drawHeight = FeaturePanel.DEFAULT_Y_STEP;
+                int drawHeight = ScalePanel.DEFAULT_Y_STEP;
                 g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER ,0.6f));
-                g2D.fillRect(0,y,fullwidth+FeaturePanel.DEFAULT_X_START,drawHeight);
+                g2D.fillRect(0,y,fullwidth+ScalePanel.DEFAULT_X_START,drawHeight);
                 g2D.setComposite(oldComp);
             }
         }
@@ -610,7 +616,7 @@ implements FeatureListener,SpiceFeatureListener
         
         for ( int f =0 ; f< features.length;f++) {
             
-            y += FeaturePanel.DEFAULT_Y_STEP;
+            y += ScalePanel.DEFAULT_Y_STEP;
             Feature feature = features[f];
             
             drawLabel(g,feature,y);
@@ -620,7 +626,7 @@ implements FeatureListener,SpiceFeatureListener
             String featureType = feature.getType();
             
             if (  featureType.equals("DISULFID")){
-                drawSpanFeature(feature,f,FeaturePanel.DEFAULT_Y_HEIGHT,g,y);
+                drawSpanFeature(feature,f,ScalePanel.DEFAULT_Y_HEIGHT,g,y);
                 
             } else if (  featureType.equals("SECSTRUC") || 
                     featureType.equals("HELIX") || 
@@ -628,9 +634,9 @@ implements FeatureListener,SpiceFeatureListener
                     featureType.equals("COIL") ||
                     featureType.equals("TURN")
             ){
-                drawSecstrucFeature(feature,f,FeaturePanel.DEFAULT_Y_HEIGHT,g,y);
+                drawSecstrucFeature(feature,f,ScalePanel.DEFAULT_Y_HEIGHT,g,y);
             } else { 
-                drawLineFeature(feature,f,FeaturePanel.DEFAULT_Y_HEIGHT,g,y);
+                drawLineFeature(feature,f,ScalePanel.DEFAULT_Y_HEIGHT,g,y);
             }
             
             checkDrawSelectedFeature(feature,f,g,y);
@@ -663,7 +669,7 @@ implements FeatureListener,SpiceFeatureListener
         Shape clip = g.getClip();
         
         // draw a background rectangle
-        g.fillRect(0,y,FeaturePanel.DEFAULT_X_START ,FeaturePanel.DEFAULT_Y_STEP);
+        g.fillRect(0,y,ScalePanel.DEFAULT_X_START ,ScalePanel.DEFAULT_Y_STEP);
         
         
         
@@ -686,9 +692,9 @@ implements FeatureListener,SpiceFeatureListener
         // now draw the actual label - text
         g.setColor(Color.black);
         
-        g.clipRect(0,y,FeaturePanel.DEFAULT_X_START ,FeaturePanel.DEFAULT_Y_STEP);
+        g.clipRect(0,y,ScalePanel.DEFAULT_X_START ,ScalePanel.DEFAULT_Y_STEP);
         
-        g.drawString(type,2+linkIconWidth,y+FeaturePanel.DEFAULT_Y_STEP);
+        g.drawString(type,2+linkIconWidth,y+ScalePanel.DEFAULT_Y_STEP);
         //g.setFont(plainFont);
         
         g.setClip(clip);
@@ -809,9 +815,9 @@ implements FeatureListener,SpiceFeatureListener
             // draw the line ...
             //g2D.fillRect(xstart,y,width,height);
             int middlex = xstart + (width/2);
-            g2D.drawLine(xstart,(y+FeaturePanel.DEFAULT_Y_HEIGHT),middlex,y);
-            g2D.drawLine(middlex,y,xstart+width,(y+FeaturePanel.DEFAULT_Y_HEIGHT));
-            g2D.drawLine(xstart,(y+FeaturePanel.DEFAULT_Y_HEIGHT),xstart+width,(y+FeaturePanel.DEFAULT_Y_HEIGHT));
+            g2D.drawLine(xstart,(y+ScalePanel.DEFAULT_Y_HEIGHT),middlex,y);
+            g2D.drawLine(middlex,y,xstart+width,(y+ScalePanel.DEFAULT_Y_HEIGHT));
+            g2D.drawLine(xstart,(y+ScalePanel.DEFAULT_Y_HEIGHT),xstart+width,(y+ScalePanel.DEFAULT_Y_HEIGHT));
             
             
             
@@ -854,15 +860,15 @@ implements FeatureListener,SpiceFeatureListener
     private int getDrawHeight(Map styleMap){
         
         String height = (String)styleMap.get("height");
-        int h = FeaturePanel.DEFAULT_Y_HEIGHT;
+        int h = ScalePanel.DEFAULT_Y_HEIGHT;
         if ( height != null){
             try {
                 h = Integer.parseInt(height);
             } catch (Exception e){}
         }
         
-        if (h > FeaturePanel.DEFAULT_Y_HEIGHT){
-            h = FeaturePanel.DEFAULT_Y_HEIGHT;
+        if (h > ScalePanel.DEFAULT_Y_HEIGHT){
+            h = ScalePanel.DEFAULT_Y_HEIGHT;
         }
         return h;
     }
@@ -874,7 +880,7 @@ implements FeatureListener,SpiceFeatureListener
         
         for ( int f =0 ; f< features.length;f++) {
             
-            y += FeaturePanel.DEFAULT_Y_STEP;
+            y += ScalePanel.DEFAULT_Y_STEP;
             
             Feature  feat = features[f];
             String featureType = feat.getType();
@@ -942,16 +948,16 @@ implements FeatureListener,SpiceFeatureListener
                 //logger.finest("no matching stylesheet found for feature type " + featureType);
                 // no stylesheet type has been found that describes how to paint this feature - use default...
                 if (  featureType.equals("DISULFID")){
-                    drawSpanFeature(feat,f,FeaturePanel.DEFAULT_Y_HEIGHT,g,y);
+                    drawSpanFeature(feat,f,ScalePanel.DEFAULT_Y_HEIGHT,g,y);
                 } else if (  featureType.equals("SECSTRUC") || 
                         featureType.equals("HELIX") || 
                         featureType.equals("STRAND") || 
                         featureType.equals("COIL") ||
                         featureType.equals("TURN")
                 ){
-                    drawSecstrucFeature(feat,f,FeaturePanel.DEFAULT_Y_HEIGHT,g,y);
+                    drawSecstrucFeature(feat,f,ScalePanel.DEFAULT_Y_HEIGHT,g,y);
                 } else { 
-                    drawLineFeature(feat,f,FeaturePanel.DEFAULT_Y_HEIGHT,g,y);
+                    drawLineFeature(feat,f,ScalePanel.DEFAULT_Y_HEIGHT,g,y);
                 }
             }
             checkDrawSelectedFeature(feat,f,g,y);            
@@ -980,7 +986,7 @@ implements FeatureListener,SpiceFeatureListener
         }
         
         featureSelected = false;
-        Feature[] allFeats = dasSource.getFeatures();
+        Feature[] allFeats = drawableDasSource.getFeatures();
         boolean featureOnThisPanel = false;
         for (int i = 0 ; i< allFeats.length;i++){
             if ( f.equals(allFeats[i])){

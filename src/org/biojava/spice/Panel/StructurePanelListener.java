@@ -332,11 +332,16 @@ SpiceFeatureListener
         //System.out.println("structurepanel selected seqpos " + seqpos );
         //highlite(currentChainNumber,seqpos,"");
         if ( seqpos == oldpos ) return ;
+        
+        // TODO: wait for Jmol to provide the isEvaluating method
+        //if ( structurePanel.getViewer().isEvaluating())
+          //  return;
         oldpos = seqpos ; 
         
         String cmd = getSelectStr(currentChainNumber,seqpos);
         
         if ( ! cmd.equals(""))
+            //if (! structurePanel.getViewer().isEvaluating())
             executeCmd(cmd);
         else {
             cmd = "select null ; set display selected" ;

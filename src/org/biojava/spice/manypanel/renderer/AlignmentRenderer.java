@@ -79,13 +79,13 @@ extends JPanel {
         this.setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
         this.setBorder(BorderFactory.createEmptyBorder());
         
-        this.setBackground(FeaturePanel.BACKGROUND_COLOR);
+        this.setBackground(ScalePanel.BACKGROUND_COLOR);
         
         layeredPane = new JLayeredPane();
         layeredPane.setBorder(BorderFactory.createEmptyBorder());
         layeredPane.setDoubleBuffered(true);
         layeredPane.setOpaque(true);
-        layeredPane.setBackground(FeaturePanel.BACKGROUND_COLOR);
+        layeredPane.setBackground(ScalePanel.BACKGROUND_COLOR);
         
         scrollPane = new JScrollPane(layeredPane);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
@@ -176,7 +176,7 @@ extends JPanel {
         int aminosize = Math.round(1*scale);
         if ( aminosize < 1)
             aminosize = 1;
-        int w = Math.round(l*scale) + aminosize+  FeaturePanel.DEFAULT_X_START + FeaturePanel.DEFAULT_X_RIGHT_BORDER;
+        int w = Math.round(l*scale) + aminosize+  ScalePanel.DEFAULT_X_START + ScalePanel.DEFAULT_X_RIGHT_BORDER;
         
         if ( w  < 200){
             w = 200;

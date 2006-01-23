@@ -48,11 +48,11 @@ extends JDialog {
     private static final long serialVersionUID = 8273923744121231231L;
     
     public static final String VERSION = 
-        "0.8.1";
+        "0.8.1-devel";
     
     static final String AUTHORS = 
         " <a href=\"mailto:ap3@sanger.ac.uk\">Andreas Prlic</a>, Thomas Down, Tim Hubbard <br>"+
-        "The Wellcome Trust Sanger Institute 2005<p>"; 
+        "The Wellcome Trust Sanger Institute 2006<p>"; 
     
     static final String SPICEINFO = 
         " More Info about SPICE: <br>"+
@@ -85,8 +85,8 @@ extends JDialog {
         ""+
         "You should have received a copy of the GNU Lesser General Public<br>"+
         "License along with this library; if not, write to the Free Software<br>" +
-	"Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA<br>"+
-	"</pre><br>" ;
+        "Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA<br>"+
+        "</pre><br>" ;
     
     
     static String DESCRIPTION_TEXT = 

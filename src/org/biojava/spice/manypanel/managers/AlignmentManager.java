@@ -51,7 +51,7 @@ public class AlignmentManager
 extends AbstractAlignmentManager 
 implements StructureListener{
     
-    
+     
     
    
     SpiceDasSource[] refservers1;
@@ -456,7 +456,7 @@ implements StructureListener{
     }
     
     public void newSequence1(SequenceEvent e){
-        //logger.info(panelName+" alignment : new sequence1:" + e.getAccessionCode() + " currently know:"+object1Id+" " + object2Id);
+       logger.finest(panelName+" alignment : new sequence1:" + e.getAccessionCode() + " currently know:"+object1Id+" " + object2Id);
         
        String ac = e.getAccessionCode().toLowerCase();
        SequenceManager sm = new SequenceManager();
@@ -624,8 +624,8 @@ implements StructureListener{
     
     
     public void newSequence2(SequenceEvent e){
-        //logger.info(panelName+" alignment : new sequence2:"+e.getAccessionCode() + 
-           //     " currently know 1: >"+object1Id+"< 2: >" + object2Id + "< seq: >" + sequence2.getSequence()+"<");
+        logger.finest(panelName+" alignment : new sequence2:"+e.getAccessionCode() + 
+                " currently know 1: >"+object1Id+"< 2: >" + object2Id + "< seq: >" + sequence2.getSequence()+"<");
         
         String ac = e.getAccessionCode().toLowerCase();
         

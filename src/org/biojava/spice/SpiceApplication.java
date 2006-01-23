@@ -81,6 +81,8 @@ import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.spice.manypanel.eventmodel.DasSourceEvent;
 import org.biojava.spice.manypanel.eventmodel.DasSourceListener;
+import org.biojava.spice.manypanel.eventmodel.StructureEvent;
+import org.biojava.spice.manypanel.eventmodel.StructureListener;
 import org.biojava.spice.server.SpiceServer;
 
 
@@ -135,6 +137,7 @@ ConfigurationListener
     JMenuItem unlock;
     JMenuItem lockMenu;
     
+    SpiceDasSource[] knownSources;
     
     //JMenuBar menuBar ;
     JTextField getCom ;
@@ -175,7 +178,7 @@ ConfigurationListener
         
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
-              
+        knownSources = new SpiceDasSource[0]; 
         
         // a few error checks.
         checkStartParameters();
@@ -335,8 +338,8 @@ ConfigurationListener
    
     private void initLoggingPanel(){
         LoggingPanel loggingPanel = new LoggingPanel(logger);
-        loggingPanel.getHandler().setLevel(Level.INFO);	
-        logger.setLevel(Level.INFO);
+        loggingPanel.getHandler().setLevel(Level.FINEST);	
+        logger.setLevel(Level.FINEST);
         loggingPanel.show(null);
     }
     
@@ -522,7 +525,7 @@ ConfigurationListener
         browserPane.addPDBSpiceFeatureListener(structurePanelListener);
         
         
-        MyDasSourceListener mdsl = new MyDasSourceListener(this);
+        MyDasSourceListener mdsl = new MyDasSourceListener();
         browserPane.addDasSourceListener(mdsl);
         browserPane.addPDBSequenceListener(spiceMenuListener);
             
@@ -530,7 +533,7 @@ ConfigurationListener
         chainDisplay = new SpiceChainDisplay(chainList);
         browserPane.addStructureListener(chainDisplay);
         chainList.addListSelectionListener(chainDisplay);
-        chainDisplay.addStructureListener(browserPane.getStructureListener());
+        chainDisplay.addStructureListener(browserPane.getStructureManager());
         chainDisplay.addStructureListener(structurePanelListener);
         chainDisplay.addStructureListener(statusPanel);
         //chainDisplay.addStructureListener(spiceMenuListener);
@@ -853,94 +856,6 @@ ConfigurationListener
     
     
     
-    //TODO: remove this method
-    /**  update the currently displayed features 
-    public void setFeatures(String sp_id, List tmpfeat) {
-        //TODO: build up a new dascanv!
-        logger.warning("depreciated method");
-        logger.info("setting features");
-        
-        //first_load = false ;
-        //logger.info("SpiceAplication setting features for "+sp_id);
-        String mem_id = makeFeatureMemoryCode(sp_id);
-        //System.out.println(mem_id);
-       
-        // TODO: need to move caching of features on a different level.
-        // We need to distinguish SP and PDB features...
-        // ev. better move cache to FeatureFetcher
-        memoryfeatures.put(mem_id,tmpfeat);
-        
-        
-        //statusPanel.setLoading(false);
-        features.clear();
-        features = tmpfeat ;
-        
-        // test if features have a LINK field
-        // if yes, add to browse menu
-        //registerBrowsableFeatures(tmpfeat);
-        
-        //this.paint(this.getGraphics());
-        updateDisplays();
-    }*/
-    
-    
-
-   /* private  void getNewFeatures(String sp_id) {
-        //logger.("SpiceApplication get new Features " + sp_id);
-        //ArrayList featureservers = getFeatureServers() ;
-        logger.finest(" getNewFeatures" + sp_id);
-        Chain chain = getChain(currentChainNumber) ;
-        if ( chain == null) {
-            System.out.println("SpiceApplication chain == null, returning ...");
-            	return ;
-            	
-        }
-        //first_load = true ;
-        this.setLoading(true);
-        features.clear();
-        //dascanv.clear();
-        //dascanv.setSeqLength(chain.getLength());
-
-        
-        if ( config != null ){
-            // test if a new local DAS source is in params
-         
-            testAddLocalServer();
-            
-           
-            
-
-        }
-       
-      
-
-        System.out.println("SpiceApplication init feature fetcher");
-        logger.finest("init feature fetcher");
-
-
-        
-        String disp = startParameters.getDisplay();
-        String labe = startParameters.getDisplayLabel();
-        logger.info("got " + disp + " " + labe);
-
-        
-        if (! disp.equals("all")){
-            if ( labe.equals("all")){
-                labe = "";
-            }
-        }
-        
-        if ( ! labe.equals("all"))
-            if ( disp.equals("all"))
-                disp = "";
-        logger.finest("got display list: "+ disp );
-        
-        
-        
-    } */
-
-    
-    
     /** test if a local DAS source is defined in the startup parameters
      * If yes, add it to the list of servers in config
      */
@@ -1172,6 +1087,18 @@ ConfigurationListener
         return structure;
     }
     
+    public void setStructure(Structure s){
+        StructureEvent event = new StructureEvent(s);
+        browserPane.getStructureManager().newStructure(event);
+        StructureListener[] sls = browserPane.getStructureListener();
+        for (int i = 0 ; i < sls.length ; i++){
+            StructureListener li = sls[i];
+            li.newStructure(event);
+        }
+        structurePanelListener.newStructure(event);
+        chainDisplay.newStructure(event);
+    }
+    
     /** send a command to Jmol *
     public void executeCmd(String cmd) {
         //logger.finest("executing Command "+ cmd);
@@ -1188,30 +1115,7 @@ ConfigurationListener
         return chain.getSwissprotId();
     }
     
-    /*
-    public void setConfiguration(RegistryConfiguration reg) {
-        logger.info("setting configuration");
-        config = reg;
-        List s = config.getServers();
-        SpiceDasSource[] sources = new SpiceDasSource[s.size()];
-        
-        for ( int i=0; i< s.size();i++){
-            SpiceDasSource d = (SpiceDasSource)s.get(i);
-            sources[i] = d;
-            logger.finest(d.getUrl());
-        }
-        browserPane.setDasSources(sources);
-        
-        Chain chain = getChain(currentChainNumber) ;
-        if ( chain != null) {
-            String sp_id = chain.getSwissprotId() ;
-            getNewFeatures(sp_id) ;
-            //updateDisplays();
-        }
-        
-    }
     
-    */
     public int getCurrentChainNumber() {
         return chainDisplay.getCurrentChainNumber();
         //return browserPane.getCurrentChainNumber();
@@ -1363,7 +1267,7 @@ ConfigurationListener
         int i = 0;
         while (iter.hasNext()){
             SpiceDasSource ds = (SpiceDasSource) iter.next();
-            //logger.finest(ds.get)
+            //logger.finest(ds.getNickname()+" "+ds.getStatus());
             sources[i] = ds;
             i++;
         }
@@ -1374,23 +1278,64 @@ ConfigurationListener
     }
     
     
+    /** make sure that already know DAS sources are re-used
+     * 
+     * @param l
+     * @return
+     */
+    private SpiceDasSource[] filterSourcesWithKnowData(SpiceDasSource[] newSources){
+            
+        
+        SpiceDasSource[] sources = new SpiceDasSource[newSources.length];
+     
+        for (int i = 0 ; i< newSources.length;i++){
+            SpiceDasSource newSource = newSources[i];
+            boolean known = false;
+            for (int j = 0 ; j < knownSources.length;j++){
+                SpiceDasSource knownSource = knownSources[j];
+                if ( knownSource.getUrl().equals(newSource.getUrl())){
+                    known = true;
+                    //logger.info("duplicate  " + knownSource.getNickname() + knownSource.getStatus()+ " " + newSource.getStatus());
+                    knownSource.setStatus(newSource.getStatus());
+                    sources[i] = knownSource;
+                    break;
+                }                
+            }
+            if ( ! known) {
+                sources[i] = newSource;
+                logger.finest("new source " + newSource.getNickname());
+            }
+        }
+        knownSources = sources;
+        return sources;
+        
+    }
+    
+    
     
     private void setDasSources(){
 
         List l = config.getAllServers();
         logger.finest("got " + l.size() + " servers");
-        
+        Iterator iter = l.iterator();
+        while (iter.hasNext()){
+            SpiceDasSource ds = (SpiceDasSource)iter.next();
+            logger.finest("setDAsSources " + ds.getNickname() + " " + ds.getStatus());
+        }
        
         SpiceDasSource[] sources = filterSourcesWithStartupData(l);
          
-        browserPane.clearDasSources();
+        
+        sources = filterSourcesWithKnowData(sources);
+        
+        //browserPane.clearDasSources();
         browserPane.setDasSources(sources);
         
     }
     
        
     public synchronized void newConfigRetrieved(RegistryConfiguration conf){
-        //logger.info("received new config " );
+        logger.finest("got new config " );
         config = conf;
         configLoaded =true;
         
@@ -1599,15 +1544,19 @@ ConfigurationListener
 }
 
 class MyDasSourceListener implements DasSourceListener{
-    SPICEFrame parent;
-    public MyDasSourceListener(SPICEFrame parent){
-        this.parent=parent;
+   
+    public MyDasSourceListener(){
+       
     }
     public void selectedDasSource(DasSourceEvent event){
         SpiceDasSource ds = event.getDasSource().getDasSource();
-        DasSourceDialog dsd = new DasSourceDialog(parent, ds);
+        DasSourceDialog dsd = new DasSourceDialog(ds);
         dsd.show();
    }
+    
+    public void removeDasSource(DasSourceEvent ds){
+        
+    }
     public void disableDasSource(DasSourceEvent ds) {
      
         

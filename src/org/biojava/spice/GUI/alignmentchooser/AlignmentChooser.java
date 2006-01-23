@@ -39,7 +39,7 @@ import org.biojava.spice.manypanel.eventmodel.ObjectListener;
 import org.biojava.spice.manypanel.eventmodel.SequenceEvent;
 import org.biojava.spice.manypanel.eventmodel.SequenceListener;
 import org.biojava.spice.manypanel.managers.SequenceManager;
-import org.biojava.spice.manypanel.renderer.FeaturePanel;
+import org.biojava.spice.manypanel.renderer.ScalePanel;
 import org.biojava.spice.Panel.SeqFeaturePanel;
 
 import org.biojava.bio.program.das.dasalignment.*;
@@ -109,7 +109,7 @@ AlignmentListener
     
     //AligPanelMouseListener mouseListener;
     JPanel panel;
-    FeaturePanel featurePanel;
+    ScalePanel featurePanel;
     
     /**
      * @param arg0
@@ -142,7 +142,7 @@ AlignmentListener
     
     public void initPanels(){
         scroll = new JScrollPane();
-        featurePanel = new FeaturePanel();
+        featurePanel = new ScalePanel();
         featurePanel.setPreferredSize(new Dimension(400,30));
         panel = new JPanel();
         aligPanels = new ArrayList();
@@ -212,7 +212,7 @@ AlignmentListener
         scroll = new JScrollPane(vBox);  
         //vBox.setPreferredSize(new Dimension(530,600));
         panel = new JPanel();
-        panel.setBackground(FeaturePanel.BACKGROUND_COLOR);
+        panel.setBackground(ScalePanel.BACKGROUND_COLOR);
         panel.setLayout(new BoxLayout(panel,BoxLayout.Y_AXIS));
         panel.setPreferredSize(new Dimension(530,600));
         panel.add(scroll);

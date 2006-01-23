@@ -24,6 +24,7 @@ package org.biojava.spice.manypanel.managers;
 
 import org.biojava.services.das.registry.DasCoordinateSystem;
 import  org.biojava.services.das.registry.DasSource;
+import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.manypanel.drawable.*;
 
 
@@ -51,6 +52,6 @@ public interface ObjectManager {
          * @return 
          */
         
-        public DrawableDasSource[] getDasSources();
+        public SpiceDasSource[] getDasSources();
                
 }

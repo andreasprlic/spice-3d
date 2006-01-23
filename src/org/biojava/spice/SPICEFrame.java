@@ -63,6 +63,8 @@ public interface SPICEFrame
     
     	/** retreive the internal Structure object */
     	public Structure getStructure();
+        
+    public void setStructure(Structure s);
     	
     /** set the new features to be displayed in sequence panels */
     //public void setFeatures(String sp_id, List features);
@@ -125,4 +127,6 @@ public interface SPICEFrame
     
     /** get the parameters that are used while loading the next molecule */
     public SpiceStartParameters getSpiceStartParameters();
+    
+    
 }

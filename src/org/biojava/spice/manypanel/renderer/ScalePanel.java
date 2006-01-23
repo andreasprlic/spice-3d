@@ -47,7 +47,7 @@ import java.awt.Image;
 //import java.awt.geom.AffineTransform;
 //import java.awt.geom.Rectangle2D;
 
-public class FeaturePanel
+public class ScalePanel
 extends JPanel{
     
     static final long serialVersionUID = 7893248902423l;
@@ -81,7 +81,7 @@ extends JPanel{
     public static final Font seqFont = new Font("Helvetica", Font.PLAIN, 10);
    
     
-    public FeaturePanel() {
+    public ScalePanel() {
         super();
         this.setBackground(BACKGROUND_COLOR);
         chain = new ChainImpl();

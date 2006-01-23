@@ -76,6 +76,7 @@ extends AbstractChainManager
     
     public void clearDasSources(){
         super.clearDasSources();
+        logger.info("clear sequence manager das sources");
         if ( seqRenderers == null){
             return;
         }
@@ -92,8 +93,8 @@ extends AbstractChainManager
 
 
     public void newObject(Object object) {
-        // TODO Auto-generated method stub
-        // got 
+        
+       
   
         
     
@@ -187,10 +188,10 @@ extends AbstractChainManager
     
     /** trigger DAS Sequence request */
     public void newObjectRequested(String accessionCode) {
-        
+        logger.finest("SequenceManager new Object Requested");
        
-        SpiceDasSource[] sds = toSpiceDasSource(dasSources);
-        SequenceThread thr = new SequenceThread(accessionCode,sds );
+        //SpiceDasSource[] sds = toSpiceDasSource(dasSources);
+        SequenceThread thr = new SequenceThread(accessionCode,dasSources );
         
         thr.addSequenceListener(this);
         //thr.addSequenceListener(featureManager);
@@ -200,13 +201,12 @@ extends AbstractChainManager
         while (iter.hasNext()){
             SequenceRenderer re = (SequenceRenderer)iter.next();
             re.getStatusPanel().setLoading(true);
-        }
-        
-        
+        }                
     }
     
     public void noObjectFound(String accessionCode){
         // clear the display...
+        logger.finest("SequenceManager noObjectFound " + accessionCode);
         
         DrawableSequence ds = fromString("","");
         Iterator iter = seqRenderers.iterator();
@@ -222,6 +222,7 @@ extends AbstractChainManager
 
 
     public void newSequence(SequenceEvent e) {
+        logger.finest("SequenceManager newSequence " + e.getAccessionCode());
         String sequence = e.getSequence();
         
         DrawableSequence ds = fromString(e.getAccessionCode(),sequence);

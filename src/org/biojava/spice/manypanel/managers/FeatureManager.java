@@ -45,9 +45,9 @@ import java.util.*;
  */
 public class FeatureManager 
 implements ObjectManager ,SequenceListener{
-
+    
     DasCoordinateSystem coordSys;
-    DrawableDasSource[] dasSources;
+    SpiceDasSource[] dasSources;
     
     static Logger logger = Logger.getLogger("org.biojava.spice");
     List featureRenderers ;
@@ -69,34 +69,34 @@ implements ObjectManager ,SequenceListener{
     
     public void clear() {
         currentAccessionCode = "";
-       
+        
     }
     
     public void clearDasSources(){
-        dasSources = new DrawableDasSource[0];
+        dasSources = new SpiceDasSource[0];
         Iterator iter = featureRenderers.iterator();
         while (iter.hasNext()){
             FeatureRenderer rend = (FeatureRenderer)iter.next();
             rend.clearDasSources();
         }
     }
-
+    
     public void addDasSourceListener(DasSourceListener dsl ){
         //logger.info("got new DasSourceListener " + dsl);
         dasSourceListeners.add(dsl);
     }
     
     public DasCoordinateSystem getCoordinateSystem() {
-      
+        
         return coordSys;
     }
-
-    public DrawableDasSource[] getDasSources() {
-      
+    
+    public SpiceDasSource[] getDasSources() {
+        
         return dasSources;
     }
-
-            
+    
+    
     
     public void addFeatureRenderer(FeatureRenderer rend){
         featureRenderers.add(rend);
@@ -109,9 +109,21 @@ implements ObjectManager ,SequenceListener{
     public void setCoordinateSystem(DasCoordinateSystem coordSys) {
         this.coordSys = coordSys;
     }
-
+    
+    public SpiceDasSource getKnownDasSource(DrawableDasSource ds){
+        for (int i = 0 ; i< dasSources.length; i++ ) {
+            SpiceDasSource tds = dasSources[i];
+            if ( tds.getUrl().equals(ds.getDasSource().getUrl())){
+                return tds;
+            }
+        }
+        return null;
+    }
+    
     public void setDasSources(DasSource[] dasSourcs) {
-        //logger.info("got " + dasSourcs.length + "feature sources for coordSYs " + coordSys);
+        logger.finest("got " + dasSourcs.length + "feature sources for coordSYs " + coordSys);
+        
+        
         
         Iterator iter = featureRenderers.iterator();
         while (iter.hasNext()){
@@ -119,20 +131,35 @@ implements ObjectManager ,SequenceListener{
             rend.clearDasSources();
         }
         
+         
+        
         List dsses = new ArrayList();
         for ( int i = 0 ; i< dasSourcs.length; i++){
             //logger.info("got new feature source " + dasSourcs[i].getUrl());
             DasSource sds = dasSourcs[i];
             
+            // if das source is known, skip            
+            
             DrawableDasSource ds = DrawableDasSource.fromDasSource(sds);
-            dsses.add(ds);
+            SpiceDasSource tmp = getKnownDasSource(ds) ;
+            if ( tmp != null) {
+                //dsses.add(tmp);
+                ds = DrawableDasSource.fromDasSource(tmp);
+            } else {
+                // really a new DAS source ...
+                logger.info("new das source " + ds.getDasSource().getNickname() + " " + currentAccessionCode);
+                if ( ( currentAccessionCode != null ) && ( ! currentAccessionCode.equals(""))){
+                    triggerFeatureRequest(currentAccessionCode,ds.getDasSource(),ds);
+                }
+            }
+            dsses.add(sds);
             //ds.setLoading(false);
             
             Iterator iter2 = featureRenderers.iterator();
             while (iter2.hasNext()){
                 FeatureRenderer rend = (FeatureRenderer)iter2.next();
                 
-               rend.addDrawableDasSource(ds);
+                rend.addDrawableDasSource(ds);
                 
                 
             }
@@ -147,16 +174,16 @@ implements ObjectManager ,SequenceListener{
             }
             
         }
-        DrawableDasSource[] drawableDasSources = (DrawableDasSource[]) dsses.toArray(
-                new DrawableDasSource[dsses.size()]);
+        SpiceDasSource[] dasSources = (SpiceDasSource[]) dsses.toArray(
+                new SpiceDasSource[dsses.size()]);
         
-        this.dasSources = drawableDasSources;
+        this.dasSources = dasSources;
         
         
         
     }
-
-
+    
+    
     /** a new object has been requested.
      * do feature requests.
      */
@@ -165,11 +192,12 @@ implements ObjectManager ,SequenceListener{
         // start feature requests
         // cache them until newObject has the object,
         // then notify Drawer ...
-        
-        triggerFeatureRequests(accessionCode);
+        if ( ! accessionCode.equals(currentAccessionCode) ) {
+            triggerFeatureRequests(accessionCode);
+        }
         
     }
-
+    
     public void noObjectFound(String accessionCode){
         
     }
@@ -184,24 +212,35 @@ implements ObjectManager ,SequenceListener{
         
         if (! accessionCode.equals(currentAccessionCode)){
             
-        for ( int i = 0 ; i< dasSources.length; i++){
-            DrawableDasSource ds = (DrawableDasSource)dasSources[i];
-            SpiceDasSource sds = ds.getDasSource();
-            //logger.info("triggering Feature request from " + sds);
-            
-            SingleFeatureThread thread = new SingleFeatureThread(accessionCode, sds);
-            Iterator iter = dasSourceListeners.iterator();
+            Iterator iter = featureRenderers.iterator();
             while (iter.hasNext()){
-                DasSourceListener li = (DasSourceListener)iter.next();
-                thread.addDasSourceListener(li);    
+                FeatureRenderer fr = (FeatureRenderer)iter.next();
+                DrawableDasSource[] dsses = fr.getDrawableDasSources();
+                
+                for ( int i = 0 ; i< dsses.length; i++){
+                    DrawableDasSource ds = (DrawableDasSource)dsses[i];
+                    SpiceDasSource sds = ds.getDasSource();
+                    
+                    
+                    triggerFeatureRequest(accessionCode,sds,ds);
+                    
+                }
             }
-            
-            thread.addFeatureListener(ds);
-            thread.start();
-        }
         }
     }
     
+    private void triggerFeatureRequest(String accessionCode, SpiceDasSource sds, DrawableDasSource ds){
+        logger.info("triggering Feature request for" + accessionCode + "  from " + sds);
+        SingleFeatureThread thread = new SingleFeatureThread(accessionCode, sds);
+        Iterator iter = dasSourceListeners.iterator();
+        while (iter.hasNext()){
+            DasSourceListener li = (DasSourceListener)iter.next();
+            thread.addDasSourceListener(li);    
+        }
+
+        thread.addFeatureListener(ds);
+        thread.start();
+    }
     
     /** a new object has been returned
      * 
@@ -213,26 +252,31 @@ implements ObjectManager ,SequenceListener{
             String accessionCode = struc.getPDBCode();
             String chainId = struc.getChain(0).getName();
             
-            
-            triggerFeatureRequests(accessionCode + "." + chainId);
+            if (! accessionCode.equals(currentAccessionCode)){
+                triggerFeatureRequests(accessionCode + "." + chainId);
+            }
         }
+        currentAccessionCode = object.toString();
         
     }
-
+    
     public void newSequence(SequenceEvent e) {
-      triggerFeatureRequests(e.getAccessionCode());  
+        String accessionCode = e.getAccessionCode();
+        if (! accessionCode.equals(currentAccessionCode)){
+            triggerFeatureRequests(accessionCode);
+        }
     }
-
+    
     public void selectedSeqPosition(int position) {
         // TODO Auto-generated method stub
         
     }
-
+    
     public void selectedSeqRange(int start, int end) {
         // TODO Auto-generated method stub
         
     }
-
+    
     public void selectionLocked(boolean flag) {
         // TODO Auto-generated method stub
         
@@ -241,5 +285,5 @@ implements ObjectManager ,SequenceListener{
     public void clearSelection(){};
     
     
-
+    
 }

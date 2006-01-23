@@ -53,10 +53,7 @@ extends AbstractChainRenderer
         statusPanel.setName("PDB");
         
         initPanels();
-        
-       
-        
-        
+         
     }
 
     
@@ -94,23 +91,7 @@ extends AbstractChainRenderer
         toolTipper.setChain(sequence.getSequence());
         calcScale(100);
         
-        //setDrawableSequence(ds);
-        //featurePanel.setChain(c);
-        // update the scales
-        
-        //featurePanel.setChain(c);
-        //cursorPanel.setChain(c);
-        
-        //featurePanel.repaint();
-        //cursorPanel.repaint();
+
     }
-
-    
-    //public void addFeatureRenderer(FeatureRenderer feat){
-      //  featurePanel.addFeatureRenderer(feat);
-    //}
-
-   
-    
 
 }

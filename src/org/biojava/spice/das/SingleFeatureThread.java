@@ -99,7 +99,7 @@ extends Thread
             e.printStackTrace();
            
         }
-        
+        logger.finest("setting feature request url " + Url);
         dascommand = Url ;
         
         
@@ -175,7 +175,7 @@ extends Thread
                     	" throwing away excess features at " +dascommand);
             features = features.subList(0,MAX_NR_FEATURES);
         }
-        
+      
               
         // notify FeatureListeners
         Map[] feats = (Map[])features.toArray(new Map[features.size()]);
@@ -219,7 +219,7 @@ extends Thread
     }
     
     private void notifyFeatureListeners(Map[] feats){
-
+        logger.finest("SingleFeatureThread found " + feats.length + " features");
         FeatureEvent fevent = new FeatureEvent(feats,dasSource);
         Iterator fiter = featureListeners.iterator();
         while (fiter.hasNext()){

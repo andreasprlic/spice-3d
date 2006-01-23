@@ -228,11 +228,12 @@ public class RegistryConfiguration
         
     }
     public void setStatus(int serverpos, boolean status) {
+        
         if ( serverpos > allservers.size() ) return  ;
         if ( serverpos < 0 ) return  ;
         SpiceDasSource ds = (SpiceDasSource) allservers.get(serverpos);
         ds.setStatus(status);
-        
+        //logger.info("setStatus " + status);
         if ( ! status) {
             // remove from active servers ...
             removeFromActive(ds);

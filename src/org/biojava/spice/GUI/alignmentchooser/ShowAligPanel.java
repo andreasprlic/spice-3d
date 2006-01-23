@@ -47,7 +47,7 @@ import org.biojava.spice.Feature.FeatureImpl;
 import org.biojava.spice.Feature.Segment;
 import org.biojava.spice.das.AlignmentTools;
 import org.biojava.spice.manypanel.renderer.DasSourcePanel;
-import org.biojava.spice.manypanel.renderer.FeaturePanel;
+import org.biojava.spice.manypanel.renderer.ScalePanel;
 
 public class ShowAligPanel 
 extends JPanel{
@@ -71,7 +71,7 @@ extends JPanel{
         aminosize = 1;
         alignment = ali;
         labelstring = "";
-        this.setBackground(FeaturePanel.BACKGROUND_COLOR);
+        this.setBackground(ScalePanel.BACKGROUND_COLOR);
         this.setPreferredSize(new Dimension(400,25));
     }
     
@@ -170,7 +170,7 @@ extends JPanel{
         
         g2D.drawString(str,2,y + 10);
         g2D.setFont(DasSourcePanel.plainFont);
-        y+= FeaturePanel.DEFAULT_Y_STEP;
+        y+= ScalePanel.DEFAULT_Y_STEP;
         drawStructureRegion(g2D,y);
     }
                 
@@ -202,11 +202,11 @@ extends JPanel{
         //System.out.println("Structure " + start + " " + end);
         
         
-        int DEFAULT_X_START = FeaturePanel.DEFAULT_X_START;
+        int DEFAULT_X_START = ScalePanel.DEFAULT_X_START;
         int xstart = java.lang.Math.round(start * scale) + DEFAULT_X_START;
         int endx   = java.lang.Math.round(end * scale)-xstart + DEFAULT_X_START +aminosize;
         //int width  = aminosize ;
-        int height = FeaturePanel.DEFAULT_Y_HEIGHT ;
+        int height = ScalePanel.DEFAULT_Y_HEIGHT ;
         
         // draw the red structure line
         g2D.setColor(STRUCTURE_COLOR);  
@@ -218,7 +218,7 @@ extends JPanel{
         g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));
         g2D.setColor(STRUCTURE_BACKGROUND_COLOR);
         //Dimension dstruc=this.getSize();
-        Rectangle strucregion = new Rectangle(xstart , y, endx, FeaturePanel.DEFAULT_Y_HEIGHT);
+        Rectangle strucregion = new Rectangle(xstart , y, endx, ScalePanel.DEFAULT_Y_HEIGHT);
         g2D.fill(strucregion);
         g2D.setComposite(origComposite);
     }

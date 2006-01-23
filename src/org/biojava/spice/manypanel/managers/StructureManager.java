@@ -75,6 +75,7 @@ implements ObjectManager, StructureListener {
     }
     
     public void clearDasSources(){
+        logger.info("StructureRenderer clearDasSources");
         super.clearDasSources();
         if ( structureRenderers == null ) {
             return;
@@ -95,12 +96,16 @@ implements ObjectManager, StructureListener {
         structureListeners.add(li);
     }
     
+    public StructureListener[] getStructureListener(){
+        return (StructureListener[]) structureListeners.toArray(new StructureListener[structureListeners.size()]);
+    }
+    
     /** a new structure should be loaded
      * trigger the loading threads.
      */
     public void newObjectRequested(String accessionCode) {
         
-       logger.info("newObjectRequested " + accessionCode);
+       logger.finest("newObjectRequested " + accessionCode);
         
         
         String[] spl = accessionCode.split("\\.");
@@ -142,9 +147,12 @@ implements ObjectManager, StructureListener {
         // a new structure should be loaded
         structure = new StructureImpl();
         
-        SpiceDasSource[] sds = toSpiceDasSource(dasSources);
-        StructureThread dsh = new StructureThread(code,sds);
+        //SpiceDasSource[] sds = toSpiceDasSource(dasSources);
+        
+        StructureThread dsh = new StructureThread(code,dasSources);
+        
         dsh.addStructureListener(this);      
+        
         Iterator iter = structureListeners.iterator();
         while (iter.hasNext()){
             StructureListener li = (StructureListener)iter.next();
@@ -192,7 +200,7 @@ implements ObjectManager, StructureListener {
      */
     public void newStructure(StructureEvent event) {
         String p = event.getPDBCode();
-        
+        logger.finest("StructureManager new Structure " + p);
         if ( p == null) {
             clear();
             Iterator iter = structureRenderers.iterator();
@@ -235,7 +243,7 @@ implements ObjectManager, StructureListener {
     
     public void noObjectFound(String accessionCode){
         // clear the display...
-       
+       logger.finest("StructureManager noObjectFound");
         Iterator iter = structureRenderers.iterator();
         while (iter.hasNext()){
             StructureRenderer rend = (StructureRenderer) iter.next();

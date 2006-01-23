@@ -242,7 +242,7 @@ SpiceFeatureListener
         g2D.setColor(SELECTION_COLOR);
         
         
-        int startX = Math.round(tmpSelectionStart *scale) + FeaturePanel.DEFAULT_X_START;
+        int startX = Math.round(tmpSelectionStart *scale) + ScalePanel.DEFAULT_X_START;
         int endX   = Math.round((selectionEnd-tmpSelectionStart+1)*scale) ;
         if (endX <0)
             endX = 0;

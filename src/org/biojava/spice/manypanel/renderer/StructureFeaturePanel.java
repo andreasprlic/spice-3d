@@ -31,7 +31,7 @@ import org.biojava.spice.Feature.Segment;
 import org.biojava.spice.Feature.Feature;
 
 public class StructureFeaturePanel 
-extends FeaturePanel{
+extends ScalePanel{
 
     public static final Color STRUCTURE_COLOR            = Color.red;
     public static final Color STRUCTURE_BACKGROUND_COLOR = new Color(0.5f, 0.1f, 0.5f, 0.5f);

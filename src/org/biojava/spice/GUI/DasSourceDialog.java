@@ -26,6 +26,9 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.logging.Logger;
 
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -34,6 +37,8 @@ import javax.swing.JEditorPane;
 import javax.swing.JScrollPane;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+
+import org.biojava.spice.JNLPProxy;
 import org.biojava.spice.SPICEFrame;
 import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.services.das.registry.DasCoordinateSystem;
@@ -47,18 +52,20 @@ extends JDialog{
     
     private static final long serialVersionUID = 8273923712341234123L;
     
+    public static Logger logger =  Logger.getLogger("org.biojava.spice");
+    
     SpiceDasSource dasSource;
-    SPICEFrame spice;
+ 
     static int H_SIZE = 750;
     static int V_SIZE = 600;
     JEditorPane txt;
     /**
      * 
      */
-    public DasSourceDialog(SPICEFrame spice_, SpiceDasSource dasSource) {
+    public DasSourceDialog( SpiceDasSource dasSource) {
         super();
         this.dasSource = dasSource;
-        this.spice=spice_;
+      
         this.setSize(new Dimension(H_SIZE, V_SIZE)) ;
         
         
@@ -72,7 +79,7 @@ extends JDialog{
                 //System.out.println(e);
                 if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                     String href = e.getDescription();
-                    spice.showDocument(href);
+                    showDocument(href);
                 }
             }
         });
@@ -109,6 +116,31 @@ extends JDialog{
         this.getContentPane().add(vBox);
         
     }
+    
+    public boolean showDocument(URL url) 
+    {
+        if ( url != null ){
+            boolean success = JNLPProxy.showDocument(url); 
+            if ( ! success)
+                logger.info("could not open URL "+url+" in browser. check your config or browser version.");
+        return success;
+        
+        }
+        else
+            return false;
+    }
+    
+    public boolean showDocument(String urlstring){
+        try{
+            URL url = new URL(urlstring);
+            
+            return showDocument(url);
+        } catch (MalformedURLException e){
+            logger.warning("malformed URL "+urlstring);
+            return false;
+        }
+    }
+    
     
     private String getHTMLText(SpiceDasSource ds){
         

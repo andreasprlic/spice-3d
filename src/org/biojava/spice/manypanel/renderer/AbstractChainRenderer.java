@@ -37,6 +37,7 @@ import org.biojava.bio.structure.*;
 import org.biojava.spice.Feature.Feature;
 import org.biojava.spice.Feature.FeatureImpl;
 import org.biojava.spice.Feature.Segment;
+import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.manypanel.eventmodel.FeatureEvent;
 import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.spice.manypanel.drawable.DrawableDasSource;
@@ -59,9 +60,7 @@ public abstract class AbstractChainRenderer
     public static final int STATUS_PANEL_HEIGHT =  20;
     public static final int FEATURE_PANEL_HEIGHT = 20;
     
-   
-    
-    FeaturePanel featurePanel;
+    ScalePanel featurePanel;
     CursorPanel cursorPanel;
     DrawableSequence sequence;
     static Logger logger = Logger.getLogger("org.biojava.spice");
@@ -94,12 +93,12 @@ public abstract class AbstractChainRenderer
         layeredPane.setBorder(BorderFactory.createEmptyBorder());
         layeredPane.setDoubleBuffered(true);
         layeredPane.setOpaque(true);
-        layeredPane.setBackground(FeaturePanel.BACKGROUND_COLOR);
+        layeredPane.setBackground(ScalePanel.BACKGROUND_COLOR);
         
         scrollPane = new JScrollPane(layeredPane);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.setOpaque(true);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(FeaturePanel.DEFAULT_Y_STEP);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(ScalePanel.DEFAULT_Y_STEP);
         
         
         dasSourcePanels = new ArrayList();
@@ -209,7 +208,12 @@ public abstract class AbstractChainRenderer
         
     }
     
+    /** removes the DasSourcePanels from display 
+     * 
+     *
+     */
     public void clearDasSources(){
+        //logger.finest("AbstractChainrenderer clearDasSources");
         Iterator iter = dasSourcePanels.iterator();
         while (iter.hasNext()){
             DasSourcePanel panel = (DasSourcePanel)iter.next();
@@ -226,7 +230,7 @@ public abstract class AbstractChainRenderer
         return dasSourcePanels;
     }
     
-    public FeaturePanel getFeaturePanel(){
+    public ScalePanel getFeaturePanel(){
         return featurePanel;
     }
     
@@ -268,8 +272,8 @@ public abstract class AbstractChainRenderer
             zoomFactor = 1;
         
         this.zoomFactor = zoomFactor;
-        int DEFAULT_X_START = FeaturePanel.DEFAULT_X_START;
-        int DEFAULT_X_RIGHT_BORDER = FeaturePanel.DEFAULT_X_RIGHT_BORDER;
+        int DEFAULT_X_START = ScalePanel.DEFAULT_X_START;
+        int DEFAULT_X_RIGHT_BORDER = ScalePanel.DEFAULT_X_RIGHT_BORDER;
         
         int seqLength = getSequenceLength();
         // the maximum width depends on the size of the parent Component
@@ -351,7 +355,7 @@ public abstract class AbstractChainRenderer
         int aminosize = Math.round(1*scale);
         if ( aminosize < 1)
             aminosize = 1;
-        int w = Math.round(l*scale) + aminosize+  FeaturePanel.DEFAULT_X_START + FeaturePanel.DEFAULT_X_RIGHT_BORDER;
+        int w = Math.round(l*scale) + aminosize+  ScalePanel.DEFAULT_X_START + ScalePanel.DEFAULT_X_RIGHT_BORDER;
         
         if ( w  < 200){
             w = 200;
@@ -376,14 +380,76 @@ public abstract class AbstractChainRenderer
     
     
     
+    private boolean isKnownDrawableDasSource(DrawableDasSource drawds){
+        
+        SpiceDasSource ds = drawds.getDasSource();
+        
+        Iterator iter = dasSourcePanels.iterator();
+        while (iter.hasNext()) {
+            DasSourcePanel panel = (DasSourcePanel) iter.next();
+            DrawableDasSource dds = panel.getDrawableDasSource();
+            //System.out.println("comparing " + ds.getNickname() + " " + dds.getDasSource().getNickname());
+            if ( ds.getUrl().equals(dds.getDasSource().getUrl())) {
+                logger.finest("AbstractChainRenderer known das source!" + ds.getUrl());
+                drawds.addFeatureListener(panel);
+                drawds.addFeatureListener(this);
+                drawds.setFeatures(dds.getFeatures());
+                panel.setDrawableDasSource(drawds);
+                
+                return true;
+            }
+        }
+        logger.finest("do not know ds  " + ds.getNickname() );
+        return false;
+    }
+    
+    
+    public void removeDasSource(DasSourceEvent event) {
+        
+        SpiceDasSource remove = event.getDasSource().getDasSource();
+        logger.finest("AbstractChainrenderer removing DAS source " + remove.getNickname());
+        Iterator iter = dasSourcePanels.iterator();
+        DasSourcePanel removeMe = null;
+        while (iter.hasNext()){
+            DasSourcePanel pan = (DasSourcePanel)iter.next();
+            DrawableDasSource test = pan.getDrawableDasSource();
+            logger.finest("AbstractChainRenderer comp " + test.getDasSource().getNickname() + " " + remove.getNickname());
+            if ( test.getDasSource().getUrl().equals(remove.getUrl())){
+                removeMe = pan;  
+                break;
+            }
+        }
+        if ( removeMe != null){
+            logger.finest("removing panel " + dasSourcePanels.contains(removeMe));
+             
+            dasSourcePanels.remove(removeMe);
+            layeredPane.remove(removeMe);
+            updatePanelPositions();
+        }
+    }
+    
+    
+    
+        
+    
+    
     /** add DasSourcePanels
      * 
      */
 
     public void newDasSource(DasSourceEvent event) {
-       
+        
         DrawableDasSource dds =event.getDasSource();
         //SpiceDasSource ds = dds.getDasSource();
+        
+        // check if we know this already
+        boolean known = isKnownDrawableDasSource(dds);
+        
+        if (known) {
+                    
+            return;
+        }
+        //logger.finest("AbstractChainRenderer new DAS source " + event.getDasSource().getDasSource().getNickname());
         
         DasSourcePanel dspanel = new DasSourcePanel(dds);
         //dspanel.setLayout(new BoxLayout(dspanel,BoxLayout.Y_AXIS));
@@ -395,12 +461,6 @@ public abstract class AbstractChainRenderer
         mouseListener.addSpiceFeatureListener(dspanel);
         
 
-        //dspanel.addMouseListener(mouseListener);
-        //dspanel.addMouseMotionListener(mouseListener);
-        //SeqToolTipListener toolTipper = new SeqToolTipListener(dspanel);
-        //mouseListener.addSpiceFeatureListener(toolTipper);
-        
-        
         //dspanel.setPreferredSize(new Dimension(200,200));
         int h = getDisplayHeight();
         int width = getDisplayWidth();
@@ -416,11 +476,15 @@ public abstract class AbstractChainRenderer
         layeredPane.add(dspanel,new Integer(panelPos+1));  
         layeredPane.moveToFront(cursorPanel);
         dasSourcePanels.add(dspanel);
+        
         Dimension d = new Dimension(width,h+panelHeight);
                
         
         //this.setPreferredSize(d);
+        
         this.setSize(d);
+        dspanel.repaint();
+        layeredPane.repaint();
         this.repaint();
         this.revalidate();
     
@@ -435,9 +499,8 @@ public abstract class AbstractChainRenderer
         //int maxsize =  Math.round(featurePanel.getScale()*sequence.getSequence().getLength());
         
         //logger.info("update panel positions " + width + 
-         //       " " + featurePanel.getScale() + " " +
-          //      sequence.getSequence().getLength() +
-           //     " check " + maxsize);
+        //        " " + featurePanel.getScale() + " " +
+        //        sequence.getSequence().getLength());
         
         //logger.info("status panel size " + statusPanel.getHeight() + " " + statusPanel.getWidth());
         
@@ -522,6 +585,8 @@ public abstract class AbstractChainRenderer
      * this method is triggered by the DrawableDasSource, once it has got new features.
      */
     public void newFeatures(FeatureEvent e) {
+        
+        
         updatePanelPositions();
         
     }
@@ -531,7 +596,8 @@ public abstract class AbstractChainRenderer
     }
     
     
-
+     
+    
     
     private Feature mapPDBFeature2Seq(Feature f){
         Feature newF = new FeatureImpl();

@@ -32,6 +32,9 @@ public interface DasSourceListener {
     /** a new DAS source to be added */
     public void newDasSource(DasSourceEvent ds);
     
+    /** remove a DAS source */
+    public void removeDasSource(DasSourceEvent ds);
+    
     /** a DAS source has been selected (in the GUI)
      * 
      * @param ds

@@ -38,6 +38,8 @@ import org.biojava.spice.JNLPProxy;
 import org.biojava.spice.Feature.Feature;
 import org.biojava.spice.Feature.FeatureImpl;
 import org.biojava.spice.Feature.Segment;
+import org.biojava.spice.GUI.DasSourceDialog;
+import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.manypanel.drawable.DrawableDasSource;
 //import org.biojava.spice.manypanel.eventmodel.FeatureEvent;
 import org.biojava.spice.manypanel.eventmodel.SequenceListener;
@@ -121,7 +123,7 @@ MouseMotionListener
         int x = e.getX();
         //int y = e.getY();
         //float scale = seqScale.getScale();
-        int DEFAULT_X_START = FeaturePanel.DEFAULT_X_START;
+        int DEFAULT_X_START = ScalePanel.DEFAULT_X_START;
         float scale = renderer.getScale();
         int seqpos =  java.lang.Math.round((x-DEFAULT_X_START-2)/scale) ;
         
@@ -129,15 +131,7 @@ MouseMotionListener
     }   
     
     
-    /** creates a spiceFeatureEvent from a mouse event
-     * or null, if the event was not over a feature line
-     * 
-     * @param e
-     * @return
-     */
-    private SpiceFeatureEvent getSpiceFeatureEvent(MouseEvent e){
-        
-        
+    private DasSourcePanel getEventPanel(MouseEvent e){
         int y = e.getY();
         
         int h =  renderer.getFeaturePanel().getHeight();
@@ -149,7 +143,6 @@ MouseMotionListener
         if ( y < h){
             return null ;
         }
-        
         
         DasSourcePanel eventPanel = null;
         
@@ -171,19 +164,66 @@ MouseMotionListener
             return null;
         }
         
-        h += FeaturePanel.DEFAULT_Y_START + FeaturePanel.DEFAULT_Y_STEP + FeaturePanel.LINE_HEIGHT;
-        if ( y < h){
+        //h += FeaturePanel.DEFAULT_Y_START + FeaturePanel.DEFAULT_Y_STEP + FeaturePanel.LINE_HEIGHT;
+        //if ( y < h){
             // smaller than the "heading section" of the display
+        //    return null;
+        //}
+        
+        return eventPanel;
+    }
+    
+    /** creates a spiceFeatureEvent from a mouse event
+     * or null, if the event was not over a feature line
+     * 
+     * @param e
+     * @return
+     */
+    private SpiceFeatureEvent getSpiceFeatureEvent(MouseEvent e){
+         
+ int y = e.getY();
+        
+        int h =  renderer.getFeaturePanel().getHeight();
+        
+        // add the top of a Featurepanel - the empty space from there
+        //h += FeaturePanel.DEFAULT_Y_START ;
+        //+ FeaturePanel.DEFAULT_Y_STEP ;
+        
+        if ( y < h){
+            return null ;
+        }
+        
+        DasSourcePanel eventPanel = null;
+        
+        Iterator iter = renderer.getDasSourcePanels().iterator();
+        while (iter.hasNext()){
+            DasSourcePanel dsp = (DasSourcePanel)iter.next();
+            int panelHeight = dsp.getDisplayHeight();
+            h+= panelHeight;
+            
+            if (y < h ) {
+                eventPanel = dsp;
+                h -= panelHeight;
+                break;
+            }
+                
+        }  
+        if (eventPanel == null) {
+            // no panel found below this event
             return null;
         }
         
-        
+        h += ScalePanel.DEFAULT_Y_START + ScalePanel.DEFAULT_Y_STEP + ScalePanel.LINE_HEIGHT;
+        if ( y < h){
+            // smaller than the "heading section" of the display
+                return null;
+        }
         
         DrawableDasSource source = eventPanel.getDrawableDasSource();
         
         Feature[] feats = source.getFeatures();
         for (int i = 0 ; i< feats.length; i ++){
-            h += FeaturePanel.DEFAULT_Y_STEP;
+            h += ScalePanel.DEFAULT_Y_STEP;
             if ( y < h) {
                 SpiceFeatureEvent event = new SpiceFeatureEvent(source.getDasSource(), feats[i]);
                 return event;
@@ -276,6 +316,7 @@ MouseMotionListener
                     return;
            
         } else {
+            
             if ( pos == oldSelectionStart)
                 return;
            
@@ -351,6 +392,7 @@ MouseMotionListener
                 triggerSelectionLocked(true);
             } else {
                 int pos = getSeqPos(event) ;
+                
                 SpiceFeatureEvent spiceEvent = getSpiceFeatureEvent(event);
                 
                 Feature feat = null ;
@@ -359,6 +401,16 @@ MouseMotionListener
                 
                 //System.out.println(pos + " " + feat);
                 if ( feat == null) {
+                    
+                    // check if the info button has been pressed
+                    //System.out.println(event.getX() + " " + event.getY());
+                    DasSourcePanel eventPanel = getEventPanel(event);
+                    if ( eventPanel != null) {                        
+                        if ( event.getX() < 16) {
+                            // info button has been pressed.
+                            triggerDasSourceInfo(eventPanel.getDrawableDasSource());
+                        }
+                    }
                     oldFeature = new FeatureImpl();
                     return;
                 }
@@ -571,6 +623,14 @@ MouseMotionListener
             }
         }
     }
+    
+    protected void triggerDasSourceInfo(DrawableDasSource ds){
+        SpiceDasSource sds = ds.getDasSource();
+        DasSourceDialog dialog = new DasSourceDialog(sds);
+        dialog.show();
+        
+    }
+    
     
     
 

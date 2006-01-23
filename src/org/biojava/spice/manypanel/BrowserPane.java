@@ -37,6 +37,7 @@ import java.util.*;
 import java.util.logging.Logger;
 
 import org.biojava.spice.das.SpiceDasSource;
+import org.biojava.spice.manypanel.drawable.DrawableDasSource;
 import org.biojava.spice.manypanel.eventmodel.*;
 import org.biojava.spice.manypanel.managers.*;
 import org.biojava.spice.manypanel.renderer.*;
@@ -522,7 +523,9 @@ ChangeListener
         
         
     }
-    
+    public void removeDasSource(DasSourceEvent dsEvent){
+        logger.finest("BrowserPane got removeDasSource ");
+    }
     public void newDasSource(DasSourceEvent dsEvent) {
         
         allsources.add(dsEvent.getDasSource().getDasSource());
@@ -536,13 +539,67 @@ ChangeListener
     public  void setDasSources(SpiceDasSource[] sources){
         
         // clear the das sources ...
-        clearDasSources();
+        //clearDasSources();       
+         
+        List newsources = new ArrayList();        
         
-        
+        // keep the das sources that have already been know...
+        // trigger remove of those that are not in list any longer...
         for (int i = 0 ; i< sources.length;i++){
             SpiceDasSource ds = sources[i];
-            allsources.add(ds);
+            
+            // is inactive, do not add
+            if (! ds.getStatus()) {
+                logger.finest(ds.getNickname() + " status: " + ds.getStatus());    
+                continue;
+            }
+            
+            SpiceDasSource oldds = null;
+            
+            boolean known = false;
+            Iterator iter = allsources.iterator();
+            while (iter.hasNext()){
+                SpiceDasSource testds = (SpiceDasSource)iter.next();
+                if ( ds.getUrl().equals(testds.getUrl())){
+                    known = true;
+                    oldds = testds;
+                  
+                    break;
+                }
+            }
+            if ( ! known) {
+                logger.finest("new server! " + ds.getNickname());
+                newsources.add(ds);
+                
+            }
+            else {
+                newsources.add(oldds);
+                logger.finest("old server: " + ds.getNickname() + ds.getStatus());
+            }
         }
+        
+        //logger.finest("# of old sources " + allsources.size() );
+        // remove  the old ones that are not used any more:
+        Iterator iter = allsources.iterator();
+        while (iter.hasNext()){
+            SpiceDasSource ds = (SpiceDasSource)iter.next();
+            Iterator newiter = newsources.iterator();
+            boolean found = false;
+            while (newiter.hasNext()){
+                SpiceDasSource newds = (SpiceDasSource)newiter.next();
+                //logger.finest(newds.getUrl() + " should  remove? " + ds.getUrl());
+                if ( newds.getUrl().equals(ds.getUrl())){
+                    found = true;
+                    break;
+                }
+            }
+            if ( ! found){
+                
+                triggerRemoveDasSource(ds);
+            }
+        }
+        
+        allsources = newsources;
         
         // this are the coord.sys.
         
@@ -559,8 +616,7 @@ ChangeListener
         seqManager.setDasSources(seqservs);
         
         DasSource[]enspservs = getServers("sequence",enspdcs);        
-        enspManager.setDasSources(enspservs);
-        
+        enspManager.setDasSources(enspservs);        
         
         // set the annotation servers
         
@@ -581,11 +637,31 @@ ChangeListener
         SpiceDasSource[] enspupaligs = getAlignmentServers(allsources,seqdcs,enspdcs);
         ensaligManager.setAlignmentServers(enspupaligs);
         
+        this.repaint();
         
     }
     
+    private void triggerRemoveDasSource(SpiceDasSource ds){
+        logger.finest("triggerRemoveDasSource " + ds.getNickname());
+        
+        DasSourceEvent event = new DasSourceEvent(DrawableDasSource.fromDasSource(ds));
+        
+        DasCoordinateSystem[] cs = ds.getCoordinateSystem();
+        for ( int i=0 ; i< cs.length; i++){
+            DasCoordinateSystem dcs = cs[i];
+            if ( dcs.toString().equals(DEFAULT_PDBCOORDSYS)){
+                // remove from structure panel
+                structureRenderer.removeDasSource(event);
+            } else if ( dcs.toString().equals(DEFAULT_UNIPROTCOORDSYS))
+                seqRenderer.removeDasSource(event);
+            else if ( dcs.toString().equals(DEFAULT_ENSPCOORDSYS))
+                enspRenderer.removeDasSource(event);
+        }
+        
+    }
     
     public  void clearDasSources() {
+        logger.info("browserPane clear das sources");
         allsources = new ArrayList();
         ensaligManager.clearDasSources();
         aligManager.clearDasSources();
@@ -638,6 +714,10 @@ ChangeListener
     public void addStructureListener(StructureListener li){
         structureListeners.add(li);        
         strucManager.addStructureListener(li);
+    }
+    
+    public StructureListener[] getStructureListener(){
+        return strucManager.getStructureListener();
     }
     
     public void addPDBSequenceListener(SequenceListener li){
@@ -726,7 +806,7 @@ ChangeListener
         
     }
     
-    public StructureListener getStructureListener(){
+    public StructureListener getStructureManager(){
         return strucManager;
         
     }
@@ -818,9 +898,7 @@ ChangeListener
             DasSource ds = (DasSource) allsources.get(i);
             if ( hasCapability(capability,ds)){
                 
-                
                 retservers.add(ds);
-                
                 
             }
         }

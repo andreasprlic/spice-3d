@@ -38,7 +38,7 @@ implements ObjectManager {
     //FeatureManager featureManager;
    
     
-    DrawableDasSource[] dasSources ;
+    SpiceDasSource[] dasSources ;
    
     DasCoordinateSystem coordinateSystem;
     static Logger logger = Logger.getLogger("org.biojava.spice");
@@ -77,7 +77,7 @@ implements ObjectManager {
     
    
     
-    public DrawableDasSource[] getDasSources() {
+    public SpiceDasSource[] getDasSources() {
         
         return dasSources;
     }
@@ -94,16 +94,47 @@ implements ObjectManager {
     /** add reference DAS source
      * 
      */
-    public void setDasSources(DasSource[] dasSources) {
-        
+    public void setDasSources(DasSource[] sources) {
+        logger.finest("setting new DAS sources " + sources.length + " previously known: " + dasSources.length);
         List dsses = new ArrayList();
-        for ( int i = 0 ; i< dasSources.length; i++){
-            // TODO: add check that only a DAS source of the correct coordSys is being added
-            DrawableDasSource ds = DrawableDasSource.fromDasSource(dasSources[i]);
-            dsses.add(ds);
+        for ( int i = 0 ; i< sources.length; i++){
+            
+            
+            SpiceDasSource ds = SpiceDasSource.fromDasSource( sources[i]);
+            DasCoordinateSystem[] dcsarr = ds.getCoordinateSystem();
+            boolean knownCoordinateSystem = false;
+            for ( int  k =0 ; k < dcsarr.length; k++) {
+                DasCoordinateSystem tmp = dcsarr[k];
+                if ( tmp.toString().equals(coordinateSystem.toString())) {
+                    knownCoordinateSystem = true;
+                    break;
+                }
+                
+            }
+            if ( ! knownCoordinateSystem ) {
+                // this das source does not fit here ...
+                continue;
+            }
+            
+            boolean known = false;
+            //System.out.println("comparing with dasSources " + dasSources.length);
+            for ( int j = 0 ; j < this.dasSources.length; j++){
+                SpiceDasSource knownDS = this.dasSources[j];
+                System.out.println(ds.getUrl() + " " + knownDS.getUrl() );
+                if ( ds.getUrl().equals(knownDS.getUrl())) {
+                    dsses.add(knownDS);   
+                    //logger.info(knownDS.getDasSource().getNickname() +  " is a known DAS source");
+                    known = true;
+                    break;
+                }
+            }
+            
+            if ( ! known )
+                dsses.add(ds);
+        
         }
-        DrawableDasSource[] drawableDasSources = (DrawableDasSource[]) dsses.toArray(
-                new DrawableDasSource[dsses.size()]);
+        SpiceDasSource[] drawableDasSources = (SpiceDasSource[]) dsses.toArray(
+                new SpiceDasSource[dsses.size()]);
         
         //Iterator iter = structureRenderers.iterator();
         
@@ -116,7 +147,8 @@ implements ObjectManager {
     }
     
     public void clearDasSources(){
-        dasSources = new DrawableDasSource[0];
+        logger.info("abstrachChainManager clearDasSources");
+        dasSources = new SpiceDasSource[0];
     }
     
     protected SpiceDasSource[] toSpiceDasSource( DrawableDasSource[] dds ){
@@ -132,14 +164,7 @@ implements ObjectManager {
         
         return (SpiceDasSource[])sources.toArray(new SpiceDasSource[sources.size()]);
     }
-
-    
-    
-    
-    
-   
-    
-    
+  
 }
 
 

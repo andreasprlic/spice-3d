@@ -35,7 +35,7 @@ import java.util.List                      ;
 // for DAS registration server:
 import org.biojava.services.das.registry.* ;
 import org.biojava.spice.das.SpiceDasSource;
-import org.biojava.spice.manypanel.renderer.FeaturePanel;
+import org.biojava.spice.manypanel.renderer.ScalePanel;
 
 //for logging
 import java.util.logging.*                 ;
@@ -93,17 +93,16 @@ extends Thread
         forceUpdate = flag;
     }
     public void addConfigListener(ConfigurationListener listener){
+        logger.finest("adding new config listener");
         configListeners.add(listener);
     }
     
     public void run(){
+        logger.finest("running registryConfigIO");
         try {
             getData();
             
-            
-            notifyConfigListeners();
-            
-            
+            //notifyConfigListeners();
             
         } catch ( ConfigurationException e) {
             //e.printStackTrace();
@@ -115,6 +114,8 @@ extends Thread
     
     /** tell all configListeners that a new config has been loaded */
     private void notifyConfigListeners(){
+        logger.finest("notifying config listeners");
+        
         Iterator iter = configListeners.iterator();
         while (iter.hasNext()){
             ConfigurationListener listener = (ConfigurationListener)iter.next();
@@ -207,6 +208,7 @@ extends Thread
         
         // test if perhaps registry was changed in config file
         URL oldregistry = config.getRegistryUrl();
+        
         if ( registryArray.length > 0 ) {
             if (! oldregistry.equals(registryArray[0])) {
                 logger.finest("registry url was changed since last contact, contacting new registry service");
@@ -386,7 +388,7 @@ extends Thread
         //progressFrame.setUndecorated(true);
         
         JPanel panel = new JPanel();
-        panel.setBackground(FeaturePanel.BACKGROUND_COLOR);
+        panel.setBackground(ScalePanel.BACKGROUND_COLOR);
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         
         Box vbox = Box.createVerticalBox();
@@ -435,7 +437,7 @@ extends Thread
     /** write back the config to the SPICE application */
     public void saveConfiguration() {
         
-        logger.finest("trying PersistentConfig");
+        logger.finest("saving configuration - trying PersistentConfig");
         try {
             PersistentConfig ps = new PersistentConfig();
             ps.save(config);

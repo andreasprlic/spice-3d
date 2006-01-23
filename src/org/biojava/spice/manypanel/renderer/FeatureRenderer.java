@@ -35,6 +35,7 @@ public class FeatureRenderer {
     }
     
     public void clearDasSources(){
+        //logger.finest("featureRenderer clearDasSources");
         dasSources = new ArrayList();
     }
     
@@ -48,6 +49,9 @@ public class FeatureRenderer {
         return (DrawableDasSource[]) dasSources.toArray(new DrawableDasSource[dasSources.size()]);
     }
     
+    public void removeDrawableDasSource(DrawableDasSource draw){
+        dasSources.remove(draw);
+    }
     
     
     

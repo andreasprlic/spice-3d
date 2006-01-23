@@ -70,6 +70,7 @@ import javax.swing.table.TableColumn;
 import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.SPICEFrame;
 import org.biojava.spice.das.SpiceDasSource;
+import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.services.das.registry.DasCoordinateSystem;
 import java.net.URL;
 
@@ -247,7 +248,7 @@ class ConfigPanel extends JPanel implements ConfigurationListener {
     private static final long serialVersionUID = 8273923744127087421L;
     
     //static String[] colNames= new String [] {"url","coordinateSystems","adminemail","capabilities","description","public","active"};
-    static String[] colNames= new String [] {"url","coordinateSystems","capabilities","public","active"};
+    static String[] colNames= new String [] {"active","nickname","url","coordinateSystems","capabilities","public"};
     
     RegistryConfiguration config       ;
     //RegistryConfigIO registryIO        ;
@@ -266,8 +267,7 @@ class ConfigPanel extends JPanel implements ConfigurationListener {
     SpiceApplication spice                   ;
     static Logger    logger      = Logger.getLogger("org.biojava.spice");
     
-    static String PDBCOORDSYS     = "PDBresnum,Protein Structure";
-    static String UNIPROTCOORDSYS = "UniProt,Protein Sequence";
+   
     
     public ConfigPanel(SpiceApplication spice_,RegistryConfiguration conf) {
         super(new GridLayout(1, 1));
@@ -346,6 +346,7 @@ class ConfigPanel extends JPanel implements ConfigurationListener {
         config = cfg;
         updateDasSourceTable();
     }
+    
     protected JPanel getGeneralConfigPanel(){
         //JPanel panel = new JPanel();
         
@@ -529,7 +530,7 @@ class ConfigPanel extends JPanel implements ConfigurationListener {
             
             if (col.equals("coordinateSystems")) {
                 // display coordinateSystems box
-                String[] coords = { UNIPROTCOORDSYS, PDBCOORDSYS};
+                String[] coords = { BrowserPane.DEFAULT_UNIPROTCOORDSYS, BrowserPane.DEFAULT_PDBCOORDSYS, BrowserPane.DEFAULT_ENSPCOORDSYS};
                 JComboBox list = new JComboBox(coords) ;		
                 list.setEditable(false);
                 list.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
@@ -758,6 +759,7 @@ class ConfigPanel extends JPanel implements ConfigurationListener {
         server.put("coordinateSystems",source.getCoordinateSystem());
         server.put("description",source.getDescription());
         server.put("adminemail",source.getAdminemail());
+        server.put("nickname",source.getNickname());
         if (source.getRegistered()) 
             server.put("public","Y");
         else 
@@ -823,7 +825,7 @@ class ConfigPanel extends JPanel implements ConfigurationListener {
     }
     
     public void setServerStatus(String url, Boolean status){
-        //System.out.print("Setting server status " + url + " " + status);
+        System.out.print("Setting server status " + url + " " + status);
         logger.finer("setting server status " + url + " " + status);
         boolean flag = status.booleanValue();
         config.setStatus(url,flag);
@@ -912,7 +914,7 @@ class ConfigPanel extends JPanel implements ConfigurationListener {
             //String[] coordSys = new String[] { "PDBresnum", };
             String[] capabs   = new String[] { "structure", };
             
-            DasCoordinateSystem dcs = DasCoordinateSystem.fromString(PDBCOORDSYS);
+            DasCoordinateSystem dcs = DasCoordinateSystem.fromString(BrowserPane.DEFAULT_PDBCOORDSYS);
             DasCoordinateSystem[] dcss = new DasCoordinateSystem[1];
             dcss[0] = dcs;
             sds.setCoordinateSystem(dcss);
@@ -973,8 +975,6 @@ class PopupListener extends MouseAdapter {
     private void maybeShowPopup(MouseEvent e) {
         if (e.isPopupTrigger()) {
             
-            
-            
             int pos = table.getSelectedRow();
             if ( pos < 0) 
                 return ;
@@ -997,9 +997,7 @@ class PopupListener extends MouseAdapter {
                 m1.setEnabled(false);
             else
                 m1.setEnabled(true);
-            
-            
-            
+
             popup.show(e.getComponent(),		       
                     e.getX(), e.getY());
         }
@@ -1077,7 +1075,7 @@ class MyTableModel extends AbstractTableModel {
     public boolean isCellEditable(int row, int col) {
         //Note that the data/cell address is constant,
         //no matter where the cell appears onscreen.
-        if (col < columnNames.length - 1 ) {
+        if (col > 0  ) {
             return false;
         } else {
             return true;
@@ -1089,23 +1087,21 @@ class MyTableModel extends AbstractTableModel {
      */
     public void setValueAt(Object value, int row, int col) {
         
-        /*
          System.out.println("Setting value at " + row + "," + col
          + " to " + value
          + " (an instance of "
          + value.getClass() + ")");
          
-         */
+         
         data[row][col] = value;
         
-        
-        
-        if ( col == ( columnNames.length - 1 )) {
+        if ( col == 0) {
             
             //String url = (String)model.getValueAt(row,0);
             // Do something with the data...
             //Boolean status = (Boolean) model.getValueAt(row, column);
-            String url = (String)getValueAt(row,0);
+            String url = (String)getValueAt(row,2);
+            System.out.println("setting server status " + value);
             parent.setServerStatus(url,(Boolean)value) ;
         }
         
@@ -1113,16 +1109,16 @@ class MyTableModel extends AbstractTableModel {
     }
     
     public void tableChanged(TableModelEvent e) {
-        //System.out.println("tableChanged");
+        System.out.println("tableChanged " + e.getColumn());
         int row = e.getFirstRow();
         int column = e.getColumn();
         MyTableModel model = (MyTableModel)e.getSource();
         //String columnName = model.getColumnName(column);
         //Object cell = model.getValueAt(row, column);
         
-        if ( column == ( columnNames.length - 1 )) {
+        if ( column == 0) {
             
-            String url = (String)model.getValueAt(row,0);
+            String url = (String)model.getValueAt(row,2);
             // Do something with the data...
             Boolean status = (Boolean) model.getValueAt(row, column);
             parent.setServerStatus(url,status) ;
