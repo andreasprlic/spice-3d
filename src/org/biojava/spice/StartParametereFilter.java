@@ -268,6 +268,11 @@ public class StartParametereFilter {
                     continue;
             }
             
+            // active servers should stay active ...
+            if ( ds.getStatus()){
+                retlst.add(ds);
+                continue;
+            }
 //          always display user config servers
             if (! ds.getRegistered()){
                 retlst.add(ds);

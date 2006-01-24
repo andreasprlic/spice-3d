@@ -25,14 +25,14 @@
 
 package org.biojava.spice.Config                  ;
 
-// to get config file via http
+//to get config file via http
 import java.net.URL                        ;
 
 import java.util.Date                      ;
 import java.util.ArrayList                 ;
 import java.util.List                      ;
 
-// for DAS registration server:
+//for DAS registration server:
 import org.biojava.services.das.registry.* ;
 import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.manypanel.renderer.ScalePanel;
@@ -40,7 +40,7 @@ import org.biojava.spice.manypanel.renderer.ScalePanel;
 //for logging
 import java.util.logging.*                 ;
 
-// for GUI;
+//for GUI;
 import java.awt.Dimension;
 import javax.swing.Box                     ;
 import javax.swing.ImageIcon               ;
@@ -77,7 +77,7 @@ extends Thread
     public RegistryConfigIO ( URL[] registryurl) {
         
         //spice = parent ;
-
+        
         registryArray = registryurl ;
         done = false ;
         configListeners = new ArrayList();
@@ -108,7 +108,7 @@ extends Thread
             //e.printStackTrace();
             logger.log(Level.WARNING,e.getMessage());
         }
-
+        
         
     } 
     
@@ -127,13 +127,13 @@ extends Thread
     
     private RegistryConfiguration loadLocalConfig() 
     throws Exception
-    	{
+    {
         PersistentConfig  persistentc = new PersistentConfig();
         return persistentc.load();
     }
     
     /** contact the das registry service and retreive new Data */
-        
+    
     private  void getData()
     throws ConfigurationException
     {
@@ -163,7 +163,7 @@ extends Thread
             if ( shouldDoUpdate(persistentconfig)){
                 logger.finest("contacting directory server");
                 doRegistryUpdate(); 
-                 
+                
             }
             saveConfiguration();
         } else {
@@ -234,7 +234,7 @@ extends Thread
     
     
     private  void doRegistryUpdate() 
-    	throws ConfigurationException{
+    throws ConfigurationException{
         // show dialog
         showProgressBar();
         
@@ -242,11 +242,11 @@ extends Thread
         
         // not finished flag for this thread..
         done = false;
-
+        
         if ( registryArray == null ) {
-	    throw new ConfigurationException("not registration server has been provided!");
-	}
-
+            throw new ConfigurationException("not registration server has been provided!");
+        }
+        
         boolean found = false;
         for ( int i =0 ; i < registryArray.length; i++){
             
@@ -270,7 +270,7 @@ extends Thread
         if ( ! found ){
             logger.warning("problem contacting registry, using locally cached config");
             config = oldconfig;
-          //  notifyAll();
+            //  notifyAll();
             throw new ConfigurationException("Could not contact any Registryation service!");
         }
         
@@ -278,6 +278,11 @@ extends Thread
         if ( oldconfig != null ) {
             config.setUpdateBehave(oldconfig.getUpdateBehave());
             config.setPDBFileExtensions(oldconfig.getPDBFileExtensions());
+            
+            
+            copyOldServerStatus(config,oldconfig);
+            
+            
             
             List localservers = oldconfig.getLocalServers();
             for ( int i = 0 ; i < localservers.size() ; i++ ) {
@@ -300,11 +305,37 @@ extends Thread
         
     }
     
+    /** copies enabled/disabled status from old config to new config...
+     * 
+     * @param newc
+     * @param oldc
+     */
+    private void copyOldServerStatus(RegistryConfiguration newc, RegistryConfiguration oldc){
+
+        // copy old server status to new servers ...
+        List allservers = oldc.getAllServers();
+        Iterator itera = allservers.iterator();
+        List newservers = newc.getAllServers();
+        
+        while (itera.hasNext()){
+            SpiceDasSource oldds = (SpiceDasSource)itera.next();
+            Iterator iterb = newservers.iterator();
+            while (iterb.hasNext()){
+                SpiceDasSource newds = (SpiceDasSource)iterb.next();
+                if ( newds.getUrl().equals(oldds.getUrl())){
+                    newds.setStatus(oldds.getStatus());
+                    break;
+                }
+            }            
+        }
+        
+    }
+    
     /** contact DAS registry and update sources ... */
     private  RegistryConfiguration doRegistryUpdate(URL registryurl)
     throws ConfigurationException
     {
-           
+        
         
         logger.log(Level.INFO,"contacting DAS directory server at: " +registryurl);
         
@@ -321,7 +352,7 @@ extends Thread
         
         String[] capabs ;
         try {
-             capabs = rclient.getAllCapabilities();
+            capabs = rclient.getAllCapabilities();
         } catch (Exception e){
             logger.log(Level.WARNING,e.getMessage());
             throw new ConfigurationException("Could not retreive all capabilities from registraion server");
@@ -341,7 +372,7 @@ extends Thread
         if ( sources==null) {
             
             logger.log(Level.WARNING,"Could not connect to registration service at " + registryurl);
-           
+            
             throw new ConfigurationException("Could not connect to registration service at " + registryurl);
         }
         logger.log(Level.CONFIG,"found "+sources.length+" servers"); 
@@ -349,8 +380,8 @@ extends Thread
         if ( sources.length < 1){
             logger.log(Level.WARNING,"Did not get any DasSource from registration service at " + registryurl);
             
-             throw new ConfigurationException("Did not get any DasSource from registration service at " + registryurl);
-          
+            throw new ConfigurationException("Did not get any DasSource from registration service at " + registryurl);
+            
         }
         //ArrayList servers = new ArrayList();
         
@@ -454,25 +485,25 @@ extends Thread
     /** returns the Config for SPICE */
     // obsolete!
     /*
-    public RegistryConfiguration getConfiguration() {
-        while (! isDone()) {	  
-            try {
-                wait(30);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                done = true ;
-            }
-        }
-        return config ; 
-    }
-    */
+     public RegistryConfiguration getConfiguration() {
+     while (! isDone()) {	  
+     try {
+     wait(30);
+     } catch (InterruptedException e) {
+     e.printStackTrace();
+     done = true ;
+     }
+     }
+     return config ; 
+     }
+     */
     /** set config fromoutside 
      * 
      */
     public void setConfiguration(RegistryConfiguration regi) {
         config = regi;	
     }
- 
+    
 }
 
 

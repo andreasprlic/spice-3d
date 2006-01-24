@@ -33,6 +33,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -578,6 +579,19 @@ class ConfigPanel extends JPanel implements ConfigurationListener {
         return addLocalPanel ;
     }
     
+    protected void selectAllSources(){
+        List servers = config.getAllServers();
+
+        int i = -1;
+        Iterator iter = servers.iterator();
+        while (iter.hasNext()){
+            i++;
+            SpiceDasSource ds = (SpiceDasSource) iter.next();
+            config.setStatus(ds.getUrl(),true);
+            dasSourceTableModel.setValueAt(new Boolean(true),i,0);
+        }
+    }
+    
     protected JPanel getAvailablePanel() {
         TitledBorder dasborder1;
         dasborder1 = BorderFactory.createTitledBorder("available DAS sources");
@@ -587,7 +601,21 @@ class ConfigPanel extends JPanel implements ConfigurationListener {
         seqstrucpanel.setLayout(new BoxLayout(seqstrucpanel, BoxLayout.Y_AXIS));	
         //List sequenceservers = config.getServers() ;
         
+        JButton selectAll = new JButton("Select All");
+        Box xBox = Box.createHorizontalBox();
+        xBox.add(selectAll);
+        seqstrucpanel.add(xBox);
         
+        selectAll.addActionListener(new ActionListener(){
+
+            public void actionPerformed(ActionEvent arg0) {
+              // selectAllDasSources
+                selectAllSources();
+            }
+            
+        });
+        
+      
         Object seqdata[][] = getTabData();
         
         //System.out.println(seqdata);
@@ -739,7 +767,9 @@ class ConfigPanel extends JPanel implements ConfigurationListener {
         //seqSplitPane.setOpaque(true);
         jsplit.setResizeWeight(0.6);
         
-        seqstrucpanel.add(jsplit);
+        Box xBox2 = Box.createHorizontalBox();
+        xBox2.add(jsplit);
+        seqstrucpanel.add(xBox2);
         return seqstrucpanel ;
     }
     
@@ -951,6 +981,8 @@ class ConfigPanel extends JPanel implements ConfigurationListener {
         this.repaint();
         tabbedPane.setSelectedIndex(0);
     }
+
+    
 }
 
 class PopupListener extends MouseAdapter {

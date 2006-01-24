@@ -192,7 +192,7 @@ implements JmolStatusListener
     }
     
     public void scriptStatus(String strStatus){
-        logger.log(Level.INFO,"jmol scriptStatus: " +strStatus);
+        logger.log(Level.FINE,"jmol scriptStatus: " +strStatus);
     }
     
     public void notifyScriptTermination(String statusMessage, int msWalltime){

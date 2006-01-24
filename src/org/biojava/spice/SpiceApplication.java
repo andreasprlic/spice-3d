@@ -1273,7 +1273,8 @@ ConfigurationListener
         }
         
         StartParametereFilter filter = new StartParametereFilter(startParameters);
-        
+        startParameters.setDisplay(null);
+        startParameters.setDisplayLabel(null);
         return filter.filterSources(sources);
     }
     
@@ -1317,10 +1318,13 @@ ConfigurationListener
 
         List l = config.getAllServers();
         logger.finest("got " + l.size() + " servers");
-        Iterator iter = l.iterator();
-        while (iter.hasNext()){
-            SpiceDasSource ds = (SpiceDasSource)iter.next();
-            logger.finest("setDAsSources " + ds.getNickname() + " " + ds.getStatus());
+        
+        if ( logger.isLoggable(Level.FINEST)) {
+            Iterator iter = l.iterator();
+            while (iter.hasNext()){
+                SpiceDasSource ds = (SpiceDasSource)iter.next();
+                logger.finest("setDasSources " + ds.getNickname() + " " + ds.getStatus());
+            }
         }
        
         SpiceDasSource[] sources = filterSourcesWithStartupData(l);
