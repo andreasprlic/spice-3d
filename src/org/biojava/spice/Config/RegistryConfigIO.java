@@ -163,8 +163,9 @@ extends Thread
             if ( shouldDoUpdate(persistentconfig)){
                 logger.finest("contacting directory server");
                 doRegistryUpdate(); 
-                saveConfiguration();    
-            }       
+                 
+            }
+            saveConfiguration();
         } else {
             // persistent config = null
             // we need to do an initial contact
