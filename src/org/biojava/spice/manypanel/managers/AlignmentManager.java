@@ -280,7 +280,7 @@ implements StructureListener{
         ac1 = ac1.toLowerCase();
         ac2 = ac2.toLowerCase();
         
-        //logger.info(panelName+" got new Alignment "+ac1 + " " + ac2+   " currently know:"+object1Id+" " + object2Id);
+        logger.fine(panelName+" got new Alignment "+ac1 + " " + ac2+   " currently know:"+object1Id+" " + object2Id);
         
         // we need to find out which of the two objects is object1/object2 ...
         
@@ -290,31 +290,31 @@ implements StructureListener{
     //  see wich object already was there..
        
        
-        if ( ac1.equals(object1Id) || 
+        if ( ac1.equalsIgnoreCase(object1Id) || 
                 ( (coordSys1.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS)) &&
                         (ac1.substring(0,4).equalsIgnoreCase(object1Id)))){
             // object1 = ac1
            
             triggerObject2Request(ac2);
-        } else if ( ac1.equals(object2Id)|| 
+        } else if ( ac1.equalsIgnoreCase(object2Id)|| 
                 ((coordSys1.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS)) &&
                         ( ac1.substring(0,4).equalsIgnoreCase(object2Id)))){
             // object2 = ac1
           
             triggerObject1Request(ac2);
-        } else if ( ac2.equals(object1Id)|| 
+        } else if ( ac2.equalsIgnoreCase(object1Id)|| 
                 ((coordSys2.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS)) &&
                 ( ac2.substring(0,4).equalsIgnoreCase(object1Id)))){
            
             triggerObject2Request(ac1);
             
-        } else if ( ac2.equals(object2Id)|| 
+        } else if ( ac2.equalsIgnoreCase(object2Id)|| 
                 ((coordSys2.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS)) &&
                 ( ac2.substring(0,4).equalsIgnoreCase(object2Id)))){
           
             triggerObject1Request(ac1);
         } else {
-            logger.info(panelName+" could not detect correct accessionCode " +ac1 + " " + ac2);
+            logger.fine(panelName+" could not detect correct accessionCode " +ac1 + " " + ac2);
         }
         
         tryCreateAlignmentChain();
