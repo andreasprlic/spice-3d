@@ -80,7 +80,7 @@ extends AbstractChainRenderer
         Structure struc = structure.getStructure();
         Chain c = struc.getChain(structure.getCurrentChainNumber());
         
-        String ac = struc.getPDBCode() + " ." + c.getName();
+        String ac = struc.getPDBCode() + "." + c.getName();
         DrawableSequence ds = DrawableSequence.fromChain(ac,c);
         this.sequence=ds;
         
