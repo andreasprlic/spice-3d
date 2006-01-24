@@ -296,7 +296,7 @@ extends Thread{
             
             try{
                 //alignments = dasc.getAlignments(code);
-                alignments= retreiveAlignments(dasalignmentcommand);
+                alignments= retrieveAlignments(dasalignmentcommand);
                 
                 //logger.finest(logname + " DASAlignmentHandler: got "+ alignments.length +" alignment(s):");
                 if ( alignments.length == 0 ) {
@@ -319,7 +319,7 @@ extends Thread{
         return new Alignment[0] ;
     }
     
-    private Alignment[] retreiveAlignments(String url)
+    private Alignment[] retrieveAlignments(String url)
     throws IOException
     {
         

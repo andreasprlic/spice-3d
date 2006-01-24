@@ -147,7 +147,7 @@ implements ObjectManager ,SequenceListener{
                 ds = DrawableDasSource.fromDasSource(tmp);
             } else {
                 // really a new DAS source ...
-                logger.info("new das source " + ds.getDasSource().getNickname() + " " + currentAccessionCode);
+                //logger.info("new das source " + ds.getDasSource().getNickname() + " " + currentAccessionCode);
                 if ( ( currentAccessionCode != null ) && ( ! currentAccessionCode.equals(""))){
                     triggerFeatureRequest(currentAccessionCode,ds.getDasSource(),ds);
                 }

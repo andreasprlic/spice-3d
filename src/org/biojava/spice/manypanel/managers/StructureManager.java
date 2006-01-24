@@ -298,7 +298,7 @@ implements ObjectManager, StructureListener {
         int nr = event.getCurrentChainNumber();
         //logger.info("selected chain " + nr);
         if ( nr == currentChainNr){
-            logger.info("already selected, ignoring...");
+            logger.finest("already selected chain nr " + nr + ", not selecting again...");
             return;
         }
         Structure s = event.getStructure();

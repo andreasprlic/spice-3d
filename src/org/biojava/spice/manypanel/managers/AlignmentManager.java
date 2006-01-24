@@ -314,7 +314,7 @@ implements StructureListener{
           
             triggerObject1Request(ac1);
         } else {
-            logger.info(panelName+" could not detect correct accessionCode");
+            logger.info(panelName+" could not detect correct accessionCode " +ac1 + " " + ac2);
         }
         
         tryCreateAlignmentChain();

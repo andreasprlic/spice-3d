@@ -780,7 +780,7 @@ SpiceFeatureListener
     }
 
     public void newStructure(StructureEvent event) {
-        logger.info("got new structure");
+        //logger.info("got new structure");
         Structure s = event.getStructure();
         setStructure(s);
 	setCurrentChainNumber(0);

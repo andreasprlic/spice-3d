@@ -661,7 +661,7 @@ ChangeListener
     }
     
     public  void clearDasSources() {
-        logger.info("browserPane clear das sources");
+        //logger.info("browserPane clear das sources");
         allsources = new ArrayList();
         ensaligManager.clearDasSources();
         aligManager.clearDasSources();
