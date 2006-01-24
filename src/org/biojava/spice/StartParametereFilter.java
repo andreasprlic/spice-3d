@@ -26,8 +26,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.biojava.services.das.registry.DasCoordinateSystem;
 import org.biojava.services.das.registry.DasSource;
 import org.biojava.spice.das.SpiceDasSource;
+import org.biojava.spice.manypanel.BrowserPane;
 
 
 
@@ -221,6 +223,7 @@ public class StartParametereFilter {
                 
                 //System.out.println(ds.getNickname() + ds.getStatus());
                 //logger.info("getUserRequestServers o " + ds.getNickname() +" " + ds.getStatus());
+               
                 // skip disabled servers ...
                 if ( ds.getStatus() == false ){
                     //logger.info("skipping das source " + ds.getNickname());
@@ -228,8 +231,18 @@ public class StartParametereFilter {
                 }
 
                  
+                DasCoordinateSystem[] coordSys = ds.getCoordinateSystem();
+                for ( int d = 0 ; d< coordSys.length;d++){
+                    String cs = coordSys[d].toString();
+                    if ( (cs.equals(BrowserPane.DEFAULT_PDBCOORDSYS) || (cs.equals(BrowserPane.DEFAULT_UNIPROTCOORDSYS)
+                            || (cs.equals(BrowserPane.DEFAULT_ENSPCOORDSYS))) )) {
+                            retlst.add(ds);
+                    } else
+                        // this is not in any of the three csses that can be displayed.
+                        ds.setStatus(false);
+                }
                 
-                retlst.add(ds);
+                
             }
             return retlst;
         }
@@ -242,10 +255,10 @@ public class StartParametereFilter {
             //System.out.println(ds.getNickname() + ds.getStatus());
             //logger.info("getuserRequestServers u" + ds.getNickname() +" " + ds.getStatus());
             // skip disabled servers ...
-            if ( ds.getStatus() == false ){
+            //if ( ds.getStatus() == false ){
                 //logger.info("skipping das source " + ds.getNickname());
-                continue;
-            }
+            //    continue;
+            //}
             
             // never skip reference servers ...
             if (( hasCapability("sequence",ds)) || 
@@ -261,15 +274,22 @@ public class StartParametereFilter {
                 //logger.info("adding local DAS source " + ds);
                 continue;
             }
+            
             if ( isInDisplayLabels(ds)) {
-                retlst.add(ds);
-                continue;
-            }
-            if( isInDisplayServers(ds)){
+                ds.setStatus(true);
                 retlst.add(ds);
                 continue;
             }
             
+            if( isInDisplayServers(ds)){
+                ds.setStatus(true);
+                retlst.add(ds);
+                continue;
+            }
+            
+            
+            // if still here, the server did not match any criteria...
+            ds.setStatus(false);
             
             
         }
