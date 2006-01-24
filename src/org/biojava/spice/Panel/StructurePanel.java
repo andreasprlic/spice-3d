@@ -186,11 +186,13 @@ implements JmolStatusListener
     }
     
     public void scriptEcho(String strEcho){
+        if (  strEcho.equals("no structure found"))
+            return;
         logger.log(Level.INFO, "jmol scriptEcho: " + strEcho);
     }
     
     public void scriptStatus(String strStatus){
-        //logger.log(Level.FINEST,"jmol scriptStatus: " +strStatus);
+        logger.log(Level.INFO,"jmol scriptStatus: " +strStatus);
     }
     
     public void notifyScriptTermination(String statusMessage, int msWalltime){
