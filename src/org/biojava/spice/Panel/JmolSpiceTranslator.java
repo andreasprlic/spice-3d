@@ -137,6 +137,8 @@ implements JmolStatusListener, StructureListener
         
         Chain currentChain = structure.getChain(currentChainNumber);
         //logger.info("current chain is " + currentChain.getName() + " selected is " + chainId);
+        if (chainId == null)
+            chainId = " ";
         if ( currentChain.getName().equals(chainId)){
             int seqPos = getSeqPosFromPdb(pdbresnum, currentChain);
             //logger.info("is spice seq. position " + seqPos);
