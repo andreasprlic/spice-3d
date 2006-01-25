@@ -75,7 +75,8 @@ extends Thread{
     }
     
     public void addStructureListener(StructureListener li){
-        structureListeners.add(li);
+        if ( ! structureListeners.contains(li))
+            structureListeners.add(li);
     }
     
     public void triggerNewStructure(StructureEvent event){

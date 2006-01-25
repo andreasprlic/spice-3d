@@ -105,7 +105,7 @@ implements ObjectManager, StructureListener {
      */
     public void newObjectRequested(String accessionCode) {
         
-       logger.finest("newObjectRequested " + accessionCode);
+       logger.info("newObjectRequested " + accessionCode);
         
         
         String[] spl = accessionCode.split("\\.");
@@ -188,10 +188,10 @@ implements ObjectManager, StructureListener {
     }
     
     public void newObject(Object object){
-        //logger.info("new object " + object);
+        logger.fine("new object " + object);
         if ( object instanceof Structure) {
             Structure s = (Structure)object;
-            drawStructure(s);
+            drawStructure(s,0);
             pdbCode = s.getPDBCode();
         }
     }
@@ -200,7 +200,7 @@ implements ObjectManager, StructureListener {
      */
     public synchronized void newStructure(StructureEvent event) {
         String p = event.getPDBCode();
-        logger.finest("StructureManager new Structure " + p);
+        logger.fine("StructureManager new Structure " + p);
         if ( p == null) {
             clear();
             Iterator iter = structureRenderers.iterator();
@@ -218,12 +218,12 @@ implements ObjectManager, StructureListener {
             return;
         }
             
-        //logger.info("got new structure " + event.getPDBCode() + " old " + pdbCode);
+        logger.finest("got new structure " + event.getPDBCode() + " old " + pdbCode + " chain:" + chain);
         
         // convert structure to drawable structure ...
         Structure s = event.getStructure();
         structure = s;
-        drawStructure(s);
+        
         
         
         currentChainNr = event.getCurrentChainNumber();
@@ -232,6 +232,8 @@ implements ObjectManager, StructureListener {
                 currentChainNr = getActiveChainFromName(chain);
             }
         }
+        drawStructure(s,currentChainNr);
+        
         code = "";
         chain = "";
         if ( currentChainNr == -1)
@@ -239,6 +241,10 @@ implements ObjectManager, StructureListener {
         Chain c = s.getChain(currentChainNr);
         //logger.info("got new structure - displaying chain " + c.getName());
         triggerNewSequence(c,event.getPDBCode());
+        
+        //StructureEvent newe = new StructureEvent(s,currentChainNr);        
+        //selectedChain(newe);
+        
     }
     
     public void noObjectFound(String accessionCode){
@@ -276,9 +282,7 @@ implements ObjectManager, StructureListener {
         
     }
     
-    private void drawStructure(Structure struc){
-        drawStructure(struc,0);
-    }
+   
     private void drawStructure(Structure struc,int currentChainId){
         DrawableStructure draw = new DrawableStructure(struc.getPDBCode());
         draw.setStructure(struc);
@@ -296,7 +300,7 @@ implements ObjectManager, StructureListener {
     public synchronized void selectedChain(StructureEvent event) {
     
         int nr = event.getCurrentChainNumber();
-        logger.info("selected chain " + nr);
+        logger.finest("selected chain " + nr);
         if ( nr == currentChainNr){
             logger.finest("already selected chain nr " + nr + ", not selecting again...");
             return;
