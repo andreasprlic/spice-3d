@@ -120,6 +120,12 @@ implements ObjectManager, StructureListener {
         }        
            
         if ( code.equalsIgnoreCase(requestedCode)){
+            if ( ! chain.equals(oldchain)){
+                int chainNumber = getActiveChainFromName(chain);
+                if ( chainNumber >=0){
+                    notifySelectedChain(chainNumber);
+                }
+            }
             chain = oldchain;
             return ;
         }
@@ -134,12 +140,9 @@ implements ObjectManager, StructureListener {
             int chainNumber = getActiveChainFromName(chain);
             //logger.info("chainNumber " + chainNumber);
             if ( chainNumber >= 0 ){
-                StructureEvent event = new StructureEvent(structure, chainNumber);
-                Iterator iter = structureListeners.iterator();
-                while (iter.hasNext()){
-                    StructureListener li = (StructureListener) iter.next();
-                    li.selectedChain(event);
-                }
+                notifySelectedChain(chainNumber);
+                
+               
             }
             return;
         }
@@ -170,6 +173,10 @@ implements ObjectManager, StructureListener {
         }
     }
     
+    private void notifySelectedChain(int chainNumber){
+        StructureEvent event = new StructureEvent(structure, chainNumber);
+        triggerChainSelected(event);
+    }
    
     
     public int getActiveChainFromName(String name){
