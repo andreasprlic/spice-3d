@@ -198,7 +198,7 @@ implements ObjectManager, StructureListener {
     /** a new Structure has been retrieved
      * 
      */
-    public void newStructure(StructureEvent event) {
+    public synchronized void newStructure(StructureEvent event) {
         String p = event.getPDBCode();
         logger.finest("StructureManager new Structure " + p);
         if ( p == null) {
@@ -293,10 +293,10 @@ implements ObjectManager, StructureListener {
         }
     }
     
-    public void selectedChain(StructureEvent event) {
+    public synchronized void selectedChain(StructureEvent event) {
     
         int nr = event.getCurrentChainNumber();
-        //logger.info("selected chain " + nr);
+        logger.info("selected chain " + nr);
         if ( nr == currentChainNr){
             logger.finest("already selected chain nr " + nr + ", not selecting again...");
             return;

@@ -81,6 +81,7 @@ import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.spice.manypanel.eventmodel.DasSourceEvent;
 import org.biojava.spice.manypanel.eventmodel.DasSourceListener;
+import org.biojava.spice.manypanel.eventmodel.SequenceListener;
 import org.biojava.spice.manypanel.eventmodel.StructureEvent;
 import org.biojava.spice.manypanel.eventmodel.StructureListener;
 import org.biojava.spice.server.SpiceServer;
@@ -119,14 +120,14 @@ ConfigurationListener
     HashMap memoryfeatures; // all features in memory
     List features ;    // currently being displayed 
         
-    //StructurePanel structurePanel ;  
+    //StructurePanel structurePanel ; 
+    JmolSpiceTranslator jmolSpiceTranslator;
     StructurePanelListener structurePanelListener ;
     //JTextField seq_pos ;
     JList chainList;   // list available chains
-    //SeqFeaturePanel dascanv ;
-    //SpiceFeatureViewer dascanv;
+   
     JScrollPane dasPanel ;
-    //JPanel leftPanel ;
+
     JSplitPane sharedPanel;
     JSplitPane mainsharedPanel;
     
@@ -203,7 +204,10 @@ ConfigurationListener
         // init the 2D display
         browserPane = new BrowserPane(params.getPdbcoordsys(),params.getUniprotcoordsys(), params.getEnspcoordsys());
               
-        StructurePanel structurePanel = new StructurePanel(this);	
+        StructurePanel structurePanel = new StructurePanel();
+        jmolSpiceTranslator = new JmolSpiceTranslator();
+        structurePanel.addJmolStatusListener(jmolSpiceTranslator);
+        
         structurePanelListener = new StructurePanelListener(structurePanel);
        
         // first thing is to start das - registry communication
@@ -509,6 +513,12 @@ ConfigurationListener
      */
     private void initListeners(){
         
+        jmolSpiceTranslator.addPDBSequenceListener(statusPanel);
+        SequenceListener[] li = browserPane.getPDBSequenceListener();
+        for ( int i = 0 ; i < li.length;i++){
+            jmolSpiceTranslator.addPDBSequenceListener(li[i]);
+                
+        }
                
         browserPane.addPDBSequenceListener(statusPanel);
         browserPane.addUniProtSequenceListener(statusPanel);
@@ -532,10 +542,13 @@ ConfigurationListener
         // things related to selecting chains
         chainDisplay = new SpiceChainDisplay(chainList);
         browserPane.addStructureListener(chainDisplay);
+        browserPane.addStructureListener(jmolSpiceTranslator);
+        
         chainList.addListSelectionListener(chainDisplay);
         chainDisplay.addStructureListener(browserPane.getStructureManager());
         chainDisplay.addStructureListener(structurePanelListener);
         chainDisplay.addStructureListener(statusPanel);
+        chainDisplay.addStructureListener(jmolSpiceTranslator);
         //chainDisplay.addStructureListener(spiceMenuListener);
             
     }
@@ -548,145 +561,24 @@ ConfigurationListener
         JMenuBar menu = new JMenuBar();
         
         // the three menus
-        JMenu file = new JMenu("File");
-        file.setMnemonic(KeyEvent.VK_F);
-        file.getAccessibleContext().setAccessibleDescription("the file menu");
-        
-        menu.add(file);
-        
-        
-        JMenuItem openpdb;
-        ImageIcon openIcon = createImageIcon("network.png");
-        if ( openIcon == null)
-            openpdb = new JMenuItem("Open");
-        else
-            openpdb = new JMenuItem("Open", openIcon);
-        
-        openpdb.setMnemonic(KeyEvent.VK_O);
-        
-        JMenuItem save ;
-        ImageIcon saveIcon = createImageIcon("3floppy_unmount.png");
-        if ( saveIcon == null)
-            save = new JMenuItem("Save");
-        else
-            save = new JMenuItem("Save",saveIcon);
-        save.setMnemonic(KeyEvent.VK_S);
-        
-        JMenuItem revert;
-        ImageIcon revertIcon = createImageIcon("revert.png");
-        if (revertIcon == null)
-            revert = new JMenuItem("Load");
-        else
-            revert = new JMenuItem("Load",revertIcon);
-        revert.setMnemonic(KeyEvent.VK_L);
-        
-        ImageIcon exitIcon = createImageIcon("exit.png");
-        JMenuItem exit;
-        if ( exitIcon != null)
-            exit    = new JMenuItem("Exit",exitIcon);
-        else
-            exit    = new JMenuItem("Exit");
-        exit.setMnemonic(KeyEvent.VK_X);
-        
-        ImageIcon propIcon = createImageIcon("configure.png");
-        JMenuItem props ;
-        if ( propIcon != null )
-            props   = new JMenuItem("Properties",propIcon);
-        else
-            props   = new JMenuItem("Properties");
-        props.setMnemonic(KeyEvent.VK_P);
-        
-        
-        SpiceMenuListener ml = spiceMenuListener;
-        
-        openpdb.addActionListener( ml );
-        save.addActionListener   ( ml );
-        revert.addActionListener ( ml );
-        exit.addActionListener   ( ml );
-        props.addActionListener  ( ml );
-
-        file.add( openpdb );
-        file.add( save    );
-        file.add( revert  );
-        file.addSeparator();
-        file.add( props   );
-        file.addSeparator();
-        file.add( exit    );
-        
+        JMenu file = MenuCreator.createFileMenu(spiceMenuListener);
+        menu.add(file); 
         // DIsplay submenu
         
-        JMenu display = StructurePanel.createMenu(ml);
+        JMenu display = MenuCreator.createDisplayMenu(spiceMenuListener);
         menu.add(display);
         
-        
-        // Browse menu
-       
-       
         // unique action listener for the browse buttons
         browseMenu = new BrowseMenuListener();
         JMenu bm = browseMenu.getBrowsermenu();
         
         menu.add(bm);
 
-        
-        
-        // Alignment submenu
-        /*
-        JMenu align = new JMenu("Alignment");
-        align.setMnemonic(KeyEvent.VK_A);
-        align.getAccessibleContext().setAccessibleDescription("show alignments");
-        menu.add(align);
-        
-        ImageIcon chooseIcon = createImageIcon("view_choose.png");
-        
-        JMenuItem seqstrucalig;
-        if ( chooseIcon ==  null )
-            seqstrucalig = new JMenuItem("Choose PDB-UniProt");
-        else 
-            seqstrucalig = new JMenuItem("Choose PDB-UniProt",chooseIcon);
-        seqstrucalig.addActionListener(ml);
-        seqstrucalig.setMnemonic(KeyEvent.VK_C);
-        align.add(seqstrucalig);
-        
-        
-        JMenuItem uniprotensp;
-        if ( chooseIcon ==  null )
-            uniprotensp = new JMenuItem("Choose UniProt-Ensp");
-        else 
-            uniprotensp = new JMenuItem("Choose UniProt-Ensp",chooseIcon);
-        seqstrucalig.addActionListener(ml);
-        seqstrucalig.setMnemonic(KeyEvent.VK_C);
-        align.add(seqstrucalig);
-        */
-        
         menu.add(Box.createGlue());
         
         // Help submenu
-        JMenu help = new JMenu("Help");
-        help.setMnemonic(KeyEvent.VK_H);
-        help.getAccessibleContext().setAccessibleDescription("get help");
+        JMenu help = MenuCreator.createHelpMenu(spiceMenuListener);
         menu.add(help);
-        
-        ImageIcon helpIcon = createImageIcon("help.png");
-        
-        JMenuItem aboutspice;
-        if ( helpIcon == null )
-            aboutspice = new JMenuItem("About SPICE");
-        else
-            aboutspice = new JMenuItem("About SPICE",helpIcon);
-        aboutspice.addActionListener  ( ml );
-        aboutspice.setMnemonic(KeyEvent.VK_A);
-        help.add(aboutspice);
-        
-        JMenuItem spicemanual;
-        ImageIcon manualIcon =  createImageIcon("toggle_log.png");
-        if ( manualIcon == null)
-            spicemanual = new JMenuItem("Manual");
-        else
-            spicemanual = new JMenuItem("Manual",manualIcon);
-        spicemanual.addActionListener(ml);
-        spicemanual.setMnemonic(KeyEvent.VK_M);
-        help.add(spicemanual);
         
         return menu ;
         

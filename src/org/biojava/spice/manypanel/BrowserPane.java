@@ -725,6 +725,9 @@ ChangeListener
         aligManager.addSequence1Listener(li);
     }
     
+    public SequenceListener[] getPDBSequenceListener(){
+        return new SequenceListener[] {aligManager.getSeq1Listener(),structureRenderer.getCursorPanel()};
+    }
     public void addUniProtListener(ObjectListener li){
         uniProtListeners.add(li);
         
