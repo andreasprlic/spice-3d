@@ -121,19 +121,13 @@ implements JmolStatusListener, StructureListener
         logger.info("Atom picked "  + atomIndex + " " + strInfo);
         
         if ( viewer != null ) {
-            //logger.info("atomName:" + viewer.getAtomName(atomIndex));
-            int mod = viewer.getAtomModelIndex(atomIndex);
-            //java.util.Properties props = viewer.getModelProperties(mod);
-            //logger.finest(props.toString());
-            //System.out.println(props);
-            //logger.info(viewer.getAtomNumber(atomIndex)+"");
-            
+            //int mod = viewer.getAtomModelIndex(atomIndex);
+               
+            // did not want to parse the string to get the data
+            // had to do modifications to Jmol for this!
             String pdbcode = viewer.getAtomSequenceCode(atomIndex);
-            String chainId = viewer.getAtomChain(atomIndex); 
-            
-            //logger.info(pdbcode);
-            //logger.info(chainId);
-            
+            String chainId = viewer.getAtomChain(atomIndex);           
+           
             highlitePdbPosition(pdbcode,chainId);
         }
     }
@@ -152,6 +146,11 @@ implements JmolStatusListener, StructureListener
         }  else {
             logger.info("selected residue " + pdbresnum + " chain " + chainId + " (chain currently not active in sequence dispay)");
 
+        }
+        // set the selection in Jmol...
+        String cmd = "select "+pdbresnum+":"+chainId+"; set display selected";
+        if ( viewer != null){
+            viewer.evalString(cmd);
         }
     }
     
