@@ -137,7 +137,7 @@ implements JmolStatusListener, StructureListener
         
         Chain currentChain = structure.getChain(currentChainNumber);
         //logger.info("current chain is " + currentChain.getName() + " selected is " + chainId);
-        if (chainId == null)
+        if ( (chainId == null) || (chainId.equals("")))
             chainId = " ";
         if ( currentChain.getName().equals(chainId)){
             int seqPos = getSeqPosFromPdb(pdbresnum, currentChain);
@@ -146,7 +146,7 @@ implements JmolStatusListener, StructureListener
                 triggerSelectedSeqPos(seqPos);
             } 
         }  else {
-            logger.info("selected residue " + pdbresnum + " chain " + chainId + " (chain currently not active in sequence dispay)");
+            logger.info("selected residue " + pdbresnum + " chain >" + chainId + "< (chain currently not active in sequence dispay)");
 
         }
         // set the selection in Jmol...

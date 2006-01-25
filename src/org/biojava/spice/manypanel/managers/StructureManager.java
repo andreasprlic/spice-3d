@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.*;
 
-import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.das.StructureThread;
 import org.biojava.spice.manypanel.drawable.*;
 import org.biojava.spice.manypanel.eventmodel.*;

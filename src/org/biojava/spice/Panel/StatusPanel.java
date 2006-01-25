@@ -386,10 +386,14 @@ StructureListener
         String note = seg.getNote();
         int start   = seg.getStart();
         int end     = seg.getEnd();
-        Group gs    = chain.getGroup(start-1);
-        Group ge    = chain.getGroup(end-1);
+        String str = "Segment: " + name + "Seq:" +start + "-" + end ;
         
-        String str = "Segment: " +name + " Seq:" +start + "-" + end +" PDB:" + gs.getPDBCode() + "-"+ge.getPDBCode();
+        if ( chain.getLength()>0) {
+            Group gs    = chain.getGroup(start-1);
+            Group ge    = chain.getGroup(end-1);
+            str += " PDB:" + gs.getPDBCode() + "-"+ge.getPDBCode();
+        }
+        
         if ( ( note != null ) && ( ! note.equals("null")))
             if ( note.length() >40)
                 str += note.substring(0,39)+"...";
