@@ -69,8 +69,7 @@ extends JPanel
     Structure structure ;
     
     public StructurePanel() {
-        super();
-        
+        super();        
         
         adapter = new SmarterJmolAdapter(null);
         

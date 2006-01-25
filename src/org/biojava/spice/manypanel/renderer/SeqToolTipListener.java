@@ -22,6 +22,7 @@
  */
 package org.biojava.spice.manypanel.renderer;
 
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -33,6 +34,8 @@ import javax.swing.JComponent;
 import javax.swing.ToolTipManager;
 
 import org.biojava.bio.structure.Chain;
+import org.biojava.bio.structure.ChainImpl;
+import org.biojava.bio.structure.Group;
 import org.biojava.spice.Feature.Feature;
 import org.biojava.spice.Feature.Segment;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureEvent;
@@ -55,7 +58,7 @@ implements SequenceListener, SpiceFeatureListener {
     String sequence;
     int oldpos ;
     ToolTipManager toolM;
-    
+    Chain chain;
     Clipboard clipboard;
     
     
@@ -72,8 +75,8 @@ implements SequenceListener, SpiceFeatureListener {
         toolM.setInitialDelay(0);
         toolM.setReshowDelay(0);
         toolM.setDismissDelay(10000);
-        //toolM.setLightWeightPopupEnabled(true);
-        
+        //toolM.setL
+        chain = new ChainImpl();
         
         clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         
@@ -87,6 +90,7 @@ implements SequenceListener, SpiceFeatureListener {
     public void setChain(Chain c){
         sequence = c.getSequence();
         length = sequence.length();
+        this.chain = c;
     }
 
     public void selectedSeqPosition(int position) {
@@ -103,8 +107,23 @@ implements SequenceListener, SpiceFeatureListener {
         oldpos = position;
         
         //System.out.println("toolTipper set "+ position + " " + length);
-        parent.setToolTipText(""+(position+1) + " " + sequence.substring(position,position+1));
+        String s = "" ;
+        Component where = getRenderer();
         
+        //System.out.println(where);
+        
+        if (where instanceof SequenceRenderer ) {
+            s = ""+(position+1) + " " + sequence.substring(position,position+1);
+        } else {
+            Group g1 = chain.getGroup(position);
+            s = "Seq:" + (position+1) +" PDB:" + g1.getPDBCode() + " " + sequence.substring(position,position+1);
+            
+        }
+        parent.setToolTipText(s);
+    }
+    
+    private Component getRenderer(){
+        return parent.getParent().getParent().getParent();
     }
 
     /** stores the text in the clipboard 
@@ -141,7 +160,10 @@ implements SequenceListener, SpiceFeatureListener {
     
     public void featureSelected(SpiceFeatureEvent e) {
         //logger.info("toolTipper feature selected ");
-        parent.setToolTipText(e.getFeature().toString());
+        Feature f = e.getFeature();
+        String s = s = f.toString();        
+        parent.setToolTipText(s);
+            
         
     }
 
@@ -175,7 +197,29 @@ implements SequenceListener, SpiceFeatureListener {
             parent.setToolTipText("");
             parent.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
         } else {
-            parent.setToolTipText(s.toString());
+            Component where = getRenderer();
+            String txt = "";
+            if ( where instanceof SequenceRenderer) {
+                txt = s.toString();
+            } else {
+                
+                String name = s.getName();
+                String note = s.getNote();
+                int start = s.getStart();
+                int end = s.getEnd();
+                Group gs = chain.getGroup(start-1);
+                Group ge = chain.getGroup(end-1);
+                
+                String str = "Segment: " +name + " Seq:" +start + "-" + end +" PDB:" + gs.getPDBCode() + "-"+ge.getPDBCode();
+                if ( ( note != null ) && ( ! note.equals("null")))
+                    if ( note.length() >40)
+                        str += note.substring(0,39)+"...";
+                    else
+                        str += note;
+                txt = str;
+                
+            }
+            parent.setToolTipText(txt);
             parent.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         }
         

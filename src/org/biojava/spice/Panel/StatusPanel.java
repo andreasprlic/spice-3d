@@ -336,7 +336,7 @@ StructureListener
         //System.out.println("selected " + start + " " + end);
         String pdbstart = getPDBPos(currentChainNumber,start);
         String pdbend = getPDBPos(currentChainNumber,end);
-        String txt = "selected seq: " + start + " - " + end + " pdb: " +pdbstart +"-" +pdbend;
+        String txt = "selected seq: " + (start+1) + " - " + (end+1) + " pdb: " +pdbstart +"-" +pdbend;
         seq_pos.setText(txt);
         seq_pos.repaint();
     }
@@ -361,7 +361,7 @@ StructureListener
 	public void mouseOverSegment(SpiceFeatureEvent e){
 	    Segment seg = e.getSegment();
 	    //System.out.println("mouse over segment " + seg);
-	    String txt = seg.toString();
+	    String txt = getSegmentDesc(seg);	     
 	    seq_pos.setText(txt);
 	}
 	public void featureSelected(SpiceFeatureEvent e){
@@ -376,10 +376,28 @@ StructureListener
 	public void segmentSelected(SpiceFeatureEvent e){
 	    Segment seg = e.getSegment();
 	    //System.out.println("selected segment " + seg);
-	    String txt = seg.toString();
+	    //String txt = seg.toString();
+        String txt = getSegmentDesc(seg);
         seq_pos.setText(txt);
 	}
 
+    private String getSegmentDesc(Segment seg){
+        String name = seg.getName();
+        String note = seg.getNote();
+        int start   = seg.getStart();
+        int end     = seg.getEnd();
+        Group gs    = chain.getGroup(start-1);
+        Group ge    = chain.getGroup(end-1);
+        
+        String str = "Segment: " +name + " Seq:" +start + "-" + end +" PDB:" + gs.getPDBCode() + "-"+ge.getPDBCode();
+        if ( ( note != null ) && ( ! note.equals("null")))
+            if ( note.length() >40)
+                str += note.substring(0,39)+"...";
+            else
+                str += note;
+    
+        return str;
+    }
 
 
 

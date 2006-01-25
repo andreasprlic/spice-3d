@@ -1032,22 +1032,13 @@ implements FeatureListener,SpiceFeatureListener
         
     }
 
-    public void mouseOverFeature(SpiceFeatureEvent e) {
-        
-        
-    }
+    public void mouseOverFeature(SpiceFeatureEvent e) {}
 
 
-    public void mouseOverSegment(SpiceFeatureEvent e) {
-      
-        
-    }
+    public void mouseOverSegment(SpiceFeatureEvent e) {}
 
 
-    public void segmentSelected(SpiceFeatureEvent e) {
-       
-        
-    }
+    public void segmentSelected(SpiceFeatureEvent e) {}
 
 
     public void clearSelection() {

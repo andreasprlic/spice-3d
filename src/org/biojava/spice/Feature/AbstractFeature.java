@@ -33,7 +33,7 @@ import java.util.List;
  *
  */
 public abstract class AbstractFeature implements Feature {
-
+    
     String name   ;
     String method ;
     String type   ;
@@ -42,42 +42,42 @@ public abstract class AbstractFeature implements Feature {
     String link   ;
     String source ;
     String score;
-
+    
     public AbstractFeature() {
-	source = "Unknown";
-	method = "Unknown";
-	type   = "Unknown";
-	note   = "";
-	link   = "";
-	score  = "";
-	
-	segments = new ArrayList();
-	       
+        source = "Unknown";
+        method = "Unknown";
+        type   = "Unknown";
+        note   = "";
+        link   = "";
+        score  = "";
+        
+        segments = new ArrayList();
+        
     }
-
+    
     public String toString() {
-	String str = "Feature: method: " + method +" type: " + type ;
-	if (( note != null) && (! note.equals("null")))
-    {
-        if (note.length() > 40)
-            str += "note: " +note.substring(0,39) + "...";
-        else
-	        str += " note: "+note;
+        String str = "Feature: method: " + method +" type: " + type ;
+        if (( note != null) && (! note.equals("null")))
+        {
+            if (note.length() > 40)
+                str += "note: " +note.substring(0,39) + "...";
+            else
+                str += " note: "+note;
+        }
+        //str += segments ;
+        return str ;
     }
-	//str += segments ;
-	return str ;
-    }
-
+    
     public void setSource(String s) { source = s;}
     public String getSource() { return source; };
-
-
+    
+    
     public void setName(String nam) { name = nam; }
     public String getName() { return name; }
     
     public void setMethod(String methd) { method = methd ; }
     public String getMethod() { return method ; }
-
+    
     public void setType(String typ) { type = typ ; }
     public String getType() { return type ; }
     
@@ -86,27 +86,27 @@ public abstract class AbstractFeature implements Feature {
     
     public void setLink(String lnk) { link = lnk;}
     public String getLink() { return link;}
-
+    
     public void setScore(String s){ score = s;}
     public String getScore() { return score;}
     
     /** add a segment to this feature */
     public void addSegment(int start, int end, String name) {
-	Segment s = new Segment() ;
-	s.setStart(start);
-	s.setEnd(end) ;
-	s.setName(name);
-	s.setParent(this);
-	segments.add(s);
+        Segment s = new Segment() ;
+        s.setStart(start);
+        s.setEnd(end) ;
+        s.setName(name);
+        s.setParent(this);
+        segments.add(s);
     }
     
     public void addSegment( Segment s ){
-	s.setParent(this);
-	segments.add(s);
+        s.setParent(this);
+        segments.add(s);
     }
-
+    
     public List getSegments() { return segments ;}
-  
+    
     
     /** test if two features are equivalent 
      * important: only comares type,method and source.
@@ -116,21 +116,21 @@ public abstract class AbstractFeature implements Feature {
     public  boolean equals(Feature feat) {
 //      if ( note == null) {
         //  if (( feat.getNote() == null ) || 
-          // ( feat.getNote().equals(""))) {
-    //} else if ( this.note.equals(feat.getNote())){
-      //  return true;
-    //}
+        // ( feat.getNote().equals(""))) {
+        //} else if ( this.note.equals(feat.getNote())){
+        //  return true;
+        //}
         if ( this.type.equals(feat.getType())){
             if ( this.method.equals(feat.getMethod())){
-                    if ( this.source.equals(feat.getSource())){
+                if ( this.source.equals(feat.getSource())){
                     
-                        return true;
-                    }
+                    return true;
+                }
             }
         }
         return false;
         
     }
     
-
+    
 }
