@@ -388,10 +388,17 @@ StructureListener
         int end     = seg.getEnd();
         String str = "Segment: " + name + "Seq:" +start + "-" + end ;
         
-        if ( chain.getLength()>0) {
-            Group gs    = chain.getGroup(start-1);
-            Group ge    = chain.getGroup(end-1);
-            str += " PDB:" + gs.getPDBCode() + "-"+ge.getPDBCode();
+        int l = chain.getLength();
+        if ( l>0) {
+            //System.out.println("statusPanel "+ l+" " + start +" " + end);
+            if ( ( start <=  l ) && (start >0)) {
+                Group gs    = chain.getGroup(start-1);
+                str += " PDB:" + gs.getPDBCode() ;
+            }
+            if ( (end<= l) && ( end >0)) {
+                Group ge    = chain.getGroup(end-1);
+                str += "-"+ge.getPDBCode();
+            }
         }
         
         if ( ( note != null ) && ( ! note.equals("null")))

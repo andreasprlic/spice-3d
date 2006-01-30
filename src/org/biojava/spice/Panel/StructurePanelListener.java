@@ -486,7 +486,7 @@ SpiceFeatureListener
             String type = feature.getType();
             boolean cmdSet = false;
             String[] displayTypes = { "cartoon","wireframe","spacefill","backbone","ribbons"};
-            if (( stylesheet != null ) &( stylesheet.length>0)){
+            if (( stylesheet != null ) &&( stylesheet.length>0)){
                 for (int m=0; m< stylesheet.length;m++){
                     Map s = stylesheet[m];
                     //logger.finest(" style:" + s);
@@ -779,11 +779,11 @@ SpiceFeatureListener
         
     }
 
-    public void newStructure(StructureEvent event) {
+    public synchronized void newStructure(StructureEvent event) {
         //logger.info("got new structure");
         Structure s = event.getStructure();
         setStructure(s);
-	setCurrentChainNumber(0);
+        setCurrentChainNumber(0);
         
     }
 

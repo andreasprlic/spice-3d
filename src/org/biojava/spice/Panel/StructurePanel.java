@@ -23,22 +23,17 @@
 
 package org.biojava.spice.Panel ;
 
-import org.biojava.spice.SpiceApplication;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import javax.swing.*;
-//for Jmol stuff
 import org.jmol.api.*;
+import org.jmol.popup.JmolPopup;
 import org.jmol.adapter.smarter.SmarterJmolAdapter;
-//biojava structure stuff
 import org.biojava.bio.structure.Structure ;
 import org.biojava.bio.structure.StructureImpl ;
-//logging
 import java.util.logging.*;
 
-import org.jmol.popup.JmolPopup;
-import java.awt.event.ActionListener;
+
 
 /** a Panel that provides a wrapper around the Jmol viewer. Code heavily
  * inspired by
@@ -81,7 +76,6 @@ extends JPanel
     
     public void addJmolStatusListener(JmolStatusListener listener) {
         viewer.setJmolStatusListener(listener);
-        
         
         // in order to provide a statuslistener for jmol we need to know the popup and viewer..        
         if ( listener instanceof JmolSpiceTranslator) {
@@ -126,10 +120,11 @@ extends JPanel
      * @param structure a Biojava structure object    
      *
      */
-    public  void setStructure(Structure structure) {
+    public void setStructure(Structure structure) {
+        
         if ( structure == null ) {
             structure = new StructureImpl();            
-        }
+        }       
         
         if ( structure.size() < 1 ) {
             //logger.info("got structure of size < 1");
@@ -137,11 +132,13 @@ extends JPanel
             executeCmd(EMPTYCMD);
             return;
         }
+        logger.info("setting new structure in Jmol " + structure.getPDBCode() + " " + structure.size());
         
         String pdbstr = structure.toPDB();
-        
+        logger.info("pdbstring "+pdbstr.substring(0,200) );
         viewer.openStringInline(pdbstr);
         
+        logger.info("finished loading structure ");
         String strError = viewer.getOpenFileError();
         
         if (strError != null) {
@@ -157,14 +154,8 @@ extends JPanel
         }
         
         logger.finest("end of setStructure");
-        //notifyAll();
-    }
-    
-    
-    
    
-    
-    
+    }
     
 }
 

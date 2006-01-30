@@ -68,10 +68,10 @@ implements JmolStatusListener, StructureListener
         this.jmolpopup = popup;
     }
     
-    public void notifyFileLoaded(String fullPathName, String fileName,
+    public synchronized void notifyFileLoaded(String fullPathName, String fileName,
             String modelName, Object clientFile,
             String errorMessage){
-        logger.finest("StructurePanel notifyFileLoaded ");
+        logger.info("JmolSpiceTranslator notifyFileLoaded " + fileName + " " + modelName);
         if (errorMessage != null){
             logger.log(Level.SEVERE,errorMessage);
         }        
@@ -136,9 +136,12 @@ implements JmolStatusListener, StructureListener
         // notify that a particulat position has been selected
         
         Chain currentChain = structure.getChain(currentChainNumber);
-        //logger.info("current chain is " + currentChain.getName() + " selected is " + chainId);
+        
+        logger.info("current chain is " + currentChain.getName() + " selected is " + chainId + " " + chainId.length());
+        
         if ( (chainId == null) || (chainId.equals("")))
             chainId = " ";
+        
         if ( currentChain.getName().equals(chainId)){
             int seqPos = getSeqPosFromPdb(pdbresnum, currentChain);
             //logger.info("is spice seq. position " + seqPos);

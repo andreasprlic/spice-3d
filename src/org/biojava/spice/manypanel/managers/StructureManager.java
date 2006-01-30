@@ -204,7 +204,7 @@ implements ObjectManager, StructureListener {
     /** a new Structure has been retrieved
      * 
      */
-    public synchronized void newStructure(StructureEvent event) {
+    public void newStructure(StructureEvent event) {
         String p = event.getPDBCode();
         logger.fine("StructureManager new Structure " + p);
         if ( p == null) {
@@ -303,7 +303,7 @@ implements ObjectManager, StructureListener {
         }
     }
     
-    public synchronized void selectedChain(StructureEvent event) {
+    public  void selectedChain(StructureEvent event) {
     
         int nr = event.getCurrentChainNumber();
         logger.finest("selected chain " + nr);
