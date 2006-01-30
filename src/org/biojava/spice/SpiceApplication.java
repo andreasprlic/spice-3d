@@ -85,6 +85,8 @@ import org.biojava.spice.manypanel.eventmodel.SequenceListener;
 import org.biojava.spice.manypanel.eventmodel.StructureEvent;
 import org.biojava.spice.manypanel.eventmodel.StructureListener;
 import org.biojava.spice.server.SpiceServer;
+import org.jmol.api.JmolSimpleViewer;
+import org.jmol.api.JmolViewer;
 
 
 /** the main application layer of SPICE
@@ -143,7 +145,7 @@ ConfigurationListener
     //JMenuBar menuBar ;
     JTextField getCom ;
     List knownFeatureLinks;
-    
+    StructurePanel structurePanel;
     StructureCommandPanel  strucommand; 
     StatusPanel statusPanel ;
    
@@ -204,7 +206,7 @@ ConfigurationListener
         // init the 2D display
         browserPane = new BrowserPane(params.getPdbcoordsys(),params.getUniprotcoordsys(), params.getEnspcoordsys());
               
-        StructurePanel structurePanel = new StructurePanel();
+        structurePanel = new StructurePanel();
         jmolSpiceTranslator = new JmolSpiceTranslator();
         structurePanel.addJmolStatusListener(jmolSpiceTranslator);
         
@@ -342,8 +344,8 @@ ConfigurationListener
    
     private void initLoggingPanel(){
         LoggingPanel loggingPanel = new LoggingPanel(logger);
-        loggingPanel.getHandler().setLevel(Level.INFO);	
-        logger.setLevel(Level.INFO);
+        loggingPanel.getHandler().setLevel(Level.FINEST);	
+        logger.setLevel(Level.FINEST);
         loggingPanel.show(null);
     }
     
@@ -1123,7 +1125,9 @@ ConfigurationListener
     }
 */
     
-    
+    public JmolViewer getViewer(){
+        return structurePanel.getViewer();
+    }
  
     
     /** get Chain number X from structure 
