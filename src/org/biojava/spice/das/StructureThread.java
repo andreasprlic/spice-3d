@@ -71,6 +71,7 @@ extends Thread{
         else
             this.accessionCode = accessionCode;
         
+
         structureListeners = new ArrayList();
     }
     

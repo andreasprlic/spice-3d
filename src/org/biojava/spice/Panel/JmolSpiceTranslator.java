@@ -71,7 +71,7 @@ implements JmolStatusListener, StructureListener
     public synchronized void notifyFileLoaded(String fullPathName, String fileName,
             String modelName, Object clientFile,
             String errorMessage){
-        logger.info("JmolSpiceTranslator notifyFileLoaded " + fileName + " " + modelName);
+        //logger.info("JmolSpiceTranslator notifyFileLoaded " + fileName + " " + modelName);
         if (errorMessage != null){
             logger.log(Level.SEVERE,errorMessage);
         }        
@@ -114,8 +114,6 @@ implements JmolStatusListener, StructureListener
         }
            
     }
-    
-    
     
     public void notifyAtomPicked(int atomIndex, String strInfo){
         logger.info("Atom picked "  + atomIndex + " " + strInfo);

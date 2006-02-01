@@ -914,7 +914,9 @@ implements StructureListener{
                 return;
             }
             int numb = event.getCurrentChainNumber();
-            sequence1 = s.getChain(numb);
+
+	    sequence1 = s.getChain(numb);
+
             Iterator iter = alignmentRenderers.iterator();
             while (iter.hasNext()){
                 AlignmentRenderer re = (AlignmentRenderer)iter.next();

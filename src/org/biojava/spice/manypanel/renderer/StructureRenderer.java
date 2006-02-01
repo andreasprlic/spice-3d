@@ -51,7 +51,7 @@ extends AbstractChainRenderer
         featurePanel = new StructureFeaturePanel();
         cursorPanel  = new CursorPanel();       
         statusPanel.setName("PDB");
-        
+        structure = new DrawableStructure("");
         initPanels();
          
     }
@@ -75,8 +75,10 @@ extends AbstractChainRenderer
     public void setDrawableStructure(DrawableStructure draw){
         statusPanel.setLoading(false);
         //logger.info("got new DrawableStructure");
-        this.structure =draw;
-      
+	synchronized(structure){
+	    structure =draw;
+	}
+
         Structure struc = structure.getStructure();
         Chain c = struc.getChain(structure.getCurrentChainNumber());
         

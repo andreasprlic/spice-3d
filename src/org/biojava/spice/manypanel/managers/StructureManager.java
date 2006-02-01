@@ -104,7 +104,7 @@ implements ObjectManager, StructureListener {
      */
     public void newObjectRequested(String accessionCode) {
         
-       logger.info("newObjectRequested " + accessionCode);
+       logger.fine("newObjectRequested " + accessionCode);
         
         
         String[] spl = accessionCode.split("\\.");
@@ -128,8 +128,11 @@ implements ObjectManager, StructureListener {
             chain = oldchain;
             return ;
         }
+	
         requestedCode = code;
-        //logger.info("accession code " + accessionCode + " co " + code + " ch " + chain +
+        chain=""; // no particular chain has been requested
+
+	//logger.info("accession code " + accessionCode + " co " + code + " ch " + chain +
         //       " pdbcode " + pdbCode);
         
         if ( pdbCode.equalsIgnoreCase(code)){
@@ -147,8 +150,11 @@ implements ObjectManager, StructureListener {
         }
         //logger.info("requesting new structure " + code);
         // a new structure should be loaded
-        structure = new StructureImpl();
-        
+	synchronized(structure) {
+	    structure = new StructureImpl();
+        }
+	currentChainNr = -1;
+
         //SpiceDasSource[] sds = toSpiceDasSource(dasSources);
         
         StructureThread dsh = new StructureThread(code,dasSources);
@@ -178,6 +184,7 @@ implements ObjectManager, StructureListener {
     }
    
     
+    
     public int getActiveChainFromName(String name){
         List chains = structure.getChains(0);
         Iterator iter = chains.iterator();
@@ -189,7 +196,8 @@ implements ObjectManager, StructureListener {
             i++;
         }
                 
-        return -1;
+	// nothing is active, so show the first chain...
+        return 0;
         
     }
     
@@ -207,7 +215,8 @@ implements ObjectManager, StructureListener {
     public void newStructure(StructureEvent event) {
         String p = event.getPDBCode();
         logger.fine("StructureManager new Structure " + p);
-        if ( p == null) {
+        
+	if ( p == null) {
             clear();
             Iterator iter = structureRenderers.iterator();
             
@@ -224,11 +233,14 @@ implements ObjectManager, StructureListener {
             return;
         }
             
-        logger.finest("got new structure " + event.getPDBCode() + " old " + pdbCode + " chain:" + chain);
+        logger.fine("got new structure " + event.getPDBCode() + " old " + pdbCode + " chain: >" + chain +"<");
         
         // convert structure to drawable structure ...
         Structure s = event.getStructure();
-        structure = s;
+
+	synchronized(structure) {
+	    structure = s;
+	}
         
         
         
@@ -238,12 +250,15 @@ implements ObjectManager, StructureListener {
                 currentChainNr = getActiveChainFromName(chain);
             }
         }
-        drawStructure(s,currentChainNr);
+
+        if ( currentChainNr == -1)
+            currentChainNr = 0;
+
+	drawStructure(s,currentChainNr);
         
         code = "";
         chain = "";
-        if ( currentChainNr == -1)
-            currentChainNr = 0;
+        
         Chain c = s.getChain(currentChainNr);
         //logger.info("got new structure - displaying chain " + c.getName());
         triggerNewSequence(c,event.getPDBCode());
@@ -273,7 +288,7 @@ implements ObjectManager, StructureListener {
         else 
             code +=".";
         */
-        
+        logger.finest("trigger new seqeunce " + code );
         SequenceEvent sevent = new SequenceEvent(code,c.getSequence());
         
         //featureManager.newSequence(sevent);
@@ -290,6 +305,7 @@ implements ObjectManager, StructureListener {
     
    
     private void drawStructure(Structure struc,int currentChainId){
+	logger.finest("draw structure " + struc.getPDBCode() + " " + currentChainId);
         DrawableStructure draw = new DrawableStructure(struc.getPDBCode());
         draw.setStructure(struc);
         draw.setCurrentChainNumber(currentChainId);

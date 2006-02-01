@@ -110,10 +110,8 @@ extends JPanel
      */
     public void executeCmd(String command) {
         //logger.info(command);
-        //TODO: is this needed?
-        synchronized(viewer){
-            viewer.evalString(command);
-        }               
+	viewer.evalString(command);
+
     }
     
     /** display a new PDB structure in Jmol 
@@ -128,17 +126,17 @@ extends JPanel
         
         if ( structure.size() < 1 ) {
             //logger.info("got structure of size < 1");
-            
-            executeCmd(EMPTYCMD);
+            viewer.evalStringSync(EMPTYCMD);
+            //executeCmd(EMPTYCMD);
             return;
         }
-        logger.info("setting new structure in Jmol " + structure.getPDBCode() + " " + structure.size());
+        //logger.info("setting new structure in Jmol " + structure.getPDBCode() + " " + structure.size());
         
         String pdbstr = structure.toPDB();
-        logger.info("pdbstring "+pdbstr.substring(0,200) );
+        //logger.info("pdbstring "+pdbstr.substring(0,200) );
         viewer.openStringInline(pdbstr);
         
-        logger.info("finished loading structure ");
+        //logger.info("finished loading structure ");
         String strError = viewer.getOpenFileError();
         
         if (strError != null) {
@@ -155,8 +153,7 @@ extends JPanel
         
         logger.finest("end of setStructure");
    
-    }
-    
+    }    
 }
 
 
