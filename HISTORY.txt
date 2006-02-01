@@ -1,3 +1,13 @@
+0.8.1 - Feb 1, 2006
+
+Mainly a bug fixing release with only a few improvements in functionality
+
+* improved communication between Jmol and spice.
+* improved management of das sources
+* fixed a threading problem in Jmol
+* fixed bugs related to the correct display of  alignments
+* some small things.
+
 0.8.0 - Dec 20, 2005
 
 * SPICE now contains three panels to display annotations
