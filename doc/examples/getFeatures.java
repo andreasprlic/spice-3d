@@ -96,6 +96,7 @@ public class getFeatures {
 		Thread.sleep(1000);
 		if ( i > 10) {
 		    System.err.println("We assume that das source do not take more than 10 seconds to provide a response.");
+		    System.out.println("In case you see SAX parser exceptions above - they are the result of some DAS servers not having any features in their responses and this can be ignored");
 		    System.exit(1);
 		}	    
 	    }	
@@ -213,5 +214,6 @@ public class getFeatures {
 	    System.out.println("das source " + ds.getNickname() + " returned " + features.length +" features");
 	}
 	public void featureSelected(FeatureEvent e){}
+	public void comeBackLater(FeatureEvent e){}
     }
 }
