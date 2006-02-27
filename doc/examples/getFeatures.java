@@ -160,7 +160,7 @@ public class getFeatures {
         DasCoordinateSystem[] coordsys = source.getCoordinateSystem() ;
         for ( int i = 0 ; i< coordsys.length; i++ ) {
             String c = coordsys[i].toString();           
-            if ( c.equals(coordSys) ) {                
+            if ( c.equals(coordSys.toString()) ) {                
                 return true ;
             }            
         }
