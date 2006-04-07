@@ -29,14 +29,11 @@ import java.util.logging.Logger;
 import java.util.Iterator;
 
 
-import org.biojava.services.das.registry.*;
 import org.biojava.spice.Feature.Feature;
 import org.biojava.spice.Feature.FeatureImpl;
 import org.biojava.spice.Feature.Segment;
-import org.biojava.spice.das.AlignmentParameters;
-import org.biojava.spice.das.AlignmentThread;
-import org.biojava.spice.das.SpiceDasSource;
-import org.biojava.spice.manypanel.eventmodel.*;
+import org.biojava.spice.manypanel.eventmodel.SpiceFeatureEvent;
+import org.biojava.spice.manypanel.eventmodel.SpiceFeatureListener;
 import org.biojava.spice.manypanel.renderer.AlignmentRenderer;
 import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.bio.Annotation;
@@ -45,6 +42,11 @@ import org.biojava.bio.program.das.dasalignment.DASException;
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.ChainImpl;
 import org.biojava.bio.structure.Structure;
+import org.biojava.dasobert.das.AlignmentParameters;
+import org.biojava.dasobert.das.AlignmentThread;
+import org.biojava.dasobert.das.SpiceDasSource;
+import org.biojava.dasobert.dasregistry.*;
+import org.biojava.dasobert.eventmodel.*;
 
 
 public class AlignmentManager 
@@ -914,9 +916,7 @@ implements StructureListener{
                 return;
             }
             int numb = event.getCurrentChainNumber();
-
-	    sequence1 = s.getChain(numb);
-
+            sequence1 = s.getChain(numb);
             Iterator iter = alignmentRenderers.iterator();
             while (iter.hasNext()){
                 AlignmentRenderer re = (AlignmentRenderer)iter.next();
