@@ -26,12 +26,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
+import org.biojava.dasobert.eventmodel.SequenceEvent;
+import org.biojava.dasobert.eventmodel.SequenceListener;
+import org.biojava.dasobert.eventmodel.StructureEvent;
+import org.biojava.dasobert.eventmodel.StructureListener;
 import org.biojava.spice.JNLPProxy;
 import org.biojava.spice.SpiceApplication;
-import org.biojava.spice.manypanel.eventmodel.SequenceEvent;
-import org.biojava.spice.manypanel.eventmodel.SequenceListener;
-import org.biojava.spice.manypanel.eventmodel.StructureEvent;
-import org.biojava.spice.manypanel.eventmodel.StructureListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JMenu;

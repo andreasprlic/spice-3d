@@ -27,12 +27,15 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.biojava.bio.structure.Structure;
-import org.biojava.services.das.registry.DasCoordinateSystem;
-import org.biojava.services.das.registry.DasSource;
-import org.biojava.spice.das.SpiceDasSource;
+import org.biojava.dasobert.das.SpiceDasSource;
+import org.biojava.dasobert.dasregistry.Das1Source;
+import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
+import org.biojava.dasobert.dasregistry.DasSource;
+import org.biojava.dasobert.eventmodel.*;
 import org.biojava.spice.das.SingleFeatureThread;
 import org.biojava.spice.manypanel.drawable.DrawableDasSource;
-import org.biojava.spice.manypanel.eventmodel.*;
+import org.biojava.spice.manypanel.eventmodel.DasSourceEvent;
+import org.biojava.spice.manypanel.eventmodel.DasSourceListener;
 import org.biojava.spice.manypanel.renderer.*;
 
 import java.util.*;
@@ -144,7 +147,7 @@ implements ObjectManager ,SequenceListener{
             SpiceDasSource tmp = getKnownDasSource(ds) ;
             if ( tmp != null) {
                 //dsses.add(tmp);
-                ds = DrawableDasSource.fromDasSource(tmp);
+                ds = DrawableDasSource.fromDasSource((DasSource)tmp);
             } else {
                 // really a new DAS source ...
                 //logger.info("new das source " + ds.getDasSource().getNickname() + " " + currentAccessionCode);

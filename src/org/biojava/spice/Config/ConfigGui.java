@@ -68,11 +68,11 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 
+import org.biojava.dasobert.das.SpiceDasSource;
+import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
 import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.SPICEFrame;
-import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.manypanel.BrowserPane;
-import org.biojava.services.das.registry.DasCoordinateSystem;
 import java.net.URL;
 
 /**
@@ -113,7 +113,8 @@ public class ConfigGui {
         //Make sure we have the standard desktop window decorations.
         JFrame.setDefaultLookAndFeelDecorated(false);
         ImageIcon icon = createImageIcon("spice16x16.gif");
-        frame.setIconImage(icon.getImage());
+        if ( icon != null)
+            frame.setIconImage(icon.getImage());
         
         //Create and set up the content pane.
         //JComponent newContentPane = new TabbedPaneDemo(config);

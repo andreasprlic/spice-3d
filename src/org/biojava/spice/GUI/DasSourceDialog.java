@@ -38,10 +38,10 @@ import javax.swing.JScrollPane;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
+import org.biojava.dasobert.das.SpiceDasSource;
+import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
 import org.biojava.spice.JNLPProxy;
 import org.biojava.spice.SPICEFrame;
-import org.biojava.spice.das.SpiceDasSource;
-import org.biojava.services.das.registry.DasCoordinateSystem;
 
 /**
  * @author Andreas Prlic
@@ -163,19 +163,21 @@ extends JDialog{
         }
         txt += "</td></tr>";
         
-        txt += "<tr><td>testcode</td><td>"+ds.getTestCode()+"</td></tr>";
+        //txt += "<tr><td>testcode</td><td>"+ds.getTestCode()+"</td></tr>";
         
         txt += "<tr><td>coordinate systems</td><td>";
         // coordinate systems
         DasCoordinateSystem[] coords = ds.getCoordinateSystem();
+       String testCode = "";
         for (int i = 0 ; i< coords.length;i++){
-            txt += coords[i].toString();
+            txt += coords[i].toString() + " testCode: " + coords[i].getTestCode() ;
+            testCode = coords[i].getTestCode();
         }
         txt+="</td></tr>";
         
         txt += "<tr<td>capabilities</td><td>";
         
-        String testCode = ds.getTestCode();
+       
         
         // capabilities;
        

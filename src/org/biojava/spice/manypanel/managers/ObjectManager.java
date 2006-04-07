@@ -22,9 +22,10 @@
  */
 package org.biojava.spice.manypanel.managers;
 
-import org.biojava.services.das.registry.DasCoordinateSystem;
-import  org.biojava.services.das.registry.DasSource;
-import org.biojava.spice.das.SpiceDasSource;
+import org.biojava.dasobert.das.SpiceDasSource;
+import org.biojava.dasobert.dasregistry.Das1Source;
+import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
+import org.biojava.dasobert.dasregistry.DasSource;
 import org.biojava.spice.manypanel.drawable.*;
 
 
@@ -44,7 +45,7 @@ public interface ObjectManager {
         /** list of available Reference DAS servers 
          * 
          * @param dasSources
-         */
+         */        
         public void setDasSources(DasSource[] dasSources);
         
         /** get the list of available Reference DAS servers 

@@ -31,8 +31,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.biojava.spice.*;
+import org.biojava.spice.SPICEFrame;
+import org.biojava.spice.SpiceApplication;
+import org.biojava.spice.SpiceStartParameters;
+
 import java.util.logging.*;
+
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 /** a class that defines the protocol how two
  * instances of spice can communicate with each other.
@@ -73,6 +81,41 @@ public class SpiceProtocol {
         
     }
     
+  private SPICEFrame userChoosesSpice(SpiceServer server){
+        
+        String[] options = new String[server.nrInstances()];
+        for ( int i=0; i< server.nrInstances();i++){
+            //SPICEFrame s = server.getInstance(i);
+            String txt = "Spice #" + (i+1);
+            options[i]=txt;
+        }
+        
+        JFrame frame = new JFrame("please choose SPICE window");
+        String msg = "`Please choose window to display the new data... ";
+        //frame.getContentPane().add(label);
+        
+        //JOptionPane opt = new JOptionPane(options);
+        String selectedValue =(String) JOptionPane.showInputDialog(frame,
+                msg,
+                "please choose SPICE window",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                options,
+                options[0]
+                );
+        
+        if (selectedValue == null)
+            return server.getInstance(0);
+        for(int counter = 0, maxCounter = options.length;
+            counter < maxCounter; counter++) {
+            if(options[counter].equals(selectedValue))
+                return server.getInstance(counter);
+        }
+        
+        return server.getInstance(0);
+        
+    }
+    
     
     /** The input should look like:
      * 
@@ -101,7 +144,7 @@ public class SpiceProtocol {
      * @param str
      * @return
      */
-    public String processInput(String str,SPICEFrame spice){
+    public String processInput(String str,SpiceServer server){
         
         if ( str.length() < 11) {
             logger.warning("do not understand command >" + str + "<");
@@ -136,7 +179,7 @@ public class SpiceProtocol {
                 String parameterValue = str.substring((13 + parameterName.length()+1),str.length());
                 
                 testSetParameter(parameterName,parameterValue);
-                spice.setSpiceStartParameters(params);
+                
                 return SPICE_OK;
             }
             else if (start.equals("SPICE: load")){
@@ -152,8 +195,19 @@ public class SpiceProtocol {
                 //System.out.println("SpiceProtocol recieved request to display " +type+ " " + accessionCode);
                 
                 if (  (type.equals("PDB")    ) || 
-                        (type.equals("UniProt")) ) {
+                        (type.equals("UniProt")) ||
+                        ( type.equals("ENSP"))) {
                     
+                    
+                   SPICEFrame spice = null;
+                   logger.info(" currenlty: " + server.nrInstances() + " spice instances");
+                    if ( server.nrInstances() == 1){               
+                        spice = server.getInstance(0);
+                    } else if ( server.nrInstances() > 1){
+                        spice = userChoosesSpice(server);
+                    }
+                    
+                    spice.setSpiceStartParameters(params);
                     spice.load(type,accessionCode);
                     
                     if ( spice instanceof SpiceApplication ){

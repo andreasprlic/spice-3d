@@ -39,8 +39,9 @@ import java.util.List ;
 import org.biojava.utils.xml.*            ; 
 import java.net.MalformedURLException;
 import java.net.URL;
-import org.biojava.services.das.registry.*;
-import org.biojava.spice.das.SpiceDasSource;
+
+import org.biojava.dasobert.das.SpiceDasSource;
+import org.biojava.dasobert.dasregistry.*;
 
 import java.util.Iterator;
 import java.util.logging.Logger;
@@ -173,6 +174,7 @@ public class RegistryConfiguration
    
      */
     public void addServer(SpiceDasSource s) {
+        logger.info("adding server " + s);
         // make sure no server with that url already exists
         Iterator iter = allservers.iterator();
         boolean known =false;

@@ -25,8 +25,15 @@
 package org.biojava.spice.das ;
 
 
+import org.biojava.dasobert.das.DAS_FeatureRetrieve;
+import org.biojava.dasobert.das.SpiceDasSource;
+import org.biojava.dasobert.dasregistry.DasSource;
+import org.biojava.dasobert.eventmodel.*;
 import org.biojava.spice.manypanel.drawable.*;
-import org.biojava.spice.manypanel.eventmodel.*;
+import org.biojava.spice.manypanel.eventmodel.DasSourceEvent;
+import org.biojava.spice.manypanel.eventmodel.DasSourceListener;
+import org.biojava.spice.manypanel.eventmodel.FeatureListener;
+
 import java.util.logging.*             ;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -230,7 +237,7 @@ extends Thread
     
     private void notifyLoadingStarted(){
 
-        DrawableDasSource drawableDs = new DrawableDasSource(dasSource);
+        DrawableDasSource drawableDs = new DrawableDasSource((DasSource)dasSource);
         DasSourceEvent dsEvent = new DasSourceEvent(drawableDs);
         Iterator iter = dasSourceListeners.iterator();
         while (iter.hasNext()){
@@ -240,7 +247,7 @@ extends Thread
     }
     
     private void notifyLoadingFinished(){
-        DrawableDasSource drawableDs = new DrawableDasSource(dasSource);
+        DrawableDasSource drawableDs = new DrawableDasSource((DasSource)dasSource);
         DasSourceEvent dsEvent = new DasSourceEvent(drawableDs);
         Iterator iter = dasSourceListeners.iterator();
         while (iter.hasNext()){

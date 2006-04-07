@@ -29,11 +29,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.biojava.services.das.registry.DasSource;
+import org.biojava.dasobert.das.SpiceDasSource;
+import org.biojava.dasobert.dasregistry.Das1Source;
+import org.biojava.dasobert.dasregistry.DasSource;
+import org.biojava.dasobert.eventmodel.*;
 //import org.biojava.servlets.dazzle.datasource.GFFFeature;
 import org.biojava.spice.Feature.*;
-import org.biojava.spice.das.SpiceDasSource;
-import org.biojava.spice.manypanel.eventmodel.*;
+import org.biojava.spice.manypanel.eventmodel.FeatureListener;
 
 /** all the data about a particular DAS source and the
  * Features associated with if ( and a particular accession code)

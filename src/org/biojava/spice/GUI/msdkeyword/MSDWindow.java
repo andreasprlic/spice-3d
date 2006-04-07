@@ -36,7 +36,9 @@ import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.table.*;
 import javax.swing.event.*;
-import org.biojava.spice.*;
+
+import org.biojava.dasobert.das.*;
+import org.biojava.spice.SPICEFrame;
 
 
 

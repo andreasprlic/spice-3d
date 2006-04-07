@@ -26,11 +26,11 @@ import java.util.List;
 import java.util.logging.Logger;
 
 
-import org.biojava.services.das.registry.DasCoordinateSystem;
-import org.biojava.services.das.registry.DasSource;
-import org.biojava.spice.das.SpiceDasSource;
+import org.biojava.dasobert.das.SpiceDasSource;
+import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
+import org.biojava.dasobert.dasregistry.DasSource;
+import org.biojava.dasobert.eventmodel.*;
 import org.biojava.spice.manypanel.drawable.DrawableDasSource;
-import org.biojava.spice.manypanel.eventmodel.*;
 
 public abstract class AbstractChainManager 
 implements ObjectManager {

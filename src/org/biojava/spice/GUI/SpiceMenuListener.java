@@ -27,10 +27,12 @@ import java.awt.event.ActionListener;
 import java.util.logging.Logger;
 
 
+import org.biojava.dasobert.eventmodel.SequenceEvent;
+import org.biojava.dasobert.eventmodel.SequenceListener;
 import org.biojava.spice.Panel.StructurePanelListener;
-import org.biojava.spice.manypanel.eventmodel.SequenceEvent;
-import org.biojava.spice.manypanel.eventmodel.SequenceListener;
+import org.biojava.spice.server.SpiceServer;
 import org.biojava.spice.SPICEFrame;
+import org.biojava.spice.SpiceStartParameters;
 //import org.biojava.spice.Panel.seqfeat.*;
 import org.biojava.spice.SpiceApplication;
 
@@ -68,21 +70,40 @@ SequenceListener
         //System.out.println(">"+e.getActionCommand()+"<");
         
         String cmd = e.getActionCommand();
-        if ( cmd.equals("Open") ) {
+        
+        if ( cmd.equals("New Window")){
+        
+            SpiceStartParameters params = parent.getSpiceStartParameters();
+            params.setInitSpiceServer(false);
+            SpiceApplication newSpice = new SpiceApplication(params);         
+            SpiceServer server = parent.getSpiceServer();
+            newSpice.setSpiceServer(server);
+            server.registerInstance(newSpice);
+            
+        }
+        else if ( cmd.equals("Open") ) {
+         
             OpenDialog op = new OpenDialog(parent);
             op.show();
+       
         } else if (cmd.equals("Save")){
+        
             if ( parent instanceof SpiceApplication) {
                 SaveLoadSession save = new SaveLoadSession((SpiceApplication)parent);
                 save.save();
             }
+        
         } else if (cmd.equals("Load")){
+        
             if ( parent instanceof SpiceApplication) {
                 SaveLoadSession load = new SaveLoadSession((SpiceApplication)parent);
                 load.load();
             }
+        
         } else if (cmd.equals("Exit")) {
+
             System.exit(0);
+        
         } else if (cmd.equals("Properties")) {
             parent.showConfig();
             //RegistryConfigIO regi = new RegistryConfigIO(parent,parent.REGISTRY_URL) ;	    

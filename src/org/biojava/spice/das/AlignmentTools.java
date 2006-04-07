@@ -28,6 +28,8 @@ import java.util.logging.*;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.program.das.dasalignment.Alignment;
 import org.biojava.bio.program.das.dasalignment.DASAlignmentCall;
+import org.biojava.dasobert.das.AlignmentThread;
+import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.spice.Config.RegistryConfiguration;
 import java.net.*;
 import java.io.*;
@@ -58,6 +60,10 @@ public class AlignmentTools {
         dasalignmentCall= new DASAlignmentCall();
 		
 
+    }
+    
+    public static Annotation getObject(String s, Alignment a){
+        return AlignmentThread.getObject(s,a);
     }
     
     /** get alignments for a particular uniprot or pdb code */
@@ -115,20 +121,7 @@ public class AlignmentTools {
     }
     
     
-    /** get the data for an object from the alignment */
-    public static  Annotation getObject(String objectid, Alignment ali) throws NoSuchElementException{
-        Annotation[] objects = ali.getObjects();
-        
-        for (int i =0 ; i<objects.length;i++) {
-    	    		Annotation object = objects[i];
-    	    		String id = (String) object.getProperty("dbAccessionId");
-			//System.out.println("comparing ignorecase " + id + " " + objectid);
-    	    		if ( id.equalsIgnoreCase (objectid)){
-    	    		    return object;
-    	    		}
-        }
-        throw new NoSuchElementException ("did not find object with id "+ objectid);
-    }
+   
     
     public static String getUniProtCodeFromAlignment(Alignment ali) {
         Annotation[] objects = ali.getObjects();

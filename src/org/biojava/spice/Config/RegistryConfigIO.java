@@ -33,8 +33,10 @@ import java.util.ArrayList                 ;
 import java.util.List                      ;
 
 //for DAS registration server:
-import org.biojava.services.das.registry.* ;
-import org.biojava.spice.das.SpiceDasSource;
+import org.biojava.dasobert.das.SpiceDasSource;
+import org.biojava.dasobert.dasregistry.Das1Source;
+import org.biojava.dasobert.dasregistry.DasSource;
+import org.biojava.services.das.registry.DasRegistryAxisClient;
 import org.biojava.spice.manypanel.renderer.ScalePanel;
 
 //for logging

@@ -37,10 +37,10 @@ import javax.swing.JScrollPane;
 
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.ChainImpl;
+import org.biojava.dasobert.eventmodel.SequenceEvent;
+import org.biojava.dasobert.eventmodel.SequenceListener;
 import org.biojava.spice.manypanel.eventmodel.ScaleEvent;
 import org.biojava.spice.manypanel.eventmodel.ScaleListener;
-import org.biojava.spice.manypanel.eventmodel.SequenceEvent;
-import org.biojava.spice.manypanel.eventmodel.SequenceListener;
 import org.biojava.spice.manypanel.managers.SequenceManager;
 
 public class AlignmentRenderer 

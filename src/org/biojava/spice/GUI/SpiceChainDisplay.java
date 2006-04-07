@@ -38,8 +38,8 @@ import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.ChainImpl;
 import org.biojava.bio.structure.Group;
 import org.biojava.bio.structure.Structure;
-import org.biojava.spice.manypanel.eventmodel.StructureEvent;
-import org.biojava.spice.manypanel.eventmodel.StructureListener;
+import org.biojava.dasobert.eventmodel.StructureEvent;
+import org.biojava.dasobert.eventmodel.StructureListener;
 
 public class SpiceChainDisplay 
 implements ListSelectionListener,

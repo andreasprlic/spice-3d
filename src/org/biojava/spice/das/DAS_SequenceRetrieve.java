@@ -23,6 +23,8 @@
  */
 package org.biojava.spice.das;
 
+import org.biojava.dasobert.das.DAS_Sequence_Handler;
+import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.spice.Config.*          ;
 import java.net.URL                        ;
 import java.io.InputStream                 ;

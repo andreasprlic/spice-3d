@@ -33,9 +33,9 @@ import org.biojava.bio.structure.Group;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.StructureException;
 import org.biojava.bio.structure.StructureImpl;
-import org.biojava.spice.manypanel.eventmodel.SequenceListener;
-import org.biojava.spice.manypanel.eventmodel.StructureEvent;
-import org.biojava.spice.manypanel.eventmodel.StructureListener;
+import org.biojava.dasobert.eventmodel.SequenceListener;
+import org.biojava.dasobert.eventmodel.StructureEvent;
+import org.biojava.dasobert.eventmodel.StructureListener;
 import org.jmol.api.JmolStatusListener;
 import org.jmol.api.JmolViewer;
 import org.jmol.popup.JmolPopup;
@@ -46,6 +46,9 @@ implements JmolStatusListener, StructureListener
 {
     
     static Logger    logger      = Logger.getLogger("org.biojava.spice");
+    
+    static  char emptyChain = ' ';
+    
     JmolViewer  viewer;    
     JmolPopup jmolpopup ;
     
@@ -71,7 +74,7 @@ implements JmolStatusListener, StructureListener
     public synchronized void notifyFileLoaded(String fullPathName, String fileName,
             String modelName, Object clientFile,
             String errorMessage){
-        //logger.info("JmolSpiceTranslator notifyFileLoaded " + fileName + " " + modelName);
+        logger.info("JmolSpiceTranslator notifyFileLoaded " + fileName + " " + modelName + " " + errorMessage);
         if (errorMessage != null){
             logger.log(Level.SEVERE,errorMessage);
         }        
@@ -115,18 +118,28 @@ implements JmolStatusListener, StructureListener
            
     }
     
+    
+
     public void notifyAtomPicked(int atomIndex, String strInfo){
         logger.info("Atom picked "  + atomIndex + " " + strInfo);
         
         if ( viewer != null ) {
             //int mod = viewer.getAtomModelIndex(atomIndex);
-               
+             //String info = viewer.getAtomInfo(atomIndex);  
+             //logger.info(info);
             // did not want to parse the string to get the data
             // had to do modifications to Jmol for this!
             String pdbcode = viewer.getAtomSequenceCode(atomIndex);
-            String chainId = viewer.getAtomChain(atomIndex);           
-           
-            highlitePdbPosition(pdbcode,chainId);
+            char chainId = viewer.getAtomChain(atomIndex);           
+           //String pdbcode = "";
+           //String chainId = "";
+            //logger.info(chainId + " numeric value: " + Character.getNumericValue(chainId));
+            if ( Character.getNumericValue(chainId) == -1 ) {
+                //logger.info("chainId == -1 setting to ' '");
+                chainId = ' ';
+            }
+            //logger.info(">"+emptyChain+"< >"+chainId+"< "  );                        
+            highlitePdbPosition(pdbcode,""+chainId);
         }
     }
     
@@ -135,7 +148,7 @@ implements JmolStatusListener, StructureListener
         
         Chain currentChain = structure.getChain(currentChainNumber);
         
-        logger.info("current chain is " + currentChain.getName() + " selected is " + chainId + " " + chainId.length());
+        logger.info("current chain is >" + currentChain.getName() + "< selected is >" + chainId + "< " + chainId.length());
         
         if ( (chainId == null) || (chainId.equals("")))
             chainId = " ";

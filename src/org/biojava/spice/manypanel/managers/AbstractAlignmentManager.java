@@ -34,11 +34,11 @@ import org.biojava.bio.program.das.dasalignment.DASException;
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.ChainImpl;
 import org.biojava.bio.structure.Group;
-import org.biojava.services.das.registry.DasCoordinateSystem;
+import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
+import org.biojava.dasobert.eventmodel.AlignmentEvent;
+import org.biojava.dasobert.eventmodel.AlignmentListener;
 import org.biojava.spice.manypanel.AlignmentTool;
 import org.biojava.spice.manypanel.BrowserPane;
-import org.biojava.spice.manypanel.eventmodel.AlignmentEvent;
-import org.biojava.spice.manypanel.eventmodel.AlignmentListener;
 
 public class AbstractAlignmentManager
 implements AlignmentListener{

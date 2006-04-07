@@ -36,14 +36,18 @@ import java.awt.Color;
 import java.util.*;
 import java.util.logging.Logger;
 
-import org.biojava.spice.das.SpiceDasSource;
+import org.biojava.dasobert.das.SpiceDasSource;
+import org.biojava.dasobert.dasregistry.Das1Source;
+import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
+import org.biojava.dasobert.dasregistry.DasSource;
+import org.biojava.dasobert.eventmodel.*;
 import org.biojava.spice.manypanel.drawable.DrawableDasSource;
-import org.biojava.spice.manypanel.eventmodel.*;
+import org.biojava.spice.manypanel.eventmodel.DasSourceEvent;
+import org.biojava.spice.manypanel.eventmodel.DasSourceListener;
+import org.biojava.spice.manypanel.eventmodel.SpiceFeatureListener;
 import org.biojava.spice.manypanel.managers.*;
 import org.biojava.spice.manypanel.renderer.*;
 
-import org.biojava.services.das.registry.DasCoordinateSystem;
-import org.biojava.services.das.registry.DasSource;
 
 //import javax.swing.BoxLayout;
 import java.awt.Dimension;
@@ -644,7 +648,7 @@ ChangeListener
     private void triggerRemoveDasSource(SpiceDasSource ds){
         logger.finest("triggerRemoveDasSource " + ds.getNickname());
         
-        DasSourceEvent event = new DasSourceEvent(DrawableDasSource.fromDasSource(ds));
+        DasSourceEvent event = new DasSourceEvent(DrawableDasSource.fromDasSource((DasSource)ds));
         
         DasCoordinateSystem[] cs = ds.getCoordinateSystem();
         for ( int i=0 ; i< cs.length; i++){
@@ -755,7 +759,7 @@ ChangeListener
     
     
     public void triggerLoadStructure(String pdbcode){
-        
+        logger.finest("trigger load structure " + pdbcode);
         clearDisplay();
         
         aligManager.clearAlignment();
@@ -831,7 +835,7 @@ ChangeListener
         //DasCoordinateSystem[] coordsys = source.getCoordinateSystem() ;
         for ( int i = 0; i< sources.size();i++){
             
-            if ( ! hasCapability("alignment", (DasSource)sources.get(i)))
+            if ( ! hasCapability("alignment", (Das1Source)sources.get(i)))
                 continue;
             SpiceDasSource source = (SpiceDasSource)sources.get(i);
             
@@ -868,7 +872,7 @@ ChangeListener
     
     private DasSource[] getServers(String capability, DasCoordinateSystem coordSys){
         // get all servers with a particular capability
-        DasSource servers[] = getServers(capability);
+        Das1Source servers[] = getServers(capability);
         
         // now also check the coordinate system
         ArrayList retservers = new ArrayList();
@@ -880,11 +884,11 @@ ChangeListener
             }    
         }
         
-        return (DasSource[])retservers.toArray(new DasSource[retservers.size()]) ;
+        return (DasSource[])retservers.toArray(new Das1Source[retservers.size()]) ;
     }
     
     
-    private boolean hasCapability(String capability, DasSource ds){
+    private boolean hasCapability(String capability, Das1Source ds){
         String[] capabilities = ds.getCapabilities() ;
         for ( int c=0; c<capabilities.length ;c++) {
             String capabil = capabilities[c];
@@ -895,10 +899,10 @@ ChangeListener
         return false;
     }
     
-    private DasSource[] getServers(String capability) {
+    private Das1Source[] getServers(String capability) {
         ArrayList retservers = new ArrayList();
         for ( int i = 0 ; i < allsources.size() ; i++ ) {
-            DasSource ds = (DasSource) allsources.get(i);
+            Das1Source ds = (Das1Source) allsources.get(i);
             if ( hasCapability(capability,ds)){
                 
                 retservers.add(ds);
@@ -907,7 +911,7 @@ ChangeListener
         }
         
         
-        return (DasSource[])retservers.toArray(new DasSource[retservers.size()]) ;
+        return (Das1Source[])retservers.toArray(new Das1Source[retservers.size()]) ;
     }
     
     public void loadingFinished(DasSourceEvent ds) {

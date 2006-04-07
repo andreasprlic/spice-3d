@@ -36,10 +36,10 @@ import org.biojava.bio.structure.io.PDBParseException;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Symbol;
-import org.biojava.spice.das.SpiceDasSource;
-import org.biojava.spice.das.SequenceThread;
+import org.biojava.dasobert.das.SequenceThread;
+import org.biojava.dasobert.das.SpiceDasSource;
+import org.biojava.dasobert.eventmodel.*;
 import org.biojava.spice.manypanel.drawable.DrawableSequence;
-import org.biojava.spice.manypanel.eventmodel.*;
 import org.biojava.spice.manypanel.renderer.*;
 
 import java.util.*;

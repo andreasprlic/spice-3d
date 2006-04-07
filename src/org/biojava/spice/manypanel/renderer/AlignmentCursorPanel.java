@@ -36,7 +36,7 @@ import javax.swing.JPanel;
 
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.ChainImpl;
-import org.biojava.spice.manypanel.eventmodel.SequenceEvent;
+import org.biojava.dasobert.eventmodel.SequenceEvent;
 
 public class AlignmentCursorPanel extends JPanel
 {

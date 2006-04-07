@@ -25,6 +25,7 @@
 package org.biojava.spice;
 
 import org.biojava.spice.Config.*;
+import org.biojava.spice.server.SpiceServer;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.Chain;
 import java.net.URL;
@@ -46,6 +47,8 @@ public interface SPICEFrame
     /** retrieve configuration for DAS servers to use */    
     public RegistryConfiguration getConfiguration();
 
+    public SpiceServer getSpiceServer();
+    
     /** returns a flag if data is being loaded using DAS. This is
      * needed for the differnt sub-frames to prevent them from having
      * problems with the loading threads  */    

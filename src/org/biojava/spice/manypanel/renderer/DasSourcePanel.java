@@ -46,14 +46,15 @@ import javax.swing.JProgressBar;
 import java.awt.*;
 
 import org.biojava.bio.structure.Chain;
+import org.biojava.dasobert.das.SpiceDasSource;
+import org.biojava.dasobert.eventmodel.*;
 import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.Feature.Feature;
 import org.biojava.spice.Feature.Segment;
-import org.biojava.spice.manypanel.eventmodel.FeatureEvent;
+import org.biojava.spice.manypanel.eventmodel.FeatureListener;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureEvent;
-import org.biojava.spice.das.SpiceDasSource;
+import org.biojava.spice.manypanel.eventmodel.SpiceFeatureListener;
 import org.biojava.spice.manypanel.drawable.*;
-import org.biojava.spice.manypanel.eventmodel.*;
 
 /** a class that draws the content of a das source
  * 
@@ -188,7 +189,8 @@ implements FeatureListener,SpiceFeatureListener
         
         String str = drawableDasSource.getDasSource().getNickname();
         //logger.info("paint DasSourcePanel "+str);
-        infoIcon.paintIcon(null, g, 1,0);        
+        if ( infoIcon != null)
+            infoIcon.paintIcon(null, g, 1,0);        
         g2D.drawString(str,16,11);
         g2D.setFont(plainFont);
         

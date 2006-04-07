@@ -34,6 +34,7 @@ import java.util.List;
 
 import javax.swing.JTextField;
 
+import org.biojava.spice.Panel.JmolCommander;
 import org.biojava.spice.Panel.StructurePanelListener;
 
 /** A class that listens to various events on the 
@@ -55,14 +56,14 @@ MouseListener
 
 {
     JTextField textfield;
-    StructurePanelListener structurePanelListener;
+    JmolCommander structurePanelListener;
     
     List history;
     int historyPosition;
     
     static Logger logger      = Logger.getLogger("org.biojava.spice");
     
-    public StructureCommandListener (StructurePanelListener spl, JTextField textfield_) {
+    public StructureCommandListener (JmolCommander spl, JTextField textfield_) {
         super();
         structurePanelListener = spl;
         textfield = textfield_ ;

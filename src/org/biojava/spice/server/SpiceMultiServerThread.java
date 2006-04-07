@@ -24,7 +24,12 @@ package org.biojava.spice.server;
 
 import java.net.*;
 import java.io.*;
-import org.biojava.spice.*;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
+import org.biojava.spice.SPICEFrame;
+
 
 /** A thread that listens to a port and a sends incomming messages
  * to the SpiceProtocol
@@ -37,17 +42,19 @@ extends Thread {
     
     
     private Socket socket ;
-    private SPICEFrame spice;
+    private SpiceServer server;
     
     /**
      * 
      */
-    public SpiceMultiServerThread(Socket socket,SPICEFrame spice) {
+    public SpiceMultiServerThread(Socket socket,SpiceServer server) {
         super("SpiceMultServerThread");
 
         this.socket=socket;
-        this.spice = spice;
+        this.server = server;
     }
+    
+  
     
     public void run() {
         
@@ -62,6 +69,7 @@ extends Thread {
             //outputLine = kkp.processInput(null);
             //out.println(outputLine);
             
+           
             
             String msg =in.readLine();
             
@@ -74,12 +82,15 @@ extends Thread {
                     break;
                 }
                 
-                outputLine = spiceProtocol.processInput(msg, spice);
+               
+                
+                outputLine = spiceProtocol.processInput(msg, server);
                 out.println(outputLine);
                 
                 msg = in.readLine();
                 
             }
+           
             
         } catch ( IOException e ) {
             e.printStackTrace();

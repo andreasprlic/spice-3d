@@ -62,6 +62,7 @@ public class SpiceStartParameters {
     private String uniprotcoordsys;
     private String enspcoordsys;
     
+    boolean initSpiceServer;
     
     
       
@@ -78,10 +79,25 @@ public class SpiceStartParameters {
             e.printStackTrace();
         }
         registryurls = new URL[0];
+        initSpiceServer = true;
     
     }
 
-    
+    /** if true a new Spice instance should init the SpiceServer. otherwise it assumes that it is already running
+     * 
+     * 
+     * @return
+     */
+    public boolean isInitSpiceServer() {
+        return initSpiceServer;
+    }
+
+
+    public void setInitSpiceServer(boolean initSpiceServer) {
+        this.initSpiceServer = initSpiceServer;
+    }
+
+
     public String getLocalServerName() {
         return localServerName;
     }

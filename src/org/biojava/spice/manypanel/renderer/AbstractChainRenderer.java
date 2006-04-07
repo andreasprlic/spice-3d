@@ -34,15 +34,19 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import org.biojava.bio.structure.*;
+import org.biojava.dasobert.das.SpiceDasSource;
+import org.biojava.dasobert.eventmodel.*;
 import org.biojava.spice.Feature.Feature;
 import org.biojava.spice.Feature.FeatureImpl;
 import org.biojava.spice.Feature.Segment;
-import org.biojava.spice.das.SpiceDasSource;
-import org.biojava.spice.manypanel.eventmodel.FeatureEvent;
+import org.biojava.spice.manypanel.eventmodel.DasSourceEvent;
+import org.biojava.spice.manypanel.eventmodel.DasSourceListener;
+import org.biojava.spice.manypanel.eventmodel.FeatureListener;
+import org.biojava.spice.manypanel.eventmodel.ScaleEvent;
+import org.biojava.spice.manypanel.eventmodel.ScaleListener;
 import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.spice.manypanel.drawable.DrawableDasSource;
 import org.biojava.spice.manypanel.drawable.DrawableSequence;
-import org.biojava.spice.manypanel.eventmodel.*;
 
 
 import java.util.*;

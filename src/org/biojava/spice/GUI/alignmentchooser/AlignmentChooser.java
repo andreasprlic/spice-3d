@@ -22,27 +22,27 @@
  */
 package org.biojava.spice.GUI.alignmentchooser;
 
-import org.biojava.services.das.registry.DasCoordinateSystem;
 import org.biojava.spice.SpiceApplication;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.ChainImpl;
-import org.biojava.spice.das.AlignmentParameters;
-import org.biojava.spice.das.AlignmentThread;
 import org.biojava.spice.das.AlignmentTools;
-import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.manypanel.AlignmentTool;
 import org.biojava.spice.manypanel.BrowserPane;
-import org.biojava.spice.manypanel.eventmodel.AlignmentEvent;
-import org.biojava.spice.manypanel.eventmodel.AlignmentListener;
-import org.biojava.spice.manypanel.eventmodel.ObjectListener;
-import org.biojava.spice.manypanel.eventmodel.SequenceEvent;
-import org.biojava.spice.manypanel.eventmodel.SequenceListener;
 import org.biojava.spice.manypanel.managers.SequenceManager;
 import org.biojava.spice.manypanel.renderer.ScalePanel;
 import org.biojava.spice.Panel.SeqFeaturePanel;
 
 import org.biojava.bio.program.das.dasalignment.*;
+import org.biojava.dasobert.das.AlignmentParameters;
+import org.biojava.dasobert.das.AlignmentThread;
+import org.biojava.dasobert.das.SpiceDasSource;
+import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
+import org.biojava.dasobert.eventmodel.AlignmentEvent;
+import org.biojava.dasobert.eventmodel.AlignmentListener;
+import org.biojava.dasobert.eventmodel.ObjectListener;
+import org.biojava.dasobert.eventmodel.SequenceEvent;
+import org.biojava.dasobert.eventmodel.SequenceListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;

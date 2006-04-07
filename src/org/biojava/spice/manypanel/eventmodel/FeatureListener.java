@@ -22,6 +22,8 @@
  */
 package org.biojava.spice.manypanel.eventmodel;
 
+import org.biojava.dasobert.eventmodel.FeatureEvent;
+
 //import org.biojava.spice.multipanel.eventmodel.FeatureEvent;
 
 /** a feature listener that returns the raw features as returned by a DAS source.

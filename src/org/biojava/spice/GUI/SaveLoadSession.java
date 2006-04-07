@@ -22,13 +22,11 @@
  */
 package org.biojava.spice.GUI;
 
-import org.biojava.spice.*;
+import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.Feature.*;
 //import org.biojava.spice.Config.*;
 import org.biojava.spice.Feature.Segment;
 //import org.biojava.spice.Panel.seqfeat.FeatureView;
-import org.biojava.spice.das.SpiceDasSource;
-import org.biojava.spice.das.StructureXMLStAXAdaptor;
 import org.biojava.utils.stax.DelegationManager;
 import org.biojava.utils.stax.StAXContentHandler;
 import org.biojava.utils.stax.StAXContentHandlerBase;
@@ -37,6 +35,7 @@ import org.biojava.utils.xml.PrettyXMLWriter;
 import org.biojava.utils.xml.XMLWriter;
 import org.biojava.bio.structure.io.FileConvert;
 import org.biojava.bio.structure.Structure;
+import org.biojava.dasobert.das.*;
 
 import java.awt.Color;
 
@@ -463,7 +462,7 @@ class MyParser
         String testCode  = attrs.getValue("testCode");
         currentDasSource.setNickname(nickname);
         currentDasSource.setUrl(url);
-        currentDasSource.setTestCode(testCode);
+        //currentDasSource.setTestCode(testCode);
     }
     
     private void createNewFeature(Attributes attrs){

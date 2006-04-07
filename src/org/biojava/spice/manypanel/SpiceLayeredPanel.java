@@ -26,8 +26,10 @@ import javax.swing.*;
 
 import java.awt.Dimension;
 import java.net.*;
-import org.biojava.services.das.registry.*;
-import org.biojava.spice.das.SpiceDasSource;
+
+import org.biojava.dasobert.das.SpiceDasSource;
+import org.biojava.dasobert.dasregistry.*;
+import org.biojava.services.das.registry.DasRegistryAxisClient;
 
 public class SpiceLayeredPanel 
 {

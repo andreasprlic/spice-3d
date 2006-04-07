@@ -38,11 +38,11 @@ import java.util.*                                     ;
 import java.util.logging.*                             ;
 import java.io.*;
 
-import org.biojava.services.das.registry.DasCoordinateSystem;
 import org.biojava.spice.das.AlignmentTools;
 import org.biojava.spice.manypanel.BrowserPane;
 
 import org.biojava.bio.program.ssbind.AnnotationFactory;
+import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
 import org.biojava.utils.ChangeVetoException;
 
 public class StructureBuilder{

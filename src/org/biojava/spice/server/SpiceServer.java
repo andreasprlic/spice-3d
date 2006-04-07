@@ -22,8 +22,11 @@
  */
 package org.biojava.spice.server;
 
-import org.biojava.spice.*;
+import org.biojava.spice.SPICEFrame;
+
 import java.net.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 import java.io.*;
 
@@ -35,16 +38,44 @@ import java.io.*;
 public class SpiceServer {
     
     public static final int SPICEPORT = 48494;
+ 
+    public static Logger logger =  Logger.getLogger("org.biojava.spice");
     
     ServerListeningThread listener;
+    
+    List otherSpices;
+    
     /**
      * 
      */
-    public SpiceServer(SPICEFrame spice) {
+    public SpiceServer() {
         super();
-        
-        listener = new ServerListeningThread(SPICEPORT,spice);
+        otherSpices = new ArrayList();
+        //registerInstance(spice);
+        listener = new ServerListeningThread(SPICEPORT,this);
         listener.start();
+    }
+    
+    public int nrInstances(){
+        return otherSpices.size();
+    }
+    
+    public SPICEFrame getInstance(int position){
+        return (SPICEFrame)otherSpices.get(position);
+    }
+    
+    public void registerInstance(SPICEFrame spice){
+        logger.info("adding spice instance " + otherSpices.size());
+        otherSpices.add(spice);
+    }
+    
+    public void removeInstance(SPICEFrame spice){
+        otherSpices.remove(spice);
+        logger.info("removed spice instance ("+otherSpices.size()+" left)");
+        if ( otherSpices.size() == 0){
+            logger.info("no active spice left, shutting down");
+            System.exit(0);
+        }
     }
     
     /** stop listening at SPICEPORT for incoming connections ... */
@@ -63,15 +94,15 @@ public class SpiceServer {
 class ServerListeningThread extends Thread {
     ServerSocket serverSocket;
     Socket clientSocket ;
-    SPICEFrame spice;
+    SpiceServer server;
     int port;
     boolean listening;
     
     public static Logger logger =  Logger.getLogger("org.biojava.spice");
     
-    public ServerListeningThread(int port, SPICEFrame spice) {
+    public ServerListeningThread(int port, SpiceServer server) {
         this.port = port;
-        this.spice = spice;
+        this.server = server;
         serverSocket = null;
         clientSocket = null;
         listening = false;
@@ -87,7 +118,7 @@ class ServerListeningThread extends Thread {
         
         try {
             while (listening)
-                new SpiceMultiServerThread(serverSocket.accept(), spice).start();
+                new SpiceMultiServerThread(serverSocket.accept(), server).start();
         } catch (IOException e){
             logger.warning("something went wrong whith SpiceMultiServerThread " + e.getMessage() );
             e.printStackTrace();

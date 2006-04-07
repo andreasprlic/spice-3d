@@ -23,13 +23,17 @@
 
 package org.biojava.spice ;
 
-import org.biojava.services.das.registry.DasCoordinateSystem;
 import org.biojava.spice.Panel.*;
 import org.biojava.spice.Config.*;
 import org.biojava.spice.GUI.*;
 
 import java.lang.reflect.*;
 import org.biojava.bio.structure.*;
+import org.biojava.dasobert.das.SpiceDasSource;
+import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
+import org.biojava.dasobert.eventmodel.SequenceListener;
+import org.biojava.dasobert.eventmodel.StructureEvent;
+import org.biojava.dasobert.eventmodel.StructureListener;
 
 // to get config file via http
 import java.net.URL;
@@ -77,15 +81,10 @@ import javax.swing.JMenuItem                    ;
 import javax.swing.JDialog;
 import java.awt.Container;
 
-import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.spice.manypanel.eventmodel.DasSourceEvent;
 import org.biojava.spice.manypanel.eventmodel.DasSourceListener;
-import org.biojava.spice.manypanel.eventmodel.SequenceListener;
-import org.biojava.spice.manypanel.eventmodel.StructureEvent;
-import org.biojava.spice.manypanel.eventmodel.StructureListener;
 import org.biojava.spice.server.SpiceServer;
-import org.jmol.api.JmolSimpleViewer;
 import org.jmol.api.JmolViewer;
 
 
@@ -98,9 +97,7 @@ public class SpiceApplication
 extends  JFrame
 implements SPICEFrame, 
 ConfigurationListener
-
-{     
-    
+{         
     private static final long serialVersionUID = 8273923744127087422L;
         
     
@@ -179,7 +176,7 @@ ConfigurationListener
         
         startParameters = params;
         
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        //this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         knownSources = new SpiceDasSource[0]; 
         
@@ -197,8 +194,11 @@ ConfigurationListener
         
         structureAlignmentMode = false ; 
         
-        // init logging related things
-        initLoggingPanel();
+        if (params.isInitSpiceServer()) {
+            // only one logging panel for all spice windows ...
+            // init logging related things
+            initLoggingPanel();
+        }
         
         // set some system properties
         setSystemProperties();     
@@ -213,6 +213,8 @@ ConfigurationListener
         structurePanelListener = new StructurePanelListener(structurePanel);
        
         // first thing is to start das - registry communication
+        
+        config = new RegistryConfiguration();
         
         URL[] registries = getAllRegistryURLs();
         RegistryConfigIO regi = new RegistryConfigIO(registries);
@@ -251,14 +253,20 @@ ConfigurationListener
 	
         firefoxIcon = createImageIcon("firefox.png");
         ImageIcon icon = createImageIcon("spice16x16.gif");
-        this.setIconImage(icon.getImage());
+        if ( icon != null)
+            this.setIconImage(icon.getImage());
         this.pack();
         
         //this.setSize(800, 600);
         this.setVisible(true);
         
+        if ( params.isInitSpiceServer())
+            initSpiceServer();
+            
         
-        initSpiceServer();
+        // if this window is closed, unregister instance... 
+        initDeregistering();
+        
     }
     
     private URL[] getAllRegistryURLs(){
@@ -322,8 +330,30 @@ ConfigurationListener
      */
     private void initSpiceServer(){
         
-        spiceServer = new SpiceServer(this);
+        spiceServer = new SpiceServer();
+        spiceServer.registerInstance(this);
         
+//        this.addWindowListener(new WindowListener() {
+//            public void windowDeiconified(WindowEvent e){}
+//            public void windowIconified(WindowEvent e){}
+//            public void windowActivated(WindowEvent e){}
+//            public void windowDeactivated(WindowEvent e){}
+//            public void windowOpened(WindowEvent e){}
+//            public void windowClosing(WindowEvent e){
+//                logger.info("destroying SPICE server");
+//                
+//                spiceServer.destroy();
+//            }
+//            public void windowClosed(WindowEvent e){}
+//        });
+        
+    }
+    
+    /** remove this instance from the server.
+     * 
+     *
+     */
+    private void initDeregistering(){
         this.addWindowListener(new WindowListener() {
             public void windowDeiconified(WindowEvent e){}
             public void windowIconified(WindowEvent e){}
@@ -331,22 +361,51 @@ ConfigurationListener
             public void windowDeactivated(WindowEvent e){}
             public void windowOpened(WindowEvent e){}
             public void windowClosing(WindowEvent e){
-                logger.info("destroying SPICE server");
+                logger.info("closing SPICE window");
                 
-                spiceServer.destroy();
+                deregisterInstance();
             }
             public void windowClosed(WindowEvent e){}
-        });
-        
+        }); 
     }
     
+    private void deregisterInstance(){
+        if (spiceServer != null) {
+            spiceServer.removeInstance(this);
+        }
+    }
     
+    public SpiceServer getSpiceServer(){
+        return spiceServer;
+    }
+    
+    public void setSpiceServer(SpiceServer server){
+        spiceServer = server; 
+    }
    
     private void initLoggingPanel(){
-        LoggingPanel loggingPanel = new LoggingPanel(logger);
-        loggingPanel.getHandler().setLevel(Level.INFO);	
-        logger.setLevel(Level.INFO);
+        
+        final LoggingPanel loggingPanel = new LoggingPanel(logger);
+        loggingPanel.getHandler().setLevel(Level.FINEST);	
+        logger.setLevel(Level.FINEST);
         loggingPanel.show(null);
+        
+        // if this window is closed, also close the logging panel..
+//        this.addWindowListener(new WindowListener() {
+//            public void windowDeiconified(WindowEvent e){}
+//            public void windowIconified(WindowEvent e){}
+//            public void windowActivated(WindowEvent e){}
+//            public void windowDeactivated(WindowEvent e){}
+//            public void windowOpened(WindowEvent e){}
+//            public void windowClosing(WindowEvent e){
+//                logger.info("closing logging panel");
+//                
+//                loggingPanel.dispose();                                
+//                
+//            }
+//            public void windowClosed(WindowEvent e){}
+//        }); 
+        
     }
     
     /** set  a couple of System Properties also contains some hacks around some strange implementation differences*/

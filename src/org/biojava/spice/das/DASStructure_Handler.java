@@ -28,6 +28,8 @@ import org.biojava.spice.Config.* ;
 import org.biojava.bio.structure.*                     ;
 import org.biojava.bio.structure.io.DASStructureClient ;
 import org.biojava.bio.structure.io.PDBFileReader      ;
+import org.biojava.dasobert.das.SpiceDasSource;
+import org.biojava.dasobert.das.SpiceStructureFeeder;
 
 import java.util.*                                     ;
 import java.util.logging.*                             ;

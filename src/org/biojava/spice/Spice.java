@@ -51,6 +51,7 @@ import org.biojava.spice.utils.CliTools;
  *  <li><b>-displayMessage</b> (optional) display a (html formatted) message when the structure has been loaded.
  *  <li><b>-displayMessageWidth</b> (optional) set the width of the message window.
  *  <li><b>-displayMessageHeight</b> (optional) set the height of the message window. 
+ *  <li><b>-localServerURL</b> (optional) add a "local" i.e. not registered DAS server
  * @author Andreas Prlic
  * 
  * */
@@ -102,16 +103,7 @@ public class Spice extends Applet {
         System.out.println("SPICE version: " + AboutDialog.VERSION);
         System.out.println("displaying for you: " + params.getCodetype() + " " + params.getCode());
         
-        /*
-        System.out.println(params.getRegistry() );
-        
-        URL[] regis = params.getRegistryurls();
-                
-        System.out.println("got " + regis.length + " registries...");
-        for (int i = 0 ; i< regis.length; i++){
-            System.out.println(regis[i]);
-        }
-        */
+    
         
         /** test if already one instance of SPICE is running
          * if yes the code should be displayed there...

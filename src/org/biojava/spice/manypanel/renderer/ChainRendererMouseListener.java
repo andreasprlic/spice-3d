@@ -34,15 +34,15 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.biojava.bio.structure.Chain;
+import org.biojava.dasobert.das.SpiceDasSource;
+import org.biojava.dasobert.eventmodel.SequenceListener;
 import org.biojava.spice.JNLPProxy;
 import org.biojava.spice.Feature.Feature;
 import org.biojava.spice.Feature.FeatureImpl;
 import org.biojava.spice.Feature.Segment;
 import org.biojava.spice.GUI.DasSourceDialog;
-import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.manypanel.drawable.DrawableDasSource;
 //import org.biojava.spice.manypanel.eventmodel.FeatureEvent;
-import org.biojava.spice.manypanel.eventmodel.SequenceListener;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureEvent;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureListener;
 

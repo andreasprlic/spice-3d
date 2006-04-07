@@ -24,7 +24,6 @@
 package org.biojava.spice.das;
 
 
-import org.biojava.services.das.registry.DasCoordinateSystem;
 import org.biojava.spice.Config.*;
 import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.spice.*       ;
@@ -34,6 +33,8 @@ import org.biojava.bio.program.das.dasalignment.*      ;
 import org.biojava.bio.structure.Structure ;
 import org.biojava.bio.structure.StructureImpl ;
 import org.biojava.bio.structure.Chain ;
+import org.biojava.dasobert.das.SpiceStructureFeeder;
+import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
 
 
 import java.io.*								;

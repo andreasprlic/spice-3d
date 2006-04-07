@@ -26,9 +26,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.biojava.services.das.registry.DasCoordinateSystem;
-import org.biojava.services.das.registry.DasSource;
-import org.biojava.spice.das.SpiceDasSource;
+import org.biojava.dasobert.das.SpiceDasSource;
+import org.biojava.dasobert.dasregistry.Das1Source;
+import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
 import org.biojava.spice.manypanel.BrowserPane;
 
 
@@ -190,7 +190,7 @@ public class StartParametereFilter {
         return false;
     }
     
-    private boolean hasCapability(String capability, DasSource ds){
+    private boolean hasCapability(String capability, Das1Source ds){
         String[] capabilities = ds.getCapabilities() ;
         for ( int c=0; c<capabilities.length ;c++) {
             String capabil = capabilities[c];
@@ -238,7 +238,7 @@ public class StartParametereFilter {
                             || (cs.equals(BrowserPane.DEFAULT_ENSPCOORDSYS))) )) {
                             retlst.add(ds);
                     } else
-                        // this is not in any of the three csses that can be displayed.
+                        // this is not in any of the three csses that can be displayed.                        
                         ds.setStatus(false);
                 }
                 
@@ -292,7 +292,6 @@ public class StartParametereFilter {
                 continue;
             }
             
-            
             // if still here, the server did not match any criteria...
             ds.setStatus(false);
             
@@ -313,7 +312,8 @@ public class StartParametereFilter {
         if ( labels != null){
             for ( int i = 0 ; i< labels.length ; i++){
                 String label = labels[i];
-                
+                if ( label == null) 
+                    continue;
                 for ( int l = 0 ; l< displayLabels.length;l++){
                     String dlabel = displayLabels[l];
                     if ( label.equals(dlabel)){

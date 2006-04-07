@@ -30,15 +30,15 @@ import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.Group;
 import org.biojava.bio.structure.Structure ;
 import org.biojava.bio.structure.StructureImpl ;
+import org.biojava.dasobert.eventmodel.SequenceEvent;
+import org.biojava.dasobert.eventmodel.SequenceListener;
+import org.biojava.dasobert.eventmodel.StructureEvent;
+import org.biojava.dasobert.eventmodel.StructureListener;
 import org.biojava.spice.Feature.Feature;
 import org.biojava.spice.Feature.Segment;
 
-import org.biojava.spice.manypanel.eventmodel.SequenceEvent;
-import org.biojava.spice.manypanel.eventmodel.SequenceListener;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureEvent;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureListener;
-import org.biojava.spice.manypanel.eventmodel.StructureEvent;
-import org.biojava.spice.manypanel.eventmodel.StructureListener;
 
 import java.util.Map;
 import java.awt.Color;
@@ -51,7 +51,8 @@ public class StructurePanelListener
 implements 
 StructureListener,
 SequenceListener,
-SpiceFeatureListener
+SpiceFeatureListener,
+JmolCommander
 {
     
     

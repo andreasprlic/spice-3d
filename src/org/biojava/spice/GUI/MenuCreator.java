@@ -79,6 +79,15 @@ public class MenuCreator {
         file.getAccessibleContext().setAccessibleDescription("the file menu");
         
         
+        JMenuItem newWindow;
+        ImageIcon nwIcon = createImageIcon("window_new.png");
+        if ( nwIcon == null)
+            newWindow = new JMenuItem("New Window");
+        else 
+            newWindow = new JMenuItem("New Window", nwIcon);
+        
+        newWindow.setMnemonic(KeyEvent.VK_N);
+        
         
         
         JMenuItem openpdb;
@@ -124,13 +133,15 @@ public class MenuCreator {
         
         
       
-        
+        newWindow.addActionListener(ml);
         openpdb.addActionListener( ml );
         save.addActionListener   ( ml );
         revert.addActionListener ( ml );
         exit.addActionListener   ( ml );
         props.addActionListener  ( ml );
 
+        file.add(newWindow);
+        file.addSeparator();
         file.add( openpdb );
         file.add( save    );
         file.add( revert  );
