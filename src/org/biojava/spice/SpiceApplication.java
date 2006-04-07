@@ -332,21 +332,7 @@ ConfigurationListener
         
         spiceServer = new SpiceServer();
         spiceServer.registerInstance(this);
-        
-//        this.addWindowListener(new WindowListener() {
-//            public void windowDeiconified(WindowEvent e){}
-//            public void windowIconified(WindowEvent e){}
-//            public void windowActivated(WindowEvent e){}
-//            public void windowDeactivated(WindowEvent e){}
-//            public void windowOpened(WindowEvent e){}
-//            public void windowClosing(WindowEvent e){
-//                logger.info("destroying SPICE server");
-//                
-//                spiceServer.destroy();
-//            }
-//            public void windowClosed(WindowEvent e){}
-//        });
-        
+                      
     }
     
     /** remove this instance from the server.
@@ -389,23 +375,7 @@ ConfigurationListener
         loggingPanel.getHandler().setLevel(Level.FINEST);	
         logger.setLevel(Level.FINEST);
         loggingPanel.show(null);
-        
-        // if this window is closed, also close the logging panel..
-//        this.addWindowListener(new WindowListener() {
-//            public void windowDeiconified(WindowEvent e){}
-//            public void windowIconified(WindowEvent e){}
-//            public void windowActivated(WindowEvent e){}
-//            public void windowDeactivated(WindowEvent e){}
-//            public void windowOpened(WindowEvent e){}
-//            public void windowClosing(WindowEvent e){
-//                logger.info("closing logging panel");
-//                
-//                loggingPanel.dispose();                                
-//                
-//            }
-//            public void windowClosed(WindowEvent e){}
-//        }); 
-        
+                       
     }
     
     /** set  a couple of System Properties also contains some hacks around some strange implementation differences*/
@@ -1059,15 +1029,17 @@ ConfigurationListener
     }
     */
     public String getPDBCode(){
-        return structure.getPDBCode();
+        
+        return browserPane.getStructureManager().getAccessionCode();
     }
     
     public String getUniProtCode(){
-        int c = getCurrentChainNumber();
-        Chain chain = getChain(c);
-        return chain.getSwissprotId();
+       return browserPane.getUPManager().getAccessionCode();       
     }
     
+    public String getENSPCode(){
+        return browserPane.getENSPManager().getAccessionCode();
+    }
     
     public int getCurrentChainNumber() {
         return chainDisplay.getCurrentChainNumber();

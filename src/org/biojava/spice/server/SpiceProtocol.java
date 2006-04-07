@@ -81,40 +81,7 @@ public class SpiceProtocol {
         
     }
     
-  private SPICEFrame userChoosesSpice(SpiceServer server){
-        
-        String[] options = new String[server.nrInstances()];
-        for ( int i=0; i< server.nrInstances();i++){
-            //SPICEFrame s = server.getInstance(i);
-            String txt = "Spice #" + (i+1);
-            options[i]=txt;
-        }
-        
-        JFrame frame = new JFrame("please choose SPICE window");
-        String msg = "`Please choose window to display the new data... ";
-        //frame.getContentPane().add(label);
-        
-        //JOptionPane opt = new JOptionPane(options);
-        String selectedValue =(String) JOptionPane.showInputDialog(frame,
-                msg,
-                "please choose SPICE window",
-                JOptionPane.PLAIN_MESSAGE,
-                null,
-                options,
-                options[0]
-                );
-        
-        if (selectedValue == null)
-            return server.getInstance(0);
-        for(int counter = 0, maxCounter = options.length;
-            counter < maxCounter; counter++) {
-            if(options[counter].equals(selectedValue))
-                return server.getInstance(counter);
-        }
-        
-        return server.getInstance(0);
-        
-    }
+  
     
     
     /** The input should look like:
@@ -204,7 +171,9 @@ public class SpiceProtocol {
                     if ( server.nrInstances() == 1){               
                         spice = server.getInstance(0);
                     } else if ( server.nrInstances() > 1){
-                        spice = userChoosesSpice(server);
+                        
+                        spice = UserChoosesSpiceDialog.choose(server);
+                    
                     }
                     
                     spice.setSpiceStartParameters(params);

@@ -37,7 +37,6 @@ import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.dasobert.das.SequenceThread;
-import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.eventmodel.*;
 import org.biojava.spice.manypanel.drawable.DrawableSequence;
 import org.biojava.spice.manypanel.renderer.*;
@@ -208,6 +207,7 @@ extends AbstractChainManager
         // clear the display...
         logger.finest("SequenceManager noObjectFound " + accessionCode);
         
+        setAccessionCode("");
         DrawableSequence ds = fromString("","");
         Iterator iter = seqRenderers.iterator();
         
@@ -243,7 +243,7 @@ extends AbstractChainManager
             li.newSequence(sevent);
         }
         
-        
+        setAccessionCode(e.getAccessionCode());
     }
 
 

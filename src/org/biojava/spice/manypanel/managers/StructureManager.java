@@ -202,6 +202,9 @@ implements ObjectManager, StructureListener {
             pdbCode = s.getPDBCode();
         }
     }
+    
+   
+    
     /** a new Structure has been retrieved
      * 
      */
@@ -233,6 +236,7 @@ implements ObjectManager, StructureListener {
         synchronized(structure){
             structure = s;
         }
+        setAccessionCode(structure.getPDBCode());
         
         currentChainNr = event.getCurrentChainNumber();
         if ( s.getPDBCode().equalsIgnoreCase(code)){
@@ -257,6 +261,7 @@ implements ObjectManager, StructureListener {
     
     public void noObjectFound(String accessionCode){
         // clear the display...
+        setAccessionCode("");
        logger.finest("StructureManager noObjectFound");
         Iterator iter = structureRenderers.iterator();
         while (iter.hasNext()){

@@ -813,9 +813,17 @@ ChangeListener
         
     }
     
-    public StructureListener getStructureManager(){
+    public StructureManager getStructureManager(){
         return strucManager;
         
+    }
+    
+    public SequenceManager getUPManager(){
+        return seqManager;
+    }
+    
+    public SequenceManager getENSPManager(){
+        return enspManager;
     }
     
     public void setSeqSelection(int start, int end){

@@ -45,13 +45,23 @@ implements ObjectManager {
     
     List sequenceListeners;
     
+    String accessionCode;
+    
     public AbstractChainManager() {
         super();
        
         //featureManager = new FeatureManager(); 
-    
+        accessionCode = "";
         clearSequenceListeners();
         clearDasSources();
+    }
+    
+    public String getAccessionCode(){
+        return accessionCode;
+    }
+    
+    public void setAccessionCode(String ac){
+        accessionCode = ac;
     }
     
     public void clear() {
