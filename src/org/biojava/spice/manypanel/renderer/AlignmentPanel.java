@@ -89,13 +89,17 @@ public class AlignmentPanel extends JPanel {
     }
     
     public void setSequence1(Chain c){
-        sequence1 = c;
+        synchronized(sequence1){
+            sequence1 = c;
+        }
         length1=c.getLength();
         scrollLeftX1 = 0;
     }
     
     public void setSequence2(Chain c){
-        sequence2 = c;
+        synchronized (sequence2){
+            sequence2 = c;
+        }
         length2 = c.getLength();
         scrollLeftX2 = 0;
         

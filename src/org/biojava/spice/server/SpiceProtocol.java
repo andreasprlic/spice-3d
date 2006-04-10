@@ -167,7 +167,7 @@ public class SpiceProtocol {
                     
                     
                    SPICEFrame spice = null;
-                   logger.info(" currenlty: " + server.nrInstances() + " spice instances");
+                   logger.info(" currently: " + server.nrInstances() + " spice instances");
                     if ( server.nrInstances() == 1){               
                         spice = server.getInstance(0);
                     } else if ( server.nrInstances() > 1){

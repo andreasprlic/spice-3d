@@ -25,13 +25,25 @@
 package org.biojava.spice ;
 
 import org.biojava.spice.server.SpiceClient;
+import org.biojava.spice.server.SpiceServer;
+
 import java.applet.Applet;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+
 import org.biojava.spice.Config.ConfigurationException;
 
 //import java.net.URL;
 import java.util.ArrayList;
 import org.biojava.spice.GUI.AboutDialog;
+import org.biojava.spice.GUI.SpiceTabbedPane;
+
 import java.util.List;
+
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JMenuBar;
+
 import org.biojava.spice.utils.CliTools;
 
 /** the startup class of SPICE. It takes care of correctly parsing the arguments that are given to SPICE.
@@ -123,11 +135,20 @@ public class Spice extends Applet {
         }
         
         // 	start a spice instance
+        createNewInstance(params);
+    }
+    
+    private void createNewInstance (SpiceStartParameters params) {
+        
         System.out.println("no spice instance has been found - starting new one for "+ params.getCodetype() + " " + params.getCode());
-        SpiceApplication appFrame = new SpiceApplication(params);
+        SpiceApplication app = new SpiceApplication(params);
+        SpiceServer server = new SpiceServer();
+        server.registerInstance(app);
+        app.setSpiceServer(server);
+        new SpiceTabbedPane(server,app);      
         
         // and display the accession code...
-        appFrame.load(params.getCodetype(),params.getCode());
+        app.load(params.getCodetype(),params.getCode());
         
     }
     
@@ -142,8 +163,7 @@ public class Spice extends Applet {
             int status = sc.send(params);
             if  (status == SpiceClient.SPICE_SUBMITTED )
                 return true;
-            
-            
+                        
         } catch (Exception e) {
             e.printStackTrace();
             

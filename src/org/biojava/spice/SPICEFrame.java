@@ -25,9 +25,12 @@
 package org.biojava.spice;
 
 import org.biojava.spice.Config.*;
+import org.biojava.spice.GUI.SpiceTabbedPane;
 import org.biojava.spice.server.SpiceServer;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.Chain;
+
+import java.awt.Container;
 import java.net.URL;
 
 /** an interface that defines methods provided by the master application. 
@@ -38,6 +41,12 @@ import java.net.URL;
 public interface SPICEFrame 	
 {
 	
+    /** returns the java.awt.Container of the spice object
+     * 
+     * @return
+     */
+    public Container getParent();
+    
     /** starts a new thread and loads a new biological object into spice 
      * @param type the type of the code provided. currently supported: PDB, UniProt, ENSP
      * @param code the code of the entry. e.g. 1a4a, P00280, 1q22 
@@ -48,6 +57,9 @@ public interface SPICEFrame
     public RegistryConfiguration getConfiguration();
 
     public SpiceServer getSpiceServer();
+    
+    public void setSpiceTabbedPane(SpiceTabbedPane tab);
+    public SpiceTabbedPane getSpiceTabbedPane();
     
     /** returns a flag if data is being loaded using DAS. This is
      * needed for the differnt sub-frames to prevent them from having

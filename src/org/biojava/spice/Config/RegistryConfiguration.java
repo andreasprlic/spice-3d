@@ -174,7 +174,7 @@ public class RegistryConfiguration
    
      */
     public void addServer(SpiceDasSource s) {
-        logger.info("adding server " + s);
+        //logger.info("adding server " + s);
         // make sure no server with that url already exists
         Iterator iter = allservers.iterator();
         boolean known =false;

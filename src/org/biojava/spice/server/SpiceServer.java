@@ -66,7 +66,11 @@ public class SpiceServer {
     
     public void registerInstance(SPICEFrame spice){
         logger.info("adding spice instance " + otherSpices.size());
-        otherSpices.add(spice);
+        if (! otherSpices.contains(spice)) {
+            otherSpices.add(spice);
+        } else {
+            logger.info("already known instance, not registering again");
+        }
     }
     
     public void removeInstance(SPICEFrame spice){

@@ -22,9 +22,17 @@
  */
 package org.biojava.spice.GUI;
 
+import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.logging.Logger;
+
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 
 
 import org.biojava.dasobert.eventmodel.SequenceEvent;
@@ -52,16 +60,16 @@ SequenceListener
     static String noselect = "select none; ";
     
     static String SPICEMANUAL = "http://www.sanger.ac.uk/Users/ap3/DAS/SPICE/SPICE_manual.pdf" ;
-    		
-    SPICEFrame parent ;
+    
+    SPICEFrame spice ;
     StructurePanelListener structurePanelListener;
     boolean selectionIsLocked;
     
     public static Logger logger =  Logger.getLogger("org.biojava.spice");
     
-    public SpiceMenuListener (SPICEFrame spice, StructurePanelListener listen) {
+    public SpiceMenuListener (SPICEFrame sp, StructurePanelListener listen) {
         selectionIsLocked = false;
-        parent = spice ;
+        spice = sp ;
         structurePanelListener = listen ;
     }
     
@@ -72,51 +80,75 @@ SequenceListener
         String cmd = e.getActionCommand();
         
         if ( cmd.equals("New Window")){
-        
-            SpiceStartParameters params = parent.getSpiceStartParameters();
+            
+            SpiceStartParameters params = spice.getSpiceStartParameters();
             params.setInitSpiceServer(false);
+            
             SpiceApplication newSpice = new SpiceApplication(params);         
-            SpiceServer server = parent.getSpiceServer();
-            newSpice.setSpiceServer(server);
-            server.registerInstance(newSpice);
+            
+            SpiceServer server = spice.getSpiceServer();
+            //newSpice.setSpiceServer(server);
+            //server.registerInstance(newSpice);
+            new SpiceTabbedPane(server,newSpice);
+            
+            
+        }
+        
+        else if ( cmd.equals("New Tab")){
+            
+            SpiceStartParameters params = spice.getSpiceStartParameters();
+            params.setInitSpiceServer(false);
+            params.setNewTab(true);
+            
+            SpiceApplication newSpice = new SpiceApplication(params);         
+            //SpiceServer server = spice.getSpiceServer();
+            //newSpice.setSpiceServer(server);
+            
+           // SpiceServer server = spice.getSpiceServer();
+            
+            SpiceTabbedPane tabbed = spice.getSpiceTabbedPane();                                               
+            tabbed.addSpice(newSpice);
+            
             
         }
         else if ( cmd.equals("Open") ) {
-         
-            OpenDialog op = new OpenDialog(parent);
-            op.show();
-       
+            if ( spice instanceof SpiceApplication){
+                SpiceApplication sp = (SpiceApplication)spice;
+                OpenDialog op = new OpenDialog(sp);
+                op.show();
+            }
+            
         } else if (cmd.equals("Save")){
-        
-            if ( parent instanceof SpiceApplication) {
-                SaveLoadSession save = new SaveLoadSession((SpiceApplication)parent);
+            
+            if ( spice instanceof SpiceApplication) {
+                SaveLoadSession save = new SaveLoadSession((SpiceApplication)spice);
                 save.save();
             }
-        
+            
         } else if (cmd.equals("Load")){
-        
-            if ( parent instanceof SpiceApplication) {
-                SaveLoadSession load = new SaveLoadSession((SpiceApplication)parent);
+            
+            if ( spice instanceof SpiceApplication) {
+                SaveLoadSession load = new SaveLoadSession((SpiceApplication)spice);
                 load.load();
             }
-        
+            
         } else if (cmd.equals("Exit")) {
-
+            
             System.exit(0);
-        
+            
         } else if (cmd.equals("Properties")) {
-            parent.showConfig();
+            spice.showConfig();
             //RegistryConfigIO regi = new RegistryConfigIO(parent,parent.REGISTRY_URL) ;	    
             //regi.setConfiguration(config);
             //regi.showConfigFrame();
         } else if (cmd.equals("Reset")) {
-            parent.resetDisplay();
+            spice.resetDisplay();
         } else if (cmd.equals("About SPICE")) {
             System.out.println("open about dialog");
-            AboutDialog asd = new AboutDialog(parent);
+            AboutDialog asd = new AboutDialog(spice);
             asd.show();
         } else if (cmd.equals("Manual")) {
-            parent.showDocument(SPICEMANUAL);
+            spice.showDocument(SPICEMANUAL);
             
         } else if ( cmd.equals("Backbone") ){
             String dcmd;
@@ -187,7 +219,7 @@ SequenceListener
             String dcmd = "select " + sel ;
             structurePanelListener.executeCmd(dcmd);
             
-        
+            
         } else if ( cmd.equals("Choose")){
             //System.out.println("pressed alig window open");
             //AlignmentChooser aligc = new AlignmentChooser(parent);
@@ -201,7 +233,7 @@ SequenceListener
     }
     
     public void selectionLocked(boolean flag){
-       // logger.warning("spicemenulistener selectionLocked " + flag );
+        // logger.warning("spicemenulistener selectionLocked " + flag );
         selectionIsLocked = flag;
     }
     
@@ -219,14 +251,14 @@ SequenceListener
         
     }
     public void selectedSeqPosition(int s){}
-
+    
     public void newSequence(SequenceEvent e) {
-
+        
         
     }
-
+    
     public void newObjectRequested(String accessionCode) {
-   
+        
         
     }
     public void noObjectFound(String accessionCode) {

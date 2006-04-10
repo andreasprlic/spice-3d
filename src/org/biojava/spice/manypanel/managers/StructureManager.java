@@ -208,7 +208,7 @@ implements ObjectManager, StructureListener {
     /** a new Structure has been retrieved
      * 
      */
-    public void newStructure(StructureEvent event) {
+    public  void newStructure(StructureEvent event) {
         String p = event.getPDBCode();
         logger.fine("StructureManager new Structure " + p);
         if ( p == null) {
@@ -262,7 +262,7 @@ implements ObjectManager, StructureListener {
     public void noObjectFound(String accessionCode){
         // clear the display...
         setAccessionCode("");
-       logger.finest("StructureManager noObjectFound");
+        logger.finest("StructureManager noObjectFound");
         Iterator iter = structureRenderers.iterator();
         while (iter.hasNext()){
             StructureRenderer rend = (StructureRenderer) iter.next();

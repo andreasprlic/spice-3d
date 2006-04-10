@@ -208,8 +208,9 @@ implements AlignmentListener{
        }
     
     public void newAlignment(AlignmentEvent event){
-       
-        alignment = event.getAlignment();
+        synchronized (alignment) {
+            alignment = event.getAlignment();
+        }
        
     }
     public void clearAlignment(){

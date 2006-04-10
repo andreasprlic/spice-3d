@@ -89,6 +89,12 @@ public class MenuCreator {
         newWindow.setMnemonic(KeyEvent.VK_N);
         
         
+        JMenuItem newTab;
+        ImageIcon tabIcon = createImageIcon("view-right.png");
+        if ( tabIcon == null)
+            newTab = new JMenuItem("New Tab");
+        else
+            newTab = new JMenuItem("New Tab", tabIcon);
         
         JMenuItem openpdb;
         ImageIcon openIcon = createImageIcon("network.png");
@@ -130,10 +136,9 @@ public class MenuCreator {
         else
             props   = new JMenuItem("Properties");
         props.setMnemonic(KeyEvent.VK_P);
-        
-        
       
         newWindow.addActionListener(ml);
+        newTab.addActionListener(ml);
         openpdb.addActionListener( ml );
         save.addActionListener   ( ml );
         revert.addActionListener ( ml );
@@ -141,13 +146,21 @@ public class MenuCreator {
         props.addActionListener  ( ml );
 
         file.add(newWindow);
+     
+        file.add(newTab);
+        
         file.addSeparator();
+        
         file.add( openpdb );
         file.add( save    );
         file.add( revert  );
+        
         file.addSeparator();
+        
         file.add( props   );
+        
         file.addSeparator();
+        
         file.add( exit    );
 
         return file;

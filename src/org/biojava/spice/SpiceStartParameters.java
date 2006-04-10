@@ -63,7 +63,7 @@ public class SpiceStartParameters {
     private String enspcoordsys;
     
     boolean initSpiceServer;
-    
+    boolean newTab;
     
       
 
@@ -80,6 +80,7 @@ public class SpiceStartParameters {
         }
         registryurls = new URL[0];
         initSpiceServer = true;
+        newTab =false;
     
     }
 
@@ -97,6 +98,19 @@ public class SpiceStartParameters {
         this.initSpiceServer = initSpiceServer;
     }
 
+    
+    /** a new spice instance should be created as a new tab (isNewTab == true) or
+     * as a new SPICE window (isNewTab == false)
+     * 
+     * @return
+     */
+    public boolean isNewTab() {
+        return newTab;
+    }
+
+    public void setNewTab(boolean newTab) {
+        this.newTab = newTab;
+    }
 
     public String getLocalServerName() {
         return localServerName;

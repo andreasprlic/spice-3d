@@ -123,7 +123,9 @@ implements FeatureListener,SpiceFeatureListener
     }
     
     public void setChain(Chain chain){
-        chainLength = chain.getLength();
+  
+            chainLength = chain.getLength();
+        
     }
     
     public void setScale(float scale) {

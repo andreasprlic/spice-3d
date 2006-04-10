@@ -23,6 +23,7 @@
 package org.biojava.spice.GUI;
 
 
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -38,7 +39,9 @@ import javax.swing.JDialog;
 import javax.swing.JTextField;
 
 import org.biojava.spice.SPICEFrame;
+import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.GUI.msdkeyword.*;
+
 import javax.swing.JLabel;
 
 
@@ -59,7 +62,7 @@ extends JDialog
     //static final String[] supportedCoords = { "PDB","UniProt"};
     static int H_SIZE = 350;
     static int V_SIZE = 150 ;
-    SPICEFrame spice       ;
+    SpiceApplication spice       ;
     JTextField getCom      ;
     JComboBox  list        ;
     String     currentType ;
@@ -67,10 +70,10 @@ extends JDialog
     
     
     /** a dialog responsible for opening new entries. */
-    public OpenDialog(SPICEFrame parent){
+    public OpenDialog(SpiceApplication parent){
         // Calls the parent telling it this
-        // dialog is modal(i.e true)	
-        super((JFrame)parent, true); 
+        // dialog is modal(i.e true)
+        
         
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent evt) {

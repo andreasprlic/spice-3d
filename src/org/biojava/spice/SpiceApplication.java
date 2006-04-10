@@ -63,6 +63,7 @@ import javax.swing.Box                          ;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
+import javax.swing.JPanel;
 import javax.swing.JSplitPane                   ;
 import javax.swing.JFrame                       ;
 import javax.swing.JList                        ;
@@ -94,7 +95,7 @@ import org.jmol.api.JmolViewer;
  * @author Andreas Prlic
  */
 public class SpiceApplication 
-extends  JFrame
+extends JPanel
 implements SPICEFrame, 
 ConfigurationListener
 {         
@@ -162,9 +163,13 @@ ConfigurationListener
     BrowseMenuListener browseMenu;
     BrowserPane browserPane ;
     SpiceChainDisplay chainDisplay;
-    
+    SpiceTabbedPane spiceTabbedPane;
     SpiceStartParameters startParameters;
     SpiceServer spiceServer;
+    JMenuBar menu;
+    
+   // JTabbedPane tabbedPane;
+    Box vBox;
     
     /** 
      * start the spice appplication
@@ -230,11 +235,27 @@ ConfigurationListener
         
         strucommand    = new StructureCommandPanel(structurePanelListener);
         
-        Box vBox = arrangePanels(statusPanel,structurePanel,browserPane,strucommand,"left"); 
+        //if ( params.isInitSpiceServer())
+        //    initSpiceServer();
         
-        this.getContentPane().setLayout(new BoxLayout(this.getContentPane(),BoxLayout.X_AXIS));
-        this.getContentPane().add(vBox);
-       
+        vBox = arrangePanels(statusPanel,structurePanel,browserPane,strucommand,"left"); 
+        
+        this.setLayout(new BoxLayout(this,BoxLayout.X_AXIS));
+        this.add(vBox);
+     
+       // tabbedPane = new JTabbedPane();
+        
+        //tabbedPane.addTab("",vBox);
+        
+        //if ( ! params.isNewTab()){
+        //    this.getContentPane().setLayout(new BoxLayout(this.getContentPane(),BoxLayout.X_AXIS));
+        //    this.getContentPane().add(tabbedPane);
+        //} else {
+            // get Spice from server and open new tab there ...
+            //TODO!
+            
+            
+        //}
        
         spiceMenuListener = new SpiceMenuListener(this,structurePanelListener) ;
        
@@ -242,32 +263,34 @@ ConfigurationListener
         memoryfeatures = new HashMap();
         features = new ArrayList();
         
-        JMenuBar menu = initMenu();
-        this.setJMenuBar(menu);
+        menu = initMenu();
        
         initListeners();
         
-        this.setTitle("SPICE") ;
+        //this.setTitle("SPICE") ;
              
-        JFrame.setDefaultLookAndFeelDecorated(false);
+       
 	
         firefoxIcon = createImageIcon("firefox.png");
-        ImageIcon icon = createImageIcon("spice16x16.gif");
-        if ( icon != null)
-            this.setIconImage(icon.getImage());
-        this.pack();
+        
+        
+        
+        if ( params.isNewTab()){
+            // do not open as a new window, open as a new Tab in previous spice instance
+            
+        }
         
         //this.setSize(800, 600);
-        this.setVisible(true);
+        //this.setVisible(true);
         
-        if ( params.isInitSpiceServer())
-            initSpiceServer();
+    
             
         
         // if this window is closed, unregister instance... 
-        initDeregistering();
+        //initDeregistering();
         
     }
+    
     
     private URL[] getAllRegistryURLs(){
         URL[] regis;
@@ -328,37 +351,27 @@ ConfigurationListener
      * 
      *
      */
-    private void initSpiceServer(){
-        
-        spiceServer = new SpiceServer();
-        spiceServer.registerInstance(this);
-                      
-    }
+//    private void initSpiceServer(){
+//        
+//        spiceServer = new SpiceServer();
+//        spiceServer.registerInstance(this);
+//                      
+//    }
     
-    /** remove this instance from the server.
-     * 
-     *
-     */
-    private void initDeregistering(){
-        this.addWindowListener(new WindowListener() {
-            public void windowDeiconified(WindowEvent e){}
-            public void windowIconified(WindowEvent e){}
-            public void windowActivated(WindowEvent e){}
-            public void windowDeactivated(WindowEvent e){}
-            public void windowOpened(WindowEvent e){}
-            public void windowClosing(WindowEvent e){
-                logger.info("closing SPICE window");
-                
-                deregisterInstance();
-            }
-            public void windowClosed(WindowEvent e){}
-        }); 
-    }
+    
     
     private void deregisterInstance(){
         if (spiceServer != null) {
             spiceServer.removeInstance(this);
         }
+    }
+    
+    public SpiceTabbedPane getSpiceTabbedPane(){
+        return spiceTabbedPane;
+    }
+    
+    public void setSpiceTabbedPane(SpiceTabbedPane tab) {
+        spiceTabbedPane = tab;        
     }
     
     public SpiceServer getSpiceServer(){
@@ -584,12 +597,19 @@ ConfigurationListener
             
     }
     
+    
+    public JMenuBar getMenu(){
+        if ( menu == null)
+            menu = initMenu();
+        return menu;
+    }
+    
     /**
      * @returns the Menu to be displayed on top of the application
      */
     private JMenuBar initMenu() {
         
-        JMenuBar menu = new JMenuBar();
+        menu = new JMenuBar();
         
         // the three menus
         JMenu file = MenuCreator.createFileMenu(spiceMenuListener);
@@ -1330,7 +1350,7 @@ ConfigurationListener
         //dasPanel.revalidate();
         //dasPanel.repaint();
         
-        this.repaint();
+        vBox.repaint();
     }
     
     
