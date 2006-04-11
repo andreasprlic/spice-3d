@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 
 import org.biojava.bio.structure.Structure;
 import org.biojava.dasobert.das.SpiceDasSource;
-import org.biojava.dasobert.dasregistry.Das1Source;
 import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
 import org.biojava.dasobert.dasregistry.DasSource;
 import org.biojava.dasobert.eventmodel.*;

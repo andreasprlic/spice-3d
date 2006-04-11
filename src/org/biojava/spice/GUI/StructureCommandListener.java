@@ -35,7 +35,7 @@ import java.util.List;
 import javax.swing.JTextField;
 
 import org.biojava.spice.Panel.JmolCommander;
-import org.biojava.spice.Panel.StructurePanelListener;
+
 
 /** A class that listens to various events on the 
  * StructureCommand line ( where it is possible to 

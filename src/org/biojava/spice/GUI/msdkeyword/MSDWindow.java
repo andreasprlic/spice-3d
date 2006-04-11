@@ -37,7 +37,6 @@ import javax.swing.*;
 import javax.swing.table.*;
 import javax.swing.event.*;
 
-import org.biojava.dasobert.das.*;
 import org.biojava.spice.SPICEFrame;
 
 

@@ -459,7 +459,7 @@ class MyParser
         currentDasSource = new SpiceDasSource();
         String nickname  = attrs.getValue("nickname");
         String url       = attrs.getValue("url");
-        String testCode  = attrs.getValue("testCode");
+        //String testCode  = attrs.getValue("testCode");
         currentDasSource.setNickname(nickname);
         currentDasSource.setUrl(url);
         //currentDasSource.setTestCode(testCode);

@@ -41,7 +41,7 @@ import javax.swing.event.HyperlinkListener;
 import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
 import org.biojava.spice.JNLPProxy;
-import org.biojava.spice.SPICEFrame;
+
 
 /**
  * @author Andreas Prlic

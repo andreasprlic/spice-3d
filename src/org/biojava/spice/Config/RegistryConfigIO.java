@@ -34,7 +34,6 @@ import java.util.List                      ;
 
 //for DAS registration server:
 import org.biojava.dasobert.das.SpiceDasSource;
-import org.biojava.dasobert.dasregistry.Das1Source;
 import org.biojava.dasobert.dasregistry.DasSource;
 import org.biojava.services.das.registry.DasRegistryAxisClient;
 import org.biojava.spice.manypanel.renderer.ScalePanel;

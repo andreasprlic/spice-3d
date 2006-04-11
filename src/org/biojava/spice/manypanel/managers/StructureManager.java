@@ -151,7 +151,7 @@ implements ObjectManager, StructureListener {
         structure = new StructureImpl();
         
         //SpiceDasSource[] sds = toSpiceDasSource(dasSources);
-        
+        logger.info("requesting new pdb: >"+code+"<");
         StructureThread dsh = new StructureThread(code,dasSources);
         
         dsh.addStructureListener(this);      
@@ -185,8 +185,13 @@ implements ObjectManager, StructureListener {
         int i = 0 ;
         while (iter.hasNext()){
             Chain c = (Chain) iter.next();
-            if (c.getName().equalsIgnoreCase(name) )
-                return i;
+            if (c.getName().equalsIgnoreCase(name) ) {
+                // sometimes chain " " is selected, but it only contains hetatoms...
+                if ( c.getLengthAminos() >0)
+                    return i;
+                else 
+                    return -1;
+            }
             i++;
         }
                 
@@ -228,7 +233,7 @@ implements ObjectManager, StructureListener {
             return;
         }
             
-        logger.finest("got new structure " + event.getPDBCode() + " old " + pdbCode + " chain:" + chain);
+        logger.info("got new structure >" + event.getPDBCode() + "< old " + pdbCode + " chain: >" + chain+ "<");
         
         // convert structure to drawable structure ...
         Structure s = event.getStructure();
@@ -239,19 +244,32 @@ implements ObjectManager, StructureListener {
         setAccessionCode(structure.getPDBCode());
         
         currentChainNr = event.getCurrentChainNumber();
+        
         if ( s.getPDBCode().equalsIgnoreCase(code)){
             if ( ! chain.equals("")){
                 currentChainNr = getActiveChainFromName(chain);
             }
         }
+        
+        logger.info("currentChainNr " + currentChainNr);
         drawStructure(s,currentChainNr);
         
         code = "";
         chain = "";
-        if ( currentChainNr == -1)
+        Chain c = null;
+        
+        if ( currentChainNr == -1) {
             currentChainNr = 0;
-        Chain c = s.getChain(currentChainNr);
-        //logger.info("got new structure - displaying chain " + c.getName());
+            for (int i=0; i< s.getChains(0).size();i++){
+                c = s.getChain(i);
+                if (c.getLengthAminos() > 0)
+                    break;
+            }
+        } else {        
+            c = s.getChain(currentChainNr);
+        }
+        
+        logger.info("got new structure - displaying chain " + c.getName() + " " + c.getLengthAminos() + " " + c.getLength());
         triggerNewSequence(c,event.getPDBCode());
         
         //StructureEvent newe = new StructureEvent(s,currentChainNr);        
@@ -297,6 +315,8 @@ implements ObjectManager, StructureListener {
     
    
     private void drawStructure(Structure struc,int currentChainId){
+        if ( currentChainId < 0 )
+            currentChainId = 0;
         DrawableStructure draw = new DrawableStructure(struc.getPDBCode());
         draw.setStructure(struc);
         draw.setCurrentChainNumber(currentChainId);
