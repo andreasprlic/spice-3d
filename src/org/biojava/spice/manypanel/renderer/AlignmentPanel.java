@@ -39,11 +39,17 @@ import javax.swing.JPanel;
 
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.ChainImpl;
+import org.biojava.bio.structure.Group;
 
 public class AlignmentPanel extends JPanel {
     
-    public static Color COLOR_ONE = new Color(0,153,255);
-    public static Color COLOR_TWO = new Color(0,51,255);
+    public static Color COLOR_MATCH_ONE = new Color(0,153,255);
+    public static Color COLOR_MATCH_TWO = new Color(0,51,255);
+    
+    public static Color COLOR_MISMATCH_ONE = new Color(102,102,102);
+    public static Color COLOR_MISMATCH_TWO = new Color(204,204,204);
+    
+    
     
     
     Chain sequence1;
@@ -187,22 +193,41 @@ public class AlignmentPanel extends JPanel {
             int h1 = pos1.intValue();
             int h2 = pos2.intValue();
             
+            if ( h1 < 0 )
+                h1 = 0;
+            if ( h2 < 0)
+                h2 = 0;
+            
             int p1 = Math.round(h1*scale1) + ScalePanel.DEFAULT_X_START - scrollLeftX1;
             int p2 = Math.round(h2*scale2) + ScalePanel.DEFAULT_X_START - scrollLeftX2;
             
-            if (h1 % 2 == 0)
-                g2D.setColor(COLOR_ONE);
-            else
-                g2D.setColor(COLOR_TWO);
+            Group g1 = null;
+            Group g2 = null;
             
-//            Polygon pol = new Polygon();
-//            
-//            pol.addPoint(p1,0);
-//            pol.addPoint(p2,h);
-//            pol.addPoint(p2+aminosize2+1,h);
-//            pol.addPoint(p1+aminosize1+1,0);
-//            g2D.fill(pol);
+            //logger.info("seq1 length " + sequence1.getLength() + " " + h1);
+            if ( sequence1.getLength() >= h1)
+                g1 = sequence1.getGroup(h1);
             
+            //logger.info("seq2 length " + sequence2.getLength() + " " + h2);            
+            if ( sequence2.getLength() >= h2)
+                g2 = sequence2.getGroup(h2);
+            
+            if ( ((g1 != null) && (g2 != null))
+                    &&
+                    ( g1.getPDBName().equals(g2.getPDBName()))) {
+            
+                if (h1 % 2 == 0)
+                    g2D.setColor(COLOR_MATCH_ONE);
+                else
+                    g2D.setColor(COLOR_MATCH_TWO);
+            } else {
+                if (h1 % 2 == 0)
+                    g2D.setColor(COLOR_MISMATCH_ONE);
+                else
+                    g2D.setColor(COLOR_MISMATCH_TWO);
+            
+            }
+                        
             GeneralPath path = new GeneralPath();
             path.moveTo(p1,0);            
             path.lineTo(p2,h);
