@@ -65,7 +65,6 @@ import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane                   ;
-import javax.swing.JFrame                       ;
 import javax.swing.JList                        ;
 import javax.swing.JScrollPane                  ;
 import javax.swing.DefaultListModel             ;
@@ -347,24 +346,7 @@ ConfigurationListener
         }
     }
     
-    /** launch the Server that listens to a port for requests from other instances of SPICE
-     * 
-     *
-     */
-//    private void initSpiceServer(){
-//        
-//        spiceServer = new SpiceServer();
-//        spiceServer.registerInstance(this);
-//                      
-//    }
-    
-    
-    
-    private void deregisterInstance(){
-        if (spiceServer != null) {
-            spiceServer.removeInstance(this);
-        }
-    }
+   
     
     public SpiceTabbedPane getSpiceTabbedPane(){
         return spiceTabbedPane;
@@ -797,7 +779,9 @@ ConfigurationListener
         browseMenu.clear();
     }
     
-    
+    public BrowserPane getBrowserPane(){
+        return browserPane;
+    }
     
     /** test if a local DAS source is defined in the startup parameters
      * If yes, add it to the list of servers in config

@@ -26,9 +26,11 @@ package org.biojava.spice;
 
 import org.biojava.spice.Config.*;
 import org.biojava.spice.GUI.SpiceTabbedPane;
+import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.spice.server.SpiceServer;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.Chain;
+import org.jmol.api.JmolViewer;
 
 import java.awt.Container;
 import java.net.URL;
@@ -61,19 +63,17 @@ public interface SPICEFrame
     public void setSpiceTabbedPane(SpiceTabbedPane tab);
     public SpiceTabbedPane getSpiceTabbedPane();
     
-    /** returns a flag if data is being loaded using DAS. This is
-     * needed for the differnt sub-frames to prevent them from having
-     * problems with the loading threads  */    
-    //public boolean isLoading() ;
-
-   
-
-    /** set a structure to be displayed. Use a default select command
-     * to color structure
-     * @param structure a Biojava structure object
+    /** get the Jmol viewer 
+     * 
+     * @return
      */
-    //public void   setStructure(Structure structure );
-
+    public JmolViewer getViewer();
+    
+    /** get the BrowserPane that is doing the 2D display
+     * 
+     * @return
+     */
+    public BrowserPane getBrowserPane();
     
     
     	/** retreive the internal Structure object */
@@ -81,19 +81,7 @@ public interface SPICEFrame
         
     public void setStructure(Structure s);
     	
-    /** set the new features to be displayed in sequence panels */
-    //public void setFeatures(String sp_id, List features);
-
-    /** get the displayed features */
-    	//public List getFeatures();
-    
-    
-    /** set the chain nr chainnr as the active one */
-    //public void setCurrentChainNumber(int chainnr);
-    
-    /** get the chain nr of the currently active chain */
-    //public int getCurrentChainNumber() ;
-  
+   
     /** reset the display, but do not change data */
     public void resetDisplay();
 
@@ -110,14 +98,6 @@ public interface SPICEFrame
     public Chain getChain(int chainnumber);
 
 
-    /** set the configuration from outside */
-    //public void setConfiguration(RegistryConfiguration conf);
-
-    /** specify from outside whether spice should display that it is 
-     * loading data */
-    //public void setLoading(boolean status);
-    
-  
     
     /** open a web page in the browser 
      * returns true if the request succeeds, otherwise false
@@ -133,6 +113,7 @@ public interface SPICEFrame
     /** returns currently displayed UniProt code; null if none*/
     public String getUniProtCode();
 
+    public String getENSPCode();
     
     /** set which parameters should be used for loading the next molecule.
      * typically set before doing a new load(type,code) call.

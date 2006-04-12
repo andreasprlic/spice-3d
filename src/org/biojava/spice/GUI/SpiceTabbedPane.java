@@ -23,12 +23,10 @@
 package org.biojava.spice.GUI;
 
 
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -36,8 +34,13 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 
+import org.biojava.dasobert.eventmodel.SequenceEvent;
+import org.biojava.dasobert.eventmodel.SequenceListener;
+import org.biojava.dasobert.eventmodel.StructureEvent;
+import org.biojava.dasobert.eventmodel.StructureListener;
 import org.biojava.spice.SPICEFrame;
 import org.biojava.spice.SpiceApplication;
+import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.spice.server.SpiceServer;
 
 public class SpiceTabbedPane extends CloseableTabbedPane 
@@ -65,10 +68,10 @@ implements WindowListener{
         
         
     }
-        
+    
     public SpiceTabbedPane(SpiceServer server,  SpiceApplication spice) {
         this(server);
-         
+        
         JMenuBar menu = spice.getMenu();
         frame.setJMenuBar(menu);
         
@@ -85,6 +88,8 @@ implements WindowListener{
         spice.setSpiceTabbedPane(this);
         server.registerInstance(spice);
         spice.setSpiceServer(server);
+        registerSpiceListeners(spice);
+        setFrameTitle(spice);
         
         frame.addWindowListener(this);
         
@@ -94,10 +99,13 @@ implements WindowListener{
                 int i = e.getTabNumber();
                 //logger.info("selected new tab " + i);
                 SpiceApplication spice = (SpiceApplication)tabbedSpices.get(i);
-              
+                
                 // make sure the menu is linked to the current active spice
                 JMenuBar menu = spice.getMenu();                
                 frame.setJMenuBar(menu);
+                
+                setFrameTitle(spice);
+                
             }
             
             public void tabClosed(TabEvent e) {
@@ -111,14 +119,46 @@ implements WindowListener{
         });
     }
     
+    protected void setFrameTitle(SPICEFrame spice){
+        String tabText = getSpiceText(spice);
+        String txt = "SPICE";
+        if ( ! (tabText.equals(""))){
+            txt += " - " + tabText;
+        }
+        frame.setTitle(txt);
+        frame.repaint();
+        
+    }
+    private void registerSpiceListeners(SPICEFrame spice){
+        BrowserPane seqDisp = spice.getBrowserPane();
+        
+        TabEventListener tlist = new TabEventListener(spice,this);
+        
+        seqDisp.addStructureListener(tlist);
+        seqDisp.addUniProtSequenceListener(tlist);
+        seqDisp.addEnspSeqeuenceListener(tlist);
+    }
+    
+    public int getTabForSpice(SPICEFrame spice){
+        return tabbedSpices.indexOf(spice);
+    }
+    
+    public int getNumberSpices(){
+        return tabbedSpices.size();
+    }
+    
     private void removeSPICEAt(int tabnr){
         SpiceApplication sp = (SpiceApplication)tabbedSpices.get(tabnr);
         removeSPICE(sp);
     }
     
     private void addTab(SpiceApplication spice){
+        String tabText = getSpiceText(spice);
+        if ( tabText.equals(""))
+            tabText = " - ";
+        addTab(tabText,spice,true);
+        setFrameTitle(spice);
         
-        addTab("SPICE",spice,true);
         
     }
     
@@ -147,6 +187,7 @@ implements WindowListener{
                 frame.remove(sp1);
                 frame.getContentPane().add(this);
                 frame.repaint();
+                
             } else {
                 //logger.info("topancesot is not jframe " + conti);
             }
@@ -165,6 +206,8 @@ implements WindowListener{
         server.registerInstance(spice);        
         tabbedSpices.add(spice);
         spice.setSpiceTabbedPane(this);
+        
+        registerSpiceListeners(spice);
     }
     
     public void removeSPICE(SPICEFrame spice){
@@ -182,16 +225,19 @@ implements WindowListener{
         tabbedSpices.remove(spice);
         
         if ( tabbedSpices.size() == 0 ){
-                        
+            
             frame.remove(sp);
             frame.dispose();                            
         }        
         
         if ( tabbedSpices.size()==1){                      
-                frame.remove(this);
-                SpiceApplication sp1 = (SpiceApplication) tabbedSpices.get(0);
-                frame.getContentPane().add(sp1);
-                frame.repaint();            
+            frame.remove(this);
+            SpiceApplication sp1 = (SpiceApplication) tabbedSpices.get(0);
+            frame.getContentPane().add(sp1);
+            frame.repaint();    
+            JMenuBar menu = sp1.getMenu();
+            frame.setJMenuBar(menu);
+            setFrameTitle(sp1);
         }
         //logger.info("after rm tabbedSpices: " + tabbedSpices.size());
         this.repaint();
@@ -203,14 +249,38 @@ implements WindowListener{
     private void removeAllSPICEs(){
         //logger.info("close all spices in tab (total:" + tabbedSpices.size()+")");
         
-       SPICEFrame[] spices = (SPICEFrame[]) tabbedSpices.toArray(new SpiceApplication[tabbedSpices.size()]);
-
-       for (int i=0;i<spices.length;i++){
-           
+        SPICEFrame[] spices = (SPICEFrame[]) tabbedSpices.toArray(new SpiceApplication[tabbedSpices.size()]);
+        
+        for (int i=0;i<spices.length;i++){
+            
             //logger.info("closing " + i);
             SPICEFrame spice = spices[i];
             removeSPICE(spice);
         }          
+    }
+    
+    protected String getSpiceText(SPICEFrame spice){
+        String pdb = spice.getPDBCode();
+        String up = spice.getUniProtCode();
+        String ensp = spice.getENSPCode();
+        String txt = "";
+        
+        if ( ! (pdb.equals(""))) 
+            txt += pdb;
+        
+        if ( ! ( pdb.equals("") && up.equals("")))
+            txt += " - ";
+        
+        if ( ! (up.equals("")))
+            txt += up;
+        
+        if ( ! (up.equals("") && ensp.equals("")))
+            txt += " - " + ensp ;
+        
+        if ( ! (ensp.equals("")))
+            txt += ensp;
+        
+        return txt;
     }
     
     public void windowDeiconified(WindowEvent e){}
@@ -226,3 +296,57 @@ implements WindowListener{
     public void windowClosed(WindowEvent e){}
     
 }
+
+class TabEventListener 
+implements StructureListener, 
+SequenceListener
+{
+    
+    SPICEFrame spice;
+    SpiceTabbedPane tabPane;
+    
+    static Logger logger      = Logger.getLogger("org.biojava.spice");
+    
+    
+    public TabEventListener(SPICEFrame spice, SpiceTabbedPane tabPane) {
+        this.tabPane = tabPane;
+        this.spice = spice;
+    }       
+    
+   
+    
+    public void newStructure(StructureEvent event) {
+        //logger.info("got new structure");
+        int i =  tabPane.getTabForSpice(spice);
+        
+        if ( tabPane.getTabCount() > 0)
+            tabPane.setTitleAt(i,tabPane.getSpiceText(spice));
+        tabPane.setFrameTitle(spice);
+    }
+    
+    public void selectedChain(StructureEvent event) {}
+    
+    public void newObjectRequested(String accessionCode) {}
+    
+    public void noObjectFound(String accessionCode) {}
+
+    public void clearSelection() {    }
+
+    public void newSequence(SequenceEvent e) {
+
+        
+        int i =  tabPane.getTabForSpice(spice);
+        if ( tabPane.getTabCount() > 0)
+            tabPane.setTitleAt(i,tabPane.getSpiceText(spice));
+        tabPane.setFrameTitle(spice);
+        
+    }
+
+    public void selectedSeqPosition(int position) {}
+
+    public void selectedSeqRange(int start, int end) {}
+
+    public void selectionLocked(boolean flag) {}
+    
+}
+
