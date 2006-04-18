@@ -183,9 +183,9 @@ public class SpiceProtocol {
                         SpiceApplication parent = (SpiceApplication) spice;
                         parent.setVisible(true);
                         parent.show();
-                        parent.toFront();
+                        //parent.toFront();
                         parent.requestFocus();
-                        parent.setState(java.awt.Frame.NORMAL);
+                        //parent.setState(java.awt.Frame.NORMAL);
                         
                     }
                     return SPICE_OK;

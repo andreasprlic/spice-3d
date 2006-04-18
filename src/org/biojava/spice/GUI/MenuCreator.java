@@ -59,6 +59,16 @@ public class MenuCreator {
         aboutspice.setMnemonic(KeyEvent.VK_A);
         help.add(aboutspice);
         
+        JMenuItem techinfo;
+        if ( helpIcon == null )
+            techinfo = new JMenuItem("Tech Info");
+        else
+            techinfo = new JMenuItem("Tech Info", helpIcon);
+        techinfo.addActionListener(ml);
+        techinfo.setMnemonic(KeyEvent.VK_T);
+        help.add(techinfo);
+        
+        
         JMenuItem spicemanual;
         ImageIcon manualIcon =  createImageIcon("toggle_log.png");
         if ( manualIcon == null)
@@ -255,6 +265,7 @@ public class MenuCreator {
         colorsub.setMnemonic(KeyEvent.VK_C);
         
         JMenuItem colorchain = new JMenuItem("Color - chain");
+        JMenuItem colorrain  = new JMenuItem("Color - rainbow");
         JMenuItem colorsec   = new JMenuItem("Color - secondary");
         JMenuItem colorcpk   = new JMenuItem("Color - cpk");
         JMenuItem colorred   = new JMenuItem("Color - red");
@@ -263,6 +274,7 @@ public class MenuCreator {
         JMenuItem coloryellow = new JMenuItem("Color - yellow");
         
         reset.addActionListener     ( ml );
+        colorrain.addActionListener(  ml );
         //lockMenu.addActionListener    ( ml );
         backbone.addActionListener  ( ml );
         wireframe.addActionListener ( ml ); 
@@ -292,7 +304,9 @@ public class MenuCreator {
         display.addSeparator();
         
         display.add(colorsub);
+        
         colorsub.add(colorchain);
+        colorsub.add(colorrain);
         colorsub.add(colorsec)   ;
         colorsub.add(colorcpk)  ;
         colorsub.add(colorred);

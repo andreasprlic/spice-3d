@@ -81,16 +81,16 @@ extends AbstractChainRenderer
 
         Structure struc = structure.getStructure();
         Chain c = struc.getChain(structure.getCurrentChainNumber());
-        
+
         String ac = struc.getPDBCode() + "." + c.getName();
         DrawableSequence ds = DrawableSequence.fromChain(ac,c);
         this.sequence=ds;
         
         statusPanel.setAccessionCode(ac);
-        featurePanel.setChain(sequence.getSequence());
-        cursorPanel.setChain(sequence.getSequence());
-        mouseListener.setChain(sequence.getSequence());
-        toolTipper.setChain(sequence.getSequence());
+        featurePanel.setChain(c);
+        cursorPanel.setChain(c);
+        mouseListener.setChain(c);
+        toolTipper.setChain(c);
         calcScale(100);
         
 

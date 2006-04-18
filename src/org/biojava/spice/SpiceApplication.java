@@ -555,7 +555,7 @@ ConfigurationListener
         browserPane.addStructureListener(statusPanel);
         browserPane.addStructureListener(browseMenu.getPDBListener());
         browserPane.addUniProtSequenceListener(browseMenu.getUniProtListener());
-        browserPane.addEnspSeqeuenceListener(browseMenu.getEnspListener());
+        browserPane.addEnspSequenceListener(browseMenu.getEnspListener());
         
         // listener for das sources
         browserPane.addPDBSpiceFeatureListener(structurePanelListener);
@@ -1431,6 +1431,8 @@ ConfigurationListener
     }
 
 
+    
+    
     /** open HttpURLConnection. Recommended way to open
      * HttpURLConnections, since this take care of setting timeouts
      * properly for java 1.4 and 1.5*/

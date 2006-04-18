@@ -24,6 +24,8 @@ package org.biojava.spice.manypanel.renderer;
 
 
 import java.awt.Color;
+import java.util.List;
+
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.Group;
 import org.biojava.spice.Feature.FeatureImpl;
@@ -118,8 +120,10 @@ extends ScalePanel{
         int start = -1;
         int end   = -1;
        
-        for ( int i=0 ; i< chain.getLength() ; i++ ) {
-            Group g = chain.getGroup(i);
+        List groups = chain.getGroups("amino");
+        
+        for ( int i=0 ; i< groups.size() ; i++ ) {
+            Group g = (Group)groups.get(i);
             
             if ( g.size() > 0 ){
                 if ( start == -1){

@@ -22,8 +22,6 @@
  */
 package org.biojava.spice.GUI;
 
-
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

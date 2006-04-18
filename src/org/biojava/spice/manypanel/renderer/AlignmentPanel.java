@@ -205,11 +205,11 @@ public class AlignmentPanel extends JPanel {
             Group g2 = null;
             
             //logger.info("seq1 length " + sequence1.getLength() + " " + h1);
-            if ( sequence1.getLength() >= h1)
+            if ( sequence1.getLength() > h1)
                 g1 = sequence1.getGroup(h1);
             
             //logger.info("seq2 length " + sequence2.getLength() + " " + h2);            
-            if ( sequence2.getLength() >= h2)
+            if ( sequence2.getLength() > h2)
                 g2 = sequence2.getGroup(h2);
             
             if ( ((g1 != null) && (g2 != null))

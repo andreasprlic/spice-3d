@@ -720,6 +720,11 @@ ChangeListener
         strucManager.addStructureListener(li);
     }
     
+    public void removeStructureListener(StructureListener li){
+        structureListeners.remove(li);
+        strucManager.removeStructureListener(li);
+    }
+    
     public StructureListener[] getStructureListener(){
         return strucManager.getStructureListener();
     }
@@ -741,12 +746,20 @@ ChangeListener
         seqManager.addSequenceListener(li);
     }
     
+    public void removeUniProtSequenceListener(SequenceListener li){
+        seqManager.removeSequenceListener(li);
+    }
+    
     public void addEnspListener(ObjectListener li){
         enspListeners.add(li);
     }
     
-    public void addEnspSeqeuenceListener(SequenceListener li){
+    public void addEnspSequenceListener(SequenceListener li){
         enspManager.addSequenceListener(li);
+    }
+    
+    public void removeEnspSequenceListener(SequenceListener li){
+        enspManager.removeSequenceListener(li);
     }
     
     public void addDasSourceListener(DasSourceListener li){
@@ -754,9 +767,6 @@ ChangeListener
         upFeatureManager.addDasSourceListener(li);
         enspFeatureManager.addDasSourceListener(li);
     }
-    
-    
-    
     
     public void triggerLoadStructure(String pdbcode){
         logger.finest("trigger load structure " + pdbcode);
@@ -816,6 +826,10 @@ ChangeListener
     public StructureManager getStructureManager(){
         return strucManager;
         
+    }
+    
+    public StructureRenderer getStructureRenderer(){
+        return structureRenderer;
     }
     
     public SequenceManager getUPManager(){

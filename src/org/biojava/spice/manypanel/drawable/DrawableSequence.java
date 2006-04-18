@@ -47,14 +47,16 @@ implements Drawable
     
     public DrawableSequence(String accessionCode){
         this.sequence = new ChainImpl();
+        
         this.loading = false;
         this.accessionCode = accessionCode;
-        
+        this.sequence.setName(accessionCode);
         
     }
     public DrawableSequence(String accessionCode,Chain sequence){
         this(accessionCode);
         this.sequence = sequence;
+        this.sequence.setName(accessionCode);
         
     }
     

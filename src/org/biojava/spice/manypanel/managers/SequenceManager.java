@@ -131,6 +131,7 @@ extends AbstractChainManager
     
     public DrawableSequence fromString(String ac, String sequence){
         Chain chain = getChainFromString(sequence);
+        chain.setName(ac);
         return new DrawableSequence(ac, chain);
     }
     

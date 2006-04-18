@@ -76,6 +76,9 @@ implements ObjectManager {
         sequenceListeners.add(li);
     }
     
+    public void removeSequenceListener(SequenceListener li){
+        sequenceListeners.remove(li);
+    }
     
     //public FeatureManager getFeatureManager(){
     //    return featureManager;

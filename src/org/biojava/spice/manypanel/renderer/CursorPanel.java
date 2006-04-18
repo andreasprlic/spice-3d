@@ -24,6 +24,7 @@ package org.biojava.spice.manypanel.renderer;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import org.biojava.bio.structure.*;
@@ -140,6 +141,22 @@ SpiceFeatureListener
         chainLength = 0;
     }
    
+    
+    public Group[] getSelection(){
+        List sel = new ArrayList();
+        List groups = chain.getGroups("amino");
+        for ( int i = selectionStart ; i < selectionEnd;i++ ) {
+            if ( i > groups.size())
+                continue;
+            Group g = (Group)groups.get(i);
+            // Hm why is this needed? looks like the parent gets lost at some point ..
+            g.setParent(chain);
+            sel.add(g);
+            
+        }
+        return (Group[])sel.toArray(new Group[sel.size()]);
+    }
+    
     private void setSelectionStart(int start){
         if ( start < 0 )
             start = 0;
@@ -165,8 +182,8 @@ SpiceFeatureListener
     
     public void setChain(Chain c){
         chain = c;
-        chainLength = c.getLength();
-        
+        chainLength = c.getLengthAminos();
+        logger.info("selected chain in cursor panel: " + c.getName());
         if ( storeStart > -1){
             selectedSeqRange(storeStart,storeEnd);
             storeStart = -1;

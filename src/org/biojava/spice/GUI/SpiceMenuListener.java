@@ -22,22 +22,21 @@
  */
 package org.biojava.spice.GUI;
 
-import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-
-
+import org.biojava.bio.structure.Chain;
+import org.biojava.bio.structure.Group;
+import org.biojava.bio.structure.GroupIterator;
+import org.biojava.bio.structure.Structure;
 import org.biojava.dasobert.eventmodel.SequenceEvent;
 import org.biojava.dasobert.eventmodel.SequenceListener;
 import org.biojava.spice.Panel.StructurePanelListener;
+import org.biojava.spice.manypanel.managers.StructureManager;
 import org.biojava.spice.server.SpiceServer;
 import org.biojava.spice.SPICEFrame;
 import org.biojava.spice.SpiceStartParameters;
@@ -147,6 +146,9 @@ SequenceListener
             System.out.println("open about dialog");
             AboutDialog asd = new AboutDialog(spice);
             asd.show();
+        } else if (cmd.equals("Tech Info")) {
+            TechInfoDialog tid = new TechInfoDialog();
+            tid.show();
         } else if (cmd.equals("Manual")) {
             spice.showDocument(SPICEMANUAL);
             
@@ -185,6 +187,50 @@ SequenceListener
             else
                 dcmd  = reset + "spacefill on; "+noselect;
             structurePanelListener.executeCmd(dcmd);
+        } else if ( cmd.equals("Color - rainbow")){
+            StructureManager sm = spice.getBrowserPane().getStructureManager();
+            
+            Group[] selection = new Group[0];
+            
+            
+            if ( isSelectionLocked()){
+                //logger.info("getting selection from cursor panel");
+                selection = spice.getBrowserPane().getStructureRenderer().getCursorPanel().getSelection();
+            } else {
+                logger.info("coloring the whole structure");
+                Structure s = sm.getStructure();
+                //System.out.println(s.toPDB());
+                // convert s  tp group[]
+                List sel = new ArrayList();
+                // hm like this the parent get's lost!
+                
+                List chains = s.getChains(0);
+                Iterator iter = chains.iterator();
+                while (iter.hasNext()){
+                    Chain c = (Chain) iter.next();
+                    List aminos = c.getGroups("amino");
+                    Iterator aiter = aminos.iterator();
+                    while (aiter.hasNext()){
+                        Group g = (Group) aiter.next();
+                        if ( g.getParent() == null){
+                            g.setParent(c);
+                        }
+                        sel.add(g);
+                    }
+                    
+                }
+//                GroupIterator iter = new GroupIterator(s);
+//                while (iter.hasNext()){
+//                    Group g = (Group)iter.next();
+//                    if ( g.getType().equals("amino")) {
+//                        
+//                        sel.add(g);
+//                    }
+//                }
+                selection = (Group[])sel.toArray(new Group[sel.size()]);
+            }
+            new RainbowPainter(structurePanelListener,selection);
+            
         } else if ( cmd.equals("Color - chain")) {
             String dcmd ;
             if (isSelectionLocked())

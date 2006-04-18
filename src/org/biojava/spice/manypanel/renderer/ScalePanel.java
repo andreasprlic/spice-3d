@@ -132,7 +132,7 @@ extends JPanel{
         int aminosize = Math.round(scale);
         if ( aminosize < 1)
             aminosize = 1;
-        int requiredWidth = DEFAULT_X_START + (aminosize * chain.getLength()) + DEFAULT_X_RIGHT_BORDER ;
+        int requiredWidth = DEFAULT_X_START + (aminosize * chain.getLengthAminos()) + DEFAULT_X_RIGHT_BORDER ;
         //logger.info("required width " + requiredWidth);
         //if (dbImage == null)
         //{
@@ -161,7 +161,7 @@ extends JPanel{
     public void paint(Graphics g){
         super.paint(g);
         //public void paintComponent(Graphics g){
-        int length = chain.getLength();
+        int length = chain.getLengthAminos();
         //logger.info("paint featurePanel " + scale + " " + length + " " + this.getWidth() + " " + this.getHeight());
         //  super.paintComponent(g);
         Graphics2D g2D =(Graphics2D) g;

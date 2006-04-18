@@ -57,9 +57,11 @@ implements WindowListener{
     List tabbedSpices;
     
     final JFrame frame;
+    TabEventListener tabEventListener;
     
     public SpiceTabbedPane(SpiceServer server){
         super(delTabIcon);
+        
         this.server = server;
         tabbedSpices = new ArrayList();
         
@@ -129,16 +131,23 @@ implements WindowListener{
         frame.repaint();
         
     }
+    
     private void registerSpiceListeners(SPICEFrame spice){
         BrowserPane seqDisp = spice.getBrowserPane();
         
-        TabEventListener tlist = new TabEventListener(spice,this);
+        tabEventListener = new TabEventListener(spice,this);
         
-        seqDisp.addStructureListener(tlist);
-        seqDisp.addUniProtSequenceListener(tlist);
-        seqDisp.addEnspSeqeuenceListener(tlist);
+        seqDisp.addStructureListener(tabEventListener);
+        seqDisp.addUniProtSequenceListener(tabEventListener);
+        seqDisp.addEnspSequenceListener(tabEventListener);
     }
     
+    private void deregisterSpiceListeners(SPICEFrame spice){
+        BrowserPane seqDisp = spice.getBrowserPane();
+        seqDisp.removeStructureListener(tabEventListener);
+        seqDisp.removeUniProtSequenceListener(tabEventListener);
+        seqDisp.removeEnspSequenceListener(tabEventListener);
+    }
     public int getTabForSpice(SPICEFrame spice){
         return tabbedSpices.indexOf(spice);
     }
@@ -213,13 +222,16 @@ implements WindowListener{
     public void removeSPICE(SPICEFrame spice){
         //System.out.println("removing spice " + spice.getPDBCode() + " tabbedSpices length:" + tabbedSpices.size());
         
-        if ( ! tabbedSpices.contains(spice))
+        if ( ! tabbedSpices.contains(spice)) {
+            logger.warning("did not find spice instance in list, can not remove!");
             return;
+        }
         //logger.info("rm check passed");
         
         SpiceApplication sp = (SpiceApplication)spice;
         //Container conti = this.getTopLevelAncestor();
         
+        deregisterSpiceListeners(spice);
         server.removeInstance(spice);
         this.remove(sp);
         tabbedSpices.remove(spice);
@@ -275,7 +287,7 @@ implements WindowListener{
             txt += up;
         
         if ( ! (up.equals("") && ensp.equals("")))
-            txt += " - " + ensp ;
+            txt += " - "  ;
         
         if ( ! (ensp.equals("")))
             txt += ensp;
