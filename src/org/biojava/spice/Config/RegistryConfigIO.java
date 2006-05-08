@@ -26,6 +26,7 @@
 package org.biojava.spice.Config                  ;
 
 //to get config file via http
+import java.net.MalformedURLException;
 import java.net.URL                        ;
 
 import java.util.Date                      ;
@@ -33,9 +34,15 @@ import java.util.ArrayList                 ;
 import java.util.List                      ;
 
 //for DAS registration server:
+import org.biojava.bio.program.das.dasalignment.DASException;
 import org.biojava.dasobert.das.SpiceDasSource;
+import org.biojava.dasobert.das2.Das2Source;
+import org.biojava.dasobert.das2.DasSourceConverter;
+import org.biojava.dasobert.das2.io.DasSourceReaderImpl;
+import org.biojava.dasobert.dasregistry.Das1Source;
+//import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
 import org.biojava.dasobert.dasregistry.DasSource;
-import org.biojava.services.das.registry.DasRegistryAxisClient;
+//import org.biojava.services.das.registry.DasRegistryAxisClient;
 import org.biojava.spice.manypanel.renderer.ScalePanel;
 
 //for logging
@@ -74,6 +81,7 @@ extends Thread
     static Logger logger      = Logger.getLogger("org.biojava.spice");
     List configListeners ;
     boolean forceUpdate;
+    boolean  noUpdate;
     
     public RegistryConfigIO ( URL[] registryurl) {
         
@@ -83,12 +91,18 @@ extends Thread
         done = false ;
         configListeners = new ArrayList();
         forceUpdate= false;
+        noUpdate = false;
     }
     
     public boolean isDone(){
         return done ;
     }
     
+    /** set flag if contaction should not be performed
+     * forceUpdate is stronger */
+    public void setNoUpdate(boolean flag){
+        noUpdate = flag;
+    }
     /** enforce connecting to the registry, default: false */
     public void setForceUpdate(boolean flag){
         forceUpdate = flag;
@@ -129,8 +143,9 @@ extends Thread
     private RegistryConfiguration loadLocalConfig() 
     throws Exception
     {
-        PersistentConfig  persistentc = new PersistentConfig();
-        return persistentc.load();
+            PersistentConfig  persistentc = new PersistentConfig();
+            return persistentc.load();
+        
     }
     
     /** contact the das registry service and retreive new Data */
@@ -148,9 +163,9 @@ extends Thread
             persistentconfig  = loadLocalConfig();
             //} catch ( javax.jnlp.UnavailableServiceException e) {
         } catch ( Exception e) {
-            System.err.println("an error occured during loading of local config");
+            //System.err.println("an error occured during loading of local config");
             e.printStackTrace();
-            logger.log(Level.WARNING,e.getMessage() + "while loading of local config");
+            logger.log(Level.INFO,e.getMessage() + "while loading of local config");
             //logger.log(Level.INFO,"contacting registration server");
             doRegistryUpdate();
             
@@ -183,8 +198,12 @@ extends Thread
     private boolean shouldDoUpdate(RegistryConfiguration persistentconfig){
         
         String behave = config.getUpdateBehave();
-        logger.finest("behave: " + behave);	    
+        //logger.info("behave: " + behave);	    
         //behave="always";
+        
+        if ( forceUpdate ) { return true; }
+        if ( noUpdate )    { return false; }
+        
         if (! behave.equals("day")) {
             // test if we did already an update today
             // if not do update now
@@ -192,18 +211,17 @@ extends Thread
             return true ;
         }
         
-        if ( forceUpdate ) { return true; }
-        
+       
         Date now = new Date();
         Date lastContact = persistentconfig.getContactDate();
         long timenow     = now.getTime();
         long timelast    = lastContact.getTime();
         
         if (( timenow - timelast ) < TIME_BETWEEN_UPDATES ) {
-            logger.finest( "timenow " + timenow + " timelast " + timelast + " < " + TIME_BETWEEN_UPDATES);
+            logger.info( "timenow " + timenow + " timelast " + timelast + " < " + TIME_BETWEEN_UPDATES);
             return true ;
         } else { 
-            logger.finest("last update < 1 day, using saved config");
+            logger.info("last update < 1 day, using saved config");
             //done =true;
             //return ;                
         }
@@ -289,7 +307,7 @@ extends Thread
             for ( int i = 0 ; i < localservers.size() ; i++ ) {
                 
                 SpiceDasSource ds = (SpiceDasSource) localservers.get(i);
-                logger.finest("adding localserver to new config " + ds.getUrl());
+                //logger.finest("adding localserver to new config " + ds.getUrl());
                 config.addServer(ds);
             }
             //logger.finest("adding registry "+ REGISTRY.toString());
@@ -343,27 +361,40 @@ extends Thread
         //RegistryConfiguration oldconfig = config;
         
         RegistryConfiguration myconfig = new RegistryConfiguration();
-        DasRegistryAxisClient rclient;
-        try {
-            rclient = new DasRegistryAxisClient(registryurl);
-        } catch (Exception e) {
-            logger.log(Level.WARNING,e.getMessage());   
-            throw new ConfigurationException("Could not init client to contact registration service " + e.getMessage());
-        }
+        // THE OLD STYLE!
+//        DasRegistryAxisClient rclient;
+//        try {
+//            rclient = new DasRegistryAxisClient(registryurl);
+//        } catch (Exception e) {
+//            logger.log(Level.WARNING,e.getMessage());   
+//            throw new ConfigurationException("Could not init client to contact registration service " + e.getMessage());
+//        }
+//        
+//        String[] capabs ;
+//        try {
+//            capabs = rclient.getAllCapabilities();
+//        } catch (Exception e){
+//            logger.log(Level.WARNING,e.getMessage());
+//            throw new ConfigurationException("Could not retreive all capabilities from registraion server");
+//        }
+//        //myconfig.setCapabilities(capabs);
+//        //Date d = new Date();
+//        //config.setContactDate(d);
+//        DasSource[]sources = null;
+//        try {
+//            sources = rclient.listServices();
+//        }
+//        
         
-        String[] capabs ;
-        try {
-            capabs = rclient.getAllCapabilities();
-        } catch (Exception e){
-            logger.log(Level.WARNING,e.getMessage());
-            throw new ConfigurationException("Could not retreive all capabilities from registraion server");
-        }
-        myconfig.setCapabilities(capabs);
-        //Date d = new Date();
-        //config.setContactDate(d);
-        DasSource[]sources = null;
-        try {
-            sources = rclient.listServices();
+//        catch (Exception e){
+//            logger.log(Level.WARNING,e.getMessage());          
+//            throw new ConfigurationException(e.getMessage());
+//        }
+        DasSource[] sources = new DasSource[0];
+        try {   
+            logger.info("doing new DAS2 style request");
+            sources = getDas1Sources(registryurl);
+            logger.info("finding " + sources.length + " servers");
         }
         catch (Exception e){
             logger.log(Level.WARNING,e.getMessage());          
@@ -388,12 +419,61 @@ extends Thread
         
         for (int i = 0 ; i < sources.length; i++) {
             DasSource s = sources[i];	    
+            
+            //DasCoordinateSystem[] dcs = s.getCoordinateSystem();
+//            for (int j=0;j< dcs.length;j++){
+//                System.out.println(dcs[j].toString());
+//            }
+            
             SpiceDasSource sds = new SpiceDasSource();
             sds = SpiceDasSource.fromDasSource(s);
-            //logger.info(" RegistryIO  go dassource " +sds.getNickname() );
+            //logger.info(" RegistryIO  go dassource " +sds.getCoordinateSystem().length +
+            //        " " + sds.getNickname() + sds.getUrl() );
+            //dcs = sds.getCoordinateSystem();
+            //for (int j=0;j< dcs.length;j++){
+            //    System.out.println(dcs[j].toString());
+            //}
             myconfig.addServer(sds);
         }
         return myconfig;
+        
+    }
+    
+    
+    public Das1Source[] getDas1Sources(URL url) throws MalformedURLException, DASException{
+        
+        DasSourceReaderImpl reader = new DasSourceReaderImpl();
+        
+        // THIS IS THE EXPERIMENTAL SERVER - NOT INTENDET FOR PRODUCTION USE!
+        // THIS FUNCTIONALITY WILL SOON BE AVAILABLE FROM
+        // http://das.sanger.ac.uk/registry/
+        //String u = "http://www.spice-3d.org/dasregistry/das1/sources";
+        
+       
+        logger.info("reading " + url);
+        DasSource[] sources = reader.readDasSource(url);
+        
+        List das1sources = new ArrayList();
+        for (int i=0;i< sources.length;i++){
+            DasSource ds = sources[i];
+            //System.out.println(ds);
+            if ( ds instanceof Das2Source){
+                System.out.println("das2source");
+                Das2Source d2s = (Das2Source)ds;
+                if (d2s.hasDas1Capabilities()){
+                    Das1Source d1s = DasSourceConverter.toDas1Source(d2s);
+                    das1sources.add(d1s);
+                }
+                    
+            } else if ( ds instanceof Das1Source){
+                //logger.info("das1source");
+                das1sources.add((Das1Source)ds);
+            }
+        }
+        
+        return (Das1Source[])das1sources.toArray(new Das1Source[das1sources.size()]);
+        
+        
         
     }
     

@@ -823,6 +823,20 @@ ChangeListener
         
     }
     
+    /** removes all listeners */
+    public void clearListeners(){
+        uniProtListeners.clear();
+        enspListeners.clear();
+        structureListeners.clear();
+        
+        strucManager.clearStructureListeners();
+        strucManager.clearSequenceListeners();
+        seqManager.clearSequenceListeners();
+        enspManager.clearSequenceListeners();
+        
+        
+    }
+    
     public StructureManager getStructureManager(){
         return strucManager;
         

@@ -27,6 +27,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
 import org.biojava.spice.manypanel.BrowserPane;
 
 /** a class to manage the SPICE statup parameters.
@@ -57,6 +58,7 @@ public class SpiceStartParameters {
     private String localServerURL = "";
     private String localServerCoordSys = "";
     private String localServerName="";
+    private String localServerCapability = "";
     
     private String pdbcoordsys;
     private String uniprotcoordsys;
@@ -64,8 +66,9 @@ public class SpiceStartParameters {
     
     boolean initSpiceServer;
     boolean newTab;
-    
+    boolean noRegistryContact;
       
+    private String structureAlignmentMode;
 
 
     public SpiceStartParameters() {
@@ -81,7 +84,35 @@ public class SpiceStartParameters {
         registryurls = new URL[0];
         initSpiceServer = true;
         newTab =false;
+        noRegistryContact = false;
+        structureAlignmentMode="";
+    }
+
     
+    
+    public String getStructureAlignmentMode() {
+        return structureAlignmentMode;
+    }
+
+    
+    /** set SPICE to run in structure alignment mode and define the coordinate system of the
+     * alignmnent server to be used
+     * @param structureAlignmentMode
+     */
+    public void setStructureAlignmentMode(String structureAlignmentMode) {
+        DasCoordinateSystem dcs = DasCoordinateSystem.fromString(structureAlignmentMode);
+        this.structureAlignmentMode = dcs.toString();
+    }
+
+
+
+    public boolean isNoRegistryContact() {
+        return noRegistryContact;
+    }
+
+    /** if set to true, the registry will notbe contacted */
+    public void setNoRegistryContact(boolean noRegistryContact) {
+        this.noRegistryContact = noRegistryContact;
     }
 
     /** if true a new Spice instance should init the SpiceServer. otherwise it assumes that it is already running
@@ -386,6 +417,20 @@ public class SpiceStartParameters {
     public void setMessageHeight(Integer height){
         messageHeight = height.intValue();
     }
+
+
+    
+    
+    public String getLocalServerCapability() {
+        return localServerCapability;
+    }
+
+
+
+    public void setLocalServerCapability(String localServerCapability) {
+        this.localServerCapability = localServerCapability;
+    }
+
 
 
     public String getLocalServerCoordSys() {

@@ -235,7 +235,7 @@ public class StartParametereFilter {
                 for ( int d = 0 ; d< coordSys.length;d++){
                     String cs = coordSys[d].toString();
                     if ( (cs.equals(BrowserPane.DEFAULT_PDBCOORDSYS) || (cs.equals(BrowserPane.DEFAULT_UNIPROTCOORDSYS)
-                            || (cs.equals(BrowserPane.DEFAULT_ENSPCOORDSYS))) )) {
+                            || (cs.equals(BrowserPane.DEFAULT_ENSPCOORDSYS))) || ( ds.getStatus()) )) {
                             retlst.add(ds);
                     } else
                         // this is not in any of the three csses that can be displayed.                        

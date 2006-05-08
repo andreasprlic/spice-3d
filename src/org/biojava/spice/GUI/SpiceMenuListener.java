@@ -98,7 +98,8 @@ SequenceListener
             SpiceStartParameters params = spice.getSpiceStartParameters();
             params.setInitSpiceServer(false);
             params.setNewTab(true);
-            
+            params.setNoRegistryContact(true); 
+           
             SpiceApplication newSpice = new SpiceApplication(params);         
             //SpiceServer server = spice.getSpiceServer();
             //newSpice.setSpiceServer(server);
@@ -197,14 +198,15 @@ SequenceListener
                 //logger.info("getting selection from cursor panel");
                 selection = spice.getBrowserPane().getStructureRenderer().getCursorPanel().getSelection();
             } else {
-                logger.info("coloring the whole structure");
+                //logger.info("coloring the whole structure");
                 Structure s = sm.getStructure();
                 //System.out.println(s.toPDB());
                 // convert s  tp group[]
                 List sel = new ArrayList();
-                // hm like this the parent get's lost!
                 
+                // there should be always at least an empty chain there ..
                 List chains = s.getChains(0);
+                
                 Iterator iter = chains.iterator();
                 while (iter.hasNext()){
                     Chain c = (Chain) iter.next();
@@ -219,6 +221,10 @@ SequenceListener
                     }
                     
                 }
+                
+                // hm: this would be my preferred waay to do it,                
+//              butlike this the parent get's lost!
+                
 //                GroupIterator iter = new GroupIterator(s);
 //                while (iter.hasNext()){
 //                    Group g = (Group)iter.next();

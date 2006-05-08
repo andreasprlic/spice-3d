@@ -227,6 +227,10 @@ implements JmolStatusListener, StructureListener
         pdbSequenceListener.add(li);
     }
     
+    public void clearListeners(){
+        pdbSequenceListener.clear();
+    }
+    
     private void triggerSelectedSeqPos(int position){
         Iterator iter = pdbSequenceListener.iterator();
         while (iter.hasNext()){

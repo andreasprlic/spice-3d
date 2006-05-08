@@ -26,24 +26,13 @@ package org.biojava.spice ;
 
 import org.biojava.spice.server.SpiceClient;
 import org.biojava.spice.server.SpiceServer;
-
 import java.applet.Applet;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-
 import org.biojava.spice.Config.ConfigurationException;
-
 //import java.net.URL;
 import java.util.ArrayList;
 import org.biojava.spice.GUI.AboutDialog;
 import org.biojava.spice.GUI.SpiceTabbedPane;
-
 import java.util.List;
-
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JMenuBar;
-
 import org.biojava.spice.utils.CliTools;
 
 /** the startup class of SPICE. It takes care of correctly parsing the arguments that are given to SPICE.

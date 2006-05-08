@@ -40,9 +40,7 @@ public class RainbowPainter {
     public RainbowPainter(JmolCommander listener, Group[] selection) {
         super();
 
-        int red = 0;
-        int green = 0; 
-        int blue = 0;
+        
         
         float stepsize = 1.0f / (float)selection.length;
         float saturation = 1.0f;
@@ -61,10 +59,8 @@ public class RainbowPainter {
             //int p = selection.length - i ;
             //int hue   = Math.round(i* stepsize);
             float hue = i * stepsize;
-            int rgb = Color.HSBtoRGB(hue, saturation, brightness);
-            red = (rgb>>16)&0xFF;
-            green = (rgb>>8)&0xFF;
-            blue = rgb&0xFF;
+            //int rgb = Color.HSBtoRGB(hue, saturation, brightness);
+            
             //green = Math.round(i* stepsize);
             //blue  = Math.round(i* stepsize);
             //System.out.println(">"+chainId + "< " + g.getPDBCode() + " "+ i+ " " + stepsize + " "+ red + " " + green + " " + blue );
@@ -76,6 +72,23 @@ public class RainbowPainter {
             cmd.append(" color [" +col.getRed()+","+col.getGreen() +","+col.getBlue() +"];");
         
         }
+//        if ( selection.length >=2){
+//            Group g1 = selection[0];
+//            Group g2 = selection[selection.length-1];
+//            
+//            String ci1 = " ";
+//            String ci2 = " ";
+//            
+//            Chain c1= g1.getParent();
+//            if ( c1 != null){
+//                ci1 = c1.getName();
+//            }
+//            Chain c2 = g2.getParent();
+//            if ( c2 != null) {
+//                ci2 = c2.getName();
+//            }
+//            cmd.append("select " + g1.getPDBCode() + ":"+ci1+"-"+g2.getPDBCode()+":"+ci2+";");
+//        }
         
         listener.executeCmd(cmd.toString());
         

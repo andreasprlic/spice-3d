@@ -222,6 +222,8 @@ ConfigurationListener
         
         URL[] registries = getAllRegistryURLs();
         RegistryConfigIO regi = new RegistryConfigIO(registries);
+        if ( params.isNoRegistryContact())
+            regi.setNoUpdate(true);
         regi.addConfigListener(this);
         regi.run();
         
@@ -242,20 +244,7 @@ ConfigurationListener
         this.setLayout(new BoxLayout(this,BoxLayout.X_AXIS));
         this.add(vBox);
      
-       // tabbedPane = new JTabbedPane();
-        
-        //tabbedPane.addTab("",vBox);
-        
-        //if ( ! params.isNewTab()){
-        //    this.getContentPane().setLayout(new BoxLayout(this.getContentPane(),BoxLayout.X_AXIS));
-        //    this.getContentPane().add(tabbedPane);
-        //} else {
-            // get Spice from server and open new tab there ...
-            //TODO!
-            
-            
-        //}
-       
+      
         spiceMenuListener = new SpiceMenuListener(this,structurePanelListener) ;
        
         
@@ -265,28 +254,10 @@ ConfigurationListener
         menu = initMenu();
        
         initListeners();
-        
-        //this.setTitle("SPICE") ;
-             
        
-	
         firefoxIcon = createImageIcon("firefox.png");
         
         
-        
-        if ( params.isNewTab()){
-            // do not open as a new window, open as a new Tab in previous spice instance
-            
-        }
-        
-        //this.setSize(800, 600);
-        //this.setVisible(true);
-        
-    
-            
-        
-        // if this window is closed, unregister instance... 
-        //initDeregistering();
         
     }
     
@@ -533,6 +504,15 @@ ConfigurationListener
         return vBox;
     }
     
+    public void clearListeners(){
+        spiceMenuListener = null;
+        browserPane.clearListeners();
+        jmolSpiceTranslator.clearListeners();
+        chainList.removeListSelectionListener(chainDisplay);
+        chainDisplay.clearStructureListeners();
+    }
+    
+    
     /** initialize the listeners of the various componentns 
      * 
      *
@@ -579,6 +559,10 @@ ConfigurationListener
             
     }
     
+    public void setMenu(JMenuBar menu) {
+        this.menu=menu;
+    }
+    
     
     public JMenuBar getMenu(){
         if ( menu == null)
@@ -621,7 +605,7 @@ ConfigurationListener
     
     /** Returns an ImageIcon, or null if the path was invalid. */
     public static ImageIcon createImageIcon(String path) {
-        java.net.URL imgURL = SpiceApplication.class.getResource(path);
+        java.net.URL imgURL = SpiceApplication.class.getClassLoader().getResource(path);
         if (imgURL != null) {
             return new ImageIcon(imgURL);
         } else {
@@ -650,6 +634,7 @@ ConfigurationListener
         String msg = "SpiceApplication load: " + type + " " + code;
         System.out.println(msg);
         logger.finest(msg);
+        
         if (type.equals("PDB")){
             
             this.loadStructure(code);
@@ -663,6 +648,13 @@ ConfigurationListener
         }
         else if (type.equals("ENSP")) {
             loadEnsp(code);
+            
+        }
+        else if (type.equals("alignment")){
+            // spice will be running in structure alignment mode
+            String aligcs = startParameters.getStructureAlignmentMode();
+            DasCoordinateSystem dcs = DasCoordinateSystem.fromString(aligcs);
+            loadAlignment(code,dcs);
             
         }
         else {
@@ -731,8 +723,6 @@ ConfigurationListener
      */
     private void loadStructure(String pdbcod) {
         
-               
-        
         //currentChain = null ;
         setCurrentChain(null,-1);
         if (logger.isLoggable(Level.FINER)) {
@@ -762,6 +752,27 @@ ConfigurationListener
         
     }
       
+    /** load an alignment from an alignment server
+     * 
+     * @param alignmentCode the accession code to be sent to the alignment server
+     * @param aligCs the coordinate system of the alignment server to use
+     */
+    public void loadAlignment(String alignmentCode, DasCoordinateSystem aligCs){
+        logger.info("loading Structure alignment for coordinate system " + aligCs.toString());
+        List aligservers = config.getServers("alignment", aligCs.toString());
+        logger.info("found " +aligservers.size() + "alignment servers");
+        SpiceDasSource[] ads = (SpiceDasSource[])aligservers.toArray(new SpiceDasSource[aligservers.size()]);
+        List strucservers = config.getServers("structure");
+        SpiceDasSource[] sds = (SpiceDasSource[])strucservers.toArray(new SpiceDasSource[strucservers.size()]);
+        
+        StructureAlignmentBuilder sacreator = new StructureAlignmentBuilder();
+        sacreator.addStructureListener(structurePanelListener);
+        sacreator.setStructurePanel(structurePanel);
+        sacreator.setAlignmentServers(ads);
+        sacreator.setStructureServers(sds);
+        
+        sacreator.request(alignmentCode);
+    }
 
        
     /** clear the displayed data */
@@ -779,6 +790,8 @@ ConfigurationListener
         browseMenu.clear();
     }
     
+    
+    
     public BrowserPane getBrowserPane(){
         return browserPane;
     }
@@ -795,6 +808,9 @@ ConfigurationListener
         if (! ((localurl == null) || (localurl.equals("")))) {
             String localcood = startParameters.getLocalServerCoordSys();
             String localname = startParameters.getLocalServerName();
+            String localcapability = startParameters.getLocalServerCapability();
+            if (localcapability == null)
+                localcapability = "features";
             //logger.info("adding new local DAS source");
             
             SpiceDasSource localDs = new SpiceDasSource();
@@ -802,11 +818,15 @@ ConfigurationListener
             localDs.setStatus(true);
             localDs.setRegistered(false);
             localDs.setNickname(localname);
+            String[] caps = new String[1];
+            caps[0]=localcapability;
+            localDs.setCapabilities(caps);
             DasCoordinateSystem dcs = DasCoordinateSystem.fromString(localcood);
             DasCoordinateSystem[] csa = new DasCoordinateSystem[1];
             csa[0]=dcs;
             localDs.setCoordinateSystem(csa);
-            config.addServer(localDs);
+            
+            config.addServerAtStart(localDs);
             
             // and clean up - we do not need to do this a second time again after ...
             startParameters.setLocalServerURL("");              
@@ -1235,7 +1255,7 @@ ConfigurationListener
             }
             if ( ! known) {
                 sources[i] = newSource;
-                logger.finest("new source " + newSource.getNickname());
+                //logger.finest("new source " + newSource.getNickname());
             }
         }
         knownSources = sources;
@@ -1251,11 +1271,11 @@ ConfigurationListener
         logger.finest("got " + l.size() + " servers");
         
         if ( logger.isLoggable(Level.FINEST)) {
-            Iterator iter = l.iterator();
-            while (iter.hasNext()){
-                SpiceDasSource ds = (SpiceDasSource)iter.next();
-                logger.finest("setDasSources " + ds.getNickname() + " " + ds.getStatus());
-            }
+            //Iterator iter = l.iterator();
+            //while (iter.hasNext()){
+                //SpiceDasSource ds = (SpiceDasSource)iter.next();
+                //logger.finest("setDasSources " + ds.getNickname() + " " + ds.getStatus());
+            //}
         }
        
         SpiceDasSource[] sources = filterSourcesWithStartupData(l);

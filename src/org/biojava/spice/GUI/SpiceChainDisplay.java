@@ -42,6 +42,7 @@ import org.biojava.dasobert.eventmodel.StructureEvent;
 import org.biojava.dasobert.eventmodel.StructureListener;
 
 public class SpiceChainDisplay 
+
 implements ListSelectionListener,
 StructureListener {
 

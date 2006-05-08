@@ -24,6 +24,7 @@ package org.biojava.spice.GUI;
 
 public interface TabListener {
 
+    public void tabClosing(TabEvent e);
     public void tabClosed(TabEvent e); 
     public void tabSelected(TabEvent e);
     

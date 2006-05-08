@@ -74,6 +74,10 @@ implements ObjectManager, StructureListener {
        
     }
     
+    public void clearStructureListeners(){
+        structureListeners.clear();
+    }
+    
     public void clearDasSources(){
         //logger.info("StructureRenderer clearDasSources");
         super.clearDasSources();

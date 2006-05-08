@@ -36,6 +36,7 @@ import java.util.Date                     ;
 import java.util.ArrayList ;
 import java.util.List ;
 
+import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.utils.xml.*            ; 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -63,8 +64,8 @@ public class RegistryConfiguration
     Date   lastContact         ;
     URL registryUrl         ;
     
-    static String PDBCOORDSYS     = "PDBresnum,Protein Structure";
-    static String UNIPROTCOORDSYS = "UniProt,Protein Sequence";
+    //static String PDBCOORDSYS     = "PDBresnum,Protein Structure";
+    //static String UNIPROTCOORDSYS = "UniProt,Protein Sequence";
     
     static String DEFAULTREGISTRY = "http://servlet.sanger.ac.uk/registry/services/das_registry";
     
@@ -129,8 +130,8 @@ public class RegistryConfiguration
         boolean uniprotflag = false ;
         boolean pdbflag     = false ;
         
-        pdbflag     =  hasCoordSys(PDBCOORDSYS,source) ;
-        uniprotflag =  hasCoordSys(UNIPROTCOORDSYS,source)   ;
+        pdbflag     =  hasCoordSys(BrowserPane.DEFAULT_PDBCOORDSYS,source) ;
+        uniprotflag =  hasCoordSys(BrowserPane.DEFAULT_UNIPROTCOORDSYS,source)   ;
         //System.out.println(pdbflag + " " + uniprotflag);
         if (( uniprotflag == true) && ( pdbflag == true)) {
             msdmapping = true ;
@@ -168,16 +169,12 @@ public class RegistryConfiguration
         return tmp ;
     }
     
-    /** add a new DAS server to the list of available ones.
-     * can be used e.g. to add a local server
-     * @param s .. the Das Source
+    
    
-     */
-    public void addServer(SpiceDasSource s) {
-        //logger.info("adding server " + s);
-        // make sure no server with that url already exists
+    
+    private boolean isKnownSource(SpiceDasSource s) {
         Iterator iter = allservers.iterator();
-        boolean known =false;
+        boolean known = false ;
         SpiceDasSource knownSource = null;
         while (iter.hasNext()) {
             knownSource = (SpiceDasSource) iter.next();
@@ -186,12 +183,41 @@ public class RegistryConfiguration
                 break;
             }
         }
+        return known;
+    }
+    
+    public SpiceDasSource getKnownSource(SpiceDasSource s){
+        Iterator iter = allservers.iterator();
+        
+        SpiceDasSource knownSource = new SpiceDasSource();
+        while (iter.hasNext()) {
+            knownSource = (SpiceDasSource) iter.next();
+            if (knownSource.getUrl().equals(s.getUrl())){
+                
+                break;
+            }
+        }
+        return knownSource;
+    }
+    
+    public void addServerAtStart(SpiceDasSource s){
+        boolean known = isKnownSource(s);
+        
         if ( ! known) {
-            allservers.add(s);
+            allservers.add(0,s);
             if (s.getStatus()) {
-                activeservers.add(s);
+                activeservers.add(0,s);
             }
         } else {
+            
+            SpiceDasSource knownSource = getKnownSource(s);
+            
+            int pos = allservers.indexOf(knownSource);
+            if ( pos > -1){
+                allservers.remove(pos);
+                
+            }
+            allservers.add(0,knownSource);
             // we already know this source, update the info on it...
             knownSource.setRegistered(s.getRegistered());
             knownSource.setNickname(s.getNickname());
@@ -199,6 +225,50 @@ public class RegistryConfiguration
             if (! knownSource.getStatus()){
                 if ( s.getStatus()){
                     knownSource.setStatus(true);
+                    
+                }
+            } 
+            
+            if ( knownSource.getStatus()){
+                pos =  activeservers.indexOf(knownSource);
+                if ( pos > -1 ) {
+                    activeservers.remove(pos);
+                }
+                activeservers.add(0,knownSource);
+            }
+        }
+    }
+    
+    /** add a new DAS server to the list of available ones.
+     * can be used e.g. to add a local server
+     * @param s .. the Das Source
+   
+     */
+    public void addServer(SpiceDasSource s) {
+        //logger.info("adding server " + s);
+        // make sure no server with that url already exists
+        boolean known = isKnownSource(s);
+        
+        if ( ! known) {
+            allservers.add(s);
+            if (s.getStatus()) {
+                activeservers.add(s);
+            }
+        } else {
+            SpiceDasSource knownSource = getKnownSource(s);
+            // we already know this source, update the info on it...
+            knownSource.setRegistered(s.getRegistered());
+            knownSource.setNickname(s.getNickname());
+            
+            if (! knownSource.getStatus()){
+                if ( s.getStatus()){
+                    knownSource.setStatus(true);
+                    
+                }
+            }
+            if ( knownSource.getStatus()){
+                int pos = activeservers.indexOf(knownSource);
+                if ( pos == -1 ){
                     activeservers.add(knownSource);
                 }
             }

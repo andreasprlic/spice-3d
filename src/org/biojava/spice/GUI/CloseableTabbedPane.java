@@ -86,9 +86,29 @@ public class CloseableTabbedPane extends JTabbedPane {
         tabListeners.add(listener);
     }
     
+    public void removeTabAt(int i){
+        Component c = getComponentAt(i);
+        super.removeTabAt(i);
+        triggerTabClosed(c);
+        
+    }
+    
     public TabListener[] getTabListener(){
         return (TabListener[])tabListeners.toArray(new TabListener[tabListeners.size()]);
     }
+    
+    private void triggerTabClosed(Component c){
+
+        Iterator iter = tabListeners.iterator();
+        while (iter.hasNext()){
+            TabListener li = (TabListener)iter.next();
+            TabEvent event = new TabEvent();
+            event.setTabNumber(-1);
+            event.setComponent(c);
+            li.tabClosed(event);
+        }
+    }
+    
     
     //--- Inner Class(es) ---
     
@@ -105,17 +125,18 @@ public class CloseableTabbedPane extends JTabbedPane {
             }
         }
         
-        private void triggerTabClosed(int tabPosition, Component c){
-
+        private void triggerTabClosing(int tabPosition, Component c){
             Iterator iter = tabListeners.iterator();
             while (iter.hasNext()){
                 TabListener li = (TabListener)iter.next();
                 TabEvent event = new TabEvent();
                 event.setTabNumber(tabPosition);
                 event.setComponent(c);
-                li.tabClosed(event);
+                li.tabClosing(event);
             }
         }
+        
+        
         
         
         public void mouseReleased(MouseEvent e)
@@ -136,16 +157,20 @@ public class CloseableTabbedPane extends JTabbedPane {
             // close tab, if icon was clicked
             if (icon != null && icon.contains(e.getX(), e.getY())) {
                 
-                triggerTabClosed( i, getComponentAt(i));
+                Component comp = getComponentAt(i);
+                triggerTabClosing( i, comp);
                 
                 // TODO: improve this hack:
                 // the actual removing is done by listener! ...
-                //removeTabAt(i);
+                removeTabAt(i);
+               
                 
             }
         }
         
     }
+    
+    
     
     /**
      * the idea for this class stems from limewire's CancelSearchIconProxy

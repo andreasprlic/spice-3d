@@ -74,6 +74,9 @@ public class SpiceServer {
     }
     
     public void removeInstance(SPICEFrame spice){
+        if ( ! otherSpices.contains(spice)){
+            logger.info("tried to remove spice instance, but does not  seem to be registered");
+        }
         otherSpices.remove(spice);
         logger.info("removed spice instance ("+otherSpices.size()+" left)");
         if ( otherSpices.size() == 0){

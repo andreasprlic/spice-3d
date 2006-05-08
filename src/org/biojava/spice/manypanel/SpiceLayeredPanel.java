@@ -28,6 +28,8 @@ import java.awt.Dimension;
 import java.net.*;
 
 import org.biojava.dasobert.das.SpiceDasSource;
+import org.biojava.dasobert.das2.io.DasSourceReader;
+import org.biojava.dasobert.das2.io.DasSourceReaderImpl;
 import org.biojava.dasobert.dasregistry.*;
 import org.biojava.services.das.registry.DasRegistryAxisClient;
 
@@ -49,8 +51,12 @@ public class SpiceLayeredPanel
     public static DasSource[] getAllDasSources() throws Exception{
         
         URL rurl = new URL(registry);
-        DasRegistryAxisClient rclient = new DasRegistryAxisClient(rurl);
-        DasSource[]  allsources = rclient.listServices();
+        //DasRegistryAxisClient rclient = new DasRegistryAxisClient(rurl);
+        //DasSource[]  allsources = rclient.listServices();
+        DasSourceReaderImpl reader = new DasSourceReaderImpl();
+        
+        DasSource[] allsources = reader.readDasSource(rurl);
+        
         return allsources;
     }   
     
