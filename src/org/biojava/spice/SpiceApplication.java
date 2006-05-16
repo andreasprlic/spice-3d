@@ -123,8 +123,9 @@ ConfigurationListener
     JmolSpiceTranslator jmolSpiceTranslator;
     StructurePanelListener structurePanelListener ;
     //JTextField seq_pos ;
-    JList chainList;   // list available chains
-   
+    //JList chainList;   // list available chains
+    SelectionPanel selectionPanel;
+    
     JScrollPane dasPanel ;
 
     JSplitPane sharedPanel;
@@ -161,7 +162,7 @@ ConfigurationListener
     SpiceMenuListener spiceMenuListener;
     BrowseMenuListener browseMenu;
     BrowserPane browserPane ;
-    SpiceChainDisplay chainDisplay;
+    //SpiceChainDisplay chainDisplay;
     SpiceTabbedPane spiceTabbedPane;
     SpiceStartParameters startParameters;
     SpiceServer spiceServer;
@@ -445,15 +446,15 @@ ConfigurationListener
 
                       
       
-        DefaultListModel model = new DefaultListModel();
-        model.add(0,"");
-        chainList=new JList(model);
-        
+        //DefaultListModel model = new DefaultListModel();
+        //model.add(0,"");
+        //chainList=new JList(model);
+        selectionPanel = new SelectionPanel();
         
         //ent_list.setPreferredSize(new Dimension(30,30));
         
         
-        JScrollPane chainPanel = new JScrollPane(chainList);
+        JScrollPane chainPanel = new JScrollPane(selectionPanel);
         chainPanel.setPreferredSize(new Dimension(30,30));
         //chainPanel.setLayout(new BoxLayout(chainPanel,BoxLayout.X_AXIS)); 
         chainPanel.setBorder(BorderFactory.createEmptyBorder());
@@ -508,8 +509,12 @@ ConfigurationListener
         spiceMenuListener = null;
         browserPane.clearListeners();
         jmolSpiceTranslator.clearListeners();
-        chainList.removeListSelectionListener(chainDisplay);
-        chainDisplay.clearStructureListeners();
+        //chainList.removeListSelectionListener(chainDisplay);
+            
+        selectionPanel.clearListeners();
+        
+        
+        
     }
     
     
@@ -523,6 +528,7 @@ ConfigurationListener
         SequenceListener[] li = browserPane.getPDBSequenceListener();
         for ( int i = 0 ; i < li.length;i++){
             jmolSpiceTranslator.addPDBSequenceListener(li[i]);
+            selectionPanel.addPDBSequenceListener(li[i]);
                 
         }
                
@@ -546,17 +552,23 @@ ConfigurationListener
         browserPane.addPDBSequenceListener(spiceMenuListener);
             
         // things related to selecting chains
-        chainDisplay = new SpiceChainDisplay(chainList);
+        //chainDisplay = new SpiceChainDisplay(chainList);
+        SpiceChainDisplay chainDisplay = selectionPanel.getChainDisplay();
         browserPane.addStructureListener(chainDisplay);
         browserPane.addStructureListener(jmolSpiceTranslator);
         
-        chainList.addListSelectionListener(chainDisplay);
+        //chainList.addListSelectionListener(chainDisplay);
         chainDisplay.addStructureListener(browserPane.getStructureManager());
         chainDisplay.addStructureListener(structurePanelListener);
         chainDisplay.addStructureListener(statusPanel);
         chainDisplay.addStructureListener(jmolSpiceTranslator);
         //chainDisplay.addStructureListener(spiceMenuListener);
-            
+        
+        
+        selectionPanel.addStructureListener(structurePanelListener);
+        //selectionPanel.addStructureListener(jmolSpiceTranslator);
+        selectionPanel.addStructureListener(browserPane.getStructureManager());
+       
     }
     
     public void setMenu(JMenuBar menu) {
@@ -766,8 +778,9 @@ ConfigurationListener
         SpiceDasSource[] sds = (SpiceDasSource[])strucservers.toArray(new SpiceDasSource[strucservers.size()]);
         
         StructureAlignmentBuilder sacreator = new StructureAlignmentBuilder();
-        sacreator.addStructureListener(structurePanelListener);
-        sacreator.setStructurePanel(structurePanel);
+        //sacreator.addStructureListener(structurePanelListener);
+        //sacreator.setStructurePanel(structurePanel);
+        sacreator.setSelectionPanel(selectionPanel);
         sacreator.setAlignmentServers(ads);
         sacreator.setStructureServers(sds);
         
@@ -1043,7 +1056,8 @@ ConfigurationListener
             li.newStructure(event);
         }
         structurePanelListener.newStructure(event);
-        chainDisplay.newStructure(event);
+        selectionPanel.newStructure(event);
+        //chainDisplay.newStructure(event);
     }
     
     /** send a command to Jmol *
@@ -1066,7 +1080,8 @@ ConfigurationListener
     }
     
     public int getCurrentChainNumber() {
-        return chainDisplay.getCurrentChainNumber();
+        return selectionPanel.getCurrentChainNumber();
+        //return chainDisplay.getCurrentChainNumber();
         //return browserPane.getCurrentChainNumber();
         //return currentChainNumber;
    }
@@ -1190,7 +1205,8 @@ ConfigurationListener
      */
     public Chain getChain(int chainnumber) {
         
-        return chainDisplay.getChain(chainnumber);
+        return selectionPanel.getChain(chainnumber);
+        //return chainDisplay.getChain(chainnumber);
         
     }
     
@@ -1341,7 +1357,8 @@ ConfigurationListener
         
         sharedPanel.paint(sharedPanel.getGraphics());
         //leftPanel.paint(leftPanel.getGraphics());
-        chainList.paint(chainList.getGraphics());
+        //chainList.paint(chainList.getGraphics());
+        selectionPanel.repaint();
         
         //lcr.paint();
         //ListCellRenderer lcr = ent_list.getCellRenderer();

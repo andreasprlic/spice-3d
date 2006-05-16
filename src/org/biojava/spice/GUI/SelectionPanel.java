@@ -1,0 +1,143 @@
+/*
+ *                  BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ * 
+ * Created on May 8, 2006
+ *
+ */
+package org.biojava.spice.GUI;
+
+import java.util.logging.Logger;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
+import javax.swing.JCheckBox;
+import javax.swing.JList;
+import javax.swing.JPanel;
+
+import org.biojava.bio.structure.Chain;
+import org.biojava.dasobert.eventmodel.SequenceListener;
+import org.biojava.dasobert.eventmodel.StructureEvent;
+import org.biojava.dasobert.eventmodel.StructureListener;
+import org.biojava.spice.StructureAlignment;
+
+/** a class that eithe provides a JList or a JCheckbox,
+ * depending if spice is running in structure alignment mode or
+ * in single protein mode
+ * 
+ * @author Andreas Prlic
+ * @since 2:02:15 PM
+ * @version %I% %G%
+ */
+public class SelectionPanel
+extends JPanel
+{
+    static final long serialVersionUID = 927593656266584l;
+
+    public static Logger logger =  Logger.getLogger("org.biojava.spice");
+    
+    JList chainList;
+    JCheckBox checkBox ;
+    SpiceChainDisplay chainDisplay;
+    boolean alignmentMode;
+    
+    Box hBox;
+    //StructureAlignment structureAlignment;
+    StructureAlignmentChooser alignmentChooser;
+    
+    
+    public SelectionPanel() {
+        super();
+        
+        DefaultListModel model = new DefaultListModel();
+        model.add(0,"");
+        chainList=new JList(model);
+        
+        checkBox = new JCheckBox();
+        
+        chainDisplay = new SpiceChainDisplay(chainList);
+        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        hBox = Box.createHorizontalBox(); 
+        this.add(hBox);
+        
+        // default we are in single protein mode ...
+        alignmentMode = false;                
+        hBox.add(chainList);
+        
+        //structureAlignment = new StructureAlignment();
+        alignmentChooser = new StructureAlignmentChooser();
+        setOpaque(false);
+    }
+
+    public void clearListeners(){
+        chainDisplay.clearStructureListeners();
+        chainList.removeListSelectionListener(chainDisplay);
+        
+        alignmentChooser.clearListeners();
+    }
+    
+    public SpiceChainDisplay getChainDisplay(){
+        return chainDisplay;
+    }
+    
+    public void addPDBSequenceListener(SequenceListener li){
+        alignmentChooser.addPDBSequenceListener(li);
+    }
+    
+    
+    public int getCurrentChainNumber(){
+        return chainDisplay.getCurrentChainNumber();
+    }
+    
+    public Chain getChain(int chainnumber){
+        return chainDisplay.getChain(chainnumber);
+    }
+    
+    public void setStructureAlignment(StructureAlignment strucAli){
+        //structureAlignment = strucAli;
+        alignmentChooser.setStructureAlignment(strucAli);
+        alignmentMode = true;
+        hBox.removeAll();
+        
+        hBox.add(alignmentChooser);
+        alignmentChooser.repaint();
+        hBox.repaint();
+        repaint();
+        
+        logger.info("set SelectionPanel to structure alignment mode...");
+    }
+    
+    public void addStructureListener(StructureListener li){
+        alignmentChooser.addStructureListener(li);
+    }
+    
+    public void newStructure(StructureEvent event){
+        // set into single structure mode
+        hBox.removeAll();
+        hBox.add(chainList);
+        chainDisplay.newStructure(event);
+        repaint();
+    }
+    
+    public void repaint(){
+        super.repaint();
+        if ( chainList != null)
+            chainList.repaint();        
+    }    
+}

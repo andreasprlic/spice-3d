@@ -31,14 +31,14 @@ import java.util.logging.Logger;
 
 import org.biojava.bio.Annotation;
 import org.biojava.bio.program.das.dasalignment.Alignment;
-import org.biojava.bio.structure.AminoAcid;
+//import org.biojava.bio.structure.AminoAcid;
 import org.biojava.bio.structure.Atom;
 import org.biojava.bio.structure.Calc;
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.ChainImpl;
 import org.biojava.bio.structure.Group;
 import org.biojava.bio.structure.GroupIterator;
-import org.biojava.bio.structure.SVDSuperimposer;
+//import org.biojava.bio.structure.SVDSuperimposer;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.StructureException;
 import org.biojava.bio.structure.StructureImpl;
@@ -51,6 +51,7 @@ import org.biojava.dasobert.eventmodel.AlignmentEvent;
 import org.biojava.dasobert.eventmodel.AlignmentListener;
 import org.biojava.dasobert.eventmodel.StructureEvent;
 import org.biojava.dasobert.eventmodel.StructureListener;
+import org.biojava.spice.GUI.SelectionPanel;
 import org.biojava.spice.Panel.StructurePanel;
 
 /** a class that builds up a structure alignment and creates a StructureAlignment object
@@ -66,6 +67,7 @@ implements AlignmentListener {
     SpiceDasSource[] structureServers;
     List structureListeners;
     StructurePanel structurePanel;
+    SelectionPanel selectionPanel;
     
     public static Logger logger = Logger.getLogger("org.biojava.spice");
     
@@ -75,6 +77,7 @@ implements AlignmentListener {
         structureServers = new SpiceDasSource[0];
         structureListeners = new ArrayList();
         structurePanel = null;
+        selectionPanel = new SelectionPanel();
     }
     
     public void setStructurePanel(StructurePanel panel){
@@ -86,6 +89,9 @@ implements AlignmentListener {
     
     public void setStructureServers(SpiceDasSource[] structureServers) {
         this.structureServers = structureServers;
+    }
+    public void setSelectionPanel(SelectionPanel panel){
+        selectionPanel = panel;
     }
     
     
@@ -110,30 +116,45 @@ implements AlignmentListener {
         
     }
     
-    private Atom[] getCaAtoms(Structure struc) throws StructureException{
-        GroupIterator iter = new GroupIterator(struc);
-        List atoms = new ArrayList();
-        while ( iter.hasNext()){
-            Group g = (Group)iter.next();
-            if ( ! (g instanceof AminoAcid)) 
-                continue;
-            Atom ca = g.getAtom("CA");
-            atoms.add(ca);
-        }
-        
-        return (Atom[]) atoms.toArray(new Atom[atoms.size()]);
-    }
+//    private Atom[] getCaAtoms(Structure struc) throws StructureException{
+//        GroupIterator iter = new GroupIterator(struc);
+//        List atoms = new ArrayList();
+//        while ( iter.hasNext()){
+//            Group g = (Group)iter.next();
+//            if ( ! (g instanceof AminoAcid)) 
+//                continue;
+//            Atom ca = g.getAtom("CA");
+//            atoms.add(ca);
+//        }
+//        
+//        return (Atom[]) atoms.toArray(new Atom[atoms.size()]);
+//    }
     
     
     public synchronized void newAlignment(AlignmentEvent e) {
         Alignment ali = e.getAlignment();
         logger.info("got new alignment " + ali);
         
-        Annotation[] matrices = ali.getMatrices();
-        for (int i=0 ; i< matrices.length;i++){
-            Annotation a = matrices[i];
-            System.out.println(a);
+        
+        StructureAlignment sali = new StructureAlignment();
+        try {
+            sali.setAlignment(ali);
+        } catch (StructureException ex){
+            ex.printStackTrace();
+            logger.warning(ex.getMessage());
         }
+        sali.setStructureServers(structureServers);
+        
+        selectionPanel.setStructureAlignment(sali);
+    }
+    
+    private void old(AlignmentEvent e){
+        Alignment ali = e.getAlignment();
+        Annotation[] matrices = ali.getMatrices();
+        //for (int i=0 ; i< matrices.length;i++){
+        //    Annotation a = matrices[i];
+            //System.out.println(a);
+        //}
         
         // get the first two structures and superimpose them..
         Annotation[] objects = ali.getObjects();
@@ -178,11 +199,12 @@ implements AlignmentListener {
             String pdb1 = intId1.substring(0,4);
             String pdb2 = intId2.substring(0,4);
             
-            Matrix max1 = getMatrix(m1);
-            Matrix max2 = getMatrix(m2);
+            //Matrix max1 = getMatrix(m1);
+            //Matrix max2 = getMatrix(m2);
             
-            max1.print(3,3);
-            max2.print(3,3);
+            //max1.print(3,3);
+            
+            //max2.print(3,3);
             
             //max1 = max1.transpose();
             //max2 = max2.transpose();
@@ -200,7 +222,7 @@ implements AlignmentListener {
                 Structure s2 = getStructure(dasstructurecommand,pdb2);
                 
                 //Structure s2 = dasc.getStructureById(pdb2);
-                
+                /*
                 Structure a1 = getRegions(s1,intId1,blocks,"A");
                 Structure a2 = getRegions(s2,intId2,blocks,"A");
                 
@@ -212,13 +234,13 @@ implements AlignmentListener {
                         
                 max3.print(3,3);
                 Atom  vec3 = svd.getTranslation();
+                */
                 
                 
-                
-                Calc.rotate(s1,max1);
-                Calc.rotate(s2,max2);
+                //Calc.rotate(s1,max1);
+                //Calc.rotate(s2,max2);
                 Calc.shift(s1,vec1);                
-                Calc.shift(s2,vec2);
+                Calc.shift(s2,vec2); 
                
                 //System.out.println("RMS:" + SVDSuperimposer.getRMS(ca1,ca2));
                 
@@ -272,7 +294,7 @@ implements AlignmentListener {
     }
     
     private String getRasmolScript(Annotation[] blocks, String intId, String chainId,String color){
-        String cmd = "";
+        String cmd = "select *"+chainId +"; backbone 0.3;";
         for (int b=0;b<blocks.length;b++){
             Annotation block = blocks[b];
             
@@ -294,7 +316,7 @@ implements AlignmentListener {
                     end = end.substring(0,indx2);
                 
                 if ( ii.equals(intId)){
-                    cmd += "select "+start+"-"+end +":"+chainId+"; color "+color+";";                            
+                    cmd += "select "+start+"-"+end +":"+chainId+"; color "+color+"; backbone 0.6;";                            
                 }
                 
                 
@@ -304,57 +326,57 @@ implements AlignmentListener {
         return cmd;
     }
     
-    private Structure getRegions(Structure struc, String intId, Annotation[] blocks, String chainName) 
-    throws StructureException {
-        Structure newstruc = new StructureImpl();
-        Chain n = new ChainImpl();
-        n.setName(chainName);
-        
-        for (int b=0;b<2;b++){
-            Annotation block = blocks[b];
-            List segments = (List)block.getProperty("segments");
-            Iterator siter = segments.iterator();
-            while (siter.hasNext()){
-                Annotation seg = (Annotation)siter.next();
-                String ii =  (String)seg.getProperty("intObjectId");
-                if (!( ii.equals(intId))) 
-                    continue;
-                String start = (String) seg.getProperty("start");
-                String end   = (String) seg.getProperty("end");
-                
-                int indx1 = start.indexOf(":");
-                String chainId1 = " ";
-                String chainId2 = " ";
-                System.out.println(start);
-                System.out.println(end);
-                
-                if (indx1 >-1) {
-                    chainId1 = start.substring(indx1+1,start.length());
-                    start = start.substring(0,indx1);
-                    
-                }
-                int indx2 = end.indexOf(":");
-                if ( indx2>-1) {
-                    chainId2 = end.substring(indx2+1,end.length());
-                    end = end.substring(0,indx2);                    
-                }
-                
-                if ( chainId1.equals(""))
-                    chainId1 = " ";
-                Chain c = struc.getChainByPDB(chainId1);
-                Group[] groups = c.getGroupsByPDB(start,end);
-                for (int g=0;g< groups.length;g++){
-                    Group gg =groups[g];
-                    n.addGroup(gg);
-                }
-                
-            }
-            
-        }
-        newstruc.addChain(n);
-        System.out.println(n.getSequence());
-        return newstruc;
-    }
+//    private Structure getRegions(Structure struc, String intId, Annotation[] blocks, String chainName) 
+//    throws StructureException {
+//        Structure newstruc = new StructureImpl();
+//        Chain n = new ChainImpl();
+//        n.setName(chainName);
+//        
+//        for (int b=0;b<2;b++){
+//            Annotation block = blocks[b];
+//            List segments = (List)block.getProperty("segments");
+//            Iterator siter = segments.iterator();
+//            while (siter.hasNext()){
+//                Annotation seg = (Annotation)siter.next();
+//                String ii =  (String)seg.getProperty("intObjectId");
+//                if (!( ii.equals(intId))) 
+//                    continue;
+//                String start = (String) seg.getProperty("start");
+//                String end   = (String) seg.getProperty("end");
+//                
+//                int indx1 = start.indexOf(":");
+//                String chainId1 = " ";
+//                String chainId2 = " ";
+//                System.out.println(start);
+//                System.out.println(end);
+//                
+//                if (indx1 >-1) {
+//                    chainId1 = start.substring(indx1+1,start.length());
+//                    start = start.substring(0,indx1);
+//                    
+//                }
+//                int indx2 = end.indexOf(":");
+//                if ( indx2>-1) {
+//                    chainId2 = end.substring(indx2+1,end.length());
+//                    end = end.substring(0,indx2);                    
+//                }
+//                
+//                if ( chainId1.equals(""))
+//                    chainId1 = " ";
+//                Chain c = struc.getChainByPDB(chainId1);
+//                Group[] groups = c.getGroupsByPDB(start,end);
+//                for (int g=0;g< groups.length;g++){
+//                    Group gg =groups[g];
+//                    n.addGroup(gg);
+//                }
+//                
+//            }
+//            
+//        }
+//        newstruc.addChain(n);
+//        System.out.println(n.getSequence());
+//        return newstruc;
+//    }
     
     private Structure getStructure(String dasstructurecommand,String pdbCode)
     throws IOException {
@@ -432,28 +454,9 @@ implements AlignmentListener {
         
     }
     
-//  private double getDoubleFromAnnotation(Annotation anno, String property){
-//  System.out.println("get double from: " +  anno);
-//  String xs = (String)anno.getProperty(property);
-//  double x = Double.parseDouble(xs);
-//  return x;
-//  
-//  }
+
     
-    private Matrix getMatrix(Annotation anno){
-        Matrix max = new Matrix(3,3);
-        
-        for(int x=1;x<4;x++){
-            for(int y=1;y<4;y++){
-                String m = "mat"+x+y;
-                String val = (String)anno.getProperty(m);
-                double d = Double.parseDouble(val);
-                max.set(x-1,y-1,d);
-            }
-        }
-        
-        return max;
-    }
+   
     
     public synchronized void noAlignmentFound(AlignmentEvent e) {
         logger.info("no alignment found " + e.getAlignment());
