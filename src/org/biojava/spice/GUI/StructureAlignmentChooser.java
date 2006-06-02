@@ -22,7 +22,7 @@
  */
 package org.biojava.spice.GUI;
 
-import java.awt.Checkbox;
+import java.awt.Color;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
@@ -34,6 +34,7 @@ import javax.swing.Box;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.Structure;
@@ -104,10 +105,13 @@ implements ItemListener {
         logger.info("got new structure alignment");
         clearButtons();
         
-        //  
         String[] ids = ali.getIds();
         for ( int i=0; i< ids.length;i++){
             String id = ids[i];
+            Color col = ali.getColor(i);
+            UIManager.put("CheckBox.background", col);
+            UIManager.put("CheckBox.interiorBackground", col);
+            UIManager.put("CheckBox.highlite", col);
             JCheckBox b = new JCheckBox(id);
             b.setSelected(false);
             vBox.add(b);

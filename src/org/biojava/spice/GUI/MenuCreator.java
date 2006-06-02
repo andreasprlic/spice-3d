@@ -37,6 +37,15 @@ public class MenuCreator {
         super();
 
     }
+    
+    public static JMenu createAlignmentMenu(SpiceMenuListener ml){
+        JMenu amenu = new JMenu("Alignment");
+        JMenuItem region = new JMenuItem("Toggle full structure");
+        region.addActionListener(ml);
+        region.setMnemonic(KeyEvent.VK_T);
+        amenu.add(region);
+        return amenu;
+    }
 
     public static ImageIcon createImageIcon(String name){
         return SpiceApplication.createImageIcon(name);

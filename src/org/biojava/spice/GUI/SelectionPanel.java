@@ -22,6 +22,7 @@
  */
 package org.biojava.spice.GUI;
 
+import java.awt.Dimension;
 import java.util.logging.Logger;
 
 import javax.swing.Box;
@@ -47,6 +48,7 @@ import org.biojava.spice.StructureAlignment;
  */
 public class SelectionPanel
 extends JPanel
+implements StructureListener
 {
     static final long serialVersionUID = 927593656266584l;
 
@@ -116,11 +118,13 @@ extends JPanel
         hBox.removeAll();
         
         hBox.add(alignmentChooser);
+        this.setPreferredSize(new Dimension(60,200));
         alignmentChooser.repaint();
         hBox.repaint();
         repaint();
-        
-        logger.info("set SelectionPanel to structure alignment mode...");
+        revalidate();
+       
+       // logger.info("set SelectionPanel to structure alignment mode...");
     }
     
     public void addStructureListener(StructureListener li){
@@ -129,15 +133,35 @@ extends JPanel
     
     public void newStructure(StructureEvent event){
         // set into single structure mode
+        //logger.info("selectionPanel got new structure");
         hBox.removeAll();
         hBox.add(chainList);
         chainDisplay.newStructure(event);
+        alignmentMode = false;
+        
+        this.setPreferredSize(new Dimension(30,30));
+        
+        hBox.repaint();
         repaint();
+        revalidate();
     }
     
     public void repaint(){
         super.repaint();
         if ( chainList != null)
             chainList.repaint();        
-    }    
+    }  
+    
+    
+    public void selectedChain(StructureEvent e){}
+
+    public void newObjectRequested(String accessionCode) {
+        
+    }
+
+    public void noObjectFound(String accessionCode) {
+  
+        
+    }
+    
 }

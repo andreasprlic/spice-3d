@@ -28,7 +28,9 @@ import org.biojava.spice.server.SpiceClient;
 import org.biojava.spice.server.SpiceServer;
 import java.applet.Applet;
 import org.biojava.spice.Config.ConfigurationException;
+import org.biojava.spice.Config.RegistryConfigIO;
 //import java.net.URL;
+import java.net.URL;
 import java.util.ArrayList;
 import org.biojava.spice.GUI.AboutDialog;
 import org.biojava.spice.GUI.SpiceTabbedPane;
@@ -135,6 +137,7 @@ public class Spice extends Applet {
         server.registerInstance(app);
         app.setSpiceServer(server);
         new SpiceTabbedPane(server,app);      
+                
         
         // and display the accession code...
         app.load(params.getCodetype(),params.getCode());

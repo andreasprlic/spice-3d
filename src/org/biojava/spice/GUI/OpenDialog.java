@@ -56,7 +56,7 @@ extends JDialog
     private static final long serialVersionUID = 2832023723402743924L;
     
     
-    static final String[] supportedCoords = { "PDB","UniProt","ENSP"};
+    static final String[] supportedCoords = { "PDB","UniProt","ENSP", "alignment"};
     //static final String[] supportedCoords = { "PDB","UniProt"};
     static int H_SIZE = 350;
     static int V_SIZE = 150 ;
@@ -127,9 +127,12 @@ extends JDialog
                 
                 if (    type.equals("PDB") ||
                         type.equals("ENSP") ||
-                        type.equals("UniProt")){
+                        type.equals("UniProt") ||
+                        type.equals("alignment")){
                     spice.load(type,code);
                     dispose();			    
+                } else {
+                    System.out.println("unknown type " + type + " code " + code);
                 }
             }
         });
@@ -186,6 +189,7 @@ extends JDialog
         } else if ( type.equals("ENSP")){
             getCom.setToolTipText("enter Ensembl peptide accession code e.g. ENSP00000334713");
         }
+        // todo: alignment helper
         
             
     }
@@ -220,7 +224,8 @@ implements ActionListener{
           
             if ( type.equals("PDB")  ||
                     type.equals("ENSP") ||
-                    type.equals("UniProt") ){
+                    type.equals("UniProt") ||
+                    type.equals("alignment")){
                 spice.load(type,code);
                 parent.dispose();			    
             }

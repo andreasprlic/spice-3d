@@ -42,7 +42,7 @@ public class RainbowPainter {
 
         
         
-        float stepsize = 1.0f / (float)selection.length;
+        float stepsize = 1.0f / (float)selection.length * 0.7f;
         float saturation = 1.0f;
         float brightness = 1.0f;
         StringBuffer cmd = new StringBuffer();
@@ -56,13 +56,9 @@ public class RainbowPainter {
                 chainId = parent.getName();
                 //System.out.println("got chain >" + chainId + "< from parent");
             }
-            //int p = selection.length - i ;
-            //int hue   = Math.round(i* stepsize);
-            float hue = i * stepsize;
-            //int rgb = Color.HSBtoRGB(hue, saturation, brightness);
+           
+            float hue = i * stepsize ;
             
-            //green = Math.round(i* stepsize);
-            //blue  = Math.round(i* stepsize);
             //System.out.println(">"+chainId + "< " + g.getPDBCode() + " "+ i+ " " + stepsize + " "+ red + " " + green + " " + blue );
             Color col = Color.getHSBColor(hue,saturation,brightness);
             

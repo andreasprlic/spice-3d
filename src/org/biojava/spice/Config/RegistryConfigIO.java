@@ -263,7 +263,7 @@ extends Thread
         done = false;
         
         if ( registryArray == null ) {
-            throw new ConfigurationException("not registration server has been provided!");
+            throw new ConfigurationException("no registration server has been provided!");
         }
         
         boolean found = false;

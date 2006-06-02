@@ -86,19 +86,23 @@ public class CloseableTabbedPane extends JTabbedPane {
         tabListeners.add(listener);
     }
     
-    public void removeTabAt(int i){
+    /*public void removeTabAt(int i){
+        
+        System.out.println("remove tab at " + i);
         Component c = getComponentAt(i);
-        super.removeTabAt(i);
+        super.remove(c);
         triggerTabClosed(c);
         
-    }
+      
+        
+    }*/
     
     public TabListener[] getTabListener(){
         return (TabListener[])tabListeners.toArray(new TabListener[tabListeners.size()]);
     }
     
     private void triggerTabClosed(Component c){
-
+        System.out.println("closeabletab trigger close");
         Iterator iter = tabListeners.iterator();
         while (iter.hasNext()){
             TabListener li = (TabListener)iter.next();
@@ -149,8 +153,6 @@ public class CloseableTabbedPane extends JTabbedPane {
             
             triggerTabSelected(i,getComponentAt(i));
             
-           
-            
             
             ClosingIcon icon = (ClosingIcon)getIconAt(i);
             
@@ -162,7 +164,7 @@ public class CloseableTabbedPane extends JTabbedPane {
                 
                 // TODO: improve this hack:
                 // the actual removing is done by listener! ...
-                removeTabAt(i);
+                //removeTabAt(i);
                
                 
             }

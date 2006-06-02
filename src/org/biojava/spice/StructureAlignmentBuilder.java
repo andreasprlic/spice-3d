@@ -66,6 +66,8 @@ implements AlignmentListener {
     SpiceDasSource[] alignmentServers;
     SpiceDasSource[] structureServers;
     List structureListeners;
+    List alignmentListeners;
+    
     StructurePanel structurePanel;
     SelectionPanel selectionPanel;
     
@@ -78,8 +80,20 @@ implements AlignmentListener {
         structureListeners = new ArrayList();
         structurePanel = null;
         selectionPanel = new SelectionPanel();
+        alignmentListeners = new ArrayList();
     }
     
+    
+    public AlignmentListener[] getAlignmentListeners() {
+        return (AlignmentListener[]) alignmentListeners.toArray(new AlignmentListener[alignmentListeners.size()]);
+    }
+
+
+    public void addAlignmentListener(AlignmentListener alignmentListener) {
+        alignmentListeners.add( alignmentListener);
+    }
+
+
     public void setStructurePanel(StructurePanel panel){
         structurePanel = panel;
     }
@@ -107,7 +121,11 @@ implements AlignmentListener {
         
         AlignmentThread thread =    new AlignmentThread(params);
         thread.addAlignmentListener(this);
-        
+        Iterator iter =alignmentListeners.iterator();
+        while (iter.hasNext()){
+            AlignmentListener li = (AlignmentListener)iter.next();
+            thread.addAlignmentListener(li);
+        }
         thread.start();
     }
     
@@ -326,57 +344,6 @@ implements AlignmentListener {
         return cmd;
     }
     
-//    private Structure getRegions(Structure struc, String intId, Annotation[] blocks, String chainName) 
-//    throws StructureException {
-//        Structure newstruc = new StructureImpl();
-//        Chain n = new ChainImpl();
-//        n.setName(chainName);
-//        
-//        for (int b=0;b<2;b++){
-//            Annotation block = blocks[b];
-//            List segments = (List)block.getProperty("segments");
-//            Iterator siter = segments.iterator();
-//            while (siter.hasNext()){
-//                Annotation seg = (Annotation)siter.next();
-//                String ii =  (String)seg.getProperty("intObjectId");
-//                if (!( ii.equals(intId))) 
-//                    continue;
-//                String start = (String) seg.getProperty("start");
-//                String end   = (String) seg.getProperty("end");
-//                
-//                int indx1 = start.indexOf(":");
-//                String chainId1 = " ";
-//                String chainId2 = " ";
-//                System.out.println(start);
-//                System.out.println(end);
-//                
-//                if (indx1 >-1) {
-//                    chainId1 = start.substring(indx1+1,start.length());
-//                    start = start.substring(0,indx1);
-//                    
-//                }
-//                int indx2 = end.indexOf(":");
-//                if ( indx2>-1) {
-//                    chainId2 = end.substring(indx2+1,end.length());
-//                    end = end.substring(0,indx2);                    
-//                }
-//                
-//                if ( chainId1.equals(""))
-//                    chainId1 = " ";
-//                Chain c = struc.getChainByPDB(chainId1);
-//                Group[] groups = c.getGroupsByPDB(start,end);
-//                for (int g=0;g< groups.length;g++){
-//                    Group gg =groups[g];
-//                    n.addGroup(gg);
-//                }
-//                
-//            }
-//            
-//        }
-//        newstruc.addChain(n);
-//        System.out.println(n.getSequence());
-//        return newstruc;
-//    }
     
     private Structure getStructure(String dasstructurecommand,String pdbCode)
     throws IOException {
@@ -388,6 +355,7 @@ implements AlignmentListener {
     
     public void clearListeners(){
         structureListeners.clear();
+        alignmentListeners.clear();
     }
     
     public void addStructureListener(StructureListener li){

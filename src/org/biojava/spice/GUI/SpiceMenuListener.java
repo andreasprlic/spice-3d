@@ -35,6 +35,7 @@ import org.biojava.bio.structure.GroupIterator;
 import org.biojava.bio.structure.Structure;
 import org.biojava.dasobert.eventmodel.SequenceEvent;
 import org.biojava.dasobert.eventmodel.SequenceListener;
+import org.biojava.spice.Config.RegistryConfiguration;
 import org.biojava.spice.Panel.StructurePanelListener;
 import org.biojava.spice.manypanel.managers.StructureManager;
 import org.biojava.spice.server.SpiceServer;
@@ -53,6 +54,7 @@ public class SpiceMenuListener
 implements ActionListener,
 SequenceListener
 {
+    public static final String structureDisplayProperty = "structureDisplay";
     
     static String alloff = "cpk off ; wireframe off ; backbone off; cartoon off ; ribbons off; " ;
     static String reset = "select *; " + alloff;
@@ -99,8 +101,10 @@ SequenceListener
             params.setInitSpiceServer(false);
             params.setNewTab(true);
             params.setNoRegistryContact(true); 
+            RegistryConfiguration config = spice.getConfiguration();
            
             SpiceApplication newSpice = new SpiceApplication(params);         
+            newSpice.newConfigRetrieved(config);
             //SpiceServer server = spice.getSpiceServer();
             //newSpice.setSpiceServer(server);
             
@@ -210,7 +214,7 @@ SequenceListener
                 Iterator iter = chains.iterator();
                 while (iter.hasNext()){
                     Chain c = (Chain) iter.next();
-                    List aminos = c.getGroups("amino");
+                    List aminos = c.getGroups();
                     Iterator aiter = aminos.iterator();
                     while (aiter.hasNext()){
                         Group g = (Group) aiter.next();
@@ -278,7 +282,21 @@ SequenceListener
             //aligc.show();
             
             // has been moved to BrowserPane !
+        } else if (cmd.equals("Toggle full structure")) {
+            
+            String strucdisp = System.getProperty(structureDisplayProperty);
+            if (strucdisp == null) {
+                System.setProperty(structureDisplayProperty,"show full");
+            } else if ( strucdisp.equals("show full")){
+                System.setProperty(structureDisplayProperty,"show region");
+            } else {
+                System.setProperty(structureDisplayProperty,"show full");
+            }
+            System.out.print("new system property " + System.getProperty(structureDisplayProperty));
+                
+        
         } else {
+        
             //System.out.println("unknown menu comand " + cmd);
         }
         

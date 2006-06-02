@@ -44,6 +44,7 @@ import org.biojava.spice.Feature.Segment;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureEvent;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 //import javax.swing.JEditorPane;
@@ -173,6 +174,8 @@ StructureListener
         */
         
         seq_pos        = new JTextField();
+        seq_pos.setEditable(false);
+        seq_pos.setBorder(BorderFactory.createEmptyBorder(1,1,1,1));
         // init Seqouece position
         //seq_pos.setForeground(new Color(255, 255, 255));
         //seq_pos.setBackground(new Color(0, 0, 0));

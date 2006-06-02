@@ -41,13 +41,16 @@ import org.biojava.bio.Annotation;
 import org.biojava.bio.program.das.dasalignment.Alignment;
 import org.biojava.bio.structure.Atom;
 import org.biojava.bio.structure.Calc;
+import org.biojava.bio.structure.Chain;
+import org.biojava.bio.structure.ChainImpl;
+import org.biojava.bio.structure.Group;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.StructureException;
 import org.biojava.bio.structure.StructureImpl;
 import org.biojava.bio.structure.io.DASStructureClient;
 import org.biojava.bio.structure.jama.Matrix;
 import org.biojava.dasobert.dasregistry.Das1Source;
-import org.biojava.spice.Config.ConfigGui;
+import org.biojava.spice.GUI.SpiceMenuListener;
 import org.biojava.spice.manypanel.renderer.ScalePanel;
 
 public class StructureAlignment {
@@ -66,6 +69,7 @@ public class StructureAlignment {
     Das1Source[] structureServers;
     JFrame progressFrame;
     Annotation[] sortedBlocks;
+    int nrSelected;
     
     public StructureAlignment() {
         super();
@@ -75,7 +79,7 @@ public class StructureAlignment {
         selection = new boolean[0];
         loaded = new boolean[0];
         sortedBlocks = new Annotation[0];
-        
+        nrSelected = 0;
     }
     
     public void setStructureServers(Das1Source[] servers){
@@ -112,7 +116,7 @@ public class StructureAlignment {
         }
         
         
-        
+        nrSelected = 0;
         matrices     = new Matrix[n];
         shiftVectors = new Atom[n];
         structures   = new Structure[n];
@@ -144,19 +148,19 @@ public class StructureAlignment {
     
     public void select(int pos){
         selection[pos] = true;
+        nrSelected++;
     }
     
     public void deselect(int pos){
         selection[pos] = false;
+        nrSelected--;
         
     }
     
     public String getRasmolScript(){
         String cmd = "select *; backbone 0.3;";
         
-        float stepsize   = 1.0f / (float)intObjectIds.length;
-        float saturation = 1.0f;
-        float brightness = 1.0f;
+       
         int modelcount = 0;
         
         for ( int p=0;p<selection.length;p++){
@@ -167,9 +171,13 @@ public class StructureAlignment {
             String intId = intObjectIds[p];
             modelcount ++;
             
-            float hue = p * stepsize;
-            Color col = Color.getHSBColor(hue,saturation,brightness);
             
+            Color col =  getColor(p);
+           
+            Color chaincol = new Color(col.getRed()/2,col.getGreen()/2,col.getBlue()/2);
+            
+            cmd += "select */"+modelcount+"; ";
+            cmd += " color [" +chaincol.getRed()+","+chaincol.getGreen() +","+chaincol.getBlue() +"];";
             
             for (int b=0;b<sortedBlocks.length;b++){
                 Annotation block = sortedBlocks[b];
@@ -246,6 +254,25 @@ public class StructureAlignment {
         return newStruc;
     }
     
+    /** re turns the color for a particular PDB file
+     * 
+     * @param position
+     * @return
+     */
+    public Color getColor(int position){
+        float stepsize   = 0;
+        //if ( nrSelected > 0 )
+        //    stepsize = 1.0f / (float)nrSelected;
+        if ( structures.length > 0 )
+            stepsize = 1.0f / (float)structures.length * 0.7f;
+        float saturation = 1.0f;
+        float brightness = 1.0f;
+        
+        float hue = position * stepsize ;
+        Color col = Color.getHSBColor(hue,saturation,brightness);
+        return col;
+    }
+    
     
     private void showProgressFrame(String pdbCode){
         progressFrame = new JFrame();
@@ -317,7 +344,7 @@ public class StructureAlignment {
     
     public Structure getStructure(int pos) throws StructureException{
         if ( loaded[pos])
-            return structures[pos];
+            return returnStructureOrRange(pos,structures[pos]);
         
         String pdbCode = intObjectIds[pos].substring(0,4);
         // show busy frame...
@@ -335,13 +362,14 @@ public class StructureAlignment {
             } catch (IOException e){
                 continue;
             }
-            
-            
         }
         disposeProgressBar();
         
         if ( s == null)
             throw new StructureException("Could not load structure at position " + pos);
+        
+               
+        
         
         // rotate, shift structure...
         Matrix m = matrices[pos];
@@ -352,7 +380,104 @@ public class StructureAlignment {
         structures[pos] = s;
         loaded[pos] = true;
         
-        return s;
+        
+        
+        
+        return returnStructureOrRange(pos,s);
+        
+    }
+    
+    private Structure returnStructureOrRange(int pos, Structure s){
+        String property = SpiceMenuListener.structureDisplayProperty;
+        
+        String val = System.getProperty(property);
+        System.out.println("in struc alig:" + val);
+        Structure ret = s;
+        if ( ( val == null) || (val == "show region")) { 
+            try {
+                Structure newStruc  = getStructureRanges(pos, s);
+                if (( newStruc != null) && ( newStruc.size() > 0)) {
+                    ret = newStruc;
+                }
+            } catch (StructureException e){
+                
+            }
+        }
+        return ret;
+    }
+    
+    private Structure getStructureRanges(int pos , Structure s ) throws StructureException{
+        
+        Structure newStruc = new StructureImpl();
+        
+        // check if the alignment has an object detail "region" for this
+        // if yes = restrict the used structure...
+        Annotation[] objects = alignment.getObjects();
+        Annotation object = objects[pos];
+        if ( object.containsProperty("details")){
+            List details = (List) object.getProperty("details");
+            
+            newStruc.setPDBCode(s.getPDBCode());
+            newStruc.setHeader(s.getHeader());
+            
+            for ( int det = 0 ; det< details.size();det++) {
+                Annotation detanno = (Annotation) details.get(det);
+                String property = (String)detanno.getProperty("property");
+                if ( property.equals("region")){
+                    String detail = (String) detanno.getProperty("detail");
+                    
+                    // split up the structure and add the region to the new structure...
+                    int cpos = detail.indexOf(":");
+                    String chainId = " ";
+                    
+                    if ( cpos > 0) {
+                        chainId = detail.substring(0,cpos);
+                        detail  = detail.substring(cpos+1,detail.length());
+                    } else {
+                        detail = detail.substring(1,detail.length());
+                    }
+                    
+                    System.out.println(detail + " " + cpos + " " + chainId);
+                    
+                    String[] spl = detail.split("-");
+                    
+                    if ( spl.length != 2)
+                        continue;
+                    String start = spl[0];
+                    String end   = spl[1];
+                    System.out.println("start " + start + " end " + end);
+                    Chain c = s.getChainByPDB(chainId);
+                    Group[] groups = c.getGroupsByPDB(start,end);
+                    
+                    Chain nc = new ChainImpl ();
+                    nc.setName(chainId);
+                    boolean knownChain = false;
+                    try {
+                        nc = newStruc.findChain(chainId);
+                        knownChain = true;
+                        
+                    } catch (Exception e){}
+                    
+                    for (int g=0;g<groups.length;g++){
+                        Group gr = groups[g];
+                        nc.addGroup(gr);
+                        
+                        
+                    }
+                    if ( ! knownChain)
+                        newStruc.addChain(nc);
+                }
+            }
+            
+            
+        }
+        
+       
+        
+        if (newStruc.size() > 0){
+            return newStruc;
+        } else
+            return null;
         
     }
     

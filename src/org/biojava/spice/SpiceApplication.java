@@ -31,6 +31,8 @@ import java.lang.reflect.*;
 import org.biojava.bio.structure.*;
 import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
+import org.biojava.dasobert.eventmodel.AlignmentEvent;
+import org.biojava.dasobert.eventmodel.AlignmentListener;
 import org.biojava.dasobert.eventmodel.SequenceListener;
 import org.biojava.dasobert.eventmodel.StructureEvent;
 import org.biojava.dasobert.eventmodel.StructureListener;
@@ -87,6 +89,8 @@ import org.biojava.spice.manypanel.eventmodel.DasSourceListener;
 import org.biojava.spice.server.SpiceServer;
 import org.jmol.api.JmolViewer;
 
+import sun.awt.PlatformFont;
+
 
 /** the main application layer of SPICE
  * do not interact with this class directly, but interact with SPICEFrame interface.
@@ -126,12 +130,12 @@ ConfigurationListener
     //JList chainList;   // list available chains
     SelectionPanel selectionPanel;
     
-    JScrollPane dasPanel ;
+    //JScrollPane dasPanel ;
 
     JSplitPane sharedPanel;
     JSplitPane mainsharedPanel;
     
-    JScrollPane seqScrollPane ;
+    //JScrollPane seqScrollPane ;
     JSplitPane  seqSplitPane  ;
     //SeqTextPane seqTextPane      ;
     JMenuItem lock;
@@ -223,10 +227,12 @@ ConfigurationListener
         
         URL[] registries = getAllRegistryURLs();
         RegistryConfigIO regi = new RegistryConfigIO(registries);
-        if ( params.isNoRegistryContact())
+        if ( params.isNoRegistryContact()) {
             regi.setNoUpdate(true);
-        regi.addConfigListener(this);
-        regi.run();
+        } else {
+            regi.addConfigListener(this);
+            regi.run();
+        }
         
         
         
@@ -455,7 +461,7 @@ ConfigurationListener
         
         
         JScrollPane chainPanel = new JScrollPane(selectionPanel);
-        chainPanel.setPreferredSize(new Dimension(30,30));
+        selectionPanel.setPreferredSize(new Dimension(60,60));
         //chainPanel.setLayout(new BoxLayout(chainPanel,BoxLayout.X_AXIS)); 
         chainPanel.setBorder(BorderFactory.createEmptyBorder());
         
@@ -479,7 +485,7 @@ ConfigurationListener
             mainsharedPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, sharedPanel,vBox2);
         
         mainsharedPanel.setOneTouchExpandable(true);
-        mainsharedPanel.setResizeWeight(0.5);
+        mainsharedPanel.setResizeWeight(0.6);
         
         mainsharedPanel.setPreferredSize(new Dimension(790, 590));
         
@@ -497,6 +503,7 @@ ConfigurationListener
         //Box hBox1 = Box.createHorizontalBox();
         //hBox1.add(statusPanel);
         Box hBox = Box.createHorizontalBox();
+        hBox.setBorder(BorderFactory.createEmptyBorder());
         hBox.add(statusPanel);
         vBox.add(hBox);
         //vBox.add(hBox1);
@@ -528,6 +535,7 @@ ConfigurationListener
         SequenceListener[] li = browserPane.getPDBSequenceListener();
         for ( int i = 0 ; i < li.length;i++){
             jmolSpiceTranslator.addPDBSequenceListener(li[i]);
+            // TODO: enable next line
             selectionPanel.addPDBSequenceListener(li[i]);
                 
         }
@@ -557,6 +565,8 @@ ConfigurationListener
         browserPane.addStructureListener(chainDisplay);
         browserPane.addStructureListener(jmolSpiceTranslator);
         
+        browserPane.addStructureListener(selectionPanel);
+        
         //chainList.addListSelectionListener(chainDisplay);
         chainDisplay.addStructureListener(browserPane.getStructureManager());
         chainDisplay.addStructureListener(structurePanelListener);
@@ -565,10 +575,11 @@ ConfigurationListener
         //chainDisplay.addStructureListener(spiceMenuListener);
         
         
-        selectionPanel.addStructureListener(structurePanelListener);
         //selectionPanel.addStructureListener(jmolSpiceTranslator);
+        //TODO: renenable the next lines
         selectionPanel.addStructureListener(browserPane.getStructureManager());
-       
+        selectionPanel.addStructureListener(structurePanelListener);
+        
     }
     
     public void setMenu(JMenuBar menu) {
@@ -599,9 +610,11 @@ ConfigurationListener
         
         // unique action listener for the browse buttons
         browseMenu = new BrowseMenuListener();
-        JMenu bm = browseMenu.getBrowsermenu();
-        
+        JMenu bm = browseMenu.getBrowsermenu();        
         menu.add(bm);
+        
+        JMenu alig = MenuCreator.createAlignmentMenu(spiceMenuListener);
+        menu.add(alig);
 
         menu.add(Box.createGlue());
         
@@ -617,7 +630,15 @@ ConfigurationListener
     
     /** Returns an ImageIcon, or null if the path was invalid. */
     public static ImageIcon createImageIcon(String path) {
-        java.net.URL imgURL = SpiceApplication.class.getClassLoader().getResource(path);
+        /*ClassLoader cl = SpiceApplication.class.getClassLoader();
+        if (cl == null) {
+            cl = ClassLoader.getSystemClassLoader();
+        }*/
+        
+        java.net.URL imgURL = SpiceApplication.class.getResource(path);
+        if (imgURL != null) {
+            imgURL = SpiceApplication.class.getResource("resources/"+path);
+        }
         if (imgURL != null) {
             return new ImageIcon(imgURL);
         } else {
@@ -783,6 +804,28 @@ ConfigurationListener
         sacreator.setSelectionPanel(selectionPanel);
         sacreator.setAlignmentServers(ads);
         sacreator.setStructureServers(sds);
+        
+        AlignmentListener ali = new AlignmentListener(){
+
+            public void clearAlignment() {
+                // TODO Auto-generated method stub
+                
+            }
+
+            public void newAlignment(AlignmentEvent e) {
+                String txt = "SPICE - " + e.getAccessionCode();
+               spiceTabbedPane.setFrameTitle(txt);
+                
+            }
+
+            public void noAlignmentFound(AlignmentEvent e) {
+                // TODO Auto-generated method stub
+                
+            }
+            
+        };
+        sacreator.addAlignmentListener(ali);
+        
         
         sacreator.request(alignmentCode);
     }
@@ -1309,7 +1352,8 @@ ConfigurationListener
         logger.finest("got new config " );
         config = conf;
         configLoaded =true;
-        
+        if ( conf == null)
+            return;
         testAddLocalServer();
         setDasSources();
                 
@@ -1365,8 +1409,8 @@ ConfigurationListener
         //ent_list.paint() ;
         sharedPanel.setVisible(true);
         //dasPanel.updateUI();
-        dasPanel.revalidate();
-        dasPanel.repaint();
+        //dasPanel.revalidate();
+        //dasPanel.repaint();
         
         //dasPanel.revalidate();
         //dasPanel.repaint();

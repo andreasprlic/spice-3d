@@ -113,16 +113,22 @@ implements WindowListener{
             public void tabClosing(TabEvent e) {
                 
                 //int i = e.getTabNumber();
-                //logger.info("got close tab event for tab " + i);
-              
+                logger.info("got close tab event for tab " + e.getTabNumber());
+                SpiceApplication s= (SpiceApplication) e.getComponent(); 
+                removeSPICE(s);
                 
             }
             public void tabClosed(TabEvent e){
-                SpiceApplication s= (SpiceApplication) e.getComponent(); 
-                removeSPICE(s);
+                logger.info("got tab closed event");
+               
             }
             
         });
+    }
+    
+    public void setFrameTitle(String text){
+        frame.setTitle(text);
+        frame.repaint();
     }
     
     protected void setFrameTitle(SPICEFrame spice){
@@ -131,8 +137,7 @@ implements WindowListener{
         if ( ! (tabText.equals(""))){
             txt += " - " + tabText;
         }
-        frame.setTitle(txt);
-        frame.repaint();
+        setFrameTitle(txt);
         
     }
     
@@ -164,6 +169,9 @@ implements WindowListener{
         return tabbedSpices.size();
     }
     
+    public JFrame getMainFrame(){
+        return frame;
+    }
     //private void removeSPICEAt(int tabnr){
       //  removeTabAt(tabnr);
         //SpiceApplication sp = (SpiceApplication)tabbedSpices.get(tabnr);
@@ -227,7 +235,7 @@ implements WindowListener{
     }
     
     public void removeSPICE(SPICEFrame spice){
-        //System.out.println("removing spice " + spice.getPDBCode() + " tabbedSpices length:" + tabbedSpices.size());
+        System.out.println("removing spice " + spice.getPDBCode() + " tabbedSpices length:" + tabbedSpices.size());
         
         if ( ! tabbedSpices.contains(spice)) {
             logger.warning("did not find spice instance in list, can not remove!");
@@ -241,9 +249,10 @@ implements WindowListener{
         deregisterSpiceListeners(spice);
         server.removeInstance(spice);
         tabbedSpices.remove(spice);
-        //int pos = getSelectedIndex();
+        int pos = getSelectedIndex();
         //this.remove(sp);
-        //removeTabAt(pos);
+        removeTabAt(pos);
+        sp.newConfigRetrieved(null);
         sp.setSpiceServer(null);
         sp.setSpiceTabbedPane(null);
         sp.setMenu(null);
@@ -285,6 +294,7 @@ implements WindowListener{
     }
     
     protected String getSpiceText(SPICEFrame spice){
+        
         String pdb = spice.getPDBCode();
         String up = spice.getUniProtCode();
         String ensp = spice.getENSPCode();
