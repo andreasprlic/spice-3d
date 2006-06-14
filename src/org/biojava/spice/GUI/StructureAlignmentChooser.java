@@ -68,7 +68,7 @@ implements ItemListener {
     
     public StructureAlignmentChooser() {
         super();
-    
+        
         structureListeners = new ArrayList();
         structureAlignment = new StructureAlignment();
         checkButtons = new ArrayList();
@@ -100,10 +100,19 @@ implements ItemListener {
         vBox.repaint();
     }
     
+    public StructureAlignment getStructureAlignment(){
+        return structureAlignment;
+    }
+    
     public void setStructureAlignment(StructureAlignment ali){
         structureAlignment = ali;
-        logger.info("got new structure alignment");
+        //logger.info("got new structure alignment");
         clearButtons();
+        if ( ali == null) {
+            clearButtons();
+            repaint();
+            return;
+        }
         
         String[] ids = ali.getIds();
         for ( int i=0; i< ids.length;i++){
@@ -138,7 +147,7 @@ implements ItemListener {
                 if (e.getStateChange() == ItemEvent.DESELECTED) {
                     // remove structure from alignment
                     structureAlignment.deselect(i);
-                     
+                    
                 } else {
                     structureAlignment.select(i);
                     // add structure to alignment
@@ -157,7 +166,7 @@ implements ItemListener {
                     li.newStructure(event);
                     if ( li instanceof StructurePanelListener){
                         StructurePanelListener pli = (StructurePanelListener)li;
-                       pli.executeCmd(cmd);
+                        pli.executeCmd(cmd);
                     }
                     
                 }
@@ -167,17 +176,18 @@ implements ItemListener {
                     Chain c1 = struc.getChain(0);
                     String sequence = c1.getSequence();
                     String ac = id + "." + c1.getName();
+                    
                     SequenceEvent sevent = new SequenceEvent(ac,sequence);
-                
-                Iterator iter3 = pdbSequenceListeners.iterator();
-                while (iter3.hasNext()){
-                    SequenceListener li = (SequenceListener)iter3.next();
-                    li.newSequence(sevent);
-                }
+                    //logger.info("*** seqeunce event " + ac);
+                    Iterator iter3 = pdbSequenceListeners.iterator();
+                    while (iter3.hasNext()){
+                        SequenceListener li = (SequenceListener)iter3.next();
+                        li.newSequence(sevent);
+                    }
                 } catch (StructureException ex){
                     ex.printStackTrace();
                 }
-               
+                
                 
             }
         }

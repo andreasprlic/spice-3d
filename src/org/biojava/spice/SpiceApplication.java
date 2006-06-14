@@ -536,7 +536,7 @@ ConfigurationListener
         for ( int i = 0 ; i < li.length;i++){
             jmolSpiceTranslator.addPDBSequenceListener(li[i]);
             // TODO: enable next line
-            selectionPanel.addPDBSequenceListener(li[i]);
+            //selectionPanel.addPDBSequenceListener(li[i]);
                 
         }
                
@@ -576,9 +576,11 @@ ConfigurationListener
         
         
         //selectionPanel.addStructureListener(jmolSpiceTranslator);
-        //TODO: renenable the next lines
+        //todo: fix bug why alignment is overwritten with structure and re-enable:
+        //selectionPanel.addStructureListener(chainDisplay);     
         selectionPanel.addStructureListener(browserPane.getStructureManager());
         selectionPanel.addStructureListener(structurePanelListener);
+   
         
     }
     
@@ -819,7 +821,7 @@ ConfigurationListener
             }
 
             public void noAlignmentFound(AlignmentEvent e) {
-                // TODO Auto-generated method stub
+               
                 
             }
             

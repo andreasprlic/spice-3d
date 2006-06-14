@@ -33,6 +33,8 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 
 import org.biojava.bio.structure.Chain;
+import org.biojava.bio.structure.Structure;
+import org.biojava.bio.structure.StructureException;
 import org.biojava.dasobert.eventmodel.SequenceListener;
 import org.biojava.dasobert.eventmodel.StructureEvent;
 import org.biojava.dasobert.eventmodel.StructureListener;
@@ -134,11 +136,27 @@ implements StructureListener
     public void newStructure(StructureEvent event){
         // set into single structure mode
         //logger.info("selectionPanel got new structure");
+        
+        // make sure this is not the first active structure in the structure alignment ...
+        StructureAlignment strucAli = alignmentChooser.getStructureAlignment();
+        int pos = strucAli.getFirstSelectedPos();
+        if ( pos > -1){
+            try {
+                Structure selected = strucAli.getStructure(pos);
+                if ( selected.getPDBCode().equalsIgnoreCase(event.getPDBCode())){
+                    return;
+                }
+            } catch (StructureException e){
+                
+            }
+            
+        }
+        
         hBox.removeAll();
         hBox.add(chainList);
         chainDisplay.newStructure(event);
         alignmentMode = false;
-        
+        alignmentChooser.setStructureAlignment(null);
         this.setPreferredSize(new Dimension(30,30));
         
         hBox.repaint();

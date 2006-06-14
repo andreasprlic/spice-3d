@@ -122,11 +122,10 @@ StructureListener {
                 Chain ch = (Chain) chains.get(i);
                 model.add(i,ch.getName());
             }
-          
-               
         }
+        
         chainNumber = 0;
-        //logger.info("got code " + code + " chain >" + chain+"< >" +structure.getPDBCode() +"<");
+        logger.info("* * * got code >" + code + "< chain >" + chain+"< >" +structure.getPDBCode() +"<");
         
         if ( code.equalsIgnoreCase(structure.getPDBCode())){
             if ( ! (chain.equals(""))) {

@@ -382,6 +382,7 @@ FeatureListener{
     private FeatureImpl getNewFeat(Map currentFeatureMap) {
         FeatureImpl feat = new FeatureImpl();
         //logger.finest(currentFeatureMap);
+        //System.out.println("DrawableDasSource " + currentFeatureMap);
         feat.setSource((String)currentFeatureMap.get("dassource"));
         feat.setName(  (String)currentFeatureMap.get("NAME"));
         feat.setType(  (String)currentFeatureMap.get("TYPE"));

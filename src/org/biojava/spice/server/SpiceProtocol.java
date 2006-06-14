@@ -121,7 +121,7 @@ public class SpiceProtocol {
         try {
             String start = str.substring(0,11);
             System.out.println(start);
-            if ( str.length() > 150){
+            if ( str.length() > 400){
                 logger.info("too long string " + start + "...");
                 return SPICE_WHAT;
             }
@@ -163,7 +163,8 @@ public class SpiceProtocol {
                 
                 if (  (type.equals("PDB")    ) || 
                         (type.equals("UniProt")) ||
-                        ( type.equals("ENSP"))) {
+                        ( type.equals("ENSP")) || 
+                        ( type.equals("alignment"))) {
                     
                     
                    SPICEFrame spice = null;

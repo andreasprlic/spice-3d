@@ -781,7 +781,15 @@ JmolCommander
     }
 
     public synchronized void newStructure(StructureEvent event) {
-        //logger.info("got new structure");
+        logger.info("got new structure " + event.getPDBCode());
+        
+        /*if ( structure != null) 
+            if ( structure.getPDBCode() != null)
+                if ( structure.getPDBCode().equalsIgnoreCase(event.getPDBCode()) )
+                    return;
+        
+        */     
+        
         Structure s = event.getStructure();
         setStructure(s);
         setCurrentChainNumber(0);

@@ -157,10 +157,21 @@ public class StructureAlignment {
         
     }
     
+    /** get the position of the first selected structure
+     * or -1 if none selected.
+     */
+    public int getFirstSelectedPos(){
+        for (int i =0 ; i< selection.length;i++){
+            if (selection[i])
+                return i;
+        }
+        return -1;
+    }
+    
     public String getRasmolScript(){
         String cmd = "select *; backbone 0.3;";
         
-       
+        
         int modelcount = 0;
         
         for ( int p=0;p<selection.length;p++){
@@ -173,7 +184,7 @@ public class StructureAlignment {
             
             
             Color col =  getColor(p);
-           
+            
             Color chaincol = new Color(col.getRed()/2,col.getGreen()/2,col.getBlue()/2);
             
             cmd += "select */"+modelcount+"; ";
@@ -231,6 +242,7 @@ public class StructureAlignment {
      */
     public Structure createArtificalStructure(){
         Structure newStruc = new StructureImpl();
+        
         newStruc.setNmr(true);
         boolean first = true;
         int n = intObjectIds.length;
@@ -368,7 +380,7 @@ public class StructureAlignment {
         if ( s == null)
             throw new StructureException("Could not load structure at position " + pos);
         
-               
+        
         
         
         // rotate, shift structure...
@@ -391,7 +403,7 @@ public class StructureAlignment {
         String property = SpiceMenuListener.structureDisplayProperty;
         
         String val = System.getProperty(property);
-        System.out.println("in struc alig:" + val);
+        //System.out.println("in struc alig:" + val);
         Structure ret = s;
         if ( ( val == null) || (val == "show region")) { 
             try {
@@ -446,8 +458,44 @@ public class StructureAlignment {
                     String start = spl[0];
                     String end   = spl[1];
                     System.out.println("start " + start + " end " + end);
+                  
                     Chain c = s.getChainByPDB(chainId);
-                    Group[] groups = c.getGroupsByPDB(start,end);
+                    
+                    Chain nc = new ChainImpl ();
+                    nc.setName(chainId);
+                    boolean knownChain = false;
+                    try {
+                        nc = newStruc.findChain(chainId);
+                        knownChain = true;
+                        
+                    } catch (Exception e){}
+                    
+                    
+                    List groups = c.getGroups();
+                    Iterator iter = groups.iterator();
+                    boolean known =false;
+                    while (iter.hasNext()){
+                        Group g = (Group) iter.next();
+                        if (g.getPDBCode().equals(start)){
+                            known = true;
+                        }
+                        
+                        Group n = (Group) g.clone();
+                        // todo: check multi domain chains -
+                        // are regions on the same chain deleted by this?
+                        if (! known)
+                            n.clearAtoms();
+                        
+                        if (g.getPDBCode().equals(end)){
+                            known = false;
+                        }
+                        nc.addGroup(n);
+                        
+                    }
+                    if ( ! knownChain)
+                        newStruc.addChain(nc);
+                    
+                    /*Group[] groups = c.getGroupsByPDB(start,end);
                     
                     Chain nc = new ChainImpl ();
                     nc.setName(chainId);
@@ -464,15 +512,15 @@ public class StructureAlignment {
                         
                         
                     }
-                    if ( ! knownChain)
-                        newStruc.addChain(nc);
+                    */
+                   
                 }
             }
             
             
         }
         
-       
+        
         
         if (newStruc.size() > 0){
             return newStruc;
