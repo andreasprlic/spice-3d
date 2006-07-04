@@ -805,6 +805,13 @@ ChangeListener
         }
     }
     
+    public AlignmentManager getTopAlignmentManager(){
+        return aligManager;
+    }
+    public AlignmentManager getBottomAlignmentManager(){
+        return ensaligManager;
+    }
+    
     
     public void clearDisplay(){
         

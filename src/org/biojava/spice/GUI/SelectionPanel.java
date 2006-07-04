@@ -31,10 +31,13 @@ import javax.swing.DefaultListModel;
 import javax.swing.JCheckBox;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.StructureException;
+import org.biojava.bio.structure.StructureImpl;
 import org.biojava.dasobert.eventmodel.SequenceListener;
 import org.biojava.dasobert.eventmodel.StructureEvent;
 import org.biojava.dasobert.eventmodel.StructureListener;
@@ -80,11 +83,13 @@ implements StructureListener
         hBox = Box.createHorizontalBox(); 
         this.add(hBox);
         
+        chainList.addListSelectionListener(chainDisplay);
+        
         // default we are in single protein mode ...
         alignmentMode = false;                
         hBox.add(chainList);
         
-        //structureAlignment = new StructureAlignment();
+
         alignmentChooser = new StructureAlignmentChooser();
         setOpaque(false);
     }
@@ -102,6 +107,7 @@ implements StructureListener
     
     public void addPDBSequenceListener(SequenceListener li){
         alignmentChooser.addPDBSequenceListener(li);
+      
     }
     
     
@@ -118,11 +124,15 @@ implements StructureListener
         alignmentChooser.setStructureAlignment(strucAli);
         alignmentMode = true;
         hBox.removeAll();
-        
-        hBox.add(alignmentChooser);
+        JScrollPane scroll = new JScrollPane(alignmentChooser);
+        hBox.add(scroll);
         this.setPreferredSize(new Dimension(60,200));
         alignmentChooser.repaint();
         hBox.repaint();
+        
+        StructureEvent event = new StructureEvent(new StructureImpl());      
+        chainDisplay.newStructure(event);
+        
         repaint();
         revalidate();
        
@@ -131,6 +141,8 @@ implements StructureListener
     
     public void addStructureListener(StructureListener li){
         alignmentChooser.addStructureListener(li);
+        chainDisplay.addStructureListener(li);
+        
     }
     
     public void newStructure(StructureEvent event){
@@ -139,6 +151,9 @@ implements StructureListener
         
         // make sure this is not the first active structure in the structure alignment ...
         StructureAlignment strucAli = alignmentChooser.getStructureAlignment();
+        if ( strucAli == null)
+            strucAli = new StructureAlignment();
+        
         int pos = strucAli.getFirstSelectedPos();
         if ( pos > -1){
             try {

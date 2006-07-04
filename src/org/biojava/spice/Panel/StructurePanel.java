@@ -31,6 +31,8 @@ import org.jmol.popup.JmolPopup;
 import org.jmol.adapter.smarter.SmarterJmolAdapter;
 import org.biojava.bio.structure.Structure ;
 import org.biojava.bio.structure.StructureImpl ;
+
+import java.util.HashMap;
 import java.util.logging.*;
 
 
@@ -112,7 +114,7 @@ extends JPanel
         //logger.info(command);
        
         viewer.evalString(command);
-                   
+        
     }
     
     /** display a new PDB structure in Jmol 

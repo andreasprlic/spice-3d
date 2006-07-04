@@ -32,8 +32,9 @@ import java.util.logging.Logger;
 
 import javax.swing.Box;
 import javax.swing.JCheckBox;
-import javax.swing.JLabel;
+//import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 
 import org.biojava.bio.structure.Chain;
@@ -74,6 +75,8 @@ implements ItemListener {
         checkButtons = new ArrayList();
         pdbSequenceListeners = new ArrayList();
         vBox = Box.createVerticalBox();
+        //JScrollPane scroll = new JScrollPane(vBox);
+        //scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         this.add(vBox);
     }
     

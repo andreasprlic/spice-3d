@@ -289,7 +289,7 @@ JmolCommander
         String endpdb = ge.getPDBCode() ;
         String cmd =  "select "+startpdb+"-"+endpdb;
         if ( ! chainid.equals(" ")) 
-            cmd += ":" +chainid;
+            cmd += ":" +chainid +"/1";
         cmd +=" and protein;";
         return cmd ;
     }
@@ -414,7 +414,7 @@ JmolCommander
             return "" ;
         }
         
-        String cmd = "select " + pdbdat + " and protein;";
+        String cmd = "select " + pdbdat + "/1 and protein;";
         return cmd ;
         
     }

@@ -53,7 +53,7 @@ public class AlignmentManager
 extends AbstractAlignmentManager 
 implements StructureListener{
     
-     
+     private static String ASSEMBLYNAME = "ensemblpep-human-ncbi36";
     
    
     SpiceDasSource[] refservers1;
@@ -610,7 +610,7 @@ implements StructureListener{
         // the alignmetn server shoudl use the correct coord sys ...
         if ( params.getSubjectCoordinateSystem().toString().equals(BrowserPane.DEFAULT_ENSPCOORDSYS)) {
             DasCoordinateSystem ecs = new DasCoordinateSystem();
-            ecs.setName("ensemblpep-human-ncbi35");
+            ecs.setName(ASSEMBLYNAME);
             params.setSubjectCoordinateSystem(ecs);   
         }
         AlignmentThread thread =    new AlignmentThread(params);

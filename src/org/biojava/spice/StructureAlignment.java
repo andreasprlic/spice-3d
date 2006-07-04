@@ -25,6 +25,7 @@ package org.biojava.spice;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
@@ -116,8 +117,53 @@ public class StructureAlignment {
         }
         
         
+        // remove objects that have a Matrix object that contains all zeros!
+        Matrix zero =  Matrix.identity(3,3);
+        for (int i=0;i<3;i++ ){
+            zero.set(i,i,0.0);
+        }
+        zero.print(3,3);
+        List objectNew   = new ArrayList();
+        List matricesNew = new ArrayList();
+        List vectorsNew  = new ArrayList();
+      
+        
+        for (int i = 0 ; i< n ; i++){
+            Annotation a = maxs[i];
+            Matrix m = getMatrix(a);
+           // System.out.println(objects[i]+ ":");
+            //m.print(3,3);
+            boolean zeroValues = true;
+            for ( int x=0;x<3;x++){
+                for ( int y=0;y<3;y++){
+                    double val = m.get(x,y);
+                    if ( val != 0.0){
+                        zeroValues = false;
+                        x=3;
+                        y=3;
+                    }
+                }
+            }
+            if ( zeroValues == true){
+                // something went wrong during creation of rotmat
+                // ignore the whole object!
+               // System.out.println("matrix is zero:"  + objects[i]);
+                m.print(3,3);
+                continue;
+            }
+            objectNew.add(objects[i]);
+            matricesNew.add(m);
+            vectorsNew.add(vectors[i]);
+       
+        }
+        // copy the data back ...
+        objects      = (Annotation[]) objectNew.toArray(   new Annotation[objectNew.size()]);
+        matrices     = (Matrix[])     matricesNew.toArray( new Matrix[matricesNew.size()]);
+        vectors      = (Annotation[]) vectorsNew.toArray(  new Annotation[vectorsNew.size()]);
+      
+        n = objects.length;
         nrSelected = 0;
-        matrices     = new Matrix[n];
+        //matrices     = new Matrix[n];
         shiftVectors = new Atom[n];
         structures   = new Structure[n];
         intObjectIds = new String[n];
@@ -126,8 +172,7 @@ public class StructureAlignment {
         
         for (int i=0;i< n;i++){
             
-            Annotation a = maxs[i];
-            matrices[i] = getMatrix(a);
+        
             
             Annotation v = vectors[i];            
             Atom vec = (Atom) v.getProperty("vector");

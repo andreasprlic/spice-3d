@@ -123,28 +123,21 @@ ConfigurationListener
     HashMap memoryfeatures; // all features in memory
     List features ;    // currently being displayed 
         
-    //StructurePanel structurePanel ; 
-    JmolSpiceTranslator jmolSpiceTranslator;
-    StructurePanelListener structurePanelListener ;
-    //JTextField seq_pos ;
-    //JList chainList;   // list available chains
-    SelectionPanel selectionPanel;
-    
-    //JScrollPane dasPanel ;
 
+    JmolSpiceTranslator jmolSpiceTranslator;
+    StructurePanelListener structurePanelListener ;   
+    SelectionPanel selectionPanel;
+  
     JSplitPane sharedPanel;
-    JSplitPane mainsharedPanel;
+    JSplitPane mainsharedPanel;      
+    JSplitPane seqSplitPane  ;
     
-    //JScrollPane seqScrollPane ;
-    JSplitPane  seqSplitPane  ;
-    //SeqTextPane seqTextPane      ;
     JMenuItem lock;
     JMenuItem unlock;
     JMenuItem lockMenu;
     
     SpiceDasSource[] knownSources;
     
-    //JMenuBar menuBar ;
     JTextField getCom ;
     List knownFeatureLinks;
     StructurePanel structurePanel;
@@ -345,8 +338,8 @@ ConfigurationListener
     private void initLoggingPanel(){
         
         final LoggingPanel loggingPanel = new LoggingPanel(logger);
-        loggingPanel.getHandler().setLevel(Level.FINEST);	
-        logger.setLevel(Level.FINEST);
+        loggingPanel.getHandler().setLevel(Level.INFO);	
+        logger.setLevel(Level.INFO);
         loggingPanel.show(null);
                        
     }
@@ -572,16 +565,14 @@ ConfigurationListener
         chainDisplay.addStructureListener(structurePanelListener);
         chainDisplay.addStructureListener(statusPanel);
         chainDisplay.addStructureListener(jmolSpiceTranslator);
+        
         //chainDisplay.addStructureListener(spiceMenuListener);
         
         
-        //selectionPanel.addStructureListener(jmolSpiceTranslator);
-        //todo: fix bug why alignment is overwritten with structure and re-enable:
-        //selectionPanel.addStructureListener(chainDisplay);     
+        
         selectionPanel.addStructureListener(browserPane.getStructureManager());
         selectionPanel.addStructureListener(structurePanelListener);
-   
-        
+        selectionPanel.addStructureListener(browserPane.getTopAlignmentManager());
     }
     
     public void setMenu(JMenuBar menu) {
@@ -632,21 +623,16 @@ ConfigurationListener
     
     /** Returns an ImageIcon, or null if the path was invalid. */
     public static ImageIcon createImageIcon(String path) {
-        /*ClassLoader cl = SpiceApplication.class.getClassLoader();
-        if (cl == null) {
-            cl = ClassLoader.getSystemClassLoader();
-        }*/
-        
+             
         java.net.URL imgURL = SpiceApplication.class.getResource(path);
-        if (imgURL != null) {
-            imgURL = SpiceApplication.class.getResource("resources/"+path);
-        }
+        
         if (imgURL != null) {
             return new ImageIcon(imgURL);
         } else {
             logger.log(Level.WARNING,"Couldn't find file: " + path);
             return null;
         }
+
     }
 
     
@@ -827,7 +813,7 @@ ConfigurationListener
             
         };
         sacreator.addAlignmentListener(ali);
-        
+      
         
         sacreator.request(alignmentCode);
     }

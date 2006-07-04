@@ -97,7 +97,7 @@ StructureListener {
     }
     
     private void triggerSelectedChain(Structure s, int chainNumber){
-        //logger.info("trigger new chain " + chainNumber);
+        logger.info("trigger new chain " + chainNumber);
         int i = chainNumber;
         
         StructureEvent sevent = new StructureEvent(s,i);
@@ -116,16 +116,17 @@ StructureListener {
         DefaultListModel model = (DefaultListModel) ent_list.getModel() ;
         synchronized (model) {
             model.clear() ;
-                  
-            ArrayList chains = (ArrayList) structure.getChains(0);
-            for (int i=0; i< chains.size();i++) {
-                Chain ch = (Chain) chains.get(i);
-                model.add(i,ch.getName());
+            if ( structure.size() > 0) {      
+                ArrayList chains = (ArrayList) structure.getChains(0);
+                for (int i=0; i< chains.size();i++) {
+                    Chain ch = (Chain) chains.get(i);
+                    model.add(i,ch.getName());
+                }
             }
         }
         
         chainNumber = 0;
-        logger.info("* * * got code >" + code + "< chain >" + chain+"< >" +structure.getPDBCode() +"<");
+        //logger.info("* * * got code >" + code + "< chain >" + chain+"< >" +structure.getPDBCode() +"<");
         
         if ( code.equalsIgnoreCase(structure.getPDBCode())){
             if ( ! (chain.equals(""))) {
