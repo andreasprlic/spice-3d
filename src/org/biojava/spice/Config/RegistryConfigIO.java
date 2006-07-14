@@ -361,35 +361,7 @@ extends Thread
         //RegistryConfiguration oldconfig = config;
         
         RegistryConfiguration myconfig = new RegistryConfiguration();
-        // THE OLD STYLE!
-//        DasRegistryAxisClient rclient;
-//        try {
-//            rclient = new DasRegistryAxisClient(registryurl);
-//        } catch (Exception e) {
-//            logger.log(Level.WARNING,e.getMessage());   
-//            throw new ConfigurationException("Could not init client to contact registration service " + e.getMessage());
-//        }
-//        
-//        String[] capabs ;
-//        try {
-//            capabs = rclient.getAllCapabilities();
-//        } catch (Exception e){
-//            logger.log(Level.WARNING,e.getMessage());
-//            throw new ConfigurationException("Could not retreive all capabilities from registraion server");
-//        }
-//        //myconfig.setCapabilities(capabs);
-//        //Date d = new Date();
-//        //config.setContactDate(d);
-//        DasSource[]sources = null;
-//        try {
-//            sources = rclient.listServices();
-//        }
-//        
-        
-//        catch (Exception e){
-//            logger.log(Level.WARNING,e.getMessage());          
-//            throw new ConfigurationException(e.getMessage());
-//        }
+     
         DasSource[] sources = new DasSource[0];
         try {   
             logger.info("doing new DAS2 style request");
@@ -458,7 +430,7 @@ extends Thread
             DasSource ds = sources[i];
             //System.out.println(ds);
             if ( ds instanceof Das2Source){
-                System.out.println("das2source");
+                //System.out.println("das2source");
                 Das2Source d2s = (Das2Source)ds;
                 if (d2s.hasDas1Capabilities()){
                     Das1Source d1s = DasSourceConverter.toDas1Source(d2s);

@@ -122,7 +122,7 @@ public class StructureAlignment {
         for (int i=0;i<3;i++ ){
             zero.set(i,i,0.0);
         }
-        zero.print(3,3);
+        //zero.print(3,3);
         List objectNew   = new ArrayList();
         List matricesNew = new ArrayList();
         List vectorsNew  = new ArrayList();

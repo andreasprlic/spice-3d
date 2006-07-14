@@ -69,7 +69,7 @@ public class SpiceServer {
         if (! otherSpices.contains(spice)) {
             otherSpices.add(spice);
         } else {
-            logger.info("already known instance, not registering again");
+            //logger.info("already known instance, not registering again");
         }
     }
     

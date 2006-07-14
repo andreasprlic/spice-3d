@@ -48,7 +48,7 @@ extends JDialog {
     private static final long serialVersionUID = 8273923744121231231L;
     
     public static final String VERSION = 
-        "0.8.1";
+        "0.8.2";
     
     static final String AUTHORS = 
         " <a href=\"mailto:ap3@sanger.ac.uk\">Andreas Prlic</a>, Thomas Down, Tim Hubbard <br>"+
@@ -68,8 +68,7 @@ extends JDialog {
         " <b>MSD</b> - <a href=\"http://www.ebi.ac.uk/msd-srv/msdmotif/\">http://www.ebi.ac.uk/msd-srv/msdmotif/</a> for providing the UniProt - PDB alignment data and the keyword search web service. <br>"+
         " <b>BioJava</b> - <a href=\"http://www.biojava.org\">http://www.biojava.org</a> - for various libs. (LGPL)<br>"+
         " <b>Geotools</b> - <a href=\"http://modules.geotools.org/\">http://modules.geotools.org/</a> for the logging panel. (LGPL)<br>"+
-        " <b>Nuvola</b> - <a href=\"http://www.icon-king.com\">http://www.icon-king.com</a> - for many of the icons used here. (LGPL) <br>"+
-        " <b>Axis</b> - <a href=\"http://ws.apache.org/axis/\">http://ws.apache.org/axis/</a> - for the WebService (SOAP) library used for contacting the "+
+        " <b>Nuvola</b> - <a href=\"http://www.icon-king.com\">http://www.icon-king.com</a> - for many of the icons used here. (LGPL) <br>"+       
         " <a href=\"http://das.sanger.ac.uk/registry/\">DAS registration server</a><p>";
    
     static final String LICENSE = 
