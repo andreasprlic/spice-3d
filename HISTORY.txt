@@ -1,9 +1,18 @@
+0.8.2 - July 14th, 2006
+
+* SPICE now supports visualization of multiple structure alignments
+* alignment display now shows conserved/non conserved regions
+* rainbow coloring mode added
+* new tabbed browsing and open window functionalities
+* smaller size (< 6MB)
+
+
 0.8.1 - Feb 1, 2006
 
 Mainly a bug fixing release with only a few improvements in functionality
 
 * improved communication between Jmol and spice.
-* improved management of das sources
+* improved management of DAS sources
 * fixed a threading problem in Jmol
 * fixed bugs related to the correct display of  alignments
 * some small things.
