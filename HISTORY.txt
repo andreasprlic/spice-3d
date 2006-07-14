@@ -1,6 +1,9 @@
 0.8.2 - July 14th, 2006
 
 * SPICE now supports visualization of multiple structure alignments
+  for an example see:
+  http://sisyphus.mrc-cpe.cam.ac.uk:8082/sisyphus/showspicejnlp.jsp?alignment=AL00069117 
+
 * alignment display now shows conserved/non conserved regions
 * rainbow coloring mode added
 * new tabbed browsing and open window functionalities
