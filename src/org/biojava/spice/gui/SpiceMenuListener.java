@@ -31,12 +31,13 @@ import java.util.logging.Logger;
 
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.Group;
-import org.biojava.bio.structure.GroupIterator;
 import org.biojava.bio.structure.Structure;
 import org.biojava.dasobert.eventmodel.SequenceEvent;
 import org.biojava.dasobert.eventmodel.SequenceListener;
 import org.biojava.spice.config.RegistryConfiguration;
+import org.biojava.spice.gui.alignment.AlignmentGui;
 import org.biojava.spice.panel.StructurePanelListener;
+import org.biojava.spice.manypanel.eventmodel.StructureAlignmentListener;
 import org.biojava.spice.manypanel.managers.StructureManager;
 import org.biojava.spice.server.SpiceServer;
 import org.biojava.spice.SPICEFrame;
@@ -122,7 +123,22 @@ SequenceListener
                 op.show();
             }
             
+        } else if (cmd.equals("Align")) {
+            RegistryConfiguration config = spice.getConfiguration();
+            AlignmentGui agui = new AlignmentGui(config);
+            if ( spice instanceof SpiceApplication) {
+                SpiceApplication sp = (SpiceApplication)spice;
+                StructureAlignmentListener[] li = sp.getStructureAlignmentListeners();
+                for (int i=0;i<li.length;i++){
+                    agui.addStructureAlignmentListener(li[i]);
+                    
+                }
+            }
+            agui.pack();
+            agui.show();
+        
         } else if (cmd.equals("Save")){
+        
             
             if ( spice instanceof SpiceApplication) {
                 SaveLoadSession save = new SaveLoadSession((SpiceApplication)spice);

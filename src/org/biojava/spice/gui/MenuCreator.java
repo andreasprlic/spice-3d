@@ -124,6 +124,16 @@ public class MenuCreator {
         
         openpdb.setMnemonic(KeyEvent.VK_O);
         
+        
+        JMenuItem align;
+        ImageIcon alignIcon = createImageIcon("align.png");
+        if ( alignIcon == null) {
+            align = new JMenuItem("Align");
+        } else
+            align = new JMenuItem("Align", alignIcon);
+        align.setMnemonic(KeyEvent.VK_A);
+        
+        /*
         JMenuItem save ;
         ImageIcon saveIcon = createImageIcon("3floppy_unmount.png");
         if ( saveIcon == null)
@@ -139,6 +149,7 @@ public class MenuCreator {
         else
             revert = new JMenuItem("Load",revertIcon);
         revert.setMnemonic(KeyEvent.VK_L);
+        */
         
         ImageIcon exitIcon = createImageIcon("exit.png");
         JMenuItem exit;
@@ -156,13 +167,14 @@ public class MenuCreator {
             props   = new JMenuItem("Properties");
         props.setMnemonic(KeyEvent.VK_P);
       
-        newWindow.addActionListener(ml);
-        newTab.addActionListener(ml);
-        openpdb.addActionListener( ml );
-        save.addActionListener   ( ml );
-        revert.addActionListener ( ml );
-        exit.addActionListener   ( ml );
-        props.addActionListener  ( ml );
+        newWindow.addActionListener(ml );
+        newTab.addActionListener (  ml );
+        openpdb.addActionListener(  ml );
+        align.addActionListener  (  ml );
+        //save.addActionListener   (  ml );
+        //revert.addActionListener (  ml );
+        exit.addActionListener   (  ml );
+        props.addActionListener  (  ml );
 
         file.add(newWindow);
      
@@ -171,11 +183,13 @@ public class MenuCreator {
         file.addSeparator();
         
         file.add( openpdb );
-        file.add( save    );
-        file.add( revert  );
+        //file.add( save    );
+        //file.add( revert  );
         
         file.addSeparator();
+        file.add( align );
         
+        file.addSeparator();
         file.add( props   );
         
         file.addSeparator();
@@ -186,7 +200,11 @@ public class MenuCreator {
     }
     
     /** create a JMenu to be used for interacting with the structure Panel.
-     * requires an ActionListener to be called when one of the Menus is being used. */
+     * requires an ActionListener to be called when one of the Menus is being used. 
+     * 
+     * @param ml ActionListener
+     * @return JMenu a menu providing the Display menu
+     * */
     public static JMenu createDisplayMenu(ActionListener ml){
         JMenu display = new JMenu("Display");
         display.setMnemonic(KeyEvent.VK_D);

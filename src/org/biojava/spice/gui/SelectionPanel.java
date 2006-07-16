@@ -31,7 +31,6 @@ import javax.swing.DefaultListModel;
 import javax.swing.JCheckBox;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 
 import org.biojava.bio.structure.Chain;
@@ -42,6 +41,7 @@ import org.biojava.dasobert.eventmodel.SequenceListener;
 import org.biojava.dasobert.eventmodel.StructureEvent;
 import org.biojava.dasobert.eventmodel.StructureListener;
 import org.biojava.spice.StructureAlignment;
+import org.biojava.spice.manypanel.eventmodel.StructureAlignmentListener;
 
 /** a class that eithe provides a JList or a JCheckbox,
  * depending if spice is running in structure alignment mode or
@@ -103,6 +103,10 @@ implements StructureListener
     
     public SpiceChainDisplay getChainDisplay(){
         return chainDisplay;
+    }
+    
+    public StructureAlignmentListener getStructureAlignmentListener(){
+        return alignmentChooser;
     }
     
     public void addPDBSequenceListener(SequenceListener li){

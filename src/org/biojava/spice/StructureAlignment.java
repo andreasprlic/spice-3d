@@ -72,6 +72,8 @@ public class StructureAlignment {
     Annotation[] sortedBlocks;
     int nrSelected;
     
+    String[] rasmolScripts;
+    
     public StructureAlignment() {
         super();
         
@@ -89,6 +91,57 @@ public class StructureAlignment {
     
     public Alignment getAlignment() {
         return alignment;
+    }
+    
+    
+    
+    public boolean[] getLoaded() {
+        return loaded;
+    }
+    
+    public void setLoaded(boolean[] loaded) {
+        this.loaded = loaded;
+    }
+    
+    public Matrix[] getMatrices() {
+        return matrices;
+    }
+    
+    public void setMatrices(Matrix[] matrices) {
+        this.matrices = matrices;
+    }
+    
+    public Atom[] getShiftVectors() {
+        return shiftVectors;
+    }
+    
+    public void setShiftVectors(Atom[] shiftVectors) {
+        this.shiftVectors = shiftVectors;
+    }
+    
+    public Structure[] getStructures() {
+        return structures;
+    }
+    
+    public void setStructures(Structure[] structures) {
+        this.structures = structures;
+    }
+    
+    
+    public String[] getRasmolScripts() {
+        return rasmolScripts;
+    }
+
+    public void setRasmolScripts(String[] rasmolScripts) {
+        this.rasmolScripts = rasmolScripts;
+    }
+
+    public String[] getIntObjectIds() {
+        return intObjectIds;
+    }
+    
+    public void setIntObjectIds(String[] intObjectIds) {
+        this.intObjectIds = intObjectIds;
     }
     
     public void setAlignment(Alignment alignment) throws StructureException {
@@ -126,12 +179,12 @@ public class StructureAlignment {
         List objectNew   = new ArrayList();
         List matricesNew = new ArrayList();
         List vectorsNew  = new ArrayList();
-      
+        
         
         for (int i = 0 ; i< n ; i++){
             Annotation a = maxs[i];
             Matrix m = getMatrix(a);
-           // System.out.println(objects[i]+ ":");
+            // System.out.println(objects[i]+ ":");
             //m.print(3,3);
             boolean zeroValues = true;
             for ( int x=0;x<3;x++){
@@ -147,20 +200,20 @@ public class StructureAlignment {
             if ( zeroValues == true){
                 // something went wrong during creation of rotmat
                 // ignore the whole object!
-               // System.out.println("matrix is zero:"  + objects[i]);
+                // System.out.println("matrix is zero:"  + objects[i]);
                 m.print(3,3);
                 continue;
             }
             objectNew.add(objects[i]);
             matricesNew.add(m);
             vectorsNew.add(vectors[i]);
-       
+            
         }
         // copy the data back ...
         objects      = (Annotation[]) objectNew.toArray(   new Annotation[objectNew.size()]);
         matrices     = (Matrix[])     matricesNew.toArray( new Matrix[matricesNew.size()]);
         vectors      = (Annotation[]) vectorsNew.toArray(  new Annotation[vectorsNew.size()]);
-      
+        
         n = objects.length;
         nrSelected = 0;
         //matrices     = new Matrix[n];
@@ -172,7 +225,7 @@ public class StructureAlignment {
         
         for (int i=0;i< n;i++){
             
-        
+            
             
             Annotation v = vectors[i];            
             Atom vec = (Atom) v.getProperty("vector");
@@ -191,6 +244,16 @@ public class StructureAlignment {
         return intObjectIds;
     }
     
+    
+    
+    public boolean[] getSelection() {
+        return selection;
+    }
+    
+    public void setSelection(boolean[] selection) {
+        this.selection = selection;
+    }
+    
     public void select(int pos){
         selection[pos] = true;
         nrSelected++;
@@ -201,6 +264,8 @@ public class StructureAlignment {
         nrSelected--;
         
     }
+    
+    
     
     /** get the position of the first selected structure
      * or -1 if none selected.
@@ -224,401 +289,430 @@ public class StructureAlignment {
         for ( int p=0;p<selection.length;p++){
             
             if (! selection[p])
-                continue;
-            
-            String intId = intObjectIds[p];
+                continue;            
+          
             modelcount ++;
             
-            
             Color col =  getColor(p);
-            
             Color chaincol = new Color(col.getRed()/2,col.getGreen()/2,col.getBlue()/2);
             
             cmd += "select */"+modelcount+"; ";
             cmd += " color [" +chaincol.getRed()+","+chaincol.getGreen() +","+chaincol.getBlue() +"];";
             
-            for (int b=0;b<sortedBlocks.length;b++){
-                Annotation block = sortedBlocks[b];
-                
-                
-                List segments = (List)block.getProperty("segments");
-                Iterator siter = segments.iterator();
-                while (siter.hasNext()){
-                    Annotation seg = (Annotation)siter.next();
-                    String ii =  (String)seg.getProperty("intObjectId");
-                    
-                    if (! ii.equals(intId))
-                        continue;
-                    
-                    String start = (String) seg.getProperty("start");
-                    String end   = (String) seg.getProperty("end");
-                    
-                    //String chain ="";
-                    int indx1 = start.indexOf(":");
-                    String chainId = " ";
-                    if ( indx1 >-1)  {
-                        chainId = start.substring(indx1+1,indx1+2);
-                        start = start.substring(0,indx1);
-                        
-                    }
-                    int indx2 = end.indexOf(":");
-                    if ( indx2>-1)
-                        end = end.substring(0,indx2);
-                    
-                    if ( ! (chainId.equals(" ")))
-                        cmd += " select "+start+"-"+end +":"+chainId+"/"+modelcount+";";
-                    else
-                        cmd += " select "+start+"-"+end +"/"+modelcount+";";
-                    cmd += " color [" +col.getRed()+","+col.getGreen() +","+col.getBlue() +"];";
-                    cmd += " backbone 0.6;";                            
-                    break;
-                }                                
-            }
+            if ( (sortedBlocks != null)&&(sortedBlocks.length > 0)) {
+                cmd += getRasmolFromSortedBlock(p, modelcount);
+            } else {
+                cmd += getRasmolScriptFromPrepared(p);
+            }                        
         }
         cmd += " model 0;";
+        
         System.out.println(cmd);
+        
         return cmd;
     }
     
-    /** create a single structure, that joins all the actively selected chains together
-     * for proper display in the 3D panel
-     * 
-     * currently: each structure is a new model. Select in jmol with /modelNr
-     * 
-     * @return Structure - an NMR structure containing all the aligned ones as models
-     */
-    public Structure createArtificalStructure(){
-        Structure newStruc = new StructureImpl();
+    private String getRasmolScriptFromPrepared(int p){
+        return rasmolScripts[p];
+    }
+    
+    private String getRasmolFromSortedBlock(int p, int modelcount){
+        String cmd = "";
+        String intId = intObjectIds[p];
+
+        Color col =  getColor(p);
         
-        newStruc.setNmr(true);
-        boolean first = true;
-        int n = intObjectIds.length;
-        for (int i=0;i<n;i++){
-            if ( selection[i]){
-                try {
-                    Structure s = getStructure(i);
-                    if ( first){
-                        newStruc.setPDBCode(s.getPDBCode());
-                        first = false;
-                    }
-                    List chains = s.getChains(0);
-                    newStruc.addModel(chains);
-                } catch (Exception e){
-                    logger.warning(e.getMessage());
-                }
+       
+        for (int b=0;b<sortedBlocks.length;b++){
+            Annotation block = sortedBlocks[b];
+            
+            
+            List segments = (List)block.getProperty("segments");
+            Iterator siter = segments.iterator();
+            while (siter.hasNext()){
+                Annotation seg = (Annotation)siter.next();
+                String ii =  (String)seg.getProperty("intObjectId");
                 
-            }
-            
-        }
-        return newStruc;
-    }
-    
-    /** re turns the color for a particular PDB file
-     * 
-     * @param position
-     * @return Color
-     */
-    public Color getColor(int position){
-        float stepsize   = 0;
-        //if ( nrSelected > 0 )
-        //    stepsize = 1.0f / (float)nrSelected;
-        if ( structures.length > 0 )
-            stepsize = 1.0f / (float)structures.length * 0.7f;
-        float saturation = 1.0f;
-        float brightness = 1.0f;
-        
-        float hue = position * stepsize ;
-        Color col = Color.getHSBColor(hue,saturation,brightness);
-        return col;
-    }
-    
-    
-    private void showProgressFrame(String pdbCode){
-        progressFrame = new JFrame();
-        progressFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        /*progressFrame.addWindowListener(new WindowAdapter() {
-         public void windowClosing(WindowEvent evt) {
-         Frame frame = (Frame) evt.getSource();
-         frame.setVisible(false);
-         frame.dispose();
-         }
-         });
-         */
-        
-        ImageIcon icon = SpiceApplication.createImageIcon("spice16x16.gif");
-        if (icon != null) {
-            progressFrame.setIconImage(icon.getImage());
-        }
-        JFrame.setDefaultLookAndFeelDecorated(false);
-        //progressFrame.setUndecorated(true);
-        
-        JPanel panel = new JPanel();
-        panel.setBackground(ScalePanel.BACKGROUND_COLOR);
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        
-        Box vbox = Box.createVerticalBox();
-        JLabel txt = new JLabel("loading structure " + pdbCode); 
-        vbox.add(txt);
-        
-        JProgressBar progressBar = new JProgressBar(0,100);
-        progressBar.setStringPainted(true); //get space for the string
-        progressBar.setString("");          //but don't paint it
-        progressBar.setIndeterminate(true);
-        progressBar.setValue(0);
-        progressBar.setMaximumSize(new Dimension(400,20));
-        progressBar.setBorder(BorderFactory.createEmptyBorder());
-        
-        //progressBar.setMaximum(100);
-        //progressBar.setValue(50);
-        
-        vbox.add(progressBar);
-        
-        //JLabel server = new JLabel("contacting "+REGISTRY, JLabel.RIGHT);
-        //logger.info("contacting DAS registry at "+REGISTRY);
-        //vbox.add(server);
-        panel.add(vbox);
-        progressFrame.getContentPane().add(panel);
-        progressFrame.pack();
-        
-        // get resolution of screen
-        Dimension dim = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        // Determine the new location of the window
-        int w = progressFrame.getSize().width;
-        int h = progressFrame.getSize().height;
-        int x = (dim.width-w)/2;
-        int y = (dim.height-h)/2;
-        
-        // Move the window
-        progressFrame.setLocation(x, y);
-        progressFrame.repaint();
-        
-        progressFrame.setVisible(true);
-        
-    }
-    private void disposeProgressBar(){
-        progressFrame.setVisible(false);
-        progressFrame.dispose();
-    }
-    
-    
-    public Structure getStructure(int pos) throws StructureException{
-        if ( loaded[pos])
-            return returnStructureOrRange(pos,structures[pos]);
-        
-        String pdbCode = intObjectIds[pos].substring(0,4);
-        // show busy frame...
-        showProgressFrame(pdbCode);
-        
-        Structure s = null;
-        // not loaded, yet. do a structure request, and rotate, shft structure.
-        for (int i=0;i< structureServers.length;i++){
-            Das1Source ds = structureServers[i];
-            String dasstructurecommand = ds.getUrl() + "structure?model=1&query=";
-            DASStructureClient dasc= new DASStructureClient(dasstructurecommand);
-            
-            try {
-                s = dasc.getStructureById(pdbCode);
-            } catch (IOException e){
-                continue;
-            }
-        }
-        disposeProgressBar();
-        
-        if ( s == null)
-            throw new StructureException("Could not load structure at position " + pos);
-        
-        
-        
-        
-        // rotate, shift structure...
-        Matrix m = matrices[pos];
-        Atom vector = shiftVectors[pos];
-        
-        Calc.rotate(s,m);
-        Calc.shift(s,vector);
-        structures[pos] = s;
-        loaded[pos] = true;
-        
-        
-        
-        
-        return returnStructureOrRange(pos,s);
-        
-    }
-    
-    private Structure returnStructureOrRange(int pos, Structure s){
-        String property = SpiceMenuListener.structureDisplayProperty;
-        
-        String val = System.getProperty(property);
-        //System.out.println("in struc alig:" + val);
-        Structure ret = s;
-        if ( ( val == null) || (val == "show region")) { 
-            try {
-                Structure newStruc  = getStructureRanges(pos, s);
-                if (( newStruc != null) && ( newStruc.size() > 0)) {
-                    ret = newStruc;
-                }
-            } catch (StructureException e){
+                if (! ii.equals(intId))
+                    continue;
                 
-            }
+                String start = (String) seg.getProperty("start");
+                String end   = (String) seg.getProperty("end");
+                
+                //String chain ="";
+                int indx1 = start.indexOf(":");
+                String chainId = " ";
+                if ( indx1 >-1)  {
+                    chainId = start.substring(indx1+1,indx1+2);
+                    start = start.substring(0,indx1);
+                    
+                }
+                int indx2 = end.indexOf(":");
+                if ( indx2>-1)
+                    end = end.substring(0,indx2);
+                
+                if ( ! (chainId.equals(" ")))
+                    cmd += " select "+start+"-"+end +":"+chainId+"/"+modelcount+";";
+                else
+                    cmd += " select "+start+"-"+end +"/"+modelcount+";";
+                cmd += " color [" +col.getRed()+","+col.getGreen() +","+col.getBlue() +"];";
+                cmd += " backbone 0.6;";                            
+                break;
+            }        
+            
         }
-        return ret;
+        return cmd;
     }
-    
-    private Structure getStructureRanges(int pos , Structure s ) throws StructureException{
-        
-        Structure newStruc = new StructureImpl();
-        
-        // check if the alignment has an object detail "region" for this
-        // if yes = restrict the used structure...
-        Annotation[] objects = alignment.getObjects();
-        Annotation object = objects[pos];
-        if ( object.containsProperty("details")){
-            List details = (List) object.getProperty("details");
             
-            newStruc.setPDBCode(s.getPDBCode());
-            newStruc.setHeader(s.getHeader());
-            
-            for ( int det = 0 ; det< details.size();det++) {
-                Annotation detanno = (Annotation) details.get(det);
-                String property = (String)detanno.getProperty("property");
-                if ( property.equals("region")){
-                    String detail = (String) detanno.getProperty("detail");
-                    
-                    // split up the structure and add the region to the new structure...
-                    int cpos = detail.indexOf(":");
-                    String chainId = " ";
-                    
-                    if ( cpos > 0) {
-                        chainId = detail.substring(0,cpos);
-                        detail  = detail.substring(cpos+1,detail.length());
-                    } else {
-                        detail = detail.substring(1,detail.length());
+            /** create a single structure, that joins all the actively selected chains together
+             * for proper display in the 3D panel
+             * 
+             * currently: each structure is a new model. Select in jmol with /modelNr
+             * 
+             * @return Structure - an NMR structure containing all the aligned ones as models
+             */
+            public Structure createArtificalStructure(){
+                Structure newStruc = new StructureImpl();
+                
+                newStruc.setNmr(true);
+                boolean first = true;
+                int n = intObjectIds.length;
+                for (int i=0;i<n;i++){
+                    if ( selection[i]){
+                        try {
+                            Structure s = getStructure(i);
+                            if ( first){
+                                newStruc.setPDBCode(s.getPDBCode());
+                                first = false;
+                            }
+                            List chains = s.getChains(0);
+                            newStruc.addModel(chains);
+                        } catch (Exception e){
+                            logger.warning(e.getMessage());
+                        }
+                        
                     }
                     
-                    System.out.println(detail + " " + cpos + " " + chainId);
+                }
+                return newStruc;
+            }
+            
+            /** re turns the color for a particular PDB file
+             * 
+             * @param position
+             * @return Color
+             */
+            public Color getColor(int position){
+                float stepsize   = 0;
+                //if ( nrSelected > 0 )
+                //    stepsize = 1.0f / (float)nrSelected;
+                if ( structures.length > 0 )
+                    stepsize = 1.0f / (float)structures.length * 0.7f;
+                float saturation = 1.0f;
+                float brightness = 1.0f;
+                
+                float hue = position * stepsize ;
+                Color col = Color.getHSBColor(hue,saturation,brightness);
+                return col;
+            }
+            
+            
+            private void showProgressFrame(String pdbCode){
+                progressFrame = new JFrame();
+                progressFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                /*progressFrame.addWindowListener(new WindowAdapter() {
+                 public void windowClosing(WindowEvent evt) {
+                 Frame frame = (Frame) evt.getSource();
+                 frame.setVisible(false);
+                 frame.dispose();
+                 }
+                 });
+                 */
+                
+                ImageIcon icon = SpiceApplication.createImageIcon("spice16x16.gif");
+                if (icon != null) {
+                    progressFrame.setIconImage(icon.getImage());
+                }
+                JFrame.setDefaultLookAndFeelDecorated(false);
+                //progressFrame.setUndecorated(true);
+                
+                JPanel panel = new JPanel();
+                panel.setBackground(ScalePanel.BACKGROUND_COLOR);
+                panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+                
+                Box vbox = Box.createVerticalBox();
+                JLabel txt = new JLabel("loading structure " + pdbCode); 
+                vbox.add(txt);
+                
+                JProgressBar progressBar = new JProgressBar(0,100);
+                progressBar.setStringPainted(true); //get space for the string
+                progressBar.setString("");          //but don't paint it
+                progressBar.setIndeterminate(true);
+                progressBar.setValue(0);
+                progressBar.setMaximumSize(new Dimension(400,20));
+                progressBar.setBorder(BorderFactory.createEmptyBorder());
+                
+                //progressBar.setMaximum(100);
+                //progressBar.setValue(50);
+                
+                vbox.add(progressBar);
+                
+                //JLabel server = new JLabel("contacting "+REGISTRY, JLabel.RIGHT);
+                //logger.info("contacting DAS registry at "+REGISTRY);
+                //vbox.add(server);
+                panel.add(vbox);
+                progressFrame.getContentPane().add(panel);
+                progressFrame.pack();
+                
+                // get resolution of screen
+                Dimension dim = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+                // Determine the new location of the window
+                int w = progressFrame.getSize().width;
+                int h = progressFrame.getSize().height;
+                int x = (dim.width-w)/2;
+                int y = (dim.height-h)/2;
+                
+                // Move the window
+                progressFrame.setLocation(x, y);
+                progressFrame.repaint();
+                
+                progressFrame.setVisible(true);
+                
+            }
+            private void disposeProgressBar(){
+                progressFrame.setVisible(false);
+                progressFrame.dispose();
+            }
+            
+            
+            public Structure getStructure(int pos) throws StructureException{
+                if ( loaded[pos])
+                    return returnStructureOrRange(pos,structures[pos]);
+                
+                String pdbCode = intObjectIds[pos].substring(0,4);
+                // show busy frame...
+                showProgressFrame(pdbCode);
+                
+                Structure s = null;
+                // not loaded, yet. do a structure request, and rotate, shft structure.
+                for (int i=0;i< structureServers.length;i++){
+                    Das1Source ds = structureServers[i];
+                    String dasstructurecommand = ds.getUrl() + "structure?model=1&query=";
+                    DASStructureClient dasc= new DASStructureClient(dasstructurecommand);
                     
-                    String[] spl = detail.split("-");
-                    
-                    if ( spl.length != 2)
+                    try {
+                        s = dasc.getStructureById(pdbCode);
+                    } catch (IOException e){
                         continue;
-                    String start = spl[0];
-                    String end   = spl[1];
-                    System.out.println("start " + start + " end " + end);
-                  
-                    Chain c = s.getChainByPDB(chainId);
-                    
-                    Chain nc = new ChainImpl ();
-                    nc.setName(chainId);
-                    boolean knownChain = false;
-                    try {
-                        nc = newStruc.findChain(chainId);
-                        knownChain = true;
-                        
-                    } catch (Exception e){}
-                    
-                    
-                    List groups = c.getGroups();
-                    Iterator iter = groups.iterator();
-                    boolean known =false;
-                    while (iter.hasNext()){
-                        Group g = (Group) iter.next();
-                        if (g.getPDBCode().equals(start)){
-                            known = true;
-                        }
-                        
-                        Group n = (Group) g.clone();
-                        // todo: check multi domain chains -
-                        // are regions on the same chain deleted by this?
-                        if (! known)
-                            n.clearAtoms();
-                        
-                        if (g.getPDBCode().equals(end)){
-                            known = false;
-                        }
-                        nc.addGroup(n);
-                        
                     }
-                    if ( ! knownChain)
-                        newStruc.addChain(nc);
-                    
-                    /*Group[] groups = c.getGroupsByPDB(start,end);
-                    
-                    Chain nc = new ChainImpl ();
-                    nc.setName(chainId);
-                    boolean knownChain = false;
-                    try {
-                        nc = newStruc.findChain(chainId);
-                        knownChain = true;
-                        
-                    } catch (Exception e){}
-                    
-                    for (int g=0;g<groups.length;g++){
-                        Group gr = groups[g];
-                        nc.addGroup(gr);
-                        
-                        
-                    }
-                    */
-                   
                 }
+                disposeProgressBar();
+                
+                if ( s == null)
+                    throw new StructureException("Could not load structure at position " + pos);
+                
+                
+                
+                
+                // rotate, shift structure...
+                Matrix m = matrices[pos];
+                Atom vector = shiftVectors[pos];
+                
+                Calc.rotate(s,m);
+                Calc.shift(s,vector);
+                structures[pos] = s;
+                loaded[pos] = true;
+                
+                
+                
+                
+                return returnStructureOrRange(pos,s);
+                
+            }
+            
+            private Structure returnStructureOrRange(int pos, Structure s){
+                String property = SpiceMenuListener.structureDisplayProperty;
+                
+                String val = System.getProperty(property);
+                //System.out.println("in struc alig:" + val);
+                Structure ret = s;
+                if ( ( val == null) || (val == "show region")) { 
+                    try {
+                        Structure newStruc  = getStructureRanges(pos, s);
+                        if (( newStruc != null) && ( newStruc.size() > 0)) {
+                            ret = newStruc;
+                        }
+                    } catch (StructureException e){
+                        
+                    }
+                }
+                return ret;
+            }
+            
+            /** return the structure object restricted to the ranges given in the ALignment
+             * if no ranges give, returns null
+             * @param pos
+             * @param s
+             * @return nu; if no ranges given, otherwise restricts the structure to the ranges.
+             * @throws StructureException
+             */
+            private Structure getStructureRanges(int pos , Structure s ) throws StructureException{
+                
+                Structure newStruc = new StructureImpl();
+                
+                if (alignment == null)
+                    return null;
+                
+                // check if the alignment has an object detail "region" for this
+                // if yes = restrict the used structure...
+                Annotation[] objects = alignment.getObjects();
+                Annotation object = objects[pos];
+                if ( object.containsProperty("details")){
+                    List details = (List) object.getProperty("details");
+                    
+                    newStruc.setPDBCode(s.getPDBCode());
+                    newStruc.setHeader(s.getHeader());
+                    
+                    for ( int det = 0 ; det< details.size();det++) {
+                        Annotation detanno = (Annotation) details.get(det);
+                        String property = (String)detanno.getProperty("property");
+                        if ( property.equals("region")){
+                            String detail = (String) detanno.getProperty("detail");
+                            
+                            // split up the structure and add the region to the new structure...
+                            int cpos = detail.indexOf(":");
+                            String chainId = " ";
+                            
+                            if ( cpos > 0) {
+                                chainId = detail.substring(0,cpos);
+                                detail  = detail.substring(cpos+1,detail.length());
+                            } else {
+                                detail = detail.substring(1,detail.length());
+                            }
+                            
+                            System.out.println(detail + " " + cpos + " " + chainId);
+                            
+                            String[] spl = detail.split("-");
+                            
+                            if ( spl.length != 2)
+                                continue;
+                            String start = spl[0];
+                            String end   = spl[1];
+                            System.out.println("start " + start + " end " + end);
+                            
+                            Chain c = s.getChainByPDB(chainId);
+                            
+                            Chain nc = new ChainImpl ();
+                            nc.setName(chainId);
+                            boolean knownChain = false;
+                            try {
+                                nc = newStruc.findChain(chainId);
+                                knownChain = true;
+                                
+                            } catch (Exception e){}
+                            
+                            
+                            List groups = c.getGroups();
+                            Iterator iter = groups.iterator();
+                            boolean known =false;
+                            while (iter.hasNext()){
+                                Group g = (Group) iter.next();
+                                if (g.getPDBCode().equals(start)){
+                                    known = true;
+                                }
+                                
+                                Group n = (Group) g.clone();
+                                // todo: check multi domain chains -
+                                // are regions on the same chain deleted by this?
+                                if (! known)
+                                    n.clearAtoms();
+                                
+                                if (g.getPDBCode().equals(end)){
+                                    known = false;
+                                }
+                                nc.addGroup(n);
+                                
+                            }
+                            if ( ! knownChain)
+                                newStruc.addChain(nc);
+                            
+                            /*Group[] groups = c.getGroupsByPDB(start,end);
+                             
+                             Chain nc = new ChainImpl ();
+                             nc.setName(chainId);
+                             boolean knownChain = false;
+                             try {
+                             nc = newStruc.findChain(chainId);
+                             knownChain = true;
+                             
+                             } catch (Exception e){}
+                             
+                             for (int g=0;g<groups.length;g++){
+                             Group gr = groups[g];
+                             nc.addGroup(gr);
+                             
+                             
+                             }
+                             */
+                            
+                        }
+                    }
+                    
+                    
+                }
+                
+                
+                
+                if (newStruc.size() > 0){
+                    return newStruc;
+                } else
+                    return null;
+                
+            }
+            
+            private Annotation[] sortBlocks(Annotation[] blockx){
+                // sort blocks
+                Annotation[] blocks = new Annotation[blockx.length];
+                
+                for (int i = 0; i < blockx.length; i++) {
+                    boolean found = false;
+                    for (int bb = 0 ; bb <blockx.length;bb++){
+                        Annotation blo = blockx[bb];
+                        String bo = (String) blo.getProperty("blockOrder");
+                        int boi = Integer.parseInt(bo);
+                        if (boi == i+1) {
+                            blocks[i] = blo;
+                            found = true;
+                        }
+                    }
+                    if ( ! found){
+                        System.out.println("did not find blockOrder "+i);
+                    }
+                }
+                return blocks;
+            }
+            
+            /** convert the Matrix annotation to a Matrix
+             * 
+             * @param anno
+             * @return rotation Matrix 
+             */
+            private Matrix getMatrix(Annotation anno){
+                Matrix max = new Matrix(3,3);
+                
+                for(int x=1;x<4;x++){
+                    for(int y=1;y<4;y++){
+                        String m = "mat"+x+y;
+                        String val = (String)anno.getProperty(m);
+                        double d = Double.parseDouble(val);
+                        max.set(x-1,y-1,d);
+                    }
+                }
+                
+                return max;
             }
             
             
+            
+            
         }
-        
-        
-        
-        if (newStruc.size() > 0){
-            return newStruc;
-        } else
-            return null;
-        
-    }
-    
-    private Annotation[] sortBlocks(Annotation[] blockx){
-        // sort blocks
-        Annotation[] blocks = new Annotation[blockx.length];
-        
-        for (int i = 0; i < blockx.length; i++) {
-            boolean found = false;
-            for (int bb = 0 ; bb <blockx.length;bb++){
-                Annotation blo = blockx[bb];
-                String bo = (String) blo.getProperty("blockOrder");
-                int boi = Integer.parseInt(bo);
-                if (boi == i+1) {
-                    blocks[i] = blo;
-                    found = true;
-                }
-            }
-            if ( ! found){
-                System.out.println("did not find blockOrder "+i);
-            }
-        }
-        return blocks;
-    }
-    
-    /** convert the Matrix annotation to a Matrix
-     * 
-     * @param anno
-     * @return rotation Matrix 
-     */
-    private Matrix getMatrix(Annotation anno){
-        Matrix max = new Matrix(3,3);
-        
-        for(int x=1;x<4;x++){
-            for(int y=1;y<4;y++){
-                String m = "mat"+x+y;
-                String val = (String)anno.getProperty(m);
-                double d = Double.parseDouble(val);
-                max.set(x-1,y-1,d);
-            }
-        }
-        
-        return max;
-    }
-    
-    
-    
-    
-}

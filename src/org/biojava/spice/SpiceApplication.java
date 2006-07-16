@@ -84,6 +84,7 @@ import java.awt.Container;
 import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.spice.manypanel.eventmodel.DasSourceEvent;
 import org.biojava.spice.manypanel.eventmodel.DasSourceListener;
+import org.biojava.spice.manypanel.eventmodel.StructureAlignmentListener;
 import org.biojava.spice.server.SpiceServer;
 import org.jmol.api.JmolViewer;
 
@@ -258,6 +259,17 @@ ConfigurationListener
         
     }
     
+    /** return all StructurteAlignmentListeners
+     * 
+     * @return components that are listening to the calculation of new StructureAlignments
+     * 
+     */
+    public StructureAlignmentListener[] getStructureAlignmentListeners(){
+        
+        StructureAlignmentListener li = selectionPanel.getStructureAlignmentListener();
+        return new StructureAlignmentListener[] {li};
+        
+    }
     
     private URL[] getAllRegistryURLs(){
         URL[] regis;

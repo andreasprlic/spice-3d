@@ -34,12 +34,12 @@ import javax.swing.Box;
 import javax.swing.JCheckBox;
 //import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.StructureException;
+import org.biojava.spice.manypanel.eventmodel.StructureAlignmentListener;
 import org.biojava.dasobert.eventmodel.SequenceEvent;
 import org.biojava.dasobert.eventmodel.SequenceListener;
 import org.biojava.dasobert.eventmodel.StructureEvent;
@@ -55,7 +55,8 @@ import org.biojava.spice.panel.StructurePanelListener;
  */
 public class StructureAlignmentChooser 
 extends JPanel 
-implements ItemListener {
+implements ItemListener, 
+StructureAlignmentListener {
     
     static final long serialVersionUID = 65937284545329877l;
     
