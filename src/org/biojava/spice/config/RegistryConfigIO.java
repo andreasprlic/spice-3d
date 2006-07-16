@@ -99,11 +99,17 @@ extends Thread
     }
     
     /** set flag if contaction should not be performed
-     * forceUpdate is stronger */
+     * forceUpdate is stronger
+     * 
+     *  @param flag 
+     *  */
     public void setNoUpdate(boolean flag){
         noUpdate = flag;
     }
-    /** enforce connecting to the registry, default: false */
+    /** enforce connecting to the registry, default: false 
+     * 
+     * @param flag
+     * */
     public void setForceUpdate(boolean flag){
         forceUpdate = flag;
     }
@@ -535,23 +541,10 @@ extends Thread
         
     }
     
-    /** returns the Config for SPICE */
-    // obsolete!
-    /*
-     public RegistryConfiguration getConfiguration() {
-     while (! isDone()) {	  
-     try {
-     wait(30);
-     } catch (InterruptedException e) {
-     e.printStackTrace();
-     done = true ;
-     }
-     }
-     return config ; 
-     }
-     */
-    /** set config fromoutside 
+  
+    /** set config fromoutside
      * 
+     * @param regi the config
      */
     public void setConfiguration(RegistryConfiguration regi) {
         config = regi;	

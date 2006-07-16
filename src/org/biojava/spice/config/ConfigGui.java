@@ -82,8 +82,11 @@ import java.net.URL;
 public class ConfigGui {
     SpiceApplication spice;
     RegistryConfiguration config ;
-    /**
+  
+    
+    /* a configuration window
      * 
+     * @param spicef the SpiceApplication
      */
     public ConfigGui(SpiceApplication spicef) {
         super();
@@ -149,7 +152,11 @@ public class ConfigGui {
         frame.setVisible(true);
     }
     
-    /** set status of server */
+    /** set status of server
+     * 
+     * @param url
+     * @param flag
+     */
     public void setServerStatus(String url, Boolean flag) {
         // browse through config and set status of server
         List servers =  config.getAllServers();

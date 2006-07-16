@@ -107,7 +107,10 @@ public class RegistryConfiguration
         return lastContact;
     }
     
-    /** set to "always", "day" */
+    /** set to "always", "day"
+     * 
+     * @param b the behaviour
+     */
     public void setUpdateBehave(String b) {
         if (b.equals("always"))
             updateBehave = b;
@@ -122,7 +125,11 @@ public class RegistryConfiguration
     public String[] getPDBFileExtensions() { return pdbFileExtensions ;}
     public void setPDBFileExtensions(String[] exts) { pdbFileExtensions = exts ; } 
     
-    /** test if a server is a UniProt vs PDBresnum alignment server */
+    /** test if a server is a UniProt vs PDBresnum alignment server
+     * 
+     * @param source
+     * @return flag
+     */
     public boolean isSeqStrucAlignmentServer(SpiceDasSource source) {
         boolean msdmapping = false ;
         //DasCoordinateSystem[] coordsys = source.getCoordinateSystem() ;
@@ -157,7 +164,10 @@ public class RegistryConfiguration
     }
     
     
-    /** returns a list of local SpiceDasSources */
+    /** returns a list of local SpiceDasSources
+     * 
+     * @return List
+     */
     public List getLocalServers(){
         
         ArrayList tmp = new ArrayList();
@@ -327,7 +337,11 @@ public class RegistryConfiguration
     }
     
     
-    /** move a server in the list of servers ... */
+    /** move a server in the list of servers ...
+     * 
+     * @param startpos
+     * @param endpos
+     */
     public void moveServer(int startpos, int endpos) {
         //System.out.println("moveServer " + startpos + " " + endpos );
         
@@ -363,7 +377,12 @@ public class RegistryConfiguration
         return activeservers ;	
     }
     
-    /** returns all DAS sources with a particular capability and coordinate system. Returns all of them, no matter if they are enabled or disabled */
+    /** returns all DAS sources with a particular capability and coordinate system. Returns all of them, no matter if they are enabled or disabled
+     * 
+     * @param capability
+     * @param coordSys
+     * @return List of servers
+     */
     public List getServers(String capability, String coordSys){
         List servers = getServers(capability);
         ArrayList retservers = new ArrayList();
@@ -380,7 +399,11 @@ public class RegistryConfiguration
         
     }
     
-    /** returns all servers with a particular capaibility. Returns enabled as well as disabled servers */
+    /** returns all servers with a particular capaibility. Returns enabled as well as disabled servers
+     * 
+     * @param capability
+     * @return List
+     */
     public List getServers(String capability) {
         ArrayList retservers = new ArrayList();
         
@@ -404,7 +427,10 @@ public class RegistryConfiguration
     
     
     
-    /** delete server. only possible for local servers */
+    /** delete server. only possible for local servers
+     * 
+     * @param pos
+     */
     public void deleteServer(int pos){
         SpiceDasSource ds = (SpiceDasSource)allservers.get(pos);
         if (!ds.getRegistered()) {
@@ -419,8 +445,11 @@ public class RegistryConfiguration
     
     
     /** convert Configuration to an XML file so it can be serialized
+     * 
+     * @param pw
+     * @return XMLWriter
+     * @throws IOException
      */
-    
     public XMLWriter toXML(PrintWriter pw) 
     throws IOException
     {
@@ -437,8 +466,13 @@ public class RegistryConfiguration
     
     
     /** convert Configuration to an XML file so it can be serialized
-     add to an already existing xml file.
+     * add to an already existing xml file.
+     * 
+     * @param xw the XML writer to use
+     * @return the writer again
+     * @throws IOException
      */
+    
     public XMLWriter toXML(XMLWriter xw) 
     throws IOException
     {

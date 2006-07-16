@@ -60,7 +60,10 @@ public class PersistentConfig
 	bs = (BasicService)ServiceManager.lookup("javax.jnlp.BasicService"); 
     }
 
-    /** writes the configuration */
+    /** writes the configuration
+     * 
+     * @param config
+     */
     public void save(RegistryConfiguration config ) {
 	if (ps != null && bs != null) { 
 	    // Persistent Service is available, running as javaws
@@ -122,6 +125,8 @@ public class PersistentConfig
 
     /** loads Config from PersistenceService
      *  returns null if no PErsistenceService has been created ...
+     *  
+     *  @return RegistryConfiguration
      */
     public RegistryConfiguration load() {
 	if (ps != null && bs != null) { 
