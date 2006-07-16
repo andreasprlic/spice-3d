@@ -118,6 +118,8 @@ StructureAlignmentListener {
             return;
         }
         
+        boolean[] selectedArr = ali.getSelection();
+        
         String[] ids = ali.getIds();
         for ( int i=0; i< ids.length;i++){
             String id = ids[i];
@@ -126,11 +128,46 @@ StructureAlignmentListener {
             UIManager.put("CheckBox.interiorBackground", col);
             UIManager.put("CheckBox.highlite", col);
             JCheckBox b = new JCheckBox(id);
-            b.setSelected(false);
+            boolean selected = false;
+            if (selectedArr[i])
+                selected = true;
+            
+            if ( i == 0) {
+                selected = true;
+                structureAlignment.select(0);
+                try {
+                    structureAlignment.getStructure(i);
+                } catch (StructureException e){
+                    selected = false;
+                };
+            }
+            
+            b.setSelected(selected);
             vBox.add(b);
             checkButtons.add(b);
             b.addItemListener(this);
         }
+        
+        //      update the structure alignment in the structure display.
+        Structure newStruc = structureAlignment.createArtificalStructure();
+        
+        // execute Rasmol cmd...
+        String cmd = structureAlignment.getRasmolScript();
+        
+        
+        StructureEvent event = new StructureEvent(newStruc);
+        Iterator iter2 = structureListeners.iterator();
+        while (iter2.hasNext()){
+            StructureListener li = (StructureListener)iter2.next();
+            li.newStructure(event);
+            if ( li instanceof StructurePanelListener){
+                StructurePanelListener pli = (StructurePanelListener)li;
+                pli.executeCmd(cmd);
+            }
+            
+        }
+        
+        
         repaint();
     }
     
@@ -147,7 +184,7 @@ StructureAlignmentListener {
             if ( o.equals(source)){
                 String[] ids = structureAlignment.getIds();
                 String id = ids[i];
-                System.out.println("do something with " + id);
+                //System.out.println("do something with " + id);
                 if (e.getStateChange() == ItemEvent.DESELECTED) {
                     // remove structure from alignment
                     structureAlignment.deselect(i);
@@ -156,6 +193,17 @@ StructureAlignmentListener {
                     structureAlignment.select(i);
                     // add structure to alignment
                 }
+                
+                Structure struc = null;
+                try {
+                    struc = structureAlignment.getStructure(i);
+                    
+                } catch (StructureException ex){
+                    ex.printStackTrace();
+                    structureAlignment.deselect(i);
+                    return;
+                }
+                
                 // update the structure alignment in the structure display.
                 Structure newStruc = structureAlignment.createArtificalStructure();
                 
@@ -175,25 +223,26 @@ StructureAlignmentListener {
                     
                 }
                 
-                try {
-                    Structure struc = structureAlignment.getStructure(i);
-                    Chain c1 = struc.getChain(0);
-                    String sequence = c1.getSequence();
-                    String ac = id + "." + c1.getName();
-                    
-                    SequenceEvent sevent = new SequenceEvent(ac,sequence);
-                    //logger.info("*** seqeunce event " + ac);
-                    Iterator iter3 = pdbSequenceListeners.iterator();
-                    while (iter3.hasNext()){
-                        SequenceListener li = (SequenceListener)iter3.next();
-                        li.newSequence(sevent);
-                    }
-                } catch (StructureException ex){
-                    ex.printStackTrace();
+                
+                
+                Chain c1 = struc.getChain(0);
+                String sequence = c1.getSequence();
+                String ac = id + "." + c1.getName();
+                
+                SequenceEvent sevent = new SequenceEvent(ac,sequence);
+                //logger.info("*** seqeunce event " + ac);
+                Iterator iter3 = pdbSequenceListeners.iterator();
+                while (iter3.hasNext()){
+                    SequenceListener li = (SequenceListener)iter3.next();
+                    li.newSequence(sevent);
                 }
                 
                 
             }
         }
+        
+        
+        
+        
     }
 }

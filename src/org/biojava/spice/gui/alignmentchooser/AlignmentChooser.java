@@ -112,7 +112,9 @@ AlignmentListener
     ScalePanel featurePanel;
     
     /**
-     * @param arg0
+     * 
+     * @param queryCs query coordinate sytstem
+     * @param subjectCs
      */
     public AlignmentChooser(DasCoordinateSystem queryCs, DasCoordinateSystem subjectCs) {
         logger = Logger.getLogger("org.biojava.spice");
@@ -132,8 +134,9 @@ AlignmentListener
     
     /** a panel to choose a seq-structure alignment
      * 
+     * @param li listener
      */
-    
+     
     
     public void addObjectListener(ObjectListener li){
         //mouseListener.addObjectListener(li);
@@ -460,7 +463,10 @@ AlignmentListener
     }
     
     
-    /** overwrite resize, to change the scale of the displayed sequence */
+    /** overwrite resize, to change the scale of the displayed sequence
+     * 
+     * @param d
+     */
     public void setSize(Dimension d){
         
         //System.out.println("resizing");
