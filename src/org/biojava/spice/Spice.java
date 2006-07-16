@@ -27,13 +27,10 @@ package org.biojava.spice ;
 import org.biojava.spice.server.SpiceClient;
 import org.biojava.spice.server.SpiceServer;
 import java.applet.Applet;
-import org.biojava.spice.Config.ConfigurationException;
-import org.biojava.spice.Config.RegistryConfigIO;
-//import java.net.URL;
-import java.net.URL;
+import org.biojava.spice.config.ConfigurationException;
 import java.util.ArrayList;
-import org.biojava.spice.GUI.AboutDialog;
-import org.biojava.spice.GUI.SpiceTabbedPane;
+import org.biojava.spice.gui.AboutDialog;
+import org.biojava.spice.gui.SpiceTabbedPane;
 import java.util.List;
 import org.biojava.spice.utils.CliTools;
 
@@ -99,7 +96,9 @@ public class Spice extends Applet {
         
     } 
     
-    /** Start SPICE @see SpiceApplication */
+    /** Start SPICE @see SpiceApplication 
+     * @param params the parameters to use
+     * */
     public void run(SpiceStartParameters params){
         
         System.out.println("Welcome to the SPICE - DAS client!");

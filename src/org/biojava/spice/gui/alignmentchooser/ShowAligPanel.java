@@ -20,7 +20,7 @@
  * Created on Dec 18, 2005
  *
  */
-package org.biojava.spice.GUI.alignmentchooser;
+package org.biojava.spice.gui.alignmentchooser;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -42,9 +42,9 @@ import org.biojava.bio.program.das.dasalignment.Alignment;
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.ChainImpl;
 import org.biojava.bio.structure.Group;
-import org.biojava.spice.Feature.Feature;
-import org.biojava.spice.Feature.FeatureImpl;
-import org.biojava.spice.Feature.Segment;
+import org.biojava.spice.feature.Feature;
+import org.biojava.spice.feature.FeatureImpl;
+import org.biojava.spice.feature.Segment;
 import org.biojava.spice.das.AlignmentTools;
 import org.biojava.spice.manypanel.renderer.DasSourcePanel;
 import org.biojava.spice.manypanel.renderer.ScalePanel;

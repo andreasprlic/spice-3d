@@ -23,9 +23,9 @@
 
 package org.biojava.spice ;
 
-import org.biojava.spice.Panel.*;
-import org.biojava.spice.Config.*;
-import org.biojava.spice.GUI.*;
+import org.biojava.spice.panel.*;
+import org.biojava.spice.config.*;
+import org.biojava.spice.gui.*;
 
 import java.lang.reflect.*;
 import org.biojava.bio.structure.*;
@@ -67,9 +67,7 @@ import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane                   ;
-import javax.swing.JList                        ;
 import javax.swing.JScrollPane                  ;
-import javax.swing.DefaultListModel             ;
 import javax.swing.JTextField                   ;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -89,7 +87,6 @@ import org.biojava.spice.manypanel.eventmodel.DasSourceListener;
 import org.biojava.spice.server.SpiceServer;
 import org.jmol.api.JmolViewer;
 
-import sun.awt.PlatformFont;
 
 
 /** the main application layer of SPICE
@@ -171,7 +168,7 @@ ConfigurationListener
     /** 
      * start the spice appplication
      * 
-     * @param the parameters for starting up...
+     * @param params the parameters for starting up...
      */
     public SpiceApplication( SpiceStartParameters params) {
         super();
@@ -621,7 +618,9 @@ ConfigurationListener
     
     
     
-    /** Returns an ImageIcon, or null if the path was invalid. */
+    /** Returns an ImageIcon, or null if the path was invalid. 
+     * @param path the path to the icon
+     * @return ImageIcon object*/
     public static ImageIcon createImageIcon(String path) {
              
         java.net.URL imgURL = SpiceApplication.class.getResource(path);
@@ -1279,8 +1278,8 @@ ConfigurationListener
     
     /** make sure that already know DAS sources are re-used
      * 
-     * @param l
-     * @return
+     * @param newSources sources to be checked
+     * @return an array of SpiceDasSources
      */
     private SpiceDasSource[] filterSourcesWithKnowData(SpiceDasSource[] newSources){
             
@@ -1409,7 +1408,7 @@ ConfigurationListener
     
     
     /** retreive the chainNumber by PDB character
-     @param PDB code for chain
+     @param chainPDBcode PDB code for chain
      @return number of chain in current structure, or -1.
      */
     public int getChainPosByPDB(String chainPDBcode){
@@ -1504,7 +1503,14 @@ ConfigurationListener
     
     /** open HttpURLConnection. Recommended way to open
      * HttpURLConnections, since this take care of setting timeouts
-     * properly for java 1.4 and 1.5*/
+     * properly for java 1.4 and 1.5
+     * 
+     * @param url URL to be opened
+     * @return HttpURLConnection an open connection to the URL
+     * @throws IOException
+     * @throws ConnectException
+     * 
+     * */
     public static HttpURLConnection openHttpURLConnection(URL url) 
 	throws IOException, ConnectException {
 	HttpURLConnection huc = null;

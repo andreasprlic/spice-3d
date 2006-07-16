@@ -19,7 +19,7 @@
  *
  */
 
-package org.biojava.spice.Config ;
+package org.biojava.spice.config ;
 
 import org.biojava.bio.BioException;
 

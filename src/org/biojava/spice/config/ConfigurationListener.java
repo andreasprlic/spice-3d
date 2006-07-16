@@ -20,7 +20,7 @@
  * Created on May 5, 2005
  *
  */
-package org.biojava.spice.Config;
+package org.biojava.spice.config;
 
 /** An interface to define an even listener, if the DAS - registry has
  *  been contacted and a new Configuration retrieved

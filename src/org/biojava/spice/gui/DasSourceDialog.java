@@ -20,7 +20,7 @@
  * Created on Jun 19, 2005
  *
  */
-package org.biojava.spice.GUI;
+package org.biojava.spice.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;

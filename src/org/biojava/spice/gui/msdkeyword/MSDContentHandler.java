@@ -20,7 +20,7 @@
  * Created on Aug 1, 2005
  *
  */
-package org.biojava.spice.GUI.msdkeyword;
+package org.biojava.spice.gui.msdkeyword;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;

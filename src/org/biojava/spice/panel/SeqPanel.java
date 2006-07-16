@@ -22,7 +22,7 @@
  * @author Andreas Prlic
  *
  */
-package org.biojava.spice.Panel;
+package org.biojava.spice.panel;
 
 import org.biojava.bio.structure.Chain ;
 

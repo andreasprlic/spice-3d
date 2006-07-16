@@ -18,7 +18,7 @@ import java.io.*;
 import java.util.*;
 import java.beans.*;
 import java.lang.reflect.*;
-import org.biojava.spice.Config.ConfigurationException;
+import org.biojava.spice.config.ConfigurationException;
 
 /**
  * Utilities for autoconfiguring javabeans based on command line arguments.

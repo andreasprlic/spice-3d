@@ -20,7 +20,7 @@
  * Created on May 10, 2005
  *
  */
-package org.biojava.spice.Config;
+package org.biojava.spice.config;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;

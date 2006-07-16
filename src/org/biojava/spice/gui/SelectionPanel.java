@@ -20,7 +20,7 @@
  * Created on May 8, 2006
  *
  */
-package org.biojava.spice.GUI;
+package org.biojava.spice.gui;
 
 import java.awt.Dimension;
 import java.util.logging.Logger;

@@ -20,7 +20,7 @@
  * Created on Jan 25, 2006
  *
  */
-package org.biojava.spice.Panel;
+package org.biojava.spice.panel;
 
 import java.util.ArrayList;
 import java.util.Iterator;

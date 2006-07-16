@@ -20,7 +20,7 @@
  * Created on Feb 2, 2005
  *
  */
-package org.biojava.spice.GUI;
+package org.biojava.spice.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -35,8 +35,8 @@ import org.biojava.bio.structure.GroupIterator;
 import org.biojava.bio.structure.Structure;
 import org.biojava.dasobert.eventmodel.SequenceEvent;
 import org.biojava.dasobert.eventmodel.SequenceListener;
-import org.biojava.spice.Config.RegistryConfiguration;
-import org.biojava.spice.Panel.StructurePanelListener;
+import org.biojava.spice.config.RegistryConfiguration;
+import org.biojava.spice.panel.StructurePanelListener;
 import org.biojava.spice.manypanel.managers.StructureManager;
 import org.biojava.spice.server.SpiceServer;
 import org.biojava.spice.SPICEFrame;

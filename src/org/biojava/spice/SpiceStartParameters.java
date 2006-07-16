@@ -110,7 +110,10 @@ public class SpiceStartParameters {
         return noRegistryContact;
     }
 
-    /** if set to true, the registry will notbe contacted */
+    /** if set to true, the registry will notbe contacted 
+     * 
+     * @param noRegistryContact a flag if registry should be contacted
+     * */
     public void setNoRegistryContact(boolean noRegistryContact) {
         this.noRegistryContact = noRegistryContact;
     }
@@ -118,7 +121,7 @@ public class SpiceStartParameters {
     /** if true a new Spice instance should init the SpiceServer. otherwise it assumes that it is already running
      * 
      * 
-     * @return
+     * @return flag if the spice server should be initiated
      */
     public boolean isInitSpiceServer() {
         return initSpiceServer;
@@ -133,7 +136,7 @@ public class SpiceStartParameters {
     /** a new spice instance should be created as a new tab (isNewTab == true) or
      * as a new SPICE window (isNewTab == false)
      * 
-     * @return
+     * @return flag if a new tab or a new window should be created
      */
     public boolean isNewTab() {
         return newTab;
@@ -292,7 +295,7 @@ public class SpiceStartParameters {
     }
     /** get the accession code
      * 
-     * @returns the accesion code
+     * @return the accesion code
      */
     public String getCode(){ return code;}
     
@@ -346,6 +349,8 @@ public class SpiceStartParameters {
     
     /** set backup registry servers. These will be contacted 
      * only if there is a problem occuring with the primary
+     * 
+     * @param urls the URL locations of the backup registries
      * 
      */
     public void setBackupRegistry(String[] urls){

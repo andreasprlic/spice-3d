@@ -21,13 +21,13 @@
  * @author Andreas Prlic
  *
  */
-package org.biojava.spice.Panel;
+package org.biojava.spice.panel;
 
 import org.biojava.spice.SPICEFrame  	   	;
-import org.biojava.spice.GUI.SelectionLockMenuListener;
+import org.biojava.spice.gui.SelectionLockMenuListener;
 
-import org.biojava.spice.Feature.*     	;
-import org.biojava.spice.Panel.SeqPanel	;
+import org.biojava.spice.feature.*     	;
+import org.biojava.spice.panel.SeqPanel	;
 import org.biojava.bio.structure.Chain 	;
 import org.biojava.bio.structure.Group  	;
 

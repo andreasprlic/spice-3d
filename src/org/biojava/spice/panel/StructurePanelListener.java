@@ -20,7 +20,7 @@
  * Created on Jun 16, 2005
  *
  */
-package org.biojava.spice.Panel;
+package org.biojava.spice.panel;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -34,8 +34,8 @@ import org.biojava.dasobert.eventmodel.SequenceEvent;
 import org.biojava.dasobert.eventmodel.SequenceListener;
 import org.biojava.dasobert.eventmodel.StructureEvent;
 import org.biojava.dasobert.eventmodel.StructureListener;
-import org.biojava.spice.Feature.Feature;
-import org.biojava.spice.Feature.Segment;
+import org.biojava.spice.feature.Feature;
+import org.biojava.spice.feature.Segment;
 
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureEvent;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureListener;

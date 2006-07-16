@@ -20,11 +20,11 @@
  * Created on Feb 7, 2005
  *
  */
-package org.biojava.spice.GUI;
+package org.biojava.spice.gui;
 
 import javax.swing.JTextField;
 
-import org.biojava.spice.Panel.JmolCommander;
+import org.biojava.spice.panel.JmolCommander;
 
 /** Provides an TextField that can be used to enter new RASMOL like commands that are sent to JMol.
  * @author Andreas Prlic

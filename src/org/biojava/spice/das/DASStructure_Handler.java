@@ -23,7 +23,7 @@
  */
 package org.biojava.spice.das;
 
-import org.biojava.spice.Config.* ;
+import org.biojava.spice.config.* ;
 
 import org.biojava.bio.structure.*                     ;
 import org.biojava.bio.structure.io.DASStructureClient ;

@@ -26,7 +26,7 @@
  */
 
 
-package org.biojava.spice.GUI;
+package org.biojava.spice.gui;
 
 
 import java.awt.*;

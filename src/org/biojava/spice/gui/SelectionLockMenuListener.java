@@ -20,7 +20,7 @@
  * Created on Feb 6, 2005
  *
  */
-package org.biojava.spice.GUI;
+package org.biojava.spice.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

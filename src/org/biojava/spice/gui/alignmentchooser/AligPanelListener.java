@@ -20,7 +20,7 @@
  * Created on Feb 28, 2005
  *
  */
-package org.biojava.spice.GUI.alignmentchooser;
+package org.biojava.spice.gui.alignmentchooser;
 
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;

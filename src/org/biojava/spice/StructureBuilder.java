@@ -82,7 +82,15 @@ public class StructureBuilder{
     
     
     
-    /** create a structure to be displayed in SPICE */
+    /** create a structure to be displayed in SPICE
+     * 
+     * @param alignment an alignment between sequence and structure
+     * @param pdbStructure the structure as obtained from the PDB structure server
+     * @param sequence the (uniprot) sequence
+     * @return a joing Strucuture object
+     * @throws DASException
+     */
+    
     public Structure createSpiceStructure(Alignment alignment, Structure pdbStructure, String sequence) 
     throws DASException
     {
@@ -383,7 +391,13 @@ public class StructureBuilder{
         return chain;
     }
     
-    /** create a chain that corrresponds to a sequence */
+    /** create a chain that corrresponds to a sequence
+     * 
+     * @param ali
+     * @param sequence
+     * @return a Chain that corresponds to a (uniprot) sequence
+     * @throws DASException
+     */
     public Chain  createChain(Alignment ali, String sequence) 
     throws DASException
     {
@@ -458,7 +472,13 @@ public class StructureBuilder{
     }
     
     
-    /** retrieve the HashMap for the sequence ... */
+    /** retrieve the HashMap for the sequence
+     * 
+     * @param ali
+     * @param coordSys
+     * @return Annotation for a particular object
+     * @throws DASException
+     */
     
     public Annotation getAlignmentObject (Alignment ali,DasCoordinateSystem coordSys) 
     throws DASException
@@ -506,8 +526,13 @@ public class StructureBuilder{
     /////////////////////////////////////////////////////////////////
     
     
-    /** joins the empty (= no 3D information) structure created from the uninprto sequences 
-     * with the structure retrieved from PDB. 
+    /** joins the empty (= no 3D information) structure created from the uniprot
+     *  sequences with the structure retrieved from PDB
+     * 
+     * @param spice_structure
+     * @param pdb_structure
+     * @return Structure
+     * @throws IOException
      */
     
     public Structure joinStructures(Structure spice_structure, Structure pdb_structure) 

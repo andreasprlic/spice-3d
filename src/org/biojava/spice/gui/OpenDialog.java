@@ -20,7 +20,7 @@
  * Created on Dec 1, 2004
  *
  */
-package org.biojava.spice.GUI;
+package org.biojava.spice.gui;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -38,7 +38,7 @@ import javax.swing.JTextField;
 
 import org.biojava.spice.SPICEFrame;
 import org.biojava.spice.SpiceApplication;
-import org.biojava.spice.GUI.msdkeyword.*;
+import org.biojava.spice.gui.msdkeyword.*;
 
 import javax.swing.JLabel;
 

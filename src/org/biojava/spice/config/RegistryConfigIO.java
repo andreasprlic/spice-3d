@@ -23,7 +23,7 @@
  */
 
 
-package org.biojava.spice.Config                  ;
+package org.biojava.spice.config                  ;
 
 //to get config file via http
 import java.net.MalformedURLException;

@@ -20,7 +20,7 @@
  * @author Andreas Prlic
  *
  */
-package org.biojava.spice.Config;
+package org.biojava.spice.config;
 
 import java.util.*                        ;
 import java.text.DateFormat;

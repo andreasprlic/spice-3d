@@ -33,7 +33,7 @@ import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.dasregistry.DasSource;
 import org.biojava.dasobert.eventmodel.*;
 //import org.biojava.servlets.dazzle.datasource.GFFFeature;
-import org.biojava.spice.Feature.*;
+import org.biojava.spice.feature.*;
 import org.biojava.spice.manypanel.eventmodel.FeatureListener;
 
 /** all the data about a particular DAS source and the

@@ -35,7 +35,7 @@ import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
 import org.biojava.dasobert.eventmodel.ObjectListener;
 import org.biojava.spice.SpiceApplication;
-import org.biojava.spice.GUI.alignmentchooser.AlignmentChooser;
+import org.biojava.spice.gui.alignmentchooser.AlignmentChooser;
 import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.spice.manypanel.managers.AlignmentManager;
 

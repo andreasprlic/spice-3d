@@ -28,9 +28,9 @@ import java.util.List;
 
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.Group;
-import org.biojava.spice.Feature.FeatureImpl;
-import org.biojava.spice.Feature.Segment;
-import org.biojava.spice.Feature.Feature;
+import org.biojava.spice.feature.FeatureImpl;
+import org.biojava.spice.feature.Segment;
+import org.biojava.spice.feature.Feature;
 
 public class StructureFeaturePanel 
 extends ScalePanel{

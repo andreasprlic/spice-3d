@@ -20,12 +20,12 @@
  * Created on Mar 9, 2005
  *
  */
-package org.biojava.spice.GUI;
+package org.biojava.spice.gui;
 
 import org.biojava.spice.SpiceApplication;
-import org.biojava.spice.Feature.*;
+import org.biojava.spice.feature.*;
 //import org.biojava.spice.Config.*;
-import org.biojava.spice.Feature.Segment;
+import org.biojava.spice.feature.Segment;
 //import org.biojava.spice.Panel.seqfeat.FeatureView;
 import org.biojava.utils.stax.DelegationManager;
 import org.biojava.utils.stax.StAXContentHandler;

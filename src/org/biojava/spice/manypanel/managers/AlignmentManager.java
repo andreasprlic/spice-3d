@@ -29,9 +29,9 @@ import java.util.logging.Logger;
 import java.util.Iterator;
 
 
-import org.biojava.spice.Feature.Feature;
-import org.biojava.spice.Feature.FeatureImpl;
-import org.biojava.spice.Feature.Segment;
+import org.biojava.spice.feature.Feature;
+import org.biojava.spice.feature.FeatureImpl;
+import org.biojava.spice.feature.Segment;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureEvent;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureListener;
 import org.biojava.spice.manypanel.renderer.AlignmentRenderer;

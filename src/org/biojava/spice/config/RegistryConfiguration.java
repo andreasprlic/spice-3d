@@ -23,7 +23,7 @@
  */
 
 
-package org.biojava.spice.Config ;
+package org.biojava.spice.config ;
 
 
 import java.io.IOException ;

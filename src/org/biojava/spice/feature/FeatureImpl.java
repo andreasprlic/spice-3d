@@ -22,7 +22,7 @@
  *
  */
 
-package org.biojava.spice.Feature;
+package org.biojava.spice.feature;
 
 
 

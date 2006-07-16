@@ -20,7 +20,7 @@
  * Created on Feb 9, 2005
  *
  */
-package org.biojava.spice.Feature;
+package org.biojava.spice.feature;
 
 import java.util.ArrayList;
 import java.util.List;

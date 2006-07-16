@@ -20,13 +20,13 @@
  * Created on Apr 13, 2006
  *
  */
-package org.biojava.spice.GUI;
+package org.biojava.spice.gui;
 
 import java.awt.Color;
 
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.Group;
-import org.biojava.spice.Panel.JmolCommander;
+import org.biojava.spice.panel.JmolCommander;
 
 
 /** gets the selection or the whole structure from spice and colors it by rainbow ...

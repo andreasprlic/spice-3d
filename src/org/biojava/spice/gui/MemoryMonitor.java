@@ -38,7 +38,7 @@
  * @(#)MemoryMonitor.java   1.31 02/06/13
  */
 
-package  org.biojava.spice.GUI;
+package  org.biojava.spice.gui;
 
 import java.awt.*;
 import java.awt.event.*;

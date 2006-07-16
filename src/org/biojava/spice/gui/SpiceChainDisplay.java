@@ -20,7 +20,7 @@
  * Created on Dec 5, 2005
  *
  */
-package org.biojava.spice.GUI;
+package org.biojava.spice.gui;
 
 import java.util.ArrayList;
 import java.util.Iterator;

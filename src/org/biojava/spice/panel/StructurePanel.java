@@ -21,7 +21,7 @@
  *
  */
 
-package org.biojava.spice.Panel ;
+package org.biojava.spice.panel ;
 
 
 import java.awt.*;

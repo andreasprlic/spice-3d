@@ -24,8 +24,8 @@
 
 package org.biojava.spice;
 
-import org.biojava.spice.Config.*;
-import org.biojava.spice.GUI.SpiceTabbedPane;
+import org.biojava.spice.config.*;
+import org.biojava.spice.gui.SpiceTabbedPane;
 import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.spice.server.SpiceServer;
 import org.biojava.bio.structure.Structure;
@@ -45,7 +45,7 @@ public interface SPICEFrame
 	
     /** returns the java.awt.Container of the spice object
      * 
-     * @return
+     * @return Container
      */
     public Container getParent();
     
@@ -55,7 +55,9 @@ public interface SPICEFrame
      */
     public void load(String type, String code);
 	
-    /** retrieve configuration for DAS servers to use */    
+    /** retrieve configuration for DAS servers to use 
+     * @return RegistryConfiguration the config
+     * */    
     public RegistryConfiguration getConfiguration();
 
     public SpiceServer getSpiceServer();
@@ -65,18 +67,20 @@ public interface SPICEFrame
     
     /** get the Jmol viewer 
      * 
-     * @return
+     * @return JmolViewer the Jmol viewer doing the 3D visualisation
      */
     public JmolViewer getViewer();
     
     /** get the BrowserPane that is doing the 2D display
      * 
-     * @return
+     * @return returns the 2D sequence and feature panels
      */
     public BrowserPane getBrowserPane();
     
     
-    	/** retreive the internal Structure object */
+    	/** retreive the internal Structure object 
+         * @return Structure the internal structure representing the PDB object  
+         * */
     	public Structure getStructure();
         
     public void setStructure(Structure s);
@@ -88,29 +92,52 @@ public interface SPICEFrame
     /** show Config */
     public void showConfig();
 
-    /** display an URL in the browser that started SPICE */
+    /** display an URL in the browser that started SPICE 
+     * 
+     * @param url to be shown
+     * @return flag if successfull
+     * */
     public boolean showURL(URL url);
    
     // rescale the windo size 
     //public void scale() ;
     
-    /** retreive info regarding structure */
+    /** retreive info regarding structure 
+     * 
+     * @param chainnumber the number of the chain
+     * @return the Chain object
+     * */
     public Chain getChain(int chainnumber);
 
 
     
     /** open a web page in the browser 
      * returns true if the request succeeds, otherwise false
+     * 
+     * @param url url to be opened
+     * @return boolean flag if successfull
+     * 
      * */
     public boolean showDocument(URL url);
         
-    /** converts a String to an URL and then calls showDocument(URL url)*/
+    /** converts a String to an URL and then calls showDocument(URL url)
+     * 
+     * @param urlstring url to be opened
+     * @return boolean flag if successfull
+     * 
+     * */
     public boolean showDocument(String urlstring);
     
-    /** returns currently displayed PDB code; null if none*/
+    /** returns currently displayed PDB code; null if none
+     * 
+     * @return String the PDB code
+     * */
     public String getPDBCode();
    
-    /** returns currently displayed UniProt code; null if none*/
+    /** returns currently displayed UniProt code; null if none
+     * 
+     * @return the Uniprot code
+     * */
     public String getUniProtCode();
 
     public String getENSPCode();
@@ -121,7 +148,10 @@ public interface SPICEFrame
      */
     public void setSpiceStartParameters(SpiceStartParameters params);
     
-    /** get the parameters that are used while loading the next molecule */
+    /** get the parameters that are used while loading the next molecule
+     * 
+     *  @return the startup parameters
+     *  */
     public SpiceStartParameters getSpiceStartParameters();
     
     

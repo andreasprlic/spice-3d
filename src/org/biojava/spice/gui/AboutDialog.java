@@ -21,7 +21,7 @@
  * @author Andreas Prlic
  * 
  */
-package org.biojava.spice.GUI;
+package org.biojava.spice.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;

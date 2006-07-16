@@ -23,36 +23,35 @@
 package org.biojava.spice;
 
 
-import java.io.IOException;
+//import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.biojava.bio.Annotation;
+//import org.biojava.bio.Annotation;
 import org.biojava.bio.program.das.dasalignment.Alignment;
 //import org.biojava.bio.structure.AminoAcid;
-import org.biojava.bio.structure.Atom;
-import org.biojava.bio.structure.Calc;
-import org.biojava.bio.structure.Chain;
-import org.biojava.bio.structure.ChainImpl;
-import org.biojava.bio.structure.Group;
-import org.biojava.bio.structure.GroupIterator;
+//import org.biojava.bio.structure.Atom;
+//import org.biojava.bio.structure.Calc;
+//import org.biojava.bio.structure.Chain;
+//import org.biojava.bio.structure.ChainImpl;
+//import org.biojava.bio.structure.Group;
+//import org.biojava.bio.structure.GroupIterator;
 //import org.biojava.bio.structure.SVDSuperimposer;
-import org.biojava.bio.structure.Structure;
+//import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.StructureException;
-import org.biojava.bio.structure.StructureImpl;
-import org.biojava.bio.structure.io.DASStructureClient;
-import org.biojava.bio.structure.jama.Matrix;
+//import org.biojava.bio.structure.StructureImpl;
+//import org.biojava.bio.structure.io.DASStructureClient;
 import org.biojava.dasobert.das.AlignmentParameters;
 import org.biojava.dasobert.das.AlignmentThread;
 import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.eventmodel.AlignmentEvent;
 import org.biojava.dasobert.eventmodel.AlignmentListener;
-import org.biojava.dasobert.eventmodel.StructureEvent;
+//import org.biojava.dasobert.eventmodel.StructureEvent;
 import org.biojava.dasobert.eventmodel.StructureListener;
-import org.biojava.spice.GUI.SelectionPanel;
-import org.biojava.spice.Panel.StructurePanel;
+import org.biojava.spice.gui.SelectionPanel;
+import org.biojava.spice.panel.StructurePanel;
 
 /** a class that builds up a structure alignment and creates a StructureAlignment object
  * 
@@ -166,6 +165,7 @@ implements AlignmentListener {
         selectionPanel.setStructureAlignment(sali);
     }
     
+    /*
     private void old(AlignmentEvent e){
         Alignment ali = e.getAlignment();
         Annotation[] matrices = ali.getMatrices();
@@ -202,8 +202,8 @@ implements AlignmentListener {
             Annotation o1 = objects[1];
             Annotation o2 = objects[2];
             
-            Annotation m1 = matrices[1];
-            Annotation m2 = matrices[2];
+            //Annotation m1 = matrices[1];
+            //Annotation m2 = matrices[2];
             
             Annotation v1 = vectors[1];
             Annotation v2 = vectors[2];
@@ -252,7 +252,7 @@ implements AlignmentListener {
                         
                 max3.print(3,3);
                 Atom  vec3 = svd.getTranslation();
-                */
+                ./
                 
                 
                 //Calc.rotate(s1,max1);
@@ -310,7 +310,9 @@ implements AlignmentListener {
         }
         
     }
+    */
     
+    /*
     private String getRasmolScript(Annotation[] blocks, String intId, String chainId,String color){
         String cmd = "select *"+chainId +"; backbone 0.3;";
         for (int b=0;b<blocks.length;b++){
@@ -343,8 +345,8 @@ implements AlignmentListener {
         }
         return cmd;
     }
-    
-    
+    */
+    /*
     private Structure getStructure(String dasstructurecommand,String pdbCode)
     throws IOException {
         DASStructureClient dasc= new DASStructureClient(dasstructurecommand);
@@ -352,6 +354,7 @@ implements AlignmentListener {
         return s;
         
     }
+    */
     
     public void clearListeners(){
         structureListeners.clear();
@@ -362,6 +365,7 @@ implements AlignmentListener {
         structureListeners.add(li);
     }
     
+    /*
     private Structure createNewStructure(Structure s1, Structure s2) 
     throws StructureException {
         
@@ -409,7 +413,9 @@ implements AlignmentListener {
         
         
     }
+    */
     
+    /*
     private Atom getVector(Annotation anno){
         Atom vec = (Atom) anno.getProperty("vector");
         
@@ -421,7 +427,7 @@ implements AlignmentListener {
         
         
     }
-    
+    */
 
     
    

@@ -21,7 +21,7 @@
  * @author Andreas Prlic
  *
  */
-package org.biojava.spice.Panel;
+package org.biojava.spice.panel;
 
 import org.biojava.bio.structure.AminoAcid;
 import org.biojava.bio.structure.Chain;
@@ -36,8 +36,8 @@ import org.biojava.dasobert.eventmodel.StructureEvent;
 import org.biojava.dasobert.eventmodel.StructureListener;
 //import org.biojava.bio.structure.StructureImpl;
 import org.biojava.spice.SPICEFrame;
-import org.biojava.spice.Feature.Feature;
-import org.biojava.spice.Feature.Segment;
+import org.biojava.spice.feature.Feature;
+import org.biojava.spice.feature.Segment;
 //import org.biojava.spice.Panel.seqfeat.FeatureEvent;
 //import org.biojava.spice.Panel.seqfeat.FeatureViewListener;
 //import org.biojava.spice.Panel.seqfeat.SelectedSeqPositionListener;

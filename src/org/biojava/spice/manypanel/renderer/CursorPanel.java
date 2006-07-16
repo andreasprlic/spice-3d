@@ -30,7 +30,7 @@ import java.util.logging.Logger;
 import org.biojava.bio.structure.*;
 import org.biojava.dasobert.eventmodel.SequenceEvent;
 import org.biojava.dasobert.eventmodel.SequenceListener;
-import org.biojava.spice.Feature.Segment;
+import org.biojava.spice.feature.Segment;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureEvent;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureListener;
 

@@ -51,7 +51,7 @@ import org.biojava.bio.structure.StructureImpl;
 import org.biojava.bio.structure.io.DASStructureClient;
 import org.biojava.bio.structure.jama.Matrix;
 import org.biojava.dasobert.dasregistry.Das1Source;
-import org.biojava.spice.GUI.SpiceMenuListener;
+import org.biojava.spice.gui.SpiceMenuListener;
 import org.biojava.spice.manypanel.renderer.ScalePanel;
 
 public class StructureAlignment {
@@ -204,6 +204,8 @@ public class StructureAlignment {
     
     /** get the position of the first selected structure
      * or -1 if none selected.
+     * 
+     * @return first selected structure position
      */
     public int getFirstSelectedPos(){
         for (int i =0 ; i< selection.length;i++){
@@ -283,7 +285,7 @@ public class StructureAlignment {
      * 
      * currently: each structure is a new model. Select in jmol with /modelNr
      * 
-     * @return
+     * @return Structure - an NMR structure containing all the aligned ones as models
      */
     public Structure createArtificalStructure(){
         Structure newStruc = new StructureImpl();
@@ -314,7 +316,7 @@ public class StructureAlignment {
     /** re turns the color for a particular PDB file
      * 
      * @param position
-     * @return
+     * @return Color
      */
     public Color getColor(int position){
         float stepsize   = 0;
@@ -599,7 +601,7 @@ public class StructureAlignment {
     /** convert the Matrix annotation to a Matrix
      * 
      * @param anno
-     * @return
+     * @return rotation Matrix 
      */
     private Matrix getMatrix(Annotation anno){
         Matrix max = new Matrix(3,3);

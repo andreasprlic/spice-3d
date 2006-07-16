@@ -20,7 +20,7 @@
  * Created on Feb 2, 2005
  *
  */
-package org.biojava.spice.GUI.alignmentchooser;
+package org.biojava.spice.gui.alignmentchooser;
 
 import org.biojava.spice.SpiceApplication;
 import org.biojava.bio.Annotation;
@@ -31,7 +31,7 @@ import org.biojava.spice.manypanel.AlignmentTool;
 import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.spice.manypanel.managers.SequenceManager;
 import org.biojava.spice.manypanel.renderer.ScalePanel;
-import org.biojava.spice.Panel.SeqFeaturePanel;
+import org.biojava.spice.panel.SeqFeaturePanel;
 
 import org.biojava.bio.program.das.dasalignment.*;
 import org.biojava.dasobert.das.AlignmentParameters;

@@ -20,7 +20,7 @@
  * Created on Feb 6, 2005
  *
  */
-package org.biojava.spice.GUI;
+package org.biojava.spice.gui;
 
 import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent; 
@@ -34,7 +34,7 @@ import java.util.List;
 
 import javax.swing.JTextField;
 
-import org.biojava.spice.Panel.JmolCommander;
+import org.biojava.spice.panel.JmolCommander;
 
 
 /** A class that listens to various events on the 

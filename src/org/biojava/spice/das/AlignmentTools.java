@@ -30,7 +30,7 @@ import org.biojava.bio.program.das.dasalignment.Alignment;
 import org.biojava.bio.program.das.dasalignment.DASAlignmentCall;
 import org.biojava.dasobert.das.AlignmentThread;
 import org.biojava.dasobert.das.SpiceDasSource;
-import org.biojava.spice.Config.RegistryConfiguration;
+import org.biojava.spice.config.RegistryConfiguration;
 import java.net.*;
 import java.io.*;
 import java.util.zip.GZIPInputStream;

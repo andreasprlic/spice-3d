@@ -20,7 +20,7 @@
  * Created on May 15, 2006
  *
  */
-package org.biojava.spice.GUI;
+package org.biojava.spice.gui;
 
 import java.awt.Color;
 import java.awt.event.ItemEvent;
@@ -45,7 +45,7 @@ import org.biojava.dasobert.eventmodel.SequenceListener;
 import org.biojava.dasobert.eventmodel.StructureEvent;
 import org.biojava.dasobert.eventmodel.StructureListener;
 import org.biojava.spice.StructureAlignment;
-import org.biojava.spice.Panel.StructurePanelListener;
+import org.biojava.spice.panel.StructurePanelListener;
 
 /** a JPanel that contains radio buttons to choose, which structures to show superimposed
  * 

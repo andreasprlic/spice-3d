@@ -20,7 +20,7 @@
  * Created on Apr 10, 2006
  *
  */
-package org.biojava.spice.GUI;
+package org.biojava.spice.gui;
 
 public interface TabListener {
 
