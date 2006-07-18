@@ -135,7 +135,7 @@ public class AlignmentCalc implements Runnable {
         
     }
     
-    public void setStructure1(Structure s1) {
+    public synchronized void setStructure1(Structure s1) {
         if ( s1 == null) {
             
             String warn =  resource.getString("alignment.structurenotfound.msg");
@@ -153,7 +153,7 @@ public class AlignmentCalc implements Runnable {
         testStructureOk();
     }
     
-    public void setStructure2(Structure s2) {
+    public synchronized  void setStructure2(Structure s2) {
         if ( s2 == null) {
             
             String warn =  resource.getString("alignment.structurenotfound.msg");

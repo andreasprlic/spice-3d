@@ -23,20 +23,21 @@
 package org.biojava.spice.gui.alignment;
 
 import java.awt.Color;
-import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.table.TableCellRenderer;
+
 import org.biojava.bio.structure.Atom;
 import org.biojava.bio.structure.AtomImpl;
 import org.biojava.bio.structure.Calc;
@@ -59,6 +60,8 @@ extends JFrame{
     private static String baseName = "alignment";
     private ResourceBundle resource;
     public static Logger logger =  Logger.getLogger("org.biojava.spice");
+    
+    private static String[] columnNames = new String[]{"#","eqr","score", "rms", "gaps","action" };
     
     AlternativeAlignment[] aligs;
     JPanel panel;
@@ -90,11 +93,9 @@ extends JFrame{
         return (StructureAlignmentListener[]) alignmentListeners.toArray(new StructureAlignmentListener[alignmentListeners.size()]);
     }
 
-
     public void addStructureAlignmentListener(StructureAlignmentListener alignmentListener) {
         alignmentListeners.add( alignmentListener);
-    }
-    
+    }    
     
     public void clearListeners(){
         alignmentListeners.clear();        
@@ -108,24 +109,46 @@ extends JFrame{
         this.aligs = aligs;
         panel.removeAll();
         
-        Box vBox = Box.createVerticalBox();
-        panel.add(vBox);
+        //Box vBox = Box.createVerticalBox();
+        //panel.add(vBox);
+        
+        Object[][] data = getDataFromAligs(aligs);
+        JTableDataButtonModel model = new JTableDataButtonModel(data, columnNames);
+        JTable table = new JTable(model);
+        TableCellRenderer defaultRenderer = table.getDefaultRenderer(JButton.class);
+        JButtonTableCellRenderer myRenderer = new JButtonTableCellRenderer(defaultRenderer);
+        table.setDefaultRenderer(JButton.class, myRenderer);
+        table.addMouseListener(new JTableMouseButtonListener(table));
+        JScrollPane scrollPane = new JScrollPane(table);
+        //vBox.add(e);
+        panel.add(scrollPane);
+        
+    }
+    
+    private Object[][] getDataFromAligs(AlternativeAlignment[] aligs){
+        
+        
+        Object[][] data = new Object[aligs.length][columnNames.length];
+        
         for ( int i=0;i< aligs.length;i++){
-            Box hBox = Box.createHorizontalBox();
-            vBox.add(hBox);
             AlternativeAlignment alig = aligs[i];
-            String txt =alig.getEqr() + " " + alig.getScore() + 
-            " " + alig.getRms() + " " + alig.getEqr();
-            JLabel lab = new JLabel(txt);
-            hBox.add(lab);
+        
+            data[i][0] = new Integer(i+1);
+            data[i][1] = new Integer(alig.getEqr());
+            data[i][2] = new Double(alig.getScore());
+            data[i][3] = new Double(alig.getRms());
+            data[i][4] = new Integer(alig.getGaps());
+            
+            
             
             String t = resource.getString("alignment.resultframe.show");
             
-            Action action1 = new MyButtonAction(t,this,i);
-            JButton but = new JButton(action1);
-            hBox.add(but);
+            //Action action1 = new MyButtonAction(t,this,i);
+            JButton but = new JButton(t);
+            but.addMouseListener(new MyButtonMouseListener(t,this,i));
+            data[i][5] = but;
         }
-        
+        return data;
     }
     
     protected void showAlternative(int position){
@@ -233,19 +256,40 @@ extends JFrame{
 
 }
 
-class MyButtonAction extends AbstractAction {
-    
-    private static final long serialVersionUID =0l;
+class MyButtonMouseListener implements MouseListener{
     AlternativeAlignmentFrame parent;
     int pos;
-    public MyButtonAction(String text, AlternativeAlignmentFrame parent, int position){
-        super(text);
+    public MyButtonMouseListener(String text, AlternativeAlignmentFrame parent, int position){
+       
         this.parent = parent;
         this.pos = position;
     }
+        
     
-    public void actionPerformed(ActionEvent evt) {
-        // Perform action...
-        parent.showAlternative(pos);
+
+    public void mouseClicked(MouseEvent arg0) {
+        // TODO Auto-generated method stub
+        
     }
+
+    public void mousePressed(MouseEvent arg0) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void mouseReleased(MouseEvent arg0) {     
+       parent.showAlternative(pos);
+        
+    }
+
+    public void mouseEntered(MouseEvent arg0) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void mouseExited(MouseEvent arg0) {
+        // TODO Auto-generated method stub
+        
+    }
+    
 }

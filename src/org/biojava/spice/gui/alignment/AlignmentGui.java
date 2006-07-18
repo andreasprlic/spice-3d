@@ -175,8 +175,7 @@ public class AlignmentGui extends JFrame{
         cont.add(hBox22);
         
         
-        // row 3 the submit buttons
-        
+        //  row 3  the status
         Action action3 = new AbstractAction(resource.getString("alignment.abort.txt")) {
             public static final long serialVersionUID = 0l;
             // This method is called when the button is pressed
@@ -185,9 +184,32 @@ public class AlignmentGui extends JFrame{
                 abortCalc();
             }
         };
-         abortB = new JButton(action3);
+        abortB = new JButton(action3);
         
         abortB.setEnabled(false);
+        
+        Box hBox41 = Box.createHorizontalBox();
+        hBox41.add(Box.createGlue());
+        hBox41.add(abortB);
+        hBox41.add(Box.createGlue());
+        
+        cont.add(hBox41);
+        
+        
+        
+       Box hBox42 = Box.createHorizontalBox();
+        progress =new JProgressBar();
+        
+        hBox42.add(Box.createGlue());
+        hBox42.add(progress);
+        hBox42.add(Box.createGlue());
+        cont.add(hBox42);
+        progress.setIndeterminate(false);
+        
+        
+        // row 4 the submit buttons
+        
+       
         
         
         Action action2 = new AbstractAction(resource.getString("alignment.close.txt")) {
@@ -228,24 +250,7 @@ public class AlignmentGui extends JFrame{
         cont.add(hBox32);
         
         
-        // last row  the status
-        Box hBox41 = Box.createHorizontalBox();
-        hBox41.add(Box.createGlue());
-        hBox41.add(abortB);
-        hBox41.add(Box.createGlue());
-        
-        cont.add(hBox41);
-        
-        
-        
-       Box hBox42 = Box.createHorizontalBox();
-        progress =new JProgressBar();
-        
-        hBox42.add(Box.createGlue());
-        hBox42.add(progress);
-        hBox42.add(Box.createGlue());
-        cont.add(hBox42);
-        progress.setIndeterminate(false);
+      
         
         structureAlignmentListeners = new ArrayList();
     }
@@ -266,6 +271,12 @@ public class AlignmentGui extends JFrame{
     }
     private  void calcAlignment(){
         
+        if ( this.thread != null ){
+            // already running
+            logger.info("alread running a calculation. please wait");
+            return;
+        }
+        
         
         String pdb1 = f11.getText();
         String pdb2 = f12.getText();
@@ -282,6 +293,8 @@ public class AlignmentGui extends JFrame{
             return;
         }
         
+        
+        
         String chain1 = f21.getText();
         String chain2 = f22.getText();
         
@@ -291,6 +304,8 @@ public class AlignmentGui extends JFrame{
         
         SpiceDasSource[] structureServers = (SpiceDasSource[] ) servs.toArray(new SpiceDasSource[servs.size()]);
         
+        
+        
         alicalc = new AlignmentCalc(this,pdb1,chain1, pdb2, chain2, structureServers);
         
         Iterator iter = structureAlignmentListeners.iterator();
@@ -299,11 +314,6 @@ public class AlignmentGui extends JFrame{
             alicalc.addStructureAlignmentListener(li);
         }
         
-        if ( this.thread != null ){
-            // already running
-            logger.info("alread running a calculation. please wait");
-            return;
-        }
         
         thread = new Thread(alicalc);
         thread.start();
@@ -322,7 +332,8 @@ public class AlignmentGui extends JFrame{
     }
     
     private void abortCalc(){
-        alicalc.interrupt();
+        if ( alicalc != null )
+            alicalc.interrupt();
         
     }
 
