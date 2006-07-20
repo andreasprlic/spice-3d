@@ -125,12 +125,19 @@ implements JmolStatusListener, StructureListener
         
         if ( viewer != null ) {
             //int mod = viewer.getAtomModelIndex(atomIndex);
-             //String info = viewer.getAtomInfo(atomIndex);  
-             //logger.info(info);
+             String info = viewer.getAtomInfo(atomIndex);  
+             logger.info(info);
             // did not want to parse the string to get the data
             // had to do modifications to Jmol for this!
-            String pdbcode = viewer.getAtomSequenceCode(atomIndex);
+          
+             String pdbcode = viewer.getAtomSequenceCode(atomIndex);
             char chainId = viewer.getAtomChain(atomIndex);           
+           
+             //String pdbcode = "";
+             //char chainId = ' ';
+           //viewer.getAtomName(atomIndex);  
+            
+           
            //String pdbcode = "";
            //String chainId = "";
             //logger.info(chainId + " numeric value: " + Character.getNumericValue(chainId));
@@ -239,6 +246,41 @@ implements JmolStatusListener, StructureListener
             
         }
         
+    }
+
+    public void notifyNewDefaultModeMeasurement(int count, String strInfo) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void notifyNewPickingModeMeasurement(int iatom, String strMeasure) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void notifyScriptStart(String statusMessage, String additionalInfo) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void sendConsoleEcho(String strEcho) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void sendConsoleMessage(String strStatus) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void sendSyncScript(String script, String appletName) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public float functionXY(String functionName, int x, int y) {
+        // TODO Auto-generated method stub
+        return 0;
     }
     
   

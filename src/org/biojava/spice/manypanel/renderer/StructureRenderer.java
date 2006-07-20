@@ -48,12 +48,22 @@ extends AbstractChainRenderer
        
         //logger.info("init StructureRenderer");
         
-        featurePanel = new StructureFeaturePanel();
+        featurePanel = new StructureScalePanel();
         cursorPanel  = new CursorPanel();       
         statusPanel.setName("PDB");
         structure = new DrawableStructure("");
         initPanels();
          
+    }
+    
+    /** if a structure region is provided, then 
+     * a "feature is drawn in the structure panel that
+     * highlights this region. e.g. used to visualize the Sisyphus
+     * regions
+     *
+     */
+    public void setStructureRegion(){
+        
     }
 
     

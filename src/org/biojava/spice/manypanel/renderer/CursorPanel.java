@@ -34,6 +34,13 @@ import org.biojava.spice.feature.Segment;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureEvent;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureListener;
 
+
+/** a class that paints the sequence position "cursor" and the selected region of a sequence
+ * 
+ * @author Andreas Prlic
+ * @since 4:15:29 PM
+ * @version %I% %G%
+ */
 public class CursorPanel 
 
 extends JPanel
@@ -259,7 +266,7 @@ SpiceFeatureListener
         g2D.setColor(SELECTION_COLOR);
         
         
-        int startX = Math.round(tmpSelectionStart *scale) + ScalePanel.DEFAULT_X_START;
+        int startX = Math.round(tmpSelectionStart *scale) + SequenceScalePanel.DEFAULT_X_START;
         int endX   = Math.round((selectionEnd-tmpSelectionStart+1)*scale) ;
         if (endX <0)
             endX = 0;

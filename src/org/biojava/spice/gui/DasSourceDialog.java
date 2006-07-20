@@ -43,7 +43,8 @@ import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
 import org.biojava.spice.JNLPProxy;
 
 
-/**
+/** A Dialog that displays some information about a DAS source
+ * 
  * @author Andreas Prlic
  *
  */
@@ -59,9 +60,7 @@ extends JDialog{
     static int H_SIZE = 750;
     static int V_SIZE = 600;
     JEditorPane txt;
-    /**
-     * 
-     */
+    
     public DasSourceDialog( SpiceDasSource dasSource) {
         super();
         this.dasSource = dasSource;

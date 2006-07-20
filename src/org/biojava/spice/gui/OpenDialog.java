@@ -67,7 +67,10 @@ extends JDialog
     JTextField kwsearch;     
     
     
-    /** a dialog responsible for opening new entries. */
+    /** a dialog responsible for opening new entries.
+     * 
+     * @param parent the parent SpiceApplication instance
+     */
     public OpenDialog(SpiceApplication parent){
         // Calls the parent telling it this
         // dialog is modal(i.e true)

@@ -62,9 +62,7 @@ public class SaveLoadSession {
     	SpiceApplication spice;
     	File  oldfile;
     	Logger logger; 
-    /**
-     * 
-     */
+    
     public SaveLoadSession(SpiceApplication parent) {
         super();
         logger = Logger.getLogger("org.biojava.spice");
@@ -165,7 +163,14 @@ public class SaveLoadSession {
         }
     }
     
-    /** parse the serialized session.spice file */
+    /** parse the serialized session.spice file
+     * 
+     * @param f a file
+     * @throws FileNotFoundException
+     * @throws SAXException
+     * @throws IOException
+     * @throws ParserConfigurationException
+     */
     public void fromXML(File f)
     	throws FileNotFoundException, SAXException, IOException, ParserConfigurationException
     {

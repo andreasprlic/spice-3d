@@ -76,7 +76,7 @@ public class AlignmentPanel extends JPanel {
         sequence2 = new ChainImpl();
         length1=0;
         length2=0;
-        this.setBackground(ScalePanel.BACKGROUND_COLOR);
+        this.setBackground(SequenceScalePanel.BACKGROUND_COLOR);
         
         scale1 = 1.0f;
         scale2 = 1.0f;
@@ -148,7 +148,7 @@ public class AlignmentPanel extends JPanel {
         
      
         
-        g2D.setColor(ScalePanel.SEQUENCE_COLOR);
+        g2D.setColor(SequenceScalePanel.SEQUENCE_COLOR);
         int aminosize1 = Math.round(1*scale1);
         if ( aminosize1 < 1)
             aminosize1 = 1;
@@ -198,8 +198,8 @@ public class AlignmentPanel extends JPanel {
             if ( h2 < 0)
                 h2 = 0;
             
-            int p1 = Math.round(h1*scale1) + ScalePanel.DEFAULT_X_START - scrollLeftX1;
-            int p2 = Math.round(h2*scale2) + ScalePanel.DEFAULT_X_START - scrollLeftX2;
+            int p1 = Math.round(h1*scale1) + SequenceScalePanel.DEFAULT_X_START - scrollLeftX1;
+            int p2 = Math.round(h2*scale2) + SequenceScalePanel.DEFAULT_X_START - scrollLeftX2;
             
             Group g1 = null;
             Group g2 = null;

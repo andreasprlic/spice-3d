@@ -31,8 +31,6 @@ import org.jmol.popup.JmolPopup;
 import org.jmol.adapter.smarter.SmarterJmolAdapter;
 import org.biojava.bio.structure.Structure ;
 import org.biojava.bio.structure.StructureImpl ;
-
-import java.util.HashMap;
 import java.util.logging.*;
 
 
@@ -115,7 +113,11 @@ extends JPanel
        
         viewer.evalString(command);
         
+        //viewer.scriptWaitVoid(command);
+        //System.out.println("done");
     }
+    
+    
     
     /** display a new PDB structure in Jmol 
      * @param structure a Biojava structure object    
@@ -130,8 +132,8 @@ extends JPanel
         
         if ( structure.size() < 1 ) {
             logger.info("got structure of size < 1");
-            viewer.evalStringSync("zap");
-            //viewer.evalStringSync(EMPTYCMD);
+            //viewer.scriptWait("zap");
+            viewer.evalStringSync(EMPTYCMD);
             return;
         }
         logger.info("setting new structure in Jmol " + structure.getPDBCode() + " " + structure.size());

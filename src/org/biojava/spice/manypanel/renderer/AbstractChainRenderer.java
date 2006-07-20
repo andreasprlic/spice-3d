@@ -64,7 +64,7 @@ public abstract class AbstractChainRenderer
     public static final int STATUS_PANEL_HEIGHT =  20;
     public static final int FEATURE_PANEL_HEIGHT = 20;
     
-    ScalePanel featurePanel;
+    SequenceScalePanel featurePanel;
     CursorPanel cursorPanel;
     DrawableSequence sequence;
     static Logger logger = Logger.getLogger("org.biojava.spice");
@@ -97,12 +97,12 @@ public abstract class AbstractChainRenderer
         layeredPane.setBorder(BorderFactory.createEmptyBorder());
         layeredPane.setDoubleBuffered(true);
         layeredPane.setOpaque(true);
-        layeredPane.setBackground(ScalePanel.BACKGROUND_COLOR);
+        layeredPane.setBackground(SequenceScalePanel.BACKGROUND_COLOR);
         
         scrollPane = new JScrollPane(layeredPane);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.setOpaque(true);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(ScalePanel.DEFAULT_Y_STEP);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(SequenceScalePanel.DEFAULT_Y_STEP);
         
         
         dasSourcePanels = new ArrayList();
@@ -234,7 +234,7 @@ public abstract class AbstractChainRenderer
         return dasSourcePanels;
     }
     
-    public ScalePanel getFeaturePanel(){
+    public SequenceScalePanel getFeaturePanel(){
         return featurePanel;
     }
     
@@ -276,8 +276,8 @@ public abstract class AbstractChainRenderer
             zoomFactor = 1;
         
         this.zoomFactor = zoomFactor;
-        int DEFAULT_X_START = ScalePanel.DEFAULT_X_START;
-        int DEFAULT_X_RIGHT_BORDER = ScalePanel.DEFAULT_X_RIGHT_BORDER;
+        int DEFAULT_X_START = SequenceScalePanel.DEFAULT_X_START;
+        int DEFAULT_X_RIGHT_BORDER = SequenceScalePanel.DEFAULT_X_RIGHT_BORDER;
         
         int seqLength = getSequenceLength();
         // the maximum width depends on the size of the parent Component
@@ -359,7 +359,7 @@ public abstract class AbstractChainRenderer
         int aminosize = Math.round(1*scale);
         if ( aminosize < 1)
             aminosize = 1;
-        int w = Math.round(l*scale) + aminosize+  ScalePanel.DEFAULT_X_START + ScalePanel.DEFAULT_X_RIGHT_BORDER;
+        int w = Math.round(l*scale) + aminosize+  SequenceScalePanel.DEFAULT_X_START + SequenceScalePanel.DEFAULT_X_RIGHT_BORDER;
         
         if ( w  < 200){
             w = 200;

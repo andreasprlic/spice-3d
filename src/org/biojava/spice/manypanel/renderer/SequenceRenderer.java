@@ -44,7 +44,7 @@ extends AbstractChainRenderer
         //logger.info("init sequenceRenderer");
         
         sequence = new DrawableSequence("",new ChainImpl());
-        featurePanel = new ScalePanel();
+        featurePanel = new SequenceScalePanel();
         cursorPanel  = new CursorPanel();
         statusPanel.setName("UniProt");
         initPanels();

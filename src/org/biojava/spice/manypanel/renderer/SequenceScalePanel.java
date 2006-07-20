@@ -47,7 +47,10 @@ import java.awt.Image;
 //import java.awt.geom.AffineTransform;
 //import java.awt.geom.Rectangle2D;
 
-public class ScalePanel
+/** a class that draws a Sequence as a rectange, a scale display over it
+ * 
+ */
+public class SequenceScalePanel
 extends JPanel{
     
     static final long serialVersionUID = 7893248902423l;
@@ -81,7 +84,7 @@ extends JPanel{
     public static final Font seqFont = new Font("Helvetica", Font.PLAIN, 10);
    
     
-    public ScalePanel() {
+    public SequenceScalePanel() {
         super();
         this.setBackground(BACKGROUND_COLOR);
         chain = new ChainImpl();
@@ -184,7 +187,7 @@ extends JPanel{
         
     }
     /** draw the Scale */
-    private int drawSequence(Graphics2D g2D, float scale, int length, int y){
+    protected int drawSequence(Graphics2D g2D, float scale, int length, int y){
         //g2D.drawString(panelName,10,10);
         
         g2D.setColor(SEQUENCE_COLOR);
@@ -232,7 +235,7 @@ extends JPanel{
   
        
     /** draw the Scale */
-    private int drawScale(Graphics2D g2D, float scale, int length, int y){
+    protected int drawScale(Graphics2D g2D, float scale, int length, int y){
         
         g2D.setColor(SCALE_COLOR);
         

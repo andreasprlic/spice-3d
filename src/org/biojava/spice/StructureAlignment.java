@@ -52,7 +52,7 @@ import org.biojava.bio.structure.io.DASStructureClient;
 import org.biojava.bio.structure.jama.Matrix;
 import org.biojava.dasobert.dasregistry.Das1Source;
 import org.biojava.spice.gui.SpiceMenuListener;
-import org.biojava.spice.manypanel.renderer.ScalePanel;
+import org.biojava.spice.manypanel.renderer.SequenceScalePanel;
 
 public class StructureAlignment {
     
@@ -437,7 +437,7 @@ public class StructureAlignment {
                 //progressFrame.setUndecorated(true);
                 
                 JPanel panel = new JPanel();
-                panel.setBackground(ScalePanel.BACKGROUND_COLOR);
+                panel.setBackground(SequenceScalePanel.BACKGROUND_COLOR);
                 panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
                 
                 Box vbox = Box.createVerticalBox();

@@ -101,6 +101,8 @@ public class CloseableTabbedPane extends JTabbedPane {
         return (TabListener[])tabListeners.toArray(new TabListener[tabListeners.size()]);
     }
     
+    
+    /*
     private void triggerTabClosed(Component c){
         System.out.println("closeabletab trigger close");
         Iterator iter = tabListeners.iterator();
@@ -112,7 +114,7 @@ public class CloseableTabbedPane extends JTabbedPane {
             li.tabClosed(event);
         }
     }
-    
+    */
     
     //--- Inner Class(es) ---
     
@@ -238,8 +240,11 @@ public class CloseableTabbedPane extends JTabbedPane {
             }
         }    
         
-        /**
-         * Verifies if x and y are within the icon's borders.
+        /** Verifies if x and y are within the icon's borders.
+         * 
+         * @param xEvent
+         * @param yEvent
+         * @return boolean if within the borders
          */
         public boolean contains(int xEvent, int yEvent)
         {

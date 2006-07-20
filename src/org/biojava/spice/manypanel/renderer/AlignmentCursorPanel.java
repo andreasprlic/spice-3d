@@ -242,13 +242,13 @@ public class AlignmentCursorPanel extends JPanel
             tmpSelectionStart2 = 0;
         }
       
-        int startX1 = Math.round(tmpSelectionStart1 *scale1) + ScalePanel.DEFAULT_X_START - scrollLeftX1;
-        int endX1   = Math.round(selectionEnd1*scale1) + aminosize1 + ScalePanel.DEFAULT_X_START - scrollLeftX1 ;
+        int startX1 = Math.round(tmpSelectionStart1 *scale1) + SequenceScalePanel.DEFAULT_X_START - scrollLeftX1;
+        int endX1   = Math.round(selectionEnd1*scale1) + aminosize1 + SequenceScalePanel.DEFAULT_X_START - scrollLeftX1 ;
         if (endX1 <1)
             endX1 = 1;
         
-        int startX2 = Math.round(tmpSelectionStart2 *scale2) + ScalePanel.DEFAULT_X_START - scrollLeftX2;
-        int endX2   = Math.round(selectionEnd2*scale2) + aminosize2 + ScalePanel.DEFAULT_X_START - scrollLeftX2;
+        int startX2 = Math.round(tmpSelectionStart2 *scale2) + SequenceScalePanel.DEFAULT_X_START - scrollLeftX2;
+        int endX2   = Math.round(selectionEnd2*scale2) + aminosize2 + SequenceScalePanel.DEFAULT_X_START - scrollLeftX2;
         if (endX2 <1)
             endX2 = 1;
         

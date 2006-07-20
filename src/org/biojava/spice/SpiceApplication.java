@@ -667,6 +667,8 @@ ConfigurationListener
         System.out.println(msg);
         logger.finest(msg);
         
+        
+        
         if (type.equals("PDB")){
             
             this.loadStructure(code);
@@ -713,7 +715,7 @@ ConfigurationListener
      */
     private void loadUniprot(String uniprot) {
         logger.info("SpiceApplication loadUniprot " + uniprot);
-        
+        System.setProperty("SPICE:drawStructureRegion","false");
         if ( config == null){
             // we have to wait until contacting the DAS registry is finished ...
             waitingType="UniProt";
@@ -730,8 +732,8 @@ ConfigurationListener
     protein structure
     */
    private void loadEnsp(String ensp) {
-       logger.info("SpiceApplication loadEnsp" + ensp);
-       
+       //logger.info("SpiceApplication loadEnsp" + ensp);
+       System.setProperty("SPICE:drawStructureRegion","false");
        if ( config == null){
            // we have to wait until contacting the DAS registry is finished ...
            waitingType="Ensp";
@@ -754,7 +756,7 @@ ConfigurationListener
      call the setStructure method to set the protein structure.
      */
     private void loadStructure(String pdbcod) {
-        
+        System.setProperty("SPICE:drawStructureRegion","false");
         //currentChain = null ;
         setCurrentChain(null,-1);
         if (logger.isLoggable(Level.FINER)) {

@@ -111,12 +111,17 @@ StructureAlignmentListener {
     public void setStructureAlignment(StructureAlignment ali){
         structureAlignment = ali;
         //logger.info("got new structure alignment");
+        
+        System.setProperty("SPICE:drawStructureRegion","true");
+        
         clearButtons();
         if ( ali == null) {
             clearButtons();
             repaint();
             return;
         }
+        
+        
         
         boolean[] selectedArr = ali.getSelection();
         
@@ -197,6 +202,8 @@ StructureAlignmentListener {
                 Structure struc = null;
                 try {
                     struc = structureAlignment.getStructure(i);
+                    Color col = structureAlignment.getColor(i);
+                    System.setProperty("SPICE:StructureRegionColor",new Integer(col.getRGB()).toString());
                     
                 } catch (StructureException ex){
                     ex.printStackTrace();

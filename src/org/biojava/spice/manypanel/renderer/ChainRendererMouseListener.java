@@ -123,7 +123,7 @@ MouseMotionListener
         int x = e.getX();
         //int y = e.getY();
         //float scale = seqScale.getScale();
-        int DEFAULT_X_START = ScalePanel.DEFAULT_X_START;
+        int DEFAULT_X_START = SequenceScalePanel.DEFAULT_X_START;
         float scale = renderer.getScale();
         int seqpos =  java.lang.Math.round((x-DEFAULT_X_START-2)/scale) ;
         
@@ -177,7 +177,7 @@ MouseMotionListener
      * or null, if the event was not over a feature line
      * 
      * @param e
-     * @return
+     * @return a SpiceFeatureEvent
      */
     private SpiceFeatureEvent getSpiceFeatureEvent(MouseEvent e){
          
@@ -213,7 +213,7 @@ MouseMotionListener
             return null;
         }
         
-        h += ScalePanel.DEFAULT_Y_START + ScalePanel.DEFAULT_Y_STEP + ScalePanel.LINE_HEIGHT;
+        h += SequenceScalePanel.DEFAULT_Y_START + SequenceScalePanel.DEFAULT_Y_STEP + SequenceScalePanel.LINE_HEIGHT;
         if ( y < h){
             // smaller than the "heading section" of the display
                 return null;
@@ -223,7 +223,7 @@ MouseMotionListener
         
         Feature[] feats = source.getFeatures();
         for (int i = 0 ; i< feats.length; i ++){
-            h += ScalePanel.DEFAULT_Y_STEP;
+            h += SequenceScalePanel.DEFAULT_Y_STEP;
             if ( y < h) {
                 SpiceFeatureEvent event = new SpiceFeatureEvent(source.getDasSource(), feats[i]);
                 return event;

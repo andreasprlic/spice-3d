@@ -43,7 +43,7 @@ import org.biojava.dasobert.dasregistry.Das1Source;
 //import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
 import org.biojava.dasobert.dasregistry.DasSource;
 //import org.biojava.services.das.registry.DasRegistryAxisClient;
-import org.biojava.spice.manypanel.renderer.ScalePanel;
+import org.biojava.spice.manypanel.renderer.SequenceScalePanel;
 
 //for logging
 import java.util.logging.*                 ;
@@ -479,7 +479,7 @@ extends Thread
         //progressFrame.setUndecorated(true);
         
         JPanel panel = new JPanel();
-        panel.setBackground(ScalePanel.BACKGROUND_COLOR);
+        panel.setBackground(SequenceScalePanel.BACKGROUND_COLOR);
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         
         Box vbox = Box.createVerticalBox();
