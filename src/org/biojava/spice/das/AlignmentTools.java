@@ -52,6 +52,7 @@ public class AlignmentTools {
 
     /**
      * 
+     * @param conf the configuration to be used
      */
     public AlignmentTools(RegistryConfiguration conf) {
         super();
@@ -66,7 +67,11 @@ public class AlignmentTools {
         return AlignmentThread.getObject(s,a);
     }
     
-    /** get alignments for a particular uniprot or pdb code */
+    /** get alignments for a particular uniprot or pdb code
+     * 
+     * @param code
+     * @return an array of Alignment object
+     */
     public  Alignment[] getAlignments(String code) {
     	logger.finest("searching for alignments of "+code+" against PDB");
     	Alignment[] alignments = null ;

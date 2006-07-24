@@ -73,6 +73,7 @@ JmolCommander
     
     /**
      * 
+     * @param structurePanel
      */
     public StructurePanelListener(StructurePanel structurePanel) {
         super();
@@ -87,7 +88,7 @@ JmolCommander
     }
     
     /** display a new PDB structure in Jmol 
-    * @param structure a Biojava structure object
+    * @param struc a Biojava structure object
     * @param displayScript  a flag to set if the INIT_SELECT script should be executed or not    
     *
     */

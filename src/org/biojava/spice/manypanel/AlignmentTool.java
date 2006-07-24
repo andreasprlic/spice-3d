@@ -81,9 +81,9 @@ public class AlignmentTool {
      * arraypos ...
      * seqpos   ... position of the sequence. is null if this sequence position is not aligned
      * 
-     * @param ali
-     * @param code the accessionCode for the object to be the reference.
-     * @return
+     * @param ali alignment
+     * @param queryCode the accessionCode for the object to be the reference.
+     * @return a List of maps objects
      */
     public static List createAlignmentTable(Alignment ali, String queryCode) {
         String code = queryCode;
@@ -146,7 +146,11 @@ public class AlignmentTool {
         //	}
     }
     
-    /** returns a list of maps */
+    /** returns a list of maps
+     * 
+     * @param cigar
+     * @return a List of map objects
+     */
     public static List getTableByCigar(String cigar) {
         
         
@@ -208,7 +212,7 @@ public class AlignmentTool {
      * @param querySequence
      * @param queryId
      * @param subjectId
-     * @return
+     * @return a chain object
      */
     public static Chain createChain(Alignment ali, String querySequence, String queryId, String subjectId ){
         SequenceManager sm = new SequenceManager();

@@ -31,6 +31,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
 
 class JTableMouseButtonListener implements MouseListener {
+    
     private JTable __table;
 
     private void __forwardEventToButton(MouseEvent e) {

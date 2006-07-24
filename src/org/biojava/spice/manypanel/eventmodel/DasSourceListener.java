@@ -29,10 +29,16 @@ package org.biojava.spice.manypanel.eventmodel;
  */
 public interface DasSourceListener {
 
-    /** a new DAS source to be added */
+    /** a new DAS source to be added
+     * 
+     * @param ds an event
+     */
     public void newDasSource(DasSourceEvent ds);
     
-    /** remove a DAS source */
+    /** remove a DAS source
+     * 
+     * @param ds an event
+     */
     public void removeDasSource(DasSourceEvent ds);
     
     /** a DAS source has been selected (in the GUI)

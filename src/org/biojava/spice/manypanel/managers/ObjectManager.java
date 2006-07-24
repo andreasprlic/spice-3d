@@ -49,7 +49,7 @@ public interface ObjectManager {
         
         /** get the list of available Reference DAS servers 
          * 
-         * @return 
+         * @return an array of das sources
          */
         
         public SpiceDasSource[] getDasSources();

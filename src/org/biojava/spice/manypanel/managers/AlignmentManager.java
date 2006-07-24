@@ -852,6 +852,8 @@ implements StructureListener{
      * 
      * @param query1
      * @param query2
+     * @return null!
+     * @deprecated
      */
     public Alignment getAlignment(String query1, String query2){
         return null;

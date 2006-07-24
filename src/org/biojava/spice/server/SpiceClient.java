@@ -59,8 +59,9 @@ public class SpiceClient {
     
     /** try to connect to SPICEPORT and see if already an instance of SPICE is running there
      * 
-    
-     * @return statuscode
+     * @param params parameters
+     * @return intstatuscode
+     * @throws IOException
      */
     public int send(SpiceStartParameters params) 
     throws IOException{
@@ -146,7 +147,7 @@ public class SpiceClient {
      * @param out
      * @param in
      * @param params
-     * @return
+     * @return a string that gives either OK or WHAT or ERROR status
      */
     private String setSpiceParameters(PrintWriter out, BufferedReader in, SpiceStartParameters params){
         

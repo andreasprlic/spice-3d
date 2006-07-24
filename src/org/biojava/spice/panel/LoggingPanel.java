@@ -294,8 +294,9 @@ public class LoggingPanel extends JPanel {
         this(Logger.getLogger(logger!=null ? logger : ""));
     }
 
-    /**
-     * Returns the logging handler.
+    /** Returns the logging handler.
+     * 
+     * @return the handler
      */
     public Handler getHandler() {
         return model;
@@ -306,6 +307,8 @@ public class LoggingPanel extends JPanel {
      *
      * @param column The column to show or hide. May be one of {@link #LOGGER}, {@link #CLASS},
      *               {@link #METHOD}, {@link #TIME_OF_DAY}, {@link #LEVEL} or {@link #MESSAGE}.
+     *  
+     *               @return a flag is visible
      */
     public boolean isColumnVisible(final Column column) {
         return model.isColumnVisible(column.index);
@@ -325,6 +328,8 @@ public class LoggingPanel extends JPanel {
     /**
      * Returns the capacity. This is the maximum number of {@link LogRecord}s the handler
      * can memorize. If more messages are logged, then the earliest messages will be discarted.
+     * 
+     * @return int the capacity
      */
     public int getCapacity() {
         return model.getCapacity();
@@ -333,7 +338,8 @@ public class LoggingPanel extends JPanel {
     /**
      * Set the capacity. This is the maximum number of {@link LogRecord}s the handler can
      * memorize. If more messages are logged, then the earliest messages will be discarted.
-     */
+     * @param capacity the max number of LogRecords that can be used
+     **/
     public void setCapacity(final int capacity) {
         model.setCapacity(capacity);
     }

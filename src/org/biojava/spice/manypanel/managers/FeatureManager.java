@@ -205,9 +205,9 @@ implements ObjectManager ,SequenceListener{
     }
     /** triggers DAS requests for each of the DAS sources
      * 
-     *      * @param accessionCode
-     * @return
-     */
+    * @param accessionCode
+     * 
+     *      */
     private void triggerFeatureRequests(String accessionCode){
         //logger.info("triggerFeatureRequests");
         
@@ -246,6 +246,7 @@ implements ObjectManager ,SequenceListener{
     
     /** a new object has been returned
      * 
+     * @param object new object
      */
     public void newObject(Object object) {
         

@@ -37,10 +37,6 @@ import org.biojava.spice.SpiceStartParameters;
 
 import java.util.logging.*;
 
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 
 /** a class that defines the protocol how two
  * instances of spice can communicate with each other.
@@ -109,7 +105,8 @@ public class SpiceProtocol {
      *  NO_RUNNING_SPICE ... there is no spice running 
      * 
      * @param str
-     * @return
+     * @param server
+     * @return a string
      */
     public String processInput(String str,SpiceServer server){
         
@@ -183,7 +180,7 @@ public class SpiceProtocol {
                     if ( spice instanceof SpiceApplication ){
                         SpiceApplication parent = (SpiceApplication) spice;
                         parent.setVisible(true);
-                        parent.show();
+                        //parent.show();
                         //parent.toFront();
                         parent.requestFocus();
                         //parent.setState(java.awt.Frame.NORMAL);

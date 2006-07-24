@@ -121,7 +121,11 @@ public class Segment {
     public void setTxtColor(String str) { txtColor = str; }
     public String getTxtColor() { return txtColor;}
     
-    /** tests if two segments are overlapping */
+    /** tests if two segments are overlapping
+     * 
+     * @param segment to compare with
+     * @return true if segments overlap
+     */
     public boolean overlaps(Segment segment){
         if (! (this.start <= this.end )) 
             throw new IndexOutOfBoundsException("start > end for segment" + this);
@@ -151,6 +155,9 @@ public class Segment {
     }
     
     /** paint this segment on a a graphics panel 
+     * @param y the y coordinate where to start drawing 
+     * @param g the graphics2D object to use for painting
+     * @deprecated
      * */
     public void paint(Graphics2D g, int y){
         

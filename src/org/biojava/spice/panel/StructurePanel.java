@@ -86,7 +86,10 @@ extends JPanel
     }
     
     
-    /** returns the JmolViewer */
+    /** returns the JmolViewer
+     * 
+     * @return the viewer
+     */
     public JmolViewer getViewer() {
         return viewer;
     }

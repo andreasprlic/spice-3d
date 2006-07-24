@@ -70,11 +70,10 @@ extends Thread
     
     static Logger logger = Logger.getLogger("org.biojava.spice");
     
-    /** contact a single DAS feature server and retreive features 
-     @param parent a link to the parent class
-     @param urlstring string of server
-     @param threadid id for this thread, if job is finished parent
-     is told that threadid has finised
+    /** contact a single DAS feature server and retreive features
+     * 
+     * @param accessionCode the accession code for which features should be fetched
+     * @param ds the das source to be used
      */
     public SingleFeatureThread( String accessionCode, SpiceDasSource ds) {
        

@@ -193,29 +193,66 @@ StructureAlignmentListener {
                 if (e.getStateChange() == ItemEvent.DESELECTED) {
                     // remove structure from alignment
                     structureAlignment.deselect(i);
+                    // display the first one that is selected
+                    // set the color to that one 
+                    for (int j=0;j<structureAlignment.getIds().length;j++){
+                        
+                        if ( structureAlignment.getSelection()[j]){
+                            Color col = structureAlignment.getColor(j);
+                            System.setProperty("SPICE:StructureRegionColor",new Integer(col.getRGB()).toString());                            
+                            break;
+                        }                        
+                    }
                     
                 } else {
                     structureAlignment.select(i);
                     // add structure to alignment
-                }
-                
-                Structure struc = null;
-                try {
-                    struc = structureAlignment.getStructure(i);
                     Color col = structureAlignment.getColor(i);
                     System.setProperty("SPICE:StructureRegionColor",new Integer(col.getRGB()).toString());
                     
-                } catch (StructureException ex){
-                    ex.printStackTrace();
-                    structureAlignment.deselect(i);
-                    return;
+                    // check if we can get the structure...
+                    Structure struc = null;
+                    try {
+                        struc = structureAlignment.getStructure(i);
+                    
+                        
+                        Chain c1 = struc.getChain(0);
+                        String sequence = c1.getSequence();
+                        String ac = id + "." + c1.getName();
+                        
+                        SequenceEvent sevent = new SequenceEvent(ac,sequence);
+                        //logger.info("*** seqeunce event " + ac);
+                        Iterator iter3 = pdbSequenceListeners.iterator();
+                        while (iter3.hasNext()){
+                            SequenceListener li = (SequenceListener)iter3.next();
+                            li.newSequence(sevent);
+                        }
+                        
+                    } catch (StructureException ex){
+                        ex.printStackTrace();
+                        structureAlignment.deselect(i);
+                        //return;
+                    }
                 }
                 
-                // update the structure alignment in the structure display.
-                Structure newStruc = structureAlignment.createArtificalStructure();
                 
-                // execute Rasmol cmd...
-                String cmd = structureAlignment.getRasmolScript();
+                
+                Structure newStruc = null; 
+//              execute Rasmol cmd...
+                String cmd = null;
+                
+                
+                // update the structure alignment in the structure display.
+                if (e.getStateChange() == ItemEvent.DESELECTED) {
+                    newStruc = structureAlignment.createArtificalStructure();
+                    structureAlignment.getRasmolScript();
+                    
+                }
+                else {
+                    newStruc = structureAlignment.createArtificalStructure(i);
+                    structureAlignment.getRasmolScript(i);
+                    
+                }
                 
                 
                 StructureEvent event = new StructureEvent(newStruc);
@@ -232,17 +269,7 @@ StructureAlignmentListener {
                 
                 
                 
-                Chain c1 = struc.getChain(0);
-                String sequence = c1.getSequence();
-                String ac = id + "." + c1.getName();
-                
-                SequenceEvent sevent = new SequenceEvent(ac,sequence);
-                //logger.info("*** seqeunce event " + ac);
-                Iterator iter3 = pdbSequenceListeners.iterator();
-                while (iter3.hasNext()){
-                    SequenceListener li = (SequenceListener)iter3.next();
-                    li.newSequence(sevent);
-                }
+               
                 
                 
             }

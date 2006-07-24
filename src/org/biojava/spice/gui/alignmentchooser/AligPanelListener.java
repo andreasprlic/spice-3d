@@ -36,8 +36,9 @@ import org.biojava.bio.structure.Chain;
 public class AligPanelListener implements ComponentListener {
     
     AlignmentChooser aligPanel;
-    /**
+    /** 
      * 
+     * @param panel
      */
     public AligPanelListener(AlignmentChooser panel) {
         super();

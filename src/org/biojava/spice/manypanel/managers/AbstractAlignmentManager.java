@@ -60,7 +60,7 @@ implements AlignmentListener{
      * 
      * @param pos2
      * @param searchdirection
-     * @return
+     * @return closest position to pos2
      */
     protected int getNextPosition1(int pos2, int searchdirection, int stop){
         
@@ -140,7 +140,7 @@ implements AlignmentListener{
      * 
      * @param pos1
      * @param searchdirection
-     * @return
+     * @return closest position to pos1
      */
     protected int getNextPosition2(int pos1, int searchdirection, int stop){
         int i = pos1;

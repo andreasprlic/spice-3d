@@ -155,7 +155,7 @@ public class MSDKeywordSearch {
     /** open an InputStream to the url below. Requests data in gzip encoding, if supported
      * 
      * @param url
-     * @return
+     * @return an input stream
      */
     private InputStream open(URL url) {
         {

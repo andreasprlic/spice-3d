@@ -869,7 +869,13 @@ ChangeListener
     
     
     
-    /** test if a server is a UniProt vs PDBresnum alignment server */
+    /** test if a server is a UniProt vs PDBresnum alignment server
+     * 
+     * @param sources
+     * @param cs1
+     * @param cs2
+     * @return an array of SpiceDasSources
+     */
     public SpiceDasSource[] getAlignmentServers(List sources,
             DasCoordinateSystem cs1, 
             DasCoordinateSystem cs2) {

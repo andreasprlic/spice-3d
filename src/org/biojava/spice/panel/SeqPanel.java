@@ -35,22 +35,38 @@ import org.biojava.bio.structure.Chain ;
 
 public interface SeqPanel {
 
-    /** set a Chain, tells which chain number in spice master application */
+    /** set a Chain, tells which chain number in spice master application
+     * 
+     * @param c 
+     * @param spice_chainnumber
+     */
     public void setChain(Chain c,int spice_chainnumber) ;   
 
-    /** highighting of range of residues
-	make sure that this is only called for the currently displayed chain fromthe outside!
+    /** highighting of range of residues make sure that this is only called for the currently displayed chain fromthe outside!
+     * 
+     * @param start
+     * @param end
+     */
 	
-    */
     public void highlite( int start, int end);
 
-    /** highighting of single residue */    
+    /** highighting of single residue 
+     * 
+     * @param seqpos
+     */
     public void highlite( int seqpos);
 
-    /** select range of residues */
+    /** select range of residues
+     * 
+     * @param start
+     * @param end
+     */
     public void select( int start, int end);
     
-    /** select single residue */
+    /** select single residue
+     * 
+     * @param seqpos
+     */
     public void select( int seqpos);
  
     

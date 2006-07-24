@@ -50,6 +50,8 @@ public class MSDWindow {
     
     /**
      * 
+     * @param parent spice frame where it belongs to     * 
+     * @param keyword to search
      */
     public MSDWindow(SPICEFrame parent,String keyword) {
         super();

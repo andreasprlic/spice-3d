@@ -28,10 +28,8 @@ import java.awt.Dimension;
 import java.net.*;
 
 import org.biojava.dasobert.das.SpiceDasSource;
-import org.biojava.dasobert.das2.io.DasSourceReader;
 import org.biojava.dasobert.das2.io.DasSourceReaderImpl;
 import org.biojava.dasobert.dasregistry.*;
-import org.biojava.services.das.registry.DasRegistryAxisClient;
 
 public class SpiceLayeredPanel 
 {

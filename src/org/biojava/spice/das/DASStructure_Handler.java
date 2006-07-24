@@ -191,6 +191,8 @@ public class DASStructure_Handler
     
 
     /** return if loading of structure is finished
+     * 
+     * @return flag if has finished
      */
     public boolean isDone(){
 	return finished ;

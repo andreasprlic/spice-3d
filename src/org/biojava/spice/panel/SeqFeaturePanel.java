@@ -129,6 +129,7 @@ implements SeqPanel, MouseListener, MouseMotionListener
     
     /**
      * 
+     * @param spicefr
      */
     public SeqFeaturePanel(SPICEFrame spicefr ) {
         super();
@@ -235,7 +236,10 @@ implements SeqPanel, MouseListener, MouseMotionListener
         //logger.exiting(this.getClass().getName(),"paintComponent");
     }
     
-    /** returns the size of one amino acid in the display; in pixel */
+    /** returns the size of one amino acid in the display; in pixel
+     * 
+     * @return the size of one amino acid 
+     */
     public int getAminoSize(){
         return Math.round(1 * scale) ;
     }
@@ -303,7 +307,11 @@ implements SeqPanel, MouseListener, MouseMotionListener
     }
     
     /** draw a line representing a sequence
-     * returns the scaled length of the sequence */
+     * returns the scaled length of the sequence
+     * @return int the scaled length of sequence
+     * @param g2D graphics 2d object
+     * @param chainlength the length of the chain
+     * */
     public  int drawSequence(Graphics2D g2D, float chainlength){
         g2D.setColor(Color.white);
         int seqx = java.lang.Math.round((chainlength-1) * scale) ;
@@ -312,7 +320,11 @@ implements SeqPanel, MouseListener, MouseMotionListener
         return seqx ;
     }
     
-    /** draw the Scale */
+    /** draw the Scale
+     * 
+     * @param g2D graphics 2D object
+     * @param chainlength the length of the chain
+     */
     public void drawScale(Graphics2D g2D, int chainlength){
         g2D.setColor(Color.GRAY);
         
@@ -330,7 +342,12 @@ implements SeqPanel, MouseListener, MouseMotionListener
         }
     }
     
-    /** draw the selected region */
+    /** draw the selected region
+     * 
+     * @param g2D
+     * @param aminosize
+     * @param seqx
+     */
     public void drawSelection(Graphics2D g2D, int aminosize, int seqx){
         
         
@@ -358,13 +375,23 @@ implements SeqPanel, MouseListener, MouseMotionListener
     
     
     
-    /** draw the features */
+    /** draw the features
+     * 
+     * @param g2D
+     * @param aminosize
+     * @param chainlength
+     */
     public void drawFeatures(Graphics g2D, int aminosize, int chainlength){
         int y = DEFAULT_Y_START ;
         drawFeatures(g2D,aminosize,y, chainlength);
     }
     /** draw the features starting at position y
      * returns the y coordinate of the last feature ;
+     * @return int the y coordinate of the last feature
+     * @param g2D
+     * @param aminosize
+     * @param y where to continue drawing
+     * @param chainlength the total length of the chain
      * */
     public int drawFeatures(Graphics g2D, int aminosize, int y, int chainlength){
         //logger.finest("number features: "+features.size());

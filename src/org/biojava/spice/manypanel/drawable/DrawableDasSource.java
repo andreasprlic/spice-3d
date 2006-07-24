@@ -60,6 +60,8 @@ FeatureListener{
 
     /** if the url of two das sources is the same
      *  this will return true;
+     *  @param compareToSource a drawable das source to compare with
+     *  @return a flag if the two are equal
      */
     public boolean equals(DrawableDasSource compareToSource){
         if ( dasSource.getUrl().equals(compareToSource.getDasSource().getUrl()))

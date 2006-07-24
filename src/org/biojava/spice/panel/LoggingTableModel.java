@@ -152,6 +152,7 @@ final class LoggingTableModel extends Handler implements TableModel {
     /**
      * Returns the capacity. This is the maximum number of {@link LogRecord}s this handler
      * can memorize. If more messages are logged, then the oldiest messages will be discarted.
+     * @return int the capacity
      */
     public int getCapacity() {
         return capacity;
@@ -160,7 +161,8 @@ final class LoggingTableModel extends Handler implements TableModel {
     /**
      * Set the capacity. This is the maximum number of {@link LogRecord}s this handler can
      * memorize. If more messages are logged, then the oldiest messages will be discarted.
-     */
+     *  @param capacity
+     *  */
     public synchronized void setCapacity(final int capacity) {
         if (recordCount != 0) {
             throw new IllegalStateException("Not yet implemented.");
@@ -267,6 +269,7 @@ final class LoggingTableModel extends Handler implements TableModel {
      *
      * @param row The row in the table. This is the visible row,
      *            not the record number from the first record.
+     *  @return the LogRecord object          
      */
     public synchronized LogRecord getLogRecord(int row) {
 	//System.out.println("LoggingTableModel getLogRecord");

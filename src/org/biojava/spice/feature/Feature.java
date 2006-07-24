@@ -60,10 +60,19 @@ public interface Feature {
     
     public abstract String getScore();
     
-    /** test if two features are equivalent */
+    /** test if two features are equivalent
+     * 
+     * @param feat feature to compare with 
+     * @return true if equivalend
+     */
     public abstract boolean equals(Feature feat);
 
-    /** add a segment to this feature */
+    /** add a segment to this feature
+     * 
+     * @param start position
+     * @param end position 
+     * @param name of feature
+     */
     public abstract void addSegment(int start, int end, String name);
 
     public abstract void addSegment(Segment s);
@@ -72,7 +81,9 @@ public interface Feature {
 
     /** draw this feature at graphics g, at a given Y coordinate 
      * the scaling is done at the segment level. Segments know about scaling
-     * 
+     * @param y the y position where to start drawing  
+     * @param g the graphics2D object to use for painting
+     * @deprecated
      * */
     public abstract void draw(Graphics2D g, int y);
 }

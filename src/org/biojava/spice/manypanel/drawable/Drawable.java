@@ -41,7 +41,7 @@ public interface Drawable
     
     /** get the color of the object
      * 
-     * @return
+     * @return a color
      */
     public Color getColor();
     
@@ -53,7 +53,7 @@ public interface Drawable
     
     /** is the Drawable currently being loaded?
      * 
-     * @return
+     * @return a flag if currently is loading data
      */
     public boolean getLoading();
     

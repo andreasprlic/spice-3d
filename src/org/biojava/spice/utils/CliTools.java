@@ -60,7 +60,10 @@ public class CliTools {
      * messages when something goes wrong.
      * </p>
      *
+     * @param bean 
+     * @param args
      * @return A string array which contains any 'anonymous' arguments (may be empty)
+     * @throws ConfigurationException
      */
     
     public static String[] configureBean(Object bean, String[] args) 

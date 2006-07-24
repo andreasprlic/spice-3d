@@ -25,11 +25,6 @@ package org.biojava.spice.server;
 import java.net.*;
 import java.io.*;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-
-import org.biojava.spice.SPICEFrame;
-
 
 /** A thread that listens to a port and a sends incomming messages
  * to the SpiceProtocol
@@ -46,6 +41,8 @@ extends Thread {
     
     /**
      * 
+     * @param socket
+     * @param server
      */
     public SpiceMultiServerThread(Socket socket,SpiceServer server) {
         super("SpiceMultServerThread");
