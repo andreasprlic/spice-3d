@@ -89,6 +89,8 @@ extends SequenceScalePanel{
         super.setChain(chn);
         chain = chn;
         structureFeature = new FeatureImpl();
+        structureFeature.setName("structure region 1");
+        structureFeature.setMethod("structure region 2");
         int start = -1;
         int end   = -1;
        
@@ -108,6 +110,8 @@ extends SequenceScalePanel{
                     Segment s = new Segment();
                     s.setStart(start);
                     s.setEnd(end);
+                    
+                    s.setName("structure region displayed in 3D display");
                     structureFeature.addSegment(s);
                     start = -1 ;
                 }
@@ -118,6 +122,7 @@ extends SequenceScalePanel{
             Segment s = new Segment();
             s.setStart(start);
             s.setEnd(end);
+            s.setName("structure region displayed in 3D display");
             structureFeature.addSegment(s);
         }
         

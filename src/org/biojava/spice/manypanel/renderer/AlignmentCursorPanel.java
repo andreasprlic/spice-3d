@@ -42,8 +42,6 @@ import org.biojava.dasobert.eventmodel.SequenceEvent;
 
 public class AlignmentCursorPanel extends JPanel
 {
-
-    
     
     static final long serialVersionUID = 23112350310101729l;
     Map alignmentMap1;

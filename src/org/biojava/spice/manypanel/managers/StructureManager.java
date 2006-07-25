@@ -253,14 +253,7 @@ implements ObjectManager, StructureListener {
         synchronized(structure){
             structure = s;
         }
-        
-        List chains = structure.getChains(0);
-        Iterator iter = chains.iterator();
-        while (iter.hasNext()){
-            Chain c= (Chain)iter.next();
-           // logger.info("got chain >"+c.getName()+"<");
-        }
-        
+                       
         setAccessionCode(structure.getPDBCode());
         
         currentChainNr = event.getCurrentChainNumber();
