@@ -121,6 +121,21 @@ public class Segment {
     public void setTxtColor(String str) { txtColor = str; }
     public String getTxtColor() { return txtColor;}
     
+    
+    /** returns true if the specified sequence position is within the range of this Segment
+     * 
+     * @param seqPosition the position to check
+     * @return true if seqPos >= start && seqPos <= end
+     */
+    public boolean overlaps(int seqPosition){
+        if ( ( getStart() <= seqPosition) && ( getEnd() >= seqPosition)){
+            return true;             
+        }   
+        return false;
+    }
+    
+    
+    
     /** tests if two segments are overlapping
      * 
      * @param segment to compare with

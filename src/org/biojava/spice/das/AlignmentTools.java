@@ -30,6 +30,7 @@ import org.biojava.bio.program.das.dasalignment.Alignment;
 import org.biojava.bio.program.das.dasalignment.DASAlignmentCall;
 import org.biojava.dasobert.das.AlignmentThread;
 import org.biojava.dasobert.das.SpiceDasSource;
+import org.biojava.dasobert.util.HttpConnectionTools;
 import org.biojava.spice.config.RegistryConfiguration;
 import java.net.*;
 import java.io.*;
@@ -202,7 +203,7 @@ public class AlignmentTools {
 	InputStream inStream = null ;
 				
 	System.out.println("opening connection to "+url);
-	HttpURLConnection huc = org.biojava.spice.SpiceApplication.openHttpURLConnection(url);  
+	HttpURLConnection huc = HttpConnectionTools.openHttpURLConnection(url);  
 	 
 
 	//System.out.println("temporarily disabled: accepting gzip encoding ");

@@ -37,6 +37,7 @@ import org.biojava.dasobert.eventmodel.StructureListener;
 import org.biojava.spice.feature.Feature;
 import org.biojava.spice.feature.Segment;
 
+import org.biojava.spice.jmol.JmolCommander;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureEvent;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureListener;
 

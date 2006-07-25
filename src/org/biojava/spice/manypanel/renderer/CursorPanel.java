@@ -26,6 +26,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.logging.Logger;
 import org.biojava.bio.structure.*;
 import org.biojava.dasobert.eventmodel.SequenceEvent;
@@ -50,7 +51,7 @@ SpiceFeatureListener
 
 {
     static final long serialVersionUID = 92019290011924233l;
-    public static final Color SELECTION_COLOR = Color.DARK_GRAY;
+    Color selectionColor ;
     int selectionStart;
     int selectionEnd;
     int oldSelectionStart;
@@ -60,27 +61,30 @@ SpiceFeatureListener
     int chainLength;
     
     boolean selectionLocked;
-   
     
     List sequenceListeners;
     
     static Logger logger = Logger.getLogger("org.biojava.spice");
-    
-    //private BufferedImage imbuf;
-    
+        
     int storeStart ;
     int storeEnd ; 
+    
+    static String baseName="spice";
+    ResourceBundle resource;
     
     public CursorPanel() {
         super(); 
         this.setOpaque(false);
         setDoubleBuffered(true);
              
+        resource = ResourceBundle.getBundle(baseName);
+        
         selectionLocked = false;
         
         storeStart = -1;
-         storeEnd  = -1;
-        
+        storeEnd   = -1;
+        String col = resource.getString("org.biojava.spice.manypanel.renderer.CursorPanel.CursorColor");
+        selectionColor = Color.decode(col);
     }
      
     
@@ -263,7 +267,7 @@ SpiceFeatureListener
         Composite oldComp = g2D.getComposite();
         g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));        
         
-        g2D.setColor(SELECTION_COLOR);
+        g2D.setColor(selectionColor);
         
         
         int startX = Math.round(tmpSelectionStart *scale) + SequenceScalePanel.DEFAULT_X_START;

@@ -293,12 +293,9 @@ public class AlignmentGui extends JFrame{
             return;
         }
         
-        
-        
         String chain1 = f21.getText();
         String chain2 = f22.getText();
         
-        //System.out.println(pdb1 + " " + chain1 + " " + pdb2 + " " + chain2);
         
         List servs =  config.getServers("structure",BrowserPane.DEFAULT_PDBCOORDSYS);
         

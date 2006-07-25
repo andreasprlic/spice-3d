@@ -23,6 +23,7 @@
 package org.biojava.spice.manypanel.renderer;
 
 import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -30,6 +31,7 @@ import java.awt.RenderingHints;
 import java.awt.geom.GeneralPath;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import javax.swing.JPanel;
@@ -64,7 +66,9 @@ public class AlignmentCursorPanel extends JPanel
     
     static Logger logger = Logger.getLogger("org.biojava.spice");
     
-    
+    Color selectionColor;
+    String baseName = "spice";
+    ResourceBundle resource;
     public AlignmentCursorPanel() {
         super();
         this.setOpaque(false);
@@ -72,8 +76,9 @@ public class AlignmentCursorPanel extends JPanel
         
         clearSelection();
         clearAlignment();
-       
-        
+        resource = ResourceBundle.getBundle(baseName);
+        String col = resource.getString("org.biojava.spice.manypanel.renderer.CursorPanel.CursorColor");
+        selectionColor = Color.decode(col);
         aminosize1 = 1;
         aminosize2 = 1;
      
@@ -230,7 +235,7 @@ public class AlignmentCursorPanel extends JPanel
         Composite oldComp = g2D.getComposite();
         g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));        
         
-        g2D.setColor(CursorPanel.SELECTION_COLOR);
+        g2D.setColor(selectionColor);
         
         int tmpSelectionStart1 = selectionStart1;
         if (( selectionStart1 < 0 ) && ( selectionEnd1 >=0)) {

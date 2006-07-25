@@ -30,35 +30,43 @@ import java.util.List;
  *
  */
 public interface Feature {
-    public abstract String toString();
-
-    public abstract void setSource(String s);
-
-    public abstract String getSource();
-
-    public abstract void setName(String nam);
-
-    public abstract String getName();
-
-    public abstract void setMethod(String methd);
-
-    public abstract String getMethod();
-
-    public abstract void setType(String typ);
-
-    public abstract String getType();
-
-    public abstract void setNote(String nte);
-
-    public abstract String getNote();
-
-    public abstract void setLink(String lnk);
-
-    public abstract String getLink();
     
-    public abstract void setScore(String score);
+    /** returns true if the specified sequence position is within the range of this Feature
+     * 
+     * @param seqPosition the position to check
+     * @return true if the position is within the ranges of the segments of this feature
+     */
+    public boolean overlaps(int seqPosition);
     
-    public abstract String getScore();
+    public  String toString();
+
+    public  void setSource(String s);
+
+    public  String getSource();
+
+    public  void setName(String nam);
+
+    public  String getName();
+
+    public  void setMethod(String methd);
+
+    public  String getMethod();
+
+    public  void setType(String typ);
+
+    public  String getType();
+
+    public  void setNote(String nte);
+
+    public  String getNote();
+
+    public  void setLink(String lnk);
+
+    public  String getLink();
+    
+    public  void setScore(String score);
+    
+    public  String getScore();
     
     /** test if two features are equivalent
      * 

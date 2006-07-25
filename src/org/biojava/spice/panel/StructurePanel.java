@@ -31,6 +31,9 @@ import org.jmol.popup.JmolPopup;
 import org.jmol.adapter.smarter.SmarterJmolAdapter;
 import org.biojava.bio.structure.Structure ;
 import org.biojava.bio.structure.StructureImpl ;
+import org.biojava.spice.jmol.JmolCommander;
+import org.biojava.spice.jmol.JmolSpiceTranslator;
+
 import java.util.logging.*;
 
 
@@ -44,7 +47,7 @@ import java.util.logging.*;
  */
 public class StructurePanel
 extends JPanel
-
+implements JmolCommander
 {
     
     private static final long serialVersionUID = 969575436790157931L;
@@ -71,6 +74,9 @@ extends JPanel
         viewer  = org.jmol.viewer.Viewer.allocateViewer(this, adapter);
         
         jmolpopup = JmolPopup.newJmolPopup(viewer);
+        
+        // this is important to make Jmol thread -safe !!
+        viewer.evalString("set scriptQueue on;");
         
     }
     
@@ -115,7 +121,7 @@ extends JPanel
         //logger.info(command);
        
         viewer.evalString(command);
-        
+        //viewer.evalStringSync(command);
         //viewer.scriptWaitVoid(command);
         //System.out.println("done");
     }
@@ -136,7 +142,8 @@ extends JPanel
         if ( structure.size() < 1 ) {
             logger.info("got structure of size < 1");
             //viewer.scriptWait("zap");
-            viewer.evalStringSync(EMPTYCMD);
+            //viewer.evalStringSync(EMPTYCMD);
+            viewer.evalString(EMPTYCMD);
             return;
         }
         logger.info("setting new structure in Jmol " + structure.getPDBCode() + " " + structure.size());

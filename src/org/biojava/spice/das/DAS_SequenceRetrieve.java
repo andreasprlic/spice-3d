@@ -25,6 +25,7 @@ package org.biojava.spice.das;
 
 import org.biojava.dasobert.das.DAS_Sequence_Handler;
 import org.biojava.dasobert.das.SpiceDasSource;
+import org.biojava.dasobert.util.HttpConnectionTools;
 import org.biojava.spice.config.*          ;
 import java.net.URL                        ;
 import java.io.InputStream                 ;
@@ -255,7 +256,7 @@ public class DAS_SequenceRetrieve {
 		//huc = proxyUrl.openConnection();
 		
 		//logger.finer("opening "+url);
-		huc = org.biojava.spice.SpiceApplication.openHttpURLConnection(url);
+		huc = HttpConnectionTools.openHttpURLConnection(url);
 		
 		
 		logger.finest(huc.getResponseMessage());

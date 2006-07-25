@@ -161,6 +161,7 @@ StructureAlignmentListener {
         
         
         StructureEvent event = new StructureEvent(newStruc);
+        
         Iterator iter2 = structureListeners.iterator();
         while (iter2.hasNext()){
             StructureListener li = (StructureListener)iter2.next();
@@ -245,13 +246,12 @@ StructureAlignmentListener {
                 // update the structure alignment in the structure display.
                 if (e.getStateChange() == ItemEvent.DESELECTED) {
                     newStruc = structureAlignment.createArtificalStructure();
-                    structureAlignment.getRasmolScript();
+                    cmd = structureAlignment.getRasmolScript();
                     
                 }
                 else {
                     newStruc = structureAlignment.createArtificalStructure(i);
-                    structureAlignment.getRasmolScript(i);
-                    
+                    cmd = structureAlignment.getRasmolScript(i);                    
                 }
                 
                 

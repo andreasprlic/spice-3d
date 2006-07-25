@@ -34,6 +34,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.biojava.dasobert.util.HttpConnectionTools;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
@@ -174,7 +175,7 @@ public class MSDKeywordSearch {
                 
                 HttpURLConnection huc = null;
                
-                huc = org.biojava.spice.SpiceApplication.openHttpURLConnection(url);
+                huc = HttpConnectionTools.openHttpURLConnection(url);
                 huc.setRequestProperty("Accept-Encoding", "gzip");
                 logger.finest(huc.getResponseMessage());
                 String contentEncoding = huc.getContentEncoding();

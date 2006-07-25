@@ -23,6 +23,7 @@
 package org.biojava.spice.feature;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /** An Abstract class representing a Feature as being diplayed in the SeqFeaturePanel 
@@ -66,6 +67,26 @@ public abstract class AbstractFeature implements Feature {
         }
         //str += segments ;
         return str ;
+    }
+    
+    
+    /** returns true if the specified sequence position is within the range of this Feature
+     * 
+     * @param seqPosition the position to check
+     * @return true if the position is within the ranges of the segments of this feature
+     */
+    public boolean overlaps(int seqPosition){
+        List segments = getSegments();
+        Iterator iter =segments.iterator();
+        
+        while (iter.hasNext()){
+            
+            Segment seg = (Segment) iter.next();
+            if ( seg.overlaps(seqPosition) )
+                return true;                                     
+        }
+        
+        return false;
     }
     
     public void setSource(String s) { source = s;}

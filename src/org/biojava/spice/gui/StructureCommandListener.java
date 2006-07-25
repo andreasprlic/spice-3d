@@ -34,7 +34,7 @@ import java.util.List;
 
 import javax.swing.JTextField;
 
-import org.biojava.spice.panel.JmolCommander;
+import org.biojava.spice.jmol.JmolCommander;
 
 
 /** A class that listens to various events on the 

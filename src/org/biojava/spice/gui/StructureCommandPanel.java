@@ -24,7 +24,7 @@ package org.biojava.spice.gui;
 
 import javax.swing.JTextField;
 
-import org.biojava.spice.panel.JmolCommander;
+import org.biojava.spice.jmol.JmolCommander;
 
 /** Provides an TextField that can be used to enter new RASMOL like commands that are sent to JMol.
  * @author Andreas Prlic

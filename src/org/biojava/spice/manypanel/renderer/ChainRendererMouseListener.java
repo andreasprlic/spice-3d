@@ -58,7 +58,7 @@ public class ChainRendererMouseListener implements
 MouseListener,
 MouseMotionListener
 {
-
+    
     AbstractChainRenderer renderer;
     boolean selectionLocked;
     boolean dragging;
@@ -103,15 +103,13 @@ MouseMotionListener
         
         int pos  = getSeqPos(event);
         
-        
-          
         draggingStart=pos;
         selectionStart = pos ;
         //selectionEnd   = pos ;
         triggerClearSelection();
         triggerSelectionLocked(false);
         triggerNewSequencePosition(pos,event.getY());
-            
+        
         
     }
     
@@ -157,7 +155,7 @@ MouseMotionListener
                 h -= panelHeight;
                 break;
             }
-                
+            
         }  
         if (eventPanel == null) {
             // no panel found below this event
@@ -166,7 +164,7 @@ MouseMotionListener
         
         //h += FeaturePanel.DEFAULT_Y_START + FeaturePanel.DEFAULT_Y_STEP + FeaturePanel.LINE_HEIGHT;
         //if ( y < h){
-            // smaller than the "heading section" of the display
+        // smaller than the "heading section" of the display
         //    return null;
         //}
         
@@ -180,8 +178,8 @@ MouseMotionListener
      * @return a SpiceFeatureEvent
      */
     private SpiceFeatureEvent getSpiceFeatureEvent(MouseEvent e){
-         
- int y = e.getY();
+        
+        int y = e.getY();
         
         int h =  renderer.getFeaturePanel().getHeight();
         
@@ -206,7 +204,7 @@ MouseMotionListener
                 h -= panelHeight;
                 break;
             }
-                
+            
         }  
         if (eventPanel == null) {
             // no panel found below this event
@@ -216,7 +214,7 @@ MouseMotionListener
         h += SequenceScalePanel.DEFAULT_Y_START + SequenceScalePanel.DEFAULT_Y_STEP + SequenceScalePanel.LINE_HEIGHT;
         if ( y < h){
             // smaller than the "heading section" of the display
-                return null;
+            return null;
         }
         
         DrawableDasSource source = eventPanel.getDrawableDasSource();
@@ -233,7 +231,7 @@ MouseMotionListener
     }
     
     public void setChain(Chain c){
-     
+        
         chainLength = c.getLength();
     }
     
@@ -248,7 +246,7 @@ MouseMotionListener
     
     private void setSelectionEnd(int end){
         //if ( end < 0 )
-            //end = 0;
+        //end = 0;
         if ( end > chainLength)
             end = chainLength;
         selectionEnd = end;
@@ -257,7 +255,7 @@ MouseMotionListener
     
     public void mouseDragged(MouseEvent e) {
         dragging = true;
-                
+        
         
         int pos = getSeqPos(e) ;
         
@@ -287,7 +285,7 @@ MouseMotionListener
             selectionEnd = draggingStart;
         }
         triggerNewSequenceRange(selectionStart,selectionEnd);
-      
+        
         
         
         
@@ -314,14 +312,14 @@ MouseMotionListener
             if ( feat.equals(oldFeature))
                 if ( pos == oldSelectionStart)
                     return;
-           
+            
         } else {
             
             if ( pos == oldSelectionStart)
                 return;
-           
-        }
             
+        }
+        
         
         //logger.info("CursorPanel: mouse moved " + e.getX() + " " + pos);
         oldSelectionStart = pos;
@@ -332,20 +330,20 @@ MouseMotionListener
         
         triggerNewSequencePosition(pos,e.getY());
         
-       
+        
         
         
         if ( feat == null) 
             return;
         
         //if ( feat.equals(oldFeature)) 
-            //return;
+        //return;
         
         oldFeature = feat;
         
         
         if ( pos >= 0) {
-//           check if pos is over a feature then trigger new SegmentSelected
+//          check if pos is over a feature then trigger new SegmentSelected
             List segments = feat.getSegments();
             Iterator iter = segments.iterator();
             while (iter.hasNext()) {
@@ -369,12 +367,12 @@ MouseMotionListener
     }
     
     public void mouseEntered(MouseEvent arg0) {
-    
+        
         
     }
     
     public void mouseExited(MouseEvent arg0) {
-    
+        
         
     }
     
@@ -423,15 +421,15 @@ MouseMotionListener
                     } else {
                         //logger.info("here " + feat + " " + oldFeature);
                         //-> trigger a new FeatureSelected
-                       
-                            triggerFeatureSelected(spiceEvent);
-                            triggerSelectionLocked(true);
-                         
+                        
+                        triggerFeatureSelected(spiceEvent);
+                        triggerSelectionLocked(true);
+                        
                         
                     }   
                     
                 } else {
-//                   check if pos is over a feature then trigger new SegmentSelected
+//                  check if pos is over a feature then trigger new SegmentSelected
                     List segments = feat.getSegments();
                     Iterator iter = segments.iterator();
                     boolean somethingTriggered = false;
@@ -465,7 +463,7 @@ MouseMotionListener
         sequenceListeners.add(li);
     }
     
- 
+    
     
     protected void triggerSelectionLocked(boolean flag){
         selectionLocked = flag;
@@ -539,7 +537,7 @@ MouseMotionListener
     protected void triggerClearSelection(){
         
         //logger.info("trigger clearSelection " );
-                
+        
         //logger.info("trigger featureSelected " + feature);
         
         Iterator iter = spiceFeatureListeners.iterator();
@@ -592,7 +590,7 @@ MouseMotionListener
     }
     
     protected void triggerMouseOverSegment(SpiceFeatureEvent event){
-      
+        
         Segment segment = event.getSegment();
         if ( segment == null){
             segment = new Segment();
@@ -611,7 +609,7 @@ MouseMotionListener
         String link = f.getLink();
         logger.info("triggerLinkSelected " + link);
         if (( link != null) && (! link.equals(""))){
-           
+            
             try {
                 URL url =new URL(link);
                 
@@ -633,5 +631,5 @@ MouseMotionListener
     
     
     
-
+    
 }

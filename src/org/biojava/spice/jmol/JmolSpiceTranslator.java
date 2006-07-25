@@ -20,7 +20,7 @@
  * Created on Jan 25, 2006
  *
  */
-package org.biojava.spice.panel;
+package org.biojava.spice.jmol;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -126,27 +126,20 @@ implements JmolStatusListener, StructureListener
         if ( viewer != null ) {
             //int mod = viewer.getAtomModelIndex(atomIndex);
              String info = viewer.getAtomInfo(atomIndex);  
+             AtomInfo ai = AtomInfoParser.parse(info);
              logger.info(info);
-            // did not want to parse the string to get the data
-            // had to do modifications to Jmol for this!
-          
-             String pdbcode = viewer.getAtomSequenceCode(atomIndex);
-            char chainId = viewer.getAtomChain(atomIndex);           
+             //logger.info(ai+"");
            
-             //String pdbcode = "";
-             //char chainId = ' ';
-           //viewer.getAtomName(atomIndex);  
-            
-           
-           //String pdbcode = "";
-           //String chainId = "";
-            //logger.info(chainId + " numeric value: " + Character.getNumericValue(chainId));
-            if ( Character.getNumericValue(chainId) == -1 ) {
-                //logger.info("chainId == -1 setting to ' '");
-                chainId = ' ';
-            }
-            //logger.info(">"+emptyChain+"< >"+chainId+"< "  );                        
-            highlitePdbPosition(pdbcode,""+chainId);
+             String pdbcode = ai.getResidueNumber();
+
+             String chainId = ai.getChainId();
+             int modelNr = ai.getModelNumber();
+             if ( modelNr > 1) {
+                 logger.info("you selected an atom from model "+modelNr+" which is currently not active");
+                 return;
+             }
+             //logger.info(">"+chainId + "< >" + pdbcode +"<");
+             highlitePdbPosition(pdbcode,""+chainId);
         }
     }
     
@@ -155,7 +148,7 @@ implements JmolStatusListener, StructureListener
         
         Chain currentChain = structure.getChain(currentChainNumber);
         
-        logger.info("current chain is >" + currentChain.getName() + "< selected is >" + chainId + "< " + chainId.length());
+        //logger.info("current chain is >" + currentChain.getName() + "< selected is >" + chainId + "< " + chainId.length());
         
         if ( (chainId == null) || (chainId.equals("")))
             chainId = " ";
@@ -171,7 +164,7 @@ implements JmolStatusListener, StructureListener
 
         }
         // set the selection in Jmol...
-        String cmd = "select "+pdbresnum+":"+chainId+"; set display selected";
+        String cmd = "select "+pdbresnum+":"+chainId+"/1; set display selected";
         if ( viewer != null){
             viewer.evalString(cmd);
         }
@@ -275,12 +268,18 @@ implements JmolStatusListener, StructureListener
 
     public void sendSyncScript(String script, String appletName) {
         // TODO Auto-generated method stub
+        logger.info("sendSyncScript" + script);
         
     }
 
     public float functionXY(String functionName, int x, int y) {
         // TODO Auto-generated method stub
         return 0;
+    }
+
+    public void notifyAtomHovered(int atomIndex, String strInfo) {
+        logger.info("over Atom " + strInfo);
+        
     }
     
   

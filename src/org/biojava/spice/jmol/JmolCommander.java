@@ -20,7 +20,7 @@
  * Created on Mar 1, 2006
  *
  */
-package org.biojava.spice.panel;
+package org.biojava.spice.jmol;
 
 public interface JmolCommander {
     public void executeCmd(String rasmolScript);

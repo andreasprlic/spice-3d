@@ -29,10 +29,8 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.util.logging.Logger;
-
 import javax.swing.JComponent;
 import javax.swing.ToolTipManager;
-
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.ChainImpl;
 import org.biojava.bio.structure.Group;
@@ -114,6 +112,20 @@ implements SequenceListener, SpiceFeatureListener {
         
         if (where instanceof SequenceRenderer ) {
             s = ""+(position+1) + " " + sequence.substring(position,position+1);
+            
+        } else if ( where instanceof StructureRenderer) {
+            Group g1 = chain.getGroup(position);
+            s = "Seq:" + (position+1) +" PDB:" + g1.getPDBCode() + " " + sequence.substring(position,position+1);
+         
+            StructureRenderer rend = (StructureRenderer)where;
+            StructureScalePanel pan = (StructureScalePanel) rend.getFeaturePanel();
+            Feature f = pan.getStructureFeature();
+            
+            if ( f.overlaps(position)) {
+                s = "this is the structural region shown in the 3D panel " + s;
+            }
+           
+            
         } else {
             Group g1 = chain.getGroup(position);
             s = "Seq:" + (position+1) +" PDB:" + g1.getPDBCode() + " " + sequence.substring(position,position+1);

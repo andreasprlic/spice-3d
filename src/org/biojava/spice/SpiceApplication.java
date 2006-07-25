@@ -26,8 +26,8 @@ package org.biojava.spice ;
 import org.biojava.spice.panel.*;
 import org.biojava.spice.config.*;
 import org.biojava.spice.gui.*;
+import org.biojava.spice.jmol.JmolSpiceTranslator;
 
-import java.lang.reflect.*;
 import org.biojava.bio.structure.*;
 import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
@@ -40,15 +40,12 @@ import org.biojava.dasobert.eventmodel.StructureListener;
 // to get config file via http
 import java.net.URL;
 import java.net.MalformedURLException;
-import java.net.HttpURLConnection;
-import java.net.ConnectException;
 
 // some utils 
 import java.util.HashMap   ;
 import java.util.ArrayList ;
 import java.util.List ;
-
-import java.io.IOException;
+import java.util.ResourceBundle;
 
 // logging
 import java.util.logging.* ;
@@ -105,9 +102,11 @@ ConfigurationListener
     
     public static Logger logger =  Logger.getLogger("org.biojava.spice");
     
+    static String baseName="spice";
+    
     URL[] REGISTRY_URLS    ; // the url to the registration server
     
-    static int    CONNECTION_TIMEOUT = 15000;// timeout for http connection = 15. sec
+    //static int    CONNECTION_TIMEOUT = 15000;// timeout for http connection = 15. sec
     static int    DEFAULT_Y_SCROLL = 50 ;
     static String XMLVALIDATION = "false" ;   
         
@@ -356,21 +355,25 @@ ConfigurationListener
     /** set  a couple of System Properties also contains some hacks around some strange implementation differences*/
    
     private void setSystemProperties(){
+        
         //  on osx move menu to the top of the screen
         System.setProperty("apple.laf.useScreenMenuBar", "true");
         
         // do xml validation when parsing DAS responses (true/false)
         System.setProperty("XMLVALIDATION",XMLVALIDATION);
         
-        int timeout = CONNECTION_TIMEOUT;
+        ResourceBundle resource = ResourceBundle.getBundle(baseName);
+        
+        String to = resource.getString("org.biojava.spice.ConnectionTimeout");
+        int timeout = Integer.parseInt(to);
         
         
         //logger.finest("setting timeouts to " + timeout);
         
         
         // timeouts when doing http connections
-	// this only applies to java 1.4
-	// java 1.5 timeouts are set by openHttpURLConnection
+        // this only applies to java 1.4
+        // java 1.5 timeouts are set by openHttpURLConnection
         System.setProperty("sun.net.client.defaultConnectTimeout", ""+timeout);
         System.setProperty("sun.net.client.defaultReadTimeout", ""+timeout);
         
@@ -404,16 +407,7 @@ ConfigurationListener
         
     }
     
-    /** Constructor for structure alignment visualization 
-     currently disabled
-     SpiceApplication(String pdb1, String pdb2, URL config_url, URL registry_url) {
-     this(pdb1, config_url,registry_url);
-     structureAlignmentMode = true ;
-     pdbcode2 = pdb2 ;
-     logger.finest("finished init of structure alignment");
-     
-     }
-     */
+    
     
     
     /**
@@ -434,14 +428,6 @@ ConfigurationListener
             String structureLocation){
         
         Box vBox = Box.createVerticalBox();
-        
-        //vBox.setBackground(Color.blue);
-        // move to submenu
-        //this.getContentPane().add(statusPanel,BorderLayout.SOUTH);
-        //this.getContentPane().add(statusPanel);
-        
-        
-        
        
         Box vBox2 = Box.createVerticalBox();
         structurePanel.setMinimumSize(new Dimension(200,200));
@@ -578,7 +564,7 @@ ConfigurationListener
         //chainDisplay.addStructureListener(spiceMenuListener);
         
         
-        
+        selectionPanel.addStructureListener(jmolSpiceTranslator);
         selectionPanel.addStructureListener(browserPane.getStructureManager());
         selectionPanel.addStructureListener(structurePanelListener);
         selectionPanel.addStructureListener(browserPane.getTopAlignmentManager());
@@ -808,14 +794,13 @@ ConfigurationListener
         
         AlignmentListener ali = new AlignmentListener(){
 
-            public void clearAlignment() {
-                // TODO Auto-generated method stub
+            public void clearAlignment() {          
                 
             }
 
             public void newAlignment(AlignmentEvent e) {
                 String txt = "SPICE - " + e.getAccessionCode();
-               spiceTabbedPane.setFrameTitle(txt);
+                spiceTabbedPane.setFrameTitle(txt);
                 
             }
 
@@ -1125,119 +1110,14 @@ ConfigurationListener
     
     public int getCurrentChainNumber() {
         return selectionPanel.getCurrentChainNumber();
-        //return chainDisplay.getCurrentChainNumber();
-        //return browserPane.getCurrentChainNumber();
-        //return currentChainNumber;
    }
     
-    /*
-    public void setCurrentChainNumber( int newCurrentChain) {
-        setCurrentChainNumber(newCurrentChain,true);
-    }*/
     
     public synchronized void setCurrentChain(Chain c, int chainNumber){
         currentChain = c;
         currentChainNumber = chainNumber;
         notifyAll();
     }
-    
-    /*
-    //todo: remove this method:
-    public  void setCurrentChainNumber( int newCurrentChain,boolean getNewFeaturesFlag) {
-        //logger.info("setCurrentChainNumber " + newCurrentChain + " " + getNewFeaturesFlag);
-        System.out.println("SpiceApplication setCurrentChainNumber " + newCurrentChain);
-        logger.warning("obsolete method!");
-        //structurePanelListener.setCurrentChainNumber(newCurrentChain);
-        statusPanel.setCurrentChainNumber(newCurrentChain);
-        
-    
-        // update features to be displayed ...
-        Chain chain = getChain(newCurrentChain) ;
-        System.out.println("SpiceApplication got chain " );
-        setCurrentChain(chain, newCurrentChain);
-        //currentChain = chain;
-        //currentChainNumber = newCurrentChain ;
-        if ( chain == null) {
-            //notifyAll();
-            return ;
-        }
-        System.out.println("SpiceApplication chain != null " );
-        String sp_id = chain.getSwissprotId() ;
-        System.out.println("SpiceApplication sp: " +sp_id);
-        //logger.info("SP_ID "+sp_id);
-        //logger.info("getting annotation");
-        // display pdb annotation
-        Annotation anno = chain.getAnnotation();
-        System.out.println("SpiceApplication anno: " +anno);
-        boolean annotationFound = false ;
-        //logger.info("chain annotation " + anno);
-        if (  ( anno != Annotation.EMPTY_ANNOTATION) && ( anno != null )){
-        
-            if ( anno.containsProperty("description")){
-                //statusPanel.setPDBDescription((String)anno.getProperty("description"));
-                //logger.info("PDB description of chain: "+(String)anno.getProperty("description") );
-                annotationFound = true ;
-            }
-        }
-        
-        if ( ! annotationFound ) {
-            //statusPanel.setPDBDescription("no chain description");
-            //logger.info("not chain data found :-(");
-        }
-        
-        //statusPanel.setSP(sp_id);
-        System.out.println("SpiceApplication statusPanel set: ");
-        if (sp_id != null){
-            //upMenu.setEnabled(true);
-            //dastyMenu.setEnabled(true);
-            //proviewMenu.setEnabled(true);
-            
-        } else {
-            //upMenu.setEnabled(false);
-            //dastyMenu.setEnabled(false);
-            //proviewMenu.setEnabled(false);
-            
-            logger.info("no UniProt sequence found for"+chain.getName());
-        }
-        
-        System.out.println("SpiceApplication setCurrentChain .. setChain dascanv");
-        //dascanv.setChain(chain);
-        System.out.println("SpiceApplication setCurrentChain ..  chain set in dascanv");
-        if(getNewFeaturesFlag){
-            //logger.info("getting new features");            
-            getNewFeatures(sp_id) ;
-        }
-        
-        //notifyAll();
-        /*
-         //TODO: re-enable feature caching ...
-        String mem_id = makeFeatureMemoryCode(sp_id);
-        ArrayList tmpfeat = getFeaturesFromMemory(mem_id) ;
-        
-        if ( tmpfeat.size() == 0 ) {
-            if ( isLoading()) {
-                //logger.log(Level.WARNING,"already loading data, please wait");
-                return ;
-            }
-            getNewFeatures(sp_id) ;
-        } else {
-            logger.finest("setting features for seq " + sp_id + " features size: " + tmpfeat.size());
-            //tures(sp_id,tmpfeat);	    
-            //features.clear()                     ;
-            features = tmpfeat                   ;
-            //SeqFeatureCanvas dascanv = daspanel.getCanv();
-            dascanv.setSeqLength(chain.getLength());
-            dascanv.setChain(chain);
-            //dascanv.setChain(chain,currentChainNumber) ;
-            //dascanv.setBackground(Color.black)   ;
-            seqTextPane.setChain(chain,currentChainNumber);
-            //updateDisplays();
-        }
-        
-        
-        
-    }
-*/
     
     public JmolViewer getViewer(){
         return structurePanel.getViewer();
@@ -1512,59 +1392,7 @@ ConfigurationListener
         }
     }
 
-
-    
-    
-    /** open HttpURLConnection. Recommended way to open
-     * HttpURLConnections, since this take care of setting timeouts
-     * properly for java 1.4 and 1.5
-     * 
-     * @param url URL to be opened
-     * @return HttpURLConnection an open connection to the URL
-     * @throws IOException
-     * @throws ConnectException
-     * 
-     * */
-    public static HttpURLConnection openHttpURLConnection(URL url) 
-	throws IOException, ConnectException {
-	HttpURLConnection huc = null;
-	huc = (HttpURLConnection) url.openConnection();
-	
-	String os_name    = java.lang.System.getProperty("os.name");
-	String os_version = java.lang.System.getProperty("os.version");
-	String os_arch    = java.lang.System.getProperty("os.arch");
-	
-	String userAgent = "SPICE/" + AboutDialog.getVersion() + "("+os_name+"; "+os_arch + " ; "+ os_version+")";
-	//e.g. "Mozilla/5.0 (Windows; U; Win98; en-US; rv:1.7.2) Gecko/20040803"
-     huc.addRequestProperty("User-Agent", userAgent);
-	//logger.finest("opening "+url);
-
-
-	// use reflection to determine if get and set timeout methods for urlconnection are available
-        // seems java 1.5 does not watch the System properties any longer...
-        // and java 1.4 did not provide these...
-	// for 1.4 see setSystemProperties
-	int timeout = CONNECTION_TIMEOUT;
-	try {
-	    // try to use reflection to set timeout property
-	    Class urlconnectionClass = Class.forName("java.net.HttpURLConnection");
-	    
-            Method setconnecttimeout = urlconnectionClass.getMethod (
-								     "setConnectTimeout", new Class [] {int.class}        
-								     );	
-	    setconnecttimeout.invoke(huc,new Object[] {new Integer(timeout)});
-	    
-	    Method setreadtimeout = urlconnectionClass.getMethod (
-								  "setReadTimeout", new Class[] {int.class}
-								  );
-	    setreadtimeout.invoke(huc,new Object[] {new Integer(timeout)});
-	    //System.out.println("successfully set java 1.5 timeout");
-	} catch (Exception e) {
-	    //e.printStackTrace();
-	    // most likely it was a NoSuchMEthodException and we are running java 1.4.
-	}
-	return huc;
-    }
+   
      
   
 }

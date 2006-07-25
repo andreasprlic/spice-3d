@@ -79,6 +79,10 @@ extends SequenceScalePanel{
     public void setStructureColor(Color structureColor) {
         this.structureColor = structureColor;
     }
+    
+    public Feature getStructureFeature(){
+        return structureFeature;        
+    }
 
     public void setChain(Chain chn){
         //logger.info("StructureFeaturePanel setChain " + chn.getName());

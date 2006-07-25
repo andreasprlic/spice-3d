@@ -47,9 +47,8 @@ extends JDialog {
     
     private static final long serialVersionUID = 8273923744121231231L;
     
-    public static final String VERSION = 
-        "0.8.3-devel";
-    
+    public static final String VERSION = "0.8.3-devel";
+      
     static final String AUTHORS = 
         " <a href=\"mailto:ap3@sanger.ac.uk\">Andreas Prlic</a>, Thomas Down, Tim Hubbard <br>"+
         "The Wellcome Trust Sanger Institute 2006<p>"; 
