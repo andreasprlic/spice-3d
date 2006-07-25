@@ -249,9 +249,10 @@ implements WindowListener{
         deregisterSpiceListeners(spice);
         server.removeInstance(spice);
         tabbedSpices.remove(spice);
-        int pos = getSelectedIndex();
+        int pos = getSelectedIndex();        
         //this.remove(sp);
-        removeTabAt(pos);
+        if ( pos > -1 )
+            removeTabAt(pos);
         sp.newConfigRetrieved(null);
         sp.setSpiceServer(null);
         sp.setSpiceTabbedPane(null);
