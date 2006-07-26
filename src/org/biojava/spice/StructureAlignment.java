@@ -770,7 +770,7 @@ public class StructureAlignment {
               if ( ! residues.contains(orig.getPDBCode())){
                   // this group has been
                   n.clearAtoms();
-                  n.setPDBCode("");
+
               }
               newChain.addGroup(n);              
             }
