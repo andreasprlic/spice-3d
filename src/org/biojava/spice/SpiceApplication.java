@@ -105,8 +105,7 @@ ConfigurationListener
     static String baseName="spice";
     
     URL[] REGISTRY_URLS    ; // the url to the registration server
-    
-    //static int    CONNECTION_TIMEOUT = 15000;// timeout for http connection = 15. sec
+     
     static int    DEFAULT_Y_SCROLL = 50 ;
     static String XMLVALIDATION = "false" ;   
         
@@ -578,6 +577,7 @@ ConfigurationListener
         selectionPanel.addStructureListener(browserPane.getStructureManager());
         selectionPanel.addStructureListener(structurePanelListener);
         selectionPanel.addStructureListener(browserPane.getTopAlignmentManager());
+        selectionPanel.addStructureListener(browseMenu.getPDBListener());
     }
     
     public void setMenu(JMenuBar menu) {

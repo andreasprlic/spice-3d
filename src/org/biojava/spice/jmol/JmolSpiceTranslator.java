@@ -165,7 +165,11 @@ implements JmolStatusListener, StructureListener
 
         }
         // set the selection in Jmol...
-        String cmd = "select "+pdbresnum+":"+chainId+"/1; set display selected";
+        String cmd ;
+        if (! chainId.equals(" ")) 
+            cmd = "select "+pdbresnum+":"+chainId+"/1; set display selected";
+        else 
+            cmd = "select "+pdbresnum+"/1; set display selected";
         if ( viewer != null){
             viewer.evalString(cmd);
         }
