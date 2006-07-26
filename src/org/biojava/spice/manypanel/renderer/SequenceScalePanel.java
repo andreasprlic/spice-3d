@@ -160,6 +160,14 @@ extends JPanel{
     }
     
   
+    protected void setPaintDefaults(Graphics2D g2D){
+        g2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+       g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON);
+       
+       g2D.setFont(seqFont);
+    }
     
     public void paint(Graphics g){
         super.paint(g);
@@ -169,21 +177,14 @@ extends JPanel{
         //  super.paintComponent(g);
         Graphics2D g2D =(Graphics2D) g;
         
+       setPaintDefaults(g2D);
+        
         //  1st: draw the scale        
         int y = 1;
         y = drawScale(g2D,scale,length,1);
         
         // 2nd: sequence
         y = drawSequence(g2D,scale,length,y);
-        
-        
-        // Rectangle test = new Rectangle(0,0, 50,20);
-        //g2D.fill(test);
-        
-       
-        //g2D.drawString("featurePanel",10,20);
-        
-        
         
     }
     /** draw the Scale */
@@ -196,10 +197,7 @@ extends JPanel{
             aminosize = 1;
         int l = Math.round(length*scale);
 
-        g2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-			     RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-			     RenderingHints.VALUE_ANTIALIAS_ON);
+      
         Composite oldComp = g2D.getComposite();
         g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));  
         //logger.info("paint l " + l + " length " + length );
@@ -215,7 +213,7 @@ extends JPanel{
         if ( scale > 9){
             g2D.setColor(Color.black);
                   
-            g2D.setFont(seqFont);
+         
             //g2D.setColor(SCALE_COLOR);
             
             // display the actual sequence!;
@@ -225,10 +223,14 @@ extends JPanel{
                 // TODO:
                 // color amino acids by hydrophobicity
                 g2D.drawString(seqArr[i].toString(),xpos+1,y+2+DEFAULT_Y_STEP);
-            }         
+            }     
+            
+//          in full sequence mode we need abit more space to look nice
+            
+            y+=2;  
         }
         g2D.setComposite(oldComp);
-        y+= DEFAULT_Y_STEP;
+        y+= DEFAULT_Y_STEP + 2;
         return y;
     }
     

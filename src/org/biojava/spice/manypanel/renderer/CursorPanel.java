@@ -271,7 +271,7 @@ SpiceFeatureListener
         
         
         int startX = Math.round(tmpSelectionStart *scale) + SequenceScalePanel.DEFAULT_X_START;
-        int endX   = Math.round((selectionEnd-tmpSelectionStart+1)*scale) ;
+        int endX   = Math.round((selectionEnd-tmpSelectionStart+1)*scale) +1;
         if (endX <0)
             endX = 0;
         //logger.info("selection " + selectionStart + " " + selectionEnd + 

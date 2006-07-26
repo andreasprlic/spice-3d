@@ -117,12 +117,14 @@ implements SequenceListener, SpiceFeatureListener {
             Group g1 = chain.getGroup(position);
             s = "Seq:" + (position+1) +" PDB:" + g1.getPDBCode() + " " + sequence.substring(position,position+1);
          
-            StructureRenderer rend = (StructureRenderer)where;
-            StructureScalePanel pan = (StructureScalePanel) rend.getFeaturePanel();
-            Feature f = pan.getStructureFeature();
-            
-            if ( f.overlaps(position)) {
-                s = "this is the structural region shown in the 3D panel " + s;
+            if ( StructureScalePanel.shouldDrawStructureRegion()){
+                StructureRenderer rend = (StructureRenderer)where;
+                StructureScalePanel pan = (StructureScalePanel) rend.getFeaturePanel();
+                Feature f = pan.getStructureFeature();
+                
+                if ( f.overlaps(position)) {
+                    s = "this is the structural region shown in the 3D panel " + s;
+                }
             }
            
             
@@ -133,6 +135,8 @@ implements SequenceListener, SpiceFeatureListener {
         }
         parent.setToolTipText(s);
     }
+    
+    
     
     private Component getRenderer(){
         return parent.getParent().getParent().getParent();

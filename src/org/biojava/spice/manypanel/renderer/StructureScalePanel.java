@@ -106,12 +106,7 @@ extends SequenceScalePanel{
                 end = i;
             } else {
                 if ( start > -1) {                  
-                    
-                    Segment s = new Segment();
-                    s.setStart(start);
-                    s.setEnd(end);
-                    
-                    s.setName("structure region displayed in 3D display");
+                    Segment s = createSegment(start,end);
                     structureFeature.addSegment(s);
                     start = -1 ;
                 }
@@ -119,52 +114,59 @@ extends SequenceScalePanel{
         }
         // finish
         if ( start > -1) {
-            Segment s = new Segment();
-            s.setStart(start);
-            s.setEnd(end);
-            s.setName("structure region displayed in 3D display");
+            Segment s = createSegment(start,end);
+            
             structureFeature.addSegment(s);
         }
         
     }
     
-    
+    private Segment createSegment(int start, int end){
+        Segment s = new Segment();
+        s.setStart(start+1);
+        s.setEnd(end+1);
+        s.setName("structure region displayed in 3D display");
+        return s;
+    }
     
     public void paint(Graphics g){
         super.paint(g);
-        //public void paintComponent(Graphics g){
-        int length = chain.getLengthAminos();
-        //logger.info("paint featurePanel " + scale + " " + length + " " + this.getWidth() + " " + this.getHeight());
-        //  super.paintComponent(g);
+                
         Graphics2D g2D =(Graphics2D) g;
+
+        setPaintDefaults(g2D);
+        
+        int length = chain.getLengthAminos();
         
         //  1st: draw the scale        
         int y = 1;
-        y = drawScale(g2D,scale,length,1);
+        y = drawScale(g2D,scale,length,y);
         
         // 2nd: sequence
         y = drawSequence(g2D,scale,length,y);
-        
-        
-        String colorStruct = System.getProperty("SPICE:StructureRegionColor");
-        if ( colorStruct != null ){
-            //System.out.println(colorStruct);
-            structureColor = Color.getColor("SPICE:StructureRegionColor");
-        }
-        
-        String drawStruct = System.getProperty("SPICE:drawStructureRegion");
-        boolean drawStructureRegion = false;
-        if (( drawStruct != null ) && ( drawStruct.equals("true")) )
-                drawStructureRegion = true;
-        
-        if ( drawStructureRegion) {
+         
+        if ( shouldDrawStructureRegion()) {
+            String colorStruct = System.getProperty("SPICE:StructureRegionColor");
+            if ( colorStruct != null ){
+                //System.out.println(colorStruct);
+                structureColor = Color.getColor("SPICE:StructureRegionColor");
+            }
+            
+            
             // now draw the Structure region       
             drawStructureRegion(g2D,scale,length,y);
         }
         
     }
     
-    
+    public static boolean shouldDrawStructureRegion(){
+        String drawStruct = System.getProperty("SPICE:drawStructureRegion");
+        boolean drawStructureRegion = false;
+        //System.out.println("drawStruct " + drawStruct);
+        if (( drawStruct != null ) && ( drawStruct.equals("true")) )
+                drawStructureRegion = true;
+        return drawStructureRegion;
+    }
     
     private void drawStruc(Graphics2D g2D, int start, int end, 
             int aminosize,float scale, int y){
@@ -204,8 +206,12 @@ extends SequenceScalePanel{
     private void drawStructureRegion(Graphics2D g2D,  float scale, int length, int y){
         // data is coming from chain;
       
-        //g2D.drawString("Structure",1,DEFAULT_STRUCTURE_Y+DEFAULT_Y_HEIGHT);
-        //logger.info("draw structure " + structureFeature.getName());
+        int textpos = y+DEFAULT_Y_HEIGHT -2;
+        if ( scale > 9)
+            textpos -= 2;
+        
+        g2D.drawString("Structure region",1, textpos);
+       
         int aminosize = Math.round(1*scale);
         if ( aminosize < 1)
             aminosize = 1;
@@ -217,8 +223,8 @@ extends SequenceScalePanel{
        
         while (iter.hasNext()){
             Segment s = (Segment) iter.next();
-            int start = s.getStart();
-            int end   = s.getEnd();
+            int start = s.getStart()-1;
+            int end   = s.getEnd()-1;
             drawStruc(g2D,start,end,aminosize,scale,y);
         }
         

@@ -115,8 +115,8 @@ StructureAlignmentListener {
     public void setStructureAlignment(StructureAlignment ali){
         structureAlignment = ali;
         //logger.info("got new structure alignment");
-        
-        System.setProperty("SPICE:drawStructureRegion","true");
+        if ( (ali != null) && ( ali.getIds().length > 0) )
+            System.setProperty("SPICE:drawStructureRegion","true");
         
         clearButtons();
         if ( ali == null) {
@@ -163,6 +163,8 @@ StructureAlignmentListener {
         // execute Rasmol cmd...
         String cmd = structureAlignment.getRasmolScript();
         
+        if ( newStruc.size() < 1)
+            return;
         
         StructureEvent event = new StructureEvent(newStruc);
         

@@ -289,7 +289,13 @@ public class StructureAlignment {
     
     
     public String getRasmolScript(int firstSelectedPos){
+        
         String cmd = "select *; backbone 0.3;";
+        
+
+        if ( firstSelectedPos < 0)
+            return cmd;
+        
         
         // set for the firstSelectedPos ...
         Color col =  getColor(firstSelectedPos);
@@ -596,6 +602,7 @@ public class StructureAlignment {
     }
     
     private Structure returnStructureOrRange(int pos, Structure s){
+      
         String property = SpiceMenuListener.structureDisplayProperty;
         
         String val = System.getProperty(property);

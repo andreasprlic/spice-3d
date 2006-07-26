@@ -192,14 +192,15 @@ MouseMotionListener
             //logger.info("event occured in FeaturePanel - check if it a structure one ...");
             if  ( y < SequenceScalePanel.DEFAULT_Y_STEP )
                 return null ;
-            
-            SequenceScalePanel ssp = renderer.getFeaturePanel();
-            if ( ssp instanceof StructureScalePanel) {
-                StructureScalePanel strucsp = (StructureScalePanel)ssp;
-                Feature f = strucsp.getStructureFeature();
-                int pos = getSeqPos(e);
-                if ( f.overlaps(pos))
-                    return new SpiceFeatureEvent(null, f);
+            if ( StructureScalePanel.shouldDrawStructureRegion()){
+                SequenceScalePanel ssp = renderer.getFeaturePanel();
+                if ( ssp instanceof StructureScalePanel) {
+                    StructureScalePanel strucsp = (StructureScalePanel)ssp;
+                    Feature f = strucsp.getStructureFeature();
+                    int pos = getSeqPos(e);
+                    if ( f.overlaps(pos))
+                        return new SpiceFeatureEvent(null, f);
+                }
             }
             return null ;
         }
@@ -410,7 +411,7 @@ MouseMotionListener
                 if ( spiceEvent != null ) 
                     feat = spiceEvent.getFeature();
                 
-                System.out.println(pos + " " + feat);
+                //System.out.println(pos + " " + feat);
                 if ( feat == null) {
                     
                     // check if the info button has been pressed
