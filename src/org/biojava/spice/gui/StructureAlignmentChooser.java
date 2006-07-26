@@ -68,6 +68,8 @@ StructureAlignmentListener {
     List structureListeners;
     List pdbSequenceListeners;
     
+    int referenceStructure; // the structure at that position is the first one 
+    
     public StructureAlignmentChooser() {
         super();
         
@@ -79,9 +81,11 @@ StructureAlignmentListener {
         //JScrollPane scroll = new JScrollPane(vBox);
         //scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         this.add(vBox);
+        referenceStructure = -1;
     }
     
     public void clearListeners(){
+        structureAlignment = new StructureAlignment();
         structureListeners.clear();
         pdbSequenceListeners.clear();
     }
@@ -122,7 +126,6 @@ StructureAlignmentListener {
         }
         
         
-        
         boolean[] selectedArr = ali.getSelection();
         
         String[] ids = ali.getIds();
@@ -139,6 +142,7 @@ StructureAlignmentListener {
             
             if ( i == 0) {
                 selected = true;
+                referenceStructure = 0;
                 structureAlignment.select(0);
                 try {
                     structureAlignment.getStructure(i);
@@ -177,7 +181,29 @@ StructureAlignmentListener {
         repaint();
     }
     
-    
+    /** recalculate the displayed alignment. e.g. can be called after toggle full structure
+     * 
+     *
+     */
+    public void recalcAlignmentDisplay() {
+        logger.info("recalculating the alignment display");
+        Structure newStruc = structureAlignment.createArtificalStructure(referenceStructure);
+        String cmd = structureAlignment.getRasmolScript(referenceStructure);                    
+        
+        
+        
+        StructureEvent event = new StructureEvent(newStruc);
+        Iterator iter2 = structureListeners.iterator();
+        while (iter2.hasNext()){
+            StructureListener li = (StructureListener)iter2.next();
+            li.newStructure(event);
+            if ( li instanceof StructurePanelListener){
+                StructurePanelListener pli = (StructurePanelListener)li;
+                pli.executeCmd(cmd);
+            }
+            
+        }
+    }
     
     public void itemStateChanged(ItemEvent e) {
         
@@ -196,14 +222,15 @@ StructureAlignmentListener {
                     structureAlignment.deselect(i);
                     // display the first one that is selected
                     // set the color to that one 
-                    for (int j=0;j<structureAlignment.getIds().length;j++){
+                    int j = structureAlignment.getFirstSelectedPos();
+                    if ( j > -1) {
+                  
+                        Color col = structureAlignment.getColor(j);
+                        System.setProperty("SPICE:StructureRegionColor",new Integer(col.getRGB()).toString());
                         
-                        if ( structureAlignment.getSelection()[j]){
-                            Color col = structureAlignment.getColor(j);
-                            System.setProperty("SPICE:StructureRegionColor",new Integer(col.getRGB()).toString());                            
-                            break;
-                        }                        
+                                              
                     }
+                    referenceStructure = j;
                     
                 } else {
                     structureAlignment.select(i);
@@ -215,7 +242,7 @@ StructureAlignmentListener {
                     Structure struc = null;
                     try {
                         struc = structureAlignment.getStructure(i);
-                    
+                        referenceStructure = i;
                         
                         Chain c1 = struc.getChain(0);
                         String sequence = c1.getSequence();

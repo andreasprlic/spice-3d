@@ -74,7 +74,7 @@ implements JmolStatusListener, StructureListener
     public synchronized void notifyFileLoaded(String fullPathName, String fileName,
             String modelName, Object clientFile,
             String errorMessage){
-        logger.info("JmolSpiceTranslator notifyFileLoaded " + fileName + " " + modelName + " " + errorMessage);
+        //logger.info("JmolSpiceTranslator notifyFileLoaded " + fileName + " " + modelName + " " + errorMessage);
         if (errorMessage != null){
             logger.log(Level.SEVERE,errorMessage);
         }        
@@ -127,7 +127,7 @@ implements JmolStatusListener, StructureListener
             //int mod = viewer.getAtomModelIndex(atomIndex);
              String info = viewer.getAtomInfo(atomIndex);  
              AtomInfo ai = AtomInfoParser.parse(info);
-             logger.info(info);
+             
              //logger.info(ai+"");
            
              String pdbcode = ai.getResidueNumber();
@@ -136,6 +136,7 @@ implements JmolStatusListener, StructureListener
              int modelNr = ai.getModelNumber();
              if ( modelNr > 1) {
                  logger.info("you selected an atom from model "+modelNr+" which is currently not active");
+                 logger.info(info);
                  return;
              }
              //logger.info(">"+chainId + "< >" + pdbcode +"<");
@@ -228,6 +229,7 @@ implements JmolStatusListener, StructureListener
     }
     
     public void clearListeners(){
+        structure = new  StructureImpl();
         pdbSequenceListener.clear();
     }
     

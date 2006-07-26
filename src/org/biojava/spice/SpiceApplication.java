@@ -326,6 +326,13 @@ ConfigurationListener
     }
     
    
+    /** return the chain / alignment selection panel in the middle
+     * 
+     * @return the SelectionPanel
+     */
+    public SelectionPanel getSelectionPanel(){
+        return selectionPanel;
+    }
     
     public SpiceTabbedPane getSpiceTabbedPane(){
         return spiceTabbedPane;
@@ -500,18 +507,21 @@ ConfigurationListener
         return vBox;
     }
     
+    
+    /** unregister all event listeners and make the application ready for being garbage collected
+     * 
+     *
+     */
     public void clearListeners(){
+        
+        spiceMenuListener.clearListeners();
         spiceMenuListener = null;
         browserPane.clearListeners();
         jmolSpiceTranslator.clearListeners();
-        //chainList.removeListSelectionListener(chainDisplay);
-            
         selectionPanel.clearListeners();
-        
-        
-        
+       
+          
     }
-    
     
     /** initialize the listeners of the various componentns 
      * 

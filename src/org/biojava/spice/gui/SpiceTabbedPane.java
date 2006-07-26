@@ -253,6 +253,8 @@ implements WindowListener{
         //this.remove(sp);
         if ( pos > -1 )
             removeTabAt(pos);
+         
+            
         sp.newConfigRetrieved(null);
         sp.setSpiceServer(null);
         sp.setSpiceTabbedPane(null);

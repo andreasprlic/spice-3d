@@ -38,6 +38,7 @@ import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.ChainImpl;
 import org.biojava.bio.structure.Group;
 import org.biojava.bio.structure.Structure;
+import org.biojava.bio.structure.StructureImpl;
 import org.biojava.dasobert.eventmodel.StructureEvent;
 import org.biojava.dasobert.eventmodel.StructureListener;
 
@@ -70,6 +71,7 @@ StructureListener {
     }
     
     public void clearStructureListeners(){
+        structure = new StructureImpl();
         structureListeners = new ArrayList();
     }
     

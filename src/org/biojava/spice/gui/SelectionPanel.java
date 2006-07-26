@@ -101,6 +101,10 @@ implements StructureListener
         alignmentChooser.clearListeners();
     }
     
+    public StructureAlignmentChooser getAlignmentChooser(){
+        return alignmentChooser;
+    }
+    
     public SpiceChainDisplay getChainDisplay(){
         return chainDisplay;
     }

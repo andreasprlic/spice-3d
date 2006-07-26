@@ -91,6 +91,12 @@ implements JmolCommander
         }
     }
     
+    public void clearListeners(){
+        
+        viewer.setJmolStatusListener(null);
+        
+    }
+    
     
     /** returns the JmolViewer
      * 
@@ -120,8 +126,8 @@ implements JmolCommander
     public void executeCmd(String command) {
         //logger.info(command);
        
-        viewer.evalString(command);
-        //viewer.evalStringSync(command);
+        //viewer.evalString(command);
+        viewer.evalStringSync(command);
         //viewer.scriptWaitVoid(command);
         //System.out.println("done");
     }
@@ -146,13 +152,13 @@ implements JmolCommander
             viewer.evalString(EMPTYCMD);
             return;
         }
-        logger.info("setting new structure in Jmol " + structure.getPDBCode() + " " + structure.size());
+        //logger.info("setting new structure in Jmol " + structure.getPDBCode() + " " + structure.size());
         
         String pdbstr = structure.toPDB();
-        logger.info("pdbstring "+pdbstr.substring(0,200) );
+        //logger.info("pdbstring "+pdbstr.substring(0,200) );
         viewer.openStringInline(pdbstr);
         
-        logger.info("finished loading structure ");
+        //logger.info("finished loading structure ");
         String strError = viewer.getOpenFileError();
         
         if (strError != null) {

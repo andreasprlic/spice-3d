@@ -88,6 +88,12 @@ JmolCommander
         rasmolScript = null;
     }
     
+    
+    public void clearPanel(){
+        structurePanel.clearListeners();
+        structurePanel = null;
+    }
+    
     /** display a new PDB structure in Jmol 
     * @param struc a Biojava structure object
     * @param displayScript  a flag to set if the INIT_SELECT script should be executed or not    

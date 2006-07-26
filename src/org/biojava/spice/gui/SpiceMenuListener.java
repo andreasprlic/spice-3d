@@ -75,6 +75,24 @@ SequenceListener
         structurePanelListener = listen ;
     }
     
+    private SpiceApplication getNewSpiceInstance(){
+        SpiceStartParameters params = spice.getSpiceStartParameters();
+        params.setInitSpiceServer(false);
+        params.setNoRegistryContact(true); 
+        SpiceApplication newSpice = new SpiceApplication(params);  
+        RegistryConfiguration config = spice.getConfiguration();
+        newSpice.newConfigRetrieved(config);
+        
+        return newSpice;
+        
+    }
+    
+    public void clearListeners(){
+        structurePanelListener.clearPanel();
+        spice = null;
+        structurePanelListener = null;
+    }
+    
     public void actionPerformed(ActionEvent e) {
         //System.out.println(e);
         //System.out.println(">"+e.getActionCommand()+"<");
@@ -83,10 +101,7 @@ SequenceListener
         
         if ( cmd.equals("New Window")){
             
-            SpiceStartParameters params = spice.getSpiceStartParameters();
-            params.setInitSpiceServer(false);
-            
-            SpiceApplication newSpice = new SpiceApplication(params);         
+            SpiceApplication newSpice = getNewSpiceInstance();
             
             SpiceServer server = spice.getSpiceServer();
             //newSpice.setSpiceServer(server);
@@ -98,7 +113,11 @@ SequenceListener
         
         else if ( cmd.equals("New Tab")){
             
-            SpiceStartParameters params = spice.getSpiceStartParameters();
+            SpiceApplication newSpice = getNewSpiceInstance();
+            SpiceTabbedPane tabbed = spice.getSpiceTabbedPane();                                               
+            tabbed.addSpice(newSpice);
+            
+            /*SpiceStartParameters params = spice.getSpiceStartParameters();
             params.setInitSpiceServer(false);
             params.setNewTab(true);
             params.setNoRegistryContact(true); 
@@ -106,13 +125,14 @@ SequenceListener
            
             SpiceApplication newSpice = new SpiceApplication(params);         
             newSpice.newConfigRetrieved(config);
+            */
+            
             //SpiceServer server = spice.getSpiceServer();
             //newSpice.setSpiceServer(server);
             
            // SpiceServer server = spice.getSpiceServer();
             
-            SpiceTabbedPane tabbed = spice.getSpiceTabbedPane();                                               
-            tabbed.addSpice(newSpice);
+         
             
             
         }
@@ -308,8 +328,12 @@ SequenceListener
             } else {
                 System.setProperty(structureDisplayProperty,"show full");
             }
-            System.out.print("new system property " + System.getProperty(structureDisplayProperty));
-                
+            //System.out.print("new system property " + System.getProperty(structureDisplayProperty));
+            if ( spice instanceof SpiceApplication) {
+                SpiceApplication sp = (SpiceApplication) spice;
+                SelectionPanel selp = sp.getSelectionPanel();
+                selp.getAlignmentChooser().recalcAlignmentDisplay();
+            }
         
         } else {
         
