@@ -26,8 +26,11 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -438,7 +441,8 @@ public class StructureAlignment {
                 newStruc.addModel(chains);
                 first = false;
             } catch (StructureException e){
-                
+                e.printStackTrace();
+                logger.warning(e.getMessage());
             }
         }
         
@@ -630,7 +634,7 @@ public class StructureAlignment {
      */
     private Structure getStructureRanges(int pos , Structure s ) throws StructureException{
         
-        Structure newStruc = new StructureImpl();
+       
         
         if (alignment == null)
             return null;
@@ -639,101 +643,139 @@ public class StructureAlignment {
         // if yes = restrict the used structure...
         Annotation[] objects = alignment.getObjects();
         Annotation object = objects[pos];
+       
+        Map protectionMap = new HashMap();
+        
         if ( object.containsProperty("details")){
             List details = (List) object.getProperty("details");
             
-            newStruc.setPDBCode(s.getPDBCode());
-            newStruc.setHeader(s.getHeader());
+          
             
             for ( int det = 0 ; det< details.size();det++) {
                 Annotation detanno = (Annotation) details.get(det);
                 String property = (String)detanno.getProperty("property");
-                if ( property.equals("region")){
-                    String detail = (String) detanno.getProperty("detail");
-                    
-                    // split up the structure and add the region to the new structure...
-                    int cpos = detail.indexOf(":");
-                    String chainId = " ";
-                    
-                    if ( cpos > 0) {
-                        chainId = detail.substring(0,cpos);
-                        detail  = detail.substring(cpos+1,detail.length());
-                    } else {
-                        detail = detail.substring(1,detail.length());
+                if (! property.equals("region"))
+                    continue;
+                
+                
+                String detail = (String) detanno.getProperty("detail");
+                
+              
+                
+                // split up the structure and add the region to the new structure...
+                int cpos = detail.indexOf(":");
+                String chainId = " ";
+                
+                if ( cpos > 0) {
+                    chainId = detail.substring(0,cpos);
+                    detail  = detail.substring(cpos+1,detail.length());
+                } else {
+                    detail = detail.substring(1,detail.length());
+                }
+                
+                //System.out.println(detail + " " + cpos + " " + chainId);
+                
+                String[] spl = detail.split("-");
+                
+                if ( spl.length != 2)
+                    continue;
+                String start = spl[0];
+                String end   = spl[1];
+                //System.out.println("start " + start + " end " + end);
+                
+                
+                Object prot = protectionMap.get(chainId);
+
+                List protectedResidues;
+                if ( prot == null)
+                    protectedResidues = new ArrayList();
+                else {
+                    protectedResidues = (List) prot;
+                }
+                
+                Chain c = s.getChainByPDB(chainId);
+                
+                //Q: do we need to do  all groups or only the aminos??
+                List groups = c.getGroups("amino");
+                
+                Iterator iter = groups.iterator();
+                boolean known =false;
+                
+                while (iter.hasNext()){
+                    Group g = (Group) iter.next();
+                    if (g.getPDBCode().equals(start)){
+                        known = true;
                     }
                     
-                    System.out.println(detail + " " + cpos + " " + chainId);
+                    Group n = (Group) g.clone();
                     
-                    String[] spl = detail.split("-");
+                    String code = n.getPDBCode();
                     
-                    if ( spl.length != 2)
-                        continue;
-                    String start = spl[0];
-                    String end   = spl[1];
-                    System.out.println("start " + start + " end " + end);
-                    
-                    Chain c = s.getChainByPDB(chainId);
-                    
-                    Chain nc = new ChainImpl ();
-                    nc.setName(chainId);
-                    boolean knownChain = false;
-                    try {
-                        nc = newStruc.findChain(chainId);
-                        knownChain = true;
-                        
-                    } catch (Exception e){}
+                    if ( known) 
+                        protectedResidues.add(code);
                     
                     
-                    List groups = c.getGroups();
-                    Iterator iter = groups.iterator();
-                    boolean known =false;
-                    while (iter.hasNext()){
-                        Group g = (Group) iter.next();
-                        if (g.getPDBCode().equals(start)){
-                            known = true;
-                        }
-                        
-                        Group n = (Group) g.clone();
-                        // todo: check multi domain chains -
-                        // are regions on the same chain deleted by this?
-                        if (! known)
-                            n.clearAtoms();
-                        
-                        if (g.getPDBCode().equals(end)){
-                            known = false;
-                        }
-                        nc.addGroup(n);
-                        
+                    if (g.getPDBCode().equals(end)){
+                        known = false;
                     }
-                    if ( ! knownChain)
-                        newStruc.addChain(nc);
-                    
-                    /*Group[] groups = c.getGroupsByPDB(start,end);
-                     
-                     Chain nc = new ChainImpl ();
-                     nc.setName(chainId);
-                     boolean knownChain = false;
-                     try {
-                     nc = newStruc.findChain(chainId);
-                     knownChain = true;
-                     
-                     } catch (Exception e){}
-                     
-                     for (int g=0;g<groups.length;g++){
-                     Group gr = groups[g];
-                     nc.addGroup(gr);
-                     
-                     
-                     }
-                     */
                     
                 }
-            }
-            
-            
+                protectionMap.put(chainId,protectedResidues);
+                
+                /*Group[] groups = c.getGroupsByPDB(start,end);
+                 
+                 Chain nc = new ChainImpl ();
+                 nc.setName(chainId);
+                 boolean knownChain = false;
+                 try {
+                 nc = newStruc.findChain(chainId);
+                 knownChain = true;
+                 
+                 } catch (Exception e){}
+                 
+                 for (int g=0;g<groups.length;g++){
+                 Group gr = groups[g];
+                 nc.addGroup(gr);
+                 
+                 
+                 }
+                 */
+            }             
         }
         
+        // o.k. here we got all residues in the protectedMap 
+        // now we build up the new structure ...
         
+        Structure newStruc = new StructureImpl();
+        newStruc.setPDBCode(s.getPDBCode());
+        newStruc.setHeader(s.getHeader());
+        
+        Set keys = protectionMap.keySet();
+        
+        Iterator iter = keys.iterator();
+        while (iter.hasNext()){
+            String chainId =(String) iter.next();
+            List residues = (List)protectionMap.get(chainId);
+            
+            Chain origChain = s.findChain(chainId);
+            Chain newChain  = new ChainImpl();
+            newChain.setName(chainId);
+            
+            List origGroups = origChain.getGroups("amino");
+            Iterator giter = origGroups.iterator();
+            
+            while (giter.hasNext()){
+              Group orig = (Group) giter.next();
+              Group n = (Group) orig.clone();
+              if ( ! residues.contains(orig.getPDBCode())){
+                  // this group has been
+                  n.clearAtoms();
+                  n.setPDBCode("");
+              }
+              newChain.addGroup(n);              
+            }
+            newStruc.addChain(newChain);                        
+        }
         
         if (newStruc.size() > 0){
             return newStruc;
