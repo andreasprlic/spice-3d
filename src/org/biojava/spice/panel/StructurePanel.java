@@ -55,7 +55,7 @@ implements JmolCommander
     final Rectangle  rectClip    = new Rectangle();
     
     static Logger    logger      = Logger.getLogger("org.biojava.spice");
-    static String    EMPTYCMD = "zap; set echo top center; font echo 22; color echo white;echo \"no structure found\";";
+    static String    EMPTYCMD = "exit; zap; set echo top center; font echo 22; color echo white;echo \"no structure found\";";
     
     JmolViewer  viewer;
     JmolAdapter adapter;
@@ -126,8 +126,8 @@ implements JmolCommander
     public void executeCmd(String command) {
         //logger.info(command);
        
-        //viewer.evalString(command);
-        viewer.evalStringSync(command);
+        viewer.evalString(command);
+        //viewer.evalStringSync(command);
         //viewer.scriptWaitVoid(command);
         //System.out.println("done");
     }
