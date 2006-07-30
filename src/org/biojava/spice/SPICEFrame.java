@@ -33,7 +33,6 @@ import org.biojava.bio.structure.Chain;
 import org.jmol.api.JmolViewer;
 
 import java.awt.Container;
-import java.net.URL;
 
 /** an interface that defines methods provided by the master application. 
 
@@ -63,6 +62,7 @@ public interface SPICEFrame
     public SpiceServer getSpiceServer();
     
     public void setSpiceTabbedPane(SpiceTabbedPane tab);
+    
     public SpiceTabbedPane getSpiceTabbedPane();
     
     /** get the Jmol viewer 
@@ -91,16 +91,6 @@ public interface SPICEFrame
 
     /** show Config */
     public void showConfig();
-
-    /** display an URL in the browser that started SPICE 
-     * 
-     * @param url to be shown
-     * @return flag if successfull
-     * */
-    public boolean showURL(URL url);
-   
-    // rescale the windo size 
-    //public void scale() ;
     
     /** retreive info regarding structure 
      * 
@@ -110,23 +100,7 @@ public interface SPICEFrame
     public Chain getChain(int chainnumber);
 
 
-    
-    /** open a web page in the browser 
-     * returns true if the request succeeds, otherwise false
-     * 
-     * @param url url to be opened
-     * @return boolean flag if successfull
-     * 
-     * */
-    public boolean showDocument(URL url);
-        
-    /** converts a String to an URL and then calls showDocument(URL url)
-     * 
-     * @param urlstring url to be opened
-     * @return boolean flag if successfull
-     * 
-     * */
-    public boolean showDocument(String urlstring);
+ 
     
     /** returns currently displayed PDB code; null if none
      * 

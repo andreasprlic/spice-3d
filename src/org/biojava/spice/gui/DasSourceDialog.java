@@ -26,8 +26,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.logging.Logger;
 
 import javax.swing.Box;
@@ -40,7 +38,7 @@ import javax.swing.event.HyperlinkListener;
 
 import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
-import org.biojava.spice.JNLPProxy;
+import org.biojava.spice.utils.BrowserOpener;
 
 
 /** A Dialog that displays some information about a DAS source
@@ -78,7 +76,7 @@ extends JDialog{
                 //System.out.println(e);
                 if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                     String href = e.getDescription();
-                    showDocument(href);
+                    BrowserOpener.showDocument(href);
                 }
             }
         });
@@ -116,29 +114,7 @@ extends JDialog{
         
     }
     
-    public boolean showDocument(URL url) 
-    {
-        if ( url != null ){
-            boolean success = JNLPProxy.showDocument(url); 
-            if ( ! success)
-                logger.info("could not open URL "+url+" in browser. check your config or browser version.");
-        return success;
-        
-        }
-        else
-            return false;
-    }
-    
-    public boolean showDocument(String urlstring){
-        try{
-            URL url = new URL(urlstring);
-            
-            return showDocument(url);
-        } catch (MalformedURLException e){
-            logger.warning("malformed URL "+urlstring);
-            return false;
-        }
-    }
+   
     
     
     private String getHTMLText(SpiceDasSource ds){

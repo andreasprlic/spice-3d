@@ -84,6 +84,7 @@ implements WindowListener{
         
         frame.getContentPane().add(spice);
         frame.pack();
+        frame.toFront();
         frame.setVisible(true);
         
         tabbedSpices.add(spice);

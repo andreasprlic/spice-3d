@@ -40,6 +40,7 @@ import org.biojava.spice.panel.StructurePanelListener;
 import org.biojava.spice.manypanel.eventmodel.StructureAlignmentListener;
 import org.biojava.spice.manypanel.managers.StructureManager;
 import org.biojava.spice.server.SpiceServer;
+import org.biojava.spice.utils.BrowserOpener;
 import org.biojava.spice.SPICEFrame;
 import org.biojava.spice.SpiceStartParameters;
 //import org.biojava.spice.Panel.seqfeat.*;
@@ -77,7 +78,6 @@ SequenceListener
     
     private SpiceApplication getNewSpiceInstance(){
         SpiceStartParameters params = spice.getSpiceStartParameters();
-        params.setInitSpiceServer(false);
         params.setNoRegistryContact(true); 
         SpiceApplication newSpice = new SpiceApplication(params);  
         RegistryConfiguration config = spice.getConfiguration();
@@ -191,7 +191,7 @@ SequenceListener
             TechInfoDialog tid = new TechInfoDialog();
             tid.show();
         } else if (cmd.equals("Manual")) {
-            spice.showDocument(SPICEMANUAL);
+            BrowserOpener.showDocument(SPICEMANUAL);
             
         } else if ( cmd.equals("Backbone") ){
             String dcmd;

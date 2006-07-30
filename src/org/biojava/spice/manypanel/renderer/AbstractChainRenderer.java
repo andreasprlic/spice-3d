@@ -149,11 +149,16 @@ public abstract class AbstractChainRenderer
         layeredPane.addMouseMotionListener(mouseListener);
         layeredPane.addMouseListener(mouseListener);
         
+        SegmentDisplayFloatingFrame fframe = new SegmentDisplayFloatingFrame();
+        layeredPane.addMouseListener(fframe);
+        layeredPane.addMouseMotionListener(fframe);
         
         //cursorPanel.addMouseListener(mouseListener);
-        
+
         mouseListener.addSequenceListener(cursorPanel);
         mouseListener.addSpiceFeatureListener(cursorPanel);
+        mouseListener.addSpiceFeatureListener(fframe);
+        mouseListener.addSequenceListener(fframe);
         
         int width = getDisplayWidth();
         

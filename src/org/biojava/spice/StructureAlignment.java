@@ -24,6 +24,8 @@ package org.biojava.spice;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -75,6 +77,11 @@ public class StructureAlignment {
     Annotation[] sortedBlocks;
     int nrSelected;
     String[] rasmolScripts;
+
+    JProgressBar progressBar;
+    boolean waitingForStructure;
+    
+    Structure loadedStructure;
     
     public StructureAlignment() {
         super();
@@ -85,7 +92,8 @@ public class StructureAlignment {
         loaded = new boolean[0];
         sortedBlocks = new Annotation[0];
         nrSelected = 0;
-     
+        waitingForStructure = false;
+        loadedStructure = null;
     }
     
     public void setStructureServers(Das1Source[] servers){
@@ -492,72 +500,8 @@ public class StructureAlignment {
     }
     
     
-    private void showProgressFrame(String pdbCode){
-        progressFrame = new JFrame();
-        progressFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        /*progressFrame.addWindowListener(new WindowAdapter() {
-         public void windowClosing(WindowEvent evt) {
-         Frame frame = (Frame) evt.getSource();
-         frame.setVisible(false);
-         frame.dispose();
-         }
-         });
-         */
-        
-        ImageIcon icon = SpiceApplication.createImageIcon("spice16x16.gif");
-        if (icon != null) {
-            progressFrame.setIconImage(icon.getImage());
-        }
-        JFrame.setDefaultLookAndFeelDecorated(false);
-        //progressFrame.setUndecorated(true);
-        
-        JPanel panel = new JPanel();
-        panel.setBackground(SequenceScalePanel.BACKGROUND_COLOR);
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        
-        Box vbox = Box.createVerticalBox();
-        JLabel txt = new JLabel("loading structure " + pdbCode); 
-        vbox.add(txt);
-        
-        JProgressBar progressBar = new JProgressBar(0,100);
-        progressBar.setStringPainted(true); //get space for the string
-        progressBar.setString("");          //but don't paint it
-        progressBar.setIndeterminate(true);
-        progressBar.setValue(0);
-        progressBar.setMaximumSize(new Dimension(400,20));
-        progressBar.setBorder(BorderFactory.createEmptyBorder());
-        
-        //progressBar.setMaximum(100);
-        //progressBar.setValue(50);
-        
-        vbox.add(progressBar);
-        
-        //JLabel server = new JLabel("contacting "+REGISTRY, JLabel.RIGHT);
-        //logger.info("contacting DAS registry at "+REGISTRY);
-        //vbox.add(server);
-        panel.add(vbox);
-        progressFrame.getContentPane().add(panel);
-        progressFrame.pack();
-        
-        // get resolution of screen
-        Dimension dim = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        // Determine the new location of the window
-        int w = progressFrame.getSize().width;
-        int h = progressFrame.getSize().height;
-        int x = (dim.width-w)/2;
-        int y = (dim.height-h)/2;
-        
-        // Move the window
-        progressFrame.setLocation(x, y);
-        progressFrame.repaint();
-        
-        progressFrame.setVisible(true);
-        
-    }
-    private void disposeProgressBar(){
-        progressFrame.setVisible(false);
-        progressFrame.dispose();
-    }
+   
+   
     
     
     public Structure getStructure(int pos) throws StructureException{
@@ -566,9 +510,31 @@ public class StructureAlignment {
         
         String pdbCode = intObjectIds[pos].substring(0,4);
         // show busy frame...
-        showProgressFrame(pdbCode);
+        ProgressThreadDrawer drawer = new ProgressThreadDrawer(pdbCode);
+        //javax.swing.SwingUtilities.invokeLater(drawer);
+        //drawer.start();
+        drawer.showProgressFrame();
+        
         
         Structure s = null;
+        
+        /*StructureThread sthread = new StructureThread(pdbCode,structureServers);
+        sthread.addStructureListener(new MyStructureListener(this));
+        waitingForStructure = true;
+        sthread.start();
+       
+        while ( waitingForStructure){
+            try {
+                System.out.println("waitingForStructure " + waitingForStructure);
+                wait(100);             
+            } catch (InterruptedException ex){
+                waitingForStructure = false;
+            }
+        }*/
+        
+        
+        
+        
         // not loaded, yet. do a structure request, and rotate, shft structure.
         for (int i=0;i< structureServers.length;i++){
             Das1Source ds = structureServers[i];
@@ -581,7 +547,8 @@ public class StructureAlignment {
                 continue;
             }
         }
-        disposeProgressBar();
+        
+        drawer.terminate();
         
         if ( s == null)
             throw new StructureException("Could not load structure at position " + pos);
@@ -633,8 +600,6 @@ public class StructureAlignment {
      * @throws StructureException
      */
     private Structure getStructureRanges(int pos , Structure s ) throws StructureException{
-        
-       
         
         if (alignment == null)
             return null;
@@ -824,9 +789,147 @@ public class StructureAlignment {
         }
         
         return max;
+    }    
+}
+
+
+
+class ProgressThreadDrawer extends Thread {
+
+    JProgressBar progress;
+    static int interval = 100;
+    JFrame frame;
+    String pdbCode;
+    boolean terminated ;
+    
+    public ProgressThreadDrawer(String pdb) {
+        frame = new JFrame("loading structure ...");
+        pdbCode = pdb;
+        
+        terminated = false;
+        
+        frame.addWindowListener(new WindowListener(){
+            public void windowClosing(WindowEvent arg0) {
+                terminate();                
+            }
+            public void windowOpened(WindowEvent arg0) {
+             }
+
+            public void windowClosed(WindowEvent arg0) {
+             }
+
+            public void windowIconified(WindowEvent arg0) {
+             }
+
+            public void windowDeiconified(WindowEvent arg0) {
+             }
+
+            public void windowActivated(WindowEvent arg0) {
+             }
+
+            public void windowDeactivated(WindowEvent arg0) {
+                
+            }
+        });
     }
     
     
+    public void terminate(){
+        terminated = true;
+        if (progress != null)
+            progress.setIndeterminate(false);
+        if ( frame != null) {
+            frame.setVisible(false);
+            frame.dispose();
+        }
+    }
     
+    public void showProgressFrame(){
+        
+       JFrame progressFrame = frame;
+        
+        ImageIcon icon = SpiceApplication.createImageIcon("spice16x16.gif");
+        if (icon != null) {
+            progressFrame.setIconImage(icon.getImage());
+        }
+                
+        JFrame.setDefaultLookAndFeelDecorated(false);
+   
+        
+        JPanel panel = new JPanel();
+        panel.setBackground(SequenceScalePanel.BACKGROUND_COLOR);
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        
+        Box vbox = Box.createVerticalBox();
+        JLabel txt = new JLabel("loading structure " + pdbCode); 
+        vbox.add(txt);
+        
+        JProgressBar progressBar = new JProgressBar(0,100);
+        progressBar.setStringPainted(true); //get space for the string
+        progressBar.setString("");          //but don't paint it
+        progressBar.setIndeterminate(true);
+        progressBar.setValue(0);
+        progressBar.setMaximumSize(new Dimension(400,20));
+        progressBar.setBorder(BorderFactory.createEmptyBorder());
+                
+        progressFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        
+        
+        //progressBar.setMaximum(100);
+        //progressBar.setValue(50);
+        
+        vbox.add(progressBar);
+        
+        //JLabel server = new JLabel("contacting "+REGISTRY, JLabel.RIGHT);
+        //logger.info("contacting DAS registry at "+REGISTRY);
+        //vbox.add(server);
+        panel.add(vbox);
+        progressFrame.getContentPane().add(panel);
+        progressFrame.pack();
+        
+        // get resolution of screen
+        Dimension dim = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        // Determine the new location of the window
+        int w = progressFrame.getSize().width;
+        int h = progressFrame.getSize().height;
+        int x = (dim.width-w)/2;
+        int y = (dim.height-h)/2;
+        
+        // Move the window
+        progressFrame.setLocation(x, y);
+        progressFrame.repaint();
+        
+        progressFrame.setVisible(true);        
+       
+        progress =progressBar;
+    }
+    
+    
+    public void run() {
+        System.out.println("drawer started");
+        showProgressFrame();
+        
+        boolean finished = false;
+        while ( ! finished) {
+            try {
+                System.out.println("repainting frame");
+                progress.repaint();
+                frame.repaint();
+               
+                if ( !terminated){
+                    finished =false;
+                    break;
+                }
+                
+                sleep(interval);
+            } catch (InterruptedException e){
+            }
+            progress.repaint();
+        }
+        progress = null;    
+        terminate();
+    }
     
 }
+
+

@@ -49,7 +49,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 
-import org.biojava.spice.JNLPProxy;
+import org.biojava.spice.utils.JNLPProxy;
 
 public class StatusPanel extends JPanel {
     public static final long serialVersionUID= 309781239871208973l;

@@ -29,6 +29,8 @@ import java.awt.Dimension;
 
 import java.awt.event.ActionEvent;
 import org.biojava.spice.SPICEFrame;
+import org.biojava.spice.utils.BrowserOpener;
+
 import javax.swing.Box;
 import javax.swing.JDialog;
 import javax.swing.JButton;
@@ -119,7 +121,7 @@ extends JDialog {
                 //System.out.println(e);
                 if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                     String href = e.getDescription();
-                    spice.showDocument(href);
+                    BrowserOpener.showDocument(href);
                 }
                 if ( e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
                     // change the mouse curor

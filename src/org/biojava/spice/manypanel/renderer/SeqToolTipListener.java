@@ -37,7 +37,6 @@ import org.biojava.bio.structure.Group;
 import org.biojava.dasobert.eventmodel.SequenceEvent;
 import org.biojava.dasobert.eventmodel.SequenceListener;
 import org.biojava.spice.feature.Feature;
-import org.biojava.spice.feature.Segment;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureEvent;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureListener;
 
@@ -179,8 +178,7 @@ implements SequenceListener, SpiceFeatureListener {
         Feature f = e.getFeature();
         String s = s = f.toString();        
         parent.setToolTipText(s);
-            
-        
+              
     }
 
     
@@ -190,30 +188,32 @@ implements SequenceListener, SpiceFeatureListener {
     }
 
     public void mouseOverFeature(SpiceFeatureEvent e) {
-        
+       
         Feature f = e.getFeature();
         //logger.info("toolTipper over feature " + f);
        
         if ( f.getType().equals("unknown")){
-            parent.setToolTipText("");
+            //parent.setToolTipText("");
             parent.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
         } else {
-            parent.setToolTipText(f.toString());
+            //parent.setToolTipText(f.toString());
             parent.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        }     
+        }
+             
     }
 
     public void mouseOverSegment(SpiceFeatureEvent e) {
         //System.out.println("toolTipper mouseOverSegment " + e.getSegment());
         //parent.setToolTipText(e.getSegment().toString());
         Feature f = e.getFeature();
-        Segment s = e.getSegment();
+        //Segment s = e.getSegment();
         
         if ( f.getType().equals("unknown")){
-            parent.setToolTipText("");
+            //parent.setToolTipText("");
             parent.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
         } else {
-            Component where = getRenderer();
+            //Component where = getRenderer();
+            /*
             String txt = "";
             if ( where instanceof SequenceRenderer) {
                 txt = s.toString();
@@ -235,7 +235,9 @@ implements SequenceListener, SpiceFeatureListener {
                 txt = str;
                 
             }
-            parent.setToolTipText(txt);
+            //parent.setToolTipText(txt);
+             * */
+             
             parent.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         }
         
@@ -243,7 +245,7 @@ implements SequenceListener, SpiceFeatureListener {
     }
 
     public void segmentSelected(SpiceFeatureEvent e) {
-        parent.setToolTipText(e.getSegment().toString());
+        //parent.setToolTipText(e.getSegment().toString());
         
     }
 

@@ -154,11 +154,12 @@ implements JmolCommander
         }
         //logger.info("setting new structure in Jmol " + structure.getPDBCode() + " " + structure.size());
         
-        String pdbstr = structure.toPDB();
-        //logger.info("pdbstring "+pdbstr.substring(0,200) );
-        viewer.openStringInline(pdbstr);
+        viewer.evalString("exit");
         
-        //logger.info("finished loading structure ");
+        String pdbstr = structure.toPDB();
+        
+        viewer.openStringInline(pdbstr);
+           
         String strError = viewer.getOpenFileError();
         
         if (strError != null) {

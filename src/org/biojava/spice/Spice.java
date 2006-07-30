@@ -62,6 +62,99 @@ public class Spice extends Applet {
     
     public static void main(String[] argv) {
         
+        javax.swing.SwingUtilities.invokeLater(new SpiceRunnable(argv));
+        
+    }
+    
+    /** Start SPICE @see SpiceApplication 
+     * @param params the parameters to use
+     * */
+    public void triggerSpice(SpiceStartParameters params){
+        
+        System.out.println("Welcome to the SPICE - DAS client!");
+        System.out.println("SPICE version: " + AboutDialog.VERSION);
+        System.out.println("displaying for you: " + params.getCodetype() + " " + params.getCode());
+        
+        
+        
+        /** test if already one instance of SPICE is running
+         * if yes the code should be displayed there...
+         * 
+         */
+        boolean serverFound = testSendToServer(params);
+        
+        
+        if (  serverFound){
+            // quit this SPICE instance, 
+            // the code is being loaded in SPICE in another instance that is already running ...
+            String msg = " sent " + params.getCodetype() + " " + params.getCode() + " to already running spice instance";
+            
+            System.out.println(msg);
+            
+            System.exit(0);
+        }
+        
+        //  start a spice instance
+        createNewInstance(params);
+    }
+    
+    private void createNewInstance (SpiceStartParameters params) {
+        
+        System.out.println("no spice instance has been found - starting new one for "+ params.getCodetype() + " " + params.getCode());
+        SpiceApplication app = new SpiceApplication(params);
+        SpiceServer server = new SpiceServer();
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                LoggingPanelManager.show();
+            }
+        });
+        server.registerInstance(app);
+        app.setSpiceServer(server);
+        new SpiceTabbedPane(server,app);      
+                
+        // and display the accession code...
+        app.load(params.getCodetype(),params.getCode());
+        
+    }
+    
+    
+    private boolean testSendToServer(SpiceStartParameters params){
+        
+        SpiceClient sc = new SpiceClient();
+        
+        try {
+//          contact the port at which SPICE is listening ...
+            // if successfull communication, no need to start another SPICE window...
+            int status = sc.send(params);
+            if  (status == SpiceClient.SPICE_SUBMITTED )
+                return true;
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            
+        }
+        
+        return false;
+        
+    }
+    
+}
+
+
+
+
+class SpiceRunnable implements Runnable {
+    String[] argv ;
+    public SpiceRunnable (String[] argv) {
+        this.argv = argv;
+    }
+    
+    public void run() {
+        createAndShowGUI(argv);
+    }
+    
+    
+    public static void createAndShowGUI(String[] argv){
         Spice app = new Spice();
         SpiceStartParameters params = new SpiceStartParameters();
         // init the configuration
@@ -92,77 +185,10 @@ public class Spice extends Applet {
             }           
         }
         
-        app.run(params);
+        app.triggerSpice(params);
         
     } 
     
-    /** Start SPICE @see SpiceApplication 
-     * @param params the parameters to use
-     * */
-    public void run(SpiceStartParameters params){
-        
-        System.out.println("Welcome to the SPICE - DAS client!");
-        System.out.println("SPICE version: " + AboutDialog.VERSION);
-        System.out.println("displaying for you: " + params.getCodetype() + " " + params.getCode());
-        
-    
-        
-        /** test if already one instance of SPICE is running
-         * if yes the code should be displayed there...
-         * 
-         */
-        boolean serverFound = testSendToServer(params);
-        
-        
-        if (  serverFound){
-            // quit this SPICE instance, 
-            // the code is being loaded in SPICE in another instance that is already running ...
-            String msg = " sent " + params.getCodetype() + " " + params.getCode() + " to already running spice instance";
-            
-            System.out.println(msg);
-            
-            System.exit(0);
-        }
-        
-        // 	start a spice instance
-        createNewInstance(params);
-    }
-    
-    private void createNewInstance (SpiceStartParameters params) {
-        
-        System.out.println("no spice instance has been found - starting new one for "+ params.getCodetype() + " " + params.getCode());
-        SpiceApplication app = new SpiceApplication(params);
-        SpiceServer server = new SpiceServer();
-        server.registerInstance(app);
-        app.setSpiceServer(server);
-        new SpiceTabbedPane(server,app);      
-                
-        
-        // and display the accession code...
-        app.load(params.getCodetype(),params.getCode());
-        
-    }
-    
-    
-    private boolean testSendToServer(SpiceStartParameters params){
-        
-        SpiceClient sc = new SpiceClient();
-        
-        try {
-//          contact the port at which SPICE is listening ...
-            // if successfull communication, no need to start another SPICE window...
-            int status = sc.send(params);
-            if  (status == SpiceClient.SPICE_SUBMITTED )
-                return true;
-                        
-        } catch (Exception e) {
-            e.printStackTrace();
-            
-        }
-        
-        return false;
-        
-    }
     
     
 }

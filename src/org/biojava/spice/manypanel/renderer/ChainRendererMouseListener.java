@@ -36,7 +36,6 @@ import java.util.logging.Logger;
 import org.biojava.bio.structure.Chain;
 import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.eventmodel.SequenceListener;
-import org.biojava.spice.JNLPProxy;
 import org.biojava.spice.feature.Feature;
 import org.biojava.spice.feature.FeatureImpl;
 import org.biojava.spice.feature.Segment;
@@ -45,6 +44,7 @@ import org.biojava.spice.manypanel.drawable.DrawableDasSource;
 //import org.biojava.spice.manypanel.eventmodel.FeatureEvent;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureEvent;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureListener;
+import org.biojava.spice.utils.JNLPProxy;
 
 
 /** a mouse listener for the AbstractChainRenderer class
@@ -495,7 +495,6 @@ MouseMotionListener
             return;
         
         //logger.info("trigger new sequence position " + pos);
-        
         Iterator iter = sequenceListeners.iterator();
         while(iter.hasNext()){
             SequenceListener li = (SequenceListener)iter.next();
@@ -511,6 +510,37 @@ MouseMotionListener
                 li.selectedSeqPosition(pos);
             }
         }
+        
+        /** nice try but not very helpfull
+        class mySeqPosRunnable implements Runnable {
+            int pos, mouseY;
+            public mySeqPosRunnable(int pos,int mouseY) {
+                this.pos = pos;
+                this.mouseY = mouseY;
+            }
+            
+            
+            public void run() {
+                Iterator iter = sequenceListeners.iterator();
+                while(iter.hasNext()){
+                    SequenceListener li = (SequenceListener)iter.next();
+                    // ugly! TODO: find a nice solution for this ...
+                    // display seq cursor only over the sequyece ...
+                    if ( li instanceof SeqToolTipListener ){
+                        if ( mouseY < 20)
+                            li.selectedSeqPosition(pos);
+                        else 
+                            li.selectedSeqPosition(-1);
+                        
+                    } else {
+                        li.selectedSeqPosition(pos);
+                    }
+                }
+            }
+        }
+        
+        javax.swing.SwingUtilities.invokeLater(new mySeqPosRunnable(pos,mouseY));
+        */
         
     }
     

@@ -394,12 +394,12 @@ implements StructureListener{
     
     
     public void triggerObject1Request(String ac){
-        //logger.info("should trigger object 1 request ?" + ac + " " + object1Id);
+        logger.info("should trigger object 1 request ?" + ac + " " + object1Id);
         if ( ac.equals(object1Id)) {
             //logger.info("no...");
             return;
         }
-        //logger.info("yes, do trigger object 1 request " + ac);
+        logger.info("yes, do trigger object 1 request " + ac);
         object1Id =ac;
         
         Iterator iter = object1Listeners.iterator();

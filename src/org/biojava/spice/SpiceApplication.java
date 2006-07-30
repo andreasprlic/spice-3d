@@ -39,12 +39,12 @@ import org.biojava.dasobert.eventmodel.StructureListener;
 
 // to get config file via http
 import java.net.URL;
-import java.net.MalformedURLException;
 
 // some utils 
 import java.util.HashMap   ;
 import java.util.ArrayList ;
 import java.util.List ;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 // logging
@@ -83,6 +83,7 @@ import org.biojava.spice.manypanel.eventmodel.DasSourceEvent;
 import org.biojava.spice.manypanel.eventmodel.DasSourceListener;
 import org.biojava.spice.manypanel.eventmodel.StructureAlignmentListener;
 import org.biojava.spice.server.SpiceServer;
+import org.biojava.spice.utils.BrowserOpener;
 import org.jmol.api.JmolViewer;
 
 
@@ -119,6 +120,7 @@ ConfigurationListener
     HashMap memoryfeatures; // all features in memory
     List features ;    // currently being displayed 
         
+    List loadQueue;
 
     JmolSpiceTranslator jmolSpiceTranslator;
     StructurePanelListener structurePanelListener ;   
@@ -144,12 +146,8 @@ ConfigurationListener
     boolean first_load ;
     boolean selectionLocked ;
     boolean structureAlignmentMode ;
-    
-    //public static Logger logger = Logger.getLogger("org.biojava.spice");
-    String waitingCode;
-    String waitingType;
-    
-    ImageIcon firefoxIcon ;
+        
+    //ImageIcon firefoxIcon ;
     
     boolean configLoaded ;
     SpiceMenuListener spiceMenuListener;
@@ -191,12 +189,8 @@ ConfigurationListener
         pdbcode2        = null ;
         
         structureAlignmentMode = false ; 
-        
-        if (params.isInitSpiceServer()) {
-            // only one logging panel for all spice windows ...
-            // init logging related things
-            initLoggingPanel();
-        }
+      
+        loadQueue = new ArrayList();
         
         // set some system properties
         setSystemProperties();     
@@ -212,7 +206,8 @@ ConfigurationListener
        
         // first thing is to start das - registry communication
         
-        config = new RegistryConfiguration();
+        //config = new RegistryConfiguration();
+        config = null;
         
         URL[] registries = getAllRegistryURLs();
         RegistryConfigIO regi = new RegistryConfigIO(registries);
@@ -220,11 +215,11 @@ ConfigurationListener
             regi.setNoUpdate(true);
         } else {
             regi.addConfigListener(this);
-            regi.run();
+            //regi.run();
+            // we do this via the swing main thread because we want to see
+            // a busy progress bar...
+            javax.swing.SwingUtilities.invokeLater(regi);
         }
-        
-        
-        
         
         // init all panels, etc..
         statusPanel    = new StatusPanel(this);
@@ -251,7 +246,7 @@ ConfigurationListener
        
         initListeners();
        
-        firefoxIcon = createImageIcon("firefox.png");
+        //firefoxIcon = createImageIcon("firefox.png");
         
         
         
@@ -349,14 +344,7 @@ ConfigurationListener
         spiceServer = server; 
     }
    
-    private void initLoggingPanel(){
-        
-        final LoggingPanel loggingPanel = new LoggingPanel(logger);
-        loggingPanel.getHandler().setLevel(Level.INFO);	
-        logger.setLevel(Level.INFO);
-        loggingPanel.show(null);
-                       
-    }
+   
     
     /** set  a couple of System Properties also contains some hacks around some strange implementation differences*/
    
@@ -571,13 +559,12 @@ ConfigurationListener
         chainDisplay.addStructureListener(jmolSpiceTranslator);
         
         //chainDisplay.addStructureListener(spiceMenuListener);
-        
-        
-        selectionPanel.addStructureListener(jmolSpiceTranslator);
+                
         selectionPanel.addStructureListener(browserPane.getStructureManager());
-        selectionPanel.addStructureListener(structurePanelListener);
-        selectionPanel.addStructureListener(browserPane.getTopAlignmentManager());
+        selectionPanel.addStructureListener(jmolSpiceTranslator);
+        selectionPanel.addStructureListener(structurePanelListener);        
         selectionPanel.addStructureListener(browseMenu.getPDBListener());
+        selectionPanel.addStructureListener(browserPane.getTopAlignmentManager());
     }
     
     public void setMenu(JMenuBar menu) {
@@ -591,6 +578,9 @@ ConfigurationListener
         return menu;
     }
     
+    public Logger getLogger(){
+        return logger;
+    }
     /**
      * @returns the Menu to be displayed on top of the application
      */
@@ -659,8 +649,39 @@ ConfigurationListener
      * @see org.biojava.spice.SPICEFrame#load(java.lang.String, java.lang.String)
      */
     public void load(String type, String code){
+        
+        
+        Map m = new HashMap();
+        m.put("type",type);
+        m.put("code",code);
+        
+        loadQueue.add(m);
+        
+        if (config != null)            
+            processNextInQueue();
+    }
+    
+    
+    private void processNextInQueue(){
+        
+        if ( loadQueue.size() <1)
+            return;
+        
+        Map m = (Map) loadQueue.get(0);
+        
+        String type = (String) m.get("type");
+        String code = (String) m.get("code");
+        
+        loadQueue.remove(0);
+        
         String msg = "SpiceApplication load: " + type + " " + code;
         System.out.println(msg);
+        
+        //MyDataLoadRunnable runner = new MyDataLoadRunnable(this,type,code);
+        
+        //Thread t = new Thread(runner);
+        //t.start();
+        
         logger.finest(msg);
         
         
@@ -709,13 +730,15 @@ ConfigurationListener
     /** start a new thead that retrieves uniprot sequence, and if available
      protein structure
      */
-    private void loadUniprot(String uniprot) {
+    protected void loadUniprot(String uniprot) {
         logger.info("SpiceApplication loadUniprot " + uniprot);
         System.setProperty("SPICE:drawStructureRegion","false");
         if ( config == null){
             // we have to wait until contacting the DAS registry is finished ...
-            waitingType="UniProt";
-            waitingCode=uniprot;
+            Map m = new HashMap();
+            m.put("type","UniProt");
+            m.put("code", uniprot);
+            loadQueue.add(m);
             return;
         }
         
@@ -727,13 +750,15 @@ ConfigurationListener
     /** start a new thead that retrieves uniprot sequence, and if available
     protein structure
     */
-   private void loadEnsp(String ensp) {
+   protected void loadEnsp(String ensp) {
        //logger.info("SpiceApplication loadEnsp" + ensp);
        System.setProperty("SPICE:drawStructureRegion","false");
        if ( config == null){
            // we have to wait until contacting the DAS registry is finished ...
-           waitingType="Ensp";
-           waitingCode=ensp;
+           Map m = new HashMap();
+           m.put("type","Ensp");
+           m.put("code", ensp);
+           loadQueue.add(m);
            return;
        }
        
@@ -751,7 +776,7 @@ ConfigurationListener
      DAS structure command from some other server this thread will
      call the setStructure method to set the protein structure.
      */
-    private void loadStructure(String pdbcod) {
+    protected void loadStructure(String pdbcod) {
         System.setProperty("SPICE:drawStructureRegion","false");
         //currentChain = null ;
         setCurrentChain(null,-1);
@@ -767,8 +792,10 @@ ConfigurationListener
         
         if ( config == null){
             // we have to wait until contacting the DAS registry is finished ...
-            waitingType="PDB";
-            waitingCode= pdbcod;
+            Map m = new HashMap();
+            m.put("type","PDB");
+            m.put("code", pdbcod);
+            loadQueue.add(m);
             return;
         }
         
@@ -1046,7 +1073,7 @@ ConfigurationListener
                 //System.out.println(e);
                 if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                     String href = e.getDescription();
-                    showDocument(href);
+                    BrowserOpener.showDocument(href);
                 }
             }
         });
@@ -1151,11 +1178,8 @@ ConfigurationListener
         
     }
     
-    /** display an URL in the browser that started SPICE */
-    public boolean showURL(URL url) {
-        return showDocument(url);
-    }
-    
+   
+  
     
     private SpiceDasSource[] filterSourcesWithStartupData(List l){
 
@@ -1247,29 +1271,13 @@ ConfigurationListener
             return;
         testAddLocalServer();
         setDasSources();
-                
-        triggerQueuedRequests();
+        
         dealWithStartParameters();
-        notifyAll();
+        
+        processNextInQueue();
+        
     }
     
-    public  void triggerQueuedRequests(){
-        // trigger queued requests
-        //logger.info("triggerQueuedRequest");
-               
-        if ( waitingType != null){
-            //MyLoadingThread thr = new MyLoadingThread(waitingType,waitingCode,this);
-            //thr.start();
-            load(waitingType,waitingCode);
-            
-            waitingType = null;
-            waitingCode = null;
-            
-        }
-        
-      
-       
-    }
     
     public void showConfig() {
         //RegistryConfigIO regi = new RegistryConfigIO(this,REGISTRY_URLS);
@@ -1377,35 +1385,14 @@ ConfigurationListener
         return true ;
         
     }    */
+   
     
-    public boolean showDocument(URL url) 
-    {
-        if ( url != null ){
-            boolean success = JNLPProxy.showDocument(url); 
-            if ( ! success)
-                logger.info("could not open URL "+url+" in browser. check your config or browser version.");
-	    return success;
-	    
-        }
-        else
-            return false;
-    }
-    
-    public boolean showDocument(String urlstring){
-        try{
-            URL url = new URL(urlstring);
-            
-            return showDocument(url);
-        } catch (MalformedURLException e){
-            logger.warning("malformed URL "+urlstring);
-            return false;
-        }
-    }
 
    
-     
-  
+ 
 }
+
+
 
 class MyDasSourceListener implements DasSourceListener{
    

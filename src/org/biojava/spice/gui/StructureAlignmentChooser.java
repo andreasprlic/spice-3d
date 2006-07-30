@@ -262,6 +262,8 @@ StructureAlignmentListener {
                         ex.printStackTrace();
                         structureAlignment.deselect(i);
                         //return;
+                       JCheckBox b = (JCheckBox) source;
+                       b.setSelected(false);
                     }
                 }
                 

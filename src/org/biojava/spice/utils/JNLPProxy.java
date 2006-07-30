@@ -15,7 +15,7 @@
 *   <a href="http://croftsoft.com/">David Wallace Croft</a>
 *********************************************************************/
 
-package org.biojava.spice;
+package org.biojava.spice.utils;
 
 import java.lang.reflect.*;
 import java.net.*;

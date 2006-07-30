@@ -64,7 +64,6 @@ public class SpiceStartParameters {
     private String uniprotcoordsys;
     private String enspcoordsys;
     
-    boolean initSpiceServer;
     boolean newTab;
     boolean noRegistryContact;
       
@@ -82,7 +81,6 @@ public class SpiceStartParameters {
             e.printStackTrace();
         }
         registryurls = new URL[0];
-        initSpiceServer = true;
         newTab =false;
         noRegistryContact = false;
         structureAlignmentMode="";
@@ -118,19 +116,7 @@ public class SpiceStartParameters {
         this.noRegistryContact = noRegistryContact;
     }
 
-    /** if true a new Spice instance should init the SpiceServer. otherwise it assumes that it is already running
-     * 
-     * 
-     * @return flag if the spice server should be initiated
-     */
-    public boolean isInitSpiceServer() {
-        return initSpiceServer;
-    }
-
-
-    public void setInitSpiceServer(boolean initSpiceServer) {
-        this.initSpiceServer = initSpiceServer;
-    }
+   
 
     
     /** a new spice instance should be created as a new tab (isNewTab == true) or

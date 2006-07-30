@@ -30,8 +30,8 @@ import org.biojava.dasobert.eventmodel.SequenceEvent;
 import org.biojava.dasobert.eventmodel.SequenceListener;
 import org.biojava.dasobert.eventmodel.StructureEvent;
 import org.biojava.dasobert.eventmodel.StructureListener;
-import org.biojava.spice.JNLPProxy;
 import org.biojava.spice.SpiceApplication;
+import org.biojava.spice.utils.JNLPProxy;
 
 import javax.swing.ImageIcon;
 import javax.swing.JMenu;

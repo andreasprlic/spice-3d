@@ -174,16 +174,14 @@ public class SpiceProtocol {
                     
                     }
                     
+                    
                     spice.setSpiceStartParameters(params);
                     spice.load(type,accessionCode);
                     
                     if ( spice instanceof SpiceApplication ){
                         SpiceApplication parent = (SpiceApplication) spice;
                         parent.setVisible(true);
-                        //parent.show();
-                        //parent.toFront();
                         parent.requestFocus();
-                        //parent.setState(java.awt.Frame.NORMAL);
                         
                     }
                     return SPICE_OK;
