@@ -149,7 +149,7 @@ public abstract class AbstractChainRenderer
         layeredPane.addMouseMotionListener(mouseListener);
         layeredPane.addMouseListener(mouseListener);
         
-        SegmentDisplayFloatingFrame fframe = new SegmentDisplayFloatingFrame();
+        SegmentPopupFrame fframe = new SegmentPopupFrame();
         layeredPane.addMouseListener(fframe);
         layeredPane.addMouseMotionListener(fframe);
         

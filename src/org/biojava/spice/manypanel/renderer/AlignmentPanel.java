@@ -32,6 +32,7 @@ import java.awt.geom.GeneralPath;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -43,13 +44,33 @@ import org.biojava.bio.structure.Group;
 
 public class AlignmentPanel extends JPanel {
     
-    public static Color COLOR_MATCH_ONE = new Color(0,153,255);
-    public static Color COLOR_MATCH_TWO = new Color(0,51,255);
+    final static long serialVersionUID = 98567459640964908l;    
     
-    public static Color COLOR_MISMATCH_ONE = new Color(102,102,102);
-    public static Color COLOR_MISMATCH_TWO = new Color(204,204,204);
+    static Logger logger = Logger.getLogger("org.biojava.spice");
     
+    public static Color COLOR_MATCH_ONE;
+    public static Color COLOR_MATCH_TWO;
     
+    public static Color COLOR_MISMATCH_ONE;
+    public static Color COLOR_MISMATCH_TWO;
+    
+    static String baseName = "spice";
+    
+    static {
+        ResourceBundle bundle = ResourceBundle.getBundle(baseName);
+        
+        String col1 = bundle.getString("org.biojava.spice.manypanel.renderer.AlignmentPanel.ColorMatchOne");
+        COLOR_MATCH_ONE= Color.decode(col1); 
+        
+        String col2 = bundle.getString("org.biojava.spice.manypanel.renderer.AlignmentPanel.ColorMatchTwo");
+        COLOR_MATCH_TWO = Color.decode(col2);
+        
+        String col3 = bundle.getString("org.biojava.spice.manypanel.renderer.AlignmentPanel.ColorMisMatchOne");
+        COLOR_MISMATCH_ONE= Color.decode(col3); 
+        
+        String col4 = bundle.getString("org.biojava.spice.manypanel.renderer.AlignmentPanel.ColorMisMatchTwo");
+        COLOR_MISMATCH_TWO= Color.decode(col4); 
+    }
     
     
     Chain sequence1;
@@ -65,13 +86,11 @@ public class AlignmentPanel extends JPanel {
     int scrollLeftX1 ; // 
     int scrollLeftX2 ;
     
-    final static long serialVersionUID = 98567459640964908l;
-    
-    
-    static Logger logger = Logger.getLogger("org.biojava.spice");
+   
     
     public AlignmentPanel() {
         super();
+        
         sequence1 = new ChainImpl();
         sequence2 = new ChainImpl();
         length1=0;
@@ -86,6 +105,9 @@ public class AlignmentPanel extends JPanel {
         
         clearAlignment();
     }
+    
+    
+    
     
     public void clearAlignment(){
         alignmentMap1 = new HashMap();
@@ -138,15 +160,11 @@ public class AlignmentPanel extends JPanel {
     
     
     public void paint(Graphics g){
-        //super.paintComponent(g);
+       
         super.paint(g);
         
-        //logger.info("paint " + length1 + " " +
-        //        scale1 + " " + scale2 + " " +
-        //        this.getWidth() );
         Graphics2D g2D = (Graphics2D) g;
         
-     
         
         g2D.setColor(SequenceScalePanel.SEQUENCE_COLOR);
         int aminosize1 = Math.round(1*scale1);
@@ -156,17 +174,13 @@ public class AlignmentPanel extends JPanel {
         int aminosize2 = Math.round(scale2);
         if ( aminosize2 <1)
             aminosize2 = 1;
-        
-        
+                
         
         
         g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
         Composite oldComp = g2D.getComposite();
         g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));  
-        
-       // logger.info("paint l " + aminosize1 + " length " + length1 + " " + scale1 + " " + scrollLeftX1 );
-        
-        
+       
         // paint alignment
         
         int h = this.getHeight();

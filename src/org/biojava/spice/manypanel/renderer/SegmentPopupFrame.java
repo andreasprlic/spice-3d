@@ -42,7 +42,7 @@ import org.biojava.spice.manypanel.eventmodel.SpiceFeatureEvent;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureListener;
 import org.biojava.spice.utils.BrowserOpener;
 
-public class SegmentDisplayFloatingFrame
+public class SegmentPopupFrame
 extends AbstractPopupFrame    
 implements SpiceFeatureListener, 
 SequenceListener
@@ -58,7 +58,7 @@ SequenceListener
     private static String ahref = "<a href=\"";
     private static String ehref = "</a>";
     
-    public SegmentDisplayFloatingFrame() {
+    public SegmentPopupFrame() {
         super();
         content = null;
         

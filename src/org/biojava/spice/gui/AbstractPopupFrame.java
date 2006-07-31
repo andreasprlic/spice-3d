@@ -47,8 +47,8 @@ import org.biojava.spice.SpiceApplication;
 
 
 /** a class that provides a "floating" frame that follows the position of the cursor
- * the "content" of the panel is provided by the content Component that can be set from 
- * the outside
+ * the "content" of the panel is provided by the content Container that has to be provided
+ * by a class that extends this abstract class
  * 
  * @author Andreas Prlic
  * @since 11:23:08 AM
@@ -59,9 +59,10 @@ implements MouseListener, MouseMotionListener{
     
     
     boolean frameshown ;    
-    JFrame floatingFrame;
+    static JFrame floatingFrame = createFrame();
     MyHideTimer hideTimer;
     static final ImageIcon delTabIcon = SpiceApplication.createImageIcon("editdelete.png");
+       
     
     public AbstractPopupFrame() {
         super();
@@ -70,7 +71,15 @@ implements MouseListener, MouseMotionListener{
         
     }
     
-   
+    protected static JFrame createFrame(){
+        JFrame frame = new JFrame();
+        JFrame.setDefaultLookAndFeelDecorated(false);
+        frame.setUndecorated(true);
+        frame.pack();
+        return frame;
+    }
+    
+    
     public void repaint() {
         if ( frameshown ) {
             
@@ -79,28 +88,21 @@ implements MouseListener, MouseMotionListener{
             floatingFrame.setContentPane(createContentPane(c));           
             floatingFrame.pack();
             floatingFrame.repaint();
-            
-            
+                        
         }
     }
- 
+    
     
     /** this class needs to be provided by implementing sub-classes. it provides the 
      * content that should be displayed in the frame
      * 
      * @return a Component
      */
-     
+    
     public abstract Container getContent() ;
     
     
-    protected JFrame createFrame(){
-        JFrame frame = new JFrame();
-        JFrame.setDefaultLookAndFeelDecorated(false);
-        frame.setUndecorated(true);
-        frame.pack();
-        return frame;
-    }
+   
     
     private Container createContentPane(Container content){
         Border border = BorderFactory.createLineBorder(Color.DARK_GRAY);
@@ -108,7 +110,7 @@ implements MouseListener, MouseMotionListener{
         JPanel panel = new JPanel();
         panel.setBackground(Color.white);
         panel.setMaximumSize(new Dimension(100,100));
-       
+        
         panel.setBorder(border);
         
         Box vBox = Box.createVerticalBox();
@@ -118,28 +120,28 @@ implements MouseListener, MouseMotionListener{
         hBox.add(Box.createGlue());
         JLabel button;
         if ( delTabIcon != null)
-             button = new JLabel("",delTabIcon,JLabel.RIGHT);
+            button = new JLabel("",delTabIcon,JLabel.RIGHT);
         else 
             button = new JLabel("X");
         
-       button.addMouseListener(new MouseListener(){
-
-        public void mouseClicked(MouseEvent arg0) { }
-
-        public void mousePressed(MouseEvent arg0) { }
-
-        public void mouseReleased(MouseEvent arg0) {
-            disposeFrame();
-        }
-
-        public void mouseEntered(MouseEvent arg0) {   }
-
-        public void mouseExited(MouseEvent arg0) { }
-           
-       });
-       button.setToolTipText("click here to close frame");
+        button.addMouseListener(new MouseListener(){
+            
+            public void mouseClicked(MouseEvent arg0) { }
+            
+            public void mousePressed(MouseEvent arg0) { }
+            
+            public void mouseReleased(MouseEvent arg0) {
+                disposeFrame();
+            }
+            
+            public void mouseEntered(MouseEvent arg0) {   }
+            
+            public void mouseExited(MouseEvent arg0) { }
+            
+        });
+        button.setToolTipText("click here to close frame");
         hBox.add(button);
-       
+        
         vBox.add(hBox);
         vBox.add(content);
         
@@ -161,10 +163,7 @@ implements MouseListener, MouseMotionListener{
             repaint();
             return;
         }
-        
-        if ( floatingFrame == null)
-            floatingFrame = createFrame();
-        
+                      
         
         Container content = getContent();
         
@@ -185,7 +184,7 @@ implements MouseListener, MouseMotionListener{
      */
     
     public synchronized void markForHide() {
-       // System.out.println("markForHide");
+        // System.out.println("markForHide");
         if ( hideTimer == null) {
             hideTimer = new MyHideTimer(this);
         } 
@@ -199,7 +198,7 @@ implements MouseListener, MouseMotionListener{
         if ( ! frameshown ){
             return;
         }
-      //  System.out.println("disposing floating frame");
+        //  System.out.println("disposing floating frame");
         floatingFrame.setVisible(false);
         floatingFrame.dispose();
         
@@ -208,7 +207,7 @@ implements MouseListener, MouseMotionListener{
     }
     
     protected synchronized void hideFrame(){
-       // System.out.println("hideFrame");
+        // System.out.println("hideFrame");
         if (floatingFrame != null) {
             floatingFrame.setVisible(false);
         }
@@ -219,7 +218,7 @@ implements MouseListener, MouseMotionListener{
     private void updateFramePosition(MouseEvent e){
         //System.out.println("updateFramePosition");
         if ( ! frameshown){
-           // System.out.println("frame not shown ...");
+            // System.out.println("frame not shown ...");
             return;
         }
         
@@ -252,19 +251,19 @@ implements MouseListener, MouseMotionListener{
         Dimension screenDim = Toolkit.getDefaultToolkit().getScreenSize();
         int screen_w = (int) screenDim.getWidth();
         int screen_h = (int) screenDim.getHeight();
-       
+        
         //System.out.println("before x " + x + " y " + y + " posx " + posx + " posy " + posy + " sw " +
         //        screenDim.getWidth() + " sh " + screenDim.getHeight() + 
         //        " compo_H " + compo_h + " compo_w " + compo_w );
         
         if ( (posy + compo_h) > screen_h) {
             System.out.println("chainging y");
-            posy = cy + y - compo_h - DIST;
+            posy = cy + y - compo_h - DIST - DIST;
         }
         
         if ( (posx + compo_w) > screen_w) {
             System.out.println("chainging x");
-            posx = cx + x - compo_w - DIST;
+            posx = cx + x - compo_w - DIST - DIST;
         }
         
         //System.out.println("after x " + x + " y " + y + " posx " + posx + " posy " + posy + " sw " +
@@ -297,7 +296,7 @@ implements MouseListener, MouseMotionListener{
      */
     public void mouseDragged(MouseEvent arg0) {
         if ( hideTimer != null) {
-            hideTimer.interrupt();
+            hideTimer.resetTimer();
             hideTimer = null;
         }
         if (frameshown) {
@@ -306,70 +305,60 @@ implements MouseListener, MouseMotionListener{
         }
     }
     
-    public void mouseEntered(MouseEvent e) {
-        //displayFrame();
-        updateFramePosition(e);
-        //floatingFrame.setVisible(true);
-        
+    public void mouseEntered(MouseEvent e) {       
+        updateFramePosition(e);  
     }
     
-    public void mouseExited(MouseEvent arg0) {
-        //disposeFrame();
-        markForHide();
-        
+    public void mouseExited(MouseEvent arg0) {     
+        markForHide();        
     }
     
     
     public void mouseMoved(MouseEvent e) {
-        //System.out.println("floating frame mouse moved");
+       
         if ( frameshown) {
             updateFramePosition(e);
-        } else {
-            //displayFrame();
-            //updateFramePosition(e);
-            //floatingFrame.setVisible(true);
-        }
-        
+        }        
     }
     
 }
 
+/** a small class that takes care of timing the disappearing of popup windows
+ * 
+ * @author Andreas Prlic
+ * @since 10:48:33 AM
+ * @version %I% %G%
+ */
 class MyHideTimer  implements ActionListener{
-
+    
     int countdown ;
     AbstractPopupFrame hideMe ;
     boolean interrupted ;
     
-    public static final int INITAL_COUNTDOWN = 1000;
+    public static final int INITAL_COUNTDOWN = 1400;
     Timer timer;
     
     public MyHideTimer(AbstractPopupFrame disposeMe){
         timer = new Timer(INITAL_COUNTDOWN,this);
-        
-       // System.out.println("new hide timer");
+              
         this.hideMe = disposeMe;
         interrupted = false;
-    }
-    
-   //public Timer getTimer(){
-   //    return timer;
-   //}
-    
+    }        
     
     public synchronized void resetTimer() {
-       // System.out.println("reset timer");
+       
         countdown = INITAL_COUNTDOWN;
         timer.restart();
     }
     
     public synchronized void interrupt(){
-        //System.out.println("interrupt");
+        
         interrupted = true;
         timer.stop();
     }
-
+    
     public void actionPerformed(ActionEvent arg0) {
-
+        
         if ( ! interrupted) {
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -382,6 +371,6 @@ class MyHideTimer  implements ActionListener{
         
     }
 }
-    
-    
+
+
 

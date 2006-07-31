@@ -38,6 +38,7 @@ import org.biojava.bio.structure.*;
 
 import java.awt.Color;
 import java.util.*;
+
 import org.biojava.spice.feature.*;
 
 
@@ -67,7 +68,7 @@ extends JPanel{
     public static final Color  SEQUENCE_COLOR           = Color.LIGHT_GRAY;
     public static final Color  SCALE_COLOR              = Color.black;
     public static final Color  TEXT_SCALE_COLOR         = Color.GRAY;
-    public static final Color  BACKGROUND_COLOR         = Color.white;
+    public static final Color  BACKGROUND_COLOR;
    
     
     Character[] seqArr;
@@ -81,8 +82,22 @@ extends JPanel{
     private Image dbImage;
     private Graphics dbg;
     
-    public static final Font seqFont = new Font("Helvetica", Font.PLAIN, 10);
+    public static final Font seqFont ;
    
+    static String baseName = "spice";
+    
+    static {
+        ResourceBundle bundle = ResourceBundle.getBundle(baseName);
+        String fontName = bundle.getString("org.biojava.spice.manypanel.renderer.SequenceScalePanel.FontName");
+        String fontSize = bundle.getString("org.biojava.spice.manypanel.renderer.SequenceScalePanel.FontSize");
+        int fsize = Integer.parseInt(fontSize);
+        seqFont = new Font(fontName,Font.PLAIN,fsize);
+        
+        String col1 = bundle.getString("org.biojava.spice.manypanel.renderer.BackgroundColor");
+        BACKGROUND_COLOR = Color.decode(col1);
+        //TODO: move the other static parameters into the .property file
+    }
+    
     
     public SequenceScalePanel() {
         super();

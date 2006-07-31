@@ -99,9 +99,7 @@ extends JPanel {
         alignmentPanel = new AlignmentPanel();
         
         cursorPanel = new AlignmentCursorPanel();
-        //cursorPanel1.setOpaque(true);
-        
-        //cursorPanel2.setOpaque(true);
+
         layeredPane.add(alignmentPanel,new Integer(0));
         layeredPane.add(cursorPanel, new Integer(1));
         
