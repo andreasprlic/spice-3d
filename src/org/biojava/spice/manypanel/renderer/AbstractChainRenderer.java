@@ -83,6 +83,7 @@ public abstract class AbstractChainRenderer
     JLayeredPane layeredPane;
     JScrollPane scrollPane;
     AdjustmentListener adjustmentListener;
+    DasScrollPaneHeader dasScrollPaneHeader;
     
     public AbstractChainRenderer() {
         super();        
@@ -104,8 +105,13 @@ public abstract class AbstractChainRenderer
         scrollPane.setOpaque(true);
         scrollPane.getVerticalScrollBar().setUnitIncrement(SequenceScalePanel.DEFAULT_Y_STEP);
         
+        dasScrollPaneHeader = new DasScrollPaneHeader(scrollPane);
+        scrollPane.setRowHeaderView(dasScrollPaneHeader);
+       
+       
         
-        dasSourcePanels = new ArrayList();
+        
+        dasSourcePanels      = new ArrayList();
         scaleChangeListeners = new ArrayList();
         
         
@@ -120,17 +126,7 @@ public abstract class AbstractChainRenderer
         statusPanel.setMaximumSize(new Dimension(Short.MAX_VALUE,20));
         
         statusPanel.setBorder(BorderFactory.createEmptyBorder());
-        // the statusPanel is in the header of the scrollbar
-        
-        //scrollPane.setColumnHeaderView(statusPanel);
-        //JPanel lowerPane = new JPanel();
-        //lowerPane.add(scrollPane);
-        
-        //Box vBox = Box.createVerticalBox();
-        //vBox.add(statusPanel);
-        //vBox.add(lowerPane);
-        //vBox.add(scrollPane);
-        //this.add(vBox);
+
         this.add(statusPanel);
         this.add(scrollPane);
     }
@@ -447,6 +443,8 @@ public abstract class AbstractChainRenderer
      */
 
     public void newDasSource(DasSourceEvent event) {
+        // the column header drawer ...
+        dasScrollPaneHeader.newDasSource(event);
         
         DrawableDasSource dds =event.getDasSource();
         //SpiceDasSource ds = dds.getDasSource();
@@ -461,6 +459,8 @@ public abstract class AbstractChainRenderer
         //logger.finest("AbstractChainRenderer new DAS source " + event.getDasSource().getDasSource().getNickname());
         
         DasSourcePanel dspanel = new DasSourcePanel(dds);
+        
+        
         //dspanel.setLayout(new BoxLayout(dspanel,BoxLayout.Y_AXIS));
         
         // join the listeners
@@ -484,6 +484,9 @@ public abstract class AbstractChainRenderer
         
         layeredPane.add(dspanel,new Integer(panelPos+1));  
         layeredPane.moveToFront(cursorPanel);
+        
+       
+        
         dasSourcePanels.add(dspanel);
         
         Dimension d = new Dimension(width,h+panelHeight);
@@ -704,6 +707,7 @@ public abstract class AbstractChainRenderer
                 dsp.setLoading(false);
             }
         }
+        dasScrollPaneHeader.loadingFinished(ds);
     }
 
     public void loadingStarted(DasSourceEvent ds) {

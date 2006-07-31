@@ -140,7 +140,7 @@ SequenceListener
         Feature f = s.getParent();
         appendFeatureDesc(text,f);
         endStringBuffer(text); 
-        System.out.println(text.toString());
+        //System.out.println(text.toString());
         descriptionPane.setText(text.toString());
         addHyperLinkListener(descriptionPane);
          

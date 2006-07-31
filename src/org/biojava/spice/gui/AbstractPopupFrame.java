@@ -257,12 +257,12 @@ implements MouseListener, MouseMotionListener{
         //        " compo_H " + compo_h + " compo_w " + compo_w );
         
         if ( (posy + compo_h) > screen_h) {
-            System.out.println("chainging y");
+            //System.out.println("chainging y");
             posy = cy + y - compo_h - DIST - DIST;
         }
         
         if ( (posx + compo_w) > screen_w) {
-            System.out.println("chainging x");
+            //System.out.println("chainging x");
             posx = cx + x - compo_w - DIST - DIST;
         }
         

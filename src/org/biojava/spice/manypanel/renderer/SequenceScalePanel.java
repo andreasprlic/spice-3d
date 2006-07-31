@@ -56,7 +56,7 @@ extends JPanel{
     
     static final long serialVersionUID = 7893248902423l;
     
-    public static final int    DEFAULT_X_START          = 70  ;
+    public static final int    DEFAULT_X_START          = 10  ;
     public static final int    DEFAULT_X_RIGHT_BORDER   = 40 ;
     public static final int    DEFAULT_Y_START          = 0 ;
     public static final int    DEFAULT_Y_STEP           = 10 ;

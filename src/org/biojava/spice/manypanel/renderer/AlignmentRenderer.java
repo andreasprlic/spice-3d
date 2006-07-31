@@ -68,13 +68,12 @@ extends JPanel {
     float scale1;
     float scale2;
     
+    DasScrollPaneHeader rowView;
     
     public AlignmentRenderer(){
         
         this.setOpaque(true);
         setDoubleBuffered(true);
-        
-        
         
         this.setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
         this.setBorder(BorderFactory.createEmptyBorder());
@@ -92,6 +91,10 @@ extends JPanel {
         scrollPane.setOpaque(true);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        
+        //TODO: make the annotation types visible on the column headers
+        rowView = new DasScrollPaneHeader(scrollPane);
+        scrollPane.setRowHeaderView(rowView);
         
         scale1Listener = new MyScaleListener(1,this);
         scale2Listener = new MyScaleListener(2,this);
@@ -210,6 +213,7 @@ extends JPanel {
         cursorPanel.revalidate();
         layeredPane.repaint();
         layeredPane.revalidate();
+        
         this.repaint();
         this.revalidate();
       

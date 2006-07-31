@@ -28,17 +28,12 @@ import java.awt.Composite;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
+import java.util.ResourceBundle;
 import java.util.logging.Logger;
-
-
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -67,8 +62,8 @@ implements FeatureListener,SpiceFeatureListener
 {
     static final long serialVersionUID = 17439836750348543l;
     
-    public static final Font plainFont = new Font("SansSerif", Font.PLAIN, 10);
-    public static final Font headFont = new Font("SansSerif", Font.BOLD, 11);
+    public static final Font plainFont;
+    public static final Font headFont;
     public static final int linkIconWidth = 10;
     public static final Color SELECTED_FEATURE_COLOR  = Color.yellow;
     
@@ -76,7 +71,7 @@ implements FeatureListener,SpiceFeatureListener
     
     float scale;
     static Logger logger = Logger.getLogger("org.biojava.spice");
-    JProgressBar bar;
+  
     
     boolean selected;
     boolean featureSelected;
@@ -87,25 +82,37 @@ implements FeatureListener,SpiceFeatureListener
     boolean progressThreadRunning;
     ProgressThread progressThread;
     
+    static {
+        String baseName= "spice";
+        ResourceBundle resource =  ResourceBundle.getBundle(baseName);
+        
+        String fontName = resource.getString("org.biojava.spice.manypanel.renderer.DasSourcePanel.FontName");        
+        String fn       = resource.getString("org.biojava.spice.manypanel.renderer.DasSourcePanel.FontSize");
+        int fsize       = Integer.parseInt(fn);
+        plainFont       = new Font(fontName, Font.PLAIN, fsize);
+        
+        String headFontName = resource.getString("org.biojava.spice.manypanel.renderer.DasSourcePanel.HeadFontName");
+        String fh           = resource.getString("org.biojava.spice.manypanel.renderer.DasSourcePanel.HeadFontSize");        
+        int hsize           = Integer.parseInt(fh);
+        headFont            = new Font(headFontName, Font.BOLD,hsize);
+        //TODO: add remaining static variables to resource file
+        
+    }
+    
     public DasSourcePanel(DrawableDasSource ds) {
         super();
         drawableDasSource = ds;
         scale = 1.0f;
         setOpaque(true);
-        bar = new JProgressBar();
-        bar.setIndeterminate(false);
-        bar.setPreferredSize(new Dimension(100,10));
-        bar.setVisible(true);
-        bar.setLocation(1,10);
-        bar.setBounds(0,0,100,10);
+        
         //add(bar);
         this.setBackground(Color.white);
         featureSelected = false;
         selectedFeaturePos = -1;
         selected = false;
         chainLength = 0;
-        linkIcon = createImageIcon("firefox10x10.png");
-        infoIcon = createImageIcon("messagebox_info16x16.png");
+        linkIcon = SpiceApplication.createImageIcon("firefox10x10.png");
+        infoIcon = SpiceApplication.createImageIcon("messagebox_info16x16.png");
         progressThreadRunning = false;
     }
     
@@ -146,71 +153,17 @@ implements FeatureListener,SpiceFeatureListener
         drawableDasSource.setLoading(flag);
     }
     
-    
-
-    /** Returns an ImageIcon, or null if the path was invalid.
-     * 
-     * @param path
-     * @return an ImageIcon object
-     */
-    public static ImageIcon createImageIcon(String path) {
-    java.net.URL imgURL = SpiceApplication.class.getResource(path);
-    if (imgURL != null) {
-        return new ImageIcon(imgURL);
-    } else {
-        logger.log(Level.WARNING,"Couldn't find file: " + path);
-        return null;
-    }
-}
-    
-    
-    public void paint(Graphics g){
-        super.paint(g);
+    public void paintComponent(Graphics g){
+        super.paintComponent(g);
         //System.out.println("painting das source " +dasSource.getDasSource().getNickname());
-        if (drawableDasSource.getLoading()){
-            //logger.info(" draw loading bar");
-            // add a progressbar           
-            if (!  progressThreadRunning ) {
-                //progressThread = new ProgressThread(bar,this);
-                //progressThread.start();
-                //progressThreadRunning = true;
-                bar.setIndeterminate(true);
-            }
-            //add
-            bar.paint(g);
-            
-        } else {
-            if ( progressThreadRunning){
-                bar.setIndeterminate(false);
-                //progressThread.cancel();
-                //progressThreadRunning = false;
-            }
-        }
-        
-        Graphics2D g2D = (Graphics2D) g;
-        g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
-        // draw the name of the das source
-        g2D.setFont(headFont);
-        g2D.setColor(Color.black);
-        
-        String str = drawableDasSource.getDasSource().getNickname();
-        //logger.info("paint DasSourcePanel "+str);
-        if ( infoIcon != null)
-            infoIcon.paintIcon(null, g, 1,0);        
-        g2D.drawString(str,16,11);
-        g2D.setFont(plainFont);
-        
         
         // now to the features ...
         
+        Graphics2D g2D = (Graphics2D)g;
+        
         Feature[] features = drawableDasSource.getFeatures();
                 
-        int y = SequenceScalePanel.DEFAULT_Y_START + SequenceScalePanel.DEFAULT_Y_STEP ;
-        //logger.info(dasSource.getDasSource().getNickname() + " " + dasSource.getLoading() + " " + this.getWidth());
-        
-        //Composite oldComp = g2D.getComposite();
-        //g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));        
-        //int aminosize = Math.round(1*scale);
+        int y = SequenceScalePanel.DEFAULT_Y_START + SequenceScalePanel.DEFAULT_Y_STEP ;      
         
         drawFeatures(g2D,features,y);
         
@@ -627,7 +580,7 @@ implements FeatureListener,SpiceFeatureListener
             y += SequenceScalePanel.DEFAULT_Y_STEP;
             Feature feature = features[f];
             
-            drawLabel(g,feature,y);
+          
             
            
             setColor(g,feature,new HashMap());
@@ -656,58 +609,7 @@ implements FeatureListener,SpiceFeatureListener
     }
     
     
-    /** display the type of the feature at the beginnng of the line
-     * 
-     * @param g
-     * @param f
-     * @param y
-     */
-    private void drawLabel(Graphics g, Feature f, int y){
-        String type = f.getType();
-        
-        List segs = f.getSegments();
-        Color c = Color.white;
-        if ( segs.size() > 0){
-            Segment s = (Segment) segs.get(0);
-            c = s.getColor();
-        }
-        g.setColor(c);
-        
-       
-        Shape clip = g.getClip();
-        
-        // draw a background rectangle
-        g.fillRect(0,y,SequenceScalePanel.DEFAULT_X_START ,SequenceScalePanel.DEFAULT_Y_STEP);
-        
-        
-        
-        // draw the link icon
-        // check if link
-        String link = f.getLink();
-        if (( link != null) && (! link.equals(""))){
-            //URL url ;
-            try {
-                new URL(link);
-                //g2D.drawString("L->", 1,y+DEFAULT_Y_HEIGHT);
-                if ( linkIcon != null)
-                    linkIcon.paintIcon(null, g, 1,y);
-            } catch (MalformedURLException e){
-                //continue ;
-            }
-        }
-        
-        
-        // now draw the actual label - text
-        g.setColor(Color.black);
-        
-        g.clipRect(0,y,SequenceScalePanel.DEFAULT_X_START ,SequenceScalePanel.DEFAULT_Y_STEP);
-        
-        g.drawString(type,2+linkIconWidth,y+SequenceScalePanel.DEFAULT_Y_STEP);
-        //g.setFont(plainFont);
-        
-        g.setClip(clip);
-        
-    }
+    
     
     /** draw a solid rectangle 
      * 
@@ -892,7 +794,7 @@ implements FeatureListener,SpiceFeatureListener
             Feature  feat = features[f];
             String featureType = feat.getType();
             
-            drawLabel(g,feat,y);
+            //drawLabel(g,feat,y);
             
             
             
