@@ -22,7 +22,9 @@
  */
 package org.biojava.spice.manypanel.renderer;
 
+import java.awt.Color;
 import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.util.logging.Logger;
 
@@ -48,10 +50,13 @@ SequenceListener
     public static Logger logger =  Logger.getLogger("org.biojava.spice");
     
     Container content ;
-    
-    private static String font  = "<font color=\"#0000FF\">";
-    private static String efont = "</font>";
+    JPanel panel;
+  
+    private static String font  =  "<b><font color=\"#0000FF\">";
+    private static String efont = "</font></b>";
     private static String endl  = "<br>";
+    private static String ahref = "<a href=\"";
+    private static String ehref = "</a>";
     
     public SegmentDisplayFloatingFrame() {
         super();
@@ -71,6 +76,7 @@ SequenceListener
     }
     
     private void appendFeatureDesc(StringBuffer text, Feature f){
+
         text.append(font + "feature: " + efont + f.getName()   + endl);
         text.append(font + "type: "   + efont +  f.getType()   + endl);
         text.append(font + "method: "  + efont + f.getMethod() + endl);
@@ -83,31 +89,40 @@ SequenceListener
         if ( f.getScore() != null)
             text.append(font + "score: " + efont + f.getScore()+ endl);
         
-        
+        if ( f.getLink() != null)
+            text.append(font + "link: " + efont + ahref + f.getLink() + "\">" + f.getLink()  + ehref + endl);
+        text.append(font + "source: " + efont + ahref  + f.getSource() + "\">"+ f.getSource()+ ehref + endl);
+                
     }
     
     private Container createContent(Feature f){
         JPanel panel = new JPanel();
+        panel.setBackground(Color.white);
+        panel.setMaximumSize(new Dimension(100,100));
+        panel.setPreferredSize(new Dimension(100,100));
+        
+        panel.setSize(new Dimension(100,100));
         
         JEditorPane descriptionPane = new JEditorPane("text/html", "");
-        descriptionPane.setMaximumSize(new Dimension(200,200));
+        
         panel.add(descriptionPane);
         
         StringBuffer text = startStringBuffer();
         appendFeatureDesc(text,f);        
         endStringBuffer(text);
         descriptionPane.setText(text.toString());
-        return panel;
+        addHyperLinkListener(descriptionPane);
         
+        return panel;        
     }
     
     
     
     private Container createContent(Segment s){
-        JPanel panel = new JPanel();
-        
+        panel = new JPanel();
+        panel.setBackground(Color.white);
         JEditorPane descriptionPane = new JEditorPane("text/html", "");
-        descriptionPane.setMaximumSize(new Dimension(200,200));
+        descriptionPane.setMaximumSize(new Dimension(100,100));
         panel.add(descriptionPane);
         
         StringBuffer text = startStringBuffer();
@@ -125,25 +140,37 @@ SequenceListener
         Feature f = s.getParent();
         appendFeatureDesc(text,f);
         endStringBuffer(text); 
+        System.out.println(text.toString());
         descriptionPane.setText(text.toString());
-        
-        descriptionPane.addHyperlinkListener(new HyperlinkListener()
-                {
-                  public void hyperlinkUpdate(HyperlinkEvent e)
-                  {
-                    if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                        String href = e.getDescription();
-                        BrowserOpener.showDocument(href);
-                    }
-                  }
-                });
-     
-        
-        return panel;
-        
+        addHyperLinkListener(descriptionPane);
+         
+        return panel;        
     }
     
     
+    private void addHyperLinkListener(JEditorPane descriptionPane){
+        descriptionPane.setEditable(false);
+        
+        descriptionPane.addHyperlinkListener(
+                new HyperlinkListener()
+                {
+                    public void hyperlinkUpdate(HyperlinkEvent e)
+                    {                    
+                        if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                            String href = e.getDescription();
+                            BrowserOpener.showDocument(href);
+                        }
+                        // change the mouse curor
+                        if ( e.getEventType() == HyperlinkEvent.EventType.ENTERED) {                           
+                            panel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));                            
+                        }
+                        if (e.getEventType() == HyperlinkEvent.EventType.EXITED) { 
+                            panel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));                           
+                        }
+                    }
+                });
+        
+    }
     
     public Container getContent() {
         return content;
@@ -151,73 +178,47 @@ SequenceListener
     
     public void mouseOverFeature(SpiceFeatureEvent e) {
         displayFrame();
-        
-        
-        //System.out.println("floating frame : overFeature");
-        Container c =createContent(e.getFeature());
-        
-        content =c ;
+     
+        content =createContent(e.getFeature());
         repaint();
         
     }
     
     public void mouseOverSegment(SpiceFeatureEvent e) {
         displayFrame();
-        
-        
-       // System.out.println("floating frame : overSegment");
-        //Component c = new JLabel("over a segment");
-        Container c = createContent(e.getSegment());
-        content = c;
+       
+        content = createContent(e.getSegment());
         repaint();
         
     }
     
     public void featureSelected(SpiceFeatureEvent e) {
-        // TODO Auto-generated method stub
-        
     }
     
     public void segmentSelected(SpiceFeatureEvent e) {
-        // TODO Auto-generated method stub
-        
     }
     
     public void clearSelection() {
-       // System.out.println("clear selection");
         markForHide();
     }
     
-    public void selectedSeqPosition(int position) {        
-        //disposeFrame();
-        //System.out.println("selected seq position "+ position);
-        markForHide();
-        //repaint();
+    public void selectedSeqPosition(int position) {           
+        markForHide();        
     }
     
     public void selectedSeqRange(int start, int end) {
-        // TODO Auto-generated method stub
-        
     }
     
     public void selectionLocked(boolean flag) {
-        // TODO Auto-generated method stub
-        
     }
     
     public void newSequence(SequenceEvent e) {
-        // TODO Auto-generated method stub
-        
     }
     
     public void newObjectRequested(String accessionCode) {
-        // TODO Auto-generated method stub
-        
     }
     
     public void noObjectFound(String accessionCode) {
-        // TODO Auto-generated method stub
-        
     }
     
 }

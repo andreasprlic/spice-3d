@@ -25,7 +25,9 @@ package org.biojava.spice.gui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -71,9 +73,10 @@ implements MouseListener, MouseMotionListener{
    
     public void repaint() {
         if ( frameshown ) {
+            
             Container c = getContent();
-            floatingFrame.setContentPane(createContentPane(c));
-            //System.out.println(c);
+            
+            floatingFrame.setContentPane(createContentPane(c));           
             floatingFrame.pack();
             floatingFrame.repaint();
             
@@ -100,9 +103,12 @@ implements MouseListener, MouseMotionListener{
     }
     
     private Container createContentPane(Container content){
-        Border border = BorderFactory.createLineBorder(Color.black);
+        Border border = BorderFactory.createLineBorder(Color.DARK_GRAY);
         
         JPanel panel = new JPanel();
+        panel.setBackground(Color.white);
+        panel.setMaximumSize(new Dimension(100,100));
+       
         panel.setBorder(border);
         
         Box vBox = Box.createVerticalBox();
@@ -110,7 +116,28 @@ implements MouseListener, MouseMotionListener{
         
         Box hBox = Box.createHorizontalBox();
         hBox.add(Box.createGlue());
-        JLabel button = new JLabel("",delTabIcon,JLabel.RIGHT);
+        JLabel button;
+        if ( delTabIcon != null)
+             button = new JLabel("",delTabIcon,JLabel.RIGHT);
+        else 
+            button = new JLabel("X");
+        
+       button.addMouseListener(new MouseListener(){
+
+        public void mouseClicked(MouseEvent arg0) { }
+
+        public void mousePressed(MouseEvent arg0) { }
+
+        public void mouseReleased(MouseEvent arg0) {
+            disposeFrame();
+        }
+
+        public void mouseEntered(MouseEvent arg0) {   }
+
+        public void mouseExited(MouseEvent arg0) { }
+           
+       });
+       button.setToolTipText("click here to close frame");
         hBox.add(button);
        
         vBox.add(hBox);
@@ -118,7 +145,10 @@ implements MouseListener, MouseMotionListener{
         
         panel.add(vBox);
         
-           return panel;
+        
+        
+        
+        return panel;
     }
     
     protected void displayFrame() {
@@ -205,15 +235,41 @@ implements MouseListener, MouseMotionListener{
         int cy = screenTopLeft.y;
         
         //int compo_h = compo.getHeight();
+        //int compo_w = compo.getWidth();        
         
-        //Dimension d = floatingFrame.getSize();
-        //int dx = d.width;
+        Container content = getContent();
+        int compo_h = content.getHeight();
+        int compo_w = content.getWidth();
         
-        //int posx = cx + x  - ( dx/2)    ;
-        //int posy = cy + y + compo_h + 5 ;
+        int DIST = 20;
         
-        int posx = cx + x   + 20; // draw a bit right of cursor
-        int posy = cy + y + 20; // draw a bit below the cursor
+        int posx = cx + x + DIST; // draw a bit right of cursor
+        int posy = cy + y + DIST; // draw a bit below the cursor
+        
+        // height = y!
+        // widht = x ...
+        
+        Dimension screenDim = Toolkit.getDefaultToolkit().getScreenSize();
+        int screen_w = (int) screenDim.getWidth();
+        int screen_h = (int) screenDim.getHeight();
+       
+        //System.out.println("before x " + x + " y " + y + " posx " + posx + " posy " + posy + " sw " +
+        //        screenDim.getWidth() + " sh " + screenDim.getHeight() + 
+        //        " compo_H " + compo_h + " compo_w " + compo_w );
+        
+        if ( (posy + compo_h) > screen_h) {
+            System.out.println("chainging y");
+            posy = cy + y - compo_h - DIST;
+        }
+        
+        if ( (posx + compo_w) > screen_w) {
+            System.out.println("chainging x");
+            posx = cx + x - compo_w - DIST;
+        }
+        
+        //System.out.println("after x " + x + " y " + y + " posx " + posx + " posy " + posy + " sw " +
+        //        screenDim.getWidth() + " sh " + screenDim.getHeight() +
+        //        " compo_H " + compo_h + " compo_w " + compo_w );
         
         floatingFrame.setLocation(posx,posy);
         floatingFrame.requestFocus();
@@ -224,8 +280,16 @@ implements MouseListener, MouseMotionListener{
     
     public void mouseClicked(MouseEvent arg0) {}
     
-    public void mousePressed(MouseEvent arg0) {  }
-    
+    public void mousePressed(MouseEvent arg0) {  
+        if ( hideTimer != null) {
+            hideTimer.interrupt();
+            hideTimer = null;
+        }
+        if (frameshown) {
+            floatingFrame.requestFocus();
+            floatingFrame.toFront();
+        }
+    }
     public void mouseReleased(MouseEvent arg0) { }
     
     /** when the mouse is dragged the frame stays at the same location and is not disposed
