@@ -24,6 +24,7 @@ package org.biojava.spice.gui;
 
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.ResourceBundle;
 
 import javax.swing.ImageIcon;
 import javax.swing.JMenu;
@@ -33,14 +34,19 @@ import org.biojava.spice.SpiceApplication;
 
 public class MenuCreator {
 
+    static String baseName = "spice";
+    static ResourceBundle bundle = ResourceBundle.getBundle(baseName);
+    
     public MenuCreator() {
         super();
 
     }
     
     public static JMenu createAlignmentMenu(SpiceMenuListener ml){
-        JMenu amenu = new JMenu("Alignment");
-        JMenuItem region = new JMenuItem("Toggle full structure");
+        String menuText = bundle.getString("org.biojava.spice.gui.menu.AlignmentMenu");
+        JMenu amenu = new JMenu(menuText);
+        String toggleText = bundle.getString("org.biojava.spice.gui.menu.AlignmentToggleStructure");
+        JMenuItem region = new JMenuItem(toggleText);
         region.addActionListener(ml);
         region.setMnemonic(KeyEvent.VK_T);
         amenu.add(region);
@@ -52,38 +58,42 @@ public class MenuCreator {
     }
     
     public static JMenu createHelpMenu(SpiceMenuListener ml){
-        JMenu help = new JMenu("Help");
+        String menuText = bundle.getString("org.biojava.spice.gui.menu.HelpMenu");
+        JMenu help = new JMenu(menuText);
         help.setMnemonic(KeyEvent.VK_H);
-        help.getAccessibleContext().setAccessibleDescription("get help");
+        String helpDesc = bundle.getString("org.biojava.spice.gui.menu.HelpMenuDesc");
+        help.getAccessibleContext().setAccessibleDescription(helpDesc);
       
         
         ImageIcon helpIcon = createImageIcon("help.png");
         
+        String aboutSpice = bundle.getString("org.biojava.spice.gui.menu.AboutSpice");
         JMenuItem aboutspice;
         if ( helpIcon == null )
-            aboutspice = new JMenuItem("About SPICE");
+            aboutspice = new JMenuItem(aboutSpice);
         else
-            aboutspice = new JMenuItem("About SPICE",helpIcon);
+            aboutspice = new JMenuItem(aboutSpice,helpIcon);
         aboutspice.addActionListener  ( ml );
         aboutspice.setMnemonic(KeyEvent.VK_A);
         help.add(aboutspice);
         
+        String techInfo = bundle.getString("org.biojava.spice.gui.menu.TechInfo");
         JMenuItem techinfo;
         if ( helpIcon == null )
-            techinfo = new JMenuItem("Tech Info");
+            techinfo = new JMenuItem(techInfo);
         else
-            techinfo = new JMenuItem("Tech Info", helpIcon);
+            techinfo = new JMenuItem(techInfo, helpIcon);
         techinfo.addActionListener(ml);
         techinfo.setMnemonic(KeyEvent.VK_T);
         help.add(techinfo);
         
-        
+        String manual = bundle.getString("org.biojava.spice.gui.menu.Manual");
         JMenuItem spicemanual;
         ImageIcon manualIcon =  createImageIcon("toggle_log.png");
         if ( manualIcon == null)
-            spicemanual = new JMenuItem("Manual");
+            spicemanual = new JMenuItem(manual);
         else
-            spicemanual = new JMenuItem("Manual",manualIcon);
+            spicemanual = new JMenuItem(manual,manualIcon);
         spicemanual.addActionListener(ml);
         spicemanual.setMnemonic(KeyEvent.VK_M);
         help.add(spicemanual);
@@ -93,34 +103,37 @@ public class MenuCreator {
     }
     
     public static JMenu createFileMenu(SpiceMenuListener ml){
-        JMenu file = new JMenu("File");
+        String fileMenu = bundle.getString("org.biojava.spice.gui.menu.FileMenu");
+        JMenu file = new JMenu(fileMenu);
         file.setMnemonic(KeyEvent.VK_F);
-        file.getAccessibleContext().setAccessibleDescription("the file menu");
+        String fileMenuDesc =bundle.getString("org.biojava.spice.gui.menu.FileMenuDesc");
+        file.getAccessibleContext().setAccessibleDescription(fileMenuDesc);
         
-        
+        String newWindowTxt =bundle.getString("org.biojava.spice.gui.menu.NewWindow");
         JMenuItem newWindow;
         ImageIcon nwIcon = createImageIcon("window_new.png");
         if ( nwIcon == null)
-            newWindow = new JMenuItem("New Window");
+            newWindow = new JMenuItem(newWindowTxt);
         else 
-            newWindow = new JMenuItem("New Window", nwIcon);
+            newWindow = new JMenuItem(newWindowTxt, nwIcon);
         
         newWindow.setMnemonic(KeyEvent.VK_N);
         
-        
+        String newTabTxt =bundle.getString("org.biojava.spice.gui.menu.NewTab");
         JMenuItem newTab;
         ImageIcon tabIcon = createImageIcon("view-right.png");
         if ( tabIcon == null)
-            newTab = new JMenuItem("New Tab");
+            newTab = new JMenuItem(newTabTxt);
         else
-            newTab = new JMenuItem("New Tab", tabIcon);
+            newTab = new JMenuItem(newTabTxt, tabIcon);
         
+        String openTxt =bundle.getString("org.biojava.spice.gui.menu.Open");
         JMenuItem openpdb;
         ImageIcon openIcon = createImageIcon("network.png");
         if ( openIcon == null)
-            openpdb = new JMenuItem("Open");
+            openpdb = new JMenuItem(openTxt);
         else
-            openpdb = new JMenuItem("Open", openIcon);
+            openpdb = new JMenuItem(openTxt, openIcon);
         
         openpdb.setMnemonic(KeyEvent.VK_O);
         
@@ -152,20 +165,22 @@ public class MenuCreator {
         revert.setMnemonic(KeyEvent.VK_L);
         */
         
+        String exitTxt =bundle.getString("org.biojava.spice.gui.menu.Exit");
         ImageIcon exitIcon = createImageIcon("exit.png");
         JMenuItem exit;
         if ( exitIcon != null)
-            exit    = new JMenuItem("Exit",exitIcon);
+            exit    = new JMenuItem(exitTxt,exitIcon);
         else
-            exit    = new JMenuItem("Exit");
+            exit    = new JMenuItem(exitTxt);
         exit.setMnemonic(KeyEvent.VK_X);
         
+        String propertiesTxt =bundle.getString("org.biojava.spice.gui.menu.Properties");
         ImageIcon propIcon = createImageIcon("configure.png");
         JMenuItem props ;
         if ( propIcon != null )
-            props   = new JMenuItem("Properties",propIcon);
+            props   = new JMenuItem(propertiesTxt,propIcon);
         else
-            props   = new JMenuItem("Properties");
+            props   = new JMenuItem(propertiesTxt);
         props.setMnemonic(KeyEvent.VK_P);
       
         newWindow.addActionListener(ml );
