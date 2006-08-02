@@ -104,7 +104,7 @@ extends JPanel{
     private void setPrefSize() {
         // hm if we do not add +2 to the length then there is a size mismatch to the other panels.
         // so I guess there is a +/-1 issue somewhere...        
-        int length = chainLength + 2 ; 
+        int length = chainLength  ; 
         int l = Math.round(length*scale) + DEFAULT_X_START + DEFAULT_X_RIGHT_BORDER ;
         if ( l  < 200){
             l = 200;
@@ -168,6 +168,7 @@ extends JPanel{
         //super.paintComponent(g);
        
         g.setColor(BACKGROUND_COLOR);
+    
         
         Rectangle drawHere = g.getClipBounds();        
         g.fillRect(drawHere.x,drawHere.y, drawHere.width, drawHere.height);
@@ -189,13 +190,18 @@ extends JPanel{
        
     }
     
+    /** start counting at 0...
+     * 
+     * @param panelPos
+     * @return the sequence position
+     */
     protected int getSeqPos(int panelPos){
         int seqPos = Math.round((panelPos - DEFAULT_X_START) / scale) ;
         if ( seqPos < 0)
             seqPos = 0;
         int length = chainLength;
-        if ( seqPos > length)
-            seqPos = length;
+        if ( seqPos >= length)
+            seqPos = length-1;
         return seqPos;
     }
     
@@ -206,8 +212,8 @@ extends JPanel{
         if ( seqPos < 0 )
             seqPos = 0;
         
-        if ( seqPos > length)
-            seqPos = length;
+        if ( seqPos >= length)
+            seqPos = length-1;
 
         int panelPos = Math.round(seqPos * scale) + DEFAULT_X_START;
         return panelPos;
@@ -237,18 +243,33 @@ extends JPanel{
         
         int startpos = getSeqPos(drawHere.x);       
         int endpos   = getSeqPos(drawHere.x+drawHere.width);
-        System.out.println(drawHere + " " + startpos + " " + endpos);
+        //System.out.println(drawHere + " " + startpos + " " + endpos);
         
-        //System.out.println("start " + startpos + "end " + endpos);
+        System.out.println("start " + startpos + "end " + endpos);
         int l = endpos - startpos ;        
         int drawStart = getPanelPos(startpos);
         int drawEnd   = getPanelPos(l);
         
-        Rectangle baseline = new Rectangle(drawStart, y, drawEnd, 2);
+     
         
+//      the frame around the sequence box
+        if ( scale < SEQUENCE_SHOW){
+            g2D.setColor(SEQUENCE_COLOR);
+            Rectangle seqline = new Rectangle(drawStart, y, drawEnd, LINE_HEIGHT);
+            
+            //g2D=  (Graphics2D)g;
+            g2D.fill(seqline);   
+            //g2D.setColor(Color.blue);
+            //g2D.draw(seqline);
+        }
+        
+        // the top line for the scale
+        g2D.setColor(SCALE_COLOR);
+        Rectangle baseline = new Rectangle(drawStart, y, drawEnd, 2);        
         g2D.fill(baseline);
+     
         
-        // draw the vertical lines
+        // draw the vertical ticks
         for (int i =startpos ; i<= endpos ; i++){
             int xpos = getPanelPos(i) ;
             
@@ -290,7 +311,7 @@ extends JPanel{
         
         
         int length = chainLength;       
-        if ( endpos >= length) {
+        if ( endpos >= length-1) {
             
             int endPanel = getPanelPos(endpos);
             g2D.drawString(""+length,endPanel+10,y+DEFAULT_Y_STEP);
@@ -320,25 +341,14 @@ extends JPanel{
         Rectangle drawHere = g2D.getClipBounds();        
         int startpos = getSeqPos(drawHere.x);       
         int endpos   = getSeqPos(drawHere.x+drawHere.width+1);
-        
-        //int l = Math.round(length*scale);
-        int l = endpos - startpos ;
-        int drawStart = getPanelPos(startpos);
-        int drawEnd   = getPanelPos(l);
+               
         
         Composite oldComp = g2D.getComposite();
         g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));  
         //logger.info("paint l " + l + " length " + length );
         
-        // the frame around the sequence box
-        if ( scale < SEQUENCE_SHOW){
-            Rectangle seqline = new Rectangle(drawStart, y, drawEnd, LINE_HEIGHT);
-            
-            //g2D=  (Graphics2D)g;
-            g2D.fill(seqline);   
-            //g2D.setColor(Color.blue);
-            //g2D.draw(seqline);
-        }
+        if ( startpos < 0)
+            startpos = 999;
         
         if ( scale > SEQUENCE_SHOW){
             g2D.setColor(Color.black);
@@ -352,6 +362,7 @@ extends JPanel{
                                 
                 // TODO:
                 // color amino acids by hydrophobicity
+                
                 g2D.drawString(seqArr[i].toString(),xpos+1,y+2+DEFAULT_Y_STEP);
             }     
             

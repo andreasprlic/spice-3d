@@ -22,6 +22,8 @@
  */
 package org.biojava.spice.manypanel.renderer;
 
+import java.awt.Color;
+
 import javax.swing.BorderFactory;
 import javax.swing.JLayeredPane;
 
@@ -41,10 +43,11 @@ public class DasScrollPaneColumnHeader extends JLayeredPane {
         this.setBorder(BorderFactory.createEmptyBorder());
         this.setDoubleBuffered(true);
         this.setOpaque(false);
-        this.setBackground(SequenceScalePanel.BACKGROUND_COLOR);
+        //this.setBackground(SequenceScalePanel.BACKGROUND_COLOR);
+        this.setBackground(Color.blue);
         
-        this.add(seqScale);
-        this.add(cursor);
+        this.add(seqScale, new Integer(1));
+        this.add(cursor, new Integer(2));
         
         moveToFront(cursor);
 

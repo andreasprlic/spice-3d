@@ -23,6 +23,7 @@
 package org.biojava.spice.manypanel.renderer;
 
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.AdjustmentListener;
 import java.util.logging.Logger;
@@ -116,8 +117,6 @@ public abstract class AbstractChainRenderer
         scrollPane.setRowHeaderView(dasScrollPaneRowHeader);
        
        //dasScrollPaneColumnHeader = new DasScrollPaneColumnHeader();
-     
-        
         
         dasSourcePanels      = new ArrayList();
         scaleChangeListeners = new ArrayList();
@@ -139,6 +138,7 @@ public abstract class AbstractChainRenderer
         this.add(scrollPane);
         
         columnCursor = new CursorPanel();
+       
     }
     
     
@@ -153,11 +153,15 @@ public abstract class AbstractChainRenderer
     protected void initPanels(){
         
         int width = getDisplayWidth();
-                
+        featurePanel.setBackground(Color.yellow);
         columnHeader = new DasScrollPaneColumnHeader(featurePanel, columnCursor);
         columnHeader.setPreferredSize(new Dimension(width,SequenceScalePanel.SIZE));
-        //scrollPane.setColumnHeaderView(columnHeader);
-        scrollPane.setColumnHeaderView(featurePanel);
+        scrollPane.setColumnHeaderView(columnHeader);
+        //scrollPane.setColumnHeaderView(featurePanel);
+        columnHeader.addMouseMotionListener(mouseListener);
+        columnHeader.addMouseListener(mouseListener);
+        
+        
         
         layeredPane.addMouseMotionListener(mouseListener);
         layeredPane.addMouseListener(mouseListener);
@@ -176,29 +180,14 @@ public abstract class AbstractChainRenderer
         mouseListener.addSpiceFeatureListener(columnCursor);
         
        
-        
-        //statusPanel.setLocation(0,0);
-        //statusPanel.setBounds(0,0,width,STATUS_PANEL_HEIGHT);
-        //statusPanel.setPreferredSize(new Dimension(width,20));
-        
-        //int y = statusPanel.getHeight();
         int y = 0;
 
-        //logger.info("statusp peanel h " + y);
-        ///featurePanel.setBounds(0,y,width,20);
-        ///featurePanel.setLocation(0,y);
-	
-        //cursorPanel.setPreferredSize(new Dimension(600,600));
-        cursorPanel.setLocation(0,y);
-        //cursorPanel.setOpaque(true);
-        cursorPanel.setBounds(0,y,width,getDisplayHeight());
-        //layeredPane.add(statusPanel,new Integer(99));
-        //layeredPane.add(featurePanel,new Integer(0));
+    
+        cursorPanel.setLocation(0,y); 
+        cursorPanel.setBounds(0,y,width,getDisplayHeight());     
         layeredPane.add(cursorPanel, new Integer(100));
         layeredPane.moveToFront(cursorPanel);
-        //scale=1.0f;
-        //featurePanel.addMouseMotionListener(mouseListener);
-       
+        
         updatePanelPositions();
     }
   
@@ -360,7 +349,8 @@ public abstract class AbstractChainRenderer
             li.scaleChanged(event);
         }
         
-        updatePanelPositions();        
+        updatePanelPositions();   
+        
     }
 
 
@@ -547,7 +537,7 @@ public abstract class AbstractChainRenderer
         this.setPreferredSize(viewSize);
         this.setSize(viewSize);
         
-        columnHeader.setPreferredSize(new Dimension(width,SequenceScalePanel.SIZE));
+        columnHeader.setPreferredSize(new Dimension(width+20,SequenceScalePanel.SIZE));
         
         //scrollPane.setPreferredSize(viewSize);
         
@@ -577,11 +567,20 @@ public abstract class AbstractChainRenderer
         
         cursorPanel.setBounds(0,0,width,h);
         
+        
+        
+        // the header stuff
+        featurePanel.setBounds(0,0,width+20,SequenceScalePanel.SIZE);
+        columnCursor.setBounds(0,0,width+20,SequenceScalePanel.SIZE);
+        Dimension headerD = new Dimension(width+20, SequenceScalePanel.SIZE);
+        featurePanel.setPreferredSize(headerD);
+        columnCursor.setPreferredSize(headerD);
+        //columnHeader.repaint();
+
+        
         // why was here a width+20 ?
         Dimension totalD = new Dimension(width,h);
-        
-        columnHeader.repaint();
-        
+
         layeredPane.setPreferredSize(totalD);
         layeredPane.setSize(totalD);
         layeredPane.repaint();        
