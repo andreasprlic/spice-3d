@@ -67,7 +67,17 @@ extends DasSourcePanel{
     }
 
 
+  
+    
     public void paintComponent(Graphics g){
+        int y = SequenceScalePanel.DEFAULT_Y_START + SequenceScalePanel.DEFAULT_Y_STEP ; 
+        paintComponent(g,y);
+    
+    }
+    
+    public void paintComponent(Graphics g, int y){
+      
+    
         //super.paintComponent(g);
        
         if (drawableDasSource.getLoading()){
@@ -93,16 +103,16 @@ extends DasSourcePanel{
         
         g2D.setColor(TEXT_COLOR);
       
-        int y = SequenceScalePanel.DEFAULT_Y_START + SequenceScalePanel.DEFAULT_Y_STEP ; 
+        
         
         String str = drawableDasSource.getDasSource().getNickname();
         //logger.info("paint DasSourcePanel "+str);
         if ( infoIcon != null)
-            infoIcon.paintIcon(null, g, 1,0); 
+            infoIcon.paintIcon(null, g, 1,y); 
         else 
-            g2D.drawString("i",1,y);
+            g2D.drawString("i",1,y+SequenceScalePanel.DEFAULT_Y_STEP);
         
-        g2D.drawString(str,16,11);
+        g2D.drawString(str,16,y+SequenceScalePanel.DEFAULT_Y_STEP);
         g2D.setFont(plainFont);
         
         y += SequenceScalePanel.DEFAULT_Y_STEP;

@@ -53,17 +53,21 @@ implements DasSourceListener
         dasSources  = new ArrayList();
         scrollPane = scroll;
         this.setBackground(Color.WHITE);
-        this.setPreferredWidth(SIZE);
+       setPrefSize();
     }
     
    
     public int getDisplayHeight(){
         
         int totalH = 0;
+        totalH +=  SequenceScalePanel.SIZE;
+        
+        
         Iterator iter = dasSources.iterator();
         while (iter.hasNext()){
             DasSourcePanelHeader dsp = (DasSourcePanelHeader)iter.next();
             totalH += dsp.getDisplayHeight();
+            totalH += SequenceScalePanel.DEFAULT_Y_STEP;
        
         }
         if (totalH < 100)
@@ -72,16 +76,41 @@ implements DasSourceListener
     }
 
   
-    public void setPreferredWidth(int pw) {
-        setPreferredSize(new Dimension(pw, getDisplayHeight()));
-    }
+  
 
    public void paintComponent(Graphics g){
-       super.paintComponent(g);       
+       //super.paintComponent(g);
+       
+       g.setColor(SequenceScalePanel.BACKGROUND_COLOR);       
+       Rectangle drawHere = g.getClipBounds();        
+       g.fillRect(drawHere.x,drawHere.y, drawHere.width, drawHere.height);
+       
+       
+       // paint everything in one panel...
+       
+       int y = SequenceScalePanel.DEFAULT_Y_START + SequenceScalePanel.DEFAULT_Y_STEP ; 
+       Iterator iter = dasSources.iterator();
+       while (iter.hasNext()){
+           DasSourcePanelHeader dsp = (DasSourcePanelHeader)iter.next();
+           
+           dsp.paintComponent(g,y);
+           y += dsp.getDisplayHeight();
+           
+       }
+       
+       //Graphics2D g2D = (Graphics2D) g;
+       //g2D.clip(drawHere);
    }
    
    
-    public void updatePanelPositions(){
+   public void setPrefSize(){
+       
+       int h = getDisplayHeight();
+       System.out.println("setting pref. size " + h);
+       this.setPreferredSize(new Dimension(SIZE,h));
+   }
+   
+   /* public void updatePanelPositions(){
         //int h = featurePanel.getHeight() + 20;
         int h = 0;
         int width = SIZE;
@@ -95,7 +124,7 @@ implements DasSourceListener
         //logger.info(viewSize+"");
         this.setPreferredSize(viewSize);
         this.setSize(viewSize);
-        */
+        * //
         
         // x .. width
         // y .. height
@@ -119,7 +148,7 @@ implements DasSourceListener
         
         this.repaint();
         this.revalidate();
-    }
+    }*/
 
    
 
@@ -129,10 +158,11 @@ implements DasSourceListener
         DasSourcePanelHeader dsph = new DasSourcePanelHeader(dds);
         dasSources.add(dsph); 
         this.add(dsph);
-        dsph.setPreferredSize(new Dimension(SIZE,dsph.getDisplayHeight()));     
+        //dsph.setPreferredSize(new Dimension(SIZE,dsph.getDisplayHeight()));     
         this.setPreferredSize(new Dimension(SIZE, getDisplayHeight()));
        
-        updatePanelPositions();
+        //updatePanelPositions();
+        setPrefSize();
     }
 
     public void removeDasSource(DasSourceEvent ds) {
@@ -152,7 +182,9 @@ implements DasSourceListener
 
     public void loadingFinished(DasSourceEvent ds) {
         // TODO Auto-generated method stub
-        updatePanelPositions();
+        //updatePanelPositions();
+        this.repaint();
+        setPrefSize();
         
     }
 

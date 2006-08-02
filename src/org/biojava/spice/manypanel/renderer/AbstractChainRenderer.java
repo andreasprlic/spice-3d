@@ -66,7 +66,7 @@ public abstract class AbstractChainRenderer
     // TODO: movie these to resource file
     public static final int MAX_SCALE               = 10;
     public static final int STATUS_PANEL_HEIGHT     = 20;
-    public static final int FEATURE_PANEL_HEIGHT    = 20;
+    public static final int FEATURE_PANEL_HEIGHT    = 0;
     
     
     DrawableSequence sequence; // the sequence to be drawn..

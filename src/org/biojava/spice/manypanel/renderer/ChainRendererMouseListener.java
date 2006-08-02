@@ -184,7 +184,8 @@ MouseMotionListener
         
         int y = e.getY();
         
-        int h =  renderer.getFeaturePanel().getHeight();
+        //int h =  renderer.getFeaturePanel().getHeight();
+        int h = 0;
         
         // add the top of a Featurepanel - the empty space from there
         //h += FeaturePanel.DEFAULT_Y_START ;
