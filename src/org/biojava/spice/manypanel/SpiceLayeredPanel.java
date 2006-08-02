@@ -28,6 +28,8 @@ import java.awt.Dimension;
 import java.net.*;
 
 import org.biojava.dasobert.das.SpiceDasSource;
+import org.biojava.dasobert.das2.Das2Source;
+import org.biojava.dasobert.das2.DasSourceConverter;
 import org.biojava.dasobert.das2.io.DasSourceReaderImpl;
 import org.biojava.dasobert.dasregistry.*;
 
@@ -37,7 +39,7 @@ public class SpiceLayeredPanel
     public static String PDBCOORDSYS     = "PDBresnum,Protein Structure";
     public static String UNIPROTCOORDSYS = "UniProt,Protein Sequence";
     public static String ENSPCOORDSYS    = "Ensembl,Protein Sequence";
-    public static  String registry = "http://servlet.sanger.ac.uk/dasregistry/services/das_registry";
+    public static  String registry = "http://das.sanger.ac.uk/registry/das1/sources";
     
     //JLayeredPane layeredPane;
     
@@ -63,7 +65,7 @@ public class SpiceLayeredPanel
      * this method should be invoked from the
      * event-dispatching thread.
      */
-    private static void createAndShowGUI() {
+    private static void createAndShowGUI(String pdbCode) {
         //Make sure we have nice window decorations.
         JFrame.setDefaultLookAndFeelDecorated(true);
         
@@ -75,10 +77,11 @@ public class SpiceLayeredPanel
             DasSource[] dss = SpiceLayeredPanel.getAllDasSources();
             SpiceDasSource[] sds = new SpiceDasSource[dss.length];
             for (int i =0 ; i < dss.length;i++){
-                sds[i] = SpiceDasSource.fromDasSource(dss[i]);
+                Das1Source d1s = DasSourceConverter.toDas1Source((Das2Source)dss[i]);
+                sds[i] = SpiceDasSource.fromDasSource(d1s);
             }
             browserPane.setDasSources(sds);
-            browserPane.triggerLoadStructure("1boi");
+            browserPane.triggerLoadStructure(pdbCode);
             
             //browserPane.triggerLoadUniProt("P50225");
             //browserPane.triggerLoadENSP("ENSP00000346625");
@@ -102,7 +105,7 @@ public class SpiceLayeredPanel
         //creating and showing this application's GUI.
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                createAndShowGUI();
+                createAndShowGUI("5pti");
             }
         });
     }

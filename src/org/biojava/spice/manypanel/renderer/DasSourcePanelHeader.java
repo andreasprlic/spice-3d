@@ -137,7 +137,7 @@ extends DasSourcePanel{
         Shape clip = g.getClip();
         
         // draw a background rectangle
-        g.fillRect(0,y,DasScrollPaneHeader.SIZE ,SequenceScalePanel.DEFAULT_Y_STEP);
+        g.fillRect(0,y,DasScrollPaneRowHeader.SIZE ,SequenceScalePanel.DEFAULT_Y_STEP);
         
         
         
@@ -164,7 +164,7 @@ extends DasSourcePanel{
         // now draw the actual label - text
         g.setColor(Color.black);
         
-        g.clipRect(0,y,DasScrollPaneHeader.SIZE ,SequenceScalePanel.DEFAULT_Y_STEP);
+        g.clipRect(0,y,DasScrollPaneRowHeader.SIZE ,SequenceScalePanel.DEFAULT_Y_STEP);
         
         g.drawString(type,2+linkIconWidth,y+SequenceScalePanel.DEFAULT_Y_STEP);
         //g.setFont(plainFont);

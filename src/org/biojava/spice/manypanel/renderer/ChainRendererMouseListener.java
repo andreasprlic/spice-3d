@@ -114,8 +114,10 @@ MouseMotionListener
     }
     
     // mouse motion part
-    /** get the sequence position of the current mouse event 
-     * */
+    
+    /** get the sequence position of the current mouse event
+     * 
+     */
     private int getSeqPos(MouseEvent e) {
         
         int x = e.getX();
@@ -124,7 +126,8 @@ MouseMotionListener
         int DEFAULT_X_START = SequenceScalePanel.DEFAULT_X_START;
         float scale = renderer.getScale();
         int seqpos =  java.lang.Math.round((x-DEFAULT_X_START-2)/scale) ;
-        
+        if ( seqpos > chainLength)
+            seqpos = -1;
         return seqpos  ;
     }   
     

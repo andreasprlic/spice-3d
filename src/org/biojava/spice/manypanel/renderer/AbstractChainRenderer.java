@@ -60,30 +60,37 @@ public abstract class AbstractChainRenderer
     
     {
     
-    public static final int    MAX_SCALE        =  10;
-    public static final int STATUS_PANEL_HEIGHT =  20;
-    public static final int FEATURE_PANEL_HEIGHT = 20;
-    
-    SequenceScalePanel featurePanel;
-    CursorPanel cursorPanel;
-    DrawableSequence sequence;
     static Logger logger = Logger.getLogger("org.biojava.spice");
     
-    List dasSourcePanels;
-    List scaleChangeListeners;
-   
+    // TODO: movie these to resource file
+    public static final int MAX_SCALE               = 10;
+    public static final int STATUS_PANEL_HEIGHT     = 20;
+    public static final int FEATURE_PANEL_HEIGHT    = 20;
     
-    SeqToolTipListener toolTipper;
+    
+    DrawableSequence sequence; // the sequence to be drawn..
+    
+
+    // different panels that are used for the visualisation
+   
+    CursorPanel             cursorPanel;
+    CursorPanel             columnCursor;
+    StatusPanel             statusPanel;
+    JLayeredPane            layeredPane;
+    JScrollPane             scrollPane;
+    DasScrollPaneRowHeader  dasScrollPaneRowHeader;    
+    DasScrollPaneColumnHeader columnHeader;
+    SequenceScalePanel      featurePanel;
+    
+    List                    dasSourcePanels;
+    List                    scaleChangeListeners;
+    
+    AdjustmentListener      adjustmentListener;
+    SeqToolTipListener      toolTipper;    
     ChainRendererMouseListener mouseListener;
     
     int componentWidth;
     int zoomFactor;
-    //List featureRenderers;
-    StatusPanel statusPanel;
-    JLayeredPane layeredPane;
-    JScrollPane scrollPane;
-    AdjustmentListener adjustmentListener;
-    DasScrollPaneHeader dasScrollPaneHeader;
     
     public AbstractChainRenderer() {
         super();        
@@ -105,10 +112,11 @@ public abstract class AbstractChainRenderer
         scrollPane.setOpaque(true);
         scrollPane.getVerticalScrollBar().setUnitIncrement(SequenceScalePanel.DEFAULT_Y_STEP);
         
-        dasScrollPaneHeader = new DasScrollPaneHeader(scrollPane);
-        scrollPane.setRowHeaderView(dasScrollPaneHeader);
+        dasScrollPaneRowHeader = new DasScrollPaneRowHeader(scrollPane);
+        scrollPane.setRowHeaderView(dasScrollPaneRowHeader);
        
-       
+       //dasScrollPaneColumnHeader = new DasScrollPaneColumnHeader();
+     
         
         
         dasSourcePanels      = new ArrayList();
@@ -129,6 +137,8 @@ public abstract class AbstractChainRenderer
 
         this.add(statusPanel);
         this.add(scrollPane);
+        
+        columnCursor = new CursorPanel();
     }
     
     
@@ -141,6 +151,13 @@ public abstract class AbstractChainRenderer
     }
 
     protected void initPanels(){
+        
+        int width = getDisplayWidth();
+                
+        columnHeader = new DasScrollPaneColumnHeader(featurePanel, columnCursor);
+        columnHeader.setPreferredSize(new Dimension(width,SequenceScalePanel.SIZE));
+        //scrollPane.setColumnHeaderView(columnHeader);
+        scrollPane.setColumnHeaderView(featurePanel);
         
         layeredPane.addMouseMotionListener(mouseListener);
         layeredPane.addMouseListener(mouseListener);
@@ -155,8 +172,10 @@ public abstract class AbstractChainRenderer
         mouseListener.addSpiceFeatureListener(cursorPanel);
         mouseListener.addSpiceFeatureListener(fframe);
         mouseListener.addSequenceListener(fframe);
+        mouseListener.addSequenceListener(columnCursor);
+        mouseListener.addSpiceFeatureListener(columnCursor);
         
-        int width = getDisplayWidth();
+       
         
         //statusPanel.setLocation(0,0);
         //statusPanel.setBounds(0,0,width,STATUS_PANEL_HEIGHT);
@@ -166,15 +185,15 @@ public abstract class AbstractChainRenderer
         int y = 0;
 
         //logger.info("statusp peanel h " + y);
-        featurePanel.setBounds(0,y,width,20);
-        featurePanel.setLocation(0,y);
+        ///featurePanel.setBounds(0,y,width,20);
+        ///featurePanel.setLocation(0,y);
 	
         //cursorPanel.setPreferredSize(new Dimension(600,600));
         cursorPanel.setLocation(0,y);
         //cursorPanel.setOpaque(true);
         cursorPanel.setBounds(0,y,width,getDisplayHeight());
         //layeredPane.add(statusPanel,new Integer(99));
-        layeredPane.add(featurePanel,new Integer(0));
+        //layeredPane.add(featurePanel,new Integer(0));
         layeredPane.add(cursorPanel, new Integer(100));
         layeredPane.moveToFront(cursorPanel);
         //scale=1.0f;
@@ -209,6 +228,7 @@ public abstract class AbstractChainRenderer
         getStatusPanel().setLoading(false);
        setScale(1.0f);
        cursorPanel.clearSelection();
+       columnCursor.clearSelection();
        
         
     }
@@ -324,7 +344,8 @@ public abstract class AbstractChainRenderer
     protected void setScale(float scale) {
         
         featurePanel.setScale(scale);
-        cursorPanel.setScale(scale);        
+        cursorPanel.setScale(scale);   
+        columnCursor.setScale(scale);
 
         Iterator iter = dasSourcePanels.iterator();
         while (iter.hasNext()){
@@ -370,7 +391,7 @@ public abstract class AbstractChainRenderer
     }
     public int getDisplayHeight(){
         
-        int totalH = featurePanel.getHeight() + STATUS_PANEL_HEIGHT; // 20 for statuspanel
+        int totalH = STATUS_PANEL_HEIGHT; // 20 for statuspanel
         Iterator iter = dasSourcePanels.iterator();
         while (iter.hasNext()){
             DasSourcePanel dsp = (DasSourcePanel)iter.next();
@@ -444,7 +465,7 @@ public abstract class AbstractChainRenderer
 
     public void newDasSource(DasSourceEvent event) {
         // the column header drawer ...
-        dasScrollPaneHeader.newDasSource(event);
+        dasScrollPaneRowHeader.newDasSource(event);
         
         DrawableDasSource dds =event.getDasSource();
         //SpiceDasSource ds = dds.getDasSource();
@@ -484,8 +505,6 @@ public abstract class AbstractChainRenderer
         
         layeredPane.add(dspanel,new Integer(panelPos+1));  
         layeredPane.moveToFront(cursorPanel);
-        
-       
         
         dasSourcePanels.add(dspanel);
         
@@ -527,18 +546,14 @@ public abstract class AbstractChainRenderer
         //logger.info(viewSize+"");
         this.setPreferredSize(viewSize);
         this.setSize(viewSize);
-        scrollPane.setPreferredSize(viewSize);
         
-        //   scrollPane.setSize(viewSize);
+        columnHeader.setPreferredSize(new Dimension(width,SequenceScalePanel.SIZE));
         
+        //scrollPane.setPreferredSize(viewSize);
         
+                
         //int vw = viewSize.width;
-        statusPanel.setPreferredSize(new Dimension(viewSize.width,STATUS_PANEL_HEIGHT));
-        
-        //statusPanel.setLocation(p.x,0);
-        //statusPanel.setBounds(p.x,0,vw,STATUS_PANEL_HEIGHT);
-        //statusPanel.setBounds(0,0,width,STATUS_PANEL_HEIGHT);
-        featurePanel.setBounds(0,0,width,h);
+        statusPanel.setPreferredSize(new Dimension(viewSize.width,STATUS_PANEL_HEIGHT));                
 	
         // x .. width
         // y .. height
@@ -561,8 +576,11 @@ public abstract class AbstractChainRenderer
         //logger.info("updatePanelPosition max: " + width + " "  + h);
         
         cursorPanel.setBounds(0,0,width,h);
-        Dimension totalD = new Dimension(width+20,h);
-        featurePanel.revalidate();
+        
+        // why was here a width+20 ?
+        Dimension totalD = new Dimension(width,h);
+        
+        columnHeader.repaint();
         
         layeredPane.setPreferredSize(totalD);
         layeredPane.setSize(totalD);
@@ -707,7 +725,7 @@ public abstract class AbstractChainRenderer
                 dsp.setLoading(false);
             }
         }
-        dasScrollPaneHeader.loadingFinished(ds);
+        dasScrollPaneRowHeader.loadingFinished(ds);
     }
 
     public void loadingStarted(DasSourceEvent ds) {

@@ -26,6 +26,7 @@ package org.biojava.spice.manypanel.renderer;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.util.Iterator;
 import java.util.List;
 
@@ -129,21 +130,23 @@ extends SequenceScalePanel{
         return s;
     }
     
-    public void paint(Graphics g){
-        super.paint(g);
-                
+    public void paintComponent(Graphics g){
+        //super.paintComponent(g);
+
+        Rectangle drawHere = g.getClipBounds();                
+        g.setColor(BACKGROUND_COLOR);
+        g.fillRect(drawHere.x,drawHere.y, drawHere.width, drawHere.height);
+        
+        
         Graphics2D g2D =(Graphics2D) g;
 
         setPaintDefaults(g2D);
         
-        int length = chain.getLengthAminos();
-        
-        //  1st: draw the scale        
         int y = 1;
-        y = drawScale(g2D,scale,length,y);
+        y = drawScale(g2D,y);
+        y = drawSequence(g2D,y);
+       
         
-        // 2nd: sequence
-        y = drawSequence(g2D,scale,length,y);
          
         if ( shouldDrawStructureRegion()) {
             String colorStruct = System.getProperty("SPICE:StructureRegionColor");
@@ -154,7 +157,7 @@ extends SequenceScalePanel{
             
             
             // now draw the Structure region       
-            drawStructureRegion(g2D,scale,length,y);
+            drawStructureRegion(g2D,y);
         }
         
     }
@@ -172,10 +175,9 @@ extends SequenceScalePanel{
             int aminosize,float scale, int y){
         //System.out.println("Structure " + start + " " + end);
         
-        
-        int DEFAULT_X_START = SequenceScalePanel.DEFAULT_X_START;
-        int xstart = java.lang.Math.round(start * scale) + DEFAULT_X_START;
-        int endx   = java.lang.Math.round(end * scale)-xstart + DEFAULT_X_START +aminosize +1 ;
+                
+        int xstart = getPanelPos(start);
+        int endx   = getPanelPos(end)+1 ;
         //int width  = aminosize ;
         int height = DEFAULT_Y_HEIGHT ;
         
@@ -203,7 +205,7 @@ extends SequenceScalePanel{
      * @param y the y position to draw this
      */ 
  
-    private void drawStructureRegion(Graphics2D g2D,  float scale, int length, int y){
+    private void drawStructureRegion(Graphics2D g2D,  int y){
         // data is coming from chain;
       
         int textpos = y+DEFAULT_Y_HEIGHT -2;

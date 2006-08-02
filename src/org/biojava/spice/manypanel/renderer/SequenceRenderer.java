@@ -58,6 +58,7 @@ extends AbstractChainRenderer
         statusPanel.setAccessionCode(sequence.getAccessionCode());
         featurePanel.setChain(sequence.getSequence());
         cursorPanel.setChain(sequence.getSequence());
+        columnCursor.setChain(sequence.getSequence());
         mouseListener.setChain(sequence.getSequence());
         toolTipper.setChain(sequence.getSequence());
         Iterator iter = dasSourcePanels.iterator();

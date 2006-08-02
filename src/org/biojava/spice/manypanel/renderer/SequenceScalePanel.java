@@ -24,29 +24,18 @@ package org.biojava.spice.manypanel.renderer;
 
 import java.awt.AlphaComposite;
 import java.awt.Composite;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-//import java.awt.Shape;
 import java.util.logging.*;
-//import java.util.Map;
 import javax.swing.JPanel;
 import org.biojava.bio.structure.*;
-
-
 import java.awt.Color;
 import java.util.*;
 
-import org.biojava.spice.feature.*;
-
-
-import java.awt.Image;
-//import java.awt.font.FontRenderContext;
-//import java.awt.font.GlyphVector;
-//import java.awt.geom.AffineTransform;
-//import java.awt.geom.Rectangle2D;
 
 /** a class that draws a Sequence as a rectange, a scale display over it
  * 
@@ -56,35 +45,34 @@ extends JPanel{
     
     static final long serialVersionUID = 7893248902423l;
     
+    Logger logger = Logger.getLogger("org.biojava.spice");
+
+    static String baseName = "spice";    
+    
     public static final int    DEFAULT_X_START          = 10  ;
     public static final int    DEFAULT_X_RIGHT_BORDER   = 40 ;
     public static final int    DEFAULT_Y_START          = 0 ;
     public static final int    DEFAULT_Y_STEP           = 10 ;
     public static final int    DEFAULT_Y_HEIGHT         = 8 ;// thes size of the boxs
     public static final int    DEFAULT_Y_BOTTOM         = 16 ;
-    public static final int    LINE_HEIGHT              = 10 ;
-    
+    public static final int    LINE_HEIGHT              = 10 ;    
     public static final int    MINIMUM_HEIGHT           = 20;
     public static final Color  SEQUENCE_COLOR           = Color.LIGHT_GRAY;
     public static final Color  SCALE_COLOR              = Color.black;
     public static final Color  TEXT_SCALE_COLOR         = Color.GRAY;
     public static final Color  BACKGROUND_COLOR;
-   
+    public static final Font   seqFont ;
     
-    Character[] seqArr;
+    // the scale value after which to show the sequence as text    
+    private static final int   SEQUENCE_SHOW = 9;
     
+    // the height of the panel
+    public static final int SIZE = 20;
+       
     Chain chain;
+    int chainLength;
     float scale;
-    Logger logger = Logger.getLogger("org.biojava.spice");
-    
-    //Feature[] features;
-    
-    private Image dbImage;
-    private Graphics dbg;
-    
-    public static final Font seqFont ;
-   
-    static String baseName = "spice";
+    Character[] seqArr;    
     
     static {
         ResourceBundle bundle = ResourceBundle.getBundle(baseName);
@@ -101,16 +89,32 @@ extends JPanel{
     
     public SequenceScalePanel() {
         super();
+        
         this.setBackground(BACKGROUND_COLOR);
+        
         chain = new ChainImpl();
         setDoubleBuffered(true);
-        //features = getRandomFeatures();
+        
         seqArr = new Character[0];       
-      
+        chainLength = 0;
+        setPrefSize();
+        
+    }
+    
+    private void setPrefSize() {
+        // hm if we do not add +2 to the length then there is a size mismatch to the other panels.
+        // so I guess there is a +/-1 issue somewhere...        
+        int length = chainLength + 2 ; 
+        int l = Math.round(length*scale) + DEFAULT_X_START + DEFAULT_X_RIGHT_BORDER ;
+        if ( l  < 200){
+            l = 200;
+        }
+        this.setPreferredSize(new Dimension(l,SIZE));
+        
     }
      
     public synchronized void setChain(Chain c){
-        //logger.info("FeaturePanel setting chain >" + c.getName()+"<");
+     
         List a = c.getGroups("amino");
         seqArr = new Character[a.size()];
         
@@ -124,57 +128,33 @@ extends JPanel{
             seqArr[i] = aa.getAminoType();
             i++;
         }
-        //this.update(this.getGraphics());
-          this.repaint();  
+
+        chainLength = i;
+        
+        setPrefSize();
+        
+        this.repaint();  
     }
     
     public synchronized float getScale(){
         return scale;
     }
     
+    
     public void setScale(float scale) {
         
         this.scale=scale;
-        //this.update(this.getGraphics());
+     
+        setPrefSize();
+     
         this.repaint();
         this.revalidate();
     }
-    
   
-    
-    public void update (Graphics g)
-    {
-        //logger.info("update FeaturePanel ");
-        // initialize buffer
-        
-        int aminosize = Math.round(scale);
-        if ( aminosize < 1)
-            aminosize = 1;
-        int requiredWidth = DEFAULT_X_START + (aminosize * chain.getLengthAminos()) + DEFAULT_X_RIGHT_BORDER ;
-        //logger.info("required width " + requiredWidth);
-        //if (dbImage == null)
-        //{
-           
-        dbImage = createImage (requiredWidth, 30);
-        dbg = dbImage.getGraphics ();
-        //}
-        
-        // clear screen in background
-        dbg.setColor (getBackground ());
-        dbg.fillRect (0, 0, requiredWidth, this.getSize().height);
-        
-        // draw elements in background
-        dbg.setColor (getForeground());
-        paint (dbg);
-        
-        // draw image on the screen
-        g.drawImage (dbImage, 0, 0, this);
-        
-        
-        
-    }
-    
-  
+    /** set some default rendering hints, like text antialiasing on
+     * 
+     * @param g2D the graphics object to set the defaults on
+     */
     protected void setPaintDefaults(Graphics2D g2D){
         g2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
                 RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
@@ -184,56 +164,191 @@ extends JPanel{
        g2D.setFont(seqFont);
     }
     
-    public void paint(Graphics g){
-        super.paint(g);
-        //public void paintComponent(Graphics g){
-        int length = chain.getLengthAminos();
-        //logger.info("paint featurePanel " + scale + " " + length + " " + this.getWidth() + " " + this.getHeight());
-        //  super.paintComponent(g);
+    public void paintComponent(Graphics g){
+        //super.paintComponent(g);
+       
+        g.setColor(BACKGROUND_COLOR);
+        
+        Rectangle drawHere = g.getClipBounds();        
+        g.fillRect(drawHere.x,drawHere.y, drawHere.width, drawHere.height);
+        
+        
         Graphics2D g2D =(Graphics2D) g;
-        
-       setPaintDefaults(g2D);
-        
-        //  1st: draw the scale        
+
+        setPaintDefaults(g2D);
+       
         int y = 1;
-        y = drawScale(g2D,scale,length,1);
+            
+        //  1st: draw the scale        
+      
+        y = drawScale(g2D,1);
         
         // 2nd: sequence
-        y = drawSequence(g2D,scale,length,y);
+        y = drawSequence(g2D,y);
+        
+       
+    }
+    
+    protected int getSeqPos(int panelPos){
+        int seqPos = Math.round((panelPos - DEFAULT_X_START) / scale) ;
+        if ( seqPos < 0)
+            seqPos = 0;
+        int length = chainLength;
+        if ( seqPos > length)
+            seqPos = length;
+        return seqPos;
+    }
+    
+    protected int getPanelPos(int seqPos){
+        int length = chainLength;
+        
+
+        if ( seqPos < 0 )
+            seqPos = 0;
+        
+        if ( seqPos > length)
+            seqPos = length;
+
+        int panelPos = Math.round(seqPos * scale) + DEFAULT_X_START;
+        return panelPos;
+    }
+
+    /** draw the Scale
+     * 
+     * @param g2D
+     * @param y the height on which to draw the scale
+     * @return the new y position
+     */
+    protected int drawScale(Graphics2D g2D, int y){
+        
+        // only draw within the ranges of the Clip
+        Rectangle drawHere = g2D.getClipBounds();        
+      
+        g2D.setColor(SCALE_COLOR);
+        
+        int aminosize = Math.round(1*scale);
+        if ( aminosize < 1)
+            aminosize = 1;
+        //y = y + DEFAULT_Y_STEP;
+        // the base line:
+        
+        //int l = Math.round(length*scale);
+       
+        
+        int startpos = getSeqPos(drawHere.x);       
+        int endpos   = getSeqPos(drawHere.x+drawHere.width);
+        System.out.println(drawHere + " " + startpos + " " + endpos);
+        
+        //System.out.println("start " + startpos + "end " + endpos);
+        int l = endpos - startpos ;        
+        int drawStart = getPanelPos(startpos);
+        int drawEnd   = getPanelPos(l);
+        
+        Rectangle baseline = new Rectangle(drawStart, y, drawEnd, 2);
+        
+        g2D.fill(baseline);
+        
+        // draw the vertical lines
+        for (int i =startpos ; i<= endpos ; i++){
+            int xpos = getPanelPos(i) ;
+            
+            int lineH = 11;
+            if ( scale <= 3)
+                lineH = 8;
+            
+            if ( ((i+1)%100) == 0 ) {
+                
+                if ( scale> 0.1) {
+                    g2D.setColor(TEXT_SCALE_COLOR);
+                    g2D.fillRect(xpos, y+2, aminosize, y+lineH);
+                    g2D.setColor(SCALE_COLOR);
+                    if ( scale < SEQUENCE_SHOW)
+                        g2D.drawString(""+(i+1),xpos,y+DEFAULT_Y_STEP);
+                }
+                
+            }else if  ( ((i+1)%50) == 0 ) {
+                if ( scale>1.4) {                    
+                    g2D.setColor(TEXT_SCALE_COLOR);
+                    g2D.fillRect(xpos,y+2, aminosize, y+lineH);  
+                    g2D.setColor(SCALE_COLOR);
+                    if ( scale < SEQUENCE_SHOW)
+                        g2D.drawString(""+(i+1),xpos,y+DEFAULT_Y_STEP);
+                   
+                }
+                
+            } else if  ( ((i+1)%10) == 0 ) {                
+                if ( scale> 3) {
+                    g2D.setColor(TEXT_SCALE_COLOR);
+                    g2D.fillRect(xpos, y+2, aminosize, y+lineH);
+                    g2D.setColor(SCALE_COLOR);
+                    if ( scale < SEQUENCE_SHOW)
+                        g2D.drawString(""+(i+1),xpos,y+DEFAULT_Y_STEP);
+                    
+                }
+            } 
+        }
+        
+        
+        int length = chainLength;       
+        if ( endpos >= length) {
+            
+            int endPanel = getPanelPos(endpos);
+            g2D.drawString(""+length,endPanel+10,y+DEFAULT_Y_STEP);
+        }
+        
+        return y ;
         
     }
-    /** draw the Scale */
-    protected int drawSequence(Graphics2D g2D, float scale, int length, int y){
+    
+    
+    
+    /** draw the sequence
+     * 
+     * @param g2D
+     * @param y .. height of line to draw the sequence onto
+     * @return the new y value
+     */
+    protected int drawSequence(Graphics2D g2D,  int y){
         //g2D.drawString(panelName,10,10);
         
         g2D.setColor(SEQUENCE_COLOR);
         int aminosize = Math.round(1*scale);
         if ( aminosize < 1)
             aminosize = 1;
-        int l = Math.round(length*scale);
-
-      
+        
+        // only draw within the ranges of the Clip
+        Rectangle drawHere = g2D.getClipBounds();        
+        int startpos = getSeqPos(drawHere.x);       
+        int endpos   = getSeqPos(drawHere.x+drawHere.width+1);
+        
+        //int l = Math.round(length*scale);
+        int l = endpos - startpos ;
+        int drawStart = getPanelPos(startpos);
+        int drawEnd   = getPanelPos(l);
+        
         Composite oldComp = g2D.getComposite();
         g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));  
         //logger.info("paint l " + l + " length " + length );
-        if ( scale < 9){
-            Rectangle seqline = new Rectangle(DEFAULT_X_START, y, l, LINE_HEIGHT);
+        
+        // the frame around the sequence box
+        if ( scale < SEQUENCE_SHOW){
+            Rectangle seqline = new Rectangle(drawStart, y, drawEnd, LINE_HEIGHT);
             
             //g2D=  (Graphics2D)g;
             g2D.fill(seqline);   
-            g2D.setColor(Color.black);
-            g2D.draw(seqline);
+            //g2D.setColor(Color.blue);
+            //g2D.draw(seqline);
         }
         
-        if ( scale > 9){
+        if ( scale > SEQUENCE_SHOW){
             g2D.setColor(Color.black);
                   
          
             //g2D.setColor(SCALE_COLOR);
             
             // display the actual sequence!;
-            for ( int i = 0 ; i < length;i++){
-                int xpos =Math.round(i*scale)+DEFAULT_X_START ;
+            for ( int i = startpos ; ((i <= endpos) && ( i < seqArr.length)) ;i++){
+                int xpos =getPanelPos(i);
                                 
                 // TODO:
                 // color amino acids by hydrophobicity
@@ -251,63 +366,8 @@ extends JPanel{
     
   
        
-    /** draw the Scale */
-    protected int drawScale(Graphics2D g2D, float scale, int length, int y){
-        
-        g2D.setColor(SCALE_COLOR);
-        
-        int aminosize = Math.round(1*scale);
-        if ( aminosize < 1)
-            aminosize = 1;
-        //y = y + DEFAULT_Y_STEP;
-        // the base line:
-        
-        int l = Math.round(length*scale);
-        
-        Rectangle baseline = new Rectangle(DEFAULT_X_START, y, l, 2);
-        
-        g2D.fill(baseline);
-        
-        // draw the vertical lines
-        for (int i =1 ; i<= length ; i++){
-            int xpos = Math.round(i*scale)+DEFAULT_X_START ;
-            
-            int lineH = 10;
-            if ( scale <= 3)
-                lineH = 6;
-            
-            if ( ((i+1)%100) == 0 ) {
-                
-                if ( scale> 0.1) {
-                    g2D.setColor(TEXT_SCALE_COLOR);
-                    g2D.fillRect(xpos, y+2, aminosize, y+lineH);
-                    g2D.setColor(SCALE_COLOR);
-                }
-                
-            }else if  ( ((i+1)%50) == 0 ) {
-                if ( scale>1.4) {                    
-                    g2D.setColor(TEXT_SCALE_COLOR);
-                    g2D.fillRect(xpos,y+2, aminosize, y+lineH);
-                    g2D.setColor(SCALE_COLOR);
-                }
-                
-            } else if  ( ((i+1)%10) == 0 ) {                
-                if ( scale> 3) {
-                    g2D.setColor(TEXT_SCALE_COLOR);
-                    g2D.fillRect(xpos, y+2, aminosize, y+lineH);
-                    g2D.setColor(SCALE_COLOR);
-                }
-            } 
-        }
-        
-        int lastPos = Math.round(length*scale)+DEFAULT_X_START + aminosize;
-        g2D.drawString(""+length,lastPos,y+DEFAULT_Y_STEP);
-        
-        return y ;
-        
-    }
     
-    
+    /*
     public Feature[] getRandomFeatures(){
         List feats = new ArrayList();
         Random generator = new Random();
@@ -329,6 +389,7 @@ extends JPanel{
         
         return (Feature[]) feats.toArray(new Feature[feats.size()]);
     }
+    */
     
     
 }

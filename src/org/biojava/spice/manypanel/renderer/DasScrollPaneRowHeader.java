@@ -37,28 +37,29 @@ import org.biojava.spice.manypanel.eventmodel.DasSourceListener;
  * scrollPane header column
  */
 
-public class DasScrollPaneHeader 
+public class DasScrollPaneRowHeader 
 extends JPanel 
 implements DasSourceListener
 {
     
     static final long serialVersionUID = 0l;
     public static final int SIZE = 70;
-    public static final int FEATURE_PANEL_HEIGHT = AbstractChainRenderer.FEATURE_PANEL_HEIGHT ;
+  
    
     List dasSources;
     JScrollPane scrollPane;
     
-    public DasScrollPaneHeader(JScrollPane scroll){
+    public DasScrollPaneRowHeader(JScrollPane scroll){
         dasSources  = new ArrayList();
         scrollPane = scroll;
         this.setBackground(Color.WHITE);
+        this.setPreferredWidth(SIZE);
     }
     
    
     public int getDisplayHeight(){
         
-        int totalH = FEATURE_PANEL_HEIGHT ; // 20 for statuspanel
+        int totalH = 0;
         Iterator iter = dasSources.iterator();
         while (iter.hasNext()){
             DasSourcePanelHeader dsp = (DasSourcePanelHeader)iter.next();
@@ -82,7 +83,7 @@ implements DasSourceListener
    
     public void updatePanelPositions(){
         //int h = featurePanel.getHeight() + 20;
-        int h = FEATURE_PANEL_HEIGHT + 100;
+        int h = 0;
         int width = SIZE;
         
         
