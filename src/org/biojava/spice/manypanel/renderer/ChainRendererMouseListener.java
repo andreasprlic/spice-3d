@@ -26,25 +26,19 @@ package org.biojava.spice.manypanel.renderer;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
-
 import org.biojava.bio.structure.Chain;
-import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.eventmodel.SequenceListener;
 import org.biojava.spice.feature.Feature;
 import org.biojava.spice.feature.FeatureImpl;
 import org.biojava.spice.feature.Segment;
-import org.biojava.spice.gui.DasSourceDialog;
 import org.biojava.spice.manypanel.drawable.DrawableDasSource;
-//import org.biojava.spice.manypanel.eventmodel.FeatureEvent;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureEvent;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureListener;
-import org.biojava.spice.utils.JNLPProxy;
+
 
 
 /** a mouse listener for the AbstractChainRenderer class
@@ -132,48 +126,6 @@ MouseMotionListener
     }   
     
     
-    private DasSourcePanel getEventPanel(MouseEvent e){
-        int y = e.getY();
-        
-        int h =  renderer.getFeaturePanel().getHeight();
-        
-        // add the top of a Featurepanel - the empty space from there
-        //h += FeaturePanel.DEFAULT_Y_START ;
-        //+ FeaturePanel.DEFAULT_Y_STEP ;
-        
-        if ( y < h){
-            return null ;
-        }
-        
-        DasSourcePanel eventPanel = null;
-        
-        Iterator iter = renderer.getDasSourcePanels().iterator();
-        while (iter.hasNext()){
-            DasSourcePanel dsp = (DasSourcePanel)iter.next();
-            int panelHeight = dsp.getDisplayHeight();
-            h+= panelHeight;
-            
-            if (y < h ) {
-                eventPanel = dsp;
-                h -= panelHeight;
-                break;
-            }
-            
-        }  
-        if (eventPanel == null) {
-            // no panel found below this event
-            return null;
-        }
-        
-        //h += FeaturePanel.DEFAULT_Y_START + FeaturePanel.DEFAULT_Y_STEP + FeaturePanel.LINE_HEIGHT;
-        //if ( y < h){
-        // smaller than the "heading section" of the display
-        //    return null;
-        //}
-        
-        return eventPanel;
-    }
-    
     /** creates a spiceFeatureEvent from a mouse event
      * or null, if the event was not over a feature line
      * 
@@ -182,14 +134,8 @@ MouseMotionListener
      */
     private SpiceFeatureEvent getSpiceFeatureEvent(MouseEvent e){
         
-        int y = e.getY();
-        
-        //int h =  renderer.getFeaturePanel().getHeight();
-        int h = 0;
-        
-        // add the top of a Featurepanel - the empty space from there
-        //h += FeaturePanel.DEFAULT_Y_START ;
-        //+ FeaturePanel.DEFAULT_Y_STEP ;
+        int y = e.getY();        
+        int h = 0;               
         
         if ( y < h){
             
@@ -277,19 +223,11 @@ MouseMotionListener
         
         int pos = getSeqPos(e) ;
         
-        //logger.info("mouseDragged " +pos + " " + dragging + " " 
-        //      + selectionStart + " " + selectionEnd);
         
         if (( pos < 0)|| ( pos> chainLength)){
             return;
         }
         
-        //if ( pos < selectionStart){
-        //selectionEnd = selectionStart;
-        //   selectionStart = pos;
-        // this.repaint();
-        //return;
-        //}
         if (pos == oldSelectionStart){
             return;
         }
@@ -304,9 +242,6 @@ MouseMotionListener
         }
         triggerNewSequenceRange(selectionStart,selectionEnd);
         
-        
-        
-        
     }
     
     
@@ -315,15 +250,14 @@ MouseMotionListener
     public void mouseMoved(MouseEvent e) {
         if ( selectionLocked )
             return;
-        //int x = e.getX();
+        
         int pos = getSeqPos(e) ;
         SpiceFeatureEvent event = getSpiceFeatureEvent(e);
         Feature feat = null;
         if ( event != null )
             feat = event.getFeature();
-        //System.out.println(pos + " " + feat + oldFeature);
+       
         
-        //
         // test if nothing changed ...
         // if nothing changed, return
         if ( feat != null ){
@@ -338,8 +272,6 @@ MouseMotionListener
             
         }
         
-        
-        //logger.info("CursorPanel: mouse moved " + e.getX() + " " + pos);
         oldSelectionStart = pos;
         
         
@@ -354,8 +286,6 @@ MouseMotionListener
         if ( feat == null) 
             return;
         
-        //if ( feat.equals(oldFeature)) 
-        //return;
         
         oldFeature = feat;
         
@@ -417,36 +347,10 @@ MouseMotionListener
                 
                 //System.out.println(pos + " " + feat);
                 if ( feat == null) {
-                    
-                    // check if the info button has been pressed
-                    //System.out.println(event.getX() + " " + event.getY());
-                    DasSourcePanel eventPanel = getEventPanel(event);
-                    if ( eventPanel != null) {                        
-                        if ( event.getX() < 16) {
-                            // info button has been pressed.
-                            triggerDasSourceInfo(eventPanel.getDrawableDasSource());
-                        }
-                    }
                     oldFeature = new FeatureImpl();
                     return;
                 }
-                if ( pos < 0) {
-                    // the user clicked on the label
-                    //int linkpos = 0 - (FeaturePanel.DEFAULT_X_START-DasSourcePanel.linkIconWidth-1);
-                    //logger.info(pos+" " + feat);
-                    if ( event.getX() < DasSourcePanel.linkIconWidth) {
-                        triggerLinkSelected(feat);
-                    } else {
-                        //logger.info("here " + feat + " " + oldFeature);
-                        //-> trigger a new FeatureSelected
-                        
-                        triggerFeatureSelected(spiceEvent);
-                        triggerSelectionLocked(true);
-                        
-                        
-                    }   
-                    
-                } else {
+                if ( pos >= 0) {
 //                  check if pos is over a feature then trigger new SegmentSelected
                     List segments = feat.getSegments();
                     Iterator iter = segments.iterator();
@@ -497,22 +401,14 @@ MouseMotionListener
     protected void triggerNewSequencePosition(int pos, int mouseY){
         if ( selectionLocked )
             return;
-        
-        //logger.info("trigger new sequence position " + pos);
+
+        //System.out.println("new sequence position " + pos);
         Iterator iter = sequenceListeners.iterator();
         while(iter.hasNext()){
             SequenceListener li = (SequenceListener)iter.next();
-            // ugly! TODO: find a nice solution for this ...
-            // display seq cursor only over the sequyece ...
-            if ( li instanceof SeqToolTipListener ){
-                if ( mouseY < 20)
-                    li.selectedSeqPosition(pos);
-                else 
-                    li.selectedSeqPosition(-1);
-                
-            } else {
-                li.selectedSeqPosition(pos);
-            }
+            
+            li.selectedSeqPosition(pos);
+            
         }
         
         /** nice try but not very helpfull
@@ -653,29 +549,9 @@ MouseMotionListener
         }
     }
     
-    protected void triggerLinkSelected(Feature f){
-        String link = f.getLink();
-        logger.info("triggerLinkSelected " + link);
-        if (( link != null) && (! link.equals(""))){
-            
-            try {
-                URL url =new URL(link);
-                
-                boolean success = JNLPProxy.showDocument(url); 
-                if ( ! success)
-                    logger.warning("could not open URL "+url+" in browser. check your config or browser version."); 
-            } catch (MalformedURLException e){
-                //continue ;
-            }
-        }
-    }
+   
     
-    protected void triggerDasSourceInfo(DrawableDasSource ds){
-        SpiceDasSource sds = ds.getDasSource();
-        DasSourceDialog dialog = new DasSourceDialog(sds);
-        dialog.show();
-        
-    }
+    
     
     
     

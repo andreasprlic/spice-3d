@@ -236,7 +236,7 @@ SequenceListener
             
             if ( isSelectionLocked()){
                 //logger.info("getting selection from cursor panel");
-                selection = spice.getBrowserPane().getStructureRenderer().getCursorPanel().getSelection();
+                selection = spice.getBrowserPane().getStructureRenderer().getCursorPanels()[0].getSelection();
             } else {
                 //logger.info("coloring the whole structure");
                 Structure s = sm.getStructure();

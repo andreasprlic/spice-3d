@@ -106,7 +106,7 @@ implements DasSourceListener
    public void setPrefSize(){
        
        int h = getDisplayHeight();
-       System.out.println("setting pref. size " + h);
+       //System.out.println("setting pref. size " + h);
        this.setPreferredSize(new Dimension(SIZE,h));
    }
    
@@ -150,6 +150,12 @@ implements DasSourceListener
         this.revalidate();
     }*/
 
+   
+   public DasSourcePanelHeader[] getDasSources(){
+       return (DasSourcePanelHeader[]) dasSources.toArray(new DasSourcePanelHeader[dasSources.size()]);
+       
+   }
+   
    
 
     public void newDasSource(DasSourceEvent ds) {

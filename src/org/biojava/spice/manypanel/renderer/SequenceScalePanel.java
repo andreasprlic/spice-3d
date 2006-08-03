@@ -235,17 +235,12 @@ extends JPanel{
         int aminosize = Math.round(1*scale);
         if ( aminosize < 1)
             aminosize = 1;
-        //y = y + DEFAULT_Y_STEP;
-        // the base line:
         
-        //int l = Math.round(length*scale);
        
         
         int startpos = getSeqPos(drawHere.x);       
         int endpos   = getSeqPos(drawHere.x+drawHere.width);
-        //System.out.println(drawHere + " " + startpos + " " + endpos);
-        
-        System.out.println("start " + startpos + "end " + endpos);
+    
         int l = endpos - startpos ;        
         int drawStart = getPanelPos(startpos);
         int drawEnd   = getPanelPos(l);
@@ -374,33 +369,6 @@ extends JPanel{
         y+= DEFAULT_Y_STEP + 2;
         return y;
     }
-    
-  
-       
-    
-    /*
-    public Feature[] getRandomFeatures(){
-        List feats = new ArrayList();
-        Random generator = new Random();
-        int length = 660;
-        // draw random features
-        for ( int i = 20;i<800;i+=DEFAULT_Y_STEP+DEFAULT_Y_HEIGHT){
-            int nr = generator.nextInt(10);
-            Feature f = new FeatureImpl();
-            for ( int p =0 ; p < nr;p++){
-                int pstart = generator.nextInt(length);
-                int pend = generator.nextInt(length-pstart+1);
-                f.addSegment(pstart,pend,"random");
-                
-                
-                
-            }
-            feats.add(f);                     
-        }
-        
-        return (Feature[]) feats.toArray(new Feature[feats.size()]);
-    }
-    */
     
     
 }

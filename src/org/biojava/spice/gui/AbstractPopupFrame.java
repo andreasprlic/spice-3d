@@ -60,7 +60,7 @@ implements MouseListener, MouseMotionListener{
     
     boolean frameshown ;    
     static JFrame floatingFrame = createFrame();
-    MyHideTimer hideTimer;
+    MyTimer hideTimer;
     static final ImageIcon delTabIcon = SpiceApplication.createImageIcon("editdelete.png");
        
     
@@ -74,8 +74,9 @@ implements MouseListener, MouseMotionListener{
     protected static JFrame createFrame(){
         JFrame frame = new JFrame();
         JFrame.setDefaultLookAndFeelDecorated(false);
-        frame.setUndecorated(true);
+        frame.setUndecorated(true);        
         frame.pack();
+        
         return frame;
     }
     
@@ -143,7 +144,9 @@ implements MouseListener, MouseMotionListener{
         hBox.add(button);
         
         vBox.add(hBox);
-        vBox.add(content);
+        
+        if ( content != null)
+            vBox.add(content);
         
         panel.add(vBox);
         
@@ -161,20 +164,13 @@ implements MouseListener, MouseMotionListener{
             }
             //floatingFrame.repaint();
             repaint();
-            return;
-        }
-                      
-        
-        Container content = getContent();
-        
-        if ( content != null) {            
-            floatingFrame.setContentPane(createContentPane(content));
-            floatingFrame.pack();
         }
         
-        floatingFrame.setVisible(true);
+        if ( hideTimer == null) {
+            //System.out.println("creating new show timer " + MyTimer.SHOW);
+            hideTimer = new MyTimer(this, MyTimer.SHOW);
+        }
         
-        frameshown = true;
         
     }
     
@@ -184,10 +180,12 @@ implements MouseListener, MouseMotionListener{
      */
     
     public synchronized void markForHide() {
-        // System.out.println("markForHide");
-        if ( hideTimer == null) {
-            hideTimer = new MyHideTimer(this);
-        } 
+        //System.out.println("markForHide");
+        if ( frameshown) {
+            if ( hideTimer == null) {
+                hideTimer = new MyTimer(this, MyTimer.HIDE);
+            } 
+        }
     }
     
     /** usually the frame is not dispsosed, but just set to invisible!
@@ -212,6 +210,22 @@ implements MouseListener, MouseMotionListener{
             floatingFrame.setVisible(false);
         }
         frameshown = false;
+        hideTimer = null;
+    }
+    
+    protected synchronized void showFrame(){
+        
+        Container content = getContent();
+        
+        if ( content != null) {            
+            floatingFrame.setContentPane(createContentPane(content));
+            floatingFrame.pack();
+        }
+        repaint();
+        floatingFrame.setVisible(true);
+        
+        frameshown = true;
+        hideTimer = null;
     }
     
     
@@ -323,47 +337,75 @@ implements MouseListener, MouseMotionListener{
     
 }
 
+
+
 /** a small class that takes care of timing the disappearing of popup windows
  * 
  * @author Andreas Prlic
  * @since 10:48:33 AM
  * @version %I% %G%
  */
-class MyHideTimer  implements ActionListener{
+class MyTimer  implements ActionListener{
     
     int countdown ;
     AbstractPopupFrame hideMe ;
     boolean interrupted ;
     
-    public static final int INITAL_COUNTDOWN = 1400;
+    public static final int SHOW_COUNTDOWN = 1000;
+    public static final int HIDE_COUNTDOWN = 1400;
+    
+    public static final int SHOW = 1;
+    public static final int HIDE = 2;
+    
     Timer timer;
     
-    public MyHideTimer(AbstractPopupFrame disposeMe){
-        timer = new Timer(INITAL_COUNTDOWN,this);
-              
+    int action ;
+    
+    public MyTimer(AbstractPopupFrame disposeMe, int ACTIONTYPE){
+        
+       // System.out.println("new timer " + ACTIONTYPE);
+        
+        if ( ACTIONTYPE == SHOW)
+            timer = new Timer(SHOW_COUNTDOWN,this);
+        else
+            timer = new Timer(HIDE_COUNTDOWN,this);
+                  
         this.hideMe = disposeMe;
         interrupted = false;
+        action = HIDE;
+        if ( ACTIONTYPE != HIDE )
+            action = SHOW;
+        
+        timer.start();
     }        
     
     public synchronized void resetTimer() {
-       
-        countdown = INITAL_COUNTDOWN;
+      //  System.out.println("reset timer");
+   
         timer.restart();
     }
     
     public synchronized void interrupt(){
-        
+       // System.out.println("interrupt timer");
         interrupted = true;
         timer.stop();
     }
     
     public void actionPerformed(ActionEvent arg0) {
+       // System.out.println("timer action " + action);
         
         if ( ! interrupted) {
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    hideMe.hideFrame();
-                    timer.stop();
+                    if ( action == HIDE) {
+                        hideMe.hideFrame();
+                        timer.stop();
+                        
+                    } else {
+                        hideMe.showFrame();
+                        timer.stop();
+                        action = HIDE;
+                    }
                 }
             });
             

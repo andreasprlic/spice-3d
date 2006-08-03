@@ -48,6 +48,9 @@ extends DasSourcePanel{
 
     static final long serialVersionUID = 0l;
     
+    public static final int INFO_ICON_SIZE = 16;
+    public static final int LINK_ICON_SIZE = 10;
+    
     DrawableDasSource dasSource;
     JProgressBar bar;
     
@@ -83,7 +86,8 @@ extends DasSourcePanel{
         if (drawableDasSource.getLoading()){
                    
             if (!  progressThreadRunning ) {
-               
+                bar.setBounds(0,y,40,y+10);
+                bar.paint(g);
                 bar.setIndeterminate(true);
             }
             //add
@@ -91,7 +95,10 @@ extends DasSourcePanel{
             
         } else {
             if ( progressThreadRunning){
-                bar.setIndeterminate(false);               
+                bar.setBounds(0,y+ SequenceScalePanel.DEFAULT_Y_STEP,40,y+SequenceScalePanel.DEFAULT_Y_STEP+10);
+                bar.paint(g);
+                bar.setIndeterminate(false);       
+                
             }
         }
         
@@ -112,7 +119,7 @@ extends DasSourcePanel{
         else 
             g2D.drawString("i",1,y+SequenceScalePanel.DEFAULT_Y_STEP);
         
-        g2D.drawString(str,16,y+SequenceScalePanel.DEFAULT_Y_STEP);
+        g2D.drawString(str,INFO_ICON_SIZE,y+SequenceScalePanel.DEFAULT_Y_STEP);
         g2D.setFont(plainFont);
         
         y += SequenceScalePanel.DEFAULT_Y_STEP;
@@ -176,7 +183,7 @@ extends DasSourcePanel{
         
         g.clipRect(0,y,DasScrollPaneRowHeader.SIZE ,SequenceScalePanel.DEFAULT_Y_STEP);
         
-        g.drawString(type,2+linkIconWidth,y+SequenceScalePanel.DEFAULT_Y_STEP);
+        g.drawString(type,2+INFO_ICON_SIZE,y+SequenceScalePanel.DEFAULT_Y_STEP);
         //g.setFont(plainFont);
         
         g.setClip(clip);

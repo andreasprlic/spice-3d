@@ -91,6 +91,7 @@ implements SequenceListener, SpiceFeatureListener {
     }
 
     public void selectedSeqPosition(int position) {
+        //System.out.println("tooltip got new seq position " + position);
         parent.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
         if (( position < 0) || (position >= length)) {
             parent.setToolTipText("");
@@ -103,12 +104,11 @@ implements SequenceListener, SpiceFeatureListener {
         
         oldpos = position;
         
-        //System.out.println("toolTipper set "+ position + " " + length);
+      
         String s = "" ;
         Component where = getRenderer();
         
-        //System.out.println(where);
-        
+        //TODO: cleanup - this is horrible!        
         if (where instanceof SequenceRenderer ) {
             s = ""+(position+1) + " " + sequence.substring(position,position+1);
             
@@ -132,7 +132,9 @@ implements SequenceListener, SpiceFeatureListener {
             s = "Seq:" + (position+1) +" PDB:" + g1.getPDBCode() + " " + sequence.substring(position,position+1);
             
         }
+        
         parent.setToolTipText(s);
+        
     }
     
     

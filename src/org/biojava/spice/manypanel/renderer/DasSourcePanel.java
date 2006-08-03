@@ -63,8 +63,7 @@ implements FeatureListener,SpiceFeatureListener
     static final long serialVersionUID = 17439836750348543l;
     
     public static final Font plainFont;
-    public static final Font headFont;
-    public static final int linkIconWidth = 10;
+    public static final Font headFont; 
     public static final Color SELECTED_FEATURE_COLOR  = Color.yellow;
     
     DrawableDasSource drawableDasSource;
@@ -79,6 +78,7 @@ implements FeatureListener,SpiceFeatureListener
     ImageIcon linkIcon ;
     ImageIcon infoIcon;
     int chainLength;
+    
     boolean progressThreadRunning;
     ProgressThread progressThread;
     

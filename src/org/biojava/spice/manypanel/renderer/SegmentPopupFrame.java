@@ -52,6 +52,10 @@ SequenceListener
     Container content ;
     JPanel panel;
   
+    private static final int FRAME_WIDTH  = 300;
+    private static final int FRAME_PREF_HEIGHT = 250;
+    private static final int FRAME_MAX_HEIGHT = 300;
+    
     private static String font  =  "<b><font color=\"#0000FF\">";
     private static String efont = "</font></b>";
     private static String endl  = "<br>";
@@ -76,7 +80,8 @@ SequenceListener
     }
     
     private void appendFeatureDesc(StringBuffer text, Feature f){
-
+        if ( f == null)
+            return;
         text.append(font + "feature: " + efont + f.getName()   + endl);
         text.append(font + "type: "   + efont +  f.getType()   + endl);
         text.append(font + "method: "  + efont + f.getMethod() + endl);
@@ -98,13 +103,14 @@ SequenceListener
     private Container createContent(Feature f){
         JPanel panel = new JPanel();
         panel.setBackground(Color.white);
-        panel.setMaximumSize(new Dimension(100,100));
-        panel.setPreferredSize(new Dimension(100,100));
+        panel.setMaximumSize(new Dimension(FRAME_WIDTH,FRAME_MAX_HEIGHT));
+        panel.setPreferredSize(new Dimension(FRAME_WIDTH,FRAME_PREF_HEIGHT));
         
-        panel.setSize(new Dimension(100,100));
+       
         
         JEditorPane descriptionPane = new JEditorPane("text/html", "");
-        
+        descriptionPane.setMaximumSize(new Dimension(FRAME_WIDTH,FRAME_MAX_HEIGHT));
+        descriptionPane.setPreferredSize(new Dimension(FRAME_WIDTH,FRAME_PREF_HEIGHT));
         panel.add(descriptionPane);
         
         StringBuffer text = startStringBuffer();
@@ -112,7 +118,7 @@ SequenceListener
         endStringBuffer(text);
         descriptionPane.setText(text.toString());
         addHyperLinkListener(descriptionPane);
-        
+     
         return panel;        
     }
     
@@ -120,9 +126,12 @@ SequenceListener
     
     private Container createContent(Segment s){
         panel = new JPanel();
+        panel.setMaximumSize(new Dimension(FRAME_WIDTH,FRAME_MAX_HEIGHT));
+        panel.setPreferredSize(new Dimension(FRAME_WIDTH,FRAME_PREF_HEIGHT));
         panel.setBackground(Color.white);
         JEditorPane descriptionPane = new JEditorPane("text/html", "");
-        descriptionPane.setMaximumSize(new Dimension(100,100));
+        descriptionPane.setMaximumSize(new Dimension(FRAME_WIDTH,FRAME_MAX_HEIGHT));
+        descriptionPane.setPreferredSize(new Dimension(FRAME_WIDTH,FRAME_PREF_HEIGHT));
         panel.add(descriptionPane);
         
         StringBuffer text = startStringBuffer();
@@ -143,7 +152,7 @@ SequenceListener
         //System.out.println(text.toString());
         descriptionPane.setText(text.toString());
         addHyperLinkListener(descriptionPane);
-         
+        
         return panel;        
     }
     

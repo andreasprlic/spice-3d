@@ -44,13 +44,8 @@ extends SequenceScalePanel{
 
     public static final long serialVersionUID = 9173629552947296348l;
     
-    // the line where to draw the structure
-    //public static final int    DEFAULT_STRUCTURE_Y    = 30 ;
-    
     Feature structureFeature;
-    
-  
-    
+      
     Color structureColor ;
     
     public StructureScalePanel(){

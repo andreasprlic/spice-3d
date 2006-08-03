@@ -183,16 +183,8 @@ ChangeListener
         ComponentResizedChainListener seqComponentWidthSetter = new ComponentResizedChainListener(seqRenderer);
         contentPanel.addComponentListener(seqComponentWidthSetter);
         
-        
-        //JScrollPane seqScroller = new JScrollPane(seqRenderer);
-        //seqScroller.getVerticalScrollBar().setUnitIncrement(FeaturePanel.DEFAULT_Y_STEP);
-        //seqRenderer.setLayout(new BoxLayout(seqRenderer,BoxLayout.Y_AXIS));
-        //box.add(seqScroller);  
-        
         DasCoordinateSystem seqdcs = DasCoordinateSystem.fromString(UNIPROTCOORDSYS);
         seqManager.setCoordinateSystem(seqdcs);
-        
-        
         seqManager.addSequenceRenderer(seqRenderer);
         
         upFeatureManager = new FeatureManager();
@@ -201,9 +193,6 @@ ChangeListener
         addUniProtListener(upFeatureManager);
         FeatureRenderer seqFeatureRenderer = new FeatureRenderer();
         upFeatureManager.addFeatureRenderer(seqFeatureRenderer);
-        
-        
-        
         
         //seqManager.setFeatureManager(seqfm);
         seqManager.addSequenceListener(upFeatureManager);
@@ -228,8 +217,14 @@ ChangeListener
         aligManager.addObject1Listener(strucManager);
         aligManager.addObject2Listener(seqManager);
         
-        aligManager.addSequence1Listener(structureRenderer.getCursorPanel());         
-        aligManager.addSequence2Listener(seqRenderer.getCursorPanel());
+        CursorPanel[] structureCursors =structureRenderer.getCursorPanels();
+        for (int i = 0; i < structureCursors.length;i++){
+            aligManager.addSequence1Listener(structureCursors[i]);
+        }
+        CursorPanel[] seqCursors =seqRenderer.getCursorPanels();
+        for (int i = 0; i < seqCursors.length;i++){        
+            aligManager.addSequence2Listener(seqCursors[i]);
+        }
         
         AlignmentRenderer seqAligRenderer = new AlignmentRenderer();
         aligManager.addAlignmentRenderer(seqAligRenderer);
@@ -312,8 +307,13 @@ ChangeListener
         ensaligManager.addObject1Listener(seqManager);
         ensaligManager.addObject2Listener(enspManager);
         
-        ensaligManager.addSequence1Listener(seqRenderer.getCursorPanel());
-        ensaligManager.addSequence2Listener(enspRenderer.getCursorPanel());
+        for (int i = 0; i < seqCursors.length;i++){        
+            ensaligManager.addSequence1Listener(seqCursors[i]);
+        }
+        CursorPanel[] enspCursors = enspRenderer.getCursorPanels();
+        for (int i = 0; i < enspCursors.length;i++){
+            ensaligManager.addSequence2Listener(enspCursors[i]);
+        }
         ensaligManager.addSequence1Listener(upList);
         
         aligManager.addSequence2Listener(upenspList);
@@ -735,7 +735,14 @@ ChangeListener
     }
     
     public SequenceListener[] getPDBSequenceListener(){
-        return new SequenceListener[] {aligManager.getSeq1Listener(),structureRenderer.getCursorPanel()};
+        CursorPanel[] cursors = structureRenderer.getCursorPanels();
+        SequenceListener[] sli = new SequenceListener[cursors.length + 1];
+        for ( int i=0;i < cursors.length;i++){
+            sli[i] = cursors[i];
+            
+        }
+        sli[cursors.length] = aligManager.getSeq1Listener();
+        return sli;
     }
     public void addUniProtListener(ObjectListener li){
         uniProtListeners.add(li);
@@ -862,7 +869,10 @@ ChangeListener
     }
     
     public void setSeqSelection(int start, int end){
-        seqRenderer.getCursorPanel().setSeqSelection(start,end);
+        CursorPanel[] cursors = seqRenderer.getCursorPanels();
+        for (int i=0 ; i < cursors.length ; i++) {
+            cursors[i].setSeqSelection(start,end);
+        }       
         
     }
     
