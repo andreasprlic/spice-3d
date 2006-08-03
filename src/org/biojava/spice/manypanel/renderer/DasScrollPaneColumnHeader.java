@@ -31,19 +31,15 @@ public class DasScrollPaneColumnHeader extends JLayeredPane {
 
     public static final long serialVersionUID = 0l;
     
-    //SequenceScalePanel seqScale;
-    //CursorPanel cursor;
+   
     
     public DasScrollPaneColumnHeader(SequenceScalePanel seqScale, CursorPanel cursor ) {
         super();
         
-        //this.seqScale = seqScale;
-        //this.cursor = cursor;
-        
+       
         this.setBorder(BorderFactory.createEmptyBorder());
         this.setDoubleBuffered(true);
-        this.setOpaque(false);
-        //this.setBackground(SequenceScalePanel.BACKGROUND_COLOR);
+        this.setOpaque(false);       
         this.setBackground(Color.blue);
         
         this.add(seqScale, new Integer(1));

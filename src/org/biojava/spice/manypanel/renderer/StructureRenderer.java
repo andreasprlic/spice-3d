@@ -56,6 +56,14 @@ extends AbstractChainRenderer
          
     }
     
+    public CursorPanel[] getCursorPanels(){
+        CursorPanel[] cursors = new CursorPanel[2];
+        cursors[0] = columnCursor;
+        cursors[1] = cursorPanel;
+        return cursors;
+    }
+    
+    
     /** if a structure region is provided, then 
      * a "feature is drawn in the structure panel that
      * highlights this region. e.g. used to visualize the Sisyphus

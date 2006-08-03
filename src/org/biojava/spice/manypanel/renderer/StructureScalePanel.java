@@ -50,6 +50,7 @@ extends SequenceScalePanel{
     
     public StructureScalePanel(){
         super();
+        
         structureFeature = new FeatureImpl();
        
         structureColor = STRUCTURE_DEFAULT_COLOR; 
@@ -149,8 +150,7 @@ extends SequenceScalePanel{
                 //System.out.println(colorStruct);
                 structureColor = Color.getColor("SPICE:StructureRegionColor");
             }
-            
-            
+                        
             // now draw the Structure region       
             drawStructureRegion(g2D,y);
         }
@@ -179,17 +179,7 @@ extends SequenceScalePanel{
         // draw the red structure line
         g2D.setColor(structureColor);  
         g2D.fillRect(xstart,y,endx,height);
-        
-        // highlite the background
-       /* currently disabled ...
-        Composite origComposite = g2D.getComposite();
-        g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));
-        g2D.setColor(STRUCTURE_BACKGROUND_COLOR);
-        //Dimension dstruc=this.getSize();
-        Rectangle strucregion = new Rectangle(xstart , y, endx, DEFAULT_Y_HEIGHT);
-        g2D.fill(strucregion);
-        g2D.setComposite(origComposite);
-        */
+              
     }
     
     /** draw structrure covered region as feature the data is coming from the chain object ( if a group has coordinates then something will be painted here

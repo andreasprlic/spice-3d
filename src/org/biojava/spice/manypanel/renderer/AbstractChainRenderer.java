@@ -154,10 +154,10 @@ public abstract class AbstractChainRenderer
         columnHeader.addMouseMotionListener(mouseListener);
         columnHeader.addMouseListener(mouseListener);
       
-        //SeqToolTipListener tool2 = new SeqToolTipListener(columnCursor);
-        //mouseListener.addSequenceListener(tool2);
-        //mouseListener.addSpiceFeatureListener(tool2);
-        
+        /*SeqToolTipListener tool2 = new SeqToolTipListener(columnHeader);
+        mouseListener.addSequenceListener(tool2);
+        mouseListener.addSpiceFeatureListener(tool2);
+        */
         
         layeredPane.addMouseMotionListener(mouseListener);
         layeredPane.addMouseListener(mouseListener);
@@ -570,7 +570,7 @@ public abstract class AbstractChainRenderer
         cursorPanel.setBounds(0,0,width,h);
         
         
-        
+       
         // the header stuff
         featurePanel.setBounds(0,0,width+20,SequenceScalePanel.SIZE);
         columnCursor.setBounds(0,0,width+20,SequenceScalePanel.SIZE);

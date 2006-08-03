@@ -122,7 +122,7 @@ SpiceFeatureListener
         setSelectionStart(position);
         setSelectionEnd(position);
         this.repaint();
-        
+        this.revalidate();
         //this.paintComponent(this.getGraphics());
         
     }
