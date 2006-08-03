@@ -242,22 +242,19 @@ SpiceFeatureListener
     }
 
 
-
-
-
-
     public void paintComponent(Graphics g){
-        //logger.info("paint cursorPanel");
+        
         super.paintComponent(g);
         
-        //g.drawImage(imbuf, 0, 0, this);
-        
-        // translate the seq positions into graphics positions ..
-        
-        if (  ( selectionStart < 0) && (selectionEnd < 0)){
+        if (  ( selectionStart < 0) && (selectionEnd < 0))
             return;
-        }
         
+        
+        if ( ( chain == null) || (chainLength < 1))
+            return;
+        
+        
+//      translate the seq positions into graphics positions ..
         int tmpSelectionStart = selectionStart;
         if (( selectionStart < 0 ) && ( selectionEnd >=0)) {
             tmpSelectionStart = 0;

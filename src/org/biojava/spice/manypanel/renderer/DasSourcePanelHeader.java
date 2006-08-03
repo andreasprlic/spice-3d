@@ -86,9 +86,11 @@ extends DasSourcePanel{
         if (drawableDasSource.getLoading()){
                    
             if (!  progressThreadRunning ) {
-                bar.setBounds(0,y,40,y+10);
-                bar.paint(g);
+          
+                bar.setBounds(0,y+ SequenceScalePanel.DEFAULT_Y_STEP,40,y+ SequenceScalePanel.DEFAULT_Y_STEP+10);
                 bar.setIndeterminate(true);
+                bar.paint(g);
+               
             }
             //add
             //bar.paintComponent(g);
@@ -96,8 +98,9 @@ extends DasSourcePanel{
         } else {
             if ( progressThreadRunning){
                 bar.setBounds(0,y+ SequenceScalePanel.DEFAULT_Y_STEP,40,y+SequenceScalePanel.DEFAULT_Y_STEP+10);
+                bar.setIndeterminate(false);
                 bar.paint(g);
-                bar.setIndeterminate(false);       
+                      
                 
             }
         }

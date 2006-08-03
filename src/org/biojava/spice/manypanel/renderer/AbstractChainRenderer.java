@@ -110,6 +110,12 @@ public abstract class AbstractChainRenderer
         scrollPane.setOpaque(true);
         scrollPane.getVerticalScrollBar().setUnitIncrement(SequenceScalePanel.DEFAULT_Y_STEP);
         
+        JScrollPaneCorner cornerLeft = new JScrollPaneCorner();
+        scrollPane.setCorner(JScrollPane.UPPER_LEFT_CORNER, cornerLeft);        
+        JScrollPaneCorner cornerRight = new JScrollPaneCorner();
+        scrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER, cornerRight);
+                
+        
         dasScrollPaneRowHeader = new DasScrollPaneRowHeader(scrollPane);
         scrollPane.setRowHeaderView(dasScrollPaneRowHeader);       
        

@@ -17,36 +17,25 @@
  *
  *      http://www.biojava.org/
  * 
- * Created on Aug 2, 2006
+ * Created on Aug 3, 2006
  *
  */
 package org.biojava.spice.manypanel.renderer;
 
-import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Rectangle;
 
-import javax.swing.BorderFactory;
-import javax.swing.JLayeredPane;
+import javax.swing.JComponent;
 
-public class DasScrollPaneColumnHeader extends JLayeredPane {
+public class JScrollPaneCorner extends JComponent {
 
-    public static final long serialVersionUID = 0l;
-    
-   
-    
-    public DasScrollPaneColumnHeader(SequenceScalePanel seqScale, CursorPanel cursor ) {
-        super();
+    static final long serialVersionUID = 0l;
+    protected void paintComponent(Graphics g) {
         
-       
-        this.setBorder(BorderFactory.createEmptyBorder());
-        this.setDoubleBuffered(true);
-        this.setOpaque(false);       
-        this.setBackground(Color.white);
+        g.setColor(SequenceScalePanel.BACKGROUND_COLOR);
         
-        this.add(seqScale, new Integer(1));
-        this.add(cursor, new Integer(2));
+        Rectangle drawHere = g.getClipBounds();
+        g.fillRect(drawHere.x,drawHere.y, drawHere.width,drawHere.height);
         
-        moveToFront(cursor);
-
     }
-
 }
