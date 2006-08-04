@@ -65,26 +65,23 @@ extends JDialog {
     
     SPICEFrame spice; 
     JEditorPane txt;
-
-
-
+    Box vBox;
+    
+    
     static {
-	ResourceBundle bundle = ResourceBundle.getBundle(baseName);
-	VERSION   = bundle.getString("org.biojava.spice.Version");
-	AUTHORS   = bundle.getString("org.biojava.spice.Authors");
-	SPICEINFO = bundle.getString("org.biojava.spice.SpiceInfo");
-	LICENSE   = bundle.getString("org.biojava.spice.License");
-	THANKS    = bundle.getString("org.biojava.spice.Thanks");
-	TITLE     = bundle.getString("org.biojava.spice.Title");
-	DESCRIPTION_TEXT = 
-        "<html><body>"+
-        TITLE + " V "+ VERSION +" <br>"+
-        "(C)" + 
-        AUTHORS + SPICEINFO + THANKS + LICENSE +   
-        "</body></html>";
-    
-    
-	
+        ResourceBundle bundle = ResourceBundle.getBundle(baseName);
+        VERSION   = bundle.getString("org.biojava.spice.Version");
+        AUTHORS   = bundle.getString("org.biojava.spice.Authors");
+        SPICEINFO = bundle.getString("org.biojava.spice.SpiceInfo");
+        LICENSE   = bundle.getString("org.biojava.spice.License");
+        THANKS    = bundle.getString("org.biojava.spice.Thanks");
+        TITLE     = bundle.getString("org.biojava.spice.Title");
+        DESCRIPTION_TEXT = 
+            "<html><body>"+
+            TITLE + " V "+ VERSION +" <br>"+
+            "(C)" + 
+            AUTHORS + SPICEINFO + THANKS + LICENSE +   
+            "</body></html>";
     }
     
     public AboutDialog(SPICEFrame spice_)
@@ -94,7 +91,13 @@ extends JDialog {
         
         this.setSize(new Dimension(H_SIZE, V_SIZE)) ;
         
+        vBox = Box.createVerticalBox();
+        
+        
         txt = new JEditorPane("text/html", DESCRIPTION_TEXT);
+        
+        JScrollPane scroll = new JScrollPane(txt);
+        vBox.add(scroll);
         
         txt.setEditable(false);
         
@@ -108,18 +111,17 @@ extends JDialog {
                 }
                 if ( e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
                     // change the mouse curor
-                    txt.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    vBox.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 }
                 if (e.getEventType() == HyperlinkEvent.EventType.EXITED) { 
-                    txt.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                    vBox.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 }
             }
         });
         
-        JScrollPane scroll = new JScrollPane(txt);
+       
         
-        Box vBox = Box.createVerticalBox();
-        vBox.add(scroll);
+       
         
         JButton close = new JButton("Close");
         
