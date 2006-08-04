@@ -39,7 +39,7 @@ import javax.swing.JEditorPane;
 import java.awt.event.ActionListener;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.HyperlinkEvent;
-
+import java.util.ResourceBundle;
 /** A Dialog to show version and copyright information for SPICE.
  * @author Andreas Prlic
  *
@@ -49,53 +49,15 @@ extends JDialog {
     
     private static final long serialVersionUID = 8273923744121231231L;
     
-    public static final String VERSION = "0.8.3-devel";
-      
-    static final String AUTHORS = 
-        " <a href=\"mailto:ap3@sanger.ac.uk\">Andreas Prlic</a>, Thomas Down, Tim Hubbard <br>"+
-        "The Wellcome Trust Sanger Institute 2006<p>"; 
-    
-    static final String SPICEINFO = 
-        " More Info about SPICE: <br>"+
-        " <a href=\"http://www.efamily.org.uk/software/dasclients/spice/\">Homepage</a><br>"+
-        " <a href=\"http://lists.sanger.ac.uk/mailman/listinfo/spice-das\">Mailing List</a><br>"+
-        " <a href=\"http://www.sanger.ac.uk/Users/ap3/DAS/SPICE/SPICE_manual.pdf\">Manual</a><br>"+
-        " <a href=\"http://www.derkholm.net/svn/repos/spice/trunk/\">Source code</a><br>" +
-        " <a href=\"http://www.gnu.org/copyleft/lesser.html\">License</a> (LGPL)<p>";
-    
-    static final String THANKS = 
-        " Thanks to the following Projects:<br>"+
-        " <b>Jmol</b> - <a href=\"http://www.jmol.org\">http://www.jmol.org</a> - for the 3D visualization API. (LGPL)<br>"+
-        " <b>MSD</b> - <a href=\"http://www.ebi.ac.uk/msd-srv/msdmotif/\">http://www.ebi.ac.uk/msd-srv/msdmotif/</a> for providing the UniProt - PDB alignment data and the keyword search web service. <br>"+
-        " <b>BioJava</b> - <a href=\"http://www.biojava.org\">http://www.biojava.org</a> - for various libs. (LGPL)<br>"+
-        " <b>Geotools</b> - <a href=\"http://modules.geotools.org/\">http://modules.geotools.org/</a> for the logging panel. (LGPL)<br>"+
-        " <b>Nuvola</b> - <a href=\"http://www.icon-king.com\">http://www.icon-king.com</a> - for many of the icons used here. (LGPL) <br>"+       
-        " <a href=\"http://das.sanger.ac.uk/registry/\">DAS registration server</a><p>";
-   
-    static final String LICENSE = 
-        " <pre>This library is free software; you can redistribute it and/or <br>"+
-        "modify it under the terms of the GNU Lesser General Public <br>"+
-        "License as published by the Free Software Foundation; either <br>"+
-        "version 2.1 of the License, or (at your option) any later version. <br>" +
-        "<br>"+
-        "This library is distributed in the hope that it will be useful,<br>"+
-        "but WITHOUT ANY WARRANTY; without even the implied warranty of<br>"+
-        "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU<br>"+
-        "Lesser General Public License for more details.<br>"+
-        ""+
-        "You should have received a copy of the GNU Lesser General Public<br>"+
-        "License along with this library; if not, write to the Free Software<br>" +
-        "Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA<br>"+
-        "</pre><br>" ;
-    
-    
-    static String DESCRIPTION_TEXT = 
-        "<html><body>"+
-        "<b>The SPICE DAS client</b> V "+ VERSION +" <br>"+
-        "(C)" + 
-        AUTHORS + SPICEINFO + THANKS + LICENSE +   
-        "</body></html>";
-    
+    static String baseName="aboutspice";
+
+    public static final String VERSION ;      
+    static final String AUTHORS;         
+    static final String SPICEINFO;    
+    static final String THANKS;           
+    static final String LICENSE; 
+    static final String TITLE;
+    static String DESCRIPTION_TEXT;
     
     static int H_SIZE = 700;
     static int V_SIZE = 700;
@@ -103,6 +65,27 @@ extends JDialog {
     
     SPICEFrame spice; 
     JEditorPane txt;
+
+
+
+    static {
+	ResourceBundle bundle = ResourceBundle.getBundle(baseName);
+	VERSION   = bundle.getString("org.biojava.spice.Version");
+	AUTHORS   = bundle.getString("org.biojava.spice.Authors");
+	SPICEINFO = bundle.getString("org.biojava.spice.SpiceInfo");
+	LICENSE   = bundle.getString("org.biojava.spice.License");
+	THANKS    = bundle.getString("org.biojava.spice.Thanks");
+	TITLE     = bundle.getString("org.biojava.spice.Title");
+	DESCRIPTION_TEXT = 
+        "<html><body>"+
+        TITLE + " V "+ VERSION +" <br>"+
+        "(C)" + 
+        AUTHORS + SPICEINFO + THANKS + LICENSE +   
+        "</body></html>";
+    
+    
+	
+    }
     
     public AboutDialog(SPICEFrame spice_)
     {
