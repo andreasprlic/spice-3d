@@ -40,6 +40,7 @@ import java.awt.event.ActionListener;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.HyperlinkEvent;
 import java.util.ResourceBundle;
+
 /** A Dialog to show version and copyright information for SPICE.
  * @author Andreas Prlic
  *
@@ -60,14 +61,12 @@ extends JDialog {
     static String DESCRIPTION_TEXT;
     
     static int H_SIZE = 700;
-    static int V_SIZE = 700;
-    //JTextField txt ;
+    static int V_SIZE = 700;   
     
     SPICEFrame spice; 
     JEditorPane txt;
     Box vBox;
-    
-    
+        
     static {
         ResourceBundle bundle = ResourceBundle.getBundle(baseName);
         VERSION   = bundle.getString("org.biojava.spice.Version");
@@ -92,11 +91,11 @@ extends JDialog {
         this.setSize(new Dimension(H_SIZE, V_SIZE)) ;
         
         vBox = Box.createVerticalBox();
-        
-        
+                
         txt = new JEditorPane("text/html", DESCRIPTION_TEXT);
         
         JScrollPane scroll = new JScrollPane(txt);
+        
         vBox.add(scroll);
         
         txt.setEditable(false);
@@ -104,7 +103,7 @@ extends JDialog {
         txt.addHyperlinkListener(new HyperlinkListener(){
             
             public void hyperlinkUpdate(HyperlinkEvent e) {
-                //System.out.println(e);
+                
                 if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                     String href = e.getDescription();
                     BrowserOpener.showDocument(href);
@@ -118,9 +117,6 @@ extends JDialog {
                 }
             }
         });
-        
-       
-        
        
         
         JButton close = new JButton("Close");
