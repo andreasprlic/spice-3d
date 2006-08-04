@@ -47,6 +47,10 @@ implements AlignmentListener{
     DasCoordinateSystem coordSys2;
     Chain sequence1;
     Chain sequence2;
+    
+    int seqLength1;
+    int seqLength2;
+    
     Map alignmentMap1;
     Map alignmentMap2;
     
@@ -54,6 +58,7 @@ implements AlignmentListener{
     
     protected static int SEARCH_DIRECTION_INCREASE = 1;
     protected static int SEARCH_DIRECTION_DECREASE = 2;
+    
     static Logger logger = Logger.getLogger("org.biojava.spice");
     
     /** find the position in the other sequence closest to pos2
@@ -70,19 +75,19 @@ implements AlignmentListener{
           
         
         // test the max and min boundaries
-        if ( pos2 > sequence2.getLengthAminos())
+        if ( pos2 > seqLength2)
             if ( ( searchdirection == SEARCH_DIRECTION_DECREASE) &&
-                    ( stop < sequence2.getLengthAminos()))
-                i = sequence2.getLengthAminos()-1;
+                    ( stop < seqLength2))
+                i = seqLength2-1;
         
         if ( pos2 < 0 )
             if ( ( searchdirection == SEARCH_DIRECTION_INCREASE) &&
-                ( stop < sequence2.getLengthAminos()) )
+                ( stop < seqLength2) )
                 i =0;
         
-        if ( stop > sequence2.getLengthAminos()){
+        if ( stop > seqLength2){
             if ( (searchdirection == SEARCH_DIRECTION_DECREASE))
-                stop = sequence2.getLengthAminos()-1;
+                stop = seqLength2-1;
         }
         if ( stop < 0) {
             if (    ( searchdirection == SEARCH_DIRECTION_INCREASE) &&
@@ -91,7 +96,7 @@ implements AlignmentListener{
         }
         
         
-        while ( (i >=-1 ) && ( i < sequence2.getLengthAminos())){
+        while ( (i >=-1 ) && ( i < seqLength2)){
             Integer p = new Integer(i);
             //logger.info("testing " + p);
             if ( alignmentMap2.containsKey(p)){
@@ -115,15 +120,15 @@ implements AlignmentListener{
         
         //logger.info("i " + i + " pos2 " + pos2 + " stop " + stop + " direction " + searchdirection);
        
-        if ( i >= sequence2.getLengthAminos())
-            return sequence1.getLengthAminos()-1;
+        if ( i >= seqLength2)
+            return seqLength1-1;
             
         if ( i < 0)
             return -1;
         
         int newstop = 0;
         if (( searchdirection == SEARCH_DIRECTION_INCREASE) )
-                newstop = sequence2.getLengthAminos()-1;
+                newstop = seqLength2-1;
         
         
         int afterpos = getNextPosition1(i,searchdirection,newstop);
@@ -145,25 +150,25 @@ implements AlignmentListener{
     protected int getNextPosition2(int pos1, int searchdirection, int stop){
         int i = pos1;
         //logger.info("get next position 2 " + pos1 + " " + searchdirection + " " + stop);
-        if ( pos1 > sequence1.getLengthAminos())
+        if ( pos1 > seqLength1)
             if ( ( searchdirection == SEARCH_DIRECTION_DECREASE) &&
-                    ( stop < sequence1.getLengthAminos()))
-                i = sequence1.getLengthAminos()-1;
+                    ( stop < seqLength1))
+                i = seqLength1-1;
         if ( pos1 < 0 )
             if ( ( searchdirection == SEARCH_DIRECTION_INCREASE) &&
-                ( stop < sequence1.getLengthAminos()) )
+                ( stop < seqLength1) )
                 i =0;
         
-        if ( stop > sequence1.getLengthAminos()){
+        if ( stop > seqLength1){
             if ( (searchdirection == SEARCH_DIRECTION_DECREASE))
-                stop = sequence1.getLengthAminos()-1;
+                stop = seqLength1-1;
         }
         if ( stop < 0) {
             if (    ( searchdirection == SEARCH_DIRECTION_INCREASE) &&
                     ( pos1 > -1 )    ) 
                 stop = 0;
         }
-        while ( (i >=-1 ) && ( i < sequence1.getLengthAminos())){ 
+        while ( (i >=-1 ) && ( i < seqLength1)){ 
             Integer p = new Integer(i);
             //logger.info("testing " + p);
             
@@ -187,15 +192,15 @@ implements AlignmentListener{
         }
         
        //logger.info("i " + i + " pos1 " + pos1 + " stop " + stop + " direction " + 
-       //        searchdirection + " l " + sequence1.getLengthAminos());
+       //        searchdirection + " l " + seqLength1);
         
-        if ( i >= sequence1.getLengthAminos())
-            return sequence2.getLengthAminos()-1;
+        if ( i >= seqLength1)
+            return seqLength2-1;
         if ( i < 0)
             return -1;
         int newstop = 0;
         if (( searchdirection == SEARCH_DIRECTION_INCREASE))
-                newstop = sequence1.getLengthAminos()-1;
+                newstop = seqLength1-1;
             
         int afterpos = getNextPosition2(i,searchdirection,newstop);
         //logger.info("afterpos 2 " + afterpos);

@@ -30,6 +30,8 @@ import java.net.URL                        ;
 import java.util.Date                      ;
 import java.util.ArrayList                 ;
 import java.util.List                      ;
+
+import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.manypanel.renderer.SequenceScalePanel;
 import java.util.logging.*                 ;
 import java.awt.Dimension;
@@ -254,17 +256,9 @@ implements Runnable, ConfigurationListener
         
         progressFrame = new JFrame("contacting DAS directory server");
         progressFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                
         
-        /*progressFrame.addWindowListener(new WindowAdapter() {
-         public void windowClosing(WindowEvent evt) {
-         Frame frame = (Frame) evt.getSource();
-         frame.setVisible(false);
-         frame.dispose();
-         }
-         });
-         */
-        
-        ImageIcon icon = ConfigGui.createImageIcon("spice16x16.gif");
+        ImageIcon icon = SpiceApplication.createImageIcon("spice16x16.gif");
         if (icon != null) {
             progressFrame.setIconImage(icon.getImage());
         }

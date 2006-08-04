@@ -234,29 +234,16 @@ MouseMotionListener {
         
     }
     
-    public void mouseEntered(MouseEvent arg0) {
-        // TODO Auto-generated method stub
-        
-    }
+    public void mouseEntered(MouseEvent arg0) { }
     
-    public void mouseExited(MouseEvent arg0) {
-        // TODO Auto-generated method stub
-        
-    }
+    public void mouseExited(MouseEvent arg0) {}
     
-    public void mouseDragged(MouseEvent arg0) {
-        // TODO Auto-generated method stub
-        
-    }
-    
-    
-    
+    public void mouseDragged(MouseEvent arg0) {}
     
     public void mouseMoved(MouseEvent e) {        
         
         SpiceFeatureEvent event = getSpiceFeatureEvent(e);
-        if ( event != null){            
-            //System.out.println("over feature " + event.getFeature());
+        if ( event != null){                      
             parent.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             triggerMouseOverFeatureEvent(event);
             return;
@@ -265,20 +252,17 @@ MouseMotionListener {
         
         DrawableDasSource dds = getInfoButtonDasSource(e);
         if ( dds != null) {
-           // System.out.println("over info button " + dds.getDasSource().getNickname());
             parent.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             return;
         }
 
         
         Feature f = getLinkFeature(e);
-        if ( f != null){
-            //System.out.println("over link " + f.getType());
+        if ( f != null){        
             parent.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             return;
         }
-        
-        System.out.println("moving over empty space");
+               
         parent.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
         return;
         

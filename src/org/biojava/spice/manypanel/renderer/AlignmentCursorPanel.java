@@ -69,6 +69,7 @@ public class AlignmentCursorPanel extends JPanel
     ResourceBundle resource;
     public AlignmentCursorPanel() {
         super();
+        
         this.setOpaque(false);
         setDoubleBuffered(true);
         
@@ -138,10 +139,7 @@ public class AlignmentCursorPanel extends JPanel
     
     }
     
-    public void newSequence1(SequenceEvent e) {
-        // TODO Auto-generated method stub
-        
-    }
+    public void newSequence1(SequenceEvent e) {}
 
     public void selectedSeqPosition1(int position) {
         if ( selectionLocked) 
@@ -170,17 +168,11 @@ public class AlignmentCursorPanel extends JPanel
         
     }
 
-    public void noObjectFound1(String accessionCode) {
-        // TODO Auto-generated method stub
-        
-    }
+    public void noObjectFound1(String accessionCode) {}
     
    
 
-    public void newSequence2(SequenceEvent e) {
-        // TODO Auto-generated method stub
-        
-    }
+    public void newSequence2(SequenceEvent e) { }
 
     public void selectedSeqPosition2(int position) {
         if ( selectionLocked) 
@@ -207,10 +199,7 @@ public class AlignmentCursorPanel extends JPanel
         
     }
 
-    public void noObjectFound2(String accessionCode) {
-        // TODO Auto-generated method stub
-        
-    }
+    public void noObjectFound2(String accessionCode) {}
     
     
     public void paintComponent(Graphics g){

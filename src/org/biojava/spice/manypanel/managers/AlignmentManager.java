@@ -474,6 +474,7 @@ implements StructureListener{
                 } else {
                     
                     sequence1 = sm.getChainFromString(e.getSequence());
+                    seqLength1 = sequence1.getLengthAminos();
                     object1Id = ac;
                     //object1Id = "";
                     sequence1.setSwissprotId(ac);
@@ -494,7 +495,7 @@ implements StructureListener{
         //logger.info("setting new sequence 1" + e.getSequence());
 
         sequence1 = sm.getChainFromString(e.getSequence());
-      
+        seqLength1 = sequence1.getLengthAminos();
         // a new object, request the data...
         object1Id = ac;
         sequence1.setSwissprotId(ac);
@@ -607,7 +608,8 @@ implements StructureListener{
     */  
     private void requestAlignment(AlignmentParameters params){
         // TODO fix this:
-        // the alignmetn server shoudl use the correct coord sys ...
+        
+        // the alignmetn server should use the correct coord sys ...
         if ( params.getSubjectCoordinateSystem().toString().equals(BrowserPane.DEFAULT_ENSPCOORDSYS)) {
             DasCoordinateSystem ecs = new DasCoordinateSystem();
             ecs.setName(ASSEMBLYNAME);
@@ -648,6 +650,7 @@ implements StructureListener{
                     return;
                 } else {
                     sequence2 = sm.getChainFromString(e.getSequence());
+                    seqLength2 = sequence2.getLengthAminos();
                     object2Id = ac;
                     //object1Id = "";
                     Iterator iter = alignmentRenderers.iterator();
@@ -666,7 +669,7 @@ implements StructureListener{
         //logger.info("setting new sequence 2" + e.getSequence());
         
         sequence2 = sm.getChainFromString(e.getSequence());
-      
+        seqLength2 = sequence2.getLengthAminos();
         object2Id = ac;
         //object1Id = "";
         sequence2.setSwissprotId(ac);
@@ -947,15 +950,9 @@ implements StructureListener{
         
     }
 
-    public void newObjectRequested(String accessionCode) {
-        // TODO Auto-generated method stub
-        
-    }
+    public void newObjectRequested(String accessionCode) { }
 
-    public void noObjectFound(String accessionCode) {
-        // TODO Auto-generated method stub
-        
-    }
+    public void noObjectFound(String accessionCode) {}
     
     
     
@@ -971,8 +968,8 @@ class MyFeatureTranslator implements SpiceFeatureListener {
     
     static Logger logger = Logger.getLogger("org.biojava.spice");
     
-    Segment currentSegmentMO;
-    Segment currentSegmentCL;
+    Segment currentSegmentMO; // the original segment
+    Segment currentSegmentCL; // the converted one
     
     Feature currentFeatureMO;
     Feature currentFeatureCL;
@@ -1044,6 +1041,41 @@ class MyFeatureTranslator implements SpiceFeatureListener {
         }
         return newF;
     }
+    
+
+    private Segment convertSegment(Segment seg){
+        //System.out.println("convert segment " + seg.getStart() + " " + seg.getEnd());
+        Segment s = (Segment)seg.clone();
+        int st = s.getStart()-1;
+        int en = s.getEnd()-1;
+        
+        int newS;
+        int newE;
+        int length;
+        if ( pos == 1){            
+            newS = parent.getNextPosition2(st,AbstractAlignmentManager.SEARCH_DIRECTION_INCREASE,en)+1;
+            newE = parent.getNextPosition2(en,AbstractAlignmentManager.SEARCH_DIRECTION_DECREASE,st)+1;
+            length = parent.seqLength2;
+        } else {
+            newS = parent.getNextPosition1(st,AbstractAlignmentManager.SEARCH_DIRECTION_INCREASE,en)+1;
+            newE = parent.getNextPosition1(en,AbstractAlignmentManager.SEARCH_DIRECTION_DECREASE,st)+1;
+            length = parent.seqLength1;
+        }
+        if ( newS < 1)
+            newS = 1;
+        
+        if ( newE > (length-1))
+            newE = length-1;
+        
+        s.setStart(newS);
+        s.setEnd(newE);
+        
+        //System.out.println("converted to " + s.getStart() + " " + s.getEnd() + " length: " + length);
+        //logger.info("new segment " + s);
+        return s;
+        
+        
+    }
 
     public void mouseOverSegment(SpiceFeatureEvent e) {
            
@@ -1063,35 +1095,6 @@ class MyFeatureTranslator implements SpiceFeatureListener {
     }
 
     
-    private Segment convertSegment(Segment seg){
-        Segment s = (Segment)seg.clone();
-        int st = s.getStart()-1;
-        int en = s.getEnd()-1;
-        
-        int newS;
-        int newE;
-        int length;
-        if ( pos == 1){            
-            newS = parent.getNextPosition2(st,AbstractAlignmentManager.SEARCH_DIRECTION_INCREASE,en)+1;
-            newE = parent.getNextPosition2(en,AbstractAlignmentManager.SEARCH_DIRECTION_DECREASE,st)+1;
-            length = parent.sequence2.getLength();
-        } else {
-            newS = parent.getNextPosition1(st,AbstractAlignmentManager.SEARCH_DIRECTION_INCREASE,en)+1;
-            newE = parent.getNextPosition1(en,AbstractAlignmentManager.SEARCH_DIRECTION_DECREASE,st)+1;
-            length = parent.sequence1.getLength();
-        }
-        if ( newS < 1)
-            newS = 1;
-        if ( newE > (length-1))
-            newE = length-1;
-        
-        s.setStart(newS);
-        s.setEnd(newE);
-        //logger.info("new segment " + s);
-        return s;
-        
-        
-    }
     
     public void segmentSelected(SpiceFeatureEvent e) {
         
@@ -1106,6 +1109,8 @@ class MyFeatureTranslator implements SpiceFeatureListener {
         currentSegmentMO = null;
         
         s = convertSegment(s);
+        
+                
         SpiceFeatureEvent event = new SpiceFeatureEvent(e.getDasSource(),e.getFeature(),s);
         
         triggerSegmentSelected(event);
