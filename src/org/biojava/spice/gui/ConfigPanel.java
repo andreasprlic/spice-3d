@@ -207,8 +207,7 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
         updateDasSourceTable();
     }
     
-    protected JPanel getGeneralConfigPanel(){
-        //JPanel panel = new JPanel();
+    protected JPanel getGeneralConfigPanel(){     
         
         TitledBorder dasborder;
         dasborder = BorderFactory.createTitledBorder(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.22")); //$NON-NLS-1$
@@ -248,8 +247,6 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
         
         h.add(txt2);
         h.add(contactRegistryNow);
-        
-        
         
         v.add(h);
         
@@ -625,15 +622,15 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
         
         MenuListener ml = new MenuListener(dasSourceTable,this);
         
-        JMenuItem menuItem = new JMenuItem(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.53")); //$NON-NLS-1$
+        JMenuItem menuItem = new JMenuItem(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Activate")); //$NON-NLS-1$
         menuItem.addActionListener(ml);
         tablePopup.add(menuItem);
-        menuItem = new JMenuItem(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.54")); //$NON-NLS-1$
+        menuItem = new JMenuItem(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Delete")); //$NON-NLS-1$
         menuItem.addActionListener(ml);
         tablePopup.add(menuItem);
         
         
-        MouseListener popupListener = new PopupListener(tablePopup,dasSourceTable,config);
+        MouseListener popupListener = new PopupListener(tablePopup,dasSourceTable);
         
         dasSourceTable.addMouseListener(popupListener);
         
@@ -861,6 +858,20 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
         config.setStatus(url,flag);
     }
     
+    
+    protected void deleteServer(SpiceDasSource ds){
+        List servers = config.getAllServers();
+        
+        for ( int i =0; i< servers.size();i++ ){
+            SpiceDasSource tds = (SpiceDasSource) servers.get(i);
+            if ( tds.getUrl().equals(ds.getUrl())){
+                config.deleteServer(i);
+                break;
+            }
+        }
+        
+        
+    }
     
     public void saveConfiguration() {
         //System.out.println("saving config");
@@ -1129,11 +1140,11 @@ class MyTableModel extends AbstractTableModel {
 class PopupListener extends MouseAdapter {
     JPopupMenu popup;
     JTable table    ;
-    RegistryConfiguration config ;
-    PopupListener(JPopupMenu popupMenu,JTable tab,RegistryConfiguration conf) {
+   
+    PopupListener(JPopupMenu popupMenu,JTable tab) {
         popup  = popupMenu;
         table  = tab     ;
-        config = conf    ;
+        
     }
     
     public void mousePressed(MouseEvent e) {
@@ -1151,9 +1162,9 @@ class PopupListener extends MouseAdapter {
             int pos = table.getSelectedRow();
             if ( pos < 0) 
                 return ;
-            //System.out.println("seleceted pos " + pos);
-            
-            SpiceDasSource ds = config.getServer(pos);
+            System.out.println("seleceted pos " + pos);
+            MyTableModel model = (MyTableModel)table.getModel();
+            SpiceDasSource ds = model.getServerAt(pos);
             
             // get the menu items
             MenuElement[] m =   popup.getSubElements() ;
@@ -1236,7 +1247,7 @@ implements ActionListener
         int    pos = table.getSelectedRow();
         if ( pos < 0) 
             return ;
-        //logger.finest("selected in row "+pos+" cmd "+cmd);
+        logger.info("selected in row "+pos+" cmd "+cmd);
         MyTableModel model = parent.getTableModel();
         SpiceDasSource ds = model.getServerAt(pos);
         String[] colNames = ConfigPanel.colNames;
@@ -1251,9 +1262,8 @@ implements ActionListener
         }
         else if ( cmd.equals(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Delete"))) {  //$NON-NLS-1$
             logger.finest("deleteting das source ..." +pos); //$NON-NLS-1$
-            
-            //TODO reenable this...
-            //config.deleteServer(pos);
+                     
+            parent.deleteServer(ds);
         }
         
         
@@ -1300,13 +1310,13 @@ class SearchAction extends AbstractAction implements KeyListener{
         table.repaint();
     }
 
-    public void keyTyped(KeyEvent arg0) {
-        searchText();        
-    }
+    public void keyTyped(KeyEvent arg0) { }
 
     public void keyPressed(KeyEvent arg0) {}
 
-    public void keyReleased(KeyEvent arg0) {  }
+    public void keyReleased(KeyEvent arg0) {
+        searchText();
+       }
     
 }
 
