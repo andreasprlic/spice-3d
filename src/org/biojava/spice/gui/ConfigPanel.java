@@ -77,11 +77,12 @@ import javax.swing.table.TableColumn;
 
 import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
-import org.biojava.spice.SPICEFrame;
+import org.biojava.spice.ResourceManager;
 import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.config.ConfigurationListener;
 import org.biojava.spice.config.RegistryConfigIO;
 import org.biojava.spice.config.RegistryConfiguration;
+import org.biojava.spice.config.SearchDasSourceManager;
 import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.spice.utils.BrowserOpener;
 
@@ -94,15 +95,15 @@ import org.biojava.spice.utils.BrowserOpener;
 public class ConfigPanel extends JPanel implements ConfigurationListener{
     
     private static final long serialVersionUID = 8273923744127087421L;
-    static Logger    logger      = Logger.getLogger("org.biojava.spice");
-    static String[] colNames= new String [] {"active","nickname","public"};
+    static Logger    logger      = Logger.getLogger("org.biojava.spice"); //$NON-NLS-1$
+    public static String[] colNames= new String [] {ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Active"),ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Nickname"),ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Public")}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     static String[] DASSOURCE_FIELDS = new String[] { 
-        "url",
-        "adminemail", 
-        "capabilities",
-        "descrioption",
-        "public",
-        "active"
+        ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Url"), //$NON-NLS-1$
+        ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Adminemail"),  //$NON-NLS-1$
+        ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Capabilities"), //$NON-NLS-1$
+        ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Description"), //$NON-NLS-1$
+        ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Public"), //$NON-NLS-1$
+        ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Active") //$NON-NLS-1$
     };
     
    
@@ -114,6 +115,7 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
     JTextField              pdbDirectory;
     JFileChooser            chooser = new JFileChooser(); 
     JTextField              fileExtensions;      
+    JTextField              searchBox;
     JEditorPane             sourceDescription;
     JScrollPane             descriptionScrollPane;
     JPopupMenu              tablePopup;
@@ -122,9 +124,10 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
     int selectMoveStartPosition;
     SpiceApplication spice                   ;
     
-    String baseName="spice";
+    String baseName="spice"; //$NON-NLS-1$
     ResourceBundle resource;
    
+    
     
     public ConfigPanel(SpiceApplication spice,RegistryConfiguration conf) {
     
@@ -136,13 +139,13 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
         this.config = conf;
         
         chooser = new JFileChooser();
-        chooser.setCurrentDirectory(new java.io.File("."));
-        chooser.setDialogTitle("select directory containing PDB files");
+        chooser.setCurrentDirectory(new java.io.File(".")); //$NON-NLS-1$
+        chooser.setDialogTitle(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.12")); //$NON-NLS-1$
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         
         
         tabbedPane = new JTabbedPane();
-        ImageIcon icon = SpiceApplication.createImageIcon("spice16x16.gif");
+        ImageIcon icon = SpiceApplication.createImageIcon(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.13")); //$NON-NLS-1$
         
         selectMoveStartPosition = -1 ;
         
@@ -153,8 +156,8 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
         
         
         JPanel seqstrucpanel = getAvailablePanel();
-        tabbedPane.addTab("list", icon, seqstrucpanel,
-        "configure sequence and structure servers");
+        tabbedPane.addTab(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.14"), icon, seqstrucpanel, //$NON-NLS-1$
+        ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.15")); //$NON-NLS-1$
         tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
         
         
@@ -164,7 +167,7 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
         
         
         JPanel addLocalPanel = getAddLocalPanel();              
-        tabbedPane.addTab("add local", icon, addLocalPanel,"add a local DAS source");
+        tabbedPane.addTab(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.16"), icon, addLocalPanel,ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.17")); //$NON-NLS-1$ //$NON-NLS-2$
         tabbedPane.setMnemonicAt(1, KeyEvent.VK_2);       
         
         ////////////////////////////////////////////////////////
@@ -172,7 +175,7 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
         ////////////////////////////////////////////////////////
         
         JPanel localPDBPanel = getLocalPDBPanel();       
-        tabbedPane.addTab("local PDB files", icon, localPDBPanel,"try to load PDB files from local directory first.");
+        tabbedPane.addTab(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.18"), icon, localPDBPanel,ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.19")); //$NON-NLS-1$ //$NON-NLS-2$
         
         
         ////////////////////////////////////////////////////////
@@ -180,7 +183,7 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
         ////////////////////////////////////////////////////////
         
         JPanel generalConfigPanel = getGeneralConfigPanel();        
-        tabbedPane.addTab("general config", icon, generalConfigPanel,"general Spice config");
+        tabbedPane.addTab(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.20"), icon, generalConfigPanel,ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.21")); //$NON-NLS-1$ //$NON-NLS-2$
         
         
         
@@ -195,10 +198,9 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
     }
     
-    public String[] getColNames(){
-        return colNames ;
+    public RegistryConfiguration getConfiguration(){
+        return config;
     }
-    
     
     public void newConfigRetrieved (RegistryConfiguration cfg ) {
         config = cfg;
@@ -209,38 +211,38 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
         //JPanel panel = new JPanel();
         
         TitledBorder dasborder;
-        dasborder = BorderFactory.createTitledBorder("general");
+        dasborder = BorderFactory.createTitledBorder(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.22")); //$NON-NLS-1$
         
         JPanel generalConfigForm = new JPanel();
         
         generalConfigForm.setBorder(dasborder);
         
         Box v = Box.createVerticalBox();
-        JTextField txt = new JTextField(" contact DAS-registration server");
+        JTextField txt = new JTextField(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.23")); //$NON-NLS-1$
         txt.setEditable(false);
         txt.setBorder(BorderFactory.createEmptyBorder());
         v.add(txt);
         
-        String[] freq = { "always","once per day"};
+        String[] freq = { ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Always"),ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.25")}; //$NON-NLS-1$ //$NON-NLS-2$
         updateBehaveList = new JComboBox(freq) ;        
         updateBehaveList.setEditable(false);
         updateBehaveList.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
         String selectedFreq = config.getUpdateBehave();
         int index = 1 ;
-        if (selectedFreq.equals("always")) 
+        if (selectedFreq.equals(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Always")))  //$NON-NLS-1$
             index = 0 ;
         updateBehaveList.setSelectedIndex(index);
         
         v.add(updateBehaveList);
         
         
-        JButton contactRegistryNow = new JButton ("Now");
-        ConfigActionListener cal = new ConfigActionListener(spice,config,this);
+        JButton contactRegistryNow = new JButton (ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Now")); //$NON-NLS-1$
+        ConfigActionListener cal = new ConfigActionListener(config,this);
         contactRegistryNow.addActionListener(cal);
         
         
         Box h = Box.createHorizontalBox();
-        JTextField txt2 = new JTextField("detect available servers") ;
+        JTextField txt2 = new JTextField(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.28")) ; //$NON-NLS-1$
         txt2.setEditable(false);
         txt2.setBorder(BorderFactory.createEmptyBorder());
         
@@ -253,7 +255,7 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
         
         
         // config which registry to use.    
-        JTextField regdesc  = new JTextField("use registry");
+        JTextField regdesc  = new JTextField(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.29")); //$NON-NLS-1$
         regdesc.setEditable(false);
         regdesc.setBorder(BorderFactory.createEmptyBorder());
         v.add(regdesc);
@@ -263,12 +265,12 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
         
         //   configure window behaviour.
         
-        JTextField jmoldesc  = new JTextField("position of Jmol - 3D structure window");
+        JTextField jmoldesc  = new JTextField(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.30")); //$NON-NLS-1$
         jmoldesc.setEditable(false);
         jmoldesc.setBorder(BorderFactory.createEmptyBorder());
         v.add(jmoldesc);
         
-        String[] windowPosition = {"top", "right","left","bottom"};
+        String[] windowPosition = {ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.31"), ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.32"),ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.33"),ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.34")}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
         JComboBox windowlayout = new JComboBox(windowPosition);
         v.add(windowlayout);
         
@@ -285,7 +287,7 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
         
         
         TitledBorder dasborder3;
-        dasborder3 = BorderFactory.createTitledBorder("get PDB from local dir");
+        dasborder3 = BorderFactory.createTitledBorder(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.35")); //$NON-NLS-1$
         
         JPanel pdbDirForm = new JPanel();
         
@@ -295,7 +297,7 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
         
         Box h = Box.createHorizontalBox();
         
-        JTextField txt = new JTextField("try to get PDB files from local directory, if not found, get from public DAS server");
+        JTextField txt = new JTextField(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.36")); //$NON-NLS-1$
         txt.setEditable(false);
         txt.setBorder(BorderFactory.createEmptyBorder());
         v.add(txt);
@@ -303,16 +305,16 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
         
         //txt.setEditable(false);
         
-        JTextField f = new JTextField("file://");
+        JTextField f = new JTextField("file://"); //$NON-NLS-1$
         f.setEditable(false);
         f.setBorder(BorderFactory.createEmptyBorder());
         h.add(f);
-        pdbDirectory = new JTextField("");
+        pdbDirectory = new JTextField(""); //$NON-NLS-1$
         //pdbDirectory.setMaximumSize(new Dimension(300,30));
         //pdbDirectory.setPreferredSize(new Dimension(300,30));
         h.add(pdbDirectory);
         
-        JButton go = new JButton("Choose ...");
+        JButton go = new JButton(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.39")); //$NON-NLS-1$
         
         go.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -320,8 +322,6 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
                 
                 if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) { 
                     
-                    //System.out.println("getCurrentDirectory(): " +  chooser.getCurrentDirectory());
-                    //System.out.println("getSelectedFile() : " +  chooser.getSelectedFile());
                     pdbDirectory.setText( chooser.getSelectedFile().toString());
                     
                 }
@@ -337,13 +337,13 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
         
         Box h2 = Box.createHorizontalBox();
         
-        JTextField fileExtensionsTxt = new JTextField("file extensions for PDB files:");
+        JTextField fileExtensionsTxt = new JTextField(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.40")); //$NON-NLS-1$
         fileExtensionsTxt.setEditable(false);
         fileExtensionsTxt.setBorder(BorderFactory.createEmptyBorder());
         
         h2.add(fileExtensionsTxt);
         
-        fileExtensions = new JTextField( ".ent .pdb .ent.Z .pdb.Z" );
+        fileExtensions = new JTextField( ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.41") ); //$NON-NLS-1$
         //fileExtensions.setPreferredSize( new Dimension(300,30)      );
         h2.add(fileExtensions);
         
@@ -361,7 +361,7 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
         addLocalPanel.setLayout(new BoxLayout(addLocalPanel, BoxLayout.LINE_AXIS));
         
         TitledBorder dasborder2;
-        dasborder2 = BorderFactory.createTitledBorder("add local DAS source");
+        dasborder2 = BorderFactory.createTitledBorder(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.42")); //$NON-NLS-1$
         
         JPanel entryForm = new JPanel();
         entryForm.setBorder(dasborder2);
@@ -378,7 +378,7 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
         for ( int i = 0 ; i < DASSOURCE_FIELDS.length; i++) {
             String col = DASSOURCE_FIELDS[i];
             
-            if ( col.equals("public")  || col.equals("active") ) 
+            if ( col.equals(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Public"))  || col.equals(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Active")) )  //$NON-NLS-1$ //$NON-NLS-2$
                 continue ;
             
             JTextField txt1 = new JTextField(col);
@@ -387,7 +387,7 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
             txt1.setBorder(BorderFactory.createEmptyBorder());
             vBoxLeft.add(txt1);
             
-            if (col.equals("coordinateSystems")) {
+            if (col.equals(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.CoordinateSystems"))) { //$NON-NLS-1$
                 // display coordinateSystems box
                 String[] coords = { BrowserPane.DEFAULT_UNIPROTCOORDSYS, BrowserPane.DEFAULT_PDBCOORDSYS, BrowserPane.DEFAULT_ENSPCOORDSYS};
                 JComboBox list = new JComboBox(coords) ;        
@@ -397,7 +397,7 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
                 vBoxRight.add(list);    
                 entryFormFields.add(list);
                 
-            } else if ( col.equals("capabilities")) {
+            } else if ( col.equals(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Capabilities"))) { //$NON-NLS-1$
                 JList list = new JList(config.getCapabilities());
                 list.setVisibleRowCount(1);
                 //list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -423,7 +423,7 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
                 
             } else {
                 
-                JTextField txt2 = new JTextField("");
+                JTextField txt2 = new JTextField(""); //$NON-NLS-1$
                 txt2.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
                 vBoxRight.add(txt2);
                 entryFormFields.add(txt2);
@@ -435,6 +435,11 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
         entryForm.add(vBoxRight);
         addLocalPanel.add(entryForm);
         return addLocalPanel ;
+    }
+    
+    protected void showAllSources(){
+        updateDasSourceTable();
+        
     }
     
     protected void selectAllSources(){
@@ -452,54 +457,62 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
     
     protected JPanel getAvailablePanel() {
         TitledBorder dasborder1;
-        dasborder1 = BorderFactory.createTitledBorder("available DAS sources");
+        dasborder1 = BorderFactory.createTitledBorder(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.AvailableSources")); //$NON-NLS-1$
         
         // Make sequence and structure Panel
         JPanel seqstrucpanel = new JPanel();
         seqstrucpanel.setLayout(new BoxLayout(seqstrucpanel, BoxLayout.Y_AXIS));    
         //List sequenceservers = config.getServers() ;
         
-        JButton selectAll = new JButton("Select All");
+        JButton selectAll = new JButton(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.SelectAll")); //$NON-NLS-1$
         Box xBox = Box.createHorizontalBox();
         xBox.add(selectAll);
         seqstrucpanel.add(xBox);
         
         selectAll.addActionListener(new ActionListener(){
 
-            public void actionPerformed(ActionEvent arg0) {
-              // selectAllDasSources
+            public void actionPerformed(ActionEvent arg0) {          
                 selectAllSources();
-            }
-            
+            }            
         });
         
         
-        Action searchAction = new AbstractAction(resource.getString("org.biojava.spice.gui.ConfigPanel.Search")) {
-            public static final long serialVersionUID = 0l;
-            // This method is called when the button is pressed
-            public void actionPerformed(ActionEvent evt) {
-                // Perform action...
-               System.out.println("search action!");
-            }
+        Action showAllAction = new AbstractAction(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.ShowAll")) {//$NON-NLS-1$
+
+            static final long serialVersionUID = 0l;
+            public void actionPerformed(ActionEvent arg0) {
+                showAllSources();                
+            }            
         };
         
-        JButton search = new JButton(searchAction);
-        xBox.add(search);
-        JTextField searchBox = new JTextField();
+        JButton showAll = new JButton(showAllAction);
+        xBox.add(showAll);
+        
+        searchBox = new JTextField();
         searchBox.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
-        xBox.add(searchBox);
-        
-        
-        
         
         Object seqdata[][] = getTabData();
         
         //System.out.println(seqdata);
         //JTable table= new JTable(seqdata,colNames);
-        dasSourceTableModel = new MyTableModel(this,seqdata,colNames);
-        //mtm.getModel().addTableModelListener(this);
+        List sources = config.getAllServers();
+        SpiceDasSource[] sourceArray = (SpiceDasSource[]) sources.toArray(new SpiceDasSource[sources.size()]);
+        dasSourceTableModel = new MyTableModel(this,seqdata,colNames,sourceArray);
         
         dasSourceTable  = new JTable(dasSourceTableModel);
+        
+        
+        SearchAction searchAction = new SearchAction(resource.getString("org.biojava.spice.gui.ConfigPanel.Search"),
+                this,searchBox,dasSourceTable); //$NON-NLS-1$
+        
+        searchBox.addActionListener(searchAction);
+        searchBox.addKeyListener(searchAction);
+        JButton search = new JButton(searchAction);
+        xBox.add(searchBox);
+        xBox.add(search);
+       
+        
+        
         
         // Disable auto resizing
         dasSourceTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
@@ -510,7 +523,7 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
             TableColumn col = dasSourceTable.getColumnModel().getColumn(vColIndex);
             
             int width = 30;
-            if ( colNames[vColIndex].equals("nickname"))
+            if ( colNames[vColIndex].equals(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Nickname"))) //$NON-NLS-1$
                 width = 160;
             col.setPreferredWidth(width);
         }
@@ -531,14 +544,17 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
                 if (lsm.isSelectionEmpty()) {
                     return ;
                 }
-                List servers = config.getAllServers();
+                
+                MyTableModel model = (MyTableModel) dasSourceTable.getModel();
+                SpiceDasSource[] servers = model.getServers();
+                //List servers = config.getAllServers();
                 
                 int minIndex = lsm.getMinSelectionIndex();
                 int maxIndex = lsm.getMaxSelectionIndex();
          
                 for (int i = minIndex; i <= maxIndex; i++) {
                     if (lsm.isSelectedIndex(i)) {
-                        SpiceDasSource ds = (SpiceDasSource) servers.get(i);  
+                        SpiceDasSource ds = (SpiceDasSource) servers[i];  
                         sourceDescription.setText(convertDasSource2HTML(ds));
                         
                         descriptionScrollPane.getViewport().setViewPosition(new Point(0,0));
@@ -607,12 +623,12 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
         tablePopup = new JPopupMenu();
         
         
-        MenuListener ml = new MenuListener(spice,dasSourceTable,config,this);
+        MenuListener ml = new MenuListener(dasSourceTable,this);
         
-        JMenuItem menuItem = new JMenuItem("activate");
+        JMenuItem menuItem = new JMenuItem(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.53")); //$NON-NLS-1$
         menuItem.addActionListener(ml);
         tablePopup.add(menuItem);
-        menuItem = new JMenuItem("delete");
+        menuItem = new JMenuItem(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.54")); //$NON-NLS-1$
         menuItem.addActionListener(ml);
         tablePopup.add(menuItem);
         
@@ -625,10 +641,10 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
         JScrollPane seqscrollPane = new JScrollPane(dasSourceTable) ;
         seqscrollPane.setBorder(dasborder1);
         
-        sourceDescription = new JEditorPane("text/html", "<html><body>"+
-                "<font size=\"2\" face=\"Verdana, Arial, Helvetica, sans-serif\">"+
-                "Please select a DAS source"+
-                "</font></body></html>");
+        sourceDescription = new JEditorPane("text/html", "<html><body>"+ //$NON-NLS-1$ //$NON-NLS-2$
+                "<font size=\"2\" face=\"Verdana, Arial, Helvetica, sans-serif\">"+ //$NON-NLS-1$
+                ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.11")+ //$NON-NLS-1$
+                "</font></body></html>"); //$NON-NLS-1$
         
         // add mouse cursor 
         addHyperLinkListener();
@@ -661,11 +677,11 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
                         // change the mouse curor
                         if ( e.getEventType() == HyperlinkEvent.EventType.ENTERED) {                           
                             sourceDescription.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); 
-                            sourceDescription.setToolTipText("open in browser: " + e.getURL());
+                            sourceDescription.setToolTipText(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.60") + e.getURL()); //$NON-NLS-1$
                         }
                         if (e.getEventType() == HyperlinkEvent.EventType.EXITED) { 
                             sourceDescription.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-                            sourceDescription.setToolTipText("");
+                            sourceDescription.setToolTipText(""); //$NON-NLS-1$
                         }
                     }
                 });        
@@ -676,49 +692,49 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
         
         
         StringBuffer text = new StringBuffer(
-        "<html><body><font size=\"2\" face=\"Verdana, Arial, Helvetica, sans-serif\">");
+        "<html><body><font size=\"2\" face=\"Verdana, Arial, Helvetica, sans-serif\">"); //$NON-NLS-1$
         
-        String font = "<font color=\"#0000FF\"><b>"; 
-        String efont = "</b></font>";
-        text.append(font + "Id: "+efont  + ds.getId() +
-        "<br>");
-        text.append(font +"Nickname: "+efont +
-                ds.getNickname() + "<br>");
+        String font = "<font color=\"#0000FF\"><b>";  //$NON-NLS-1$
+        String efont = "</b></font>"; //$NON-NLS-1$
+        text.append(font + ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.65")+efont  + ds.getId() + //$NON-NLS-1$
+        "<br>"); //$NON-NLS-1$
+        text.append(font +ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.67")+efont + //$NON-NLS-1$
+                ds.getNickname() + "<br>"); //$NON-NLS-1$
         
-        text.append(font + "URL:"+efont + ds.getUrl() +
-        "<br>");
+        text.append(font + ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.69")+efont + ds.getUrl() + //$NON-NLS-1$
+        "<br>"); //$NON-NLS-1$
         
-        text.append(font + "Description: "+efont +
-                ds.getDescription() + "<br>");
+        text.append(font + ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.71")+efont + //$NON-NLS-1$
+                ds.getDescription() + "<br>"); //$NON-NLS-1$
         
-        text.append(font + "Admin Email: "+efont+" <a href=\"mailto:"
+        text.append(font + ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.73")+efont+" <a href=\"mailto:" //$NON-NLS-1$ //$NON-NLS-2$
                 +ds.getAdminemail()
-                +"\">"+ds.getAdminemail()+"</a>" +
-        "<br>");
+                +"\">"+ds.getAdminemail()+"</a>" + //$NON-NLS-1$ //$NON-NLS-2$
+        "<br>"); //$NON-NLS-1$
         
         
-        text.append(font + "Registered at: "+efont + ds.getRegisterDate() +
-        "<br>");
+        text.append(font + ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.78")+efont + ds.getRegisterDate() + //$NON-NLS-1$
+        ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.79")); //$NON-NLS-1$
         
-        text.append(font + "Last successful test: "+efont + ds.getLeaseDate() +
-        "<br>");
+        text.append(font + ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.80")+efont + ds.getLeaseDate() + //$NON-NLS-1$
+        "<br>"); //$NON-NLS-1$
         
-        text.append(font + "Labels: " +efont );
+        text.append(font + ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.82") +efont ); //$NON-NLS-1$
         for(int s=0; s<ds.getLabels().length; s++)
         {
             text.append( ds.getLabels()[s]);
             if(s<ds.getLabels().length-1)
-                text.append(",");
-            text.append(" ");
+                text.append(","); //$NON-NLS-1$
+            text.append(" "); //$NON-NLS-1$
         }
-        text.append("<br>");
+        text.append("<br>"); //$NON-NLS-1$
         
         
         
-        text.append(font + "Capabilities: "+efont);
+        text.append(font + ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.86")+efont); //$NON-NLS-1$
         String[] scap = ds.getCapabilities();
         DasCoordinateSystem[] dcs = ds.getCoordinateSystem();
-        String testCode = "";
+        String testCode = ""; //$NON-NLS-1$
         if ( dcs.length > 0)
             testCode = dcs[0].getTestCode();
         
@@ -729,33 +745,33 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
             // these DAS commands need a testcode...
             
             
-            if ( scap[j].equals("sequence"))
-                cap += "?segment="+testCode;
-            if ( scap[j].equals("structure"))
-                cap += "?query="+testCode;
-            if ( scap[j].equals("features"))
-                cap += "?segment="+testCode;
-            if ( scap[j].equals("alignment"))
-                cap += "?query="+testCode;
+            if ( scap[j].equals("sequence")) //$NON-NLS-1$
+                cap += "?segment="+testCode; //$NON-NLS-1$
+            if ( scap[j].equals("structure")) //$NON-NLS-1$
+                cap += "?query="+testCode; //$NON-NLS-1$
+            if ( scap[j].equals("features")) //$NON-NLS-1$
+                cap += "?segment="+testCode; //$NON-NLS-1$
+            if ( scap[j].equals("alignment")) //$NON-NLS-1$
+                cap += "?query="+testCode; //$NON-NLS-1$
             
             
-            text.append("<a href=\""+cap+"\">"+scap[j]+"</a>");
+            text.append("<a href=\""+cap+"\">"+scap[j]+"</a>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             if (j < scap.length - 1)
-                text.append(", ");
+                text.append(", "); //$NON-NLS-1$
         }
-        text.append("<br>");
+        text.append("<br>"); //$NON-NLS-1$
         
-        text.append(font + "Coordinates: " + efont);
+        text.append(font + ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.10") + efont); //$NON-NLS-1$
         
         for (int j = 0; j < dcs.length; j++)
         {
-            text.append(dcs[j].getCategory() + ", " + dcs[j].getName());
+            text.append(dcs[j].getCategory() + ", " + dcs[j].getName()); //$NON-NLS-1$
             if (dcs[j].getNCBITaxId() != 0)
-                text.append(", " + dcs[j].getNCBITaxId());
+                text.append(", " + dcs[j].getNCBITaxId()); //$NON-NLS-1$
             if (dcs[j].getOrganismName().length() > 0)
-                text.append(", " + dcs[j].getOrganismName());
+                text.append(", " + dcs[j].getOrganismName()); //$NON-NLS-1$
             
-            text.append("<br>");
+            text.append("<br>"); //$NON-NLS-1$
         }
         
         
@@ -764,12 +780,12 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
         if (ds.getHelperurl()!=null
                 && ds.getHelperurl().length() > 0)
         {
-            text.append("<font color=\"#0000FF\"><a href=\"" +
+            text.append("<font color=\"#0000FF\"><a href=\"" + //$NON-NLS-1$
                     ds.getHelperurl()
-                    + "\">Go to site</a></font<br>");
+                    + ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.107")); //$NON-NLS-1$
         }
         
-        text.append("</font><body></html>");
+        text.append("</font><body></html>"); //$NON-NLS-1$
         
         return text.toString();
     }
@@ -785,37 +801,46 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
     
     private Map convertSource2Map(SpiceDasSource source) {
         HashMap server = new HashMap();
-        server.put("name",source.getUrl()); // for backwards compability
-        server.put("url",source.getUrl());
-        server.put("coordinateSystems",source.getCoordinateSystem());
-        server.put("description",source.getDescription());
-        server.put("adminemail",source.getAdminemail());
-        server.put("nickname",source.getNickname());
+        server.put(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Name"),source.getUrl()); // for backwards compability //$NON-NLS-1$
+        server.put(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Url"),source.getUrl()); //$NON-NLS-1$
+        server.put(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.CoordinateSystems"),source.getCoordinateSystem()); //$NON-NLS-1$
+        server.put(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Description"),source.getDescription()); //$NON-NLS-1$
+        server.put(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Adminemail"),source.getAdminemail()); //$NON-NLS-1$
+        server.put(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Nickname"),source.getNickname()); //$NON-NLS-1$
         if (source.getRegistered()) 
-            server.put("public","Y");
+            server.put(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Public"),ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Y")); //$NON-NLS-1$ //$NON-NLS-2$
         else 
-            server.put("public","N");
-        server.put("capabilities",source.getCapabilities());
-        server.put("active",new Boolean(source.getStatus()));
+            server.put(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Public"),ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.N")); //$NON-NLS-1$ //$NON-NLS-2$
+        server.put(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Capabilities"),source.getCapabilities()); //$NON-NLS-1$
+        server.put(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Active"),new Boolean(source.getStatus())); //$NON-NLS-1$
         return server ;
     }
     
     
     public Object[][] getTabData() {
         List servers = config.getAllServers();
-
-        // active nickname public
+        SpiceDasSource[] sources = (SpiceDasSource[]) servers.toArray(new SpiceDasSource[servers.size()]);
+        return getTabData(sources);
+    }
+    
+    protected MyTableModel getTableModel(){
+        return  (MyTableModel)dasSourceTable.getModel();
+    }
+    
+    public Object[][] getTabData(SpiceDasSource[] servers){
         
-        Object[][] data = new Object[servers.size()][colNames.length+1];
         
-        for ( int i =0; i< servers.size(); i++ ) {
-            SpiceDasSource ds = (SpiceDasSource) servers.get(i);
+        
+        Object[][] data = new Object[servers.length][colNames.length+1];
+        
+        for ( int i =0; i< servers.length; i++ ) {
+            SpiceDasSource ds = (SpiceDasSource) servers[i];
             Map server = convertSource2Map(ds);
             for ( int j =0;j<colNames.length;j++){
                 String colname = colNames[j];
                 //System.out.println(colname);
-                String s = "" ;
-                if (colname.equals("active")) {
+                String s = "" ; //$NON-NLS-1$
+                if (colname.equals(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Active"))) { //$NON-NLS-1$
                     data[i][j] = server.get(colname);
                     continue;
                 }
@@ -830,8 +855,8 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
     }
     
     public void setServerStatus(String url, Boolean status){
-        System.out.print("Setting server status " + url + " " + status);
-        logger.finer("setting server status " + url + " " + status);
+        //System.out.print("Setting server status " + url + " " + status); //$NON-NLS-1$ //$NON-NLS-2$
+        logger.finer("setting server status " + url + " " + status); //$NON-NLS-1$ //$NON-NLS-2$
         boolean flag = status.booleanValue();
         config.setStatus(url,flag);
     }
@@ -848,12 +873,12 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
         if ( pos == 1 ) {       
             
             //System.out.println("adding new local DAS source");
-            logger.finest("adding new local DAS source");
+            logger.finest(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.127")); //$NON-NLS-1$
             HashMap formdata = new HashMap();
             int formPos = -1 ;
             for ( int i = 0 ; i < DASSOURCE_FIELDS.length; i++) {
                 String col = DASSOURCE_FIELDS[i];
-                if ( col.equals("public") || col.equals("active")) 
+                if ( col.equals(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Public")) || col.equals(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Active")))  //$NON-NLS-1$ //$NON-NLS-2$
                     continue ;
                 formPos++ ;
                 Object o = entryFormFields.get(formPos);
@@ -881,12 +906,12 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
             SpiceDasSource sds = new SpiceDasSource();
             sds.setRegistered(false);
             sds.setStatus(true);
-            sds.setUrl(              (String) formdata.get("url"));
-            sds.setAdminemail(       (String) formdata.get("adminemail"));
-            sds.setDescription(      (String) formdata.get("description"));
+            sds.setUrl(              (String) formdata.get(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Url"))); //$NON-NLS-1$
+            sds.setAdminemail(       (String) formdata.get(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Adminemail"))); //$NON-NLS-1$
+            sds.setDescription(      (String) formdata.get(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Description"))); //$NON-NLS-1$
             
             
-            String [] coordSys = (String[]) formdata.get("coordinateSystems");
+            String [] coordSys = (String[]) formdata.get(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.CoordinateSystems")); //$NON-NLS-1$
             DasCoordinateSystem[] dcss = new DasCoordinateSystem[coordSys.length];
             for ( int i = 0 ; i< coordSys.length;i++) {
                 DasCoordinateSystem dcs = DasCoordinateSystem.fromString(coordSys[i]);
@@ -894,7 +919,7 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
             }
             sds.setCoordinateSystem(dcss);
             
-            String[] capabs =  (String[]) formdata.get("capabilities") ;        
+            String[] capabs =  (String[]) formdata.get(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.134")) ;         //$NON-NLS-1$
             //String[] split = capabs.split(" ");
             sds.setCapabilities(capabs);
             
@@ -908,17 +933,17 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
         // get PDB files from locally
         else if ( pos == 2 ) {
             String e = fileExtensions.getText() ;
-            String[] exts = e.split(" ");
+            String[] exts = e.split(" "); //$NON-NLS-1$
             config.setPDBFileExtensions(exts);
             // add a new "pseudo" DAS source
             
             SpiceDasSource sds = new SpiceDasSource();
             sds.setRegistered(false);
-            sds.setUrl("file://"+pdbDirectory.getText());
-            sds.setAdminemail("unknown@localhost.org");
-            sds.setDescription("Access PDB files from local installation. If file not found, retreive from public DAS server");
+            sds.setUrl("file://"+pdbDirectory.getText()); //$NON-NLS-1$
+            sds.setAdminemail(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.137")); //$NON-NLS-1$
+            sds.setDescription(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.138")); //$NON-NLS-1$
             //String[] coordSys = new String[] { "PDBresnum", };
-            String[] capabs   = new String[] { "structure", };
+            String[] capabs   = new String[] { "structure", }; //$NON-NLS-1$
             
             DasCoordinateSystem dcs = DasCoordinateSystem.fromString(BrowserPane.DEFAULT_PDBCOORDSYS);
             DasCoordinateSystem[] dcss = new DasCoordinateSystem[1];
@@ -932,9 +957,9 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
             String behave = (String)updateBehaveList.getSelectedItem();
             
             //System.out.println("setting update behaviour to " + behave);
-            logger.finest("setting update behaviour to " + behave);
-            if ( behave.equals("once per day"))
-                behave = "day" ;
+            logger.finest("setting update behaviour to " + behave); //$NON-NLS-1$
+            if ( behave.equals(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.141"))) //$NON-NLS-1$
+                behave = ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.142") ; //$NON-NLS-1$
             config.setUpdateBehave(behave);
             updateDasSourceTable();
         }
@@ -952,7 +977,10 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
     
     public void updateDasSourceTable(){
         Object seqdata[][] = getTabData();
-        dasSourceTableModel = new MyTableModel(this,seqdata,colNames);
+        List sources = config.getAllServers();
+        SpiceDasSource[] sourceArray = (SpiceDasSource[]) sources.toArray(new SpiceDasSource[sources.size()]);
+        
+        dasSourceTableModel = new MyTableModel(this,seqdata,colNames,sourceArray);
         dasSourceTable.setModel(dasSourceTableModel);
         this.repaint();
         tabbedPane.setSelectedIndex(0);
@@ -970,16 +998,25 @@ class MyTableModel extends AbstractTableModel {
     
     private Object[][] data ;
     private String[]   columnNames  ;
+    SpiceDasSource[] sources;
     
-    public MyTableModel(ConfigPanel parent_,Object[][]seqdata, String[] columnNames_){
+    public MyTableModel(ConfigPanel parent_,Object[][]seqdata, 
+            String[] columnNames_, SpiceDasSource[] sources){
         super();
         parent = parent_ ;
         columnNames = columnNames_;
-        
+        this.sources = sources; 
         setData(seqdata);
         
     }
     
+    public SpiceDasSource getServerAt(int rowPosition){
+        return sources[rowPosition];
+    }
+    
+    public SpiceDasSource[] getServers() {
+        return sources;
+    }
     
     private void setData(Object[][]seqdata) {
         Object[][] o = new Object[seqdata.length][columnNames.length];
@@ -1045,10 +1082,10 @@ class MyTableModel extends AbstractTableModel {
      */
     public void setValueAt(Object value, int row, int col) {
         
-         System.out.println("Setting value at " + row + "," + col
-         + " to " + value
-         + " (an instance of "
-         + value.getClass() + ")");
+         System.out.println("Setting value at " + row + "," + col //$NON-NLS-1$ //$NON-NLS-2$
+         + " to " + value //$NON-NLS-1$
+         + " (an instance of " //$NON-NLS-1$
+         + value.getClass() + ")"); //$NON-NLS-1$
          
          
         data[row][col] = value;
@@ -1058,8 +1095,9 @@ class MyTableModel extends AbstractTableModel {
             //String url = (String)model.getValueAt(row,0);
             // Do something with the data...
             //Boolean status = (Boolean) model.getValueAt(row, column);
-            String url = (String)getValueAt(row,2);
-            System.out.println("setting server status " + value);
+            SpiceDasSource ds = sources[row];
+            String url = ds.getUrl();
+            System.out.println("setting server status " + value); //$NON-NLS-1$
             parent.setServerStatus(url,(Boolean)value) ;
         }
         
@@ -1067,7 +1105,7 @@ class MyTableModel extends AbstractTableModel {
     }
     
     public void tableChanged(TableModelEvent e) {
-        System.out.println("tableChanged " + e.getColumn());
+        System.out.println("tableChanged " + e.getColumn()); //$NON-NLS-1$
         int row = e.getFirstRow();
         int column = e.getColumn();
         MyTableModel model = (MyTableModel)e.getSource();
@@ -1076,7 +1114,9 @@ class MyTableModel extends AbstractTableModel {
         
         if ( column == 0) {
             
-            String url = (String)model.getValueAt(row,2);
+            //String url = (String)model.getValueAt(row,2);
+            SpiceDasSource ds = sources[row];
+            String url = ds.getUrl();
             // Do something with the data...
             Boolean status = (Boolean) model.getValueAt(row, column);
             parent.setServerStatus(url,status) ;
@@ -1122,9 +1162,9 @@ class PopupListener extends MouseAdapter {
             
             // adapt the display of the MenuItems
             if ( ds.getStatus()) 
-                m0.setText("inactivate") ;
+                m0.setText(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Inactivate")) ; //$NON-NLS-1$
             else 
-                m0.setText("activate");
+                m0.setText(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Activate")); //$NON-NLS-1$
             
             if (ds.getRegistered())
                 m1.setEnabled(false);
@@ -1139,13 +1179,12 @@ class PopupListener extends MouseAdapter {
 
 
 class ConfigActionListener implements ActionListener{
-    SPICEFrame spice ;
+  
     RegistryConfiguration config;
     ConfigPanel parent;
-    static Logger    logger      = Logger.getLogger("org.biojava.spice");
+    static Logger    logger      = Logger.getLogger("org.biojava.spice"); //$NON-NLS-1$
     
-    public ConfigActionListener(SPICEFrame spice_, RegistryConfiguration config_, ConfigPanel tpd){
-        spice = spice_;
+    public ConfigActionListener( RegistryConfiguration config_, ConfigPanel tpd){        
         config = config_;
         parent = tpd;
     }
@@ -1173,19 +1212,20 @@ class ConfigActionListener implements ActionListener{
 class MenuListener
 implements ActionListener
 {
-    JTable table                 ;
-    RegistryConfiguration config ;
+    JTable table                 ;  
     ConfigPanel parent        ;
-    SPICEFrame spice             ;
-    static Logger    logger      = Logger.getLogger("org.biojava.spice");
+  
     
-    public MenuListener( SPICEFrame spice_, 
-            JTable tab,RegistryConfiguration conf,
-            ConfigPanel tabd ){
+    static Logger    logger      = Logger.getLogger("org.biojava.spice"); //$NON-NLS-1$
+    
+    public MenuListener(  
+            JTable tab,
+            ConfigPanel tabd
+            ){
         table  = tab  ;
-        config = conf ;
+       
         parent = tabd  ;
-        spice = spice_;
+       
     }
     
     public void actionPerformed(ActionEvent e){
@@ -1197,25 +1237,76 @@ implements ActionListener
         if ( pos < 0) 
             return ;
         //logger.finest("selected in row "+pos+" cmd "+cmd);
-        SpiceDasSource ds = config.getServer(pos);
-        String[] colNames = parent.getColNames();
+        MyTableModel model = parent.getTableModel();
+        SpiceDasSource ds = model.getServerAt(pos);
+        String[] colNames = ConfigPanel.colNames;
         
-        if (cmd.equals("activate")) {
+        if (cmd.equals(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Activate"))) { //$NON-NLS-1$
             ds.setStatus(true);
             table.setValueAt(new Boolean(true),pos,colNames.length-1);
         }
-        else if ( cmd.equals("inactivate")) {
+        else if ( cmd.equals(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Inactivate"))) { //$NON-NLS-1$
             ds.setStatus(false);
             table.setValueAt(new Boolean(false),pos,colNames.length-1);
         }
-        else if ( cmd.equals("delete")) { 
-            logger.finest("deleteting das source ..." +pos);
-            config.deleteServer(pos);
+        else if ( cmd.equals(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Delete"))) {  //$NON-NLS-1$
+            logger.finest("deleteting das source ..." +pos); //$NON-NLS-1$
+            
+            //TODO reenable this...
+            //config.deleteServer(pos);
         }
         
         
         parent.updateDasSourceTable();
         
     }
+}
+
+class SearchAction extends AbstractAction implements KeyListener{
+    
+    public static final long serialVersionUID = 0l;
+    ConfigPanel parent;
+    JTextField searchBox;
+    JTable table;
+    public SearchAction(String title, ConfigPanel parent, JTextField box, JTable table){
+        super(title);
+        this.parent = parent;
+        searchBox = box;
+        this.table = table;
+        
+    }
+    
+    /** This method is called when the button or Enter is pressed
+     * 
+     */
+    public void actionPerformed(ActionEvent evt) {
+        
+        searchText();
+    }
+    
+    private void searchText() {
+        
+        
+        String searchText = searchBox.getText();
+       
+        List servers = parent.getConfiguration().getAllServers();
+        SpiceDasSource[] sources = (SpiceDasSource[]) servers.toArray(new SpiceDasSource[servers.size()]);
+        SpiceDasSource[] selectedSources = SearchDasSourceManager.searchForKeyword(sources,searchText);
+        Object seqdata[][] = parent.getTabData(selectedSources);
+        
+             
+        MyTableModel dasSourceTableModel = new MyTableModel(parent,seqdata,ConfigPanel.colNames, selectedSources);
+        table.setModel(dasSourceTableModel);
+        table.repaint();
+    }
+
+    public void keyTyped(KeyEvent arg0) {
+        searchText();        
+    }
+
+    public void keyPressed(KeyEvent arg0) {}
+
+    public void keyReleased(KeyEvent arg0) {  }
+    
 }
 
