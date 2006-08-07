@@ -38,32 +38,34 @@ import org.biojava.spice.manypanel.BrowserPane;
  * @author Andreas Prlic
  *
  */
-public class StartParametereFilter {
+public class StartParameterFilter {
 
-    SpiceStartParameters parameters;
+    
     String[] displayLabels;
     String[] displayDASServers;
     
     public static Logger logger =  Logger.getLogger("org.biojava.spice");
     
     
-    public StartParametereFilter(SpiceStartParameters params) {
+    public StartParameterFilter() {
         super();
-        parameters = params;
+        
         displayLabels = new String[0];
         displayDASServers = new String[0];
         
-        setDisplayServers(params.getDisplay());
-        setDisplayLabels(params.getDisplayLabel());
+        setDisplayServers(null);
+        setDisplayLabels(null);
         
     }
 
     /** convert a ";" separated list of DAS source ids e.g. DS_101;DS_102;DS_110
-     * into the unique idds of DAS servers
+     * into the unique ids of DAS servers
      * @param spiceargument
      */
-    private void setDisplayServers(String spiceargument){
+    public void setDisplayServers(String spiceargument){
+        
         //logger.info("SpiceParameterFilter  " + spiceargument);
+        
         if ( spiceargument == null )
             if ((displayLabels == null ) || ( displayLabels.length == 0)) {
                 displayDASServers = new String[0];
@@ -86,13 +88,14 @@ public class StartParametereFilter {
         if ( spl.length == 0)
             return ;
         
+
         
         List ds = new ArrayList();
         // process the input ...
         for ( int i = 0 ; i< spl.length ; i++){
             
             String code = spl[i];
-            
+
             // each code must match to the following pattern:
             // something + "_" + a number.
             
@@ -120,8 +123,8 @@ public class StartParametereFilter {
             displayLabels = null;
     }
     
-    private void setDisplayLabels(String spiceargument){
-        //logger.info("FeatureFetcher got labels " + spiceargument);
+    public void setDisplayLabels(String spiceargument){
+        //logger.info("got labels " + spiceargument);
         if ( spiceargument == null ) {
             if ( (displayDASServers == null ) || (displayDASServers.length == 0))
                 displayLabels = new String[0];
@@ -180,9 +183,9 @@ public class StartParametereFilter {
         // check if in ids
         String id = ds.getId();
         for ( int i=0; i< displayDASServers.length;i++){
-            String testid = displayDASServers[i];
+            String testid = displayDASServers[i];           
             if ( testid.equals(id)){
-                logger.info("isInDisplayServers " + ds);
+                //logger.info("isInDisplayServers " + ds);
                 return true;
             }
         }
@@ -247,6 +250,8 @@ public class StartParametereFilter {
             return retlst;
         }
         
+       
+        
         // PART II: iterate over all servers and select only those that match
         List retlst = new ArrayList();  
         for (int i = 0 ; i < servers.length; i++){
@@ -259,6 +264,15 @@ public class StartParametereFilter {
                 //logger.info("skipping das source " + ds.getNickname());
             //    continue;
             //}
+            
+            
+            // move  servers that have particularly requested to the front
+            if( isInDisplayServers(ds)){
+                //System.out.println("adding " + ds.getNickname() + " at pos 0");
+                ds.setStatus(true);
+                retlst.add(0,ds);
+                continue;
+            }
             
             // never skip reference servers ...
             if (( hasCapability("sequence",ds)) || 
@@ -281,12 +295,6 @@ public class StartParametereFilter {
             }
             
             if ( isInDisplayLabels(ds)) {
-                ds.setStatus(true);
-                retlst.add(ds);
-                continue;
-            }
-            
-            if( isInDisplayServers(ds)){
                 ds.setStatus(true);
                 retlst.add(ds);
                 continue;

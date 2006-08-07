@@ -30,12 +30,16 @@ import java.applet.Applet;
 import org.biojava.spice.config.ConfigurationException;
 import java.util.ArrayList;
 import org.biojava.spice.gui.AboutDialog;
+import org.biojava.spice.gui.LoggingPanelManager;
 import org.biojava.spice.gui.SpiceTabbedPane;
 import java.util.List;
 import org.biojava.spice.utils.CliTools;
 
 /** the startup class of SPICE. It takes care of correctly parsing the arguments that are given to SPICE.
- * currently supported arguments are:
+ * 
+ * please look at the {@link SpiceStartParameters} class to get a complete list of arguments.
+ * 
+ *  some example arguments:
  * <ul>
  * 	<li><b>-codetype</b> the <i>type</i> of the provided code. currently supported: <i>PDB</i> and <i>UniProt</i>.</li>
  * 	<li><b>-code</b>the <i>Accession code</i>. e.g. 5pti for PDB or P00280 for UniProt.</li>
@@ -52,6 +56,7 @@ import org.biojava.spice.utils.CliTools;
  *  <li><b>-displayMessageWidth</b> (optional) set the width of the message window.
  *  <li><b>-displayMessageHeight</b> (optional) set the height of the message window. 
  *  <li><b>-localServerURL</b> (optional) add a "local" i.e. not registered DAS server
+ *  
  * @author Andreas Prlic
  * 
  * */

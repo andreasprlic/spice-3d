@@ -98,8 +98,7 @@ extends JPanel
 implements SPICEFrame, 
 ConfigurationListener
 {         
-    private static final long serialVersionUID = 8273923744127087422L;
-        
+    private static final long serialVersionUID = 8273923744127087422L;       
     
     public static Logger logger =  Logger.getLogger("org.biojava.spice");
     
@@ -1197,9 +1196,13 @@ ConfigurationListener
             i++;
         }
         
-        StartParametereFilter filter = new StartParametereFilter(startParameters);
-        startParameters.setDisplay(null);
-        startParameters.setDisplayLabel(null);
+        StartParameterFilter filter = new StartParameterFilter();
+        filter.setDisplayServers(startParameters.getDisplay());
+        filter.setDisplayLabels(startParameters.getDisplayLabel());
+        
+        //TODO: why the heck???
+        //startParameters.setDisplay(null);
+        //startParameters.setDisplayLabel(null);
         return filter.filterSources(sources);
     }
     
@@ -1256,6 +1259,10 @@ ConfigurationListener
          
         
         sources = filterSourcesWithKnowData(sources);
+        
+        for (int i=0 ; i < sources.length;i++){
+            System.out.println(" pos:"+(i+1) + " " + sources[i].getNickname());
+        }
         
         //browserPane.clearDasSources();
         browserPane.setDasSources(sources);
