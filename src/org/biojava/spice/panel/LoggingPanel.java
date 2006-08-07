@@ -219,8 +219,14 @@ public class LoggingPanel extends JPanel {
 		public void tableChanged(TableModelEvent e){
 		    if ( e.getType() == TableModelEvent.INSERT ) {
 
-		        scroll.getVerticalScrollBar().setValue(scroll.getVerticalScrollBar().getMaximum());
-		        scroll.repaint();
+                javax.swing.SwingUtilities.invokeLater(new Runnable()
+                        {
+                          public void run()
+                          {
+                              scroll.getVerticalScrollBar().setValue(scroll.getVerticalScrollBar().getMaximum());
+                              //scroll.repaint();
+                          }
+                        });
 		    }
             
 		}
