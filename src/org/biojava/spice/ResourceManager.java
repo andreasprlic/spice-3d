@@ -25,17 +25,27 @@ package org.biojava.spice;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+/** A class that manages the Strings that are defined in the spice.properties file. 
+ * This will be usefull for internationalisation. 
+ * 
+ * TODO: provide spice.properties files for other locales.
+ * e.g. spice_de_DE.properties, etc.
+ * 
+ * @author Andreas Prlic
+ * @since 1:43:04 PM
+ * @version %I% %G%
+ */
 public class ResourceManager {
+    
     private static final String BUNDLE_NAME = "spice"; //$NON-NLS-1$
 
-    private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle
-            .getBundle(BUNDLE_NAME);
+    private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
 
     private ResourceManager() {
     }
 
     public static String getString(String key) {
-        // TODO Auto-generated method stub
+        
         try {
             return RESOURCE_BUNDLE.getString(key);
         } catch (MissingResourceException e) {

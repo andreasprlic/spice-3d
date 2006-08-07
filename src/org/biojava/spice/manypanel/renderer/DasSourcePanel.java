@@ -32,7 +32,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
@@ -43,6 +42,7 @@ import java.awt.*;
 import org.biojava.bio.structure.Chain;
 import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.eventmodel.*;
+import org.biojava.spice.ResourceManager;
 import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.feature.Feature;
 import org.biojava.spice.feature.Segment;
@@ -62,41 +62,41 @@ implements FeatureListener,SpiceFeatureListener
 {
     static final long serialVersionUID = 17439836750348543l;
     
-    public static final Font plainFont;
-    public static final Font headFont; 
-    public static final Color SELECTED_FEATURE_COLOR  = Color.yellow;
-    
-    DrawableDasSource drawableDasSource;
-    
-    float scale;
     static Logger logger = Logger.getLogger("org.biojava.spice");
-  
     
-    boolean selected;
-    boolean featureSelected;
-    int selectedFeaturePos;
+    public static final Font  plainFont;
+    public static final Font  headFont; 
+    public static final Color SELECTED_FEATURE_COLOR;
+    
+    
+    
+    float     scale;
+    boolean   selected;
+    boolean   featureSelected;
+    int       selectedFeaturePos;
     ImageIcon linkIcon ;
     ImageIcon infoIcon;
-    int chainLength;
+    int       chainLength;    
+    boolean   progressThreadRunning;
     
-    boolean progressThreadRunning;
-    ProgressThread progressThread;
+    ProgressThread    progressThread;
+    DrawableDasSource drawableDasSource;
     
     static {
-        String baseName= "spice";
-        ResourceBundle resource =  ResourceBundle.getBundle(baseName);
+     
         
-        String fontName = resource.getString("org.biojava.spice.manypanel.renderer.DasSourcePanel.FontName");        
-        String fn       = resource.getString("org.biojava.spice.manypanel.renderer.DasSourcePanel.FontSize");
+        String fontName = ResourceManager.getString("org.biojava.spice.manypanel.renderer.DasSourcePanel.FontName");        
+        String fn       = ResourceManager.getString("org.biojava.spice.manypanel.renderer.DasSourcePanel.FontSize");
         int fsize       = Integer.parseInt(fn);
         plainFont       = new Font(fontName, Font.PLAIN, fsize);
         
-        String headFontName = resource.getString("org.biojava.spice.manypanel.renderer.DasSourcePanel.HeadFontName");
-        String fh           = resource.getString("org.biojava.spice.manypanel.renderer.DasSourcePanel.HeadFontSize");        
+        String headFontName = ResourceManager.getString("org.biojava.spice.manypanel.renderer.DasSourcePanel.HeadFontName");
+        String fh           = ResourceManager.getString("org.biojava.spice.manypanel.renderer.DasSourcePanel.HeadFontSize");        
         int hsize           = Integer.parseInt(fh);
         headFont            = new Font(headFontName, Font.BOLD,hsize);
-        //TODO: add remaining static variables to resource file
         
+        String selColor = ResourceManager.getString("org.biojava.spice.manypanel.renderer.DasSourcePanel.SelectedFeatureColor");
+        SELECTED_FEATURE_COLOR = Color.decode(selColor);
     }
     
     public DasSourcePanel(DrawableDasSource ds) {
@@ -131,7 +131,7 @@ implements FeatureListener,SpiceFeatureListener
     
     public void setChain(Chain chain){
   
-            chainLength = chain.getLength();
+            chainLength = chain.getLengthAminos();
         
     }
     
@@ -559,12 +559,14 @@ implements FeatureListener,SpiceFeatureListener
         int f = featurePos;
         
         if ( featureSelected){
+            //logger.info("feature selected " + selectedFeaturePos);
             if (f == selectedFeaturePos) {
                 int fullwidth = Math.round(scale*chainLength);
-                //Dimension dstruc = this.getSize();
+               
                 g2D.setColor(SELECTED_FEATURE_COLOR);
                 Composite oldComp = g2D.getComposite();
                 int drawHeight = SequenceScalePanel.DEFAULT_Y_STEP;
+                
                 g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER ,0.6f));
                 g2D.fillRect(0,y,fullwidth+SequenceScalePanel.DEFAULT_X_START,drawHeight);
                 g2D.setComposite(oldComp);
@@ -579,10 +581,7 @@ implements FeatureListener,SpiceFeatureListener
             
             y += SequenceScalePanel.DEFAULT_Y_STEP;
             Feature feature = features[f];
-            
-          
-            
-           
+             
             setColor(g,feature,new HashMap());
             String featureType = feature.getType();
             
@@ -926,7 +925,7 @@ implements FeatureListener,SpiceFeatureListener
                 if ( ! found){
                     continue;
                 }
-                //logger.info("setting feature pos "  + i);
+                    //logger.info("setting feature pos "  + i);
                 selectedFeaturePos = i;
                 featureOnThisPanel = true;
                 featureSelected = true;

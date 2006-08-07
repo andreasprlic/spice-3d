@@ -519,7 +519,7 @@ ConfigurationListener
         SequenceListener[] li = browserPane.getPDBSequenceListener();
         for ( int i = 0 ; i < li.length;i++){
             jmolSpiceTranslator.addPDBSequenceListener(li[i]);
-            // TODO: enable next line
+            // TODO: enable next line (???)
             //selectionPanel.addPDBSequenceListener(li[i]);
                 
         }
@@ -1200,7 +1200,7 @@ ConfigurationListener
         filter.setDisplayServers(startParameters.getDisplay());
         filter.setDisplayLabels(startParameters.getDisplayLabel());
         
-        //TODO: why the heck???
+        //TODO: why the heck were the next lines?
         //startParameters.setDisplay(null);
         //startParameters.setDisplayLabel(null);
         return filter.filterSources(sources);
@@ -1247,22 +1247,22 @@ ConfigurationListener
         List l = config.getAllServers();
         logger.finest("got " + l.size() + " servers");
         
-        if ( logger.isLoggable(Level.FINEST)) {
+        //if ( logger.isLoggable(Level.FINEST)) {
             //Iterator iter = l.iterator();
             //while (iter.hasNext()){
                 //SpiceDasSource ds = (SpiceDasSource)iter.next();
                 //logger.finest("setDasSources " + ds.getNickname() + " " + ds.getStatus());
             //}
-        }
+        //}
        
         SpiceDasSource[] sources = filterSourcesWithStartupData(l);
          
         
         sources = filterSourcesWithKnowData(sources);
         
-        for (int i=0 ; i < sources.length;i++){
+        /*for (int i=0 ; i < sources.length;i++){
             System.out.println(" pos:"+(i+1) + " " + sources[i].getNickname());
-        }
+        }*/
         
         //browserPane.clearDasSources();
         browserPane.setDasSources(sources);

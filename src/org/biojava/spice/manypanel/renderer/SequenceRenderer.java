@@ -61,6 +61,7 @@ extends AbstractChainRenderer
         columnCursor.setChain(sequence.getSequence());
         mouseListener.setChain(sequence.getSequence());
         toolTipper.setChain(sequence.getSequence());
+        
         Iterator iter = dasSourcePanels.iterator();
         while (iter.hasNext()){
             DasSourcePanel dsp = (DasSourcePanel)iter.next();

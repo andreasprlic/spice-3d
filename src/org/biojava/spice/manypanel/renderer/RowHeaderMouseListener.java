@@ -218,7 +218,7 @@ MouseMotionListener {
         SpiceFeatureEvent event = getSpiceFeatureEvent(e);
         
         if ( event != null){
-            triggerFeatureSelectedEvent(event);
+            triggerFeatureSelectedEvent(event);       
         }
         
         DrawableDasSource dds = getInfoButtonDasSource(e);
@@ -314,5 +314,6 @@ MouseMotionListener {
             BrowserOpener.showDocument(link);
         }
     }        
+    
     
 }

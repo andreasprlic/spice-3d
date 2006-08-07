@@ -458,15 +458,13 @@ MouseMotionListener
     
     protected void triggerFeatureSelected(SpiceFeatureEvent event){
         Feature feature = event.getFeature();
-        //logger.info("trigger feture selected " + feature);
+        logger.info("trigger feture selected " + feature);
         if ( selectionLocked)
             return;
         
         if (feature == null){
             return;
         }
-        
-        
         
         //logger.info("trigger featureSelected " + feature);
         

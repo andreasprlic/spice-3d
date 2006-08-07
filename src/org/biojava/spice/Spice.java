@@ -90,8 +90,6 @@ public class Spice {
         System.out.println("SPICE version: " + AboutDialog.VERSION);
         System.out.println("displaying for you: " + params.getCodetype() + " " + params.getCode());
         
-        
-        
         /** test if already one instance of SPICE is running
          * if yes the code should be displayed there...
          * 

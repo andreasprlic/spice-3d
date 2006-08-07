@@ -46,6 +46,8 @@ public class DasScrollPaneColumnHeader extends JLayeredPane {
         this.add(cursor, new Integer(2));
         
         moveToFront(cursor);
+        
+        
 
     }
 

@@ -43,6 +43,7 @@ import org.biojava.spice.manypanel.eventmodel.DasSourceListener;
 import org.biojava.spice.manypanel.eventmodel.FeatureListener;
 import org.biojava.spice.manypanel.eventmodel.ScaleEvent;
 import org.biojava.spice.manypanel.eventmodel.ScaleListener;
+import org.biojava.spice.manypanel.eventmodel.SpiceFeatureListener;
 import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.spice.manypanel.drawable.DrawableDasSource;
 import org.biojava.spice.manypanel.drawable.DrawableSequence;
@@ -217,9 +218,9 @@ public abstract class AbstractChainRenderer
     
     
     public void clearListeners(){
-        mouseListener.clearSequenceListeners();
-        mouseListener.clearSpiceFeatureListeners();
         
+        mouseListener.clearSequenceListeners();
+        mouseListener.clearSpiceFeatureListeners();        
         rowHeaderListener.clearSpiceFeatureListeners();
         
     }
@@ -283,12 +284,22 @@ public abstract class AbstractChainRenderer
         return cursors;
     }
     
+    public RowHeaderMouseListener getRowHeaderListener() {
+        return rowHeaderListener;
+    }
+    
     public ChainRendererMouseListener getChainRendererMouseListener(){
         return mouseListener;
     }
     
     public void addSequenceListener(SequenceListener li){
         mouseListener.addSequenceListener(li);
+    }
+    
+    
+    public void addSpiceFeatureListener(SpiceFeatureListener li) {
+        mouseListener.addSpiceFeatureListener(li);
+        rowHeaderListener.addSpiceFeatureListener(li);
     }
    
     public void addScaleChangeListener(ScaleListener li){

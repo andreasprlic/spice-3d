@@ -171,37 +171,21 @@ implements DasSourceListener
         setPrefSize();
     }
 
-    public void removeDasSource(DasSourceEvent ds) {
-        // TODO Auto-generated method stub
-        
-    }
+    public void removeDasSource(DasSourceEvent ds) {}
 
-    public void selectedDasSource(DasSourceEvent ds) {
-        // TODO Auto-generated method stub
-        
-    }
+    public void selectedDasSource(DasSourceEvent ds) {   }
 
-    public void loadingStarted(DasSourceEvent ds) {
-        // TODO Auto-generated method stub
-        
-    }
+    public void loadingStarted(DasSourceEvent ds) {}
 
     public void loadingFinished(DasSourceEvent ds) {
-        // TODO Auto-generated method stub
         //updatePanelPositions();
         this.repaint();
         setPrefSize();
         
     }
 
-    public void enableDasSource(DasSourceEvent ds) {
-        // TODO Auto-generated method stub
-        
-    }
+    public void enableDasSource(DasSourceEvent ds) {}
 
-    public void disableDasSource(DasSourceEvent ds) {
-        // TODO Auto-generated method stub
-        
-    }
+    public void disableDasSource(DasSourceEvent ds) { }
     
 }

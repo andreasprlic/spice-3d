@@ -394,7 +394,7 @@ JmolCommander
     public void featureSelected(SpiceFeatureEvent e){
         
         Feature feat = (Feature) e.getFeature();
-        //logger.info("selected feature " + feat);
+        logger.info("StructurePanelListener selected feature " + feat);
         //System.out.println("StructurePanel selected feature " + feat);
         Map[] stylesheet = e.getDasSource().get3DStylesheet();
         highliteFeature(feat,stylesheet,true);

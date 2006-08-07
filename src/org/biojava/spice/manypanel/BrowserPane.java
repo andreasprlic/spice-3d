@@ -134,7 +134,8 @@ ChangeListener
         strucManager = new StructureManager();
         addStructureListener(strucManager);
         
-        structureRenderer = new StructureRenderer(); 
+        structureRenderer = new StructureRenderer();
+        //structureRenderer = new StructureRenderer(); 
         structureRenderer.getStatusPanel().setName("PDB");
         structureRenderer.setBackground(BG_COLOR);
         
@@ -236,8 +237,6 @@ ChangeListener
         seqRenderer.addSequenceListener(seqAligRenderer.getSequenceListener2());
         aligManager.addSequence1Listener(seqAligRenderer.getSequenceListener1());
         aligManager.addSequence2Listener(seqAligRenderer.getSequenceListener2());
-        
-        
         
         structureRenderer.addAdjustmentListener(seqAligRenderer.getAdjust1());
         seqRenderer.addAdjustmentListener(seqAligRenderer.getAdjust2());
@@ -439,10 +438,14 @@ ChangeListener
     private void registerEventTranslators(){
 
         
-        ChainRendererMouseListener mouserPdb = structureRenderer.getChainRendererMouseListener();
+        ChainRendererMouseListener mouserPdb  = structureRenderer.getChainRendererMouseListener();
         ChainRendererMouseListener mouserUp   = seqRenderer.getChainRendererMouseListener();
         ChainRendererMouseListener mouserEnsp = enspRenderer.getChainRendererMouseListener();
         
+        // for selection of the whole feature
+        RowHeaderMouseListener upRowHeader   = seqRenderer.getRowHeaderListener();
+        RowHeaderMouseListener pdbRowHeader  = structureRenderer.getRowHeaderListener();
+        RowHeaderMouseListener enspRowHeader = enspRenderer.getRowHeaderListener();
         
         SpiceFeatureListener li1 = aligManager.getFeatureTranslator1();
         SpiceFeatureListener li2 = aligManager.getFeatureTranslator2();
@@ -452,9 +455,15 @@ ChangeListener
         
         
         mouserPdb.addSpiceFeatureListener(li1);
+        pdbRowHeader.addSpiceFeatureListener(li1);
+        
         mouserUp.addSpiceFeatureListener(li2);
         mouserUp.addSpiceFeatureListener(li3);        
+        upRowHeader.addSpiceFeatureListener(li2);
+        upRowHeader.addSpiceFeatureListener(li3);
+        
         mouserEnsp.addSpiceFeatureListener(li4);
+        enspRowHeader.addSpiceFeatureListener(li4);
         
         // and register the cursor panels ...
                 
@@ -693,10 +702,13 @@ ChangeListener
     }
     
     public void addPDBSpiceFeatureListener(SpiceFeatureListener li){
-        ChainRendererMouseListener mouser = structureRenderer.getChainRendererMouseListener();
-        mouser.addSpiceFeatureListener(li);
-        
+        // now done by renderer...
+        //ChainRendererMouseListener mouser = structureRenderer.getChainRendererMouseListener();
+        //mouser.addSpiceFeatureListener(li);        
+        structureRenderer.addSpiceFeatureListener(li);
         aligManager.addSeq1FeatureListener(li);
+        
+    
         
     }
     
@@ -847,6 +859,10 @@ ChangeListener
         strucManager.clearSequenceListeners();
         seqManager.clearSequenceListeners();
         enspManager.clearSequenceListeners();
+        
+        structureRenderer.clearListeners();
+        seqRenderer.clearListeners();
+        enspRenderer.clearListeners();
         
         
     }

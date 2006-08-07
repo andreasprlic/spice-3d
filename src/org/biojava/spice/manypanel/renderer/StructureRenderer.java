@@ -23,6 +23,7 @@
 package org.biojava.spice.manypanel.renderer;
 
 
+import java.util.Iterator;
 import java.util.logging.*;
 import org.biojava.bio.structure.*;
 import org.biojava.spice.manypanel.drawable.DrawableSequence;
@@ -49,19 +50,16 @@ extends AbstractChainRenderer
         //logger.info("init StructureRenderer");
         
         featurePanel = new StructureScalePanel();
-        cursorPanel  = new CursorPanel();       
+        cursorPanel  = new CursorPanel();  
+        
         statusPanel.setName("PDB");
         structure = new DrawableStructure("");
+        
         initPanels();
          
     }
     
-    public CursorPanel[] getCursorPanels(){
-        CursorPanel[] cursors = new CursorPanel[2];
-        cursors[0] = columnCursor;
-        cursors[1] = cursorPanel;
-        return cursors;
-    }
+    
     
     
     /** if a structure region is provided, then 
@@ -93,9 +91,9 @@ extends AbstractChainRenderer
     public void setDrawableStructure(DrawableStructure draw){
         statusPanel.setLoading(false);
         //logger.info("got new DrawableStructure");
-	synchronized(structure){
-	    structure =draw;
-	}
+        synchronized(structure){
+            structure =draw;
+        }
 
         Structure struc = structure.getStructure();
         Chain c = struc.getChain(structure.getCurrentChainNumber());
@@ -107,8 +105,15 @@ extends AbstractChainRenderer
         statusPanel.setAccessionCode(ac);
         featurePanel.setChain(c);
         cursorPanel.setChain(c);
+        columnCursor.setChain(c);
         mouseListener.setChain(c);
         toolTipper.setChain(c);
+        
+        Iterator iter = dasSourcePanels.iterator();
+        while (iter.hasNext()){
+            DasSourcePanel dsp = (DasSourcePanel)iter.next();
+            dsp.setChain(c);
+        }
         calcScale(100);
         
 

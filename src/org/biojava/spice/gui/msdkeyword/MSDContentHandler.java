@@ -89,7 +89,7 @@ public class MSDContentHandler  extends DefaultHandler{
 	        try {
 	            date = sdf.parse(d);
 	        } catch (Exception e){
-	            e.printStackTrace();
+	            //e.printStackTrace();
 	            
 	        }
 	        depo.setLastModified(date);
