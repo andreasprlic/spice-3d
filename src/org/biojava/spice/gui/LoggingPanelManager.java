@@ -20,7 +20,7 @@
  * Created on Jul 30, 2006
  *
  */
-package org.biojava.spice;
+package org.biojava.spice.gui;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
