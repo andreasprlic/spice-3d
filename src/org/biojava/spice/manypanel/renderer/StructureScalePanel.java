@@ -166,19 +166,19 @@ extends SequenceScalePanel{
         return drawStructureRegion;
     }
     
-    private void drawStruc(Graphics2D g2D, int start, int end, 
-            int aminosize,float scale, int y){
+    private void drawStruc(Graphics2D g2D, int start, int end, int y){
         //System.out.println("Structure " + start + " " + end);
         
                 
         int xstart = getPanelPos(start);
         int endx   = getPanelPos(end)+1 ;
-        //int width  = aminosize ;
+        
         int height = DEFAULT_Y_HEIGHT ;
         
-        // draw the red structure line
+        // draw the structure line
         g2D.setColor(structureColor);  
-        g2D.fillRect(xstart,y,endx,height);
+        int diff = endx - xstart + 1;
+        g2D.fillRect(xstart,y,diff,height);
               
     }
     
@@ -192,17 +192,13 @@ extends SequenceScalePanel{
  
     private void drawStructureRegion(Graphics2D g2D,  int y){
         // data is coming from chain;
-      
+        
         int textpos = y+DEFAULT_Y_HEIGHT -2;
+      
         if ( scale > 9)
             textpos -= 2;
         
         g2D.drawString("Structure region",1, textpos);
-       
-        int aminosize = Math.round(1*scale);
-        if ( aminosize < 1)
-            aminosize = 1;
-        //int l = Math.round(length*scale);
         
         
         List segments = structureFeature.getSegments();
@@ -212,10 +208,7 @@ extends SequenceScalePanel{
             Segment s = (Segment) iter.next();
             int start = s.getStart()-1;
             int end   = s.getEnd()-1;
-            drawStruc(g2D,start,end,aminosize,scale,y);
-        }
-        
-    }
-    
-    
+            drawStruc(g2D,start,end,y);
+        }        
+    }        
 }
