@@ -23,10 +23,8 @@
 package org.biojava.spice.manypanel.renderer;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.net.MalformedURLException;
@@ -34,12 +32,13 @@ import java.net.URL;
 import java.util.List;
 
 import javax.swing.ImageIcon;
-import javax.swing.JProgressBar;
 
+import org.biojava.spice.ResourceManager;
 import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.feature.Feature;
 import org.biojava.spice.feature.Segment;
 import org.biojava.spice.manypanel.drawable.DrawableDasSource;
+
 
 
 /** a class that takes care of rendering the head of a DrawableDassource (the header part of the scrollPane)
@@ -57,25 +56,23 @@ extends DasSourcePanel{
     public static final int LINK_ICON_SIZE = 10;
     
     DrawableDasSource dasSource;
-    JProgressBar bar;
+ 
+    static Color TEXT_COLOR ;
     
-    static Color TEXT_COLOR = Color.BLACK;
+    static ImageIcon clock;
     
-    ImageIcon clock;
+    static {
+        String col = ResourceManager.getString("org.biojava.spice.manypanel.renderer.FontColor");
+        TEXT_COLOR = Color.decode(col);
+        
+        clock = SpiceApplication.createImageIcon("clock.png");
+        
+    }
     
     public DasSourcePanelHeader(DrawableDasSource ds) {
         super(ds);
         dasSource = ds;
         
-        bar = new JProgressBar();
-        bar.setIndeterminate(false);
-        bar.setPreferredSize(new Dimension(100,10));
-        bar.setVisible(true);
-        bar.setLocation(1,10);
-        bar.setBounds(0,0,100,10);
-        
-        clock = SpiceApplication.createImageIcon("clock.png");
-
     }
 
 
@@ -92,41 +89,15 @@ extends DasSourcePanel{
     
         //super.paintComponent(g);
         Graphics2D g2D = (Graphics2D) g;
-        Rectangle r = new Rectangle(0,y+ SequenceScalePanel.DEFAULT_Y_STEP,50,y+ SequenceScalePanel.DEFAULT_Y_STEP+10);          
+                  
         if (drawableDasSource.getLoading()){
-         
-            if (!  progressThreadRunning ) {
-                /*bar.setBounds(r);
-                bar.setLocation(0,y+SequenceScalePanel.DEFAULT_Y_STEP);
-                bar.setIndeterminate(true);
-                bar.paint(g);
-                */
-                //g2D.draw(r);
-               if (clock != null)
-                   clock.paintIcon(null, g, 1,y + SequenceScalePanel.DEFAULT_Y_STEP);
-               else                   
-                   g2D.drawString("loading ... ",1,y+(SequenceScalePanel.DEFAULT_Y_STEP*2));
-               
-            }
-            //add
-            //bar.paintComponent(g);
-            
-        } else {
-            /*
+  
             if (clock != null)
-                clock.paintIcon(null, g, 1,y + SequenceScalePanel.DEFAULT_Y_STEP);
+                clock.paintIcon(null, g, 1,y + clock.getIconHeight());
             else                   
                 g2D.drawString("loading ... ",1,y+(SequenceScalePanel.DEFAULT_Y_STEP*2));
-            */
-            /*if ( progressThreadRunning){
-                bar.setBounds(r);
-                bar.setIndeterminate(false);
-                bar.paint(g);
-                      
-                
-            }*/
+            
         }
-        
         
      
         g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);

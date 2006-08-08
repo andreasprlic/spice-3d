@@ -77,7 +77,7 @@ implements FeatureListener,SpiceFeatureListener
     ImageIcon linkIcon ;
     ImageIcon infoIcon;
     int       chainLength;    
-    boolean   progressThreadRunning;
+   
     
     ProgressThread    progressThread;
     DrawableDasSource drawableDasSource;
@@ -113,7 +113,7 @@ implements FeatureListener,SpiceFeatureListener
         chainLength = 0;
         linkIcon = SpiceApplication.createImageIcon("firefox10x10.png");
         infoIcon = SpiceApplication.createImageIcon("messagebox_info16x16.png");
-        progressThreadRunning = false;
+        
     }
     
     
