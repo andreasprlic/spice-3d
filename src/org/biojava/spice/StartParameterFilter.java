@@ -218,6 +218,8 @@ public class StartParameterFilter {
                 && ( displayLabels != null )
                 && ( displayLabels.length == 0)) {
             
+            System.out.println("using part I got " + servers.length + " servers" );
+            
             List retlst = new ArrayList();  
             for (int i = 0 ; i < servers.length; i++){
                 
@@ -239,6 +241,7 @@ public class StartParameterFilter {
                     String cs = coordSys[d].toString();
                     if ( (cs.equals(BrowserPane.DEFAULT_PDBCOORDSYS) || (cs.equals(BrowserPane.DEFAULT_UNIPROTCOORDSYS)
                             || (cs.equals(BrowserPane.DEFAULT_ENSPCOORDSYS))) || ( ds.getStatus()) )) {
+                        if ( ! retlst.contains(ds))
                             retlst.add(ds);
                     } else
                         // this is not in any of the three csses that can be displayed.                        
@@ -251,7 +254,7 @@ public class StartParameterFilter {
         }
         
        
-        
+        System.out.println("using part II");
         // PART II: iterate over all servers and select only those that match
         List retlst = new ArrayList();  
         for (int i = 0 ; i < servers.length; i++){

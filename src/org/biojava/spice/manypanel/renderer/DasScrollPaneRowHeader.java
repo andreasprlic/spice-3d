@@ -165,10 +165,18 @@ implements DasSourceListener
         dasSources.add(dsph); 
         this.add(dsph);
         //dsph.setPreferredSize(new Dimension(SIZE,dsph.getDisplayHeight()));     
-        this.setPreferredSize(new Dimension(SIZE, getDisplayHeight()));
+        
+        //this.setPreferredSize(new Dimension(SIZE, getDisplayHeight()));
        
         //updatePanelPositions();
         setPrefSize();
+    }
+    
+    public void clearDasSources(){
+        dasSources.clear();
+        this.removeAll();
+        setPrefSize();
+        
     }
 
     public void removeDasSource(DasSourceEvent ds) {}

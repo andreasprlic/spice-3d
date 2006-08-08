@@ -108,20 +108,20 @@ JmolCommander
     /** sent the exit command that terminates the curretn Jmol scripting queue.
      *  Only call this when you are sure ...
      *
-     */
+     
     private void hardInterruptJmol(){
         String cmd = "exit;";
         executeCmd(cmd);
-    }
+    }*/
     
     /** interrupt any script that is currently being executed by Jmol
      * 
      *
-     */
+     
     private void interruptJmol(){
         String cmd = "quit;";
         executeCmd(cmd);
-    }
+    }*/
     
     /** display a new PDB structure in Jmol 
      * @param structure a Biojava structure object    
@@ -212,7 +212,7 @@ JmolCommander
     /** reset the Jmol panel */
     public void resetDisplay(){
         
-        interruptJmol();
+        //interruptJmol();
                 
         String cmd = INIT_SELECT;        
         executeCmd(cmd);
@@ -394,7 +394,8 @@ JmolCommander
         
         if ( ! cmd.equals("")) {            
             
-            interruptJmol();
+            // hm this causes problems ...
+            //interruptJmol();
             
             // now do the selection of the position
             executeCmd(cmd);

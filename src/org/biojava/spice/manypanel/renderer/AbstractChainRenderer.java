@@ -255,6 +255,9 @@ public abstract class AbstractChainRenderer
             layeredPane.remove(panel);
         }
         dasSourcePanels.clear();
+        
+        dasScrollPaneRowHeader.clearDasSources();
+        
     }
     
     public JScrollPane getScrollPane(){

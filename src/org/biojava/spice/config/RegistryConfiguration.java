@@ -287,7 +287,45 @@ public class RegistryConfiguration
     
     
     public String[] getCapabilities() { return capabilities ; }
+    
     public void setCapabilities(String[] capabs){capabilities = capabs ; }
+    
+    
+    /** returns the position of this server in the complete list
+     * 
+     * @param url
+     * @return position of the server in the complete list
+     */
+    private int getPosition(String url){
+        
+        for ( int i = 0 ; i < allservers.size() ; i++ ) {
+            SpiceDasSource ds = (SpiceDasSource) allservers.get(i);
+            if ( ds.getUrl().equals(url)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    
+    /** move the server with the url to position 
+     * note: all positions relative to all servers
+     * 
+     * @param url
+     * @param pos
+     */
+    public void moveToPosition(String url, int pos){
+        int currentPos = getPosition(url);
+        if ( currentPos > -1) {
+            SpiceDasSource ds = (SpiceDasSource) allservers.get(currentPos);
+            allservers.remove(currentPos);
+            if ( getPosition(url) != -1 ) {
+                logger.warning("duplicated DAS source! " + url);
+            }
+            if ( pos > allservers.size())
+                pos = allservers.size(); 
+            allservers.add(pos,ds);
+        }
+    }
     
     public void setStatus(String url, boolean status) {
         for ( int i = 0 ; i < allservers.size() ; i++ ) {

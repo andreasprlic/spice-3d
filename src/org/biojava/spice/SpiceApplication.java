@@ -625,7 +625,7 @@ ConfigurationListener
         if (imgURL != null) {
             return new ImageIcon(imgURL);
         } else {
-            logger.log(Level.WARNING,"Couldn't find file: " + path);
+            logger.log(Level.FINE,"Couldn't find file: " + path);
             return null;
         }
 
@@ -636,6 +636,7 @@ ConfigurationListener
         startParameters = parameters;        
         dealWithStartParameters();
         testAddLocalServer();
+
         setDasSources();
     }
     
@@ -1200,9 +1201,11 @@ ConfigurationListener
         filter.setDisplayServers(startParameters.getDisplay());
         filter.setDisplayLabels(startParameters.getDisplayLabel());
         
-        //TODO: why the heck were the next lines?
-        //startParameters.setDisplay(null);
-        //startParameters.setDisplayLabel(null);
+        // need to clear this for multiple tabs, otherwise this would
+        // cause problems ...
+        startParameters.setDisplay(null);
+        startParameters.setDisplayLabel(null);
+        
         return filter.filterSources(sources);
     }
     
@@ -1218,10 +1221,15 @@ ConfigurationListener
         SpiceDasSource[] sources = new SpiceDasSource[newSources.length];
      
         for (int i = 0 ; i< newSources.length;i++){
+            
             SpiceDasSource newSource = newSources[i];
+            
             boolean known = false;
+            
             for (int j = 0 ; j < knownSources.length;j++){
+            
                 SpiceDasSource knownSource = knownSources[j];
+                
                 if ( knownSource.getUrl().equals(newSource.getUrl())){
                     known = true;
                     //logger.info("duplicate  " + knownSource.getNickname() + knownSource.getStatus()+ " " + newSource.getStatus());
@@ -1230,6 +1238,7 @@ ConfigurationListener
                     break;
                 }                
             }
+            
             if ( ! known) {
                 sources[i] = newSource;
                 //logger.finest("new source " + newSource.getNickname());
@@ -1258,10 +1267,13 @@ ConfigurationListener
         SpiceDasSource[] sources = filterSourcesWithStartupData(l);
          
         
+        
         sources = filterSourcesWithKnowData(sources);
         
-        /*for (int i=0 ; i < sources.length;i++){
-            System.out.println(" pos:"+(i+1) + " " + sources[i].getNickname());
+       /* for (int i=0 ; i < sources.length;i++){
+            System.out.println("a pos:"+(i+1) + " " + sources[i].getNickname() + " " + sources[i].getUrl());
+            SpiceDasSource ds = sources[i];
+            config.moveToPosition(ds.getUrl(),i);            
         }*/
         
         //browserPane.clearDasSources();
