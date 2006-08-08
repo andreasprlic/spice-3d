@@ -194,7 +194,7 @@ SpiceFeatureListener
     public void setChain(Chain c){
         chain = c;
         chainLength = c.getLengthAminos();
-        logger.info("selected chain in cursor panel: " + c.getName());
+       
         if ( storeStart > -1){
             selectedSeqRange(storeStart,storeEnd);
             storeStart = -1;

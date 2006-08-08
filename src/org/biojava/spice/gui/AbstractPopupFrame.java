@@ -63,11 +63,14 @@ implements MouseListener, MouseMotionListener{
     MyTimer hideTimer;
     static final ImageIcon delTabIcon = SpiceApplication.createImageIcon("editdelete.png");
        
+    Point oldPoint;
     
     public AbstractPopupFrame() {
         super();
         
         frameshown = false;
+        
+        oldPoint = new Point(0,0);
         
     }
     
@@ -214,6 +217,7 @@ implements MouseListener, MouseMotionListener{
     }
     
     protected synchronized void showFrame(){
+        floatingFrame.setLocation(oldPoint);
         
         Container content = getContent();
         
@@ -231,10 +235,7 @@ implements MouseListener, MouseMotionListener{
     
     private void updateFramePosition(MouseEvent e){
         //System.out.println("updateFramePosition");
-        if ( ! frameshown){
-            // System.out.println("frame not shown ...");
-            return;
-        }
+     
         
         
         int x = e.getX();
@@ -251,8 +252,14 @@ implements MouseListener, MouseMotionListener{
         //int compo_w = compo.getWidth();        
         
         Container content = getContent();
-        int compo_h = content.getHeight();
-        int compo_w = content.getWidth();
+       
+        int compo_h = 0 ;
+        int compo_w = 0 ;
+        
+        if (content != null ) {
+            compo_h = content.getHeight();
+            compo_w = content.getWidth();
+        }
         
         int DIST = 20;
         
@@ -284,10 +291,23 @@ implements MouseListener, MouseMotionListener{
         //        screenDim.getWidth() + " sh " + screenDim.getHeight() +
         //        " compo_H " + compo_h + " compo_w " + compo_w );
         
-        floatingFrame.setLocation(posx,posy);
+        
+        Point p = new Point(posx,posy);
+        
+        oldPoint = p;
+        
+        if ( ! frameshown){
+            // System.out.println("frame not shown ...");
+            return;
+        }
+        
+        javax.swing.SwingUtilities.invokeLater(new MyLocation(p,floatingFrame));
+        
+        /*
+        floatingFrame.setLocation(p);
         floatingFrame.requestFocus();
         floatingFrame.toFront();
-        
+        */
     }
     
     
@@ -339,6 +359,22 @@ implements MouseListener, MouseMotionListener{
 
 
 
+class MyLocation implements Runnable {
+    Point p;
+    JFrame c;
+    
+    public MyLocation(Point p, JFrame c) {
+        this.p = p;
+        this.c = c;
+    }
+    public void run() {
+        c.setLocation(p);
+        c.requestFocus();
+        c.toFront();
+
+    }
+}
+
 /** a small class that takes care of timing the disappearing of popup windows
  * 
  * @author Andreas Prlic
@@ -361,9 +397,7 @@ class MyTimer  implements ActionListener{
     
     int action ;
     
-    public MyTimer(AbstractPopupFrame disposeMe, int ACTIONTYPE){
-        
-       // System.out.println("new timer " + ACTIONTYPE);
+    public MyTimer(AbstractPopupFrame disposeMe, int ACTIONTYPE){              
         
         if ( ACTIONTYPE == SHOW)
             timer = new Timer(SHOW_COUNTDOWN,this);
@@ -380,23 +414,25 @@ class MyTimer  implements ActionListener{
     }        
     
     public synchronized void resetTimer() {
-      //  System.out.println("reset timer");
-   
+      
         timer.restart();
     }
     
     public synchronized void interrupt(){
-       // System.out.println("interrupt timer");
+    
         interrupted = true;
         timer.stop();
     }
     
+    /** this method is called by the timer
+     * 
+     */
     public void actionPerformed(ActionEvent arg0) {
-       // System.out.println("timer action " + action);
-        
+     
         if ( ! interrupted) {
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
+                    
                     if ( action == HIDE) {
                         hideMe.hideFrame();
                         timer.stop();

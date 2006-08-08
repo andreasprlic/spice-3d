@@ -34,6 +34,7 @@ import org.biojava.dasobert.eventmodel.SequenceEvent;
 import org.biojava.dasobert.eventmodel.SequenceListener;
 import org.biojava.dasobert.eventmodel.StructureEvent;
 import org.biojava.dasobert.eventmodel.StructureListener;
+import org.biojava.spice.ResourceManager;
 import org.biojava.spice.feature.Feature;
 import org.biojava.spice.feature.Segment;
 
@@ -44,7 +45,14 @@ import org.biojava.spice.manypanel.eventmodel.SpiceFeatureListener;
 import java.util.Map;
 import java.awt.Color;
 
-/**
+/** A class that listens to SPICE events ( like sequence position selected) and
+ * triggers the corresponding script in the Jmol display (the structurePanel)
+ * 
+ * @see org.biojava.spice.panel.StructurePanel
+ * @see org.biojava.dasobert.eventmodel.SequenceListener
+ * @see org.biojava.spice.manypanel.eventmodel.SpiceFeatureListener
+ * @see org.biojava.dasobert.eventmodel.StructureListener
+ * 
  * @author Andreas Prlic
  *
  */
@@ -55,11 +63,12 @@ SequenceListener,
 SpiceFeatureListener,
 JmolCommander
 {
+    static String INIT_SELECT;
     
+    static {
+        INIT_SELECT = ResourceManager.getString("org.biojava.spice.panel.StructurePanelListener.InitScript");
+    }
     
-//1l1y
-    static String INIT_SELECT = "select all; cpk off ; cartoon off ; backbone 0.5; " +
-        "wireframe off; colour chain;select not protein and not solvent; spacefill on;";
     
     StructurePanel structurePanel ;
     int currentChainNumber ;
@@ -72,20 +81,22 @@ JmolCommander
     String  pdbSelectEnd;
     String   rasmolScript;
     
-    /**
+    
+    /** listens to spice events and creates the Rasmol scripts
+     * to be sent to Jmol 
      * 
-     * @param structurePanel
+     * @param structurePanel the container of Jmol
      */
     public StructurePanelListener(StructurePanel structurePanel) {
         super();
+        
         this.structurePanel = structurePanel;
-        currentChainNumber = 0;
-        //int oldpos = -1;
-        selectionIsLocked =false;
-        structure = new StructureImpl();
-        pdbSelectStart = null;
-        pdbSelectEnd = null;
-        rasmolScript = null;
+        currentChainNumber  = 0;       
+        selectionIsLocked   = false;
+        structure           = new StructureImpl();
+        pdbSelectStart      = null;
+        pdbSelectEnd        = null;
+        rasmolScript        = null;
     }
     
     
@@ -93,38 +104,78 @@ JmolCommander
         structurePanel.clearListeners();
         structurePanel = null;
     }
+
+    /** sent the exit command that terminates the curretn Jmol scripting queue.
+     *  Only call this when you are sure ...
+     *
+     */
+    private void hardInterruptJmol(){
+        String cmd = "exit;";
+        executeCmd(cmd);
+    }
+    
+    /** interrupt any script that is currently being executed by Jmol
+     * 
+     *
+     */
+    private void interruptJmol(){
+        String cmd = "quit;";
+        executeCmd(cmd);
+    }
     
     /** display a new PDB structure in Jmol 
+     * @param structure a Biojava structure object    
+     *
+     */
+    public  void setStructure(Structure structure) {
+        boolean displayScript = true;
+        
+        //interruptJmol();
+        
+        setStructure(structure, displayScript );
+       
+    }
+    
+    
+    /** display a new PDB structure in Jmol 
+     * 
     * @param struc a Biojava structure object
     * @param displayScript  a flag to set if the INIT_SELECT script should be executed or not    
     *
     */
    public  void setStructure(Structure struc, boolean displayScript) {
+       
        logger.finest("setting structure in StructurePanelListener");
-       //System.out.println(struc.toPDB());
+      
        if ( struc == null ) {
-           //executeCmd(EMPTYCMD);
-           //return;
+      
            logger.finest("empty structure in StructurePanelListener");
            struc = new StructureImpl();
        } else {
            logger.finest("structure size: " + structure.size());
        }
+       
        this.structure=struc;
        structurePanel.setStructure(structure);
+       
        if ( structure.size() > 0)
+           
            if ( displayScript)
                executeCmd(INIT_SELECT);
    
       
        if ( pdbSelectStart != null) {
+
            String cmd = ""; 
+
            if ( rasmolScript != null) {
                cmd += rasmolScript;
            }           
+
            cmd +=  "select " + pdbSelectStart + " - " + pdbSelectEnd + "; set displaySelected";
            
            executeCmd(cmd);
+
            pdbSelectStart = null;
            pdbSelectEnd = null;
            rasmolScript = null;
@@ -149,15 +200,7 @@ JmolCommander
         rasmolScript = script;
     }
         
-   /** display a new PDB structure in Jmol 
-    * @param structure a Biojava structure object    
-    *
-    */
-   public  void setStructure(Structure structure) {
-       boolean displayScript = true;
-       setStructure(structure, displayScript );
-      
-   }
+  
    
     private void setCurrentChainNumber(int i){
         logger.finest("setting current chain in StructurePanelListener " + i);
@@ -168,8 +211,11 @@ JmolCommander
 
     /** reset the Jmol panel */
     public void resetDisplay(){
-        String cmd = INIT_SELECT;
-        structurePanel.executeCmd(cmd);
+        
+        interruptJmol();
+                
+        String cmd = INIT_SELECT;        
+        executeCmd(cmd);
         
     }
     
@@ -338,63 +384,35 @@ JmolCommander
     }
     
     public void selectedSeqPosition(int seqpos){
-        //System.out.println("structurepanel selected seqpos " + seqpos );
-        //highlite(currentChainNumber,seqpos,"");
+      
         if ( seqpos == oldpos ) return ;
         
-        // TODO: wait for Jmol to provide the isEvaluating method
-        //if ( structurePanel.getViewer().isEvaluating())
-          //  return;
+      
         oldpos = seqpos ; 
         
         String cmd = getSelectStr(currentChainNumber,seqpos);
         
-        if ( ! cmd.equals(""))
-            //if (! structurePanel.getViewer().isEvaluating())
+        if ( ! cmd.equals("")) {            
+            
+            interruptJmol();
+            
+            // now do the selection of the position
             executeCmd(cmd);
+        }
         else {
             cmd = "select null ; set display selected" ;
             executeCmd(cmd);	
         }
     }
-    public void mouseOverFeature(SpiceFeatureEvent e){
-        /*
-        Feature feat = (Feature) e.getSource();
-        //System.out.println("StructurePanel mouse over feature " + feat);
-        
-        highliteFeature(feat,false);
-        */
-    }
+    public void mouseOverFeature(SpiceFeatureEvent e){}
     
-    public void mouseOverSegment(SpiceFeatureEvent e){
-        /*
-        Segment s = (Segment)e.getSource();
-        //System.out.println("StructurePanel mouseOverSegment " + s);
-        //highliteSegment(seg);
-        int start =s.getStart()-1;
-        int end = s.getEnd()-1;
-        String cmd = "";
-        if (  s.getName().equals("DISULFID")) {
-           
-            cmd += "select "+ getDisulfidSelect(start,end) + " ;";
-            
-            
-        }
-        else {
-            
-            cmd = getSelectStr(currentChainNumber,start,end);
-            
-        } 
-        cmd += " set display selected;  ";
-        executeCmd(cmd);
-        */
-    }
+    public void mouseOverSegment(SpiceFeatureEvent e){ }
     
     
     public void featureSelected(SpiceFeatureEvent e){
         
         Feature feat = (Feature) e.getFeature();
-        logger.info("StructurePanelListener selected feature " + feat);
+        //logger.info("StructurePanelListener selected feature " + feat);
         //System.out.println("StructurePanel selected feature " + feat);
         Map[] stylesheet = e.getDasSource().get3DStylesheet();
         highliteFeature(feat,stylesheet,true);
@@ -790,14 +808,7 @@ JmolCommander
 
     public synchronized void newStructure(StructureEvent event) {
         logger.info("got new structure " + event.getPDBCode());
-        
-        /*if ( structure != null) 
-            if ( structure.getPDBCode() != null)
-                if ( structure.getPDBCode().equalsIgnoreCase(event.getPDBCode()) )
-                    return;
-        
-        */     
-        
+               
         Structure s = event.getStructure();
         setStructure(s);
         setCurrentChainNumber(0);

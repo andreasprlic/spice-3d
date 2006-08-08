@@ -69,6 +69,8 @@ MouseMotionListener
     
     static Logger logger = Logger.getLogger("org.biojava.spice");
     
+    MySequencePositionTrigger mySequencePositionTrigger = new MySequencePositionTrigger();
+    
     
     public ChainRendererMouseListener(AbstractChainRenderer renderer) {
         super();
@@ -379,10 +381,12 @@ MouseMotionListener
     
     public void clearSequenceListeners(){
         sequenceListeners = new ArrayList();
+        mySequencePositionTrigger.clearListeners();
     }
     
     public void addSequenceListener(SequenceListener li){
         sequenceListeners.add(li);
+        mySequencePositionTrigger.addSequenceListener(li);
     }
     
     
@@ -401,46 +405,17 @@ MouseMotionListener
     protected void triggerNewSequencePosition(int pos, int mouseY){
         if ( selectionLocked )
             return;
-
-        //System.out.println("new sequence position " + pos);
-        Iterator iter = sequenceListeners.iterator();
+        /*Iterator iter = sequenceListeners.iterator();
+        
         while(iter.hasNext()){
             SequenceListener li = (SequenceListener)iter.next();
-            
             li.selectedSeqPosition(pos);
-            
-        }
+        }*/
         
-        /** nice try but not very helpfull
-        class mySeqPosRunnable implements Runnable {
-            int pos, mouseY;
-            public mySeqPosRunnable(int pos,int mouseY) {
-                this.pos = pos;
-                this.mouseY = mouseY;
-            }
-            
-            
-            public void run() {
-                Iterator iter = sequenceListeners.iterator();
-                while(iter.hasNext()){
-                    SequenceListener li = (SequenceListener)iter.next();
-                    // ugly! TODO: find a nice solution for this ...
-                    // display seq cursor only over the sequyece ...
-                    if ( li instanceof SeqToolTipListener ){
-                        if ( mouseY < 20)
-                            li.selectedSeqPosition(pos);
-                        else 
-                            li.selectedSeqPosition(-1);
-                        
-                    } else {
-                        li.selectedSeqPosition(pos);
-                    }
-                }
-            }
-        }
+        mySequencePositionTrigger.setPosition(pos,mouseY);
+        if ( ! mySequencePositionTrigger.isPainting())
+            javax.swing.SwingUtilities.invokeLater(mySequencePositionTrigger);
         
-        javax.swing.SwingUtilities.invokeLater(new mySeqPosRunnable(pos,mouseY));
-        */
         
     }
     
@@ -547,11 +522,99 @@ MouseMotionListener
         }
     }
     
-   
     
     
+}
+
+class MySequencePositionTrigger implements Runnable {
     
-    
-    
-    
+        int pos, mouseY;
+        boolean painting;
+        List sequenceListeners;
+        
+        int savePos, saveMouse; // the coordinates of the next invocation...
+        
+        public MySequencePositionTrigger() {
+            pos = 0 ;
+            mouseY = 0;
+            
+            savePos   = -1;
+            saveMouse = -1;
+            
+            sequenceListeners = new ArrayList();
+        }
+        
+        /*public synchronized void setListeners(List sequenceListeners) {
+            this.sequenceListeners = sequenceListeners;
+            
+        }*/
+        
+        public void addSequenceListener(SequenceListener li){
+            sequenceListeners.add(li);
+        }
+        
+        public synchronized void clearListeners() {
+            sequenceListeners.clear();
+        }
+        
+        
+        public synchronized void setPosition(int pos, int mouseY){
+            //this.pos = pos;
+            //this.mouseY = mouseY;
+            if ( ! painting) {
+                this.pos = pos;
+                this.mouseY = mouseY;
+                savePos = -1;
+                saveMouse = -1;
+            } else {
+                savePos   = pos;
+                saveMouse = mouseY;
+            }
+        }
+        
+        public boolean isPainting(){
+            return painting;
+        }
+        
+        public synchronized void setPainting(boolean flag){
+            painting = flag;
+        }
+        
+        public void run() {
+            setPainting(true);
+            Iterator iter = sequenceListeners.iterator();
+            
+            while(iter.hasNext()){
+                SequenceListener li = (SequenceListener)iter.next();
+                li.selectedSeqPosition(pos);
+                
+                /*
+                // ugly! TODO: find a nice solution for this ...
+                // display seq cursor only over the sequyece ...
+                if ( li instanceof SeqToolTipListener ){
+                    if ( mouseY < 20)
+                        li.selectedSeqPosition(pos);
+                    else 
+                        li.selectedSeqPosition(-1);
+                    
+                } else {
+                    li.selectedSeqPosition(pos);
+                }*/
+            }
+            
+            
+            //TODO: is this actually necessary? 
+            if ( savePos > -1) {
+                System.out.println("got new mouse position, notifying...");
+                pos = savePos;
+                savePos = -1;           
+                mouseY = saveMouse;
+                saveMouse = -1;
+                run();
+            }
+            setPainting(false);
+        }
+        
+
+
 }

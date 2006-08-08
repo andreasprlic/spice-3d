@@ -31,6 +31,7 @@ import org.jmol.popup.JmolPopup;
 import org.jmol.adapter.smarter.SmarterJmolAdapter;
 import org.biojava.bio.structure.Structure ;
 import org.biojava.bio.structure.StructureImpl ;
+import org.biojava.spice.ResourceManager;
 import org.biojava.spice.jmol.JmolCommander;
 import org.biojava.spice.jmol.JmolSpiceTranslator;
 
@@ -51,19 +52,25 @@ implements JmolCommander
 {
     
     private static final long serialVersionUID = 969575436790157931L;
+    
     final  Dimension currentSize = new Dimension();
     final Rectangle  rectClip    = new Rectangle();
     
     static Logger    logger      = Logger.getLogger("org.biojava.spice");
-    static String    EMPTYCMD = "exit; zap; set echo top center; font echo 22; color echo white;echo \"no structure found\";";
+    
+    static String    EMPTYCMD =  ResourceManager.getString("org.biojava.spice.panel.StructurePanel.EmptyCmd");
+    
     
     JmolViewer  viewer;
+    
     JmolAdapter adapter;
     
     JmolPopup jmolpopup ;
     
     JTextField  strucommand  ; 
+    
     int currentChainNumber;
+    
     Structure structure ;
     
     public StructurePanel() {
@@ -146,13 +153,10 @@ implements JmolCommander
         
         
         if ( structure.size() < 1 ) {
-            logger.info("got structure of size < 1");
-            //viewer.scriptWait("zap");
-            //viewer.evalStringSync(EMPTYCMD);
+            //logger.info("got structure of size < 1");
             viewer.evalString(EMPTYCMD);
             return;
-        }
-        //logger.info("setting new structure in Jmol " + structure.getPDBCode() + " " + structure.size());
+        }       
         
         viewer.evalString("exit");
         

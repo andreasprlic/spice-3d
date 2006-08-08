@@ -42,6 +42,16 @@ import org.biojava.spice.manypanel.eventmodel.SpiceFeatureEvent;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureListener;
 import org.biojava.spice.utils.BrowserOpener;
 
+
+
+/** provides the actual implementation of the AbstractPopupFrame
+ * This class takes care of the actual behaviour of when the popup appears, as well
+ * as provides the content
+ * 
+ * @author Andreas Prlic
+ * @since 1:31:08 PM
+ * @version %I% %G%
+ */
 public class SegmentPopupFrame
 extends AbstractPopupFrame    
 implements SpiceFeatureListener, 
@@ -52,9 +62,9 @@ SequenceListener
     Container content ;
     JPanel panel;
   
-    private static final int FRAME_WIDTH  = 300;
-    private static final int FRAME_PREF_HEIGHT = 250;
-    private static final int FRAME_MAX_HEIGHT = 300;
+    private static final int FRAME_WIDTH        = 300;
+    private static final int FRAME_PREF_HEIGHT  = 250;
+    private static final int FRAME_MAX_HEIGHT   = 300;
     
     private static String font  =  "<b><font color=\"#0000FF\">";
     private static String efont = "</font></b>";
@@ -171,7 +181,8 @@ SequenceListener
                         }
                         // change the mouse curor
                         if ( e.getEventType() == HyperlinkEvent.EventType.ENTERED) {                           
-                            panel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));                            
+                            panel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));   
+                            
                         }
                         if (e.getEventType() == HyperlinkEvent.EventType.EXITED) { 
                             panel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));                           
