@@ -106,6 +106,7 @@ SequenceListener
             SpiceServer server = spice.getSpiceServer();
             //newSpice.setSpiceServer(server);
             //server.registerInstance(newSpice);
+           
             new SpiceTabbedPane(server,newSpice);
             
             
@@ -114,7 +115,8 @@ SequenceListener
         else if ( cmd.equals("New Tab")){
             
             SpiceApplication newSpice = getNewSpiceInstance();
-            SpiceTabbedPane tabbed = spice.getSpiceTabbedPane();                                               
+            SpiceTabbedPane tabbed = spice.getSpiceTabbedPane(); 
+            newSpice.setSpiceServer(spice.getSpiceServer());
             tabbed.addSpice(newSpice);
             
             /*SpiceStartParameters params = spice.getSpiceStartParameters();

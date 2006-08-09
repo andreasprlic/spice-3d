@@ -339,7 +339,7 @@ ConfigurationListener
         return spiceServer;
     }
     
-    public void setSpiceServer(SpiceServer server){
+    public void setSpiceServer(SpiceServer server){     
         spiceServer = server; 
     }
    

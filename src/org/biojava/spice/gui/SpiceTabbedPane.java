@@ -275,7 +275,7 @@ implements WindowListener{
             frame.repaint();    
             JMenuBar menu = sp1.getMenu();
             frame.setJMenuBar(menu);
-            setFrameTitle(sp1);
+            setFrameTitle(sp1);           
         }
         //logger.info("after rm tabbedSpices: " + tabbedSpices.size());
         this.repaint();
