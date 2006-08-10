@@ -67,6 +67,8 @@ extends JPanel {
     Chain seq2;
     float scale1;
     float scale2;
+    int scrolled1;
+    int scrolled2;
     
     DasScrollPaneRowHeader rowView;
     
@@ -92,7 +94,7 @@ extends JPanel {
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
         
-        //TODO: make the annotation types visible on the column headers
+        
         rowView = new DasScrollPaneRowHeader(scrollPane);
         scrollPane.setRowHeaderView(rowView);
         
@@ -126,11 +128,23 @@ extends JPanel {
         //this.setMinimumSize(new Dimension(Short.MAX_VALUE,30));
         //this.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
         //this.setSize(new Dimension(Short.MAX_VALUE,30));
+        AlignmentPanelMouseListener aligM = new AlignmentPanelMouseListener(this);
+        alignmentPanel.addMouseListener(aligM);
+        alignmentPanel.addMouseMotionListener(aligM);
         
-        
+        scrolled1=0;
+        scrolled2=0;
         
     }
     
+    
+    public int getScrolled1(){
+        return scrolled1;
+    }
+    
+    public int getScrolled2(){
+        return scrolled2;
+    }
     
     public void clearAlignment(){
         alignmentPanel.clearAlignment();
@@ -275,7 +289,7 @@ extends JPanel {
         
     }
     public void setScale2(float scale){
-        //logger.info("scale2 "+ scale);
+        logger.info("scale2 "+ scale);
         alignmentPanel.setScale2(scale);
         cursorPanel.setScale2(scale);
         
@@ -289,6 +303,7 @@ extends JPanel {
         //System.out.println("current scroll value " + value + " " + source.getVisibleAmount() + " " + source.getMaximum()+ " " +
              //   source.getMinimum());
         //System.out.println(source);
+        scrolled1 = value;
         alignmentPanel.setScrolled1(value);
         cursorPanel.setScrolled1(value);
         this.repaint();
@@ -300,6 +315,7 @@ extends JPanel {
         //System.out.println("current scroll value " + value + " " + source.getVisibleAmount() + " " + source.getMaximum()+ " " +
              //   source.getMinimum());
         //System.out.println(source);
+        scrolled2 = value;
         alignmentPanel.setScrolled2(value);
         cursorPanel.setScrolled2(value);
         this.repaint();
