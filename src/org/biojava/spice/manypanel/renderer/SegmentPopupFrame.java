@@ -75,7 +75,7 @@ SequenceListener
     public SegmentPopupFrame() {
         super();
         content = null;
-        
+        panel = new JPanel();
     }
     
     
@@ -111,7 +111,7 @@ SequenceListener
     }
     
     private Container createContent(Feature f){
-        JPanel panel = new JPanel();
+        panel = new JPanel();
         panel.setBackground(Color.white);
         panel.setMaximumSize(new Dimension(FRAME_WIDTH,FRAME_MAX_HEIGHT));
         panel.setPreferredSize(new Dimension(FRAME_WIDTH,FRAME_PREF_HEIGHT));
@@ -180,11 +180,11 @@ SequenceListener
                             BrowserOpener.showDocument(href);
                         }
                         // change the mouse curor
-                        if ( e.getEventType() == HyperlinkEvent.EventType.ENTERED) {                           
+                        if ( e.getEventType() == HyperlinkEvent.EventType.ENTERED) {                              
                             panel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));   
                             
                         }
-                        if (e.getEventType() == HyperlinkEvent.EventType.EXITED) { 
+                        if (e.getEventType() == HyperlinkEvent.EventType.EXITED) {                            
                             panel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));                           
                         }
                     }

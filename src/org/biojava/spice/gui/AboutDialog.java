@@ -28,6 +28,8 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 
 import java.awt.event.ActionEvent;
+
+import org.biojava.spice.ResourceManager;
 import org.biojava.spice.SPICEFrame;
 import org.biojava.spice.utils.BrowserOpener;
 
@@ -119,7 +121,7 @@ extends JDialog {
         });
        
         
-        JButton close = new JButton("Close");
+        JButton close = new JButton(ResourceManager.getString("org.biojava.spice.action.close"));
         
         close.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent event) {

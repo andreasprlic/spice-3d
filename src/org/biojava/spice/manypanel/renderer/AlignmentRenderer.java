@@ -289,7 +289,7 @@ extends JPanel {
         
     }
     public void setScale2(float scale){
-        logger.info("scale2 "+ scale);
+        //logger.info("scale2 "+ scale);
         alignmentPanel.setScale2(scale);
         cursorPanel.setScale2(scale);
         

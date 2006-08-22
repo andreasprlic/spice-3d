@@ -388,7 +388,7 @@ class MyTimer  implements ActionListener{
     boolean interrupted ;
     
     public static final int SHOW_COUNTDOWN = 1000;
-    public static final int HIDE_COUNTDOWN = 1400;
+    public static final int HIDE_COUNTDOWN = 500;
     
     public static final int SHOW = 1;
     public static final int HIDE = 2;
@@ -396,6 +396,7 @@ class MyTimer  implements ActionListener{
     Timer timer;
     
     int action ;
+    
     
     public MyTimer(AbstractPopupFrame disposeMe, int ACTIONTYPE){              
         

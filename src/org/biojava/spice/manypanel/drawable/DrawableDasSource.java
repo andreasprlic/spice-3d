@@ -153,7 +153,7 @@ FeatureListener{
         //logger.finest("joined to " + features.length + " features -check:"+feats.length  );
         // AbstractChainRenderer is listening to this and
         // needs to resize itself
-        //TODO: this should not be part of the Drawable code by of the DasSourcePanel code...
+        //TODO: this should not be part of the Drawable code but of the DasSourcePanel code...
         Iterator iter = featureListeners.iterator();
         while (iter.hasNext()){
             FeatureListener featL = (FeatureListener)iter.next();
@@ -322,6 +322,8 @@ FeatureListener{
         ) return true;
         return false;
     }
+    
+    
     private List testAddFeatures(List features,Feature feat){
         // test if this features is added as a new feature to the features list, or if it is joint with an already existing one...
         //System.out.println("testing " + feat);   

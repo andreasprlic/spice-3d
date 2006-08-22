@@ -271,17 +271,17 @@ implements ObjectManager ,SequenceListener{
     }
     
     public void selectedSeqPosition(int position) {
-        // TODO Auto-generated method stub
+      
         
     }
     
     public void selectedSeqRange(int start, int end) {
-        // TODO Auto-generated method stub
+      
         
     }
     
     public void selectionLocked(boolean flag) {
-        // TODO Auto-generated method stub
+       
         
     }
     

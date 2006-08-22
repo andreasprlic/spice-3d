@@ -41,6 +41,7 @@ import org.biojava.dasobert.eventmodel.StructureListener;
 import java.net.URL;
 
 // some utils 
+import java.text.MessageFormat;
 import java.util.HashMap   ;
 import java.util.ArrayList ;
 import java.util.List ;
@@ -709,9 +710,12 @@ ConfigurationListener
             
         }
         else {
-            // unknown code type!
-            //System.err.println("unknown code type >"+type+"< currently supported: PDB,UniProt,ENSP");
-            logger.warning("unknown code type >"+type+"< currently supported: PDB,UniProt,ENSP");
+            // unknown code type!     
+            String warn =  ResourceManager.getString("org.biojava.spice.SpiceApplication.load.wrongType");
+            
+            Object[] arg = {type};
+            String txt =  MessageFormat.format(warn,arg);
+            logger.warning(txt);
             return;
         }
         

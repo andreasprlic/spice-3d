@@ -1,7 +1,6 @@
 /*
- * This class is taken from Geotool and used with very little
- * modifications.  since Spice is LGLP and hereby the code is made
- * available, the LGPL license criteria should be fulfilled
+ * This class is taken from Geotool and used with a few 
+ * modifications.   
  * Andreas Prlic ap3@sanger.ac.uk
  *
  * Geotools 2 - OpenSource mapping toolkit
@@ -37,7 +36,9 @@
  */
 package org.biojava.spice.panel;
 
-// Swing dependencies
+//Swing dependencies
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JTable;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
@@ -59,10 +60,13 @@ import javax.swing.ListSelectionModel            ;
 
 import javax.swing.JButton;
 import javax.swing.Box;
-import java.awt.event.ActionEvent          ;
-import java.awt.event.ActionListener       ;
 
-// AWT
+import org.biojava.spice.ResourceManager;
+
+import java.awt.event.ActionEvent          ;
+
+
+//AWT
 import java.awt.Color;
 import java.awt.Frame;
 import java.awt.Dialog;
@@ -71,19 +75,19 @@ import java.awt.BorderLayout;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
 
-// Logging
+//Logging
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
-// Collections
+//Collections
 import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
 
-// Resources
-// disabled by Andreas Prlic
+//Resources
+//disabled by Andreas Prlic
 //import org.geotools.resources.XArray;
 //import org.geotools.resources.gui.Resources;
 //import org.geotools.resources.gui.ResourceKeys;
@@ -107,13 +111,13 @@ import java.util.ArrayList;
  * @author Martin Desruisseaux
  */
 public class LoggingPanel extends JPanel {
-
+    
     private static final long serialVersionUID = 1429403307410293841L;
     
     
-    
+    JFrame frame;
     JScrollPane scroll ;
-
+    
     /**
      * Enumeration class for columns to be shown in a {@link LoggingPanel}.
      * Valid columns include {@link #LOGGER LOGGER}, {@link #CLASS CLASS},
@@ -128,7 +132,7 @@ public class LoggingPanel extends JPanel {
             this.index = index;
         }
     }
-
+    
     /*
      * NOTE: Values for the following contants MUST match
      * index in the LoggingTableModel.COLUMN_NAMES array.
@@ -139,22 +143,22 @@ public class LoggingPanel extends JPanel {
     /** Constant for {@link #setColumnVisible}. */  public static final Column TIME_OF_DAY = new Column(3);
     /** Constant for {@link #setColumnVisible}. */  public static final Column LEVEL       = new Column(4);
     /** Constant for {@link #setColumnVisible}. */  public static final Column MESSAGE     = new Column(5);
-
+    
     /**
      * The background color for the columns prior to the logging message.
      */
     private static final Color INFO_BACKGROUND = new Color(240,240,240);
-
+    
     /**
      * The model for this component.
      */
     private final LoggingTableModel model = new LoggingTableModel();
-
+    
     /**
      * The table for displaying logging messages.
      */
     private final JTable table = new JTable(model);
-
+    
     /**
      * The levels for colors enumerated in <code>levelColors</code>. This array
      * <strong>must</strong> be in increasing order. Logging messages of level
@@ -166,7 +170,7 @@ public class LoggingPanel extends JPanel {
      * @see #getBackground(LogRecord)
      */
     private int[] levelValues = new int[0];
-
+    
     /**
      * Pairs of foreground and background colors to use for displaying logging messages.
      * Logging messages of level <code>levelValues[i]</code> or higher will be displayed
@@ -177,12 +181,12 @@ public class LoggingPanel extends JPanel {
      * @see #getBackground(LogRecord)
      */
     private final List levelColors = new ArrayList();
-
+    
     /**
      * The logger specified at construction time, or <code>null</code> if none.
      */
     private Logger logger;
-
+    
     /**
      * Constructs a new logging panel. This panel is not registered to any logger.
      * Registration can be done with the following code:
@@ -193,16 +197,16 @@ public class LoggingPanel extends JPanel {
      */
     public LoggingPanel() {
         super(new BorderLayout());
-
+        
         table.setShowGrid(false);
         // by AP
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setCellSelectionEnabled(true);
-	
+        
         table.setGridColor(Color.LIGHT_GRAY);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         table.setDefaultRenderer(Object.class, new CellRenderer());
-	
+        
         if (true) {
             int width = 300;
             final TableColumnModel columns = table.getColumnModel();
@@ -211,74 +215,100 @@ public class LoggingPanel extends JPanel {
                 width = 80;
             }
         }
-
-	scroll = new JScrollPane(table);
-
-	// added a new record, scroll to end
-	model.addTableModelListener(new TableModelListener(){
-		public void tableChanged(TableModelEvent e){
-		    if ( e.getType() == TableModelEvent.INSERT ) {
-
-                javax.swing.SwingUtilities.invokeLater(new Runnable()
+        
+        scroll = new JScrollPane(table);
+        
+        // added a new record, scroll to end
+        model.addTableModelListener(new TableModelListener(){
+            public void tableChanged(TableModelEvent e){
+                if ( e.getType() == TableModelEvent.INSERT ) {
+                    
+                    // scroll to newest entry
+                    javax.swing.SwingUtilities.invokeLater(new Runnable()
+                            {
+                        public void run()
                         {
-                          public void run()
-                          {
-                              scroll.getVerticalScrollBar().setValue(scroll.getVerticalScrollBar().getMaximum());
-                              //scroll.repaint();
-                          }
-                        });
-		    }
+                            scroll.getVerticalScrollBar().setValue(scroll.getVerticalScrollBar().getMaximum());
+                          
+                        }
+                            });
+                }
+                
+            }
+        });
+        Box vBox = Box.createVerticalBox();
+        
+        vBox.add(scroll);
+        
+        
+        Action clearAction = new AbstractAction(ResourceManager.getString("org.biojava.spice.action.clear")) {
             
-		}
-	    });
-	Box vBox = Box.createVerticalBox();
-
-	vBox.add(scroll);
-
-	
-	// modifications by AP 20050305
-	JButton clearButton = new JButton("Clear");
-	clearButton.addActionListener(new ActionListener(){
-		// button is pressed
-		public void actionPerformed(ActionEvent e) {
-		    LoggingTableModel ltm = (LoggingTableModel) table.getModel();
-		    ltm.clearRecords();
-		    table.repaint();
-		}
-		
-	    });
-	
-	//Box hBox = Box.createHorizontalBox();
-	//hBox.add(clearButton,BorderLayout.WEST);
-	//vBox.add(Box.createGlue());
-	//vBox.add(clearButton);
-
-	/*JButton close = new JButton("Close");
-	close.addActionListener(new ActionListener(){
-	    public void actionPerformed(ActionEvent event) {
-	        /hm do not know about frame here :-/
-	        dispose();
-	     }	
-	 });	
-	 */	
-	
-	 Box hBoxb = Box.createHorizontalBox();
-	 hBoxb.add(Box.createGlue());
-	 hBoxb.add(clearButton,BorderLayout.EAST);
-	 //hBoxb.add(close,BorderLayout.EAST);
-	 
-	 vBox.add(hBoxb);
-	
-
-     	add(vBox);
-
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 1L;
+            
+            public void actionPerformed(ActionEvent arg0) {
+                LoggingTableModel ltm = (LoggingTableModel) table.getModel();
+                ltm.clearRecords();
+                table.repaint();
+                
+            }
+            
+        };
+        
+        JButton clearButton = new JButton(clearAction);
+        
+        Action closeAction = new AbstractAction(ResourceManager.getString("org.biojava.spice.action.close")) {
+            
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 1L;
+            
+            public void actionPerformed(ActionEvent arg0) {
+                frame.dispose();
+                
+            }
+            
+        };
+        
+        JButton closeButton = new JButton(closeAction);
+        
+        
+        //Box hBox = Box.createHorizontalBox();
+        //hBox.add(clearButton,BorderLayout.WEST);
+        //vBox.add(Box.createGlue());
+        //vBox.add(clearButton);
+        
+        /*JButton close = new JButton("Close");
+         close.addActionListener(new ActionListener(){
+         public void actionPerformed(ActionEvent event) {
+         /hm do not know about frame here :-/
+          dispose();
+          }	
+          });	
+          */	
+        
+        Box hBoxb = Box.createHorizontalBox();
+        hBoxb.add(Box.createGlue());
+        
+        hBoxb.add(clearButton,BorderLayout.EAST);
+        hBoxb.add(closeButton,BorderLayout.EAST);
+        //hBoxb.add(close,BorderLayout.EAST);
+        
+        vBox.add(hBoxb);
+        
+        
+        add(vBox);
+        
         setLevelColor(Level.ALL,     Color.GRAY,       null);
         setLevelColor(Level.CONFIG,  null,             null);
         setLevelColor(Level.WARNING, Color.RED,        null);
         setLevelColor(Level.SEVERE,  Color.WHITE, Color.RED);
-
+        
     }
-
+    
     /**
      * Constructs a new logging panel and register it to the specified logger.
      *
@@ -292,7 +322,7 @@ public class LoggingPanel extends JPanel {
         logger.addHandler(getHandler());
         this.logger = logger;
     }
-
+    
     /**
      * Construct a logging panel and register it to the specified logger.
      *
@@ -301,7 +331,7 @@ public class LoggingPanel extends JPanel {
     public LoggingPanel(final String logger) {
         this(Logger.getLogger(logger!=null ? logger : ""));
     }
-
+    
     /** Returns the logging handler.
      * 
      * @return the handler
@@ -309,7 +339,7 @@ public class LoggingPanel extends JPanel {
     public Handler getHandler() {
         return model;
     }
-
+    
     /**
      * Returns <code>true</code> if the given column is visible.
      *
@@ -321,7 +351,7 @@ public class LoggingPanel extends JPanel {
     public boolean isColumnVisible(final Column column) {
         return model.isColumnVisible(column.index);
     }
-
+    
     /**
      * Show or hide the given column.
      *
@@ -332,7 +362,7 @@ public class LoggingPanel extends JPanel {
     public void setColumnVisible(final Column column, final boolean visible) {
         model.setColumnVisible(column.index, visible);
     }
-
+    
     /**
      * Returns the capacity. This is the maximum number of {@link LogRecord}s the handler
      * can memorize. If more messages are logged, then the earliest messages will be discarted.
@@ -342,7 +372,7 @@ public class LoggingPanel extends JPanel {
     public int getCapacity() {
         return model.getCapacity();
     }
-
+    
     /**
      * Set the capacity. This is the maximum number of {@link LogRecord}s the handler can
      * memorize. If more messages are logged, then the earliest messages will be discarted.
@@ -351,7 +381,7 @@ public class LoggingPanel extends JPanel {
     public void setCapacity(final int capacity) {
         model.setCapacity(capacity);
     }
-
+    
     /**
      * Returns the foreground color for the specified log record. This method is invoked at
      * rendering time for every cell in the table's "message" column. The default implementation
@@ -364,7 +394,7 @@ public class LoggingPanel extends JPanel {
     public Color getForeground(final LogRecord record) {
         return getColor(record, 0);
     }
-
+    
     /**
      * Returns the background color for the specified log record. This method is invoked at
      * rendering time for every cell in the table's "message" column. The default implementation
@@ -377,7 +407,7 @@ public class LoggingPanel extends JPanel {
     public Color getBackground(final LogRecord record) {
         return getColor(record, 1);
     }
-
+    
     /**
      * Returns the foreground or background color for the specified record.
      *
@@ -395,22 +425,22 @@ public class LoggingPanel extends JPanel {
         }
         return (Color) levelColors.get(i*2 + offset);
     }
-
-
+    
+    
     // by AP
     // replacement for XArray lib from geotools
     private int[] insertArray( int[] array,  int index,  int length) {
         if (length == 0) {
             return array;
         }
-	int    arrayLength = array.length ;
-	int[]  newArray = new int[arrayLength + length ];
+        int    arrayLength = array.length ;
+        int[]  newArray = new int[arrayLength + length ];
         System.arraycopy(array, 0,     newArray, 0,            index            );
         System.arraycopy(array, index, newArray, index+length, arrayLength-index);
         return (int[]) newArray;
     }
-
-
+    
+    
     /**
      * Set the foreground and background colors for messages of the specified level.
      * The specified colors will apply on any messages of level <code>level</code> or
@@ -429,19 +459,19 @@ public class LoggingPanel extends JPanel {
             levelColors.set(i+1, background);
         } else {
             i = ~i;
-	    // by AP
+            // by AP
             levelValues = insertArray(levelValues, i, 1);
-	    
+            
             levelValues[i] = value;
             i *= 2;
             levelColors.add(i+0, foreground);
             levelColors.add(i+1, background);
         }
-	// by AP
+        // by AP
         //assert XArray.isSorted(levelValues);
         assert levelValues.length*2 == levelColors.size();
     }
-
+    
     /**
      * Layout this component. This method give all the remaining space, if any,
      * to the last table's column. This column is usually the one with logging
@@ -464,7 +494,7 @@ public class LoggingPanel extends JPanel {
         }
         super.doLayout();
     }
-
+    
     /**
      * Convenience method showing this logging panel into a frame.
      * Different kinds of frame can be constructed according <code>owner</code> class:
@@ -483,28 +513,28 @@ public class LoggingPanel extends JPanel {
      *         a {@link JDialog} or a {@link JFrame}.
      */
     public Component show(final Component owner) { 
-
-	int frameWidth  = 750 ;
-	int frameHeight = 300 ;
-	
-	// Get the size of the default screen
-	java.awt.Dimension dim = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-	
-	//System.out.println("LoggingPanel show!!!!!!!");
-	JFrame frame = new JFrame();
-	frame.setLocation((dim.width - frameWidth),(dim.height - frameHeight));
-	frame.setTitle("SPICE - log");
-	frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        
+        int frameWidth  = 750 ;
+        int frameHeight = 300 ;
+        
+        // Get the size of the default screen
+        java.awt.Dimension dim = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        
+        //System.out.println("LoggingPanel show!!!!!!!");
+        frame = new JFrame();
+        frame.setLocation((dim.width - frameWidth),(dim.height - frameHeight));
+        frame.setTitle("SPICE - log");
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.addWindowListener(new WindowAdapter()
-        {
+                {
             public void windowClosed(WindowEvent event) {
                 dispose();
             }
-        });
+                });
         frame.getContentPane().add(this);
         frame.pack();
-	
-						       
+        
+        
         frame.setSize(frameWidth, frameHeight);
         frame.setVisible(true);
         doLayout();
@@ -531,13 +561,13 @@ public class LoggingPanel extends JPanel {
         }
         handler.close();
     }
-
+    
     /**
      * Display cell contents. This class is used for changing
      * the cell's color according the log record level.
      */
     private final class CellRenderer extends DefaultTableCellRenderer
-                                  implements TableColumnModelListener
+    implements TableColumnModelListener
     {
         private static final long serialVersionUID = 96315731843284319L;
         
@@ -545,22 +575,22 @@ public class LoggingPanel extends JPanel {
          * Default color for the foreground.
          */
         private Color foreground;
-
+        
         /**
          * Default color for the background.
          */
         private Color background;
-
+        
         /**
          * The index of messages column.
          */
         private int messageColumn;
-
+        
         /**
          * The last row for which the side has been computed.
          */
         private int lastRow;
-
+        
         /**
          * Construct a new cell renderer.
          */
@@ -569,32 +599,32 @@ public class LoggingPanel extends JPanel {
             background = super.getBackground();
             table.getColumnModel().addColumnModelListener(this);
         }
-
+        
         /**
          * Set the foreground color.
          */
         public void setForeground(final Color foreground) {
             super.setForeground(this.foreground=foreground);
         }
-
+        
         /**
          * Set the background colior
          */
         public void setBackground(final Color background) {
             super.setBackground(this.background=background);
         }
-
+        
         /**
          * Returns the component to use for painting the cell.
          */
         public Component getTableCellRendererComponent(final JTable  table,
-                                                       final Object  value,
-                                                       final boolean isSelected,
-                                                       final boolean hasFocus,
-                                                       final int     rowIndex,
-                                                       final int     columnIndex)
+                final Object  value,
+                final boolean isSelected,
+                final boolean hasFocus,
+                final int     rowIndex,
+                final int     columnIndex)
         {
-	    //System.out.println("LoggingPanel getTableCellrendererComponent");
+            //System.out.println("LoggingPanel getTableCellrendererComponent");
             Color foreground = this.foreground;
             Color background = this.background;
             final boolean isMessage = (columnIndex == messageColumn);
@@ -614,7 +644,7 @@ public class LoggingPanel extends JPanel {
             super.setBackground(background);
             super.setForeground(foreground);
             final Component component = super.getTableCellRendererComponent(table, value,
-                                             isSelected, hasFocus, rowIndex, columnIndex);
+                    isSelected, hasFocus, rowIndex, columnIndex);
             /*
              * If a new record is being painted and this new record is wider
              * than previous ones, then make the message column width larger.
@@ -633,7 +663,7 @@ public class LoggingPanel extends JPanel {
             }
             return component;
         }
-
+        
         /**
          * Invoked when the message column may have moved. This method update the
          * {@link #messageColumn} field, so that the message column will continue

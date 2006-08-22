@@ -36,8 +36,6 @@ import org.biojava.bio.structure.*;
 import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.eventmodel.*;
 import org.biojava.spice.feature.Feature;
-import org.biojava.spice.feature.FeatureImpl;
-import org.biojava.spice.feature.Segment;
 import org.biojava.spice.manypanel.eventmodel.DasSourceEvent;
 import org.biojava.spice.manypanel.eventmodel.DasSourceListener;
 import org.biojava.spice.manypanel.eventmodel.FeatureListener;
@@ -124,9 +122,7 @@ public abstract class AbstractChainRenderer
         scaleChangeListeners = new ArrayList();
               
         mouseListener = new ChainRendererMouseListener(this);
-        toolTipper = new SeqToolTipListener(layeredPane);
-        mouseListener.addSequenceListener(toolTipper);        
-        mouseListener.addSpiceFeatureListener(toolTipper);
+       
   
         componentWidth = BrowserPane.DEFAULT_PANE_WIDTH;
         
@@ -152,6 +148,12 @@ public abstract class AbstractChainRenderer
 
     protected void initPanels(){
         
+        toolTipper = new SeqToolTipListener(layeredPane);
+        
+        mouseListener.addSequenceListener(toolTipper);        
+        mouseListener.addSpiceFeatureListener(toolTipper);
+        
+        
         int width = getDisplayWidth();
       
         columnHeader = new DasScrollPaneColumnHeader(featurePanel, columnCursor);
@@ -160,11 +162,13 @@ public abstract class AbstractChainRenderer
         //scrollPane.setColumnHeaderView(featurePanel);
         columnHeader.addMouseMotionListener(mouseListener);
         columnHeader.addMouseListener(mouseListener);
-      
-        /*SeqToolTipListener tool2 = new SeqToolTipListener(columnHeader);
+       
+      /*
+        SeqToolTipListener tool2 = new SeqToolTipListener(columnHeader);
         mouseListener.addSequenceListener(tool2);
         mouseListener.addSpiceFeatureListener(tool2);
         */
+        
         
         layeredPane.addMouseMotionListener(mouseListener);
         layeredPane.addMouseListener(mouseListener);
@@ -647,64 +651,6 @@ public abstract class AbstractChainRenderer
     }
     
     
-     
-    
-    
-    private Feature mapPDBFeature2Seq(Feature f){
-        Feature newF = new FeatureImpl();
-        newF.setMethod(f.getMethod());
-        newF.setName(f.getName());
-        newF.setNote(f.getNote());
-        newF.setScore(f.getScore());
-        newF.setSource(f.getSource());
-        newF.setType(f.getType());
-        
-        newF.setLink(f.getLink());
-        List segments = f.getSegments();
-        
-        
-        
-        Iterator iter = segments.iterator();
-        while (iter.hasNext()){
-            Segment s = (Segment)iter.next();
-            Segment newS =(Segment) s.clone();
-            // and now re-label the positions!
-            int startOld = s.getStart();
-            int seqPos = getGroupPosByPDBPos(startOld+"");
-            newS.setStart(seqPos);
-            int endOld = s.getEnd();
-            int seqePos = getGroupPosByPDBPos(endOld+"");
-            newS.setEnd(seqePos);
-            newF.addSegment(newS);
-        }
-        return newF;
-        
-        
-    }
-    
-    private int getGroupPosByPDBPos(String pdbPos){
-        Chain c = sequence.getSequence();
-    
-        List groups = c.getGroups();
-        
-        // now iterate over all groups in this chain.
-        // in order to find the amino acid that has this pdbRenum.               
-        
-        Iterator giter = groups.iterator();
-        int i = 0;
-        while (giter.hasNext()){
-            i++;
-        
-            Group g = (Group) giter.next();
-            String rnum = g.getPDBCode();
-            if ( rnum.equals(pdbPos)) {
-                //System.out.println(i + " = " + rnum);
-                return i;
-            }
-        }    
-        //logger.warning("could not map pdb pos " + pdbPos + " to sequence!");
-        return -1;
-    }
     
     
     private void mapPDBPos2Seq(DrawableDasSource ds){
@@ -713,7 +659,7 @@ public abstract class AbstractChainRenderer
         List newFeats = new ArrayList();
         for (int i=0 ; i < feats.length; i++){
             Feature f = feats[i];
-            Feature newF = mapPDBFeature2Seq(f);
+            Feature newF = PDB2SeqPositionMapper.mapPDBFeature2Seq(f,sequence.getSequence());
             newFeats.add(newF);
         }
         
@@ -723,7 +669,7 @@ public abstract class AbstractChainRenderer
     }
     
     /** set that loading has been finised
-     * and re-lable the coordinates for protein structure codes...
+     * and remap the coordinates for protein structure codes...
      */
     public void loadingFinished(DasSourceEvent ds) {
         //logger.info("loading finished " + ds);
@@ -734,7 +680,7 @@ public abstract class AbstractChainRenderer
             DrawableDasSource thisSource = dsp.getDrawableDasSource();
             
             //todo: add the coordinate system of each implementation and
-            // teplace this...
+            // replace this...
            
             
             if ( eventSource.equals(thisSource)) {

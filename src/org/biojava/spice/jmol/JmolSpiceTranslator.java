@@ -202,7 +202,7 @@ implements JmolStatusListener, StructureListener
         //logger.info("JmolSpiceTranslator got new structure " + event.getPDBCode() + " " + structure.getPDBCode());
         String p = event.getPDBCode();
         
-        if ( p.equalsIgnoreCase(structure.getPDBCode())) {
+        if ( ( p != null ) && ( p.equalsIgnoreCase(structure.getPDBCode()))) {
             // already known
             return;
         }

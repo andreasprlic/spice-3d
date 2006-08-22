@@ -45,6 +45,7 @@ import javax.swing.JProgressBar;
 
 import org.biojava.bio.Annotation;
 import org.biojava.bio.program.das.dasalignment.Alignment;
+import org.biojava.bio.program.das.dasalignment.DASException;
 import org.biojava.bio.structure.Atom;
 import org.biojava.bio.structure.Calc;
 import org.biojava.bio.structure.Chain;
@@ -61,8 +62,7 @@ import org.biojava.spice.manypanel.renderer.SequenceScalePanel;
 
 public class StructureAlignment {
     
-    public static Logger logger =  Logger.getLogger("org.biojava.spice");
-    
+    public static Logger logger =  Logger.getLogger("org.biojava.spice");    
     
     Alignment alignment;
     
@@ -82,6 +82,16 @@ public class StructureAlignment {
     boolean waitingForStructure;
     
     Structure loadedStructure;
+    
+    static Matrix zero;
+    
+    static {
+        // remove objects that have a Matrix object that contains all zeros!
+        zero =  Matrix.identity(3,3);
+        for (int i=0;i<3;i++ ){
+            zero.set(i,i,0.0);
+        }
+    }
     
     public StructureAlignment() {
         super();
@@ -155,17 +165,53 @@ public class StructureAlignment {
         this.intObjectIds = intObjectIds;
     }
     
+    
+    public boolean isZeroMatrix(Matrix m){
+       
+        for ( int x=0;x<3;x++){
+            for ( int y=0;y<3;y++){
+                double val = m.get(x,y);
+                if ( val != 0.0){
+                   return false;
+                }
+            }
+        }
+        return true;
+    }
+    
+    private Alignment newAlignmentFromCheckedData(Annotation[] objects,
+            Annotation[] matrices, 
+            Annotation[] vectors,
+            Annotation[] blockx) 
+    throws DASException {
+        Alignment ali = new Alignment();
+        
+        for (int i=0 ; i < objects.length;i++) {
+            ali.addObject(objects[i]);
+        }
+        for (int i=0 ; i < matrices.length;i++) {
+            ali.addMatrix(matrices[i]);
+        }
+        for (int i=0 ; i < vectors.length;i++) {
+            ali.addVector(vectors[i]);
+        }
+        for (int i=0 ; i < blockx.length;i++) {
+            ali.addBlock(blockx[i]);
+            
+        }
+        
+        return ali;
+    }
+    
     public void setAlignment(Alignment alignment) throws StructureException {
-        this.alignment = alignment;
+       
         
         // convert the alignment object into the internal matrices, vectors
         Annotation[] maxs = alignment.getMatrices();
         
         Annotation[] objects = alignment.getObjects();
         Annotation[] vectors = alignment.getVectors();
-        Annotation[] blockx  = alignment.getBlocks();
-        //Annotation[] blocks = new Annotation[blockx.length];
-        sortedBlocks = sortBlocks(blockx);
+       
         
         int n = objects.length;
         
@@ -181,49 +227,52 @@ public class StructureAlignment {
         }
         
         
-        // remove objects that have a Matrix object that contains all zeros!
-        Matrix zero =  Matrix.identity(3,3);
-        for (int i=0;i<3;i++ ){
-            zero.set(i,i,0.0);
-        }
+       
         //zero.print(3,3);
         List objectNew   = new ArrayList();
         List matricesNew = new ArrayList();
         List vectorsNew  = new ArrayList();
-        
+        List annoMax     = new ArrayList();
         
         for (int i = 0 ; i< n ; i++){
             Annotation a = maxs[i];
             Matrix m = getMatrix(a);
-            // System.out.println(objects[i]+ ":");
-            //m.print(3,3);
-            boolean zeroValues = true;
-            for ( int x=0;x<3;x++){
-                for ( int y=0;y<3;y++){
-                    double val = m.get(x,y);
-                    if ( val != 0.0){
-                        zeroValues = false;
-                        x=3;
-                        y=3;
-                    }
-                }
-            }
-            if ( zeroValues == true){
+            if ( isZeroMatrix(m)) {
+                
                 // something went wrong during creation of rotmat
                 // ignore the whole object!
-                // System.out.println("matrix is zero:"  + objects[i]);
-                m.print(3,3);
+                System.out.println("matrix is zero:"  + objects[i]);
+                //m.print(3,3);
                 continue;
             }
+            
+            System.out.println("adding " + objects[i]);            
             objectNew.add(objects[i]);
             matricesNew.add(m);
             vectorsNew.add(vectors[i]);
+            annoMax.add(a);
             
         }
         // copy the data back ...
         objects      = (Annotation[]) objectNew.toArray(   new Annotation[objectNew.size()]);
         matrices     = (Matrix[])     matricesNew.toArray( new Matrix[matricesNew.size()]);
         vectors      = (Annotation[]) vectorsNew.toArray(  new Annotation[vectorsNew.size()]);
+       
+        Annotation[] blockx  = alignment.getBlocks();
+        Annotation[] allMaxes =(Annotation[]) annoMax.toArray(new Annotation[annoMax.size()]); 
+        try {
+            this.alignment = newAlignmentFromCheckedData(objects, allMaxes, vectors,blockx);
+        } catch (DASException e) {
+            e.printStackTrace();
+          
+        }
+        
+        sortedBlocks = sortBlocks(blockx);
+        
+        System.out.println(n);
+        System.out.println(objects.length);
+        System.out.println(matrices.length);
+        System.out.println(vectors.length);
         
         n = objects.length;
         nrSelected = 0;
@@ -236,19 +285,18 @@ public class StructureAlignment {
         
         for (int i=0;i< n;i++){
             
-            
-            
             Annotation v = vectors[i];            
             Atom vec = (Atom) v.getProperty("vector");
-            shiftVectors[i] = vec; 
             
-            structures[i] = null;
-            
-            intObjectIds[i] = (String)objects[i].getProperty("intObjectId");
-            
-            selection[i] = false;
-            loaded[i]    = false;
-        }        
+            shiftVectors[i] = vec;             
+            structures[i]   = null;            
+            intObjectIds[i] = (String)objects[i].getProperty("intObjectId");            
+            selection[i]    = false;
+            loaded[i]       = false;
+        } 
+        
+       
+        
     }
     
     public String[] getIds(){
@@ -356,9 +404,10 @@ public class StructureAlignment {
     }
     
     private String getRasmolFromSortedBlock(int p, int modelcount){
+        
         String cmd = "";
         String intId = intObjectIds[p];
-        
+        logger.info("get rasmol sc ript from sorted blocks for " + intId );
         Color col =  getColor(p);
         
         
@@ -374,6 +423,7 @@ public class StructureAlignment {
                 
                 if (! ii.equals(intId))
                     continue;
+                System.out.println("StructureAlignment getRasmolFromSortedBlock segment: " + seg);
                 
                 String start = (String) seg.getProperty("start");
                 String end   = (String) seg.getProperty("end");
@@ -430,7 +480,7 @@ public class StructureAlignment {
     public Structure createArtificalStructure(int firstPosition){
         
         
-        logger.info("firstPosition " + firstPosition);
+        //logger.info("firstPosition " + firstPosition);
         Structure newStruc = new StructureImpl();
         newStruc.setNmr(true);
                 
@@ -566,9 +616,10 @@ public class StructureAlignment {
         loaded[pos] = true;
         
         
-        
-        
-        return returnStructureOrRange(pos,s);
+        Structure tmp = returnStructureOrRange(pos,s); 
+        if ( tmp == null)
+            throw new StructureException("could not getStructureOrRange");
+        return tmp;
         
     }
     
@@ -586,6 +637,7 @@ public class StructureAlignment {
                     ret = newStruc;
                 }
             } catch (StructureException e){
+                e.printStackTrace();
                 
             }
         }
@@ -603,19 +655,19 @@ public class StructureAlignment {
         
         if (alignment == null)
             return null;
+        logger.info("get structure range for " + s.getPDBCode());
         
         // check if the alignment has an object detail "region" for this
         // if yes = restrict the used structure...
         Annotation[] objects = alignment.getObjects();
         Annotation object = objects[pos];
-       
+        //System.out.println(object);
         Map protectionMap = new HashMap();
         
         if ( object.containsProperty("details")){
+
             List details = (List) object.getProperty("details");
-            
-          
-            
+              
             for ( int det = 0 ; det< details.size();det++) {
                 Annotation detanno = (Annotation) details.get(det);
                 String property = (String)detanno.getProperty("property");
@@ -624,7 +676,7 @@ public class StructureAlignment {
                 
                 
                 String detail = (String) detanno.getProperty("detail");
-                
+                //System.out.println("got detail " + detail);
               
                 
                 // split up the structure and add the region to the new structure...
@@ -660,8 +712,8 @@ public class StructureAlignment {
                 
                 Chain c = s.getChainByPDB(chainId);
                 
-                //Q: do we need to do  all groups or only the aminos??
-                List groups = c.getGroups("amino");
+                //TODO: Q: do we need to do  all groups or only the aminos??
+                List groups = c.getGroups();
                 
                 Iterator iter = groups.iterator();
                 boolean known =false;
@@ -726,7 +778,8 @@ public class StructureAlignment {
             Chain newChain  = new ChainImpl();
             newChain.setName(chainId);
             
-            List origGroups = origChain.getGroups("amino");
+            //TODO: Q: do we need to do  all groups or only the aminos??
+            List origGroups = origChain.getGroups();
             Iterator giter = origGroups.iterator();
             
             while (giter.hasNext()){

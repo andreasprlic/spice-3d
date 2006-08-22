@@ -115,7 +115,7 @@ implements SequenceListener, SpiceFeatureListener {
         } else if ( where instanceof StructureRenderer) {
             Group g1 = chain.getGroup(position);
             s = "Seq:" + (position+1) +" PDB:" + g1.getPDBCode() + " " + sequence.substring(position,position+1);
-         
+            /*
             if ( StructureScalePanel.shouldDrawStructureRegion()){
                 StructureRenderer rend = (StructureRenderer)where;
                 StructureScalePanel pan = (StructureScalePanel) rend.getFeaturePanel();
@@ -124,7 +124,7 @@ implements SequenceListener, SpiceFeatureListener {
                 if ( f.overlaps(position)) {
                     s = "this is the structural region shown in the 3D panel " + s;
                 }
-            }
+            }*/
            
             
         } else {
@@ -205,7 +205,7 @@ implements SequenceListener, SpiceFeatureListener {
     }
 
     public void mouseOverSegment(SpiceFeatureEvent e) {
-        //System.out.println("toolTipper mouseOverSegment " + e.getSegment());
+       // System.out.println("toolTipper mouseOverSegment " + e.getSegment());
         //parent.setToolTipText(e.getSegment().toString());
         Feature f = e.getFeature();
         //Segment s = e.getSegment();
@@ -214,8 +214,10 @@ implements SequenceListener, SpiceFeatureListener {
             //parent.setToolTipText("");
             parent.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
         } else {
-            //Component where = getRenderer();
+            parent.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             /*
+            Component where = getRenderer();
+            
             String txt = "";
             if ( where instanceof SequenceRenderer) {
                 txt = s.toString();
@@ -237,10 +239,10 @@ implements SequenceListener, SpiceFeatureListener {
                 txt = str;
                 
             }
-            //parent.setToolTipText(txt);
-             * */
+            parent.setToolTipText(txt);
+             */
              
-            parent.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+          
         }
         
         

@@ -36,6 +36,7 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JTextField;
 
+import org.biojava.spice.ResourceManager;
 import org.biojava.spice.SPICEFrame;
 import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.gui.msdkeyword.*;
@@ -145,10 +146,10 @@ extends JDialog
         hBox1.add(getCom);
        
         
-        JButton openB =new JButton("Open");
+        JButton openB =new JButton(ResourceManager.getString("org.biojava.spice.action.open"));
         openB.addActionListener(new ButtonListener(spice,this));
         
-        JButton cancelB = new JButton("Cancel");
+        JButton cancelB = new JButton(ResourceManager.getString("org.biojava.spice.action.cancel"));
         cancelB.addActionListener(new ButtonListener(spice,this));
         
         hBox1.add(openB);
@@ -164,7 +165,8 @@ extends JDialog
             }
             
         });
-        JButton openKw = new JButton("Search");
+        
+        JButton openKw = new JButton(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Search"));
         openKw.addActionListener(new ButtonListener(spice,this));
         JLabel kwl = new JLabel("keyword:");
         hBox2.add(kwl);

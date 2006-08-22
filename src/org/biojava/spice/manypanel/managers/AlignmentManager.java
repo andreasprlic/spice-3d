@@ -1061,8 +1061,9 @@ class MyFeatureTranslator implements SpiceFeatureListener {
             newE = parent.getNextPosition1(en,AbstractAlignmentManager.SEARCH_DIRECTION_DECREASE,st)+1;
             length = parent.seqLength1;
         }
-        if ( newS < 1)
-            newS = 1;
+        
+        if ( newS < 1) 
+            newS = 1;            
         
         if ( newE > (length-1))
             newE = length-1;

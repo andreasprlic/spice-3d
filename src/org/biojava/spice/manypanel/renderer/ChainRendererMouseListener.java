@@ -66,6 +66,7 @@ MouseMotionListener
     List sequenceListeners;
     List spiceFeatureListeners;
     Feature oldFeature;
+    Segment oldSegment;
     
     static Logger logger = Logger.getLogger("org.biojava.spice");
     
@@ -282,9 +283,6 @@ MouseMotionListener
         
         triggerNewSequencePosition(pos,e.getY());
         
-        
-        
-        
         if ( feat == null) 
             return;
         
@@ -298,9 +296,13 @@ MouseMotionListener
             Iterator iter = segments.iterator();
             while (iter.hasNext()) {
                 Segment s = (Segment)iter.next();
-                if ( (pos >= s.getStart()-1) && ( pos <= s.getEnd()-1)) {
+                if ( s.overlaps(pos)) {
+                
+                   
+                    
                     event.setSegment(s);
                     triggerMouseOverSegment(event);
+                   
                     //triggerSegmentSelected(feat,s);
                 }
             }
@@ -507,7 +509,27 @@ MouseMotionListener
     }
     
     protected void triggerMouseOverSegment(SpiceFeatureEvent event){
+      
+        MyMouseOverSegment trigger = new MyMouseOverSegment(event, spiceFeatureListeners);
         
+        javax.swing.SwingUtilities.invokeLater(trigger);
+      
+        
+    }
+        
+}
+
+class MyMouseOverSegment implements Runnable {
+    List spiceFeatureListeners;
+    SpiceFeatureEvent event;
+    
+    public MyMouseOverSegment( SpiceFeatureEvent e, List listeners) {
+        event = e;
+        spiceFeatureListeners = listeners;
+    }
+    
+    public void run() {
+    
         Segment segment = event.getSegment();
         if ( segment == null){
             segment = new Segment();
@@ -515,16 +537,18 @@ MouseMotionListener
         }
         
         
+        
+        
         Iterator iter = spiceFeatureListeners.iterator();
         while (iter.hasNext()){
             SpiceFeatureListener li = (SpiceFeatureListener)iter.next();
             li.mouseOverSegment(event);
         }
+        
     }
     
-    
-    
 }
+
 
 class MySequencePositionTrigger implements Runnable {
     
@@ -544,10 +568,7 @@ class MySequencePositionTrigger implements Runnable {
             sequenceListeners = new ArrayList();
         }
         
-        /*public synchronized void setListeners(List sequenceListeners) {
-            this.sequenceListeners = sequenceListeners;
-            
-        }*/
+      
         
         public void addSequenceListener(SequenceListener li){
             sequenceListeners.add(li);
@@ -588,8 +609,8 @@ class MySequencePositionTrigger implements Runnable {
                 SequenceListener li = (SequenceListener)iter.next();
                 li.selectedSeqPosition(pos);
                 
-                /*
-                // ugly! TODO: find a nice solution for this ...
+                
+                /*// ugly! TODO: find a nice solution for this ...
                 // display seq cursor only over the sequyece ...
                 if ( li instanceof SeqToolTipListener ){
                     if ( mouseY < 20)
