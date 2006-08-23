@@ -346,14 +346,18 @@ implements MouseListener, MouseMotionListener{
        
     }
     
-    
-    public void mouseClicked(MouseEvent arg0) {}
-    
-    public void mousePressed(MouseEvent arg0) {  
+    public void interruptTimer(){
         if ( hideTimer != null) {
             hideTimer.interrupt();
             hideTimer = null;
         }
+    }
+    
+    public void mouseClicked(MouseEvent arg0) {}
+    
+    public void mousePressed(MouseEvent arg0) {  
+        interruptTimer();
+        
         if (frameshown) {
             floatingFrame.requestFocus();
             floatingFrame.toFront();

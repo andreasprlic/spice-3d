@@ -238,7 +238,8 @@ MouseMotionListener
     public void mouseDragged(MouseEvent e) {
         dragging = true;
         
-        popupFrame.resetTimer();
+        
+        popupFrame.interruptTimer();
         
         int pos = getSeqPos(e) ;
         
