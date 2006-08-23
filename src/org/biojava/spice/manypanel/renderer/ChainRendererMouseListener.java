@@ -67,6 +67,7 @@ MouseMotionListener
     List spiceFeatureListeners;
     Feature oldFeature;
     Segment oldSegment;
+    CoordManager coordManager;
     
     static Logger logger = Logger.getLogger("org.biojava.spice");
     
@@ -86,6 +87,7 @@ MouseMotionListener
         chainLength = 0;
         clearSequenceListeners();
         clearSpiceFeatureListeners();
+        coordManager = new CoordManager();
     }
     
     public void clearSpiceFeatureListeners(){
@@ -120,11 +122,12 @@ MouseMotionListener
         int x = e.getX();
         //int y = e.getY();
         //float scale = seqScale.getScale();
-        int DEFAULT_X_START = SequenceScalePanel.DEFAULT_X_START;
+        //int DEFAULT_X_START = SequenceScalePanel.DEFAULT_X_START;
         float scale = renderer.getScale();
-        int seqpos =  java.lang.Math.round((x-DEFAULT_X_START-2)/scale) ;
-        if ( seqpos > chainLength)
-            seqpos = -1;
+        coordManager.setScale(scale);
+        int seqpos = coordManager.getSeqPos(x-2);
+        
+   
         return seqpos  ;
     }   
     
@@ -200,6 +203,7 @@ MouseMotionListener
     public void setChain(Chain c){
         
         chainLength = c.getLength();
+        coordManager.setLength(chainLength);
     }
     
     private void setSelectionStart(int start){
@@ -296,9 +300,10 @@ MouseMotionListener
             Iterator iter = segments.iterator();
             while (iter.hasNext()) {
                 Segment s = (Segment)iter.next();
-                if ( s.overlaps(pos)) {
                 
-                   
+                // pos is in coords starting with 0
+                // segment is in DAS coords starting with 1!
+                if ( s.overlaps(pos+1)) {
                     
                     event.setSegment(s);
                     triggerMouseOverSegment(event);

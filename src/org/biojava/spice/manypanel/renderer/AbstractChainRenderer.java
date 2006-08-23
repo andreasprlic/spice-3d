@@ -372,11 +372,12 @@ public abstract class AbstractChainRenderer
     }
 
     protected void setScale(float scale) {
-        
+       
         featurePanel.setScale(scale);
         cursorPanel.setScale(scale);   
         columnCursor.setScale(scale);
-
+       
+        
         Iterator iter = dasSourcePanels.iterator();
         while (iter.hasNext()){
             DasSourcePanel dsp = (DasSourcePanel)iter.next();

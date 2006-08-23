@@ -74,6 +74,8 @@ extends JPanel{
     float scale;
     Character[] seqArr;    
     
+    CoordManager coordManager;
+    
     static {
         ResourceBundle bundle = ResourceBundle.getBundle(baseName);
         String fontName = bundle.getString("org.biojava.spice.manypanel.renderer.SequenceScalePanel.FontName");
@@ -97,13 +99,15 @@ extends JPanel{
         
         seqArr = new Character[0];       
         chainLength = 0;
+        scale = 1.0f;
+        
         setPrefSize();
+        coordManager = new CoordManager();
         
     }
     
     private void setPrefSize() {
-        // hm if we do not add +2 to the length then there is a size mismatch to the other panels.
-        // so I guess there is a +/-1 issue somewhere...        
+     
         int length = chainLength  ; 
         int l = Math.round(length*scale) + DEFAULT_X_START + DEFAULT_X_RIGHT_BORDER ;
         if ( l  < 200){
@@ -116,6 +120,7 @@ extends JPanel{
     public synchronized void setChain(Chain c){
      
         List a = c.getGroups("amino");
+        
         seqArr = new Character[a.size()];
         
         chain = new ChainImpl();
@@ -130,11 +135,12 @@ extends JPanel{
         }
 
         chainLength = i;
-        
+        coordManager.setLength(chainLength);
         setPrefSize();
         
         this.repaint();  
     }
+    
     
     public synchronized float getScale(){
         return scale;
@@ -144,7 +150,7 @@ extends JPanel{
     public void setScale(float scale) {
         
         this.scale=scale;
-     
+        coordManager.setScale(scale);
         setPrefSize();
      
         this.repaint();
@@ -165,11 +171,9 @@ extends JPanel{
     }
     
     public void paintComponent(Graphics g){
-        //super.paintComponent(g);
-       
+        
         g.setColor(BACKGROUND_COLOR);
     
-        
         Rectangle drawHere = g.getClipBounds();        
         g.fillRect(drawHere.x,drawHere.y, drawHere.width, drawHere.height);
         
@@ -190,34 +194,7 @@ extends JPanel{
        
     }
     
-    /** start counting at 0...
-     * 
-     * @param panelPos
-     * @return the sequence position
-     */
-    protected int getSeqPos(int panelPos){
-        int seqPos = Math.round((panelPos - DEFAULT_X_START) / scale) ;
-        if ( seqPos < 0)
-            seqPos = 0;
-        int length = chainLength;
-        if ( seqPos >= length)
-            seqPos = length-1;
-        return seqPos;
-    }
     
-    protected int getPanelPos(int seqPos){
-        int length = chainLength;
-        
-
-        if ( seqPos < 0 )
-            seqPos = 0;
-        
-        if ( seqPos >= length)
-            seqPos = length-1;
-
-        int panelPos = Math.round(seqPos * scale) + DEFAULT_X_START;
-        return panelPos;
-    }
 
     /** draw the Scale
      * 
@@ -238,18 +215,23 @@ extends JPanel{
         
        
         
-        int startpos = getSeqPos(drawHere.x);       
-        int endpos   = getSeqPos(drawHere.x+drawHere.width);
+        int startpos = coordManager.getSeqPos(drawHere.x);       
+        int endpos   = coordManager.getSeqPos(drawHere.x+drawHere.width);
     
-        int l = endpos - startpos ;        
-        int drawStart = getPanelPos(startpos);
-        int drawEnd   = getPanelPos(l);
+        int l = endpos - startpos + 1 ;     
         
-     
+        int drawStart = coordManager.getPanelPos(startpos);
+        int drawEnd   = coordManager.getPanelPos(l) - DEFAULT_X_START + aminosize;
+        
+        /*System.out.println("SeqScalePanel drawing scale s:" + startpos + " e: " + endpos + 
+             " ps: " + drawStart + " pe:" + drawEnd  + " draw.x " + drawHere.x + " draw.w " + drawHere.width +
+             " scale " + scale);
+        */
         
 //      the frame around the sequence box
         if ( scale < SEQUENCE_SHOW){
             g2D.setColor(SEQUENCE_COLOR);
+            //g2D.setColor(Color.blue);
             Rectangle seqline = new Rectangle(drawStart, y, drawEnd, LINE_HEIGHT);
             
             //g2D=  (Graphics2D)g;
@@ -266,7 +248,7 @@ extends JPanel{
         
         // draw the vertical ticks
         for (int i =startpos ; i<= endpos ; i++){
-            int xpos = getPanelPos(i) ;
+            int xpos = coordManager.getPanelPos(i) ;
             
             int lineH = 11;
             if ( scale <= 3)
@@ -308,7 +290,7 @@ extends JPanel{
         int length = chainLength;       
         if ( endpos >= length-1) {
             
-            int endPanel = getPanelPos(endpos);
+            int endPanel = coordManager.getPanelPos(endpos);
             g2D.drawString(""+length,endPanel+10,y+DEFAULT_Y_STEP);
         }
         
@@ -334,8 +316,8 @@ extends JPanel{
         
         // only draw within the ranges of the Clip
         Rectangle drawHere = g2D.getClipBounds();        
-        int startpos = getSeqPos(drawHere.x);       
-        int endpos   = getSeqPos(drawHere.x+drawHere.width+1);
+        int startpos = coordManager.getSeqPos(drawHere.x);       
+        int endpos   = coordManager.getSeqPos(drawHere.x+drawHere.width-2);
                
         
         Composite oldComp = g2D.getComposite();
@@ -353,7 +335,7 @@ extends JPanel{
             
             // display the actual sequence!;
             for ( int i = startpos ; ((i <= endpos) && ( i < seqArr.length)) ;i++){
-                int xpos =getPanelPos(i);
+                int xpos =coordManager.getPanelPos(i);
                                 
                 // TODO:
                 // color amino acids by hydrophobicity

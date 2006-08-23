@@ -170,8 +170,8 @@ extends SequenceScalePanel{
         //System.out.println("Structure " + start + " " + end);
         
                 
-        int xstart = getPanelPos(start);
-        int endx   = getPanelPos(end)+1 ;
+        int xstart = coordManager.getPanelPos(start);
+        int endx   = coordManager.getPanelPos(end)+1 ;
         
         int height = DEFAULT_Y_HEIGHT ;
         
