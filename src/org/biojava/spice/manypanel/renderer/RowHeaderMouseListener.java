@@ -65,66 +65,7 @@ MouseMotionListener {
     }
     
     
-    /** returns the feature if mouse over the link icon 
-     * 
-     * @param e
-     * @return the feature of the link, or null if either not over a feature or feature does not have a link
-     */
-    private Feature getLinkFeature(MouseEvent e){
-        int xe = e.getX();
-        if ( xe > DasSourcePanelHeader.LINK_ICON_SIZE )
-            return null;        
-        int y = SequenceScalePanel.DEFAULT_Y_START + SequenceScalePanel.DEFAULT_Y_STEP ;
-        
-        int ye = e.getY();
-        
-        if ( ye < (y+SequenceScalePanel.DEFAULT_Y_STEP)) {
-            // moved the mouse in the header region ..
-            return null;
-        }
-        
-        DasSourcePanelHeader[] dasSources = parent.getDasSources();
-        
-        for (int pi = 0 ; pi < dasSources.length ; pi++ ){
-            DasSourcePanelHeader dsp = dasSources[pi];
-            
-            int compH =dsp.getDisplayHeight();
-            if ( ye < (y+compH) ) {
-                Feature[] feats = dsp.getDrawableDasSource().getFeatures();
-                // now get the right feature ...
-                Feature found = null;
 
-                // the nickname text in the row ...
-                y+= SequenceScalePanel.DEFAULT_Y_STEP;                
-                
-                for (int i =0 ; i < feats.length ; i++){
-                    y += SequenceScalePanel.DEFAULT_Y_STEP;
-                    if ( ye < y) {
-                      
-                        found = feats[i];
-                        String link = found.getLink();
-                        if (( link != null) && (! link.equals(""))){
-                            System.out.println(link);
-                            return found;
-                        } else {
-                           return null;
-                        }
-                    }
-                }
-            }
-
-            if ( ye < y ) {
-                // we can at most be over a link icon here..test somewhere else
-                return null;
-            }
-            
-        }
-        
-        return null;
-        
-        
-    }
-    
     private DrawableDasSource getInfoButtonDasSource(MouseEvent e){
         
         int xe = e.getX();
@@ -157,6 +98,80 @@ MouseMotionListener {
         }
         
         return null;
+        
+    }
+    
+    
+    /** returns the feature if mouse over the link icon 
+     * 
+     * @param e
+     * @return the feature of the link, or null if either not over a feature or feature does not have a link
+     */
+    private Feature getLinkFeature(MouseEvent e){
+        //logger.info("getLinkFeatyre");
+        int xe = e.getX();
+        if ( xe > DasSourcePanelHeader.LINK_ICON_SIZE ) {
+            //logger.info("xe > icon");
+            return null;        
+        }
+        int y = SequenceScalePanel.DEFAULT_Y_START + SequenceScalePanel.DEFAULT_Y_STEP ;
+        
+        int ye = e.getY();
+        //logger.info("yEvent " + ye);
+        
+        if ( ye < (y+SequenceScalePanel.DEFAULT_Y_STEP)) {
+            // moved the mouse in the header region ..
+            //logger.info("ye in header");
+            return null;
+        }
+        
+        DasSourcePanelHeader[] dasSources = parent.getDasSources();
+        
+        for (int pi = 0 ; pi < dasSources.length ; pi++ ){
+            DasSourcePanelHeader dsp = dasSources[pi];
+            
+            int compH =dsp.getDisplayHeight();
+            
+            
+            if ( ye < (y+compH) ) {
+                Feature[] feats = dsp.getDrawableDasSource().getFeatures();
+                // now get the right feature ...
+                Feature found = null;
+
+                // the nickname text in the row ...
+                y+= SequenceScalePanel.DEFAULT_Y_STEP;                
+                
+                for (int i =0 ; i < feats.length ; i++){
+                    y += SequenceScalePanel.DEFAULT_Y_STEP;
+                    if ( ye < y) {
+                      
+                        found = feats[i];
+                        //logger.info("found feature " + found);
+                        String link = found.getLink();
+                        if (( link != null) && (! link.equals(""))){
+                            //.out.println(link);
+                            return found;
+                        } else {
+                            //logger.info("no link in feature");
+                           return null;
+                        }
+                    }
+                }
+            }
+
+            /*if ( ye < y -SequenceScalePanel.DEFAULT_Y_STEP  ) {
+                // we can at most be over a link icon here..test somewhere else
+                logger.info("ye < y " + ye + " " + y);
+                return null;
+            }*/
+            
+            y += compH;
+            
+        }
+        
+        //logger.info("end of function");
+        return null;
+        
         
     }
     
