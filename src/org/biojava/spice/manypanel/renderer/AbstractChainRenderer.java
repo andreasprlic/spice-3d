@@ -177,17 +177,17 @@ public abstract class AbstractChainRenderer
         layeredPane.addMouseMotionListener(mouseListener);
         layeredPane.addMouseListener(mouseListener);
         
-        SegmentPopupFrame fframe = new SegmentPopupFrame();
-        layeredPane.addMouseListener(fframe);
-        layeredPane.addMouseMotionListener(fframe);
+        //XSegmentPopupFrame fframe = new SegmentPopupFrame();
+//      XlayeredPane.addMouseListener(fframe);
+//      XlayeredPane.addMouseMotionListener(fframe);
         
 
         mouseListener.addSequenceListener(cursorPanel);
         mouseListener.addSpiceFeatureListener(cursorPanel);
         mouseListener.addSequenceListener(columnCursor);
         mouseListener.addSpiceFeatureListener(columnCursor);
-        mouseListener.addSpiceFeatureListener(fframe);
-        mouseListener.addSequenceListener(fframe);
+//      XmouseListener.addSpiceFeatureListener(fframe);
+//      XmouseListener.addSequenceListener(fframe);
 
       
        
@@ -196,9 +196,9 @@ public abstract class AbstractChainRenderer
         dasScrollPaneRowHeader.addMouseMotionListener(rowHeaderListener);
         rowHeaderListener.addSpiceFeatureListener(cursorPanel);
         rowHeaderListener.addSpiceFeatureListener(columnCursor);
-        rowHeaderListener.addSpiceFeatureListener(fframe);
-        dasScrollPaneRowHeader.addMouseListener(fframe);
-        dasScrollPaneRowHeader.addMouseMotionListener(fframe);
+//      XrowHeaderListener.addSpiceFeatureListener(fframe);
+//      XdasScrollPaneRowHeader.addMouseListener(fframe);
+//      XdasScrollPaneRowHeader.addMouseMotionListener(fframe);
         
         int y = 0;
 
@@ -286,6 +286,10 @@ public abstract class AbstractChainRenderer
     
     public SeqToolTipListener[] getToolTipListener(){
         return new SeqToolTipListener[] { toolTipper, tool2} ;
+    }
+    
+    public JLayeredPane getLayeredPane(){
+        return layeredPane;
     }
     
     public CursorPanel[] getCursorPanels(){

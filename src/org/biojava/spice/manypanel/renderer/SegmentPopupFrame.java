@@ -197,7 +197,7 @@ SequenceListener
     }
     
     public void mouseOverFeature(SpiceFeatureEvent e) {
-        displayFrame();
+        //displayFrame();
      
         content =createContent(e.getFeature());
         repaint();
@@ -205,7 +205,7 @@ SequenceListener
     }
     
     public void mouseOverSegment(SpiceFeatureEvent e) {
-        displayFrame();
+        //displayFrame();
        
         content = createContent(e.getSegment());
         repaint();

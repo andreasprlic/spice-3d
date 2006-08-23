@@ -133,7 +133,7 @@ implements SequenceListener, SpiceFeatureListener {
             s = "Seq:" + (position+1) +" PDB:" + g1.getPDBCode() + " " + sequence.substring(position,position+1);
             
         }
-        System.out.println("setting tooltip to " +s);
+        //System.out.println("setting tooltip to " +s);
         
         parent.setToolTipText(s);
       

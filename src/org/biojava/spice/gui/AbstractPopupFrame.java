@@ -159,7 +159,7 @@ implements MouseListener, MouseMotionListener{
         return panel;
     }
     
-    protected void displayFrame() {
+    public void displayFrame() {
         //System.out.println("displayFrame");
         if ( frameshown ) {
             if ( hideTimer != null) {
@@ -387,7 +387,7 @@ class MyTimer  implements ActionListener{
     AbstractPopupFrame hideMe ;
     boolean interrupted ;
     
-    public static final int SHOW_COUNTDOWN = 1000;
+    public static final int SHOW_COUNTDOWN = 1;
     public static final int HIDE_COUNTDOWN = 500;
     
     public static final int SHOW = 1;

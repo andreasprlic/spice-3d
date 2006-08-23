@@ -264,11 +264,13 @@ implements JmolStatusListener, StructureListener
 
     public void sendConsoleEcho(String strEcho) {
         // TODO Auto-generated method stub
+        logger.info(strEcho);
         
     }
 
     public void sendConsoleMessage(String strStatus) {
         // TODO Auto-generated method stub
+        logger.info(strStatus);
         
     }
 
@@ -285,6 +287,11 @@ implements JmolStatusListener, StructureListener
 
     public void notifyAtomHovered(int atomIndex, String strInfo) {
         logger.info("over Atom " + strInfo);
+        
+    }
+
+    public void setCallbackFunction(String callbackType, String callbackFunction) {
+        // TODO Auto-generated method stub
         
     }
     

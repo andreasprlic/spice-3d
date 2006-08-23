@@ -73,6 +73,7 @@ MouseMotionListener
     
     MySequencePositionTrigger mySequencePositionTrigger = new MySequencePositionTrigger();
     
+    SegmentPopupFrame popupFrame;
     
     public ChainRendererMouseListener(AbstractChainRenderer renderer) {
         super();
@@ -88,6 +89,12 @@ MouseMotionListener
         clearSequenceListeners();
         clearSpiceFeatureListeners();
         coordManager = new CoordManager();
+        
+        popupFrame = new SegmentPopupFrame();
+        renderer.getLayeredPane().addMouseListener(popupFrame);
+        renderer.getLayeredPane().addMouseMotionListener(popupFrame);
+        addSpiceFeatureListener(popupFrame);
+        addSequenceListener(popupFrame);
     }
     
     public void clearSpiceFeatureListeners(){
@@ -100,6 +107,8 @@ MouseMotionListener
     
     public void mousePressed(MouseEvent event) {
         
+     
+        
         int pos  = getSeqPos(event);
         
         draggingStart=pos;
@@ -108,6 +117,8 @@ MouseMotionListener
         triggerClearSelection();
         triggerSelectionLocked(false);
         triggerNewSequencePosition(pos,event.getY());
+        
+        
         
         
     }
@@ -334,9 +345,6 @@ MouseMotionListener
     }
     
     
-    
-    
-    
     public void mouseReleased(MouseEvent event) {
         //logger.info("mouse released");
         
@@ -364,6 +372,7 @@ MouseMotionListener
                     List segments = feat.getSegments();
                     Iterator iter = segments.iterator();
                     boolean somethingTriggered = false;
+                   // if ( event.getClickCount() > 1 ) {
                     while (iter.hasNext()) {
                         Segment s = (Segment)iter.next();
                         if ( s.overlaps(pos+1)) {                        
@@ -373,14 +382,18 @@ MouseMotionListener
                             triggerSelectionLocked(true);
                             somethingTriggered = true;
                         }
+                    //}
                     }
                     if ( ! somethingTriggered){
-                        triggerNewSequencePosition(pos,event.getY());
+                        triggerNewSequencePosition(pos,event.getX());
                     }
                 }
                 oldFeature = feat;
             }
         }
+        
+        //if ( event.getClickCount() < 2)
+            popupFrame.displayFrame();
         dragging = false ;
     }
     
