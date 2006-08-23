@@ -223,6 +223,7 @@ MouseMotionListener {
         SpiceFeatureEvent event = getSpiceFeatureEvent(e);
         
         if ( event != null){
+            //System.out.println("rowheaderMouselistener showFrame");
             popupFrame.showFrame();
             triggerFeatureSelectedEvent(event);       
         }

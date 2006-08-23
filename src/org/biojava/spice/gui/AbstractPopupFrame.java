@@ -65,6 +65,8 @@ implements MouseListener, MouseMotionListener{
        
     Point oldPoint;
     
+    public static final int DIST = 20; // the distance of the frame to the mouse cursor
+    
     public AbstractPopupFrame() {
         super();
         
@@ -228,7 +230,7 @@ implements MouseListener, MouseMotionListener{
     }
     
     public synchronized void showFrame(){
-        
+        //ystem.out.println("showFrame");
         floatingFrame.setLocation(oldPoint);
         
         Container content = getContent();
@@ -238,6 +240,8 @@ implements MouseListener, MouseMotionListener{
             floatingFrame.pack();
             //System.out.println("got content " + content);
         }
+        
+        javax.swing.SwingUtilities.invokeLater(new MyLocation(oldPoint,floatingFrame));
         
         floatingFrame.setVisible(true);
         
@@ -252,8 +256,7 @@ implements MouseListener, MouseMotionListener{
     }
     
     
-    private void updateFramePosition(MouseEvent e){
-        //System.out.println("updateFramePosition");
+    private Point getFramePoint(MouseEvent e){
         int x = e.getX();
         int y = e.getY();
         
@@ -267,8 +270,37 @@ implements MouseListener, MouseMotionListener{
         //int compo_h = compo.getHeight();
         //int compo_w = compo.getWidth();        
         
-        Container content = getContent();
        
+        
+        
+        
+        int posx = cx + x + DIST; // draw a bit right of cursor
+        int posy = cy + y + DIST; // draw a bit below the cursor
+        
+        Point p = new Point(posx, posy);
+        return p;
+    }
+    
+    
+    private void updateFramePosition(MouseEvent e){
+        //System.out.println("updateFramePosition");
+       
+        Point p = getFramePoint(e);
+        
+        int x = e.getX();
+        int y = e.getY();
+        int posx = p.x;
+        int posy = p.y;
+        Component compo = e.getComponent();
+        Point screenTopLeft = compo.getLocationOnScreen();
+        int cx = screenTopLeft.x;
+        int cy = screenTopLeft.y;
+        
+        // height = y!
+        // widht = x ...
+        
+        Container content = getContent();
+        
         int compo_h = 0 ;
         int compo_w = 0 ;
         
@@ -277,13 +309,6 @@ implements MouseListener, MouseMotionListener{
             compo_w = content.getWidth();
         }
         
-        int DIST = 20;
-        
-        int posx = cx + x + DIST; // draw a bit right of cursor
-        int posy = cy + y + DIST; // draw a bit below the cursor
-        
-        // height = y!
-        // widht = x ...
         
         Dimension screenDim = Toolkit.getDefaultToolkit().getScreenSize();
         int screen_w = (int) screenDim.getWidth();
@@ -308,7 +333,7 @@ implements MouseListener, MouseMotionListener{
         //        " compo_H " + compo_h + " compo_w " + compo_w );
         
         
-        Point p = new Point(posx,posy);
+        
         
         oldPoint = p;
         
@@ -317,7 +342,7 @@ implements MouseListener, MouseMotionListener{
             return;
         }
         
-        javax.swing.SwingUtilities.invokeLater(new MyLocation(p,floatingFrame));
+        
        
     }
     
@@ -360,7 +385,8 @@ implements MouseListener, MouseMotionListener{
     
     
     public void mouseMoved(MouseEvent e) {
-       
+        oldPoint = getFramePoint(e);
+        
         if ( frameshown) {
             updateFramePosition(e);
         }        
@@ -380,7 +406,7 @@ class MyLocation implements Runnable {
     }
     public void run() {
         c.setLocation(p);
-        c.requestFocus();
+        //c.requestFocus();
         c.toFront();
 
     }
@@ -399,7 +425,7 @@ class MyTimer  implements ActionListener{
     boolean interrupted ;
     
     public static final int SHOW_COUNTDOWN = 1;
-    public static final int HIDE_COUNTDOWN = 500;
+    public static final int HIDE_COUNTDOWN = 1;
     
     public static final int SHOW = 1;
     public static final int HIDE = 2;
@@ -450,6 +476,7 @@ class MyTimer  implements ActionListener{
                         timer.stop();
                         
                     } else {
+                        System.out.println("timer show frame");
                         hideMe.showFrame();
                         timer.stop();
                         action = HIDE;

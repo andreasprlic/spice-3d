@@ -91,7 +91,7 @@ MouseMotionListener
         coordManager = new CoordManager();
         
         popupFrame = new SegmentPopupFrame();
-        renderer.getLayeredPane().addMouseListener(popupFrame);
+        //renderer.getLayeredPane().addMouseListener(popupFrame);
         renderer.getLayeredPane().addMouseMotionListener(popupFrame);
         addSpiceFeatureListener(popupFrame);
         addSequenceListener(popupFrame);
@@ -237,8 +237,8 @@ MouseMotionListener
     
     public void mouseDragged(MouseEvent e) {
         dragging = true;
-        if (  popupFrame.isShown() )
-            popupFrame.resetTimer();
+        
+        popupFrame.resetTimer();
         
         int pos = getSeqPos(e) ;
         
@@ -267,8 +267,12 @@ MouseMotionListener
     
     
     public void mouseMoved(MouseEvent e) {
+        
+        
         if ( selectionLocked )
             return;
+        
+        
         
         int pos = getSeqPos(e) ;
         SpiceFeatureEvent event = getSpiceFeatureEvent(e);
@@ -355,7 +359,7 @@ MouseMotionListener
     public void mouseReleased(MouseEvent event) {
         //logger.info("mouse released");
         
-        popupFrame.resetTimer();
+        
         
         draggingStart = -1;
         
@@ -377,6 +381,7 @@ MouseMotionListener
             //System.out.println(pos + " " + feat);
             if ( feat == null) {
                 oldFeature = new FeatureImpl();
+                popupFrame.markForHide();
                 return;
             }
             if ( pos >= 0) {
@@ -386,14 +391,16 @@ MouseMotionListener
                 if ( ! somethingTriggered){
                     if ( ! selectionLocked)
                         triggerNewSequencePosition(pos,event.getX());
+                    popupFrame.markForHide();
                 }
             }
             oldFeature = feat;
+            
         }
         
         
-        //if ( event.getClickCount() < 2)
-        popupFrame.showFrame();
+       
+      
         dragging = false ;
     }
     
@@ -404,7 +411,9 @@ MouseMotionListener
         while (iter.hasNext()) {
             Segment s = (Segment)iter.next();
             if ( s.overlaps(pos+1)) {  
-                popupFrame.createContent(s);
+                //System.out.println(s);
+                popupFrame.createContent(s);                
+                popupFrame.showFrame();
                 if ( ! selectionLocked) {
                     spiceEvent.setSegment(s);
                     //triggerSegmentSelected(spiceEvent);
