@@ -28,8 +28,10 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.util.logging.Logger;
 
+import javax.swing.BorderFactory;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
@@ -128,8 +130,10 @@ SequenceListener
         endStringBuffer(text);
         descriptionPane.setText(text.toString());
         addHyperLinkListener(descriptionPane);
-        content = panel;
-        return panel;        
+        JScrollPane scroll = new JScrollPane(panel);
+        scroll.setBorder(BorderFactory.createEmptyBorder());
+        content = scroll;
+        return scroll;        
     }
     
     
@@ -164,9 +168,10 @@ SequenceListener
         descriptionPane.setText(text.toString());
         addHyperLinkListener(descriptionPane);
         
-        content = panel;
-        
-        return panel;        
+        JScrollPane scroll = new JScrollPane(panel);
+        scroll.setBorder(BorderFactory.createEmptyBorder());
+        content = scroll;
+        return scroll;      
     }
     
     

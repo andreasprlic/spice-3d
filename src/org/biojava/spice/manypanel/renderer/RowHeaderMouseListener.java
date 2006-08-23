@@ -104,6 +104,7 @@ MouseMotionListener {
                         found = feats[i];
                         String link = found.getLink();
                         if (( link != null) && (! link.equals(""))){
+                            System.out.println(link);
                             return found;
                         } else {
                            return null;

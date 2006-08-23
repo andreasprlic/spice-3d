@@ -475,8 +475,7 @@ class MyTimer  implements ActionListener{
                         hideMe.hideFrame();
                         timer.stop();
                         
-                    } else {
-                        System.out.println("timer show frame");
+                    } else {                       
                         hideMe.showFrame();
                         timer.stop();
                         action = HIDE;
