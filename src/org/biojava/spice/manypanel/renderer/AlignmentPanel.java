@@ -212,8 +212,8 @@ public class AlignmentPanel extends JPanel {
             if ( h2 < 0)
                 h2 = 0;
             
-            int p1 = Math.round(h1*scale1) + SequenceScalePanel.DEFAULT_X_START - scrollLeftX1;
-            int p2 = Math.round(h2*scale2) + SequenceScalePanel.DEFAULT_X_START - scrollLeftX2;
+            int p1 = Math.round(h1*scale1) + SequenceScalePanel.DEFAULT_X_START - scrollLeftX1 ;
+            int p2 = Math.round(h2*scale2) + SequenceScalePanel.DEFAULT_X_START - scrollLeftX2 ;
             
             Group g1 = null;
             Group g2 = null;

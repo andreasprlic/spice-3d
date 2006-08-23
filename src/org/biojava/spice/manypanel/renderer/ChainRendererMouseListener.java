@@ -366,7 +366,7 @@ MouseMotionListener
                     boolean somethingTriggered = false;
                     while (iter.hasNext()) {
                         Segment s = (Segment)iter.next();
-                        if ( (pos >= s.getStart()) && ( pos <= s.getEnd())) {
+                        if ( s.overlaps(pos+1)) {                        
                             spiceEvent.setSegment(s);
                             //triggerSegmentSelected(spiceEvent);
                             triggerNewSequenceRange(s.getStart()-1,s.getEnd()-1);

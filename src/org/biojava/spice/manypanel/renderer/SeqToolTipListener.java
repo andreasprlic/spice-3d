@@ -108,7 +108,8 @@ implements SequenceListener, SpiceFeatureListener {
         String s = "" ;
         Component where = getRenderer();
         
-        //TODO: cleanup - this is horrible!        
+        //TODO: cleanup - this is horrible!      
+        //System.out.println(where);
         if (where instanceof SequenceRenderer ) {
             s = ""+(position+1) + " " + sequence.substring(position,position+1);
             
@@ -132,9 +133,10 @@ implements SequenceListener, SpiceFeatureListener {
             s = "Seq:" + (position+1) +" PDB:" + g1.getPDBCode() + " " + sequence.substring(position,position+1);
             
         }
+        System.out.println("setting tooltip to " +s);
         
         parent.setToolTipText(s);
-        
+      
     }
     
     

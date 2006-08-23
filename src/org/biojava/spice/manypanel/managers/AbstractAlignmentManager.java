@@ -342,7 +342,7 @@ implements AlignmentListener{
             if ( alignmentMap1.containsKey(p)){
                 //System.out.println(alignmentMap1.get(p));
                 Integer spos2 = (Integer) alignmentMap1.get(p);
-                pos2 = spos2.intValue();
+                pos2 = spos2.intValue() ;
             }
         } catch (Exception e){ e.printStackTrace();}
             
@@ -359,7 +359,7 @@ implements AlignmentListener{
             if ( alignmentMap2.containsKey(p)){
                 //System.out.println(alignmentMap2.get(p));
                 Integer spos1 = (Integer) alignmentMap2.get(p);
-                pos1 = spos1.intValue();
+                pos1 = spos1.intValue() ;
             }
         } catch (Exception e){}
         return pos1;

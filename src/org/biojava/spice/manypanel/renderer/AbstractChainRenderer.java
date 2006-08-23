@@ -85,7 +85,10 @@ public abstract class AbstractChainRenderer
     
     AdjustmentListener      adjustmentListener;
     SeqToolTipListener      toolTipper;    
+    SeqToolTipListener      tool2;
+    
     ChainRendererMouseListener mouseListener;
+
     RowHeaderMouseListener     rowHeaderListener;
     int componentWidth;
     int zoomFactor;
@@ -122,7 +125,7 @@ public abstract class AbstractChainRenderer
         scaleChangeListeners = new ArrayList();
               
         mouseListener = new ChainRendererMouseListener(this);
-       
+        
   
         componentWidth = BrowserPane.DEFAULT_PANE_WIDTH;
         
@@ -159,16 +162,17 @@ public abstract class AbstractChainRenderer
         columnHeader = new DasScrollPaneColumnHeader(featurePanel, columnCursor);
         columnHeader.setPreferredSize(new Dimension(width,SequenceScalePanel.SIZE));
         scrollPane.setColumnHeaderView(columnHeader);
-        //scrollPane.setColumnHeaderView(featurePanel);
-        columnHeader.addMouseMotionListener(mouseListener);
-        columnHeader.addMouseListener(mouseListener);
-       
-      /*
-        SeqToolTipListener tool2 = new SeqToolTipListener(columnHeader);
+        
+      
+        
+      
+        tool2 = new SeqToolTipListener(columnHeader);
         mouseListener.addSequenceListener(tool2);
         mouseListener.addSpiceFeatureListener(tool2);
-        */
         
+        
+        columnHeader.addMouseMotionListener(mouseListener);
+        columnHeader.addMouseListener(mouseListener);
         
         layeredPane.addMouseMotionListener(mouseListener);
         layeredPane.addMouseListener(mouseListener);
@@ -185,7 +189,7 @@ public abstract class AbstractChainRenderer
         mouseListener.addSpiceFeatureListener(fframe);
         mouseListener.addSequenceListener(fframe);
 
-        
+      
        
         rowHeaderListener = new RowHeaderMouseListener(dasScrollPaneRowHeader);
         dasScrollPaneRowHeader.addMouseListener(rowHeaderListener);
@@ -280,8 +284,8 @@ public abstract class AbstractChainRenderer
         return statusPanel;
     }
     
-    public SeqToolTipListener getToolTipListener(){
-        return toolTipper;
+    public SeqToolTipListener[] getToolTipListener(){
+        return new SeqToolTipListener[] { toolTipper, tool2} ;
     }
     
     public CursorPanel[] getCursorPanels(){

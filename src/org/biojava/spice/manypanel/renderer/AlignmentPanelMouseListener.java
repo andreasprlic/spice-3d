@@ -71,16 +71,17 @@ public class AlignmentPanelMouseListener implements MouseListener,
 
     public void mouseMoved(MouseEvent e) {
 
-        int seqPos1 = getSeqPos1(e);
+        /*int seqPos1 = getSeqPos1(e);
         int seqPos2 = getSeqPos2(e);
         System.out.println(e.getX());
         System.out.println(" mouse moved at " + seqPos1 + " " + seqPos2);
-        
+        */
         
         
         
     }
     
+    /*
     private int getSeqPos1(MouseEvent e){
         float scale1  = parent.getScale1();
         int scrolled1 = parent.getScrolled1();
@@ -95,6 +96,6 @@ public class AlignmentPanelMouseListener implements MouseListener,
         int XBORDER   = SequenceScalePanel.DEFAULT_X_START;
         int pos2      = Math.round((e.getX()-XBORDER+scrolled2) / scale2) ;
         return pos2;
-    }
+    }*/
 
 }

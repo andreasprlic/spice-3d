@@ -27,16 +27,17 @@ import java.awt.Color;
 import javax.swing.BorderFactory;
 import javax.swing.JLayeredPane;
 
-public class DasScrollPaneColumnHeader extends JLayeredPane {
-
+public class DasScrollPaneColumnHeader 
+extends JLayeredPane {
+    
     public static final long serialVersionUID = 0l;
     
-   
+    
     
     public DasScrollPaneColumnHeader(SequenceScalePanel seqScale, CursorPanel cursor ) {
         super();
         
-       
+        
         this.setBorder(BorderFactory.createEmptyBorder());
         this.setDoubleBuffered(true);
         this.setOpaque(false);       
@@ -48,7 +49,7 @@ public class DasScrollPaneColumnHeader extends JLayeredPane {
         moveToFront(cursor);
         
         
-
+        
     }
-
+    
 }
