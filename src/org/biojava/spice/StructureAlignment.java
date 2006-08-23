@@ -241,12 +241,12 @@ public class StructureAlignment {
                 
                 // something went wrong during creation of rotmat
                 // ignore the whole object!
-                System.out.println("matrix is zero:"  + objects[i]);
+                //System.out.println("matrix is zero:"  + objects[i]);
                 //m.print(3,3);
                 continue;
             }
             
-            System.out.println("adding " + objects[i]);            
+            //System.out.println("adding " + objects[i]);            
             objectNew.add(objects[i]);
             matricesNew.add(m);
             vectorsNew.add(vectors[i]);
@@ -269,10 +269,11 @@ public class StructureAlignment {
         
         sortedBlocks = sortBlocks(blockx);
         
-        System.out.println(n);
+        /*System.out.println(n);
         System.out.println(objects.length);
         System.out.println(matrices.length);
         System.out.println(vectors.length);
+        */
         
         n = objects.length;
         nrSelected = 0;
@@ -407,7 +408,7 @@ public class StructureAlignment {
         
         String cmd = "";
         String intId = intObjectIds[p];
-        logger.info("get rasmol sc ript from sorted blocks for " + intId );
+        //logger.info("get rasmol sc ript from sorted blocks for " + intId );
         Color col =  getColor(p);
         
         
@@ -423,7 +424,7 @@ public class StructureAlignment {
                 
                 if (! ii.equals(intId))
                     continue;
-                System.out.println("StructureAlignment getRasmolFromSortedBlock segment: " + seg);
+                //System.out.println("StructureAlignment getRasmolFromSortedBlock segment: " + seg);
                 
                 String start = (String) seg.getProperty("start");
                 String end   = (String) seg.getProperty("end");
@@ -959,13 +960,13 @@ class ProgressThreadDrawer extends Thread {
     
     
     public void run() {
-        System.out.println("drawer started");
+        //System.out.println("drawer started");
         showProgressFrame();
         
         boolean finished = false;
         while ( ! finished) {
             try {
-                System.out.println("repainting frame");
+                //System.out.println("repainting frame");
                 progress.repaint();
                 frame.repaint();
                
