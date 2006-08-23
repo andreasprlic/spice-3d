@@ -237,7 +237,8 @@ MouseMotionListener
     
     public void mouseDragged(MouseEvent e) {
         dragging = true;
-        
+        if (  popupFrame.isShown() )
+            popupFrame.resetTimer();
         
         int pos = getSeqPos(e) ;
         
@@ -272,22 +273,28 @@ MouseMotionListener
         int pos = getSeqPos(e) ;
         SpiceFeatureEvent event = getSpiceFeatureEvent(e);
         Feature feat = null;
-        if ( event != null )
+        if ( event != null ) {
             feat = event.getFeature();
-       
+           
+        }
         
         // test if nothing changed ...
         // if nothing changed, return
         if ( feat != null ){
-            if ( feat.equals(oldFeature))
-                if ( pos == oldSelectionStart)
+            if ( feat.equals(oldFeature)) {
+                if ( pos == oldSelectionStart) {
+                   
                     return;
+                }
+            } else {
+                popupFrame.createContent(feat);
+                
+            }
             
         } else {
-            
-            if ( pos == oldSelectionStart)
-                return;
-            
+            popupFrame.markForHide();
+            if ( pos == oldSelectionStart)                
+                return;                       
         }
         
         oldSelectionStart = pos;
@@ -348,56 +355,68 @@ MouseMotionListener
     public void mouseReleased(MouseEvent event) {
         //logger.info("mouse released");
         
+        popupFrame.resetTimer();
+        
         draggingStart = -1;
         
-        if  ( ! selectionLocked) {
-            if ( dragging) {
+        
+        if ( dragging) {
+            if  ( ! selectionLocked) {
                 triggerSelectionLocked(true);
-            } else {
-                int pos = getSeqPos(event) ;
-                
-                SpiceFeatureEvent spiceEvent = getSpiceFeatureEvent(event);
-                
-                Feature feat = null ;
-                if ( spiceEvent != null ) 
-                    feat = spiceEvent.getFeature();
-                
-                //System.out.println(pos + " " + feat);
-                if ( feat == null) {
-                    oldFeature = new FeatureImpl();
-                    return;
-                }
-                if ( pos >= 0) {
-//                  check if pos is over a feature then trigger new SegmentSelected
-                    List segments = feat.getSegments();
-                    Iterator iter = segments.iterator();
-                    boolean somethingTriggered = false;
-                   // if ( event.getClickCount() > 1 ) {
-                    while (iter.hasNext()) {
-                        Segment s = (Segment)iter.next();
-                        if ( s.overlaps(pos+1)) {                        
-                            spiceEvent.setSegment(s);
-                            //triggerSegmentSelected(spiceEvent);
-                            triggerNewSequenceRange(s.getStart()-1,s.getEnd()-1);
-                            triggerSelectionLocked(true);
-                            somethingTriggered = true;
-                        }
-                    //}
-                    }
-                    if ( ! somethingTriggered){
-                        triggerNewSequencePosition(pos,event.getX());
-                    }
-                }
-                oldFeature = feat;
             }
+        } else {
+            
+            int pos = getSeqPos(event) ;
+            
+            SpiceFeatureEvent spiceEvent = getSpiceFeatureEvent(event);
+            
+            Feature feat = null ;
+            if ( spiceEvent != null ) 
+                feat = spiceEvent.getFeature();
+            
+            //System.out.println(pos + " " + feat);
+            if ( feat == null) {
+                oldFeature = new FeatureImpl();
+                return;
+            }
+            if ( pos >= 0) {
+//              check if pos is over a feature then trigger new SegmentSelected
+                List segments = feat.getSegments();
+                boolean somethingTriggered = checkOverSegment(segments, pos, spiceEvent, selectionLocked);
+                if ( ! somethingTriggered){
+                    if ( ! selectionLocked)
+                        triggerNewSequencePosition(pos,event.getX());
+                }
+            }
+            oldFeature = feat;
         }
         
+        
         //if ( event.getClickCount() < 2)
-            popupFrame.displayFrame();
+        popupFrame.showFrame();
         dragging = false ;
     }
     
-    
+    private boolean checkOverSegment(List segments, int pos, SpiceFeatureEvent spiceEvent, boolean selectionLocked){
+        Iterator iter = segments.iterator();
+        boolean somethingTriggered = false;
+       // if ( event.getClickCount() > 1 ) {
+        while (iter.hasNext()) {
+            Segment s = (Segment)iter.next();
+            if ( s.overlaps(pos+1)) {  
+                popupFrame.createContent(s);
+                if ( ! selectionLocked) {
+                    spiceEvent.setSegment(s);
+                    //triggerSegmentSelected(spiceEvent);
+                    triggerNewSequenceRange(s.getStart()-1,s.getEnd()-1);
+                    triggerSelectionLocked(true);
+                    somethingTriggered = true;
+                }
+            }
+        //}
+        }
+        return somethingTriggered;
+    }
     
     public void clearSequenceListeners(){
         sequenceListeners = new ArrayList();

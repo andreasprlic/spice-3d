@@ -52,11 +52,16 @@ MouseMotionListener {
     
     DasScrollPaneRowHeader parent;    
     List spiceFeatureListeners;
-    
+    SegmentPopupFrame popupFrame;
     public RowHeaderMouseListener(DasScrollPaneRowHeader parent) {
         super();
         spiceFeatureListeners = new ArrayList();
         this.parent = parent;
+        popupFrame = new SegmentPopupFrame();
+        addSpiceFeatureListener(popupFrame);
+        parent.addMouseListener(popupFrame);
+        parent.addMouseMotionListener(popupFrame);
+     
     }
     
     
@@ -218,6 +223,7 @@ MouseMotionListener {
         SpiceFeatureEvent event = getSpiceFeatureEvent(e);
         
         if ( event != null){
+            popupFrame.showFrame();
             triggerFeatureSelectedEvent(event);       
         }
         
@@ -242,8 +248,11 @@ MouseMotionListener {
     
     public void mouseMoved(MouseEvent e) {        
         
+        
+        
         SpiceFeatureEvent event = getSpiceFeatureEvent(e);
-        if ( event != null){                      
+        if ( event != null){       
+            popupFrame.createContent(event.getFeature());
             parent.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             triggerMouseOverFeatureEvent(event);
             return;

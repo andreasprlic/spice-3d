@@ -110,7 +110,7 @@ SequenceListener
                 
     }
     
-    private Container createContent(Feature f){
+    public Container createContent(Feature f){
         panel = new JPanel();
         panel.setBackground(Color.white);
         panel.setMaximumSize(new Dimension(FRAME_WIDTH,FRAME_MAX_HEIGHT));
@@ -128,13 +128,14 @@ SequenceListener
         endStringBuffer(text);
         descriptionPane.setText(text.toString());
         addHyperLinkListener(descriptionPane);
-     
+        content = panel;
         return panel;        
     }
     
     
     
-    private Container createContent(Segment s){
+    public Container createContent(Segment s){
+      
         panel = new JPanel();
         panel.setMaximumSize(new Dimension(FRAME_WIDTH,FRAME_MAX_HEIGHT));
         panel.setPreferredSize(new Dimension(FRAME_WIDTH,FRAME_PREF_HEIGHT));
@@ -162,6 +163,8 @@ SequenceListener
         //System.out.println(text.toString());
         descriptionPane.setText(text.toString());
         addHyperLinkListener(descriptionPane);
+        
+        content = panel;
         
         return panel;        
     }
@@ -223,7 +226,7 @@ SequenceListener
     }
     
     public void selectedSeqPosition(int position) {           
-        markForHide();        
+        //markForHide();        
     }
     
     public void selectedSeqRange(int start, int end) {

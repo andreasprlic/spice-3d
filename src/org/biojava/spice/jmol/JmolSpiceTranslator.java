@@ -270,7 +270,9 @@ implements JmolStatusListener, StructureListener
 
     public void sendConsoleMessage(String strStatus) {
         // TODO Auto-generated method stub
-        logger.info(strStatus);
+        
+       
+        //logger.info(strStatus);
         
     }
 

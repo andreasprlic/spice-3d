@@ -74,6 +74,14 @@ implements MouseListener, MouseMotionListener{
         
     }
     
+    /** return a flag if the frame is currently shown
+     * 
+     * @return flag is currently being shown
+     */
+    public boolean isShown(){
+        return frameshown;
+    }
+    
     protected static JFrame createFrame(){
         JFrame frame = new JFrame();
         JFrame.setDefaultLookAndFeelDecorated(false);
@@ -86,11 +94,13 @@ implements MouseListener, MouseMotionListener{
     
     public void repaint() {
         if ( frameshown ) {
+          
             
             Container c = getContent();
             
             floatingFrame.setContentPane(createContentPane(c));           
-            floatingFrame.pack();
+            floatingFrame.pack();           
+
             floatingFrame.repaint();
                         
         }
@@ -109,6 +119,7 @@ implements MouseListener, MouseMotionListener{
    
     
     private Container createContentPane(Container content){
+        //System.out.println("create ContentPane");
         Border border = BorderFactory.createLineBorder(Color.DARK_GRAY);
         
         JPanel panel = new JPanel();
@@ -159,13 +170,13 @@ implements MouseListener, MouseMotionListener{
         return panel;
     }
     
-    public void displayFrame() {
+    public void resetTimer() {
         //System.out.println("displayFrame");
         if ( frameshown ) {
             if ( hideTimer != null) {
                 hideTimer.resetTimer();
             }
-            //floatingFrame.repaint();
+            
             repaint();
         }
         
@@ -216,7 +227,8 @@ implements MouseListener, MouseMotionListener{
         hideTimer = null;
     }
     
-    protected synchronized void showFrame(){
+    public synchronized void showFrame(){
+        
         floatingFrame.setLocation(oldPoint);
         
         Container content = getContent();
@@ -224,20 +236,24 @@ implements MouseListener, MouseMotionListener{
         if ( content != null) {            
             floatingFrame.setContentPane(createContentPane(content));
             floatingFrame.pack();
+            //System.out.println("got content " + content);
         }
-        repaint();
+        
         floatingFrame.setVisible(true);
         
+        if ( hideTimer != null) {
+            hideTimer.interrupt();
+            hideTimer = null;
+        }
+        
         frameshown = true;
-        hideTimer = null;
+        
+        repaint();
     }
     
     
     private void updateFramePosition(MouseEvent e){
         //System.out.println("updateFramePosition");
-     
-        
-        
         int x = e.getX();
         int y = e.getY();
         
@@ -302,12 +318,7 @@ implements MouseListener, MouseMotionListener{
         }
         
         javax.swing.SwingUtilities.invokeLater(new MyLocation(p,floatingFrame));
-        
-        /*
-        floatingFrame.setLocation(p);
-        floatingFrame.requestFocus();
-        floatingFrame.toFront();
-        */
+       
     }
     
     
