@@ -40,6 +40,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.border.Border;
 
@@ -294,7 +295,7 @@ implements MouseListener, MouseMotionListener{
     
     
     public void updateFramePosition(MouseEvent e){
-        System.out.println("updateFramePosition");
+        //System.out.println("updateFramePosition");
        
         Point p = getFramePoint(e);
         if (oldPoint.equals(p))
@@ -461,12 +462,13 @@ implements MouseMotionListener {
         
         int diffX = prevMouseOnScreen.x - mouseOnScreen.x;
         int diffY = prevMouseOnScreen.y - mouseOnScreen.y;
-        System.out.println(diffX + " " + diffY);
+        //System.out.println(diffX + " " + diffY);
         prevMouseOnScreen = getMouseOnScreen(e);
         
         Point newPosition = new Point(screenTopLeft.x - diffX, screenTopLeft.y - diffY);     
-        MyLocation loc = new MyLocation(newPosition,parent);
-        javax.swing.SwingUtilities.invokeLater(loc);
+        //MyLocation loc = new MyLocation(newPosition,parent);
+        //javax.swing.SwingUtilities.(loc);
+        parent.setLocation(newPosition);
         
        
         
@@ -475,15 +477,12 @@ implements MouseMotionListener {
     private Point getMouseOnScreen(MouseEvent e){
         Point thisMouse = e.getPoint();
         
-        
 //      get parent components locations
         Component compo = e.getComponent();
-        Point screenTopLeft = compo.getLocationOnScreen();
-                       
+        SwingUtilities.convertPointToScreen(thisMouse,compo);
         
-        Point mouseOnScreen = (Point) screenTopLeft.clone();
-        mouseOnScreen.translate(thisMouse.x,thisMouse.y);
-        return mouseOnScreen;
+        return thisMouse;
+        
         
     }
 
