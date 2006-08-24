@@ -69,6 +69,8 @@ implements FeatureListener,SpiceFeatureListener
     public static final Color SELECTED_FEATURE_COLOR;
     
     
+    private static final String DISULFID = "DISULFID"; 
+    
     
     float     scale;
     boolean   selected;
@@ -586,7 +588,7 @@ implements FeatureListener,SpiceFeatureListener
             setColor(g,feature,new HashMap());
             String featureType = feature.getType();
             
-            if (  featureType.equals("DISULFID")){
+            if (  featureType.equals(DISULFID)){
                 drawSpanFeature(feature,f,SequenceScalePanel.DEFAULT_Y_HEIGHT,g,y);
                 
             } else if (  featureType.equals("SECSTRUC") || 
@@ -750,7 +752,7 @@ implements FeatureListener,SpiceFeatureListener
             g.setColor(c);
         } else {
             //logger.info("no stylesheet defined color found for" + feature.getName());
-            if ( feature.getType().equals("DISULFID")){
+            if ( feature.getType().equals(DISULFID)){
                 g.setColor(Color.yellow);
             } else {
                 setDefaultColor(g,feature);
@@ -797,14 +799,19 @@ implements FeatureListener,SpiceFeatureListener
             Feature  feat = features[f];
             String featureType = feat.getType();
             
-            //drawLabel(g,feat,y);
-            
-            
-            
+            // disulfid bridges are never overwritten...            
+            if (  featureType.equals(DISULFID)){ 
+                drawSpanFeature(feat,f,SequenceScalePanel.DEFAULT_Y_HEIGHT,g,y);
+                continue;
+            }
+                    
             boolean matchingStyle = false ;
             for (int m=0; m< style.length;m++){
                 Map s = style[m];
                 // logger.finest(" style:" + s);
+                
+               
+                
                 String styleType = (String) s.get("type");
                 
                 if ( styleType.equals(featureType) ){
@@ -859,7 +866,7 @@ implements FeatureListener,SpiceFeatureListener
                 
                 //logger.finest("no matching stylesheet found for feature type " + featureType);
                 // no stylesheet type has been found that describes how to paint this feature - use default...
-                if (  featureType.equals("DISULFID")){
+                if (  featureType.equals(DISULFID)){
                     drawSpanFeature(feat,f,SequenceScalePanel.DEFAULT_Y_HEIGHT,g,y);
                 } else if (  featureType.equals("SECSTRUC") || 
                         featureType.equals("HELIX") || 
