@@ -219,7 +219,10 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
         regdesc.setEditable(false);
         regdesc.setBorder(BorderFactory.createEmptyBorder());
         v.add(regdesc);
-        JTextField registry = new JTextField(config.getRegistryUrl().toString());
+        String url = RegistryConfiguration.DEFAULTREGISTRY;
+        if ( config != null )
+            url = config.getRegistryUrl().toString();
+        JTextField registry = new JTextField(url);
         v.add(registry);
         
         

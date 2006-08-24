@@ -67,7 +67,7 @@ public class RegistryConfiguration
     //static String PDBCOORDSYS     = "PDBresnum,Protein Structure";
     //static String UNIPROTCOORDSYS = "UniProt,Protein Sequence";
     
-    static String DEFAULTREGISTRY = "http://das.sanger.ac.uk/registry/das1/sources";
+    public static String DEFAULTREGISTRY = "http://das.sanger.ac.uk/registry/das1/sources";
     
     static Logger logger      = Logger.getLogger("org.biojava.spice");
     
