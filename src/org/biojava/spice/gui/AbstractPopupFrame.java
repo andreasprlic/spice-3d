@@ -248,6 +248,7 @@ implements MouseListener, MouseMotionListener{
     
     public synchronized void showFrame(){
         //ystem.out.println("showFrame");
+        
         floatingFrame.setLocation(oldPoint);
         
         Container content = getContent();
@@ -284,13 +285,6 @@ implements MouseListener, MouseMotionListener{
         int cx = screenTopLeft.x;
         int cy = screenTopLeft.y;
         
-        //int compo_h = compo.getHeight();
-        //int compo_w = compo.getWidth();        
-        
-       
-        
-        
-        
         int posx = cx + x + DIST; // draw a bit right of cursor
         int posy = cy + y + DIST; // draw a bit below the cursor
         
@@ -299,10 +293,12 @@ implements MouseListener, MouseMotionListener{
     }
     
     
-    private void updateFramePosition(MouseEvent e){
+    public void updateFramePosition(MouseEvent e){
         //System.out.println("updateFramePosition");
        
         Point p = getFramePoint(e);
+        if (oldPoint.equals(p))
+            return;
         
         int x = e.getX();
         int y = e.getY();
@@ -350,15 +346,11 @@ implements MouseListener, MouseMotionListener{
         //        " compo_H " + compo_h + " compo_w " + compo_w );
         
         
-        
+        p = new Point(posx,posy);
         
         oldPoint = p;
         
-        if ( ! frameshown){
-            // System.out.println("frame not shown ...");
-            return;
-        }
-        
+    
         
        
     }
@@ -442,11 +434,11 @@ implements MouseListener {
 class MyFrameMouseListener
 implements MouseMotionListener {
 
-    Point oldP;
+    Point prevMouseOnScreen;
     JFrame parent;
     AbstractPopupFrame manager;
     public MyFrameMouseListener(JFrame frame, AbstractPopupFrame manager) {
-        oldP = null;
+        prevMouseOnScreen = null;
         parent =frame;
         this.manager = manager;
     }
@@ -455,34 +447,48 @@ implements MouseMotionListener {
 
         manager.dispatchFrame();
         
-        int x = e.getX();
-        int y = e.getY();
-        
-        if ( oldP == null)  {
-            oldP = e.getPoint();
+        if ( prevMouseOnScreen == null)  {
+            prevMouseOnScreen = getMouseOnScreen(e);
             return;
         }
         
-        int diffX = oldP.x - x;
-        int diffY = oldP.y - y;
+           
+        
+        Component compo = e.getComponent();
+        Point screenTopLeft = compo.getLocationOnScreen();
+       
+        Point mouseOnScreen = getMouseOnScreen(e);
+        
+        int diffX = prevMouseOnScreen.x - mouseOnScreen.x;
+        int diffY = prevMouseOnScreen.y - mouseOnScreen.y;
+        
+        prevMouseOnScreen = getMouseOnScreen(e);
+        
+        Point newPosition = new Point(screenTopLeft.x - diffX, screenTopLeft.y - diffY);     
+        MyLocation loc = new MyLocation(newPosition,parent);
+        javax.swing.SwingUtilities.invokeLater(loc);
+        
+       
+        
+    }
+    
+    private Point getMouseOnScreen(MouseEvent e){
+        Point thisMouse = e.getPoint();
         
         
 //      get parent components locations
         Component compo = e.getComponent();
         Point screenTopLeft = compo.getLocationOnScreen();
+                       
         
-        int cx = screenTopLeft.x;
-        int cy = screenTopLeft.y;
-        
-        
-        Point newPosition = new Point(cx-diffX, cy-diffY);        
-        parent.setLocation(newPosition);
+        Point mouseOnScreen = (Point) screenTopLeft.clone();
+        mouseOnScreen.translate(thisMouse.x,thisMouse.y);
+        return mouseOnScreen;
         
     }
 
     public void mouseMoved(MouseEvent e) {
-        oldP = e.getPoint();
-        
+        prevMouseOnScreen = getMouseOnScreen(e);        
     }
     
 }

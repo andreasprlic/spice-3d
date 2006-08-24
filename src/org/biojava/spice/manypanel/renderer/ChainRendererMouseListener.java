@@ -389,6 +389,7 @@ MouseMotionListener
             if ( pos >= 0) {
 //              check if pos is over a feature then trigger new SegmentSelected
                 List segments = feat.getSegments();
+                popupFrame.updateFramePosition(event);
                 boolean somethingTriggered = checkOverSegment(segments, pos, spiceEvent, selectionLocked);
                 if ( ! somethingTriggered){
                     if ( ! selectionLocked)
@@ -414,7 +415,8 @@ MouseMotionListener
             Segment s = (Segment)iter.next();
             if ( s.overlaps(pos+1)) {  
                 //System.out.println(s);
-                popupFrame.createContent(s);                
+                popupFrame.createContent(s);  
+                
                 popupFrame.showFrame();
                 if ( ! selectionLocked) {
                     spiceEvent.setSegment(s);

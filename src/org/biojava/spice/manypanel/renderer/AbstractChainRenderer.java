@@ -564,6 +564,7 @@ public abstract class AbstractChainRenderer
     }
     
     public void updatePanelPositions(){
+        //logger.info("updatePanelPosition");
         //int h = featurePanel.getHeight() + 20;
         int h = FEATURE_PANEL_HEIGHT;
         int width = getDisplayWidth();
