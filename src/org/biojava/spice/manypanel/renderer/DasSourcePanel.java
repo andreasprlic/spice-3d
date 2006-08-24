@@ -760,9 +760,12 @@ implements FeatureListener,SpiceFeatureListener
     
     private void setDefaultColor(Graphics g, Feature feature){
         List segments = feature.getSegments();
-        Segment seg0 = (Segment) segments.get(0) ;
+        Color col = Color.BLUE;
+        if ( segments.size() > 0) {
+            Segment seg0 = (Segment) segments.get(0) ;
         
-        Color col =  seg0.getColor();   
+            col =  seg0.getColor();
+        }
         g.setColor(col);
     }
     
