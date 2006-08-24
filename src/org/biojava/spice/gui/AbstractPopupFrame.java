@@ -399,8 +399,9 @@ implements MouseListener, MouseMotionListener{
         updateFramePosition(e);  
     }
     
-    public void mouseExited(MouseEvent arg0) {     
-        markForHide();        
+    public void mouseExited(MouseEvent arg0) {    
+        //System.out.println("mouse exited marking for hide...");
+        //markForHide();        
     }
     
     

@@ -239,7 +239,8 @@ MouseMotionListener {
         SpiceFeatureEvent event = getSpiceFeatureEvent(e);
         
         if ( event != null){
-            //System.out.println("rowheaderMouselistener showFrame");
+          
+            popupFrame.createContent(event.getFeature());
             popupFrame.showFrame();
             triggerFeatureSelectedEvent(event);       
         }
@@ -269,7 +270,7 @@ MouseMotionListener {
         
         SpiceFeatureEvent event = getSpiceFeatureEvent(e);
         if ( event != null){       
-            popupFrame.createContent(event.getFeature());
+            
             parent.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             triggerMouseOverFeatureEvent(event);
             return;

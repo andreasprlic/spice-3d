@@ -298,6 +298,7 @@ MouseMotionListener
             }
             
         } else {
+            //System.out.println("marking for hide");
             popupFrame.markForHide();
             if ( pos == oldSelectionStart)                
                 return;                       
@@ -395,15 +396,13 @@ MouseMotionListener
                     if ( ! selectionLocked)
                         triggerNewSequencePosition(pos,event.getX());
                     popupFrame.markForHide();
+                    
                 }
             }
             oldFeature = feat;
             
         }
         
-        
-       
-      
         dragging = false ;
     }
     

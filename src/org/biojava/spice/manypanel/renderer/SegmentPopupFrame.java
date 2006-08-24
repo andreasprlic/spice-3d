@@ -216,23 +216,25 @@ SequenceListener
     public void mouseOverFeature(SpiceFeatureEvent e) {
         //displayFrame();
      
-        content =createContent(e.getFeature());
-        repaint();
         
     }
     
     public void mouseOverSegment(SpiceFeatureEvent e) {
         //displayFrame();
        
-        content = createContent(e.getSegment());
-        repaint();
+      
         
     }
     
     public void featureSelected(SpiceFeatureEvent e) {
+
+        content =createContent(e.getFeature());
+        repaint();
     }
     
     public void segmentSelected(SpiceFeatureEvent e) {
+        content = createContent(e.getSegment());
+        repaint();
     }
     
     public void clearSelection() {
