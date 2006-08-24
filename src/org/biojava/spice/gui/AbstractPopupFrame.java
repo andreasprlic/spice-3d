@@ -22,14 +22,12 @@
  */
 package org.biojava.spice.gui;
 
-import java.awt.AWTEvent;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
-import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -97,6 +95,7 @@ implements MouseListener, MouseMotionListener{
         
         MyFrameMouseListener frameMouse = new MyFrameMouseListener(frame, this);
         frame.addMouseMotionListener(frameMouse);
+        frame.addMouseListener(frameMouse);
                
         return frame;
     }
@@ -213,8 +212,8 @@ implements MouseListener, MouseMotionListener{
     
     public synchronized void markForHide() {
         //System.out.println("markForHide");
-        if ( frameshown) {
-            if ( hideTimer == null) {
+        if ( frameshown ) {
+            if ( hideTimer == null ) {
                 hideTimer = new MyTimer(this, MyTimer.HIDE);
             } 
         }
@@ -261,9 +260,10 @@ implements MouseListener, MouseMotionListener{
             //System.out.println("got content " + content);
         }
         
-        javax.swing.SwingUtilities.invokeLater(new MyLocation(oldPoint,floatingFrame));
+        //javax.swing.SwingUtilities.invokeLater(new MyLocation(oldPoint,floatingFrame));
         
         floatingFrame.setVisible(true);
+        floatingFrame.toFront();
         
         if ( hideTimer != null) {
             hideTimer.interrupt();
@@ -441,12 +441,34 @@ implements MouseMotionListener, MouseListener {
     AbstractPopupFrame manager;
     Point mouseDistance;
     
+    boolean dispatched;
+    
     public MyFrameMouseListener(JFrame frame, AbstractPopupFrame manager) {
         mouseDistance = null;
         parent =frame;
         this.manager = manager;
+        
+        dispatched = false;
     }
     
+    
+    public void mouseDragged(MouseEvent e) {
+        
+        // when dragging is started mouseDistance == null
+        if ( mouseDistance == null) {
+            mouseDistance = getMouseDistance(e);
+            manager.dispatchFrame();
+            dispatched =true;
+        }        
+        
+        Point mouseOnScreen = getMouseOnScreen(e);   
+        
+        Point newPosition = new Point(mouseOnScreen.x + mouseDistance.x, mouseOnScreen.y+mouseDistance.y);     
+        
+        MyLocation loc = new MyLocation(newPosition,parent);
+        javax.swing.SwingUtilities.invokeLater(loc);
+        
+    }
     
     private Point getMouseDistance(MouseEvent e) {
         Point p =  getMouseOnScreen(e);
@@ -458,30 +480,9 @@ implements MouseMotionListener, MouseListener {
         
     }
     
-    public void mouseDragged(MouseEvent e) {
-        
-        // when dragging is started mouseDistance == null
-        if ( mouseDistance == null) {
-            mouseDistance = getMouseDistance(e);
-            manager.dispatchFrame();
-        }
-        
-        Point mouseOnScreen = getMouseOnScreen(e);
-        
-        
-        Point newPosition = new Point(mouseOnScreen.x + mouseDistance.x, mouseOnScreen.y+mouseDistance.y);     
-        MyLocation loc = new MyLocation(newPosition,parent);
-        javax.swing.SwingUtilities.invokeLater(loc);
-        //parent.setLocation(newPosition);
-        
-       
-        
-    }
-    
     private Point getMouseOnScreen(MouseEvent e){
         Point thisMouse = e.getPoint();
         
-//      get parent components locations
         Component compo = e.getComponent();
         SwingUtilities.convertPointToScreen(thisMouse,compo);
         
@@ -514,8 +515,38 @@ implements MouseMotionListener, MouseListener {
     public void mouseEntered(MouseEvent arg0) {  }
 
 
+    /** check if mouseEvent occurs within the component
+     * 
+     * @param e
+     * @return flag
+     */
+    private boolean eventWithinFrame(MouseEvent e){
 
-    public void mouseExited(MouseEvent arg0) { }
+        Component compo = e.getComponent();
+        
+        int w = compo.getWidth();
+        int h = compo.getHeight();
+        
+        Point p = e.getPoint();
+        
+        if ( ( p.x > 0 ) && ( p.x < w) ) {
+            if ( (p.y > 0 ) && (p.y < h)) {
+                return true;
+            }
+        }
+        return false;
+        
+    }
+    
+    public void mouseExited(MouseEvent e) { 
+        
+        if ( ! dispatched) {
+            
+            if ( ! eventWithinFrame(e)) 
+                manager.markForHide();
+        }
+        mouseDistance = null;
+    }
     
 }
 
@@ -527,8 +558,10 @@ class MyLocation implements Runnable {
     public MyLocation(Point p, JFrame c) {
         this.p = p;
         this.c = c;
+        
     }
     public void run() {
+        c.setVisible(true);
         c.setLocation(p);
         //c.requestFocus();
         c.toFront();
