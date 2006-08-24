@@ -390,6 +390,7 @@ MouseMotionListener
 //              check if pos is over a feature then trigger new SegmentSelected
                 List segments = feat.getSegments();
                 popupFrame.updateFramePosition(event);
+                
                 boolean somethingTriggered = checkOverSegment(segments, pos, spiceEvent, selectionLocked);
                 if ( ! somethingTriggered){
                     if ( ! selectionLocked)

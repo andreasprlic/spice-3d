@@ -22,12 +22,14 @@
  */
 package org.biojava.spice.gui;
 
+import java.awt.AWTEvent;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -95,8 +97,7 @@ implements MouseListener, MouseMotionListener{
         
         MyFrameMouseListener frameMouse = new MyFrameMouseListener(frame, this);
         frame.addMouseMotionListener(frameMouse);
-        
-        
+               
         return frame;
     }
     
@@ -137,12 +138,14 @@ implements MouseListener, MouseMotionListener{
         
         JPanel panel = new JPanel();
         panel.setBackground(Color.white);
-        panel.setMaximumSize(new Dimension(100,100));
+        //panel.setPreferSize(new Dimension(100,100));
         
         panel.setBorder(border);
         
-        Box vBox = Box.createVerticalBox();
         
+        Box vBox = Box.createVerticalBox();
+        vBox.setBackground(Color.white);
+        //vBox.setBorder(border);
         
         Box hBox = Box.createHorizontalBox();
        
@@ -180,10 +183,8 @@ implements MouseListener, MouseMotionListener{
         if ( content != null)
             vBox.add(content);
         
+        
         panel.add(vBox);
-        
-        
-        
         
         return panel;
     }
@@ -433,42 +434,45 @@ implements MouseListener {
 
 
 class MyFrameMouseListener
-implements MouseMotionListener {
+implements MouseMotionListener, MouseListener {
 
-    Point prevMouseOnScreen;
+    
     JFrame parent;
     AbstractPopupFrame manager;
+    Point mouseDistance;
+    
     public MyFrameMouseListener(JFrame frame, AbstractPopupFrame manager) {
-        prevMouseOnScreen = null;
+        mouseDistance = null;
         parent =frame;
         this.manager = manager;
     }
     
-    public void mouseDragged(MouseEvent e) {
-
-        manager.dispatchFrame();
-        
-        if ( prevMouseOnScreen == null)  {
-            prevMouseOnScreen = getMouseOnScreen(e);
-            return;
-        }
-        
-           
-        
+    
+    private Point getMouseDistance(MouseEvent e) {
+        Point p =  getMouseOnScreen(e);
         Component compo = e.getComponent();
         Point screenTopLeft = compo.getLocationOnScreen();
-       
+        
+        Point n = new Point (screenTopLeft.x - p.x, screenTopLeft.y - p.y);
+        return n;
+        
+    }
+    
+    public void mouseDragged(MouseEvent e) {
+        
+        // when dragging is started mouseDistance == null
+        if ( mouseDistance == null) {
+            mouseDistance = getMouseDistance(e);
+            manager.dispatchFrame();
+        }
+        
         Point mouseOnScreen = getMouseOnScreen(e);
         
-        int diffX = prevMouseOnScreen.x - mouseOnScreen.x;
-        int diffY = prevMouseOnScreen.y - mouseOnScreen.y;
-        //System.out.println(diffX + " " + diffY);
-        prevMouseOnScreen = getMouseOnScreen(e);
         
-        Point newPosition = new Point(screenTopLeft.x - diffX, screenTopLeft.y - diffY);     
-        //MyLocation loc = new MyLocation(newPosition,parent);
-        //javax.swing.SwingUtilities.(loc);
-        parent.setLocation(newPosition);
+        Point newPosition = new Point(mouseOnScreen.x + mouseDistance.x, mouseOnScreen.y+mouseDistance.y);     
+        MyLocation loc = new MyLocation(newPosition,parent);
+        javax.swing.SwingUtilities.invokeLater(loc);
+        //parent.setLocation(newPosition);
         
        
         
@@ -487,8 +491,31 @@ implements MouseMotionListener {
     }
 
     public void mouseMoved(MouseEvent e) {
-        prevMouseOnScreen = getMouseOnScreen(e);        
+        mouseDistance = null;
     }
+
+
+
+    public void mouseClicked(MouseEvent arg0) {   }
+
+
+
+    public void mousePressed(MouseEvent arg0) {}
+
+
+
+    public void mouseReleased(MouseEvent arg0) {
+       mouseDistance = null;
+        
+    }
+
+
+
+    public void mouseEntered(MouseEvent arg0) {  }
+
+
+
+    public void mouseExited(MouseEvent arg0) { }
     
 }
 
