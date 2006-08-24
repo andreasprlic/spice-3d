@@ -83,6 +83,7 @@ import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.spice.manypanel.eventmodel.DasSourceEvent;
 import org.biojava.spice.manypanel.eventmodel.DasSourceListener;
 import org.biojava.spice.manypanel.eventmodel.StructureAlignmentListener;
+import org.biojava.spice.manypanel.renderer.SegmentPopupFrame;
 import org.biojava.spice.server.SpiceServer;
 import org.biojava.spice.utils.BrowserOpener;
 import org.jmol.api.JmolViewer;
@@ -161,6 +162,8 @@ ConfigurationListener
     
    // JTabbedPane tabbedPane;
     Box vBox;
+    
+    static SegmentPopupFrame popupFrame = new SegmentPopupFrame();
     
     /** 
      * start the spice appplication
@@ -873,6 +876,10 @@ ConfigurationListener
         browseMenu.clear();
     }
     
+    
+    public static SegmentPopupFrame getPopupFrame() {
+        return popupFrame;
+    }
     
     
     public BrowserPane getBrowserPane(){

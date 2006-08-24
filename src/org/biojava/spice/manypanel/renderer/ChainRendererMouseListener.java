@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import org.biojava.bio.structure.Chain;
 import org.biojava.dasobert.eventmodel.SequenceListener;
+import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.feature.Feature;
 import org.biojava.spice.feature.FeatureImpl;
 import org.biojava.spice.feature.Segment;
@@ -90,7 +91,7 @@ MouseMotionListener
         clearSpiceFeatureListeners();
         coordManager = new CoordManager();
         
-        popupFrame = new SegmentPopupFrame();
+        popupFrame = SpiceApplication.getPopupFrame();
         //renderer.getLayeredPane().addMouseListener(popupFrame);
         renderer.getLayeredPane().addMouseMotionListener(popupFrame);
         addSpiceFeatureListener(popupFrame);

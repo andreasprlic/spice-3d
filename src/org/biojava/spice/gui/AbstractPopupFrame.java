@@ -59,7 +59,7 @@ implements MouseListener, MouseMotionListener{
     
     
     boolean frameshown ;    
-    static JFrame floatingFrame = createFrame();
+    JFrame floatingFrame; 
     MyTimer hideTimer;
     static final ImageIcon delTabIcon = SpiceApplication.createImageIcon("editdelete.png");
        
@@ -69,6 +69,8 @@ implements MouseListener, MouseMotionListener{
     
     public AbstractPopupFrame() {
         super();
+        
+        floatingFrame = createFrame();
         
         frameshown = false;
         
@@ -84,13 +86,21 @@ implements MouseListener, MouseMotionListener{
         return frameshown;
     }
     
-    protected static JFrame createFrame(){
+    protected JFrame createFrame(){
         JFrame frame = new JFrame();
         JFrame.setDefaultLookAndFeelDecorated(false);
         frame.setUndecorated(true);        
         frame.pack();
         
+        MyFrameMouseListener frameMouse = new MyFrameMouseListener(frame, this);
+        frame.addMouseMotionListener(frameMouse);
+        
+        
         return frame;
+    }
+    
+    protected void dispatchFrame() {
+        floatingFrame = createFrame();
     }
     
     
@@ -134,30 +144,35 @@ implements MouseListener, MouseMotionListener{
         
         
         Box hBox = Box.createHorizontalBox();
-        hBox.add(Box.createGlue());
+       
         JLabel button;
         if ( delTabIcon != null)
-            button = new JLabel("",delTabIcon,JLabel.RIGHT);
+            button = new JLabel("",delTabIcon,JLabel.LEFT);
         else 
             button = new JLabel("X");
         
-        button.addMouseListener(new MouseListener(){
-            
-            public void mouseClicked(MouseEvent arg0) { }
-            
+       
+        button.addMouseListener(new MouseListener() {
+
+            public void mouseClicked(MouseEvent arg0) {}
+
             public void mousePressed(MouseEvent arg0) { }
-            
+
             public void mouseReleased(MouseEvent arg0) {
                 disposeFrame();
             }
-            
+
             public void mouseEntered(MouseEvent arg0) {   }
-            
-            public void mouseExited(MouseEvent arg0) { }
+
+            public void mouseExited(MouseEvent arg0) {  }
             
         });
+        
+        button.addMouseListener(new MyFrameCloseListener(floatingFrame));
+        
         button.setToolTipText("click here to close frame");
         hBox.add(button);
+        hBox.add(Box.createGlue());
         
         vBox.add(hBox);
         
@@ -182,8 +197,7 @@ implements MouseListener, MouseMotionListener{
             repaint();
         }
         
-        if ( hideTimer == null) {
-            //System.out.println("creating new show timer " + MyTimer.SHOW);
+        if ( hideTimer == null) {           
             hideTimer = new MyTimer(this, MyTimer.SHOW);
         }
         
@@ -209,10 +223,13 @@ implements MouseListener, MouseMotionListener{
      *
      */
     protected synchronized void disposeFrame(){
+        
         if ( ! frameshown ){
             return;
         }
+        
         //  System.out.println("disposing floating frame");
+        
         floatingFrame.setVisible(false);
         floatingFrame.dispose();
         
@@ -398,6 +415,77 @@ implements MouseListener, MouseMotionListener{
     
 }
 
+class MyFrameCloseListener 
+implements MouseListener {
+    JFrame parent;
+    public MyFrameCloseListener (JFrame parent) {
+        this.parent = parent;
+    }
+    
+    public void mouseClicked(MouseEvent arg0) {}
+
+    public void mousePressed(MouseEvent arg0) { }
+
+    public void mouseReleased(MouseEvent arg0) {
+        parent.dispose();
+        
+    }
+
+    public void mouseEntered(MouseEvent arg0) { }
+
+    public void mouseExited(MouseEvent arg0) {  }
+    
+}
+
+
+
+class MyFrameMouseListener
+implements MouseMotionListener {
+
+    Point oldP;
+    JFrame parent;
+    AbstractPopupFrame manager;
+    public MyFrameMouseListener(JFrame frame, AbstractPopupFrame manager) {
+        oldP = null;
+        parent =frame;
+        this.manager = manager;
+    }
+    
+    public void mouseDragged(MouseEvent e) {
+
+        manager.dispatchFrame();
+        
+        int x = e.getX();
+        int y = e.getY();
+        
+        if ( oldP == null)  {
+            oldP = e.getPoint();
+            return;
+        }
+        
+        int diffX = oldP.x - x;
+        int diffY = oldP.y - y;
+        
+        
+//      get parent components locations
+        Component compo = e.getComponent();
+        Point screenTopLeft = compo.getLocationOnScreen();
+        
+        int cx = screenTopLeft.x;
+        int cy = screenTopLeft.y;
+        
+        
+        Point newPosition = new Point(cx-diffX, cy-diffY);        
+        parent.setLocation(newPosition);
+        
+    }
+
+    public void mouseMoved(MouseEvent e) {
+        oldP = e.getPoint();
+        
+    }
+    
+}
 
 
 class MyLocation implements Runnable {
