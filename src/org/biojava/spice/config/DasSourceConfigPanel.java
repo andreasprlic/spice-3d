@@ -90,6 +90,7 @@ public class DasSourceConfigPanel {
         super();
         //this.parent = parent;
         this.config = config;
+        
         selectMoveStartPosition = -1;
     }
 
@@ -199,7 +200,10 @@ public class DasSourceConfigPanel {
         
         //System.out.println(seqdata);
         //JTable table= new JTable(seqdata,colNames);
-        List sources = config.getAllServers();
+        List sources = new ArrayList();
+        if ( config != null )
+            sources = config.getAllServers();
+        
         SpiceDasSource[] sourceArray = (SpiceDasSource[]) sources.toArray(new SpiceDasSource[sources.size()]);
         dasSourceTableModel = new DasSourcePanelTableModel(this,seqdata,colNames,sourceArray);
         
