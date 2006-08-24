@@ -65,9 +65,10 @@ extends JDialog {
     static int H_SIZE = 700;
     static int V_SIZE = 700;   
     
-    SPICEFrame spice; 
+    SPICEFrame  spice;
+    JScrollPane scroll;
     JEditorPane txt;
-    Box vBox;
+    Box         vBox;
         
     static {
         ResourceBundle bundle = ResourceBundle.getBundle(baseName);
@@ -96,7 +97,7 @@ extends JDialog {
                 
         txt = new JEditorPane("text/html", DESCRIPTION_TEXT);
         
-        JScrollPane scroll = new JScrollPane(txt);
+         scroll = new JScrollPane(txt);
         
         vBox.add(scroll);
         
@@ -134,6 +135,14 @@ extends JDialog {
         hBoxb.add(close,BorderLayout.EAST);
         
         vBox.add(hBoxb);
+        
+        javax.swing.SwingUtilities.invokeLater(new Runnable()
+                {
+                  public void run()
+                  {
+                   scroll.getVerticalScrollBar().setValue(0);
+                  }
+                });
         
         this.getContentPane().add(vBox);
         
