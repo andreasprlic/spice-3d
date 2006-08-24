@@ -294,7 +294,7 @@ implements MouseListener, MouseMotionListener{
     
     
     public void updateFramePosition(MouseEvent e){
-        //System.out.println("updateFramePosition");
+        System.out.println("updateFramePosition");
        
         Point p = getFramePoint(e);
         if (oldPoint.equals(p))
@@ -461,7 +461,7 @@ implements MouseMotionListener {
         
         int diffX = prevMouseOnScreen.x - mouseOnScreen.x;
         int diffY = prevMouseOnScreen.y - mouseOnScreen.y;
-        
+        System.out.println(diffX + " " + diffY);
         prevMouseOnScreen = getMouseOnScreen(e);
         
         Point newPosition = new Point(screenTopLeft.x - diffX, screenTopLeft.y - diffY);     
