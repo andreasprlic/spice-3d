@@ -277,6 +277,7 @@ implements MouseListener, MouseMotionListener{
     
     
     private Point getFramePoint(MouseEvent e){
+        
         int x = e.getX();
         int y = e.getY();
         
@@ -296,11 +297,13 @@ implements MouseListener, MouseMotionListener{
     
     
     public void updateFramePosition(MouseEvent e){
-        //System.out.println("updateFramePosition");
-       
+       //System.out.println("updateFramePosition " + e.getX());
         Point p = getFramePoint(e);
-        if (oldPoint.equals(p))
+        
+       /* if ((oldPoint.x == p.x)  && ( oldPoint.y == p.y)) {
+            System.out.println("oldpoint == p");
             return;
+        }*/
         
         int x = e.getX();
         int y = e.getY();
@@ -314,24 +317,26 @@ implements MouseListener, MouseMotionListener{
         // height = y!
         // widht = x ...
         
-        Container content = getContent();
+        //Container content = getContent();
+        Container content = floatingFrame.getContentPane();
         
         int compo_h = 0 ;
         int compo_w = 0 ;
         
         if (content != null ) {
+            
             compo_h = content.getHeight();
             compo_w = content.getWidth();
-        }
+        } 
         
         
         Dimension screenDim = Toolkit.getDefaultToolkit().getScreenSize();
         int screen_w = (int) screenDim.getWidth();
         int screen_h = (int) screenDim.getHeight();
         
-        //System.out.println("before x " + x + " y " + y + " posx " + posx + " posy " + posy + " sw " +
-        //        screenDim.getWidth() + " sh " + screenDim.getHeight() + 
-        //        " compo_H " + compo_h + " compo_w " + compo_w );
+       // System.out.println("before x " + x + " y " + y + " posx " + posx + " posy " + posy + " sw " +
+         //       screenDim.getWidth() + " sh " + screenDim.getHeight() + 
+           //     " compo_H " + compo_h + " compo_w " + compo_w );
         
         if ( (posy + compo_h) > screen_h) {
             //System.out.println("chainging y");
