@@ -354,7 +354,12 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
                 entryFormFields.add(list);
                 
             } else if ( col.equals(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Capabilities"))) { //$NON-NLS-1$
-                JList list = new JList(config.getCapabilities());
+                JList list;
+                if ( config != null )
+                    list = new JList(config.getCapabilities());
+                else 
+                    list = new JList();
+                
                 list.setVisibleRowCount(1);
                 //list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
                 if ( list.getMaxSelectionIndex() > 3) {
