@@ -31,6 +31,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -411,7 +412,9 @@ public class DasSourceConfigPanel {
     
     
     public Object[][] getTabData() {
-        List servers = config.getAllServers();
+        List servers = new ArrayList();
+        if ( config != null )
+            servers = config.getAllServers();
         SpiceDasSource[] sources = (SpiceDasSource[]) servers.toArray(new SpiceDasSource[servers.size()]);
         return getTabData(sources);
     }
