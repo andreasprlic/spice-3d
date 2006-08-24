@@ -208,6 +208,8 @@ implements Runnable, ConfigurationListener
             return true ;
         } else { 
             logger.info("last update < 1 day, using saved config");
+            logger.info("forcing update");
+            //return true;
             //done =true;
             //return ;                
         }
@@ -234,7 +236,9 @@ implements Runnable, ConfigurationListener
         }
         
         logger.finest("there seems to be no need to contact to registry now");
-        return false;
+        
+        //return false;
+        return true;
     }
     
     

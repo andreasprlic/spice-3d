@@ -181,7 +181,7 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
         txt.setBorder(BorderFactory.createEmptyBorder());
         v.add(txt);
         
-        String[] freq = { ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Always"),ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.25")}; //$NON-NLS-1$ //$NON-NLS-2$
+        String[] freq = { ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Always"),ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Once")}; //$NON-NLS-1$ //$NON-NLS-2$
         updateBehaveList = new JComboBox(freq) ;        
         updateBehaveList.setEditable(false);
         updateBehaveList.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
