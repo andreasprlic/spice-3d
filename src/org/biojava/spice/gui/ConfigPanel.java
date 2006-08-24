@@ -429,7 +429,8 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
         int pos = tabbedPane.getSelectedIndex();
         //System.out.println("active tab: " + pos);
         
-        
+        if ( config == null)
+            config = new RegistryConfiguration();
         
         // add a new local DAS source ...
         if ( pos == 1 ) {       
