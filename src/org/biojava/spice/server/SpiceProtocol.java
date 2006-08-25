@@ -118,7 +118,7 @@ public class SpiceProtocol {
         try {
             String start = str.substring(0,11);
             System.out.println(start);
-            if ( str.length() > 400){
+            if ( str.length() > 2000){
                 logger.info("too long string " + start + "...");
                 return SPICE_WHAT;
             }
