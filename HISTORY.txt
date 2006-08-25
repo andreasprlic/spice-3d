@@ -1,3 +1,18 @@
+0.8.3 - August 25th, 2006
+
+* now with improved display of annotated features
+* if feature  <note> section contain HTML <img> tags, those images can be displayed
+* better configuration of DAS sources
+* user interface improvements
+
+* several improvements when showing structure alignments:
+* now starts with the first structure loaded in an alignment
+* there is a feature display that shows the region used for the alignment
+* the toggle full structure button now immediately triggers a reload of the alignment
+* interaction between Jmol and Spice now also works with alignments (if the "active"
+   model is clicked, for the others a message on the console is printed)
+
+
 0.8.2 - July 14th, 2006
 
 * SPICE now supports visualization of multiple structure alignments
