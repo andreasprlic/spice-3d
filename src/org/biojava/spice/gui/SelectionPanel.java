@@ -32,6 +32,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.Structure;
@@ -68,18 +69,20 @@ implements StructureListener
     //StructureAlignment structureAlignment;
     StructureAlignmentChooser alignmentChooser;
     
+    JSplitPane splitPanel;
     
     public SelectionPanel() {
         super();
         
-        DefaultListModel model = new DefaultListModel();
+        DefaultListModel model = new DefaultListModel();        
         model.add(0,"");
-        chainList=new JList(model);
         
-        checkBox = new JCheckBox();
+        chainList	= new JList(model);        
+        checkBox 	= new JCheckBox();
         
         chainDisplay = new SpiceChainDisplay(chainList);
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        
         hBox = Box.createHorizontalBox(); 
         this.add(hBox);
         
@@ -129,12 +132,28 @@ implements StructureListener
     
     public void setStructureAlignment(StructureAlignment strucAli){
         //structureAlignment = strucAli;
+    	
         alignmentChooser.setStructureAlignment(strucAli);
         alignmentMode = true;
         hBox.removeAll();
+        
         JScrollPane scroll = new JScrollPane(alignmentChooser);
         hBox.add(scroll);
-        this.setPreferredSize(new Dimension(60,200));
+        
+        
+        Dimension dim = new Dimension(100,200);
+        logger.finest("setting selection panel size" + dim);
+        this.setPreferredSize(dim);
+        this.setSize(dim);
+        
+        
+        this.repaint();
+        if ( splitPanel != null) {
+        	splitPanel.repaint();
+        	splitPanel.setDividerLocation(160);
+        }
+    
+        
         alignmentChooser.repaint();
         hBox.repaint();
         
@@ -145,6 +164,11 @@ implements StructureListener
         revalidate();
        
        // logger.info("set SelectionPanel to structure alignment mode...");
+    }
+    
+    public void setSplitPanel(JSplitPane panel){
+    	splitPanel = panel;
+    	
     }
     
     public void addStructureListener(StructureListener li){
@@ -160,7 +184,7 @@ implements StructureListener
         // make sure this is not the first active structure in the structure alignment ...
         StructureAlignment strucAli = alignmentChooser.getStructureAlignment();
         if ( strucAli == null)
-            strucAli = new StructureAlignment();
+            strucAli = new StructureAlignment(null);
         
         int pos = strucAli.getFirstSelectedPos();
         if ( pos > -1){
@@ -180,11 +204,19 @@ implements StructureListener
         chainDisplay.newStructure(event);
         alignmentMode = false;
         alignmentChooser.setStructureAlignment(null);
-        this.setPreferredSize(new Dimension(30,30));
+        
+        Dimension dim = new Dimension(30,30);
+        logger.finest("setting SelectionPanel dimension to " + dim);
+        this.setPreferredSize(dim);
+        if ( splitPanel != null) {
+        	splitPanel.repaint();
+        	splitPanel.setDividerLocation(30);
+        }
         
         hBox.repaint();
         repaint();
         revalidate();
+        
     }
     
     public void repaint(){

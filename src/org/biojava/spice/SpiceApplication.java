@@ -46,7 +46,6 @@ import java.util.HashMap   ;
 import java.util.ArrayList ;
 import java.util.List ;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 // logging
 import java.util.logging.* ;
@@ -102,14 +101,14 @@ ConfigurationListener
 {         
     private static final long serialVersionUID = 8273923744127087422L;       
     
-    public static Logger logger =  Logger.getLogger("org.biojava.spice");
+    public static Logger logger =  Logger.getLogger(SpiceDefaults.LOGGER);
     
     static String baseName="spice";
     
     URL[] REGISTRY_URLS    ; // the url to the registration server
      
     static int    DEFAULT_Y_SCROLL = 50 ;
-    static String XMLVALIDATION = "false" ;   
+    
         
     RegistryConfiguration config      ;
     Structure structure ; 
@@ -172,7 +171,8 @@ ConfigurationListener
      */
     public SpiceApplication( SpiceStartParameters params) {
         super();
-        
+        logger.setLevel(SpiceDefaults.LOG_LEVEL);
+      
         startParameters = params;
         
         //this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -181,8 +181,8 @@ ConfigurationListener
         
         // a few error checks.
         checkStartParameters();
-       
-       
+             
+        
         // init variables ...
         setCurrentChain(null,-1);
         selectionLocked = false ;
@@ -196,12 +196,12 @@ ConfigurationListener
         loadQueue = new ArrayList();
         
         // set some system properties
-        setSystemProperties();     
+         
         
         // init the 2D display
         browserPane = new BrowserPane(params.getPdbcoordsys(),params.getUniprotcoordsys(), params.getEnspcoordsys());
               
-        structurePanel = new StructurePanel();
+        structurePanel      = new StructurePanel();
         jmolSpiceTranslator = new JmolSpiceTranslator();
         structurePanel.addJmolStatusListener(jmolSpiceTranslator);
         
@@ -217,8 +217,7 @@ ConfigurationListener
         if ( params.isNoRegistryContact()) {
             regi.setNoUpdate(true);
         } else {
-            regi.addConfigListener(this);
-            //regi.run();
+            regi.addConfigListener(this);            
             // we do this via the swing main thread because we want to see
             // a busy progress bar...
             javax.swing.SwingUtilities.invokeLater(regi);
@@ -349,60 +348,6 @@ ConfigurationListener
    
    
     
-    /** set  a couple of System Properties also contains some hacks around some strange implementation differences*/
-   
-    private void setSystemProperties(){
-        
-        //  on osx move menu to the top of the screen
-        System.setProperty("apple.laf.useScreenMenuBar", "true");
-        
-        // do xml validation when parsing DAS responses (true/false)
-        System.setProperty("XMLVALIDATION",XMLVALIDATION);
-        
-        ResourceBundle resource = ResourceBundle.getBundle(baseName);
-        
-        String to = resource.getString("org.biojava.spice.ConnectionTimeout");
-        int timeout = Integer.parseInt(to);
-        
-        
-        //logger.finest("setting timeouts to " + timeout);
-        
-        
-        // timeouts when doing http connections
-        // this only applies to java 1.4
-        // java 1.5 timeouts are set by openHttpURLConnection
-        System.setProperty("sun.net.client.defaultConnectTimeout", ""+timeout);
-        System.setProperty("sun.net.client.defaultReadTimeout", ""+timeout);
-        
-              
-        // bugfix for some strange setups!!!
-        String proxyHost  = System.getProperty("proxyHost");
-        String proxyPort  = System.getProperty("proxyPort");
-        
-        if (logger.isLoggable(Level.FINEST)) {
-            logger.finest("proxyHost"         + proxyHost);
-            logger.finest("proxyPort"         + proxyPort);
-            logger.finest("http.proxyHost"    + System.getProperty("http.proxyHost"));
-            logger.finest("http.proxyPort"    + System.getProperty("http.proxyPort"));
-        }
-        // hack around some config problems ... argh!
-        if ( proxyHost != null ) {
-            System.setProperty("proxySet","true");
-            if ( System.getProperty("http.proxyHost") == null ){
-                System.setProperty("http.proxyHost",proxyHost) ;
-            }
-        }
-        
-        if ( proxyPort != null ) {
-            if ( System.getProperty("http.proxyPort") == null ){
-                System.setProperty("http.proxyPort",proxyPort);
-            }
-        }
-        if (logger.isLoggable(Level.FINEST)) {
-            logger.finest("using Proxy:" + System.getProperty("proxySet"));
-        }
-        
-    }
     
     
     
@@ -429,25 +374,17 @@ ConfigurationListener
         Box vBox2 = Box.createVerticalBox();
         structurePanel.setMinimumSize(new Dimension(200,200));
         vBox2.add(structurePanel);
-        strucommand.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
-        //this.getContentPane().add(strucommand,BorderLayout.SOUTH);
-        //this.getContentPane().add(strucommand);
+        
+        strucommand.setMaximumSize(new Dimension(Short.MAX_VALUE,30));    
         vBox2.add(strucommand);
-        //structurePanel.setLayout(new BoxLayout(structurePanel,BoxLayout.X_AXIS)); 
-
-                      
-      
-        //DefaultListModel model = new DefaultListModel();
-        //model.add(0,"");
-        //chainList=new JList(model);
+        
         selectionPanel = new SelectionPanel();
-        
-        //ent_list.setPreferredSize(new Dimension(30,30));
-        
+                     
         
         JScrollPane chainPanel = new JScrollPane(selectionPanel);
+        
         selectionPanel.setPreferredSize(new Dimension(60,60));
-        //chainPanel.setLayout(new BoxLayout(chainPanel,BoxLayout.X_AXIS)); 
+        
         chainPanel.setBorder(BorderFactory.createEmptyBorder());
         
         browserPane.setBorder(BorderFactory.createEmptyBorder());
@@ -456,9 +393,8 @@ ConfigurationListener
                 chainPanel, browserPane);
         sharedPanel.setOneTouchExpandable(true);
         sharedPanel.setResizeWeight(0);
-        //sharedPanel.setPreferredSize(new Dimension(400, 400));
-        //sharedPanel.setLayout(new BoxLayout(sharedPanel,BoxLayout.Y_AXIS)); 
         sharedPanel.setBorder(BorderFactory.createEmptyBorder());
+        selectionPanel.setSplitPanel(sharedPanel);
         
         if (structureLocation.equals("top"))
             mainsharedPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, vBox2,sharedPanel);
@@ -470,23 +406,18 @@ ConfigurationListener
             mainsharedPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, sharedPanel,vBox2);
         
         mainsharedPanel.setOneTouchExpandable(true);
-        mainsharedPanel.setResizeWeight(0.6);
+        mainsharedPanel.setResizeWeight(0.7);
         
         mainsharedPanel.setPreferredSize(new Dimension(790, 590));
-        
-        //mainsharedPanel.setBorder(BorderFactory.createEmptyBorder());
-        //mainsharedPanel.setLayout(new BoxLayout(mainsharedPanel,BoxLayout.Y_AXIS));  
+          
         Box hBox1 =  Box.createHorizontalBox();
         hBox1.add(mainsharedPanel);
         vBox.add(hBox1);
         
         
         statusPanel.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
-        //statusPanel.setLayout(new BoxLayout(statusPanel,BoxLayout._AXIS));
         statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.X_AXIS));
-        //statusPanel.setMaximumSize(new Dimension(Short.MAX_VALUE,20));
-        //Box hBox1 = Box.createHorizontalBox();
-        //hBox1.add(statusPanel);
+
         Box hBox = Box.createHorizontalBox();
         hBox.setBorder(BorderFactory.createEmptyBorder());
         hBox.add(statusPanel);
@@ -829,7 +760,7 @@ ConfigurationListener
         List strucservers = config.getServers("structure");
         SpiceDasSource[] sds = (SpiceDasSource[])strucservers.toArray(new SpiceDasSource[strucservers.size()]);
         
-        StructureAlignmentBuilder sacreator = new StructureAlignmentBuilder();
+        StructureAlignmentBuilder sacreator = new StructureAlignmentBuilder(aligCs);
         //sacreator.addStructureListener(structurePanelListener);
         //sacreator.setStructurePanel(structurePanel);
         sacreator.setSelectionPanel(selectionPanel);

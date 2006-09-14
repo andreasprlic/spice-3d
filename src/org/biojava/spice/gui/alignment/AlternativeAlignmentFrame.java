@@ -44,7 +44,9 @@ import org.biojava.bio.structure.Calc;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.align.pairwise.AlternativeAlignment;
 import org.biojava.bio.structure.jama.Matrix;
+import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
 import org.biojava.spice.StructureAlignment;
+import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.spice.manypanel.eventmodel.StructureAlignmentListener;
 
 /** a frame showing the alternative alignments, which are the result of a structure superimposition
@@ -160,7 +162,9 @@ extends JFrame{
         
         // create the structure alignment object and tell the listeners ...
         
-        StructureAlignment salig = new StructureAlignment();
+        String defaultCoordSys = BrowserPane.DEFAULT_PDBCOORDSYS;
+        DasCoordinateSystem defaultcs = DasCoordinateSystem.fromString(defaultCoordSys);
+        StructureAlignment salig = new StructureAlignment(defaultcs);
        
         salig.setLoaded(new boolean[] {true,true});
         

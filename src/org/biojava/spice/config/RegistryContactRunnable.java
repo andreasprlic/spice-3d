@@ -42,7 +42,7 @@ import org.biojava.dasobert.dasregistry.DasSource;
 
 class RegistryContactRunnable implements Runnable {
     
-    static Logger logger      = Logger.getLogger("org.biojava.spice");
+    static Logger logger      = Logger.getLogger(SpiceDefaults.LOGGER);
     
     URL[] registryArray  ;
     RegistryConfiguration config;

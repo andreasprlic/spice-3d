@@ -57,6 +57,7 @@ import org.biojava.bio.structure.StructureImpl;
 import org.biojava.bio.structure.io.DASStructureClient;
 import org.biojava.bio.structure.jama.Matrix;
 import org.biojava.dasobert.dasregistry.Das1Source;
+import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
 import org.biojava.spice.gui.SpiceMenuListener;
 import org.biojava.spice.manypanel.renderer.SequenceScalePanel;
 
@@ -70,6 +71,8 @@ public class StructureAlignment {
     Matrix[] matrices;
     Atom[] shiftVectors;
     String[] intObjectIds;
+    String[] accessionCodes;
+    
     boolean[] selection;
     boolean[] loaded ;
     Das1Source[] structureServers;
@@ -93,8 +96,12 @@ public class StructureAlignment {
         }
     }
     
-    public StructureAlignment() {
+    DasCoordinateSystem coordSys;
+    
+    public StructureAlignment(DasCoordinateSystem coordSys) {
         super();
+        
+        this.coordSys = coordSys;
         
         structureServers = new Das1Source[0];
         structures = new Structure[0];
@@ -163,10 +170,17 @@ public class StructureAlignment {
     
     public void setIntObjectIds(String[] intObjectIds) {
         this.intObjectIds = intObjectIds;
-    }
+    }    
     
-    
-    public boolean isZeroMatrix(Matrix m){
+    public String[] getAccessionCodes() {
+		return accessionCodes;
+	}
+
+	public void setAccessionCodes(String[] accessionCodes) {
+		this.accessionCodes = accessionCodes;
+	}
+
+	public boolean isZeroMatrix(Matrix m){
        
         for ( int x=0;x<3;x++){
             for ( int y=0;y<3;y++){
@@ -278,22 +292,24 @@ public class StructureAlignment {
         n = objects.length;
         nrSelected = 0;
         //matrices     = new Matrix[n];
-        shiftVectors = new Atom[n];
-        structures   = new Structure[n];
-        intObjectIds = new String[n];
-        selection    = new boolean[n];
-        loaded       = new boolean[n];
+        shiftVectors   = new Atom[n];
+        structures     = new Structure[n];
+        intObjectIds   = new String[n];
+        selection      = new boolean[n];
+        loaded         = new boolean[n];
+        accessionCodes = new String[n];
         
         for (int i=0;i< n;i++){
             
             Annotation v = vectors[i];            
             Atom vec = (Atom) v.getProperty("vector");
             
-            shiftVectors[i] = vec;             
-            structures[i]   = null;            
-            intObjectIds[i] = (String)objects[i].getProperty("intObjectId");            
-            selection[i]    = false;
-            loaded[i]       = false;
+            shiftVectors[i]   = vec;             
+            structures[i]     = null;            
+            intObjectIds[i]   = (String)objects[i].getProperty("intObjectId");
+            accessionCodes[i] = (String)objects[i].getProperty("dbAccessionId");
+            selection[i]      = false;
+            loaded[i]         = false;
         } 
         
        
@@ -401,7 +417,10 @@ public class StructureAlignment {
     }
     
     private String getRasmolScriptFromPrepared(int p){
-        return rasmolScripts[p];
+    	if ( rasmolScripts == null)
+    		return "";
+    	else 
+    		return rasmolScripts[p];
     }
     
     private String getRasmolFromSortedBlock(int p, int modelcount){
@@ -537,31 +556,67 @@ public class StructureAlignment {
      * @return Color
      */
     public Color getColor(int position){
+    	
+    	if ( position == 0 ) {
+    		if ( coordSys.toString().equals("CASP,Protein Structure")){
+    			return Color.white;
+    		}
+    	}
+    	
         float stepsize   = 0;
-        //if ( nrSelected > 0 )
-        //    stepsize = 1.0f / (float)nrSelected;
-        if ( structures.length > 0 )
-            stepsize = 1.0f / (float)structures.length * 0.7f;
+               
+        // do a circle of 6 colors...
+        
+        int NR_COLS = 6;
+        stepsize = 1.0f / (float)NR_COLS ;
         float saturation = 1.0f;
         float brightness = 1.0f;
         
-        float hue = position * stepsize ;
+        float hue = (position % NR_COLS)* stepsize ;
         Color col = Color.getHSBColor(hue,saturation,brightness);
         return col;
     }
     
     
-   
+    /** convert the internal objecet ids to accession codes
+     * 
+     * @param pos
+     * @return the accession code for object nr X.
+     */
+    private String getAccesionCodeForObject(int pos){
+    	
+    	//TODO:  move these rules to a config file!
+    	
+    	//TODO: the SISYPHUS should acutally use the dbAccesionId codes as foreign IDS
+    	//TODO:  update the SISYPHUS das server
+    	
+    	String pdbCode = "";
+    	
+    	if ((coordSys != null) &&( coordSys.toString().equals("CASP,Protein Structure")))
+    		pdbCode = accessionCodes[pos];
+    	
+    	else {
+    		pdbCode = intObjectIds[pos].substring(0,4);
+    	}
+    	
+    	return pdbCode;
+
+    }
    
     
     
     public Structure getStructure(int pos) throws StructureException{
-        if ( loaded[pos])
+        
+    	if ( loaded[pos])
             return returnStructureOrRange(pos,structures[pos]);
         
-        String pdbCode = intObjectIds[pos].substring(0,4);
+    	
+    	String pdbCode = getAccesionCodeForObject(pos);
+    	
+        
         // show busy frame...
         ProgressThreadDrawer drawer = new ProgressThreadDrawer(pdbCode);
+        
         //javax.swing.SwingUtilities.invokeLater(drawer);
         //drawer.start();
         drawer.showProgressFrame();
@@ -594,6 +649,10 @@ public class StructureAlignment {
             
             try {
                 s = dasc.getStructureById(pdbCode);
+                if ( s != null) {
+                	if ( s.size() > 0)
+                		break;
+                }
             } catch (IOException e){
                 continue;
             }
@@ -610,6 +669,9 @@ public class StructureAlignment {
         // rotate, shift structure...
         Matrix m = matrices[pos];
         Atom vector = shiftVectors[pos];
+        
+        //System.out.println("applying rotation matrix");
+        m.print(3,3);
         
         Calc.rotate(s,m);
         Calc.shift(s,vector);

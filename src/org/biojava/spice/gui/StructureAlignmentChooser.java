@@ -73,19 +73,19 @@ StructureAlignmentListener {
     public StructureAlignmentChooser() {
         super();
         
-        structureListeners = new ArrayList();
-        structureAlignment = new StructureAlignment();
-        checkButtons = new ArrayList();
-        pdbSequenceListeners = new ArrayList();
-        vBox = Box.createVerticalBox();
-        //JScrollPane scroll = new JScrollPane(vBox);
-        //scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        structureListeners 		= new ArrayList();
+        structureAlignment 		= new StructureAlignment(null);
+        checkButtons 			= new ArrayList();
+        pdbSequenceListeners 	= new ArrayList();
+        
+        vBox 					= Box.createVerticalBox();
+        
         this.add(vBox);
         referenceStructure = -1;
     }
     
     public void clearListeners(){
-        structureAlignment = new StructureAlignment();
+        structureAlignment = new StructureAlignment(null);
         structureListeners.clear();
         pdbSequenceListeners.clear();
     }
@@ -129,26 +129,45 @@ StructureAlignmentListener {
         boolean[] selectedArr = ali.getSelection();
         
         String[] ids = ali.getIds();
+        Color background = getBackground();
         for ( int i=0; i< ids.length;i++){
             String id = ids[i];
-            Color col = ali.getColor(i);
-            UIManager.put("CheckBox.background", col);
-            UIManager.put("CheckBox.interiorBackground", col);
-            UIManager.put("CheckBox.highlite", col);
+            Color col = structureAlignment.getColor(i);
+            if ( i == 0 ){
+                
+                UIManager.put("CheckBox.background", col);
+                UIManager.put("CheckBox.interiorBackground", col);
+                UIManager.put("CheckBox.highlite", col);
+                
+            } else if ( i == 1){
+            	 UIManager.put("CheckBox.background", background);
+                 UIManager.put("CheckBox.interiorBackground", background);
+                 UIManager.put("CheckBox.highlite", background);
+            }
             JCheckBox b = new JCheckBox(id);
             boolean selected = false;
             if (selectedArr[i])
                 selected = true;
             
             if ( i == 0) {
-                selected = true;
+                
+            	
+               
+            	
+            	selected = true;
+                
                 referenceStructure = 0;
                 structureAlignment.select(0);
+                                
+                System.setProperty("SPICE:StructureRegionColor",new Integer(col.getRGB()).toString());                                      
+               
                 try {
                     structureAlignment.getStructure(i);
                 } catch (StructureException e){
                     selected = false;
                 };
+               
+                
             }
             
             b.setSelected(selected);
@@ -215,6 +234,7 @@ StructureAlignmentListener {
         while (iter.hasNext()){
             i++;
             Object o = iter.next();
+            JCheckBox box =(JCheckBox)o;
             if ( o.equals(source)){
                 String[] ids = structureAlignment.getIds();
                 String id = ids[i];
@@ -222,6 +242,8 @@ StructureAlignmentListener {
                 if (e.getStateChange() == ItemEvent.DESELECTED) {
                     // remove structure from alignment
                     structureAlignment.deselect(i);
+                    box.setBackground(this.getBackground());
+                    box.repaint();
                     // display the first one that is selected
                     // set the color to that one 
                     int j = structureAlignment.getFirstSelectedPos();
@@ -238,7 +260,14 @@ StructureAlignmentListener {
                     structureAlignment.select(i);
                     // add structure to alignment
                     Color col = structureAlignment.getColor(i);
-                    System.setProperty("SPICE:StructureRegionColor",new Integer(col.getRGB()).toString());
+                    
+                    System.setProperty("SPICE:StructureRegionColor",new Integer(col.getRGB()).toString());                                      
+                    UIManager.put("CheckBox.background", col);
+                    UIManager.put("CheckBox.interiorBackground", col);
+                    UIManager.put("CheckBox.highlite", col);
+                   
+                    box.setBackground(col);
+                    box.repaint();
                     
                     // check if we can get the structure...
                     Structure struc = null;

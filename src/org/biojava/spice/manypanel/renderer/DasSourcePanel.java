@@ -332,7 +332,7 @@ implements FeatureListener,SpiceFeatureListener
         List segments = feature.getSegments() ;
         
         //if ( feature.getType().equals("DISULFID")){
-        //    g2D.setColor(Color.yellow);
+        //    g2D.setColor(Color.yelldrawBoxow);
         //}
         int aminosize = Math.round(1*scale);
         if ( aminosize < 1 )

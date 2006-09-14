@@ -180,7 +180,7 @@ implements SequenceListener, SpiceFeatureListener {
     public void featureSelected(SpiceFeatureEvent e) {
         //logger.info("toolTipper feature selected ");
         Feature f = e.getFeature();
-        String s = s = f.toString();        
+        String s = f.toString();        
         parent.setToolTipText(s);
               
     }

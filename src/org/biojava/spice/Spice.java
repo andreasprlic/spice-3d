@@ -27,11 +27,17 @@ package org.biojava.spice ;
 import org.biojava.spice.server.SpiceClient;
 import org.biojava.spice.server.SpiceServer;
 import org.biojava.spice.config.ConfigurationException;
+import org.biojava.spice.config.SpiceDefaults;
+
 import java.util.ArrayList;
+
 import org.biojava.spice.gui.AboutDialog;
 import org.biojava.spice.gui.LoggingPanelManager;
 import org.biojava.spice.gui.SpiceTabbedPane;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.biojava.spice.utils.CliTools;
 
 /** SPICE is a browser for protein structure and sequence annotations built on the Distributed Annotation System.
@@ -167,12 +173,81 @@ public class Spice {
 
 class SpiceRunnable implements Runnable {
     String[] argv ;
+    Logger logger = Logger.getLogger(SpiceDefaults.LOGGER);
+    
     public SpiceRunnable (String[] argv) {
         this.argv = argv;
     }
     
     public void run() {
+    	
+    	
+    	setSystemProperties();
         createAndShowGUI(argv);
+    }
+    
+
+    /** set  a couple of System Properties also contains some hacks around some strange implementation differences*/
+   
+    private void setSystemProperties(){
+    	
+        logger.info("using log level " + logger.getLevel());
+    	
+        logger.log(Level.FINEST,"setting system properties");
+    	
+        //  on osx move menu to the top of the screen
+        System.setProperty("apple.laf.useScreenMenuBar", "true");
+        
+        // do xml validation when parsing DAS responses (true/false)        
+        System.setProperty("XMLVALIDATION","false");
+        
+               
+        String to = ResourceManager.getString("org.biojava.spice.ConnectionTimeout");
+        int timeout = Integer.parseInt(to);
+        
+        
+        //logger.finest("setting timeouts to " + timeout);
+        
+        
+        // timeouts when doing http connections
+        // this only applies to java 1.4
+        // java 1.5 timeouts are set by openHttpURLConnection
+        System.setProperty("sun.net.client.defaultConnectTimeout", ""+timeout);
+        System.setProperty("sun.net.client.defaultReadTimeout", ""+timeout);
+        
+              
+        // bugfix for some strange setups!!!
+        String proxyHost  = System.getProperty("proxyHost");
+        String proxyPort  = System.getProperty("proxyPort");
+
+        
+        
+        //if (logger.isLoggable(Level.FINEST)) {
+            logger.info("proxyHost"         + proxyHost);
+            logger.info("proxyPort"         + proxyPort);
+            logger.info("http.proxyHost"    + System.getProperty("http.proxyHost"));
+            logger.info("http.proxyPort"    + System.getProperty("http.proxyPort"));
+        //}
+
+            
+          
+            
+        if ( proxyHost != null ) {
+            System.setProperty("proxySet","true");
+            if ( System.getProperty("http.proxyHost") == null ){
+                System.setProperty("http.proxyHost",proxyHost) ;
+            }
+        }
+        
+        if ( proxyPort != null ) {
+            if ( System.getProperty("http.proxyPort") == null ){
+                System.setProperty("http.proxyPort",proxyPort);
+            }
+        }
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest("using Proxy:" + System.getProperty("proxySet"));
+        }
+        
     }
     
     

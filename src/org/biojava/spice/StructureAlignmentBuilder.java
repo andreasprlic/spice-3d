@@ -46,6 +46,7 @@ import org.biojava.bio.structure.StructureException;
 import org.biojava.dasobert.das.AlignmentParameters;
 import org.biojava.dasobert.das.AlignmentThread;
 import org.biojava.dasobert.das.SpiceDasSource;
+import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
 import org.biojava.dasobert.eventmodel.AlignmentEvent;
 import org.biojava.dasobert.eventmodel.AlignmentListener;
 //import org.biojava.dasobert.eventmodel.StructureEvent;
@@ -72,8 +73,12 @@ implements AlignmentListener {
     
     public static Logger logger = Logger.getLogger("org.biojava.spice");
     
-    public StructureAlignmentBuilder(){
+    DasCoordinateSystem coordSys;
+    
+    public StructureAlignmentBuilder(DasCoordinateSystem coordSys){
         super();
+        this.coordSys = coordSys;
+        
         alignmentServers = new SpiceDasSource[0];
         structureServers = new SpiceDasSource[0];
         structureListeners = new ArrayList();
@@ -153,7 +158,7 @@ implements AlignmentListener {
         logger.info("got new alignment ");
         
         
-        StructureAlignment sali = new StructureAlignment();
+        StructureAlignment sali = new StructureAlignment(coordSys);
         try {
             sali.setAlignment(ali);
         } catch (StructureException ex){

@@ -63,7 +63,7 @@ implements Runnable, ConfigurationListener
     
     JProgressBar progressBar ;
     JFrame progressFrame      ;
-    static Logger logger      = Logger.getLogger("org.biojava.spice");
+    static Logger logger      = Logger.getLogger(SpiceDefaults.LOGGER);
     List configListeners ;
     boolean forceUpdate;
     boolean  noUpdate;

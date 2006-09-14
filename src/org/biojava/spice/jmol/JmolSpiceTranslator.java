@@ -125,18 +125,20 @@ implements JmolStatusListener, StructureListener
         
         if ( viewer != null ) {
             //int mod = viewer.getAtomModelIndex(atomIndex);
+        	 //viewer.get
              String info = viewer.getAtomInfo(atomIndex);  
              AtomInfo ai = AtomInfoParser.parse(info);
              
              //logger.info(ai+"");
            
+             //int modelNr = viewer.getAtomModelIndex(atomIndex);
              String pdbcode = ai.getResidueNumber();
 
              String chainId = ai.getChainId();
              int modelNr = ai.getModelNumber();
              if ( modelNr > 1) {
                  logger.info("you selected an atom from model "+modelNr+" which is currently not active");
-                 logger.info(info);
+                 logger.info(strInfo);
                  return;
              }
              //logger.info(">"+chainId + "< >" + pdbcode +"<");

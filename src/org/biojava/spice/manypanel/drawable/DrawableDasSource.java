@@ -33,6 +33,7 @@ import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.dasregistry.DasSource;
 import org.biojava.dasobert.eventmodel.*;
 //import org.biojava.servlets.dazzle.datasource.GFFFeature;
+import org.biojava.spice.config.SpiceDefaults;
 import org.biojava.spice.feature.*;
 import org.biojava.spice.manypanel.eventmodel.FeatureListener;
 
@@ -72,10 +73,6 @@ FeatureListener{
     public static final String[] txtColors = new String[] { "blue","pink","green","yellow","red","cyan","pink"};
 
     
-    
-    public static final Color HELIX_COLOR  = new Color(255,51,51);
-    public static final Color STRAND_COLOR = new Color(255,204,51);
-    public static final Color TURN_COLOR   = new Color(204,204,204); 
     
     static Logger logger = Logger.getLogger("org.biojava.spice");
     boolean loading;
@@ -256,7 +253,7 @@ FeatureListener{
             
             if (type.equals("STRAND")){
                 secstruc = true ;
-                currentFeatureMap.put("color",STRAND_COLOR);
+                currentFeatureMap.put("color",SpiceDefaults.STRAND_COLOR);
                 currentFeatureMap.put("colorTxt","yellow");
                 feat.setName("SECSTRUC");       
                 feat.setType("SECSTRUC");
@@ -264,7 +261,7 @@ FeatureListener{
             
             else if (type.equals("HELIX")) {
                 secstruc = true ;
-                currentFeatureMap.put("color",HELIX_COLOR);
+                currentFeatureMap.put("color",SpiceDefaults.HELIX_COLOR);
                 currentFeatureMap.put("colorTxt","red");
                 feat.setName("SECSTRUC");
                 feat.setType("SECSTRUC");
@@ -272,7 +269,7 @@ FeatureListener{
             
             else if (type.equals("TURN")) {
                 secstruc = true ;
-                currentFeatureMap.put("color",TURN_COLOR);
+                currentFeatureMap.put("color",SpiceDefaults.TURN_COLOR);
                 currentFeatureMap.put("colorTxt","white");
                 
                 feat.setName("SECSTRUC");
