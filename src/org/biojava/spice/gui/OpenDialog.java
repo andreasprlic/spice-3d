@@ -57,9 +57,6 @@ extends JDialog
 
 	private static final long serialVersionUID = 2832023723402743924L;
 
-
-	static final String[] supportedCoords = { "PDB","UniProt","ENSP", "alignment"};
-	//static final String[] supportedCoords = { "PDB","UniProt"};
 	static int H_SIZE = 350;
 	static int V_SIZE = 150 ;
 	SpiceApplication spice       ;
@@ -98,8 +95,10 @@ extends JDialog
 		Box hBox3 = Box.createHorizontalBox();
 
 		int startpos   = 0;
-		currentType    = supportedCoords[startpos];
+		currentType    = (String) SpiceDefaults.argumentTypes.get(startpos);
 
+		String[] supportedCoords = (String[])SpiceDefaults.argumentTypes.toArray(new String[SpiceDefaults.argumentTypes.size()]); 
+		
 		list = new JComboBox(supportedCoords) ;		
 		list.setEditable(false);
 		list.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
@@ -108,7 +107,7 @@ extends JDialog
 		list.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent arg0) {
-				//System.out.println("action performed");
+			
 				setHelpToolTip();     
 
 			}        
@@ -145,10 +144,10 @@ extends JDialog
 
 
 		JButton openB =new JButton(ResourceManager.getString("org.biojava.spice.action.open"));
-		openB.addActionListener(new openActionListener(spice,this));
+		openB.addActionListener(new OpenActionListener(spice,this));
 
 		JButton cancelB = new JButton(ResourceManager.getString("org.biojava.spice.action.cancel"));
-		cancelB.addActionListener(new openActionListener(spice,this));
+		cancelB.addActionListener(new OpenActionListener(spice,this));
 
 		hBox1.add(openB);
 		hBox3.add(cancelB);
@@ -165,7 +164,7 @@ extends JDialog
 		});
 
 		JButton openKw = new JButton(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Search"));
-		openKw.addActionListener(new openActionListener(spice,this));
+		openKw.addActionListener(new OpenActionListener(spice,this));
 		JLabel kwl = new JLabel("keyword:");
 		hBox2.add(kwl);
 		hBox2.add(kwsearch);
@@ -199,12 +198,12 @@ extends JDialog
 
 }
 
-class openActionListener implements ActionListener {
+class OpenActionListener implements ActionListener {
 	
 	OpenDialog parent;
 	SPICEFrame spice;
 
-	public openActionListener(SPICEFrame spice, OpenDialog parent){
+	public OpenActionListener(SPICEFrame spice, OpenDialog parent){
 		this.spice = spice;
 		this.parent = parent ;
 	}
