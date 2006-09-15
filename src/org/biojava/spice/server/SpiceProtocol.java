@@ -34,6 +34,7 @@ import java.util.Map;
 import org.biojava.spice.SPICEFrame;
 import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.SpiceStartParameters;
+import org.biojava.spice.config.SpiceDefaults;
 
 import java.util.logging.*;
 
@@ -156,41 +157,41 @@ public class SpiceProtocol {
                 }
                 String type = split[2];
                 String accessionCode = split[3];
+                
                 //System.out.println("SpiceProtocol recieved request to display " +type+ " " + accessionCode);
                 
-                if (  (type.equals("PDB")    ) || 
-                        (type.equals("UniProt")) ||
-                        ( type.equals("ENSP")) || 
-                        ( type.equals("alignment"))) {
-                    
-                    
-                   SPICEFrame spice = null;
-                   logger.info(" currently: " + server.nrInstances() + " spice instances");
-                    if ( server.nrInstances() == 1){               
-                        spice = server.getInstance(0);
-                    } else if ( server.nrInstances() > 1){
-                        
-                        spice = UserChoosesSpiceDialog.choose(server);
-                    
-                    }
-                    
-                    
-                    spice.setSpiceStartParameters(params);
-                    spice.load(type,accessionCode);
-                    
-                    if ( spice instanceof SpiceApplication ){
-                        SpiceApplication parent = (SpiceApplication) spice;
-                        parent.setVisible(true);
-                        parent.requestFocus();
-                        
-                    }
-                    return SPICE_OK;
-                }
-                else {
-                    // what kind of type is this ???
+                if ( ! SpiceDefaults.argumentTypes.contains(type))  {
+                	 // what kind of argument type is this ???
                     logger.info("unknown type found : " + type);
-                    return SPICE_WHAT;
+                    return SPICE_WHAT;  
                 }
+                
+                SPICEFrame spice = null;
+                
+                logger.info(" currently: " + server.nrInstances() + " spice instances");
+                
+                if ( server.nrInstances() == 1){               
+                	spice = server.getInstance(0);
+                } else if ( server.nrInstances() > 1){
+
+                	spice = UserChoosesSpiceDialog.choose(server);
+
+                }
+
+                if ( params == null)
+                	params = new SpiceStartParameters();
+                spice.setSpiceStartParameters(params);
+                
+                spice.load(type,accessionCode);
+
+                if ( spice instanceof SpiceApplication ){
+                	SpiceApplication parent = (SpiceApplication) spice;
+                	parent.setVisible(true);
+                	parent.requestFocus();
+
+                }
+                return SPICE_OK;
+
                 
             } else {
                 logger.info("unknown SPICE command found : " + start);
