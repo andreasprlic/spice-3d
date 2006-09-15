@@ -35,8 +35,8 @@ import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
 import org.biojava.dasobert.eventmodel.ObjectListener;
 import org.biojava.spice.SpiceApplication;
+import org.biojava.spice.config.SpiceDefaults;
 import org.biojava.spice.gui.alignmentchooser.AlignmentChooser;
-import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.spice.manypanel.managers.AlignmentManager;
 
 
@@ -166,13 +166,13 @@ implements MouseListener {
         String code ="";
         if ( panelNumber == 1){
             code = parent.getUpperAlignmentManager().getId2();
-            if (! parent.getUpperAlignmentManager().getCoordSys2().toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS)){
+            if (! parent.getUpperAlignmentManager().getCoordSys2().toString().equals(SpiceDefaults.PDBCOORDSYS)){
                 code = code.toUpperCase();
             }
         }
         else {
             code= parent.getLowerAlignmentManager().getId1();
-            if (! parent.getUpperAlignmentManager().getCoordSys1().toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS)){
+            if (! parent.getUpperAlignmentManager().getCoordSys1().toString().equals(SpiceDefaults.PDBCOORDSYS)){
                 code = code.toUpperCase();
             }
         }

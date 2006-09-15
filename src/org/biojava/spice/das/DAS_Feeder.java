@@ -25,7 +25,6 @@ package org.biojava.spice.das;
 
 
 import org.biojava.spice.config.*;
-import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.spice.*       ;
 
 import org.biojava.bio.Annotation;
@@ -93,12 +92,12 @@ implements SpiceStructureFeeder
     
     public DasCoordinateSystem getStructureCoordSys(){
         
-        String cs = BrowserPane.DEFAULT_PDBCOORDSYS;
+        String cs = SpiceDefaults.PDBCOORDSYS;
         return DasCoordinateSystem.fromString(cs);
     }
     
     public DasCoordinateSystem getUniProtCoordSys(){
-        String cs = BrowserPane.DEFAULT_UNIPROTCOORDSYS;
+        String cs = SpiceDefaults.UNIPROTCOORDSYS;
         return DasCoordinateSystem.fromString(cs);
     }
     

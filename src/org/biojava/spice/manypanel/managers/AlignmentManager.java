@@ -29,13 +29,13 @@ import java.util.logging.Logger;
 import java.util.Iterator;
 
 
+import org.biojava.spice.config.SpiceDefaults;
 import org.biojava.spice.feature.Feature;
 import org.biojava.spice.feature.FeatureImpl;
 import org.biojava.spice.feature.Segment;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureEvent;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureListener;
 import org.biojava.spice.manypanel.renderer.AlignmentRenderer;
-import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.program.das.dasalignment.Alignment;
 import org.biojava.bio.program.das.dasalignment.DASException;
@@ -293,25 +293,25 @@ implements StructureListener{
        
        
         if ( ac1.equalsIgnoreCase(object1Id) || 
-                ( (coordSys1.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS)) &&
+                ( (coordSys1.toString().equals(SpiceDefaults.PDBCOORDSYS)) &&
                         (ac1.substring(0,4).equalsIgnoreCase(object1Id)))){
             // object1 = ac1
            
             triggerObject2Request(ac2);
         } else if ( ac1.equalsIgnoreCase(object2Id)|| 
-                ((coordSys1.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS)) &&
+                ((coordSys1.toString().equals(SpiceDefaults.PDBCOORDSYS)) &&
                         ( ac1.substring(0,4).equalsIgnoreCase(object2Id)))){
             // object2 = ac1
           
             triggerObject1Request(ac2);
         } else if ( ac2.equalsIgnoreCase(object1Id)|| 
-                ((coordSys2.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS)) &&
+                ((coordSys2.toString().equals(SpiceDefaults.PDBCOORDSYS)) &&
                 ( ac2.substring(0,4).equalsIgnoreCase(object1Id)))){
            
             triggerObject2Request(ac1);
             
         } else if ( ac2.equalsIgnoreCase(object2Id)|| 
-                ((coordSys2.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS)) &&
+                ((coordSys2.toString().equals(SpiceDefaults.PDBCOORDSYS)) &&
                 ( ac2.substring(0,4).equalsIgnoreCase(object2Id)))){
           
             triggerObject1Request(ac1);
@@ -370,7 +370,7 @@ implements StructureListener{
     public void triggerNoObject1(String ac){
         logger.info("trigger no object 1");
         Iterator iter = object1Listeners.iterator();
-        if  (! coordSys1.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS) )
+        if  (! coordSys1.toString().equals(SpiceDefaults.PDBCOORDSYS) )
             ac = ac.toUpperCase();
         
         while (iter.hasNext()){
@@ -383,7 +383,7 @@ implements StructureListener{
     public void triggerNoObject2(String ac){
         logger.info("trigger no object 2");
         Iterator iter = object2Listeners.iterator();
-        if  (! coordSys2.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS) )
+        if  (! coordSys2.toString().equals(SpiceDefaults.PDBCOORDSYS) )
             ac = ac.toUpperCase();
         
         while (iter.hasNext()){
@@ -403,7 +403,7 @@ implements StructureListener{
         object1Id =ac;
         
         Iterator iter = object1Listeners.iterator();
-        if  (! coordSys1.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS) )
+        if  (! coordSys1.toString().equals(SpiceDefaults.PDBCOORDSYS) )
             ac = ac.toUpperCase();
         
         while (iter.hasNext()){
@@ -420,7 +420,7 @@ implements StructureListener{
         }
         object2Id = ac;
         
-        if  (! coordSys2.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS) )
+        if  (! coordSys2.toString().equals(SpiceDefaults.PDBCOORDSYS) )
             ac = ac.toUpperCase();
         //logger.info("do triggerObject2Request " + ac);
         
@@ -518,7 +518,7 @@ implements StructureListener{
             //requestAlignment(object1Id);
             AlignmentParameters params = new AlignmentParameters();
             params.setQuery(object1Id);
-            if ( coordSys1.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS )) {
+            if ( coordSys1.toString().equals(SpiceDefaults.PDBCOORDSYS )) {
                 String chainId = getChainIdFromPDBCode(object1Id);
                 if ( chainId != null)
                     params.setQueryPDBChainId(chainId);
@@ -538,13 +538,13 @@ implements StructureListener{
            
             AlignmentParameters params = new AlignmentParameters();
             
-            if (! coordSys1.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS ))
+            if (! coordSys1.toString().equals(SpiceDefaults.PDBCOORDSYS ))
                 o1 = o1.toUpperCase();
             else {
                 String chainId = getChainIdFromPDBCode(object1Id);
                 params.setQueryPDBChainId(chainId);
             }
-            if (! coordSys2.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS )) 
+            if (! coordSys2.toString().equals(SpiceDefaults.PDBCOORDSYS )) 
                 o2 = o2.toUpperCase();
             else {
                 
@@ -610,7 +610,7 @@ implements StructureListener{
         // TODO fix this:
         
         // the alignmetn server should use the correct coord sys ...
-        if ( params.getSubjectCoordinateSystem().toString().equals(BrowserPane.DEFAULT_ENSPCOORDSYS)) {
+        if ( params.getSubjectCoordinateSystem().toString().equals(SpiceDefaults.ENSPCOORDSYS)) {
             DasCoordinateSystem ecs = new DasCoordinateSystem();
             ecs.setName(ASSEMBLYNAME);
             params.setSubjectCoordinateSystem(ecs);   
@@ -691,7 +691,7 @@ implements StructureListener{
             // get first alignment for this sequence..
                 
             AlignmentParameters params = new AlignmentParameters();
-            if (! coordSys2.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS))
+            if (! coordSys2.toString().equals(SpiceDefaults.PDBCOORDSYS))
                 params.setQuery(object2Id.toUpperCase());
             else 
                 params.setQuery(object2Id);
@@ -707,13 +707,13 @@ implements StructureListener{
             
             AlignmentParameters params = new AlignmentParameters();
             
-            if (! coordSys1.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS))
+            if (! coordSys1.toString().equals(SpiceDefaults.PDBCOORDSYS))
                 o1 = o1.toUpperCase();
             else {
                 String chainId = getChainIdFromPDBCode(object1Id);
                 params.setSubjectPDBChainId(chainId);
             }
-            if (! coordSys2.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS )) 
+            if (! coordSys2.toString().equals(SpiceDefaults.PDBCOORDSYS )) 
                 o2 = o2.toUpperCase();
             else {
                 
@@ -915,7 +915,7 @@ implements StructureListener{
     public void newStructure(StructureEvent event) {
        
         //logger.info("alig manager got new structure");
-        if ( coordSys1.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS)){
+        if ( coordSys1.toString().equals(SpiceDefaults.PDBCOORDSYS)){
             Structure s = event.getStructure();
             if ( s.size() < 1){
                 return;
@@ -935,7 +935,7 @@ implements StructureListener{
 
     public void selectedChain(StructureEvent event) {
         //logger.info("sected chain in aligmanager ");
-       if ( coordSys1.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS)){
+       if ( coordSys1.toString().equals(SpiceDefaults.PDBCOORDSYS)){
            Structure s = event.getStructure();
            int numb = event.getCurrentChainNumber();
            sequence1 = s.getChain(numb);

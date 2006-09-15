@@ -41,6 +41,7 @@ import org.biojava.dasobert.dasregistry.Das1Source;
 import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
 import org.biojava.dasobert.dasregistry.DasSource;
 import org.biojava.dasobert.eventmodel.*;
+import org.biojava.spice.config.SpiceDefaults;
 import org.biojava.spice.manypanel.drawable.DrawableDasSource;
 import org.biojava.spice.manypanel.eventmodel.DasSourceEvent;
 import org.biojava.spice.manypanel.eventmodel.DasSourceListener;
@@ -77,14 +78,9 @@ ChangeListener
 {
     final static long serialVersionUID = 879143879134613639L;
     
-    static Logger logger = Logger.getLogger("org.biojava.spice");
+    static Logger logger = Logger.getLogger(SpiceDefaults.LOGGER);
     
-    //public static  String registry = "http://servlet.sanger.ac.uk/dasregistry/services/das_registry";
-    //public static  String registry = "http://www.spice-3d.org/dasregistry/services/das_registry";
-    
-    public static String DEFAULT_PDBCOORDSYS     = "PDBresnum,Protein Structure";
-    public static String DEFAULT_UNIPROTCOORDSYS = "UniProt,Protein Sequence";
-    public static String DEFAULT_ENSPCOORDSYS    = "Ensembl,Protein Sequence";
+     
     
     List allsources ; // a list of DasSource[] 
     
@@ -103,7 +99,8 @@ ChangeListener
     SequenceManager enspManager;
     AlignmentManager aligManager;
     AlignmentManager ensaligManager;
-    
+    AlignmentRenderer seqAligRenderer;
+    AlignmentRenderer enspAligRenderer;
     FeatureManager pdbFeatureManager;
     FeatureManager upFeatureManager;
     FeatureManager enspFeatureManager;
@@ -117,8 +114,166 @@ ChangeListener
     
     JSlider residueSizeSlider;
     
+    /** create a BrowserPane that only has a structure Panel
+     * 
+     * @param PDBCOORDSYS
+     */
+    public BrowserPane(String PDBCOORDSYS){
+    	
+    	initPanels(PDBCOORDSYS, SpiceDefaults.UNIPROTCOORDSYS, SpiceDefaults.ENSPCOORDSYS);
+    	
+        // reset all the DAS sources...
+        clearDasSources();
+                
+        registerEventTranslators();
+        
+        
+        //
+        // build up the display from the components:
+        //
+        
+        
+        //Dimension d = new Dimension(DEFAULT_PANE_WIDTH,DEFAULT_PANE_HEIGHT);
+        //split2.setPreferredSize(d);
+        contentPanel.add(structureRenderer);
+        
+        
+        /// and now ...
+        
+        // the scale ...
+        int RES_MIN  = 1;
+        int RES_MAX  = 100;
+        int RES_INIT = 100;
+        residueSizeSlider = new JSlider(JSlider.HORIZONTAL,
+                RES_MIN, RES_MAX, RES_INIT);
+        residueSizeSlider.setInverted(true);
+        //residueSizeSlider.setMajorTickSpacing(5);
+        //residueSizeSlider.setMinorTickSpacing(2);
+        residueSizeSlider.setPaintTicks(false);
+        residueSizeSlider.setPaintLabels(false);
+        residueSizeSlider.addChangeListener(this);
+        residueSizeSlider.setPreferredSize(new Dimension(100,15));
+        
+        
+        Box hBox = Box.createHorizontalBox();
+        hBox.setBackground(BG_COLOR);
+        hBox.add(Box.createHorizontalGlue());
+        hBox.add(residueSizeSlider);
+        hBox.add(Box.createHorizontalGlue());
+        
+        // register the managers
+        registerManagers();
+        
+        this.setOpaque(true);
+        this.setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+        
+        this.add(contentPanel);
+        this.add(hBox);
+        
+    	
+    }
+    
+    /** create a browserPane that has PDB,  Uniprot and ENSP panels
+     * 
+     * @param PDBCOORDSYS
+     * @param UNIPROTCOORDSYS
+     * @param ENSPCOORDSYS
+     */
     public BrowserPane(String PDBCOORDSYS, String UNIPROTCOORDSYS, String ENSPCOORDSYS) {
         super();
+        initPanels(PDBCOORDSYS, UNIPROTCOORDSYS, ENSPCOORDSYS);
+        // reset all the DAS sources...
+        clearDasSources();
+        
+        
+        registerEventTranslators();
+        
+        
+        //
+        // build up the display from the components:
+        //
+        
+        
+        JSplitPane splito = new JSplitPane(JSplitPane.VERTICAL_SPLIT,structureRenderer,seqAligRenderer);
+        splito.setOneTouchExpandable(true);
+        splito.setResizeWeight(1.0);
+        splito.setBorder(BorderFactory.createEmptyBorder());
+        
+        MyPropertyChangeListener mpcl = new MyPropertyChangeListener(seqAligRenderer,this,splito,"bottom");
+        splito.addPropertyChangeListener("dividerLocation", mpcl );
+        
+        JSplitPane split1 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,splito,seqRenderer);
+        split1.setOneTouchExpandable(true);
+        // uniprot panel gets a little more space, because so many more DAS sources...
+        split1.setResizeWeight(0.5);
+        
+        split1.setBorder(BorderFactory.createEmptyBorder());
+        
+        
+        
+        
+//      JPanel p2 = new JPanel();
+//      p2.setLayout(new BoxLayout(p2,BoxLayout.Y_AXIS));
+//      p2.add(enspAligRenderer);
+//      p2.add(enspRenderer);
+        
+        JSplitPane splitb = new JSplitPane(JSplitPane.VERTICAL_SPLIT,enspAligRenderer,enspRenderer);
+        splitb.setOneTouchExpandable(true);
+        splitb.setResizeWeight(0);
+        splitb.setBorder(BorderFactory.createEmptyBorder());
+        
+        //MyComponentListener mycompo2 = new MyComponentListener(enspAligRenderer,enspRenderer);
+        
+        //splitb.addComponentListener(mycompo2);
+        
+        MyPropertyChangeListener mpcl2 = new MyPropertyChangeListener(enspAligRenderer,this,splitb,"top");
+        splitb.addPropertyChangeListener("dividerLocation",mpcl2);
+        
+        JSplitPane split2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,split1,splitb);
+        split2.setOneTouchExpandable(true);
+        // uniprot panel gets more space
+        split2.setResizeWeight(0.7);
+        split2.setBorder(BorderFactory.createEmptyBorder());
+        
+        //Dimension d = new Dimension(DEFAULT_PANE_WIDTH,DEFAULT_PANE_HEIGHT);
+        //split2.setPreferredSize(d);
+        contentPanel.add(split2);
+        
+        
+        /// and now ...
+        
+        // the scale ...
+        int RES_MIN  = 1;
+        int RES_MAX  = 100;
+        int RES_INIT = 100;
+        residueSizeSlider = new JSlider(JSlider.HORIZONTAL,
+                RES_MIN, RES_MAX, RES_INIT);
+        residueSizeSlider.setInverted(true);
+        //residueSizeSlider.setMajorTickSpacing(5);
+        //residueSizeSlider.setMinorTickSpacing(2);
+        residueSizeSlider.setPaintTicks(false);
+        residueSizeSlider.setPaintLabels(false);
+        residueSizeSlider.addChangeListener(this);
+        residueSizeSlider.setPreferredSize(new Dimension(100,15));
+        
+        
+        Box hBox = Box.createHorizontalBox();
+        hBox.setBackground(BG_COLOR);
+        hBox.add(Box.createHorizontalGlue());
+        hBox.add(residueSizeSlider);
+        hBox.add(Box.createHorizontalGlue());
+        
+        // register the managers
+        registerManagers();
+        
+        this.setOpaque(true);
+        this.setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+        
+        this.add(contentPanel);
+        this.add(hBox);
+    }
+    
+    private void initPanels(String PDBCOORDSYS, String UNIPROTCOORDSYS, String ENSPCOORDSYS) {
         contentPanel = new JPanel();
         
         contentPanel.setLayout(new BoxLayout(contentPanel,BoxLayout.X_AXIS));
@@ -227,7 +382,7 @@ ChangeListener
             aligManager.addSequence2Listener(seqCursors[i]);
         }
         
-        AlignmentRenderer seqAligRenderer = new AlignmentRenderer();
+        seqAligRenderer = new AlignmentRenderer();
         aligManager.addAlignmentRenderer(seqAligRenderer);
         
         structureRenderer.addScaleChangeListener(seqAligRenderer.getSeq1ScaleListener());
@@ -318,7 +473,7 @@ ChangeListener
         aligManager.addSequence2Listener(upenspList);
         
         
-        AlignmentRenderer enspAligRenderer = new AlignmentRenderer();
+        enspAligRenderer = new AlignmentRenderer();
         ensaligManager.addAlignmentRenderer(enspAligRenderer);
         
         seqRenderer.addScaleChangeListener(enspAligRenderer.getSeq1ScaleListener());
@@ -337,95 +492,7 @@ ChangeListener
         seqRenderer.addAdjustmentListener(enspAligRenderer.getAdjust1());
         enspRenderer.addAdjustmentListener(enspAligRenderer.getAdjust2());
         
-        // reset all the DAS sources...
-        clearDasSources();
-        
-        
-        registerEventTranslators();
-        
-        
-        //
-        // build up the display from the components:
-        //
-        
-        
-        JSplitPane splito = new JSplitPane(JSplitPane.VERTICAL_SPLIT,structureRenderer,seqAligRenderer);
-        splito.setOneTouchExpandable(true);
-        splito.setResizeWeight(1.0);
-        splito.setBorder(BorderFactory.createEmptyBorder());
-        
-        MyPropertyChangeListener mpcl = new MyPropertyChangeListener(seqAligRenderer,this,splito,"bottom");
-        splito.addPropertyChangeListener("dividerLocation", mpcl );
-        
-        JSplitPane split1 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,splito,seqRenderer);
-        split1.setOneTouchExpandable(true);
-        // uniprot panel gets a little more space, because so many more DAS sources...
-        split1.setResizeWeight(0.5);
-        
-        split1.setBorder(BorderFactory.createEmptyBorder());
-        
-        
-        
-        
-//      JPanel p2 = new JPanel();
-//      p2.setLayout(new BoxLayout(p2,BoxLayout.Y_AXIS));
-//      p2.add(enspAligRenderer);
-//      p2.add(enspRenderer);
-        
-        JSplitPane splitb = new JSplitPane(JSplitPane.VERTICAL_SPLIT,enspAligRenderer,enspRenderer);
-        splitb.setOneTouchExpandable(true);
-        splitb.setResizeWeight(0);
-        splitb.setBorder(BorderFactory.createEmptyBorder());
-        
-        //MyComponentListener mycompo2 = new MyComponentListener(enspAligRenderer,enspRenderer);
-        
-        //splitb.addComponentListener(mycompo2);
-        
-        MyPropertyChangeListener mpcl2 = new MyPropertyChangeListener(enspAligRenderer,this,splitb,"top");
-        splitb.addPropertyChangeListener("dividerLocation",mpcl2);
-        
-        JSplitPane split2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,split1,splitb);
-        split2.setOneTouchExpandable(true);
-        // uniprot panel gets more space
-        split2.setResizeWeight(0.7);
-        split2.setBorder(BorderFactory.createEmptyBorder());
-        
-        //Dimension d = new Dimension(DEFAULT_PANE_WIDTH,DEFAULT_PANE_HEIGHT);
-        //split2.setPreferredSize(d);
-        contentPanel.add(split2);
-        
-        
-        /// and now ...
-        
-        // the scale ...
-        int RES_MIN  = 1;
-        int RES_MAX  = 100;
-        int RES_INIT = 100;
-        residueSizeSlider = new JSlider(JSlider.HORIZONTAL,
-                RES_MIN, RES_MAX, RES_INIT);
-        residueSizeSlider.setInverted(true);
-        //residueSizeSlider.setMajorTickSpacing(5);
-        //residueSizeSlider.setMinorTickSpacing(2);
-        residueSizeSlider.setPaintTicks(false);
-        residueSizeSlider.setPaintLabels(false);
-        residueSizeSlider.addChangeListener(this);
-        residueSizeSlider.setPreferredSize(new Dimension(100,15));
-        
-        
-        Box hBox = Box.createHorizontalBox();
-        hBox.setBackground(BG_COLOR);
-        hBox.add(Box.createHorizontalGlue());
-        hBox.add(residueSizeSlider);
-        hBox.add(Box.createHorizontalGlue());
-        
-        // register the managers
-        registerManagers();
-        
-        this.setOpaque(true);
-        this.setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
-        
-        this.add(contentPanel);
-        this.add(hBox);
+       
         
         
     }
@@ -662,12 +729,12 @@ ChangeListener
         DasCoordinateSystem[] cs = ds.getCoordinateSystem();
         for ( int i=0 ; i< cs.length; i++){
             DasCoordinateSystem dcs = cs[i];
-            if ( dcs.toString().equals(DEFAULT_PDBCOORDSYS)){
+            if ( dcs.toString().equals(SpiceDefaults.PDBCOORDSYS)){
                 // remove from structure panel
                 structureRenderer.removeDasSource(event);
-            } else if ( dcs.toString().equals(DEFAULT_UNIPROTCOORDSYS))
+            } else if ( dcs.toString().equals(SpiceDefaults.UNIPROTCOORDSYS))
                 seqRenderer.removeDasSource(event);
-            else if ( dcs.toString().equals(DEFAULT_ENSPCOORDSYS))
+            else if ( dcs.toString().equals(SpiceDefaults.ENSPCOORDSYS))
                 enspRenderer.removeDasSource(event);
         }
         

@@ -222,12 +222,12 @@ class SpiceRunnable implements Runnable {
 
         
         
-        //if (logger.isLoggable(Level.FINEST)) {
-            logger.info("proxyHost"         + proxyHost);
-            logger.info("proxyPort"         + proxyPort);
-            logger.info("http.proxyHost"    + System.getProperty("http.proxyHost"));
-            logger.info("http.proxyPort"    + System.getProperty("http.proxyPort"));
-        //}
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.info("proxyHost "         + proxyHost);
+            logger.info("proxyPort "         + proxyPort);
+            logger.info("http.proxyHost "    + System.getProperty("http.proxyHost"));
+            logger.info("http.proxyPort "    + System.getProperty("http.proxyPort"));
+        }
 
             
           

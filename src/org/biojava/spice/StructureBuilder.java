@@ -38,20 +38,15 @@ import java.util.*                                     ;
 import java.util.logging.*                             ;
 import java.io.*;
 
+import org.biojava.spice.config.SpiceDefaults;
 import org.biojava.spice.das.AlignmentTools;
-import org.biojava.spice.manypanel.BrowserPane;
 
 import org.biojava.bio.program.ssbind.AnnotationFactory;
 import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
 import org.biojava.utils.ChangeVetoException;
 
 public class StructureBuilder{
-    
-    // hard coded - 
-    // find a better solution ...
-    static String SEQUENCEDATABASE  = BrowserPane.DEFAULT_UNIPROTCOORDSYS;
-    static String STRUCTUREDATABASE = BrowserPane.DEFAULT_PDBCOORDSYS ;
-    static String ENSPDATABASE      = BrowserPane.DEFAULT_ENSPCOORDSYS;
+          
     
     DasCoordinateSystem coordSys1;
     DasCoordinateSystem coordSys2;
@@ -501,15 +496,15 @@ public class StructureBuilder{
             
             /** TODO: fix this */
             // tmp fix until Alignment server returns the same coordsystems as the registry contains ... :-/
-            if ( objecttype.equals(SEQUENCEDATABASE)){
+            if ( objecttype.equals(SpiceDefaults.UNIPROTCOORDSYS)){
                 if ( dbCoordSys.equals("UniProt"))
                     return object;
             }
-            if ( objecttype.equals(STRUCTUREDATABASE)){
+            if ( objecttype.equals(SpiceDefaults.PDBCOORDSYS)){
                 if ( dbCoordSys.equals("PDBresnum"))
                     return object;
             }
-            if ( objecttype.equals(ENSPDATABASE)){
+            if ( objecttype.equals(SpiceDefaults.ENSPCOORDSYS)){
                 if ( dbCoordSys.equals("ENSEMBLPEP"))
                     return object;
             }

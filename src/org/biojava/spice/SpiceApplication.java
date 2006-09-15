@@ -198,9 +198,12 @@ ConfigurationListener
         // set some system properties
          
         
-        // init the 2D display
-        browserPane = new BrowserPane(params.getPdbcoordsys(),params.getUniprotcoordsys(), params.getEnspcoordsys());
-              
+        if (params.getStructureAlignmentMode().equals(SpiceDefaults.CASPCOORDSYS)){
+        	browserPane = new BrowserPane(params.getPdbcoordsys());
+        } else  {
+        	// init the 2D display
+        	browserPane = new BrowserPane(params.getPdbcoordsys(),params.getUniprotcoordsys(), params.getEnspcoordsys());
+        }
         structurePanel      = new StructurePanel();
         jmolSpiceTranslator = new JmolSpiceTranslator();
         structurePanel.addJmolStatusListener(jmolSpiceTranslator);
@@ -1199,6 +1202,7 @@ ConfigurationListener
         if ( config != null ) 
         		l = config.getAllServers();
         
+        //Q: if we do not have servers, should we trigger a request for them here?
         logger.finest("got " + l.size() + " servers");
         
         //if ( logger.isLoggable(Level.FINEST)) {

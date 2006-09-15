@@ -26,9 +26,9 @@ import org.biojava.spice.SpiceApplication;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.ChainImpl;
+import org.biojava.spice.config.SpiceDefaults;
 import org.biojava.spice.das.AlignmentTools;
 import org.biojava.spice.manypanel.AlignmentTool;
-import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.spice.manypanel.managers.SequenceManager;
 import org.biojava.spice.manypanel.renderer.SequenceScalePanel;
 import org.biojava.spice.panel.SeqFeaturePanel;
@@ -287,7 +287,7 @@ AlignmentListener
         AlignmentParameters param = new AlignmentParameters();
         
         param.setDasSources(dasSources);
-        if ( queryCoordSys.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS ))
+        if ( queryCoordSys.toString().equals(SpiceDefaults.PDBCOORDSYS ))
             if ( code.length() == 6) {
                 
                 String chain = code.substring(5,6).toUpperCase();
@@ -304,10 +304,10 @@ AlignmentListener
         DasCoordinateSystem ecs = new DasCoordinateSystem();
         ecs.setName("ensemblpep-human-ncbi35");
         
-        if ( queryCoordSys.toString().equals(BrowserPane.DEFAULT_ENSPCOORDSYS)){
+        if ( queryCoordSys.toString().equals(SpiceDefaults.ENSPCOORDSYS)){
             param.setQueryCoordinateSystem(ecs);               
         }
-        if ( subjectCoordSys.toString().equals(BrowserPane.DEFAULT_ENSPCOORDSYS)) {
+        if ( subjectCoordSys.toString().equals(SpiceDefaults.ENSPCOORDSYS)) {
             param.setSubjectCoordinateSystem(ecs);
         }
         

@@ -29,7 +29,7 @@ import java.util.List;
 
 import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
 import org.biojava.spice.config.SpiceDefaults;
-import org.biojava.spice.manypanel.BrowserPane;
+
 
 /** a class to manage the SPICE statup parameters.
  * display</li>,<li>displayLabel</li>,
@@ -73,9 +73,9 @@ public class SpiceStartParameters {
 
     public SpiceStartParameters() {
         super();
-        pdbcoordsys     = BrowserPane.DEFAULT_PDBCOORDSYS;
-        uniprotcoordsys = BrowserPane.DEFAULT_UNIPROTCOORDSYS;
-        enspcoordsys    = BrowserPane.DEFAULT_ENSPCOORDSYS;
+        pdbcoordsys     = SpiceDefaults.PDBCOORDSYS;
+        uniprotcoordsys = SpiceDefaults.UNIPROTCOORDSYS;
+        enspcoordsys    = SpiceDefaults.ENSPCOORDSYS;
         try {
             registry = new URL(SpiceDefaults.REGISTRY);
         } catch (MalformedURLException e){

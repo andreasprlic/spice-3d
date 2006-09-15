@@ -36,7 +36,6 @@ import java.util.Date                     ;
 import java.util.ArrayList ;
 import java.util.List ;
 
-import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.utils.xml.*            ; 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -137,8 +136,8 @@ public class RegistryConfiguration
         boolean uniprotflag = false ;
         boolean pdbflag     = false ;
         
-        pdbflag     =  hasCoordSys(BrowserPane.DEFAULT_PDBCOORDSYS,source) ;
-        uniprotflag =  hasCoordSys(BrowserPane.DEFAULT_UNIPROTCOORDSYS,source)   ;
+        pdbflag     =  hasCoordSys(SpiceDefaults.PDBCOORDSYS,source) ;
+        uniprotflag =  hasCoordSys(SpiceDefaults.UNIPROTCOORDSYS,source)   ;
         //System.out.println(pdbflag + " " + uniprotflag);
         if (( uniprotflag == true) && ( pdbflag == true)) {
             msdmapping = true ;

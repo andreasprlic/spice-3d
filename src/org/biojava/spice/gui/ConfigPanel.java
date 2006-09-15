@@ -59,7 +59,8 @@ import org.biojava.spice.config.ConfigurationListener;
 import org.biojava.spice.config.DasSourceConfigPanel;
 import org.biojava.spice.config.RegistryConfigIO;
 import org.biojava.spice.config.RegistryConfiguration;
-import org.biojava.spice.manypanel.BrowserPane;
+import org.biojava.spice.config.SpiceDefaults;
+
 
 /** a Component that provides the GUI for configuring SPICE
  * 
@@ -352,7 +353,9 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
             
             if (col.equals(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.CoordinateSystems"))) { //$NON-NLS-1$
                 // display coordinateSystems box
-                String[] coords = { BrowserPane.DEFAULT_UNIPROTCOORDSYS, BrowserPane.DEFAULT_PDBCOORDSYS, BrowserPane.DEFAULT_ENSPCOORDSYS};
+                String[] coords = { SpiceDefaults.UNIPROTCOORDSYS, 
+                		SpiceDefaults.PDBCOORDSYS,
+                		SpiceDefaults.ENSPCOORDSYS};
                 JComboBox list = new JComboBox(coords) ;        
                 list.setEditable(false);
                 list.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
@@ -508,7 +511,7 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
             //String[] coordSys = new String[] { "PDBresnum", };
             String[] capabs   = new String[] { "structure", }; //$NON-NLS-1$
             
-            DasCoordinateSystem dcs = DasCoordinateSystem.fromString(BrowserPane.DEFAULT_PDBCOORDSYS);
+            DasCoordinateSystem dcs = DasCoordinateSystem.fromString(SpiceDefaults.PDBCOORDSYS);
             DasCoordinateSystem[] dcss = new DasCoordinateSystem[1];
             dcss[0] = dcs;
             sds.setCoordinateSystem(dcss);

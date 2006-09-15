@@ -22,7 +22,10 @@
  */
 package org.biojava.spice.config;
 
+import java.net.Authenticator;
+
 import java.net.MalformedURLException;
+import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -230,6 +233,27 @@ class RegistryContactRunnable implements Runnable {
         
     }
     
+    
+   /* public class MyAuthenticator extends Authenticator {
+        // This method is called when a password-protected URL is accessed
+        protected PasswordAuthentication getPasswordAuthentication() {
+        	logger.warning("using hard coded CASP authentication");
+            // Get information about the request
+            /String promptString = getRequestingPrompt();
+            //String hostname = getRequestingHost();
+            //InetAddress ipaddr = getRequestingSite();
+            //int port = getRequestingPort();
+             
+            // Get the username from the user...
+            String username = "";
+    
+            // Get the password from the user...
+            String password = "";
+    
+            // Return the information
+            return new PasswordAuthentication(username, password.toCharArray());
+        }
+    }*/
 
     
     public Das1Source[] getDas1Sources(URL url) throws MalformedURLException, DASException{
@@ -237,6 +261,11 @@ class RegistryContactRunnable implements Runnable {
         DasSourceReaderImpl reader = new DasSourceReaderImpl();
        
         logger.info("reading " + url);
+       // logger.warning("remove hard coded name / password for CASP!");
+        
+        
+        //Authenticator.setDefault(new MyAuthenticator());
+        
         DasSource[] sources = reader.readDasSource(url);
         
         List das1sources = new ArrayList();

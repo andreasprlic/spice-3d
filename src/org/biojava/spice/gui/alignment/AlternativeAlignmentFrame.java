@@ -46,7 +46,7 @@ import org.biojava.bio.structure.align.pairwise.AlternativeAlignment;
 import org.biojava.bio.structure.jama.Matrix;
 import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
 import org.biojava.spice.StructureAlignment;
-import org.biojava.spice.manypanel.BrowserPane;
+import org.biojava.spice.config.SpiceDefaults;
 import org.biojava.spice.manypanel.eventmodel.StructureAlignmentListener;
 
 /** a frame showing the alternative alignments, which are the result of a structure superimposition
@@ -162,7 +162,7 @@ extends JFrame{
         
         // create the structure alignment object and tell the listeners ...
         
-        String defaultCoordSys = BrowserPane.DEFAULT_PDBCOORDSYS;
+        String defaultCoordSys = SpiceDefaults.PDBCOORDSYS;
         DasCoordinateSystem defaultcs = DasCoordinateSystem.fromString(defaultCoordSys);
         StructureAlignment salig = new StructureAlignment(defaultcs);
        

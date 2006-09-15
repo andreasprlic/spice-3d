@@ -29,8 +29,7 @@ import java.util.logging.Logger;
 import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.dasregistry.Das1Source;
 import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
-import org.biojava.spice.manypanel.BrowserPane;
-
+import org.biojava.spice.config.SpiceDefaults;
 
 
 /** a class that filters SpiceDasSources based on the SpiceStartParameters
@@ -239,8 +238,8 @@ public class StartParameterFilter {
                 DasCoordinateSystem[] coordSys = ds.getCoordinateSystem();
                 for ( int d = 0 ; d< coordSys.length;d++){
                     String cs = coordSys[d].toString();
-                    if ( (cs.equals(BrowserPane.DEFAULT_PDBCOORDSYS) || (cs.equals(BrowserPane.DEFAULT_UNIPROTCOORDSYS)
-                            || (cs.equals(BrowserPane.DEFAULT_ENSPCOORDSYS))) || ( ds.getStatus()) )) {
+                    if ( (cs.equals(SpiceDefaults.PDBCOORDSYS) || (cs.equals(SpiceDefaults.UNIPROTCOORDSYS)
+                            || (cs.equals(SpiceDefaults.ENSPCOORDSYS))) || ( ds.getStatus()) )) {
                         if ( ! retlst.contains(ds))
                             retlst.add(ds);
                     } else

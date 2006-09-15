@@ -37,8 +37,8 @@ import org.biojava.bio.structure.Group;
 import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
 import org.biojava.dasobert.eventmodel.AlignmentEvent;
 import org.biojava.dasobert.eventmodel.AlignmentListener;
+import org.biojava.spice.config.SpiceDefaults;
 import org.biojava.spice.manypanel.AlignmentTool;
-import org.biojava.spice.manypanel.BrowserPane;
 
 public class AbstractAlignmentManager
 implements AlignmentListener{
@@ -274,13 +274,13 @@ implements AlignmentListener{
                 continue;
             }
             
-            if ( coordSys1.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS)) {
+            if ( coordSys1.toString().equals(SpiceDefaults.PDBCOORDSYS)) {
                 
                 int snew = getSeqPosForPDB(sequence1, s1.toString());
                 s1 = new Integer(snew);
             }
              
-            if ( coordSys2.toString().equals(BrowserPane.DEFAULT_PDBCOORDSYS)) {
+            if ( coordSys2.toString().equals(SpiceDefaults.PDBCOORDSYS)) {
                 
                 int snew = getSeqPosForPDB(sequence2, s2.toString());
                 s2 = new Integer(snew);
