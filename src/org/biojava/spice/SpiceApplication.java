@@ -1195,7 +1195,10 @@ ConfigurationListener
     
     private void setDasSources(){
 
-        List l = config.getAllServers();
+        List l = new ArrayList();
+        if ( config != null ) 
+        		l = config.getAllServers();
+        
         logger.finest("got " + l.size() + " servers");
         
         //if ( logger.isLoggable(Level.FINEST)) {
