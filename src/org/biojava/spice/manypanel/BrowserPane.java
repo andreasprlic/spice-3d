@@ -41,6 +41,7 @@ import org.biojava.dasobert.dasregistry.Das1Source;
 import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
 import org.biojava.dasobert.dasregistry.DasSource;
 import org.biojava.dasobert.eventmodel.*;
+import org.biojava.spice.ResourceManager;
 import org.biojava.spice.config.SpiceDefaults;
 import org.biojava.spice.manypanel.drawable.DrawableDasSource;
 import org.biojava.spice.manypanel.eventmodel.DasSourceEvent;
@@ -104,11 +105,9 @@ ChangeListener
     FeatureManager pdbFeatureManager;
     FeatureManager upFeatureManager;
     FeatureManager enspFeatureManager;
+        
     
-    public static int DEFAULT_PANE_WIDTH  = 600;
-    public static int DEFAULT_PANE_HEIGHT = 600;
-    
-    static Color BG_COLOR = Color.WHITE;
+    //static Color BG_COLOR = Color.WHITE;
     JPanel contentPanel;
     
     
@@ -127,7 +126,8 @@ ChangeListener
                 
         registerEventTranslators();
         
-        
+        String bgcol = ResourceManager.getString("org.biojava.spice.manypanel.renderer.BackgroundColor");
+        Color BG_COLOR = Color.decode(bgcol);
         //
         // build up the display from the components:
         //
@@ -188,7 +188,8 @@ ChangeListener
         
         registerEventTranslators();
         
-        
+        String bgcol = ResourceManager.getString("org.biojava.spice.manypanel.renderer.BackgroundColor");
+        Color BG_COLOR = Color.decode(bgcol);
         //
         // build up the display from the components:
         //
@@ -275,6 +276,9 @@ ChangeListener
     
     private void initPanels(String PDBCOORDSYS, String UNIPROTCOORDSYS, String ENSPCOORDSYS) {
         contentPanel = new JPanel();
+        
+        String bgcol = ResourceManager.getString("org.biojava.spice.manypanel.renderer.BackgroundColor");
+        Color BG_COLOR = Color.decode(bgcol);
         
         contentPanel.setLayout(new BoxLayout(contentPanel,BoxLayout.X_AXIS));
         

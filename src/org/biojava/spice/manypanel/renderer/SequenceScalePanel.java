@@ -110,8 +110,8 @@ extends JPanel{
      
         int length = chainLength  ; 
         int l = Math.round(length*scale) + DEFAULT_X_START + DEFAULT_X_RIGHT_BORDER ;
-        if ( l  < 200){
-            l = 200;
+        if ( l  < 60){
+            l = 60;
         }
         this.setPreferredSize(new Dimension(l,SIZE));
         

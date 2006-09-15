@@ -275,17 +275,20 @@ StructureAlignmentListener {
                     try {
                         struc = structureAlignment.getStructure(i);
                         referenceStructure = i;
-                        
-                        Chain c1 = struc.getChain(0);
-                        String sequence = c1.getSequence();
-                        String ac = id + "." + c1.getName();
-                        
-                        SequenceEvent sevent = new SequenceEvent(ac,sequence);
-                        //logger.info("*** seqeunce event " + ac);
-                        Iterator iter3 = pdbSequenceListeners.iterator();
-                        while (iter3.hasNext()){
-                            SequenceListener li = (SequenceListener)iter3.next();
-                            li.newSequence(sevent);
+                        if ( struc.size() > 0) {
+                        	Chain c1 = struc.getChain(0);
+                        	String sequence = c1.getSequence();
+                        	String ac = id + "." + c1.getName();
+
+                        	SequenceEvent sevent = new SequenceEvent(ac,sequence);
+                        	//logger.info("*** seqeunce event " + ac);
+                        	Iterator iter3 = pdbSequenceListeners.iterator();
+                        	while (iter3.hasNext()){
+                        		SequenceListener li = (SequenceListener)iter3.next();
+                        		li.newSequence(sevent);
+                        	}
+                        } else {
+                        	logger.warning("could not load structure at position " +i );
                         }
                         
                     } catch (StructureException ex){

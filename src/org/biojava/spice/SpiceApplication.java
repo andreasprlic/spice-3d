@@ -375,7 +375,7 @@ ConfigurationListener
         Box vBox = Box.createVerticalBox();
        
         Box vBox2 = Box.createVerticalBox();
-        //structurePanel.setMinimumSize(new Dimension(200,200));
+        structurePanel.setMinimumSize(new Dimension(200,200));
         vBox2.add(structurePanel);
         
         strucommand.setMaximumSize(new Dimension(Short.MAX_VALUE,30));    
@@ -391,7 +391,7 @@ ConfigurationListener
         chainPanel.setBorder(BorderFactory.createEmptyBorder());
         
         browserPane.setBorder(BorderFactory.createEmptyBorder());
-        
+        browserPane.setPreferredSize(new Dimension(200,200));
         sharedPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                 chainPanel, browserPane);
         sharedPanel.setOneTouchExpandable(true);
@@ -409,7 +409,7 @@ ConfigurationListener
             mainsharedPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, sharedPanel,vBox2);
         
         mainsharedPanel.setOneTouchExpandable(true);
-        mainsharedPanel.setResizeWeight(0.5);
+        mainsharedPanel.setResizeWeight(0.6);
         
         mainsharedPanel.setPreferredSize(new Dimension(790, 590));
           
@@ -859,83 +859,6 @@ ConfigurationListener
     }
     
     
-    
-    /** set a structure to be displayed and sends a script command to
-     * color structure 
-     * @param structure_ a Biojava structure object
-     */
-    /*
-    public  void setStructure(Structure structure_ ) {
-        logger.warning("depreciated method!");
-        if (logger.isLoggable(Level.FINER)) {
-            logger.entering(this.getClass().getName(), "setStructure",  new Object[]{"got structure object"});
-        }
-        
-        logger.finest("SpiceApplication got structure " + structure_);
-        
-        this.setLoading(false);
-        //first_load = false ;
-        //statusPanel.setLoading(false);
-        
-        if ( structure_.size() < 1 ){
-            logger.log(Level.INFO,"got no structure");
-            return ;
-        }
-        
-        structure = structure_ ;
-        //currentChain = null;
-        setCurrentChain(null,-1);
-        pdbcode = structure.getPDBCode();
-        
-        //if (pdbcode != null)
-          //  pdbMenu.setEnabled(true);
-        //if (logger.isLoggable(Level.FINEST)) {
-        //System.out.println(structure.toPDB());	    
-        //}
-        
-        
-        
-        DefaultListModel model = (DefaultListModel) chainList.getModel() ;
-        synchronized (model) {
-            model.clear() ;
-            //logger.finest(pdbstr);		
-            ArrayList chains = (ArrayList) structure.getChains(0);
-            for (int i=0; i< chains.size();i++) {
-                Chain ch = (Chain) chains.get(i);
-                model.add(i,ch.getName());
-            }
-            //notifyAll();
-               
-        }
-        
-        //System.out.println("SpiceApplication... setting structure in Jmol");
-        
-        
-        
-        //System.out.println("SpiceApplication... back in main spice");
-        logger.finest("back in main spice ...");
-        
-        //Map header = structure.getHeader();
-        //logger.info("structure header " + header);
-        //statusPanel.setPDB(structure.getPDBCode());
-        //statusPanel.setPDBHeader(structure.getHeader());
-        
-        //structurePanelListener.executeCmd(selectcmd);
-        //System.out.println("SpiceApplication... setting chain");
-        logger.finest("setting chain...");
-        //setCurrentChainNumber(0);
-        //System.out.println("SpiceApplication... requesting getChain");
-        //Chain chain = getChain(currentChainNumber) ;
-        
-        
-        //currentChain = chain;
-        //System.out.println("SpiceApplication... setting chain in dascanv");
-        //dascanv.setChain(chain);
-        //System.out.println("SpiceApplication... set chain in dascanv");
-        
-        //if ( chain != null) 
-            //seqTextPane.setChain(chain,0);
-        */
 
     private void dealWithStartParameters(){
         

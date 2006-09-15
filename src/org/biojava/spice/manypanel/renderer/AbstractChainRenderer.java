@@ -42,7 +42,6 @@ import org.biojava.spice.manypanel.eventmodel.FeatureListener;
 import org.biojava.spice.manypanel.eventmodel.ScaleEvent;
 import org.biojava.spice.manypanel.eventmodel.ScaleListener;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureListener;
-import org.biojava.spice.manypanel.BrowserPane;
 import org.biojava.spice.manypanel.drawable.DrawableDasSource;
 import org.biojava.spice.manypanel.drawable.DrawableSequence;
 
@@ -127,7 +126,8 @@ public abstract class AbstractChainRenderer
         mouseListener = new ChainRendererMouseListener(this);
         
   
-        componentWidth = BrowserPane.DEFAULT_PANE_WIDTH;
+        //componentWidth = BrowserPane.DEFAULT_PANE_WIDTH;
+        componentWidth = 100;
         
         statusPanel = new StatusPanel();
         statusPanel.setMaximumSize(new Dimension(Short.MAX_VALUE,20));        
@@ -423,8 +423,8 @@ public abstract class AbstractChainRenderer
             aminosize = 1;
         int w = Math.round(l*scale) + aminosize+  SequenceScalePanel.DEFAULT_X_START + SequenceScalePanel.DEFAULT_X_RIGHT_BORDER;
         
-        if ( w  < 100){
-            w = 100;
+        if ( w  < 60){
+            w = 60;
         }
         //logger.info("displayWidth " + w + " scale" +scale + " length"+ l);
         return w;
