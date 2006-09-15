@@ -138,13 +138,16 @@ public class MenuCreator {
         openpdb.setMnemonic(KeyEvent.VK_O);
         
         // currently disabled
-        /*JMenuItem align;
+        /*
+        JMenuItem align;
         ImageIcon alignIcon = createImageIcon("align.png");
         if ( alignIcon == null) {
             align = new JMenuItem("Align");
         } else
             align = new JMenuItem("Align", alignIcon);
         align.setMnemonic(KeyEvent.VK_A);
+        align.addActionListener  (  ml );
+        file.add( align );
         */
         
         /*
@@ -186,7 +189,7 @@ public class MenuCreator {
         newWindow.addActionListener(ml );
         newTab.addActionListener (  ml );
         openpdb.addActionListener(  ml );
-        //align.addActionListener  (  ml );
+        
         //save.addActionListener   (  ml );
         //revert.addActionListener (  ml );
         exit.addActionListener   (  ml );
@@ -203,7 +206,7 @@ public class MenuCreator {
         //file.add( revert  );
         
         //file.addSeparator();
-        //file.add( align );
+
         
         file.addSeparator();
         file.add( props   );

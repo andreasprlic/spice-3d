@@ -234,26 +234,26 @@ class RegistryContactRunnable implements Runnable {
     }
     
     
-   /* public class MyAuthenticator extends Authenticator {
+    public class MyAuthenticator extends Authenticator {
         // This method is called when a password-protected URL is accessed
         protected PasswordAuthentication getPasswordAuthentication() {
         	logger.warning("using hard coded CASP authentication");
             // Get information about the request
-            /String promptString = getRequestingPrompt();
+            //String promptString = getRequestingPrompt();
             //String hostname = getRequestingHost();
             //InetAddress ipaddr = getRequestingSite();
             //int port = getRequestingPort();
              
             // Get the username from the user...
-            String username = "";
+            String username = "das";
     
             // Get the password from the user...
-            String password = "";
+            String password = "%rdcv";
     
             // Return the information
             return new PasswordAuthentication(username, password.toCharArray());
         }
-    }*/
+    }
 
     
     public Das1Source[] getDas1Sources(URL url) throws MalformedURLException, DASException{
@@ -261,10 +261,10 @@ class RegistryContactRunnable implements Runnable {
         DasSourceReaderImpl reader = new DasSourceReaderImpl();
        
         logger.info("reading " + url);
-       // logger.warning("remove hard coded name / password for CASP!");
+       logger.warning("remove hard coded name / password for CASP!");
         
         
-        //Authenticator.setDefault(new MyAuthenticator());
+        Authenticator.setDefault(new MyAuthenticator());
         
         DasSource[] sources = reader.readDasSource(url);
         

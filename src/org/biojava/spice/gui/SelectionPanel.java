@@ -149,8 +149,10 @@ implements StructureListener
         
         this.repaint();
         if ( splitPanel != null) {
-        	splitPanel.repaint();
-        	splitPanel.setDividerLocation(160);
+            
+            splitPanel.setDividerLocation(150);
+            splitPanel.repaint();
+            
         }
     
         
@@ -186,7 +188,7 @@ implements StructureListener
         if ( strucAli == null)
             strucAli = new StructureAlignment(null);
         
-        int pos = strucAli.getFirstSelectedPos();
+        int pos = strucAli.getLastSelectedPos();
         if ( pos > -1){
             try {
                 Structure selected = strucAli.getStructure(pos);

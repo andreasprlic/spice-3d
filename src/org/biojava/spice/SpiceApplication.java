@@ -199,10 +199,10 @@ ConfigurationListener
          
         
         if (params.getStructureAlignmentMode().equals(SpiceDefaults.CASPCOORDSYS)){
-        	browserPane = new BrowserPane(params.getPdbcoordsys());
+        	    browserPane = new BrowserPane(params.getPdbcoordsys());
         } else  {
         	// init the 2D display
-        	browserPane = new BrowserPane(params.getPdbcoordsys(),params.getUniprotcoordsys(), params.getEnspcoordsys());
+        	    browserPane = new BrowserPane(params.getPdbcoordsys(),params.getUniprotcoordsys(), params.getEnspcoordsys());
         }
         structurePanel      = new StructurePanel();
         jmolSpiceTranslator = new JmolSpiceTranslator();
@@ -375,7 +375,7 @@ ConfigurationListener
         Box vBox = Box.createVerticalBox();
        
         Box vBox2 = Box.createVerticalBox();
-        structurePanel.setMinimumSize(new Dimension(200,200));
+        //structurePanel.setMinimumSize(new Dimension(200,200));
         vBox2.add(structurePanel);
         
         strucommand.setMaximumSize(new Dimension(Short.MAX_VALUE,30));    
@@ -409,7 +409,7 @@ ConfigurationListener
             mainsharedPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, sharedPanel,vBox2);
         
         mainsharedPanel.setOneTouchExpandable(true);
-        mainsharedPanel.setResizeWeight(0.7);
+        mainsharedPanel.setResizeWeight(0.5);
         
         mainsharedPanel.setPreferredSize(new Dimension(790, 590));
           

@@ -423,8 +423,8 @@ public abstract class AbstractChainRenderer
             aminosize = 1;
         int w = Math.round(l*scale) + aminosize+  SequenceScalePanel.DEFAULT_X_START + SequenceScalePanel.DEFAULT_X_RIGHT_BORDER;
         
-        if ( w  < 200){
-            w = 200;
+        if ( w  < 100){
+            w = 100;
         }
         //logger.info("displayWidth " + w + " scale" +scale + " length"+ l);
         return w;

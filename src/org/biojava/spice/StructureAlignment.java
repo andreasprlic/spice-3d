@@ -356,9 +356,25 @@ public class StructureAlignment {
         return -1;
     }
     
+    
+    /** get the position of the first selected structure
+     * or -1 if none selected.
+     * 
+     * @return first selected structure position
+     */
+    public int getLastSelectedPos(){
+        for (int i =selection.length -1 ; i>=0 ;i--){
+            if (selection[i])
+                return i;
+        }
+        return -1;
+    }
+    
+    
+    
     public String getRasmolScript(){
     
-        return getRasmolScript(getFirstSelectedPos()); 
+        return getRasmolScript(getLastSelectedPos()); 
             
         
     }
@@ -482,7 +498,7 @@ public class StructureAlignment {
      */
     public Structure createArtificalStructure(){
         
-        int firstOne = getFirstSelectedPos() ;        
+        int firstOne = getLastSelectedPos() ;        
          
         return createArtificalStructure(firstOne);
         
@@ -718,7 +734,7 @@ public class StructureAlignment {
         
         if (alignment == null)
             return null;
-        logger.info("get structure range for " + s.getPDBCode());
+        logger.fine("get structure range for " + s.getPDBCode());
         
         // check if the alignment has an object detail "region" for this
         // if yes = restrict the used structure...

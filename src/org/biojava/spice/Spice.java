@@ -187,7 +187,8 @@ class SpiceRunnable implements Runnable {
     }
     
 
-    /** set  a couple of System Properties also contains some hacks around some strange implementation differences*/
+    /** set  a couple of System Properties. 
+     * Also contains some hacks around some strange implementation differences*/
    
     private void setSystemProperties(){
     	

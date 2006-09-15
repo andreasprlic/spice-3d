@@ -50,7 +50,6 @@ import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 
 import org.biojava.spice.ResourceManager;
-import org.biojava.spice.gui.msdkeyword.Deposition;
 import org.biojava.spice.gui.msdkeyword.MSDKeywordSearch;
 import org.biojava.spice.utils.JNLPProxy;
 

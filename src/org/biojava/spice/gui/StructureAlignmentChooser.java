@@ -246,7 +246,8 @@ StructureAlignmentListener {
                     box.repaint();
                     // display the first one that is selected
                     // set the color to that one 
-                    int j = structureAlignment.getFirstSelectedPos();
+                    //int j = structureAlignment.getFirstSelectedPos();
+                    int j = structureAlignment.getLastSelectedPos();
                     if ( j > -1) {
                   
                         Color col = structureAlignment.getColor(j);
