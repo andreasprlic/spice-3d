@@ -89,7 +89,6 @@ public class MSDKeywordSearch {
         
         InputStream dasInStream =open(url); 
         
-        
         SAXParserFactory spfactory =
             SAXParserFactory.newInstance();
         

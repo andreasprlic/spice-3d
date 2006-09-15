@@ -49,7 +49,12 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 
+import org.biojava.spice.ResourceManager;
+import org.biojava.spice.gui.msdkeyword.Deposition;
+import org.biojava.spice.gui.msdkeyword.MSDKeywordSearch;
 import org.biojava.spice.utils.JNLPProxy;
+
+
 
 public class StatusPanel extends JPanel {
     public static final long serialVersionUID= 309781239871208973l;
@@ -65,9 +70,17 @@ public class StatusPanel extends JPanel {
     
     public static Logger logger =  Logger.getLogger("org.biojava.spice");
     
-    static Color BG_COLOR = Color.WHITE;
+    static Color BG_COLOR;
     
-   
+    static {
+        String c = ResourceManager.getString("org.biojava.spice.manypanel.renderer.BackgroundColor");
+        
+        BG_COLOR = Color.decode(c);
+    }
+    
+    static String PDB_TYPE = "PDB";
+    static MSDKeywordSearch msdSearch = new MSDKeywordSearch();
+    DescMouseListener descMouseListener;
     
     public StatusPanel() {
         super();
@@ -116,18 +129,7 @@ public class StatusPanel extends JPanel {
         description.setBackground(BG_COLOR);
         hBox.add(description);   
         
-        //TODO: enable this again
-        /*
-        DescMouseListener descMouseListener = new DescMouseListener();
-        
-          //pdbdescMouseListener.setPDBHeader(new HashMap());
        
-        pdbdescMouseListener.setHeader(pdbheader);
-        pdbDescription.addMouseListener(pdbdescMouseListener);
-        pdbDescription.addMouseMotionListener(pdbdescMouseListener);
-        
-        hBox.add(pdbDescription);
-        */
         hBox.add(Box.createHorizontalGlue());
         
         
@@ -158,6 +160,29 @@ public class StatusPanel extends JPanel {
         accessionCode.setText(ac);
         accessionCode.repaint();
         
+        if ( dbName.getText().equals(PDB_TYPE)) {
+            logger.info("fetching PDB description");
+            // trigger fetch of PDB description
+            /*Deposition[] result = msdSearch.search(ac);
+            if ( result.length > 0) {
+                Deposition d = result[0];
+                System.out.println(d);
+                Map m = new HashMap();
+                
+                m.put("classification",d.getClassification());
+                
+                m.put("title",d.getTitle());
+                m.put("exp data",d.getExpData());
+                m.put("resolution",d.getResolution()+"");
+                m.put("r-factor",d.getRfactor()+"");
+                
+                descMouseListener.setPDBHeader(m);
+                setDescription(d.toString());
+                
+            }
+            */
+        }
+        
     }
     
     public void setDescription(String d){
@@ -168,6 +193,19 @@ public class StatusPanel extends JPanel {
     
     public void setName(String n){
         dbName.setText(n);
+        
+        if ( n.equals(PDB_TYPE)) {
+        
+            descMouseListener = new DescMouseListener();
+            
+            //pdbdescMouseListener.setPDBHeader(new HashMap());
+                        
+            description.addMouseListener(descMouseListener);
+            description.addMouseMotionListener(descMouseListener);
+            
+           
+        }
+        
         
        
     }
