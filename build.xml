@@ -17,7 +17,8 @@
     compile-tests     compiles JUnit tests
     compile-demos     compiles the demo files
     compile-apps      compiles the application files
-    package-spice     builds the spice.jar file (default)
+    package-spice     builds the spice.jar file
+    copy-jar          build spice and copies it into the WWW subdir
     package-demos     builds the demos.jar file
     package-apps      builds the jar.apps file
     runtests          runs all tests (requires Ant 1.6.0 or later)
@@ -46,7 +47,7 @@
 
 -->
 
-<project name="spice" default="package-spice" basedir=".">
+<project name="spice" default="copy-jar" basedir=".">
 
   <!-- Checks environment and setup variables -->
   <target name="init" description="Checks environment and setup variables">
@@ -469,15 +470,22 @@
 </target>
 
 
-  <!-- copy into WWW dir -->
-  <target name="www" depends="package-spice"
-  description="copy into WWW dir">
+  <target name="copy-jar" 
+  depends="package-spice"
+  description="copy jar file into WWW dir">
     <copy todir="${www.dir}">
       <fileset dir="${build.dir}">
         <include name="${name.spice}.jar" />
         <exclude name="${docbook.tools.file}" />
       </fileset>
     </copy>
+
+
+  </target>
+
+  <!-- copy into WWW dir -->
+  <target name="www" depends="package-spice,copy-jar"
+  description="sign the spice.jar for public releas via the web">
     
     <signjar jar="${www.dir}/${name.spice}.jar" 
 	     alias="" 
