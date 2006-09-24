@@ -23,29 +23,44 @@
 package org.biojava.spice.gui;
 
 import java.awt.Color;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JCheckBox;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+
 //import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
+import javax.swing.border.Border;
 
+import org.biojava.bio.structure.Calc;
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.StructureException;
+import org.biojava.bio.structure.jama.Matrix;
 import org.biojava.spice.manypanel.eventmodel.StructureAlignmentListener;
 import org.biojava.dasobert.eventmodel.SequenceEvent;
 import org.biojava.dasobert.eventmodel.SequenceListener;
 import org.biojava.dasobert.eventmodel.StructureEvent;
 import org.biojava.dasobert.eventmodel.StructureListener;
 import org.biojava.spice.StructureAlignment;
+import org.biojava.spice.panel.StructurePanel;
 import org.biojava.spice.panel.StructurePanelListener;
+import org.jmol.api.JmolViewer;
+
+import javax.vecmath.Matrix3f;
 
 /** a JPanel that contains radio buttons to choose, which structures to show superimposed
  * 
@@ -70,6 +85,10 @@ StructureAlignmentListener {
     
     int referenceStructure; // the structure at that position is the first one 
     
+    JTextField searchBox;
+    JScrollPane scroller;
+    StructurePanel structurePanel;
+    
     public StructureAlignmentChooser() {
         super();
         
@@ -82,6 +101,26 @@ StructureAlignmentListener {
         
         this.add(vBox);
         referenceStructure = -1;
+        
+        searchBox = new JTextField();
+        searchBox.setEditable(true);
+        searchBox.addKeyListener(new MyKeyListener(this));
+    }
+    
+    public void setStructurePanel(StructurePanel panel){
+        this.structurePanel = panel;
+    }
+    
+    public void setScroller(JScrollPane scroll){
+        this.scroller = scroll;
+    }
+    
+    protected JScrollPane getScroller(){
+        return scroller;
+    }
+    
+    public JTextField getSearchBox() {
+        return searchBox;
     }
     
     public void clearListeners(){
@@ -140,9 +179,9 @@ StructureAlignmentListener {
                 UIManager.put("CheckBox.highlite", col);
                 
             } else if ( i == 1){
-            	 UIManager.put("CheckBox.background", background);
-                 UIManager.put("CheckBox.interiorBackground", background);
-                 UIManager.put("CheckBox.highlite", background);
+                UIManager.put("CheckBox.background", background);
+                UIManager.put("CheckBox.interiorBackground", background);
+                UIManager.put("CheckBox.highlite", background);
             }
             JCheckBox b = new JCheckBox(id);
             boolean selected = false;
@@ -151,22 +190,22 @@ StructureAlignmentListener {
             
             if ( i == 0) {
                 
-            	
-               
-            	
-            	selected = true;
+                
+                
+                
+                selected = true;
                 
                 referenceStructure = 0;
                 structureAlignment.select(0);
-                                
+                
                 System.setProperty("SPICE:StructureRegionColor",new Integer(col.getRGB()).toString());                                      
-               
+                
                 try {
                     structureAlignment.getStructure(i);
                 } catch (StructureException e){
                     selected = false;
                 };
-               
+                
                 
             }
             
@@ -226,6 +265,10 @@ StructureAlignmentListener {
         }
     }
     
+    protected List getCheckBoxes() {
+        return checkButtons;
+    }
+    
     public void itemStateChanged(ItemEvent e) {
         
         Object source = e.getItemSelectable();
@@ -249,11 +292,11 @@ StructureAlignmentListener {
                     //int j = structureAlignment.getFirstSelectedPos();
                     int j = structureAlignment.getLastSelectedPos();
                     if ( j > -1) {
-                  
+                        
                         Color col = structureAlignment.getColor(j);
                         System.setProperty("SPICE:StructureRegionColor",new Integer(col.getRGB()).toString());
                         
-                                              
+                        
                     }
                     referenceStructure = j;
                     
@@ -266,7 +309,7 @@ StructureAlignmentListener {
                     UIManager.put("CheckBox.background", col);
                     UIManager.put("CheckBox.interiorBackground", col);
                     UIManager.put("CheckBox.highlite", col);
-                   
+                    
                     box.setBackground(col);
                     box.repaint();
                     
@@ -276,29 +319,33 @@ StructureAlignmentListener {
                         struc = structureAlignment.getStructure(i);
                         referenceStructure = i;
                         if ( struc.size() > 0) {
-                        	Chain c1 = struc.getChain(0);
-                        	String sequence = c1.getSequence();
-                        	String ac = id + "." + c1.getName();
-
-                        	SequenceEvent sevent = new SequenceEvent(ac,sequence);
-                        	//logger.info("*** seqeunce event " + ac);
-                        	Iterator iter3 = pdbSequenceListeners.iterator();
-                        	while (iter3.hasNext()){
-                        		SequenceListener li = (SequenceListener)iter3.next();
-                        		li.newSequence(sevent);
-                        	}
+                            Chain c1 = struc.getChain(0);
+                            String sequence = c1.getSequence();
+                            String ac = id + "." + c1.getName();
+                            
+                            SequenceEvent sevent = new SequenceEvent(ac,sequence);
+                            //logger.info("*** seqeunce event " + ac);
+                            Iterator iter3 = pdbSequenceListeners.iterator();
+                            while (iter3.hasNext()){
+                                SequenceListener li = (SequenceListener)iter3.next();
+                                li.newSequence(sevent);
+                            }
                         } else {
-                        	logger.warning("could not load structure at position " +i );
+                            logger.warning("could not load structure at position " +i );
                         }
                         
                     } catch (StructureException ex){
                         ex.printStackTrace();
                         structureAlignment.deselect(i);
                         //return;
-                       JCheckBox b = (JCheckBox) source;
-                       b.setSelected(false);
+                        JCheckBox b = (JCheckBox) source;
+                        b.setSelected(false);
                     }
                 }
+                
+                
+                
+                Matrix jmolRotation = getJmolRotation();
                 
                 
                 
@@ -318,7 +365,13 @@ StructureAlignmentListener {
                     cmd = structureAlignment.getRasmolScript(i);                    
                 }
                 
-                
+//                if ( newStruc != null){
+//                    if ( jmolRotation != null){
+//                        Structure clonedStruc = (Structure) newStruc.clone();
+//                        Calc.rotate(clonedStruc,jmolRotation);
+//                        newStruc = clonedStruc;
+//                    }
+//                }
                 StructureEvent event = new StructureEvent(newStruc);
                 Iterator iter2 = structureListeners.iterator();
                 while (iter2.hasNext()){
@@ -331,16 +384,194 @@ StructureAlignmentListener {
                     
                 }
                 
-                
-                
+                rotateJmol(jmolRotation);
+            }
+           
+        }
+        
+    }
+    
+    
+    private double rad2deg(double radians){
+        return radians *  (3.14/180);
+    }
+    
+    private void rotateJmol(Matrix jmolRotation) {
+        if ( structurePanel != null){
+            if ( jmolRotation != null) {
+                jmolRotation.print(3,3);
+                //double[] eu = Calc.getXYZEuler(jmolRotation);
+                //Matrix test = Calc.matrixFromEuler(eu[0],eu[1],eu[2]);
+                //test.print(3,3);
+                //System.out.println("rotating jmol " + eu[0] + " " + eu[1] + " " + eu[2]);
+                //String deg = "" + ( eu[0] *  (3.14/180));
+                //System.out.println(eu[0] + " rad = deg: " + deg);
+                JmolViewer jmol = structurePanel.getViewer();
                
+                double[] zyz = Calc.getZYZEuler(jmolRotation);
+                System.out.println(" rZ " +zyz[0] + "  ry " + zyz[1]+ " rZ " + zyz[2]);
+                //zyz = new double[]{140,112,-100};
+               
+               
+                //jmol.rotateToX((float)rad2deg(eu[0]));
+                //jmol.rotateToY((float)rad2deg(eu[1]));
+                //jmol.rotateToZ((float)rad2deg(eu[2]));
+              
+                //System.out.println(jmol.isScriptExecuting());
                 
+                //reset; rotate z 142.8; rotate y 92.9; rotate z -129.8;
+                //reset; rotate z 175.1; rotate y 93.8; rotate z -108.2;
+                //jmol.homePosition();
+                /*jmol.rotateFront();
+                jmol.rotateToZ((float)-zyz[0]);
+                jmol.rotateToY((float)zyz[1]);
+                jmol.rotateToZ((float)zyz[2]);
+                */
+                String script = "reset; rotate z "+zyz[0] +"; rotate y " + zyz[1] +"; rotate z"+zyz[2]+";";
+                structurePanel.executeCmd(script);
+                //String rasmol = "moveto 0 -34 997 -66 0 100 0 0 ";
+                //String rasmol = "moveto 0 "  + eu[0] + " " + eu[1] + " " + eu[2] + " 0 100 0 0;";
+                //System.out.println(rasmol);
+                //structurePanel.executeCmd(rasmol);
+                //Matrix check = getJmolRotation();
+                //check.print(3,3);
+            }
+        }
+    }
+    
+    
+    //private float[] getZYZEuler(Matrix m) {
+        
+    
+       /*
+        int zoom = getZoomPercent();
+        if (zoom != 100) {
+          sb.append("; zoom ");
+          sb.append(zoom);
+        }
+        int tX = (int) getTranslationXPercent();
+        if (tX != 0) {
+          sb.append("; translate x ");
+          sb.append(tX);
+        }
+        int tY = (int) getTranslationYPercent();
+        if (tY != 0) {
+          sb.append("; translate y ");
+          sb.append(tY);
+        }
+        sb.append(';');
+        return "" + sb;*/
+     // }
+    
+    
+    /** get the rotation out of Jmol 
+     * 
+     * @return the jmol rotation matrix
+     */
+    private Matrix getJmolRotation(){
+        Matrix jmolRotation = null;
+        if ( structurePanel != null){
+            //structurePanel.executeCmd("show orientation;");
+            JmolViewer jmol = structurePanel.getViewer();
+            Object obj = jmol.getProperty(null,"transformInfo","");
+            //System.out.println(obj);
+            if ( obj instanceof Matrix3f ) {
+                Matrix3f max = (Matrix3f) obj;
+                jmolRotation = new Matrix(3,3);
+                for (int x=0; x<3;x++) {
+                    for (int y=0 ; y<3;y++){
+                        float val = max.getElement(x,y);
+                        //System.out.println("x " + x + " y " + y + " " + val);
+                        jmolRotation.set(x,y,val);
+                    }
+                }
                 
+            }                             
+        }    
+        return jmolRotation;
+    }
+}
+
+class MyKeyListener extends KeyAdapter {
+    
+    StructureAlignmentChooser chooser;
+    
+    public MyKeyListener(StructureAlignmentChooser chooser){
+        this.chooser = chooser;
+    }
+    
+    public void keyPressed(KeyEvent evt) {
+
+        JTextField txt = (JTextField) evt.getSource();
+        char ch = evt.getKeyChar();
+        
+        String search = txt.getText();
+        
+        // If a printable character add to search text
+        if (ch != KeyEvent.CHAR_UNDEFINED) {
+            if ( ch != KeyEvent.VK_ENTER )
+                if ( ch != KeyEvent.VK_HOME )
+                    search += ch;
+        }
+         
+        //System.out.println("search text: " + search);
+        StructureAlignment ali = chooser.getStructureAlignment();
+        String[] ids = ali.getIds();
+        if ( search.equals("")){
+            search = "no search provided";
+        }
+        
+        Border b = BorderFactory.createMatteBorder(3,3,3,3,Color.blue);
+        
+        List checkBoxes = chooser.getCheckBoxes();
+        boolean firstFound = false;
+        
+        JScrollPane scroller = chooser.getScroller();
+        int  h = 0;
+        for (int i=0; i <ids.length;i++){
+            JCheckBox box = (JCheckBox) checkBoxes.get(i);
+            
+            if ( ids[i].indexOf(search) > -1) {
+                // this is the selected label
+                //System.out.println("selected label " + ids[i]);
+                box.setBorder(b);
+                box.setBorderPainted(true);
+                
+                if ( ! firstFound ) {
+                    // scroll to this position
+                    if ( scroller != null){
+                        scroller.getViewport().setViewPosition(new Point (0,h));
+                    }
+                }
+                firstFound = true;
+                
+            } else {
+                // clear checkbutton
+                box.setBorderPainted(false);
+            }
+            box.repaint();
+            h+= box.getHeight();
+        }
+        if (! firstFound) {
+            if ( ( search.length() > 0) && (ch != KeyEvent.CHAR_UNDEFINED) ) {
+                if (! (ch == KeyEvent.VK_BACK_SPACE)) {
+                    Toolkit.getDefaultToolkit().beep();
+                }
             }
         }
         
-        
-        
-        
+        // Get pressed character
+         
+        else if ( ch == KeyEvent.VK_ENTER) {
+            // if keyPressed = Enter, search from startpos +1
+            
+        }
+        else if ( ch == KeyEvent.VK_HOME) {
+            // if keyPressed = Home , move to first character.
+            
+            
+        } 
     }
 }
+
+

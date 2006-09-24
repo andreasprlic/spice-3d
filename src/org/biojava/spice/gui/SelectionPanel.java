@@ -23,16 +23,22 @@
 package org.biojava.spice.gui;
 
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTextField;
+
 
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.Structure;
@@ -43,6 +49,7 @@ import org.biojava.dasobert.eventmodel.StructureEvent;
 import org.biojava.dasobert.eventmodel.StructureListener;
 import org.biojava.spice.StructureAlignment;
 import org.biojava.spice.manypanel.eventmodel.StructureAlignmentListener;
+import org.biojava.spice.panel.StructurePanel;
 
 /** a class that eithe provides a JList or a JCheckbox,
  * depending if spice is running in structure alignment mode or
@@ -83,7 +90,7 @@ implements StructureListener
         chainDisplay = new SpiceChainDisplay(chainList);
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         
-        hBox = Box.createHorizontalBox(); 
+        hBox = Box.createVerticalBox(); 
         this.add(hBox);
         
         chainList.addListSelectionListener(chainDisplay);
@@ -130,6 +137,11 @@ implements StructureListener
         return chainDisplay.getChain(chainnumber);
     }
     
+    
+    public void setStructurePanel(StructurePanel panel){
+        alignmentChooser.setStructurePanel(panel);
+    }
+    
     public void setStructureAlignment(StructureAlignment strucAli){
         //structureAlignment = strucAli;
     	
@@ -139,7 +151,29 @@ implements StructureListener
         
         JScrollPane scroll = new JScrollPane(alignmentChooser);
         hBox.add(scroll);
+      
+        alignmentChooser.setScroller(scroll);
         
+        Box horBox = Box.createHorizontalBox();
+        JTextField searchBox = alignmentChooser.getSearchBox();
+        horBox.add(searchBox);
+        
+        /*Action action = new AbstractAction("X") {
+            
+            private static final long serialVersionUID = 1L;
+
+            // This method is called when the button is pressed
+            public void actionPerformed(ActionEvent evt) {
+                JTextField searchBox = alignmentChooser.getSearchBox();
+                searchBox.setText("");
+            }
+        };
+        
+        JButton b = new JButton(action);
+        horBox.add(b);
+        */
+        hBox.add(horBox);
+      
         
         Dimension dim = new Dimension(100,200);
         logger.finest("setting selection panel size" + dim);

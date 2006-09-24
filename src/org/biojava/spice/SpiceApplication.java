@@ -382,7 +382,7 @@ ConfigurationListener
         vBox2.add(strucommand);
         
         selectionPanel = new SelectionPanel();
-                     
+        selectionPanel.setStructurePanel(structurePanel);
         
         JScrollPane chainPanel = new JScrollPane(selectionPanel);
         
@@ -443,6 +443,7 @@ ConfigurationListener
         browserPane.clearListeners();
         jmolSpiceTranslator.clearListeners();
         selectionPanel.clearListeners();
+        selectionPanel.setStructurePanel(null);
        
           
     }
