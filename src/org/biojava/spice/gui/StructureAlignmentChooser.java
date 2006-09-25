@@ -89,6 +89,10 @@ StructureAlignmentListener {
     JScrollPane scroller;
     StructurePanel structurePanel;
     
+    public final static float radiansPerDegree = (float) (2 * Math.PI / 360);
+    public final static float degreesPerRadian = (float) (360 / (2 * Math.PI));
+    
+    
     public StructureAlignmentChooser() {
         super();
         
@@ -476,14 +480,14 @@ StructureAlignmentListener {
      */
     public static double[] getZYZEuler(Matrix m) {
         double m22 = m.get(2,2);
-        double rY = (float) Math.acos(m22) * Calc.degreesPerRadian;
+        double rY = (float) Math.acos(m22) * degreesPerRadian;
         double rZ1, rZ2;
         if (m22 > .999d || m22 < -.999d) {
-          rZ1 = (double) Math.atan2(m.get(1,0),  m.get(1,1)) * Calc.degreesPerRadian;
+          rZ1 = (double) Math.atan2(m.get(1,0),  m.get(1,1)) * degreesPerRadian;
           rZ2 = 0;
         } else {
-          rZ1 = (double) Math.atan2(m.get(2,1), -m.get(2,0)) * Calc.degreesPerRadian;
-          rZ2 = (double) Math.atan2(m.get(1,2),  m.get(0,2)) * Calc.degreesPerRadian;
+          rZ1 = (double) Math.atan2(m.get(2,1), -m.get(2,0)) * degreesPerRadian;
+          rZ2 = (double) Math.atan2(m.get(1,2),  m.get(0,2)) * degreesPerRadian;
         }
         return new double[] {rZ1,rY,rZ2};
     }
