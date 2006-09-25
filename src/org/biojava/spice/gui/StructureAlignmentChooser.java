@@ -391,77 +391,22 @@ StructureAlignmentListener {
         
     }
     
-    
-    private double rad2deg(double radians){
-        return radians *  (3.14/180);
-    }
+   
     
     private void rotateJmol(Matrix jmolRotation) {
         if ( structurePanel != null){
             if ( jmolRotation != null) {
-                jmolRotation.print(3,3);
-                //double[] eu = Calc.getXYZEuler(jmolRotation);
-                //Matrix test = Calc.matrixFromEuler(eu[0],eu[1],eu[2]);
-                //test.print(3,3);
-                //System.out.println("rotating jmol " + eu[0] + " " + eu[1] + " " + eu[2]);
-                //String deg = "" + ( eu[0] *  (3.14/180));
-                //System.out.println(eu[0] + " rad = deg: " + deg);
-                JmolViewer jmol = structurePanel.getViewer();
-               
+ 
                 double[] zyz = Calc.getZYZEuler(jmolRotation);
-                System.out.println(" rZ " +zyz[0] + "  ry " + zyz[1]+ " rZ " + zyz[2]);
-                //zyz = new double[]{140,112,-100};
-               
-               
-                //jmol.rotateToX((float)rad2deg(eu[0]));
-                //jmol.rotateToY((float)rad2deg(eu[1]));
-                //jmol.rotateToZ((float)rad2deg(eu[2]));
-              
-                //System.out.println(jmol.isScriptExecuting());
-                
-                //reset; rotate z 142.8; rotate y 92.9; rotate z -129.8;
-                //reset; rotate z 175.1; rotate y 93.8; rotate z -108.2;
-                //jmol.homePosition();
-                /*jmol.rotateFront();
-                jmol.rotateToZ((float)-zyz[0]);
-                jmol.rotateToY((float)zyz[1]);
-                jmol.rotateToZ((float)zyz[2]);
-                */
+
                 String script = "reset; rotate z "+zyz[0] +"; rotate y " + zyz[1] +"; rotate z"+zyz[2]+";";
                 structurePanel.executeCmd(script);
-                //String rasmol = "moveto 0 -34 997 -66 0 100 0 0 ";
-                //String rasmol = "moveto 0 "  + eu[0] + " " + eu[1] + " " + eu[2] + " 0 100 0 0;";
-                //System.out.println(rasmol);
-                //structurePanel.executeCmd(rasmol);
-                //Matrix check = getJmolRotation();
-                //check.print(3,3);
+                
             }
         }
     }
     
     
-    //private float[] getZYZEuler(Matrix m) {
-        
-    
-       /*
-        int zoom = getZoomPercent();
-        if (zoom != 100) {
-          sb.append("; zoom ");
-          sb.append(zoom);
-        }
-        int tX = (int) getTranslationXPercent();
-        if (tX != 0) {
-          sb.append("; translate x ");
-          sb.append(tX);
-        }
-        int tY = (int) getTranslationYPercent();
-        if (tY != 0) {
-          sb.append("; translate y ");
-          sb.append(tY);
-        }
-        sb.append(';');
-        return "" + sb;*/
-     // }
     
     
     /** get the rotation out of Jmol 
