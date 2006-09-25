@@ -48,6 +48,7 @@ import javax.swing.border.Border;
 
 
 import org.biojava.bio.Annotation;
+
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.StructureException;
@@ -363,6 +364,8 @@ StructureAlignmentListener {
                             }
                         } else {
                             logger.warning("could not load structure at position " +i );
+                            JCheckBox b = (JCheckBox) source;
+                            b.setSelected(false);
                         }
                         
                     } catch (StructureException ex){
@@ -427,9 +430,9 @@ StructureAlignmentListener {
             if ( jmolRotation != null) {
  
                 double[] zyz = getZYZEuler(jmolRotation);
-
+                
                 String script = "reset; rotate z "+zyz[0] +"; rotate y " + zyz[1] +"; rotate z"+zyz[2]+";";
-                //System.out.println(script);
+
                 structurePanel.executeCmd(script);
                 /*structurePanel.executeCmd("show orientation");
                 JmolViewer viewer = structurePanel.getViewer();
@@ -630,18 +633,7 @@ class MyKeyListener extends KeyAdapter {
                 }
             }
         }
-        
-        // Get pressed character
-         
-        else if ( ch == KeyEvent.VK_ENTER) {
-            // if keyPressed = Enter, search from startpos +1
-            
-        }
-        else if ( ch == KeyEvent.VK_HOME) {
-            // if keyPressed = Home , move to first character.
-            
-            
-        } 
+               
     }
     
    

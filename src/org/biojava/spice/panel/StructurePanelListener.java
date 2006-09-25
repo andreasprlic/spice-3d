@@ -156,6 +156,7 @@ JmolCommander
        }
        
        this.structure=struc;
+       
        structurePanel.setStructure(structure);
        
        if ( structure.size() > 0)

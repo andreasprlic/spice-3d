@@ -132,7 +132,10 @@ implements JmolCommander
      */
     public void executeCmd(String command) {
         //logger.info(command);
-       
+        if (viewer.isScriptExecuting()) {
+        	logger.info("viewer is executing");
+        	try {wait(1000);} catch (Exception e) {}
+        }
         viewer.evalString(command);
         //viewer.evalStringSync(command);
         //viewer.scriptWaitVoid(command);
@@ -159,11 +162,11 @@ implements JmolCommander
         }       
         
         viewer.evalString("exit");
-        
+      
         String pdbstr = structure.toPDB();
-        //System.out.println(pdbstr);
+
         viewer.openStringInline(pdbstr);
-           
+        logger.info("done");
         String strError = viewer.getOpenFileError();
         
         if (strError != null) {
