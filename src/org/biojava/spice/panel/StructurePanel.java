@@ -161,7 +161,7 @@ implements JmolCommander
         viewer.evalString("exit");
         
         String pdbstr = structure.toPDB();
-        
+        //System.out.println(pdbstr);
         viewer.openStringInline(pdbstr);
            
         String strError = viewer.getOpenFileError();

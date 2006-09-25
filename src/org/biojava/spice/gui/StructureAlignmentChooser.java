@@ -32,6 +32,7 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -45,7 +46,8 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 
-import org.biojava.bio.structure.Calc;
+
+import org.biojava.bio.Annotation;
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.StructureException;
@@ -168,6 +170,7 @@ StructureAlignmentListener {
             return;
         }
         
+        Annotation[] objects = structureAlignment.getAlignment().getObjects();
         
         boolean[] selectedArr = ali.getSelection();
         
@@ -188,6 +191,30 @@ StructureAlignmentListener {
                 UIManager.put("CheckBox.highlite", background);
             }
             JCheckBox b = new JCheckBox(id);
+            
+            // get tooltip
+            String tooltip = "";
+            Annotation anno = objects[i];
+            List details = new ArrayList();
+           // System.out.println(anno);
+            try {
+                details = (List) anno.getProperty("details");
+            } catch (NoSuchElementException e){}
+            
+            if ( details != null) {
+            
+                Iterator iter = details.iterator();
+                while ( iter.hasNext()) {
+                    Annotation d = (Annotation) iter.next();
+                    String prop = (String) d.getProperty("property");
+                    String det  = (String) d.getProperty("detail");
+                    if (! tooltip.equals(""))
+                        tooltip += " | ";
+                    tooltip += prop + " " + det;
+                }                
+            }
+            b.setToolTipText(tooltip);
+            
             boolean selected = false;
             if (selectedArr[i])
                 selected = true;
@@ -395,8 +422,6 @@ StructureAlignmentListener {
         
     }
     
-   
-    
     private void rotateJmol(Matrix jmolRotation) {
         if ( structurePanel != null){
             if ( jmolRotation != null) {
@@ -404,14 +429,19 @@ StructureAlignmentListener {
                 double[] zyz = getZYZEuler(jmolRotation);
 
                 String script = "reset; rotate z "+zyz[0] +"; rotate y " + zyz[1] +"; rotate z"+zyz[2]+";";
+                //System.out.println(script);
                 structurePanel.executeCmd(script);
-                
+                /*structurePanel.executeCmd("show orientation");
+                JmolViewer viewer = structurePanel.getViewer();
+                System.out.println("rotating jmol ... " + script);
+                viewer.homePosition();
+                viewer.rotateToZ(Math.round(zyz[0]));
+                viewer.rotateToY(Math.round(zyz[1]));
+                viewer.rotateToZ(Math.round(zyz[2]));
+                */
             }
         }
     }
-    
-    
-    
     
     /** get the rotation out of Jmol 
      * 

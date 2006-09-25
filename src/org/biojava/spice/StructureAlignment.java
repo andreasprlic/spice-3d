@@ -224,6 +224,7 @@ public class StructureAlignment {
         Annotation[] maxs = alignment.getMatrices();
         
         Annotation[] objects = alignment.getObjects();
+        System.out.println(objects[0]);
         Annotation[] vectors = alignment.getVectors();
        
         
@@ -588,7 +589,11 @@ public class StructureAlignment {
         float saturation = 1.0f;
         float brightness = 1.0f;
         
-        float hue = (position % NR_COLS)* stepsize ;
+        int pos = ( position % NR_COLS );
+        
+        //System.out.println("color: position " + position + " nrSel " + nrSelected + " " + pos );
+        
+        float hue = ( pos * stepsize );
         Color col = Color.getHSBColor(hue,saturation,brightness);
         return col;
     }
@@ -687,7 +692,7 @@ public class StructureAlignment {
         Atom vector = shiftVectors[pos];
         
         //System.out.println("applying rotation matrix");
-        m.print(3,3);
+       // m.print(3,3);
         
         Calc.rotate(s,m);
         Calc.shift(s,vector);

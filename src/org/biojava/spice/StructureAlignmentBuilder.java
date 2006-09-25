@@ -155,8 +155,7 @@ implements AlignmentListener {
     
     public synchronized void newAlignment(AlignmentEvent e) {
         Alignment ali = e.getAlignment();
-        logger.info("got new alignment ");
-        
+        //logger.info("got new alignment ");
         
         StructureAlignment sali = new StructureAlignment(coordSys);
         try {
