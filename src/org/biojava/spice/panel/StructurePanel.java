@@ -134,7 +134,7 @@ implements JmolCommander
         //logger.info(command);
         if (viewer.isScriptExecuting()) {
         	logger.info("viewer is executing");
-        	try {wait(1000);} catch (Exception e) {}
+        	
         }
         viewer.evalString(command);
         //viewer.evalStringSync(command);
@@ -166,7 +166,7 @@ implements JmolCommander
         String pdbstr = structure.toPDB();
 
         viewer.openStringInline(pdbstr);
-        logger.info("done");
+       
         String strError = viewer.getOpenFileError();
         
         if (strError != null) {

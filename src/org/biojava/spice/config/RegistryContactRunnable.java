@@ -234,7 +234,7 @@ class RegistryContactRunnable implements Runnable {
     }
     
     
-    /*public class MyAuthenticator extends Authenticator {
+  /*  public class MyAuthenticator extends Authenticator {
         // This method is called when a password-protected URL is accessed
         protected PasswordAuthentication getPasswordAuthentication() {
         	logger.warning("using hard coded CASP authentication");
@@ -264,7 +264,7 @@ class RegistryContactRunnable implements Runnable {
        //logger.warning("remove hard coded name / password for CASP!");
         
         
-      //  Authenticator.setDefault(new MyAuthenticator());
+       //Authenticator.setDefault(new MyAuthenticator());
         
         DasSource[] sources = reader.readDasSource(url);
         
