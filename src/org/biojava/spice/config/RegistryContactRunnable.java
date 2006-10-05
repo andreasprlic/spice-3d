@@ -22,10 +22,8 @@
  */
 package org.biojava.spice.config;
 
-import java.net.Authenticator;
 
 import java.net.MalformedURLException;
-import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;

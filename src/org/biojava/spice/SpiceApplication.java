@@ -158,6 +158,7 @@ ConfigurationListener
     SpiceStartParameters startParameters;
     SpiceServer spiceServer;
     JMenuBar menu;
+    JMenu alignmentMenu;
     
    // JTabbedPane tabbedPane;
     Box vBox;
@@ -539,8 +540,8 @@ ConfigurationListener
         JMenu bm = browseMenu.getBrowsermenu();        
         menu.add(bm);
         
-        JMenu alig = MenuCreator.createAlignmentMenu(spiceMenuListener);
-        menu.add(alig);
+        alignmentMenu = MenuCreator.createAlignmentMenu(spiceMenuListener);
+        menu.add(alignmentMenu);
 
         menu.add(Box.createGlue());
         
@@ -790,8 +791,8 @@ ConfigurationListener
             
         };
         sacreator.addAlignmentListener(ali);
-      
-        
+        MenuAlignmentListener menuListener = new MenuAlignmentListener(alignmentMenu,selectionPanel.getAlignmentChooser());
+        sacreator.addAlignmentListener(menuListener);
         sacreator.request(alignmentCode);
     }
 

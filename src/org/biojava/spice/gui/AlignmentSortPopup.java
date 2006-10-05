@@ -33,7 +33,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import org.biojava.bio.Annotation;
@@ -46,18 +45,7 @@ import org.biojava.spice.StructureAlignmentComparator;
 public class AlignmentSortPopup 
 implements MouseListener, ActionListener
 {
-
-    
-    private static final String[] supportedDetails = new String[] { "LGA_S","LGA_Q","RMSD" };
-    
-    public static final List supportedDetailsList ;
-    
-    static {
-        
-        supportedDetailsList = Arrays.asList(supportedDetails);
-    }
-    
-    StructureAlignment alignment;
+    StructureAlignment structureAlignment;
     JPopupMenu menu ;
     
     StructureAlignmentChooser chooser;
@@ -66,53 +54,17 @@ implements MouseListener, ActionListener
     
     public AlignmentSortPopup(StructureAlignment alignment, StructureAlignmentChooser chooser, boolean sortReverse) {
         super();
-        this.alignment = alignment;
+        
+        this.structureAlignment = alignment;
         
         this.chooser = chooser;
         this.sortReverse = sortReverse;
         
         menu = new JPopupMenu();
-        JMenu sort = new JMenu("sort by");
-        menu.add(sort);
         
-        int nrs = alignment.getNrStructures();
-        
-        if (nrs < 2) {
-            return;
-        }
-
-        Alignment ali = alignment.getAlignment();
-        
-        Annotation[] annos = ali.getObjects();
-        Annotation a = annos[2];
-        
-        List details = (List) a.getProperty("details");
-        Iterator iter = details.iterator();
-        while (iter.hasNext()){
-            Annotation det = (Annotation) iter.next();
-            String property = (String) det.getProperty("property");
-            String value    = (String) det.getProperty("detail");
-            //System.out.println("prop " + property + " " + value);
-            
-            boolean okProperty = false;
-            Iterator iter2 = supportedDetailsList.iterator();
-            while (iter2.hasNext()){
-                String supported = (String)iter2.next();
-                if ( supported.equals(property)){
-                    okProperty = true;
-                    break;
-                }
-            }
-            
-            if ( okProperty) {
-                JMenuItem item = new JMenuItem(property);
-                sort.add(item);
+        JMenu sort = MenuAlignmentListener.getMenuFromAlignment(alignment.getAlignment(),this);
                 
-                item.addActionListener(this);
-            }
-            
-        }
-        
+        menu.add(sort);
         
     }
 
@@ -158,7 +110,7 @@ implements MouseListener, ActionListener
         
         //sorter.sort(e.getActionCommand(),sortReverse,alignment,chooser);
         
-        Alignment a = alignment.getAlignment();
+        Alignment a = structureAlignment.getAlignment();
         
         List oldobjects = Arrays.asList(a.getObjects());
         
@@ -181,7 +133,7 @@ implements MouseListener, ActionListener
         
         // copy objects form old location to new one ...
         List newobjects = Arrays.asList(objects);
-        int nr = alignment.getNrStructures();
+        int nr = structureAlignment.getNrStructures();
         
         Annotation[] oldmaxs = a.getMatrices();                     
         Annotation[] oldvectors = a.getVectors();
@@ -190,7 +142,7 @@ implements MouseListener, ActionListener
         Iterator iter = newobjects.iterator();
         int pos = 0;
         Alignment newa = new Alignment();
-        Structure[] oldstructs = alignment.getStructures();
+        Structure[] oldstructs = structureAlignment.getStructures();
         Structure[] newstructs = new Structure[nr];
         String[] accessionCodes = new String[nr];
         
@@ -219,14 +171,14 @@ implements MouseListener, ActionListener
             pos++;
         }
         
-        int oldselected = alignment.getLastSelectedPos();
+        int oldselected = structureAlignment.getLastSelectedPos();
         Annotation oldselobj = (Annotation)a.getObjects()[oldselected];
         int newselpos = newobjects.indexOf(oldselobj);
         
         
         
-        StructureAlignment newstrucalig = new StructureAlignment(alignment.getCoordinateSystem());
-        newstrucalig.setStructureServers(alignment.getStructureServers());
+        StructureAlignment newstrucalig = new StructureAlignment(structureAlignment.getCoordinateSystem());
+        newstrucalig.setStructureServers(structureAlignment.getStructureServers());
    
         try {
             newstrucalig.setAlignment(newa);
@@ -244,10 +196,10 @@ implements MouseListener, ActionListener
           
             int oldpos = oldobjects.indexOf(object);
             
-            if ( alignment.isLoaded(oldpos))
+            if ( structureAlignment.isLoaded(oldpos))
                 newstrucalig.setLoaded(i,true);
                         
-            if ( alignment.isSelected(oldpos))
+            if ( structureAlignment.isSelected(oldpos))
                 newstrucalig.setSelected(i,true);
         }
         
