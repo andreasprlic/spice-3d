@@ -232,11 +232,9 @@ ConfigurationListener
         statusPanel.setBorder(BorderFactory.createEmptyBorder());
         
         strucommand    = new StructureCommandPanel(structurePanelListener);
-        
-        //if ( params.isInitSpiceServer())
-        //    initSpiceServer();
-        
+                
         // initMenu should be before arrangePanels, because structurealignmentchooser needs the alignmentmenu
+        spiceMenuListener = new SpiceMenuListener(this,structurePanelListener) ;
         menu = initMenu();
         
         vBox = arrangePanels(statusPanel,structurePanel,browserPane,strucommand,"left"); 
@@ -245,19 +243,14 @@ ConfigurationListener
         this.add(vBox);
      
       
-        spiceMenuListener = new SpiceMenuListener(this,structurePanelListener) ;
+        
        
         
         memoryfeatures = new HashMap();
         features = new ArrayList();
-        
-      
        
         initListeners();
        
-        //firefoxIcon = createImageIcon("firefox.png");
-        
-        
         
     }
     

@@ -304,7 +304,4 @@ implements JmolStatusListener, StructureListener
         
     }
     
-  
-    
-    
 }

@@ -23,7 +23,6 @@
 package org.biojava.spice.gui;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ItemEvent;
@@ -181,7 +180,7 @@ StructureAlignmentListener {
             parent.remove(sort);
 
         AlignmentSortPopup sorter = new AlignmentSortPopup(structureAlignment, this, false);
-        sort = MenuAlignmentListener.getMenuFromAlignment(structureAlignment.getAlignment(),sorter);
+        sort = MenuAlignmentListener.getSortMenuFromAlignment(structureAlignment.getAlignment(),sorter);
         logger.info("added new menu item " + sort);
         parent.add(sort);     
         

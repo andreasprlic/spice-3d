@@ -22,7 +22,6 @@
  */
 package org.biojava.spice.gui;
 
-import java.awt.Component;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -48,6 +47,7 @@ public class MenuAlignmentListener implements AlignmentListener {
     }
     
     private static final String menuSortText = "sort by";
+    private static final String menuFilterText = "filter by";
     
     JMenu parent;
     JMenu sort;
@@ -59,21 +59,7 @@ public class MenuAlignmentListener implements AlignmentListener {
         this.chooser = chooser;
     }
     
-    public synchronized void newAlignment(AlignmentEvent e) {
-      
-        Component[] m = parent.getMenuComponents();
-        
-        for ( int i=0 ; i< m.length ;i++){
-            Component c = m[i];
-            if ( c instanceof JMenuItem) {
-                JMenuItem menuItem = (JMenuItem)c;
-                if ( menuItem.getText().equals(menuSortText)) {
-                    parent.remove(menuItem);
-                }
-            }
-        }
-        
-      
+    public  void newAlignment(AlignmentEvent e) {
         
     }
     
@@ -92,12 +78,28 @@ public class MenuAlignmentListener implements AlignmentListener {
         
     }
     
+    public static JMenu getFilterMenuFromAlignment(Alignment ali, ActionListener listener){
+    	JMenu filter = new JMenu(menuFilterText);
+    	 Annotation[] annos = ali.getObjects();
+         
+         if ( annos.length < 2)
+         	return filter;
+         
+         //Annotation a = annos[2];
+    	
+         return filter;
+    }
+   
     
-    public static JMenu getMenuFromAlignment(Alignment ali, ActionListener listener){
+    public static JMenu getSortMenuFromAlignment(Alignment ali, ActionListener listener){
         
         JMenu sort = new JMenu(menuSortText);
         
         Annotation[] annos = ali.getObjects();
+        
+        if ( annos.length < 2)
+        	return sort;
+        
         Annotation a = annos[2];
         
         List details = (List) a.getProperty("details");

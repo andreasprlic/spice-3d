@@ -22,18 +22,12 @@
  */
 package org.biojava.spice.gui;
 
-import java.awt.Component;
-import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
-
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.Group;
 import org.biojava.bio.structure.Structure;
@@ -327,23 +321,7 @@ SequenceListener
             // has been moved to BrowserPane !
         } else if (cmd.equals("Toggle full structure")) {
             
-            Object o = e.getSource();
-            System.out.println(o);
-            if ( o instanceof JMenuItem ){
-                JMenuItem menuitem = (JMenuItem)o;
-                Container parent = menuitem.getParent();
-                System.out.println(parent);
-                if ( parent instanceof JMenu ) {
-                    
-                    JMenu menu = (JMenu ) parent;
-                    Component[] items =  menu.getMenuComponents();
-                    for (int i=0 ; i < items.length; i++){
-                        System.out.println(items[i]);
-                    }
-                }
-            }
-            
-            
+                  
             String strucdisp = System.getProperty(structureDisplayProperty);
             if (strucdisp == null) {
                 System.setProperty(structureDisplayProperty,"show full");

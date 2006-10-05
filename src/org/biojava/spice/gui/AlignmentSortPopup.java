@@ -62,7 +62,9 @@ implements MouseListener, ActionListener
         
         menu = new JPopupMenu();
         
-        JMenu sort = MenuAlignmentListener.getMenuFromAlignment(alignment.getAlignment(),this);
+
+        JMenu sort = MenuAlignmentListener.getSortMenuFromAlignment(alignment.getAlignment(),this);
+
                 
         menu.add(sort);
         

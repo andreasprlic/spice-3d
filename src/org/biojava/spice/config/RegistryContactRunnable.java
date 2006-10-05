@@ -22,7 +22,6 @@
  */
 package org.biojava.spice.config;
 
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
