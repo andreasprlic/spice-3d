@@ -132,10 +132,9 @@ implements JmolCommander
      */
     public void executeCmd(String command) {
         //logger.info(command);
-        if (viewer.isScriptExecuting()) {
-        	logger.info("viewer is executing");
-        	
-        }
+        if (viewer.isScriptExecuting()) 
+            logger.info("viewer is executing");
+        
         viewer.evalString(command);
         //viewer.evalStringSync(command);
         //viewer.scriptWaitVoid(command);

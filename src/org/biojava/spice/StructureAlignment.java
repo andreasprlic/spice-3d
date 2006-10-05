@@ -75,10 +75,14 @@ public class StructureAlignment {
     
     boolean[] selection;
     boolean[] loaded ;
+    
     Das1Source[] structureServers;
     JFrame progressFrame;
+    
     Annotation[] sortedBlocks;
+    
     int nrSelected;
+    
     String[] rasmolScripts;
 
     JProgressBar progressBar;
@@ -113,15 +117,27 @@ public class StructureAlignment {
         loadedStructure = null;
     }
     
+    public DasCoordinateSystem getCoordinateSystem(){
+        return coordSys;
+    }
+    
     public void setStructureServers(Das1Source[] servers){
         structureServers = servers;
+    }
+    
+    public Das1Source[] getStructureServers(){
+        return structureServers;
     }
     
     public Alignment getAlignment() {
         return alignment;
     }
     
-    
+    public int getNrStructures(){
+        if ( structures == null)
+            return 0;
+        return structures.length;
+    }
     
     public boolean[] getLoaded() {
         return loaded;
@@ -682,7 +698,7 @@ public class StructureAlignment {
         drawer.terminate();
         
         if ( s == null)
-            throw new StructureException("Could not load structure at position " + pos);
+            throw new StructureException("Could not load structure at position " + pos + " " + pdbCode);
         
         
         
@@ -908,6 +924,23 @@ public class StructureAlignment {
         return blocks;
     }
     
+    public boolean isLoaded(int pos){
+        return loaded[pos];
+    }
+    
+    public void setLoaded(int pos, boolean flag){
+        loaded[pos] = flag;
+    }
+    
+    
+    public boolean isSelected(int pos){
+        return selection[pos];
+    }
+    
+    public void setSelected(int pos, boolean flag){
+        selection[pos] = flag;
+    }
+
     /** convert the Matrix annotation to a Matrix
      * 
      * @param anno

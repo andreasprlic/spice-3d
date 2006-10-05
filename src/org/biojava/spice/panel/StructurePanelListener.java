@@ -513,12 +513,14 @@ JmolCommander
             //feature.getSource();
             
             String type = feature.getType();
+            
             boolean cmdSet = false;
             String[] displayTypes = { "cartoon","wireframe","spacefill","backbone","ribbons"};
             if (( stylesheet != null ) &&( stylesheet.length>0)){
                 for (int m=0; m< stylesheet.length;m++){
                     Map s = stylesheet[m];
                     //logger.finest(" style:" + s);
+                    
                     String styleType = (String) s.get("type");
                     if ( styleType.equals(type)){
                         //logger.finest("coloring 3D stylesheet");

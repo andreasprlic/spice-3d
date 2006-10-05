@@ -95,6 +95,7 @@ StructureAlignmentListener {
     public final static float radiansPerDegree = (float) (2 * Math.PI / 360);
     public final static float degreesPerRadian = (float) (360 / (2 * Math.PI));
     
+    boolean sortReverse;
     
     public StructureAlignmentChooser() {
         super();
@@ -120,6 +121,11 @@ StructureAlignmentListener {
     
     public void setScroller(JScrollPane scroll){
         this.scroller = scroll;
+    }
+    
+    
+    public void setSortReverse(boolean direction){
+        sortReverse = direction;
     }
     
     protected JScrollPane getScroller(){
@@ -159,11 +165,13 @@ StructureAlignmentListener {
     }
     
     public void setStructureAlignment(StructureAlignment ali){
+        
         structureAlignment = ali;
         //logger.info("got new structure alignment");
         if ( (ali != null) && ( ali.getIds().length > 0) )
             System.setProperty("SPICE:drawStructureRegion","true");
         
+                
         clearButtons();
         if ( ali == null) {
             clearButtons();
@@ -171,27 +179,30 @@ StructureAlignmentListener {
             return;
         }
         
+        AlignmentSortPopup sorter = new AlignmentSortPopup(ali,this, sortReverse);
+        
         Annotation[] objects = structureAlignment.getAlignment().getObjects();
         
         boolean[] selectedArr = ali.getSelection();
-        
+      
         String[] ids = ali.getIds();
         Color background = getBackground();
         for ( int i=0; i< ids.length;i++){
             String id = ids[i];
             Color col = structureAlignment.getColor(i);
-            if ( i == 0 ){
+            if ( ( i == 0 ) || (structureAlignment.isSelected(i))){
                 
                 UIManager.put("CheckBox.background", col);
                 UIManager.put("CheckBox.interiorBackground", col);
                 UIManager.put("CheckBox.highlite", col);
                 
-            } else if ( i == 1){
+            } else {
                 UIManager.put("CheckBox.background", background);
                 UIManager.put("CheckBox.interiorBackground", background);
                 UIManager.put("CheckBox.highlite", background);
             }
             JCheckBox b = new JCheckBox(id);
+            b.addMouseListener(sorter);
             
             // get tooltip
             String tooltip = "";
@@ -221,9 +232,6 @@ StructureAlignmentListener {
                 selected = true;
             
             if ( i == 0) {
-                
-                
-                
                 
                 selected = true;
                 
@@ -338,6 +346,8 @@ StructureAlignmentListener {
                     Color col = structureAlignment.getColor(i);
                     
                     System.setProperty("SPICE:StructureRegionColor",new Integer(col.getRGB()).toString());                                      
+                    
+                    
                     UIManager.put("CheckBox.background", col);
                     UIManager.put("CheckBox.interiorBackground", col);
                     UIManager.put("CheckBox.highlite", col);

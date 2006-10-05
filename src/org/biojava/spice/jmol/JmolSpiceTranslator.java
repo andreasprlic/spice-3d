@@ -298,6 +298,11 @@ implements JmolStatusListener, StructureListener
         // TODO Auto-generated method stub
         
     }
+
+    public void createImage(String file, String type, int quality) {
+        // TODO Auto-generated method stub
+        
+    }
     
   
     
