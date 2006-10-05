@@ -101,6 +101,7 @@ StructureAlignmentListener {
     boolean sortReverse;
     JMenu parent;
     JMenuItem sort;
+    JMenuItem filter;
     
     public StructureAlignmentChooser(JMenu parent) {
         super();
@@ -182,10 +183,18 @@ StructureAlignmentListener {
         if ( sort != null)            
             parent.remove(sort);
 
+        if ( filter != null)
+            parent.remove(filter);
+        
         AlignmentSortPopup sorter = new AlignmentSortPopup(structureAlignment, this, false);
+        
+        AlignmentFilterActionListener filterAction = new AlignmentFilterActionListener(this);
+        
         sort = MenuAlignmentListener.getSortMenuFromAlignment(structureAlignment.getAlignment(),sorter);
-        logger.info("added new menu item " + sort);
         parent.add(sort);     
+        
+        filter = MenuAlignmentListener.getFilterMenuFromAlignment(structureAlignment.getAlignment(),filterAction);        
+        parent.add(filter);
         
       
     }
