@@ -160,7 +160,7 @@ public class StatusPanel extends JPanel {
         accessionCode.repaint();
         
         if ( dbName.getText().equals(PDB_TYPE)) {
-            logger.info("fetching PDB description");
+            //logger.info("fetching PDB description");
             // trigger fetch of PDB description
             /*Deposition[] result = msdSearch.search(ac);
             if ( result.length > 0) {

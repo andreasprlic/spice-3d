@@ -22,6 +22,7 @@
  */
 package org.biojava.spice.gui;
 
+import java.awt.Component;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -46,6 +47,7 @@ public class MenuAlignmentListener implements AlignmentListener {
         supportedDetailsList = Arrays.asList(supportedDetails);
     }
     
+    private static final String menuSortText = "sort by";
     
     JMenu parent;
     JMenu sort;
@@ -59,6 +61,18 @@ public class MenuAlignmentListener implements AlignmentListener {
     
     public synchronized void newAlignment(AlignmentEvent e) {
       
+        Component[] m = parent.getMenuComponents();
+        
+        for ( int i=0 ; i< m.length ;i++){
+            Component c = m[i];
+            if ( c instanceof JMenuItem) {
+                JMenuItem menuItem = (JMenuItem)c;
+                if ( menuItem.getText().equals(menuSortText)) {
+                    parent.remove(menuItem);
+                }
+            }
+        }
+        
         AlignmentSortPopup sorter = new AlignmentSortPopup(chooser.getStructureAlignment(), chooser, false);
         if ( sort != null)
             parent.remove(sort);
@@ -85,7 +99,7 @@ public class MenuAlignmentListener implements AlignmentListener {
     
     public static JMenu getMenuFromAlignment(Alignment ali, ActionListener listener){
         
-        JMenu sort = new JMenu("sort by");
+        JMenu sort = new JMenu(menuSortText);
         
         Annotation[] annos = ali.getObjects();
         Annotation a = annos[2];
