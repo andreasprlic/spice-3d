@@ -83,7 +83,7 @@ implements AlignmentListener {
         structureServers = new SpiceDasSource[0];
         structureListeners = new ArrayList();
         structurePanel = null;
-        selectionPanel = new SelectionPanel();
+        selectionPanel = new SelectionPanel(null);
         alignmentListeners = new ArrayList();
     }
     

@@ -236,6 +236,9 @@ ConfigurationListener
         //if ( params.isInitSpiceServer())
         //    initSpiceServer();
         
+        // initMenu should be before arrangePanels, because structurealignmentchooser needs the alignmentmenu
+        menu = initMenu();
+        
         vBox = arrangePanels(statusPanel,structurePanel,browserPane,strucommand,"left"); 
         
         this.setLayout(new BoxLayout(this,BoxLayout.X_AXIS));
@@ -248,7 +251,7 @@ ConfigurationListener
         memoryfeatures = new HashMap();
         features = new ArrayList();
         
-        menu = initMenu();
+      
        
         initListeners();
        
@@ -382,7 +385,9 @@ ConfigurationListener
         strucommand.setMaximumSize(new Dimension(Short.MAX_VALUE,30));    
         vBox2.add(strucommand);
         
-        selectionPanel = new SelectionPanel();
+        if ( alignmentMenu == null)
+            logger.warning("alignment menu has not been initialized!");
+        selectionPanel = new SelectionPanel(alignmentMenu);
         selectionPanel.setStructurePanel(structurePanel);
         
         JScrollPane chainPanel = new JScrollPane(selectionPanel);

@@ -73,11 +73,7 @@ public class MenuAlignmentListener implements AlignmentListener {
             }
         }
         
-        AlignmentSortPopup sorter = new AlignmentSortPopup(chooser.getStructureAlignment(), chooser, false);
-        if ( sort != null)
-            parent.remove(sort);
-        sort = getMenuFromAlignment(e.getAlignment(),sorter);
-        parent.add(sort);
+      
         
     }
     

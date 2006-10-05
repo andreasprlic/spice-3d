@@ -29,6 +29,7 @@ import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JCheckBox;
 import javax.swing.JList;
+import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -70,10 +71,11 @@ implements StructureListener
     StructureAlignmentChooser alignmentChooser;
     
     JSplitPane splitPanel;
+    JMenu parentMenu;
     
-    public SelectionPanel() {
+    public SelectionPanel(JMenu parentMenu) {
         super();
-        
+        this.parentMenu = parentMenu;
         DefaultListModel model = new DefaultListModel();        
         model.add(0,"");
         
@@ -93,7 +95,7 @@ implements StructureListener
         hBox.add(chainList);
         
 
-        alignmentChooser = new StructureAlignmentChooser();
+        alignmentChooser = new StructureAlignmentChooser(parentMenu);
         setOpaque(false);
     }
 

@@ -23,6 +23,7 @@
 package org.biojava.spice.gui;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ItemEvent;
@@ -38,6 +39,8 @@ import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JCheckBox;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
@@ -96,10 +99,12 @@ StructureAlignmentListener {
     public final static float degreesPerRadian = (float) (360 / (2 * Math.PI));
     
     boolean sortReverse;
+    JMenu parent;
+    JMenuItem sort;
     
-    public StructureAlignmentChooser() {
+    public StructureAlignmentChooser(JMenu parent) {
         super();
-        
+        this.parent = parent;
         structureListeners 		= new ArrayList();
         structureAlignment 		= new StructureAlignment(null);
         checkButtons 			= new ArrayList();
@@ -140,6 +145,7 @@ StructureAlignmentListener {
         structureAlignment = new StructureAlignment(null);
         structureListeners.clear();
         pdbSequenceListeners.clear();
+        parent = null;
     }
     public void addStructureListener(StructureListener li){
         structureListeners.add(li);
@@ -164,6 +170,24 @@ StructureAlignmentListener {
         return structureAlignment;
     }
     
+    
+    private void updateMenuItems(){
+
+        if ( parent == null) {
+            return;
+        }
+
+        if ( sort != null)            
+            parent.remove(sort);
+
+        AlignmentSortPopup sorter = new AlignmentSortPopup(structureAlignment, this, false);
+        sort = MenuAlignmentListener.getMenuFromAlignment(structureAlignment.getAlignment(),sorter);
+        logger.info("added new menu item " + sort);
+        parent.add(sort);     
+        
+      
+    }
+    
     public void setStructureAlignment(StructureAlignment ali){
         
         structureAlignment = ali;
@@ -179,6 +203,8 @@ StructureAlignmentListener {
             return;
         }
         
+        updateMenuItems();
+                
         AlignmentSortPopup sorter = new AlignmentSortPopup(ali,this, sortReverse);
         
         Annotation[] objects = structureAlignment.getAlignment().getObjects();

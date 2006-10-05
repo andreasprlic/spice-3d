@@ -107,7 +107,7 @@ public class StatusPanel extends JPanel {
         accessionCode.setEditable(false);
         
         accessionCode.setBorder(BorderFactory.createEmptyBorder());
-        accessionCode.setMaximumSize(new Dimension(120,20));
+        accessionCode.setMaximumSize(new Dimension(180,20));
         accessionCode.setPreferredSize(new Dimension(120,20));
         accessionCode.setBackground(BG_COLOR);
        
