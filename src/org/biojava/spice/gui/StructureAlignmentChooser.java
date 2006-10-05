@@ -23,6 +23,7 @@
 package org.biojava.spice.gui;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ItemEvent;
@@ -116,7 +117,9 @@ StructureAlignmentListener {
         
         searchBox = new JTextField();
         searchBox.setEditable(true);
+        searchBox.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
         searchBox.addKeyListener(new MyKeyListener(this));
+        
     }
     
     public void setStructurePanel(StructurePanel panel){
@@ -187,6 +190,60 @@ StructureAlignmentListener {
       
     }
     
+    private String getButtonTooltip(Annotation anno){
+        String tooltip = "";
+        
+        List details = new ArrayList();
+       // System.out.println(anno);
+        try {
+            details = (List) anno.getProperty("details");
+        } catch (NoSuchElementException e){}
+        
+        if ( details != null) {
+        
+            Iterator iter = details.iterator();
+            while ( iter.hasNext()) {
+                Annotation d = (Annotation) iter.next();
+                String prop = (String) d.getProperty("property");
+                if ( prop.equals(MenuAlignmentListener.filterProperty))
+                    continue;
+                String det  = (String) d.getProperty("detail");
+                if (! tooltip.equals(""))
+                    tooltip += " | ";
+                tooltip += prop + " " + det;
+            }                
+        }
+        return tooltip;
+    }
+    
+    /** return true if it should be displayed
+     * 
+     * @param object
+     * @param filterBy
+     * @return flag if is visible or not
+     */
+    private boolean isVisibleAfterFilter(Annotation object, String filterBy){
+        boolean show = true;
+        if ( filterBy == null)
+            return true;
+        if ( filterBy.equalsIgnoreCase(MenuAlignmentListener.showAllObjects))
+            return true;
+        
+        List details = (List) object.getProperty("details");
+        Iterator iter = details.iterator();
+        while ( iter.hasNext()) {
+            Annotation d = (Annotation) iter.next();
+            String prop = (String) d.getProperty("property");
+            if (! prop.equals(MenuAlignmentListener.filterProperty))
+                continue;
+            String det  = (String) d.getProperty("detail");
+            if (! det.equalsIgnoreCase(filterBy)){                
+                return false;
+            }
+        }        
+        return show;
+    }
+    
     public void setStructureAlignment(StructureAlignment ali){
         
         structureAlignment = ali;
@@ -230,31 +287,20 @@ StructureAlignmentListener {
             b.addMouseListener(sorter);
             
             // get tooltip
-            String tooltip = "";
-            Annotation anno = objects[i];
-            List details = new ArrayList();
-           // System.out.println(anno);
-            try {
-                details = (List) anno.getProperty("details");
-            } catch (NoSuchElementException e){}
+            String tooltip = getButtonTooltip(objects[i]);
             
-            if ( details != null) {
-            
-                Iterator iter = details.iterator();
-                while ( iter.hasNext()) {
-                    Annotation d = (Annotation) iter.next();
-                    String prop = (String) d.getProperty("property");
-                    String det  = (String) d.getProperty("detail");
-                    if (! tooltip.equals(""))
-                        tooltip += " | ";
-                    tooltip += prop + " " + det;
-                }                
+            boolean doShow = isVisibleAfterFilter(objects[i],structureAlignment.getFilterBy());
+            if ( ! doShow) {
+                b.setVisible(false);
             }
             b.setToolTipText(tooltip);
             
             boolean selected = false;
-            if (selectedArr[i])
+            if (selectedArr[i]) {
                 selected = true;
+                // always show selected / even if filtered out!
+                b.setVisible(true);
+            }
             
             if ( i == 0) {
                 
@@ -460,7 +506,7 @@ StructureAlignmentListener {
         
     }
     
-    private void rotateJmol(Matrix jmolRotation) {
+    public void rotateJmol(Matrix jmolRotation) {
         if ( structurePanel != null){
             if ( jmolRotation != null) {
  
@@ -485,7 +531,7 @@ StructureAlignmentListener {
      * 
      * @return the jmol rotation matrix
      */
-    private Matrix getJmolRotation(){
+    public Matrix getJmolRotation(){
         Matrix jmolRotation = null;
         if ( structurePanel != null){
             //structurePanel.executeCmd("show orientation;");

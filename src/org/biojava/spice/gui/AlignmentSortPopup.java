@@ -39,6 +39,7 @@ import org.biojava.bio.Annotation;
 import org.biojava.bio.program.das.dasalignment.Alignment;
 import org.biojava.bio.program.das.dasalignment.DASException;
 import org.biojava.bio.structure.Structure;
+import org.biojava.bio.structure.jama.Matrix;
 import org.biojava.spice.StructureAlignment;
 import org.biojava.spice.StructureAlignmentComparator;
 
@@ -60,13 +61,14 @@ implements MouseListener, ActionListener
         this.chooser = chooser;
         this.sortReverse = sortReverse;
         
-        menu = new JPopupMenu();
-        
+        menu = new JPopupMenu();        
 
         JMenu sort = MenuAlignmentListener.getSortMenuFromAlignment(alignment.getAlignment(),this);
-
-                
         menu.add(sort);
+        
+        AlignmentFilterActionListener filterAction = new AlignmentFilterActionListener(chooser);
+        JMenu filter = MenuAlignmentListener.getFilterMenuFromAlignment(alignment.getAlignment(),filterAction);                        
+        menu.add(filter);
         
     }
 
@@ -111,7 +113,7 @@ implements MouseListener, ActionListener
         // set it back in chooser ...
         
         //sorter.sort(e.getActionCommand(),sortReverse,alignment,chooser);
-        
+        Matrix jmolRotation = chooser.getJmolRotation();
         Alignment a = structureAlignment.getAlignment();
         
         List oldobjects = Arrays.asList(a.getObjects());
@@ -119,6 +121,7 @@ implements MouseListener, ActionListener
         Annotation[] objects = (Annotation[]) a.getObjects().clone();
         
         Arrays.sort(objects,sorter);
+        
         
         if ( ! sortfield.equals("RMSD")) {
             // reverse the order!
@@ -207,7 +210,7 @@ implements MouseListener, ActionListener
         
         newstrucalig.select(newselpos);
         chooser.setStructureAlignment(newstrucalig);
-        
+        chooser.rotateJmol(jmolRotation);
     }
 
 }

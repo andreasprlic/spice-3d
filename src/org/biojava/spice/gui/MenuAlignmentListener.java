@@ -24,8 +24,11 @@ package org.biojava.spice.gui;
 
 import java.awt.event.ActionListener;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -39,6 +42,8 @@ public class MenuAlignmentListener implements AlignmentListener {
     
     private static final String[] supportedDetails = new String[] { "LGA_S","LGA_Q","RMSD" };
     
+    public static final String filterProperty = "filterBy";
+    public static final String showAllObjects = "show all";
     public static final List supportedDetailsList ;
     
     static {
@@ -64,7 +69,7 @@ public class MenuAlignmentListener implements AlignmentListener {
     }
     
     public void noAlignmentFound(AlignmentEvent e) {
-      
+        
         if ( sort != null)
             sort.setEnabled(false);
     }
@@ -74,22 +79,67 @@ public class MenuAlignmentListener implements AlignmentListener {
             parent.remove(sort);
             sort = null;
         }
-      
+        
         
     }
     
+    
+    
+    /** 
+     *  get the "filter by" menu
+     * @param ali
+     * @param listener
+     * @return a JMenu for filtering
+     */
     public static JMenu getFilterMenuFromAlignment(Alignment ali, ActionListener listener){
-    	JMenu filter = new JMenu(menuFilterText);
-    	 Annotation[] annos = ali.getObjects();
+        JMenu filter = new JMenu(menuFilterText);
+        Annotation[] annos = ali.getObjects();
+        
+        if ( annos.length < 2)
+            return filter;
+        
+        
+        Map m = new HashMap();
+        
+        for ( int i=1 ; i < annos.length ; i ++) {
+            Annotation a = annos[i];
+            List details = (List) a.getProperty("details");
+            Iterator iter = details.iterator();
+            
          
-         if ( annos.length < 2)
-         	return filter;
-         
-         //Annotation a = annos[2];
-    	
-         return filter;
+            while (iter.hasNext()){
+                Annotation det = (Annotation) iter.next();
+                String property = (String) det.getProperty("property");
+                //System.out.println(det);
+                if ( property.equals(filterProperty)) {
+                    String detail = (String) det.getProperty("detail");
+                    m.put( detail,"");
+                }
+            }
+        }
+        
+        JMenuItem all = new JMenuItem(showAllObjects);
+        all.addActionListener(listener);
+        filter.add(all);
+        
+        Set keys = m.keySet();
+        
+        String[] strings = (String[]) keys.toArray(new String[keys.size()]);
+        Arrays.sort(strings,String.CASE_INSENSITIVE_ORDER);
+        
+        List keylist = Arrays.asList(strings);
+        
+        Iterator iterk = keylist.iterator();
+        while (iterk.hasNext()){
+            String property = (String) iterk.next();
+            JMenuItem item = new JMenuItem(property);
+            item.addActionListener(listener);
+            filter.add(item);             
+        }         
+        
+        return filter;
     }
-   
+    
     
     public static JMenu getSortMenuFromAlignment(Alignment ali, ActionListener listener){
         
@@ -98,7 +148,7 @@ public class MenuAlignmentListener implements AlignmentListener {
         Annotation[] annos = ali.getObjects();
         
         if ( annos.length < 2)
-        	return sort;
+            return sort;
         
         Annotation a = annos[2];
         

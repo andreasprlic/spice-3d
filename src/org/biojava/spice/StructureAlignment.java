@@ -85,6 +85,8 @@ public class StructureAlignment {
     
     String[] rasmolScripts;
 
+    String filterBy;
+    
     JProgressBar progressBar;
     boolean waitingForStructure;
     
@@ -133,6 +135,14 @@ public class StructureAlignment {
         return alignment;
     }
     
+    public String getFilterBy() {
+        return filterBy;
+    }
+
+    public void setFilterBy(String filterBy) {
+        this.filterBy = filterBy;
+    }
+
     public int getNrStructures(){
         if ( structures == null)
             return 0;
