@@ -105,6 +105,8 @@ public class StructureAlignment {
     
     DasCoordinateSystem coordSys;
     
+    List selectionOrder;
+    
     public StructureAlignment(DasCoordinateSystem coordSys) {
         super();
         
@@ -118,6 +120,7 @@ public class StructureAlignment {
         nrSelected = 0;
         waitingForStructure = false;
         loadedStructure = null;
+        selectionOrder = new ArrayList();
     }
     
     public DasCoordinateSystem getCoordinateSystem(){
@@ -361,11 +364,15 @@ public class StructureAlignment {
     public void select(int pos){
         selection[pos] = true;
         nrSelected++;
+        
+        if ( ! selectionOrder.contains(new Integer(pos)))
+            selectionOrder.add(new Integer(pos));
     }
     
     public void deselect(int pos){
         selection[pos] = false;
         nrSelected--;
+        selectionOrder.remove(new Integer(pos));
         
     }
     
@@ -607,22 +614,35 @@ public class StructureAlignment {
     		}
     	}
     	
-        float stepsize   = 0;
-               
-        // do a circle of 6 colors...
+         float stepsize   = 0;
+         
+         // do a circle of 6 colors...
+         
+         int NR_COLS = 6;
+         stepsize = 1.0f / (float)NR_COLS ;
+         float saturation = 1.0f;
+         float brightness = 1.0f;
         
-        int NR_COLS = 6;
-        stepsize = 1.0f / (float)NR_COLS ;
-        float saturation = 1.0f;
-        float brightness = 1.0f;
-        
-        int pos = ( position % NR_COLS );
-        
-        //System.out.println("color: position " + position + " nrSel " + nrSelected + " " + pos );
-        
-        float hue = ( pos * stepsize );
-        Color col = Color.getHSBColor(hue,saturation,brightness);
-        return col;
+        Integer selectionPosition = new Integer(position);
+
+        if (!  selectionOrder.contains(selectionPosition)) {
+            int pos = ( position % NR_COLS );
+            
+            //System.out.println("color: position " + position + " nrSel " + nrSelected + " " + pos );
+            
+            float hue = ( pos * stepsize );
+            Color col = Color.getHSBColor(hue,saturation,brightness);
+            return col;
+            
+        } else {           
+            
+            int selectPos = selectionOrder.indexOf(selectionPosition);
+            int pos = ( selectPos % NR_COLS);
+            float hue = ( pos * stepsize );
+            Color col = Color.getHSBColor(hue,saturation,brightness);
+            return col;
+            
+        }
     }
     
     

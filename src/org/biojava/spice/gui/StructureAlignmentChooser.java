@@ -38,6 +38,7 @@ import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -56,6 +57,8 @@ import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.StructureException;
 import org.biojava.bio.structure.jama.Matrix;
+import org.biojava.spice.ResourceManager;
+import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.alignment.StructureAlignment;
 import org.biojava.spice.manypanel.eventmodel.StructureAlignmentListener;
 import org.biojava.dasobert.eventmodel.SequenceEvent;
@@ -102,6 +105,7 @@ StructureAlignmentListener {
     JMenu parent;
     JMenuItem sort;
     JMenuItem filter;
+    ImageIcon deleteIcon;
     
     public StructureAlignmentChooser(JMenu parent) {
         super();
@@ -121,6 +125,7 @@ StructureAlignmentListener {
         searchBox.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
         searchBox.addKeyListener(new MyKeyListener(this));
         
+        deleteIcon = SpiceApplication.createImageIcon(ResourceManager.getString("org.biojava.spice.Icons.EditDelete"));
     }
     
     public void setStructurePanel(StructurePanel panel){
@@ -144,6 +149,16 @@ StructureAlignmentListener {
         return searchBox;
     }
     
+    
+    
+    public ImageIcon getDeleteIcon() {
+        return deleteIcon;
+    }
+
+    public void setDeleteIcon(ImageIcon deleteIcon) {
+        this.deleteIcon = deleteIcon;
+    }
+
     public void clearListeners(){
         structureAlignment = new StructureAlignment(null);
         structureListeners.clear();
@@ -389,6 +404,136 @@ StructureAlignmentListener {
         return checkButtons;
     }
     
+    
+    private void repaintBox(JCheckBox box, int pos, Color backgroundColor) {
+        Color col = backgroundColor;
+        UIManager.put("CheckBox.background", col);
+        UIManager.put("CheckBox.interiorBackground", col);
+        UIManager.put("CheckBox.highlite", col);
+        
+        box.setBackground(col);
+        box.repaint();
+    }
+     
+    
+    /** a checkbox has been clicked - update the 3D display
+     * 
+     * @param box
+     * @param e
+     * @param i
+     */
+    private void updateBox( JCheckBox box, ItemEvent e, int i) {
+
+        
+        
+        String[] ids = structureAlignment.getIds();
+        String id = ids[i];
+        //System.out.println("do something with " + id);
+        if (e.getStateChange() == ItemEvent.DESELECTED) {
+            // remove structure from alignment
+            structureAlignment.deselect(i);
+            box.setBackground(this.getBackground());
+            box.repaint();
+            // display the first one that is selected
+            // set the color to that one 
+            //int j = structureAlignment.getFirstSelectedPos();
+            int j = structureAlignment.getLastSelectedPos();
+            if ( j > -1) {
+                
+                Color col = structureAlignment.getColor(j);
+                System.setProperty("SPICE:StructureRegionColor",new Integer(col.getRGB()).toString());                        
+                
+            }
+            referenceStructure = j;
+            
+        } else {
+            structureAlignment.select(i);
+            // add structure to alignment
+            Color col = structureAlignment.getColor(i);
+            
+            System.setProperty("SPICE:StructureRegionColor",new Integer(col.getRGB()).toString());                                      
+            
+            repaintBox(box,i,col);
+            
+            
+            // check if we can get the structure...
+            Structure struc = null;
+            try {
+                struc = structureAlignment.getStructure(i);
+                referenceStructure = i;
+                if ( struc.size() > 0) {
+                    Chain c1 = struc.getChain(0);
+                    String sequence = c1.getSequence();
+                    String ac = id + "." + c1.getName();
+                    
+                    SequenceEvent sevent = new SequenceEvent(ac,sequence);
+                    //logger.info("*** seqeunce event " + ac);
+                    Iterator iter3 = pdbSequenceListeners.iterator();
+                    while (iter3.hasNext()){
+                        SequenceListener li = (SequenceListener)iter3.next();
+                        li.newSequence(sevent);
+                    }
+                } else {
+                    logger.warning("could not load structure at position " +i );
+                   
+                    box.setSelected(false);
+                }
+                
+            } catch (StructureException ex){
+                ex.printStackTrace();
+                structureAlignment.deselect(i);
+                //return;
+               
+                box.setSelected(false);
+            }
+        }
+        
+        
+        
+        Matrix jmolRotation = getJmolRotation();
+        
+        
+        
+        Structure newStruc = null; 
+//      execute Rasmol cmd...
+        String cmd = null;
+        
+        
+        // update the structure alignment in the structure display.
+        if (e.getStateChange() == ItemEvent.DESELECTED) {
+            newStruc = structureAlignment.createArtificalStructure();
+            cmd = structureAlignment.getRasmolScript();
+            
+        }
+        else {
+            newStruc = structureAlignment.createArtificalStructure(i);
+            cmd = structureAlignment.getRasmolScript(i);                    
+        }
+        
+//        if ( newStruc != null){
+//            if ( jmolRotation != null){
+//                Structure clonedStruc = (Structure) newStruc.clone();
+//                Calc.rotate(clonedStruc,jmolRotation);
+//                newStruc = clonedStruc;
+//            }
+//        }
+        StructureEvent event = new StructureEvent(newStruc);
+        Iterator iter2 = structureListeners.iterator();
+        while (iter2.hasNext()){
+            StructureListener li = (StructureListener)iter2.next();
+            li.newStructure(event);
+            if ( li instanceof StructurePanelListener){
+                StructurePanelListener pli = (StructurePanelListener)li;
+                pli.executeCmd(cmd);
+            }
+            
+        }
+        
+        rotateJmol(jmolRotation);
+    
+    }
+    
+    
     public void itemStateChanged(ItemEvent e) {
         
         Object source = e.getItemSelectable();
@@ -399,120 +544,16 @@ StructureAlignmentListener {
             Object o = iter.next();
             JCheckBox box =(JCheckBox)o;
             if ( o.equals(source)){
-                String[] ids = structureAlignment.getIds();
-                String id = ids[i];
-                //System.out.println("do something with " + id);
-                if (e.getStateChange() == ItemEvent.DESELECTED) {
-                    // remove structure from alignment
-                    structureAlignment.deselect(i);
-                    box.setBackground(this.getBackground());
-                    box.repaint();
-                    // display the first one that is selected
-                    // set the color to that one 
-                    //int j = structureAlignment.getFirstSelectedPos();
-                    int j = structureAlignment.getLastSelectedPos();
-                    if ( j > -1) {
-                        
-                        Color col = structureAlignment.getColor(j);
-                        System.setProperty("SPICE:StructureRegionColor",new Integer(col.getRGB()).toString());
-                        
-                        
-                    }
-                    referenceStructure = j;
-                    
-                } else {
-                    structureAlignment.select(i);
-                    // add structure to alignment
-                    Color col = structureAlignment.getColor(i);
-                    
-                    System.setProperty("SPICE:StructureRegionColor",new Integer(col.getRGB()).toString());                                      
-                    
-                    
-                    UIManager.put("CheckBox.background", col);
-                    UIManager.put("CheckBox.interiorBackground", col);
-                    UIManager.put("CheckBox.highlite", col);
-                    
-                    box.setBackground(col);
-                    box.repaint();
-                    
-                    // check if we can get the structure...
-                    Structure struc = null;
-                    try {
-                        struc = structureAlignment.getStructure(i);
-                        referenceStructure = i;
-                        if ( struc.size() > 0) {
-                            Chain c1 = struc.getChain(0);
-                            String sequence = c1.getSequence();
-                            String ac = id + "." + c1.getName();
-                            
-                            SequenceEvent sevent = new SequenceEvent(ac,sequence);
-                            //logger.info("*** seqeunce event " + ac);
-                            Iterator iter3 = pdbSequenceListeners.iterator();
-                            while (iter3.hasNext()){
-                                SequenceListener li = (SequenceListener)iter3.next();
-                                li.newSequence(sevent);
-                            }
-                        } else {
-                            logger.warning("could not load structure at position " +i );
-                            JCheckBox b = (JCheckBox) source;
-                            b.setSelected(false);
-                        }
-                        
-                    } catch (StructureException ex){
-                        ex.printStackTrace();
-                        structureAlignment.deselect(i);
-                        //return;
-                        JCheckBox b = (JCheckBox) source;
-                        b.setSelected(false);
-                    }
-                }
-                
-                
-                
-                Matrix jmolRotation = getJmolRotation();
-                
-                
-                
-                Structure newStruc = null; 
-//              execute Rasmol cmd...
-                String cmd = null;
-                
-                
-                // update the structure alignment in the structure display.
-                if (e.getStateChange() == ItemEvent.DESELECTED) {
-                    newStruc = structureAlignment.createArtificalStructure();
-                    cmd = structureAlignment.getRasmolScript();
-                    
-                }
-                else {
-                    newStruc = structureAlignment.createArtificalStructure(i);
-                    cmd = structureAlignment.getRasmolScript(i);                    
-                }
-                
-//                if ( newStruc != null){
-//                    if ( jmolRotation != null){
-//                        Structure clonedStruc = (Structure) newStruc.clone();
-//                        Calc.rotate(clonedStruc,jmolRotation);
-//                        newStruc = clonedStruc;
-//                    }
-//                }
-                StructureEvent event = new StructureEvent(newStruc);
-                Iterator iter2 = structureListeners.iterator();
-                while (iter2.hasNext()){
-                    StructureListener li = (StructureListener)iter2.next();
-                    li.newStructure(event);
-                    if ( li instanceof StructurePanelListener){
-                        StructurePanelListener pli = (StructurePanelListener)li;
-                        pli.executeCmd(cmd);
-                    }
-                    
-                }
-                
-                rotateJmol(jmolRotation);
-            }
-           
-        }
-        
+                updateBox(box, e,i);
+            } else {
+                Color col = null;
+                if ( structureAlignment.isSelected(i))
+                    col = structureAlignment.getColor(i);
+                else
+                    col = this.getBackground(); 
+                repaintBox(box,i,col);
+            }           
+        }        
     }
     
     public void rotateJmol(Matrix jmolRotation) {

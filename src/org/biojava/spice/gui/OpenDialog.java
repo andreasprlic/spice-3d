@@ -29,6 +29,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.JPanel;
 import javax.swing.JFrame;
@@ -60,6 +61,8 @@ extends JDialog
 
 	private static final long serialVersionUID = 2832023723402743924L;
 
+    public static Logger logger =  Logger.getLogger(SpiceDefaults.LOGGER);
+    
 	static int H_SIZE = 350;
 	static int V_SIZE = 150 ;
 	SpiceApplication spice       ;
@@ -100,11 +103,6 @@ extends JDialog
 		int startpos   = 0;
         
 		currentType    = (String) SpiceDefaults.argumentTypes.get(startpos);
-                
-        
- 
-
-        
         // filter supported coords by startup arguments ...
         SpiceStartParameters params = spice.getSpiceStartParameters();
         String openDialogCoords = params.getOpenDialogCoords();
@@ -209,6 +207,7 @@ extends JDialog
         if ( parameters == null || parameters.equals("")){
             return supportedCoords;    
         }
+        logger.info("got openDialogCoords " + parameters);
         
         List displayCoords = new ArrayList();
         String[] spl = parameters.split(";");
@@ -245,8 +244,9 @@ extends JDialog
             return arg;
         
         String openDialogCoords = parameters.getOpenDialogCoords();
+       
         
-        // hm somebody asked to get one of the coords relabeled ( e.g. CASP)
+        //  somebody asked to get one of the coords relabeled ( e.g. CASP)
         String[] spl = openDialogCoords.split(";");
         
         for (int i = 0 ; i < spl.length ; i++){

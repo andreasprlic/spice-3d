@@ -23,10 +23,18 @@
 package org.biojava.spice.gui;
 
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.logging.Logger;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JList;
 import javax.swing.JMenu;
@@ -34,6 +42,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
+
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.StructureException;
@@ -153,7 +162,10 @@ implements StructureListener
         JTextField searchBox = alignmentChooser.getSearchBox();
         horBox.add(searchBox);
         
-        /*Action action = new AbstractAction("X") {
+        ImageIcon icon = alignmentChooser.getDeleteIcon();
+        
+        
+        Action action = new AbstractAction("x") {
             
             private static final long serialVersionUID = 1L;
 
@@ -161,12 +173,21 @@ implements StructureListener
             public void actionPerformed(ActionEvent evt) {
                 JTextField searchBox = alignmentChooser.getSearchBox();
                 searchBox.setText("");
+                //KeyEvent(Component source, int id, long when, int modifiers, int keyCode, char keyChar) 
+                KeyEvent event = new KeyEvent(searchBox,1,new java.util.Date().getTime(),1,1,'x');
+                
+                KeyListener[] listeners = searchBox.getKeyListeners();
+                for (int i=0 ; i< listeners.length ;i++){
+                    KeyListener kl = listeners[i];
+                    kl.keyPressed(event);
+                }
             }
         };
         
-        JButton b = new JButton(action);
+        JButton b = new JButton(icon);
+        b.addActionListener(action);
         horBox.add(b);
-        */
+        
         hBox.add(horBox);
       
         
