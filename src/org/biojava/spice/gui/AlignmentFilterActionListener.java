@@ -26,7 +26,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import org.biojava.bio.structure.jama.Matrix;
-import org.biojava.spice.StructureAlignment;
+import org.biojava.spice.alignment.StructureAlignment;
 
 public class AlignmentFilterActionListener implements ActionListener{
 

@@ -45,7 +45,7 @@ import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.align.pairwise.AlternativeAlignment;
 import org.biojava.bio.structure.jama.Matrix;
 import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
-import org.biojava.spice.StructureAlignment;
+import org.biojava.spice.alignment.StructureAlignment;
 import org.biojava.spice.config.SpiceDefaults;
 import org.biojava.spice.manypanel.eventmodel.StructureAlignmentListener;
 

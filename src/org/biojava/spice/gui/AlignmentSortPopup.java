@@ -40,8 +40,8 @@ import org.biojava.bio.program.das.dasalignment.Alignment;
 import org.biojava.bio.program.das.dasalignment.DASException;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.jama.Matrix;
-import org.biojava.spice.StructureAlignment;
-import org.biojava.spice.StructureAlignmentComparator;
+import org.biojava.spice.alignment.StructureAlignment;
+import org.biojava.spice.alignment.StructureAlignmentComparator;
 
 public class AlignmentSortPopup 
 implements MouseListener, ActionListener

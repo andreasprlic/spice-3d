@@ -20,7 +20,7 @@
  * Created on May 15, 2006
  *
  */
-package org.biojava.spice;
+package org.biojava.spice.alignment;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -58,6 +58,7 @@ import org.biojava.bio.structure.io.DASStructureClient;
 import org.biojava.bio.structure.jama.Matrix;
 import org.biojava.dasobert.dasregistry.Das1Source;
 import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
+import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.gui.SpiceMenuListener;
 import org.biojava.spice.manypanel.renderer.SequenceScalePanel;
 

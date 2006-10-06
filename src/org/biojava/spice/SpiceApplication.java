@@ -24,6 +24,7 @@
 package org.biojava.spice ;
 
 import org.biojava.spice.panel.*;
+import org.biojava.spice.alignment.StructureAlignmentBuilder;
 import org.biojava.spice.config.*;
 import org.biojava.spice.gui.*;
 import org.biojava.spice.jmol.JmolSpiceTranslator;

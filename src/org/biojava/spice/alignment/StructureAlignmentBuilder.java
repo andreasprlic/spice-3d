@@ -20,7 +20,7 @@
  * Created on May 3, 2006
  *
  */
-package org.biojava.spice;
+package org.biojava.spice.alignment;
 
 
 //import java.io.IOException;

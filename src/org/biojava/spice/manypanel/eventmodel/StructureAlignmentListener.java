@@ -22,7 +22,7 @@
  */
 package org.biojava.spice.manypanel.eventmodel;
 
-import org.biojava.spice.StructureAlignment;
+import org.biojava.spice.alignment.StructureAlignment;
 
 public interface StructureAlignmentListener {
 

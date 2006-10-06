@@ -20,7 +20,7 @@
  * Created on Oct 4, 2006
  *
  */
-package org.biojava.spice;
+package org.biojava.spice.alignment;
 
 import java.util.Comparator;
 import java.util.Iterator;
