@@ -40,7 +40,7 @@ import org.biojava.dasobert.eventmodel.AlignmentListener;
 
 public class MenuAlignmentListener implements AlignmentListener {
     
-    private static final String[] supportedDetails = new String[] { "LGA_S","LGA_Q","RMSD" };
+    private static final String[] supportedDetails = new String[] { "GDT_TS","LGA_S","LGA_Q","RMSD","Seq_Id" };
     
     public static final String filterProperty = "filterBy";
     public static final String showAllObjects = "show all";
