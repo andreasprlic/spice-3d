@@ -65,6 +65,8 @@ public class SpiceStartParameters {
     private String uniprotcoordsys;
     private String enspcoordsys;
     
+    private String openDialogCoords;
+    
     boolean newTab;
     boolean noRegistryContact;
       
@@ -81,14 +83,27 @@ public class SpiceStartParameters {
         } catch (MalformedURLException e){
             e.printStackTrace();
         }
-        registryurls = new URL[0];
-        newTab =false;
-        noRegistryContact = false;
-        structureAlignmentMode="";
+        registryurls            = new URL[0];
+        newTab                  = false;
+        noRegistryContact       = false;
+        structureAlignmentMode  = "";
+        openDialogCoords        = "";
     }
 
     
     
+    public String getOpenDialogCoords() {
+        return openDialogCoords;
+    }
+
+
+
+    public void setOpenDialogCoords(String openDialogCoords) {
+        this.openDialogCoords = openDialogCoords;
+    }
+
+
+
     public String getStructureAlignmentMode() {
         return structureAlignmentMode;
     }

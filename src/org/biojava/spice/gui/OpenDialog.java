@@ -27,6 +27,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JPanel;
 import javax.swing.JFrame;
@@ -39,6 +41,7 @@ import javax.swing.JTextField;
 import org.biojava.spice.ResourceManager;
 import org.biojava.spice.SPICEFrame;
 import org.biojava.spice.SpiceApplication;
+import org.biojava.spice.SpiceStartParameters;
 import org.biojava.spice.config.SpiceDefaults;
 import org.biojava.spice.gui.msdkeyword.*;
 
@@ -95,11 +98,20 @@ extends JDialog
 		Box hBox3 = Box.createHorizontalBox();
 
 		int startpos   = 0;
+        
 		currentType    = (String) SpiceDefaults.argumentTypes.get(startpos);
+                
+        
+ 
 
-		String[] supportedCoords = (String[])SpiceDefaults.argumentTypes.toArray(new String[SpiceDefaults.argumentTypes.size()]); 
-		
-		list = new JComboBox(supportedCoords) ;		
+        
+        // filter supported coords by startup arguments ...
+        SpiceStartParameters params = spice.getSpiceStartParameters();
+        String openDialogCoords = params.getOpenDialogCoords();
+        
+        String[] displayCoords = getOpenDialogCoords(openDialogCoords);
+        
+		list = new JComboBox(displayCoords) ;		
 		list.setEditable(false);
 		list.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
 		list.setSelectedIndex(startpos);
@@ -128,7 +140,8 @@ extends JDialog
 				String code = getCom.getText();
 				String type = (String)list.getSelectedItem() ;
 
-
+				type = getTypeCoordMapping(type,spice.getSpiceStartParameters());
+				
 				if ( SpiceDefaults.argumentTypes.contains(type) ) {
 					spice.load(type,code);
 					dispose();			    
@@ -182,6 +195,70 @@ extends JDialog
 		this.setSize(H_SIZE, V_SIZE);
 	}
 
+    /** smebody wants to restrict the "Open menu" coordiante systems.
+     *  usefull e.g. for CASP
+     *  syntax is e.g. "PDB=off;UniProt=off;Ensp=off;alignment=CASP"
+     * 
+     * @param parameters
+     * @return the array of parameters as they should be displayed ...
+     */
+    private String[] getOpenDialogCoords(String parameters){
+        
+        String[] supportedCoords = (String[])SpiceDefaults.argumentTypes.toArray(new String[SpiceDefaults.argumentTypes.size()]);
+        
+        if ( parameters == null || parameters.equals("")){
+            return supportedCoords;    
+        }
+        
+        List displayCoords = new ArrayList();
+        String[] spl = parameters.split(";");
+        
+        for (int i = 0 ; i < spl.length ; i++){
+            String parm = spl[i];
+            String[] spl2 = parm.split("=");
+            
+            if ( SpiceDefaults.argumentTypes.contains(spl2[0])){
+                // o.k we identified it...
+                
+                if ( spl2[1].equalsIgnoreCase("off")) {
+                    // we don;t want to display it ...
+                    continue;
+                } else if ( spl2[1].equalsIgnoreCase("on")) {
+                    displayCoords.add(spl2[0]);
+                } else {
+                    displayCoords.add(spl2[1]);
+                }
+                
+            }
+        }
+        
+        return (String[]) displayCoords.toArray(new String[displayCoords.size()]);
+    }
+    
+    
+    protected String getTypeCoordMapping(String arg, SpiceStartParameters parameters){
+        
+        if ( SpiceDefaults.argumentTypes.contains(arg))
+            return arg;
+        
+        String openDialogCoords = parameters.getOpenDialogCoords();
+        
+        // hm somebody asked to get one of the coords relabeled ( e.g. CASP)
+        String[] spl = openDialogCoords.split(";");
+        
+        for (int i = 0 ; i < spl.length ; i++){
+            String parm = spl[i];
+            String[] spl2 = parm.split("=");
+            
+            if ( SpiceDefaults.argumentTypes.contains(spl2[0])){
+                if ( spl2[1].equalsIgnoreCase(arg))
+                    return spl2[0];
+            }
+        }
+        return null;
+    }
+    
+    
 	private void setHelpToolTip(){
 		String type = (String) list.getSelectedItem();
 		if ( type.equals("PDB")){
@@ -220,7 +297,7 @@ class OpenActionListener implements ActionListener {
 		{ 
 			String type = (String)parent.list.getSelectedItem() ;
 			String code = parent.getCom.getText();
-
+             type = parent.getTypeCoordMapping(type,spice.getSpiceStartParameters());
 			if ( SpiceDefaults.argumentTypes.contains(type)){
 				spice.load(type,code);
 				parent.dispose();			    

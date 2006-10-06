@@ -59,8 +59,7 @@ implements JmolCommander
     static Logger    logger      = Logger.getLogger("org.biojava.spice");
     
     static String    EMPTYCMD =  ResourceManager.getString("org.biojava.spice.panel.StructurePanel.EmptyCmd");
-    
-    
+        
     JmolViewer  viewer;
     
     JmolAdapter adapter;
@@ -136,9 +135,7 @@ implements JmolCommander
             logger.info("viewer is executing");
         
         viewer.evalString(command);
-        //viewer.evalStringSync(command);
-        //viewer.scriptWaitVoid(command);
-        //System.out.println("done");
+       
     }
     
     
