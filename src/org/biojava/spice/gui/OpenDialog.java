@@ -216,6 +216,8 @@ extends JDialog
         for (int i = 0 ; i < spl.length ; i++){
             String parm = spl[i];
             String[] spl2 = parm.split("=");
+            if ( spl2.length != 2)
+                continue;
             
             if ( SpiceDefaults.argumentTypes.contains(spl2[0])){
                 // o.k we identified it...
@@ -226,7 +228,8 @@ extends JDialog
                 } else if ( spl2[1].equalsIgnoreCase("on")) {
                     displayCoords.add(spl2[0]);
                 } else {
-                    displayCoords.add(spl2[1]);
+                    if ( spl2[1].length() < 100)
+                        displayCoords.add(spl2[1]);
                 }
                 
             }
@@ -249,7 +252,8 @@ extends JDialog
         for (int i = 0 ; i < spl.length ; i++){
             String parm = spl[i];
             String[] spl2 = parm.split("=");
-            
+            if ( spl2.length != 2)
+                continue;
             if ( SpiceDefaults.argumentTypes.contains(spl2[0])){
                 if ( spl2[1].equalsIgnoreCase(arg))
                     return spl2[0];
