@@ -604,6 +604,7 @@ StructureAlignmentListener {
         return jmolRotation;
     }
     
+    // TODO: move this to calc?
     
     /** Convert a rotation Matrix to Euler angles.
      *   This conversion uses conventions as described on page:

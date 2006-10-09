@@ -156,6 +156,7 @@ implements StructureListener
         JScrollPane scroll = new JScrollPane(alignmentChooser);
         hBox.add(scroll);
       
+        scroll.getVerticalScrollBar().setUnitIncrement(10);
         alignmentChooser.setScroller(scroll);
         
         Box horBox = Box.createHorizontalBox();
@@ -165,7 +166,7 @@ implements StructureListener
         ImageIcon icon = alignmentChooser.getDeleteIcon();
         
         
-        Action action = new AbstractAction("x") {
+        Action action = new AbstractAction("X") {
             
             private static final long serialVersionUID = 1L;
 
@@ -184,7 +185,11 @@ implements StructureListener
             }
         };
         
-        JButton b = new JButton(icon);
+        JButton b = null;
+        if ( icon != null )
+        	b = new JButton(icon);
+        else 
+        	b = new JButton("X");
         b.addActionListener(action);
         horBox.add(b);
         
