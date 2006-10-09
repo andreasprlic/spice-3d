@@ -30,6 +30,7 @@ import java.awt.Shape;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.ImageIcon;
 
@@ -119,11 +120,11 @@ extends DasSourcePanel{
         g2D.setFont(plainFont);
         
         y += SequenceScalePanel.DEFAULT_Y_STEP;
-        
+        Map[] stylesheet = drawableDasSource.getStylesheet();
         Feature[] features = drawableDasSource.getFeatures();
         for ( int f =0 ; f< features.length;f++) {
             Feature feature = features[f];
-            drawLabel(g,feature,y);
+            drawLabel(g,feature,y, stylesheet);
             y += SequenceScalePanel.DEFAULT_Y_STEP;
         }
         
@@ -135,14 +136,33 @@ extends DasSourcePanel{
      * @param f
      * @param y
      */
-    private void drawLabel(Graphics g, Feature f, int y){
+    private void drawLabel(Graphics g, Feature f, int y, Map[] stylesheet){
         String type = f.getType();
         
         List segs = f.getSegments();
         Color c = Color.white;
-        if ( segs.size() > 0){
-            Segment s = (Segment) segs.get(0);
-            c = s.getColor();
+        
+        // check if we have a stylesheet for this Features
+        boolean foundAStyleSheet = false;
+        for ( int i=0 ; i< stylesheet.length ;i++ ){
+            Map m = stylesheet[i];
+            String styleType = (String) m.get("type");
+            if ( f.getType().equals(styleType)){
+                Color col= (Color)(m.get("color"));
+                if ( col != null) {
+                    c = col;
+                    foundAStyleSheet = true;
+                    break;
+                }
+            }
+        }
+        
+        // otherwise use the one from the segment
+        if (! foundAStyleSheet) {
+            if ( segs.size() > 0){
+                Segment s = (Segment) segs.get(0);
+                c = s.getColor();
+            } 
         }
         g.setColor(c);
         
