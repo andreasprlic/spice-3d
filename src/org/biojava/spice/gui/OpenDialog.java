@@ -37,6 +37,7 @@ import javax.swing.JButton;
 import javax.swing.Box;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JRootPane;
 import javax.swing.JTextField;
 
 import org.biojava.spice.ResourceManager;
@@ -83,9 +84,21 @@ extends JDialog
 
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent evt) {
-				JFrame frame = (JFrame) evt.getSource();
-				frame.setVisible(false);
-				frame.dispose();
+                
+                Object o = evt.getSource();
+                JFrame frame = null;
+                if ( o instanceof JFrame) {
+                
+                     frame =  (JFrame) o;
+                    
+                } else if ( o instanceof JRootPane){
+                    JRootPane root = (JRootPane)o;
+                    frame = (JFrame) root.getTopLevelAncestor();
+                }
+                if ( frame != null){
+                    frame.setVisible(false);
+                    frame.dispose();
+                }
 			}
 		});
 
