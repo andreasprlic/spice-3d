@@ -207,6 +207,7 @@ ConfigurationListener
         	    browserPane = new BrowserPane(params.getPdbcoordsys(),params.getUniprotcoordsys(), params.getEnspcoordsys());
         }
         structurePanel      = new StructurePanel();
+        structurePanel.initJmolDisplay();
         jmolSpiceTranslator = new JmolSpiceTranslator();
         structurePanel.addJmolStatusListener(jmolSpiceTranslator);
         

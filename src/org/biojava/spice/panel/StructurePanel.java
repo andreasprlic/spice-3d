@@ -126,6 +126,13 @@ implements JmolCommander
         
     }
     
+    
+    public void initJmolDisplay(){
+        String pdb = "ATOM     63  CA  GLY     9      47.866  28.415   2.952 \n" ;
+        viewer.openStringInline(pdb);
+    }
+    
+    
     /** send a RASMOL like command to Jmol
      * @param command - a String containing a RASMOL like command. e.g. "select protein; cartoon on;"
      */
