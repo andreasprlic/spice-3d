@@ -130,6 +130,7 @@ extends JDialog
 
 		getCom = new JTextField(10);
 
+        
 
 		getCom.addActionListener(new ActionListener()  {
 
@@ -191,6 +192,7 @@ extends JDialog
 		this.getContentPane().add(p);
 
 		this.setSize(H_SIZE, V_SIZE);
+        getCom.requestFocus();
 	}
 
     /** smebody wants to restrict the "Open menu" coordiante systems.
@@ -276,6 +278,15 @@ extends JDialog
 
 
 	}
+
+    public void show() {
+     
+        super.show();
+        getCom.requestFocus();
+    }
+    
+    
+    
 
 }
 
