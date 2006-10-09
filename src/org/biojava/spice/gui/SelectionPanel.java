@@ -156,7 +156,8 @@ implements StructureListener
         JScrollPane scroll = new JScrollPane(alignmentChooser);
         hBox.add(scroll);
       
-        scroll.getVerticalScrollBar().setUnitIncrement(10);
+        int nr = strucAli.getNrStructures();
+        scroll.getVerticalScrollBar().setUnitIncrement((nr / 10));
         alignmentChooser.setScroller(scroll);
         
         Box horBox = Box.createHorizontalBox();
@@ -175,7 +176,7 @@ implements StructureListener
                 JTextField searchBox = alignmentChooser.getSearchBox();
                 searchBox.setText("");
                 //KeyEvent(Component source, int id, long when, int modifiers, int keyCode, char keyChar) 
-                KeyEvent event = new KeyEvent(searchBox,1,new java.util.Date().getTime(),1,1,'x');
+                KeyEvent event = new KeyEvent(searchBox,1,new java.util.Date().getTime(),1,KeyEvent.VK_BACK_SPACE,KeyEvent.CHAR_UNDEFINED);
                 
                 KeyListener[] listeners = searchBox.getKeyListeners();
                 for (int i=0 ; i< listeners.length ;i++){
