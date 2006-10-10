@@ -44,8 +44,8 @@ import org.biojava.spice.manypanel.eventmodel.SpiceFeatureListener;
 import java.util.Map;
 import java.awt.Color;
 
-/** A class that listens to SPICE events ( like sequence position selected) and
- * triggers the corresponding script in the Jmol display (the structurePanel)
+/** A class that listens to SPICE events (like sequence position selected) and
+ * triggers the corresponding rasmol script in the Jmol display (the structurePanel)
  * 
  * @see org.biojava.spice.jmol.StructurePanel
  * @see org.biojava.dasobert.eventmodel.SequenceListener

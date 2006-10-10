@@ -37,7 +37,9 @@ import java.util.logging.*;
 
 
 
-/** a Panel that provides a wrapper around the Jmol viewer. Code heavily
+/** A panel that provides a wrapper around the Jmol viewer. 
+ * 
+ * The code for this is heavily
  * inspired by
  * http://cvs.sourceforge.net/viewcvs.py/jmol/Jmol/examples/Integration.java?view=markup
  * - the Jmol example of how to integrate Jmol into an application.
@@ -84,6 +86,12 @@ implements JmolCommander
         
     }
     
+    /** Add a JmolStatus listener to Jmol
+     * 
+     * @see JmolSpiceTranslator
+     * 
+     * @param listener
+     */
     public void addJmolStatusListener(JmolStatusListener listener) {
         viewer.setJmolStatusListener(listener);
         
@@ -95,6 +103,9 @@ implements JmolCommander
         }
     }
     
+    /** remove the listeners from Jmol again. 
+     * 
+     */
     public void clearListeners(){
         
         viewer.setJmolStatusListener(null);
@@ -124,14 +135,18 @@ implements JmolCommander
         
     }
     
-    
+    /** call this upon startup. This is a workaround to a bug in Jmol.
+     * 
+     *
+     */
     public void initJmolDisplay(){
         String pdb = "ATOM     63  CA  GLY     9      47.866  28.415   2.952 \n" ;
         viewer.openStringInline(pdb);
+        executeCmd("select *; spacefill off;");
     }
     
     
-    /** send a RASMOL like command to Jmol
+    /** Send a RASMOL like command to Jmol
      * @param command - a String containing a RASMOL like command. e.g. "select protein; cartoon on;"
      */
     public void executeCmd(String command) {
@@ -171,6 +186,7 @@ implements JmolCommander
         String strError = viewer.getOpenFileError();
         
         if (strError != null) {
+            
             if (logger.isLoggable(Level.WARNING)) {
                 logger.severe("could not open PDB file in viewer "+ strError);
             }
