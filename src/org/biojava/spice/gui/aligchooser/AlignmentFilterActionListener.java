@@ -20,7 +20,7 @@
  * Created on Oct 5, 2006
  *
  */
-package org.biojava.spice.gui;
+package org.biojava.spice.gui.aligchooser;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

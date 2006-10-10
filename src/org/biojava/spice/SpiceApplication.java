@@ -27,6 +27,7 @@ import org.biojava.spice.panel.*;
 import org.biojava.spice.alignment.StructureAlignmentBuilder;
 import org.biojava.spice.config.*;
 import org.biojava.spice.gui.*;
+import org.biojava.spice.gui.aligchooser.MenuAlignmentListener;
 import org.biojava.spice.jmol.JmolSpiceTranslator;
 
 import org.biojava.bio.structure.*;

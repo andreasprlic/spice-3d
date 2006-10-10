@@ -51,6 +51,7 @@ import org.biojava.dasobert.eventmodel.SequenceListener;
 import org.biojava.dasobert.eventmodel.StructureEvent;
 import org.biojava.dasobert.eventmodel.StructureListener;
 import org.biojava.spice.alignment.StructureAlignment;
+import org.biojava.spice.gui.aligchooser.StructureAlignmentChooser;
 import org.biojava.spice.manypanel.eventmodel.StructureAlignmentListener;
 import org.biojava.spice.panel.StructurePanel;
 

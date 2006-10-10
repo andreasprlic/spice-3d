@@ -20,7 +20,7 @@
  * Created on Oct 5, 2006
  *
  */
-package org.biojava.spice.gui;
+package org.biojava.spice.gui.aligchooser;
 
 import java.awt.event.ActionListener;
 import java.util.Arrays;
@@ -51,7 +51,7 @@ public class MenuAlignmentListener implements AlignmentListener {
         supportedDetailsList = Arrays.asList(supportedDetails);
     }
     
-    private static final String menuSortText = "sort by";
+    private static final String menuSortText   = "sort by";
     private static final String menuFilterText = "filter by";
     
     JMenu parent;

@@ -20,7 +20,7 @@
  * Created on May 15, 2006
  *
  */
-package org.biojava.spice.gui;
+package org.biojava.spice.gui.aligchooser;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -307,7 +307,7 @@ StructureAlignmentListener {
                 UIManager.put("CheckBox.interiorBackground", background);
                 UIManager.put("CheckBox.highlite", background);
             }
-            JCheckBox b = new JCheckBox(id);
+            JCheckBox b = new JCheckBox((i+1)+" "+id);
             b.addMouseListener(sorter);
             
             // get tooltip
