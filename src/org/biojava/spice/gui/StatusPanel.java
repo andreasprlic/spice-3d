@@ -21,7 +21,7 @@
  * @author Andreas Prlic
  *
  */
-package org.biojava.spice.panel;
+package org.biojava.spice.gui;
 
 import org.biojava.bio.structure.AminoAcid;
 import org.biojava.bio.structure.Chain;

@@ -21,7 +21,7 @@
  *
  */
 
-package org.biojava.spice.panel ;
+package org.biojava.spice.jmol ;
 
 
 import java.awt.*;
@@ -32,8 +32,6 @@ import org.jmol.adapter.smarter.SmarterJmolAdapter;
 import org.biojava.bio.structure.Structure ;
 import org.biojava.bio.structure.StructureImpl ;
 import org.biojava.spice.ResourceManager;
-import org.biojava.spice.jmol.JmolCommander;
-import org.biojava.spice.jmol.JmolSpiceTranslator;
 
 import java.util.logging.*;
 

@@ -52,7 +52,7 @@ import org.biojava.dasobert.eventmodel.AlignmentListener;
 //import org.biojava.dasobert.eventmodel.StructureEvent;
 import org.biojava.dasobert.eventmodel.StructureListener;
 import org.biojava.spice.gui.SelectionPanel;
-import org.biojava.spice.panel.StructurePanel;
+import org.biojava.spice.jmol.StructurePanel;
 
 /** a class that builds up a structure alignment and creates a StructureAlignment object
  * 

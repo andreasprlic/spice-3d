@@ -60,13 +60,13 @@ import org.biojava.bio.structure.jama.Matrix;
 import org.biojava.spice.ResourceManager;
 import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.alignment.StructureAlignment;
+import org.biojava.spice.jmol.StructurePanel;
+import org.biojava.spice.jmol.StructurePanelListener;
 import org.biojava.spice.manypanel.eventmodel.StructureAlignmentListener;
 import org.biojava.dasobert.eventmodel.SequenceEvent;
 import org.biojava.dasobert.eventmodel.SequenceListener;
 import org.biojava.dasobert.eventmodel.StructureEvent;
 import org.biojava.dasobert.eventmodel.StructureListener;
-import org.biojava.spice.panel.StructurePanel;
-import org.biojava.spice.panel.StructurePanelListener;
 import org.jmol.api.JmolViewer;
 
 import javax.vecmath.Matrix3f;
@@ -293,6 +293,9 @@ StructureAlignmentListener {
       
         String[] ids = ali.getIds();
         Color background = getBackground();
+        
+        int displayPosition = 1;
+        
         for ( int i=0; i< ids.length;i++){
             String id = ids[i];
             Color col = structureAlignment.getColor(i);
@@ -307,7 +310,7 @@ StructureAlignmentListener {
                 UIManager.put("CheckBox.interiorBackground", background);
                 UIManager.put("CheckBox.highlite", background);
             }
-            JCheckBox b = new JCheckBox((i+1)+" "+id);
+            JCheckBox b = new JCheckBox(displayPosition+" "+id);
             b.addMouseListener(sorter);
             
             // get tooltip
@@ -316,6 +319,8 @@ StructureAlignmentListener {
             boolean doShow = isVisibleAfterFilter(objects[i],structureAlignment.getFilterBy());
             if ( ! doShow) {
                 b.setVisible(false);
+            } else {
+                displayPosition++;
             }
             b.setToolTipText(tooltip);
             
@@ -323,13 +328,16 @@ StructureAlignmentListener {
             if (selectedArr[i]) {
                 selected = true;
                 // always show selected / even if filtered out!
+                if ( ! b.isVisible())
+                    displayPosition++;
                 b.setVisible(true);
+                
             }
             
             if ( i == 0) {
                 
                 selected = true;
-                
+               
                 referenceStructure = 0;
                 structureAlignment.select(0);
                 

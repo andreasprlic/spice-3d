@@ -35,7 +35,7 @@ import org.biojava.dasobert.eventmodel.SequenceEvent;
 import org.biojava.dasobert.eventmodel.SequenceListener;
 import org.biojava.spice.config.RegistryConfiguration;
 import org.biojava.spice.gui.alignment.AlignmentGui;
-import org.biojava.spice.panel.StructurePanelListener;
+import org.biojava.spice.jmol.StructurePanelListener;
 import org.biojava.spice.manypanel.eventmodel.StructureAlignmentListener;
 import org.biojava.spice.manypanel.managers.StructureManager;
 import org.biojava.spice.server.SpiceServer;

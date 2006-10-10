@@ -31,7 +31,6 @@ import org.biojava.spice.das.AlignmentTools;
 import org.biojava.spice.manypanel.AlignmentTool;
 import org.biojava.spice.manypanel.managers.SequenceManager;
 import org.biojava.spice.manypanel.renderer.SequenceScalePanel;
-import org.biojava.spice.panel.SeqFeaturePanel;
 
 import org.biojava.bio.program.das.dasalignment.*;
 import org.biojava.dasobert.das.AlignmentParameters;
@@ -93,7 +92,7 @@ AlignmentListener
     int currentChainNumber;
     DasCoordinateSystem queryCoordSys;
     DasCoordinateSystem subjectCoordSys;
-    SeqFeaturePanel seqPanel; 
+     
     //StructureBuilder struBuild;
     Map pdbFeatures ;
     Map chainMap;

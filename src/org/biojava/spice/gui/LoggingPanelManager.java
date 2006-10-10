@@ -25,7 +25,7 @@ package org.biojava.spice.gui;
 import java.util.logging.Logger;
 
 import org.biojava.spice.config.SpiceDefaults;
-import org.biojava.spice.panel.LoggingPanel;
+import org.biojava.spice.gui.logging.LoggingPanel;
 
 public class LoggingPanelManager {
 

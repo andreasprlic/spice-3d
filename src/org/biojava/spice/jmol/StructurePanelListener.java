@@ -20,7 +20,7 @@
  * Created on Jun 16, 2005
  *
  */
-package org.biojava.spice.panel;
+package org.biojava.spice.jmol;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -38,7 +38,6 @@ import org.biojava.spice.ResourceManager;
 import org.biojava.spice.feature.Feature;
 import org.biojava.spice.feature.Segment;
 
-import org.biojava.spice.jmol.JmolCommander;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureEvent;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureListener;
 
@@ -48,7 +47,7 @@ import java.awt.Color;
 /** A class that listens to SPICE events ( like sequence position selected) and
  * triggers the corresponding script in the Jmol display (the structurePanel)
  * 
- * @see org.biojava.spice.panel.StructurePanel
+ * @see org.biojava.spice.jmol.StructurePanel
  * @see org.biojava.dasobert.eventmodel.SequenceListener
  * @see org.biojava.spice.manypanel.eventmodel.SpiceFeatureListener
  * @see org.biojava.dasobert.eventmodel.StructureListener
