@@ -142,6 +142,9 @@ extends DasSourcePanel{
         List segs = f.getSegments();
         Color c = Color.white;
         
+        if ( stylesheet == null)
+            stylesheet = new Map[0];
+        
         // check if we have a stylesheet for this Features
         boolean foundAStyleSheet = false;
         for ( int i=0 ; i< stylesheet.length ;i++ ){
