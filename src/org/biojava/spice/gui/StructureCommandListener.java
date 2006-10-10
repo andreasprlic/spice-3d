@@ -107,6 +107,7 @@ MouseListener
         String cmd = textfield.getText();
         if ( cmd.equals("enter RASMOL like command...")){
             textfield.setText("");
+            textfield.repaint();
         }
     };
     

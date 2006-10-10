@@ -35,6 +35,7 @@ import org.biojava.dasobert.eventmodel.SequenceListener;
 import org.biojava.dasobert.eventmodel.StructureEvent;
 import org.biojava.dasobert.eventmodel.StructureListener;
 import org.biojava.spice.ResourceManager;
+import org.biojava.spice.config.SpiceDefaults;
 import org.biojava.spice.feature.Feature;
 import org.biojava.spice.feature.Segment;
 
@@ -68,6 +69,7 @@ JmolCommander
         INIT_SELECT = ResourceManager.getString("org.biojava.spice.panel.StructurePanelListener.InitScript");
     }
     
+    static private String MODEL1 = "/1";
     
     StructurePanel structurePanel ;
     int currentChainNumber ;
@@ -342,8 +344,13 @@ JmolCommander
         String startpdb = gs.getPDBCode() ;
         String endpdb = ge.getPDBCode() ;
         String cmd =  "select "+startpdb+"-"+endpdb;
+        
+        // TODO: allow to select chainId with different models
+        // Q: is it always model one that has DAS tracks?
         if ( ! chainid.equals(" ")) 
-            cmd += ":" +chainid +"/1";
+            cmd += ":" +chainid + MODEL1;
+        else
+            cmd += MODEL1;
         cmd +=" and protein;";
         return cmd ;
     }
@@ -366,7 +373,7 @@ JmolCommander
      *  only turns selection on
      */
     public void selectedSeqRange(int start, int end) {
-        //System.out.println("selected " + start + " " + end);
+        //logger.info("selected " + start + " " + end);
         //highlite(currentChainNumber,start,end,"");
         String cmd = getSelectStr(currentChainNumber,start+1,end+1);
         cmd += " set display selected;";
@@ -441,13 +448,13 @@ JmolCommander
             return "" ;
         }
         
-        String cmd = "select " + pdbdat + "/1 and protein;";
+        String cmd = "select " + pdbdat + MODEL1 +" and protein;";
         return cmd ;
         
     }
     
     private void highliteFeature(Feature feature, Map[] stylesheet, boolean color ){
-        //logger.finest("highlite feature " + feature.getName());
+        //logger.info("highlite feature " + feature.getName());
         //Feature feature = (Feature) features.get(featurenr) ;
         //logger.finest("highlite feature " + feature);
         
@@ -457,7 +464,7 @@ JmolCommander
   
         Chain chain = getChain(currentChainNumber);
         if ( chain == null ){
-            logger.finest("chain=null    !");
+            logger.finest("chain=null !");
             return;
         }
         String chainId = chain.getName();
@@ -477,9 +484,9 @@ JmolCommander
             int end   = segment.getEnd()-1;
             //logger.finest("highilte segment " + i+" " + start + " " +end + "chain" + currentChainNumber );
             
-            if ( feature.getType().equals("DISULFID")){
+            if ( feature.getType().equals(SpiceDefaults.DISULFID_TYPE)){
             
-                String c = getDisulfidSelect(start,end);
+                String c = getDisulfidSelect(start,end) ;
                 cmd += "select " + c + " and protein";
                 
             } else {
@@ -501,7 +508,7 @@ JmolCommander
                 String c = "" ;
 
            
-                c += startpdb + " - " + endpdb + chainselect ; 
+                c += startpdb + " - " + endpdb + chainselect +MODEL1; 
                 cmd += "select "+  c + " and protein";
             } 
             cmd +=";";
@@ -569,18 +576,18 @@ JmolCommander
                 }
                 
                 //logger.finest("no 3D stylesheet found");
-                if ( ( feature.getType().equals("METAL")) ||
+                if ( ( feature.getType().equals(SpiceDefaults.METAL_TYPE)) ||
                         ( feature.getType().equals("SITE"))  ||
                         ( feature.getType().equals("ACT_SITE")) 	     
                 ){
                     if ( color)
                         cmd += " spacefill on; " ;
-                } else if ( feature.getType().equals("MSD_SITE")|| 
+                } else if ( feature.getType().equals(SpiceDefaults.MSD_SITE_TYPE)|| 
                         feature.getType().equals("snp") 
                 ) {
                     if ( color)
                         cmd += " wireframe on; " ;
-                } else if ( feature.getType().equals("DISULFID")){
+                } else if ( feature.getType().equals(SpiceDefaults.DISULFID_TYPE)){
                     if ( color)
                         cmd += "colour cpk; spacefill on;";
                 }
@@ -601,7 +608,7 @@ JmolCommander
             
             //logger.finest("highilte feature " +featurenr+" " + start + " " +end );
             
-            if ( feature.getType().equals("DISULFID")){
+            if ( feature.getType().equals(SpiceDefaults.DISULFID_TYPE)){
             
                 String c = getDisulfidSelect(start,end);
                 cmd +="select " + c + " and protein";
@@ -628,7 +635,7 @@ JmolCommander
                     c += ", ";
                 }
                 first = false;
-                c += startpdb + " - " + endpdb +chainselect; 
+                c += startpdb + " - " + endpdb +chainselect + MODEL1; 
                 cmd +=  c + " and protein";
             } 
         }
@@ -673,7 +680,7 @@ JmolCommander
        		
         if ( seqpos    < 0 ) return ;
         if (chainNumber < 0 ) return ;
-        String cmd = getSelectStr( chainNumber,  seqpos);
+        String cmd = getSelectStr( chainNumber,  seqpos) ;
         if (! cmd.equals("")){
             cmd += "colour "+ colour+";";
             structurePanel.executeCmd(cmd);
@@ -688,7 +695,7 @@ JmolCommander
         if ( start    < 0 ) return ;
         if (chainNumber < 0 ) return ;
         
-        String cmd = getSelectStr( chainNumber,  start,  end);
+        String cmd = getSelectStr( chainNumber,  start,  end) ;
         if ( ! cmd.equals("")){
             cmd += "colour "+ colour+"; set display selected;";
             structurePanel.executeCmd(cmd);
@@ -704,19 +711,16 @@ JmolCommander
      * @param colour
      */
     private void highlite(int chainNumber, int start, int end, String colour){
-        //logger.finest("highlite start end" + start + " " + end );
-        //if ( first_load)       return ;		
+        
       
         if ( start       < 0 ) return ;
         if ( chainNumber < 0 ) return ;
-        //if ( selectionLocked ) return ;
-        
-        // highlite structure
-        String cmd = getSelectStr( chainNumber,  start,  end);
-        //cmd +=  " spacefill on; " ;
+
+        String cmd = getSelectStr( chainNumber,  start,  end) ;
+
         if (! cmd.equals("")){
             if ( colour  != "") {
-                cmd += "colour " +colour ;
+                cmd += "colour " +colour ;                
                 colour(chainNumber,start,end,colour) ;
             }
         }
@@ -769,23 +773,15 @@ JmolCommander
         int end   = segment.getEnd()   -1 ;
         
         String type =  segment.getParent().getType() ;
-        //logger.finest(start+" " + end+" "+type);
-        //logger.finest(segment);
-        
-        
-        
-        
-        if ( type.equals("DISULFID")){
-            //highlite(currentChainNumber,start);
-            //highlite(currentChainNumber,end);
+      
+        if ( type.equals(SpiceDefaults.DISULFID_TYPE)){
             String cmd = "select " + getDisulfidSelect(start,end) + "; spacefill on; colour cpk;" ;
-            executeCmd(cmd);
+            executeCmd(cmd);            
             
-            
-        } else if (type.equals("METAL") ){
+        } else if (type.equals(SpiceDefaults.METAL_TYPE) ){
             highlite(currentChainNumber,start+1,end+1  ,"cpk");
             
-        } else if ( type.equals("MSD_SITE") || 
+        } else if ( type.equals(SpiceDefaults.MSD_SITE_TYPE) || 
                 type.equals("snp")      		  
         ) {
             highlite(currentChainNumber,start+1,end+1  ,"wireframe");	    
@@ -795,7 +791,7 @@ JmolCommander
         } else {
             
             Color c = null; 
-            if ( type.equals("SECSTRUC")){
+            if ( type.equals(SpiceDefaults.SECSTRUC_TYPE)){
                 c = segment.getColor();
             } else {
                 Segment first = (Segment) segment.getParent().getSegments().get(0);

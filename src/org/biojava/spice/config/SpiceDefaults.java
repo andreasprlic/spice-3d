@@ -49,6 +49,14 @@ public class SpiceDefaults {
     public static final Color STRAND_COLOR = new Color(255,204,51);
     public static final Color TURN_COLOR   = new Color(204,204,204); 
     
+    
+    // some  annotation types, for which there is a special treatment
+    public static final String DISULFID_TYPE = "DISULFID";
+    public static final String SECSTRUC_TYPE = "SECSTRUC";
+    public static final String METAL_TYPE    = "METAL";
+    public static final String MSD_SITE_TYPE = "MSD_SITE";
+    
+    
     public static final List argumentTypes;
     
     	static { 
