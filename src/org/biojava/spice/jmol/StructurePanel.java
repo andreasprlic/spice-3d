@@ -143,6 +143,8 @@ implements JmolCommander
         String pdb = "ATOM     63  CA  GLY     9      47.866  28.415   2.952 \n" ;
         viewer.openStringInline(pdb);
         executeCmd("select *; spacefill off;");
+        
+        
     }
     
     
@@ -150,11 +152,11 @@ implements JmolCommander
      * @param command - a String containing a RASMOL like command. e.g. "select protein; cartoon on;"
      */
     public void executeCmd(String command) {
-        logger.info(command);
+       // logger.info(command);
         if (viewer.isScriptExecuting()) 
             logger.info("viewer is executing");
         
-        viewer.evalString(command);
+        viewer.script(command);
        
     }
     

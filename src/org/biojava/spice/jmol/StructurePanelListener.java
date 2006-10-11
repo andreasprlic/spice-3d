@@ -703,6 +703,7 @@ JmolCommander
         //cmd += "set display selected;";
     }
     
+    
     /** selects a range and does some coloring
      * 
      * @param chainNumber
@@ -725,8 +726,7 @@ JmolCommander
             }
         }
         
-        structurePanel.executeCmd(cmd);
-        //structurePanel.forceRepaint();
+        structurePanel.executeCmd(cmd);       
         
     }
     

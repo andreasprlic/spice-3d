@@ -168,19 +168,17 @@ extends DasSourcePanel{
             } 
         }
         g.setColor(c);
-        
-       
+               
         Shape clip = g.getClip();
         
         // draw a background rectangle
         g.fillRect(0,y,DasScrollPaneRowHeader.SIZE ,SequenceScalePanel.DEFAULT_Y_STEP);
-        
-        
+                
         
         // draw the link icon
         // check if link
         String link = f.getLink();
-        if (( link != null) && (! link.equals(""))){
+        if ( ( link != null) && (! link.equals(""))){
             //URL url ;
             try {
                 new URL(link);
