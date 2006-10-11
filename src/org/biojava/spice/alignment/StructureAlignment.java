@@ -85,7 +85,7 @@ public class StructureAlignment {
     int nrSelected;
     
     String[] rasmolScripts;
-
+    
     String filterBy;
     
     JProgressBar progressBar;
@@ -106,6 +106,7 @@ public class StructureAlignment {
     DasCoordinateSystem coordSys;
     
     List selectionOrder;
+    Map assignedColors;
     
     public StructureAlignment(DasCoordinateSystem coordSys) {
         super();
@@ -121,6 +122,7 @@ public class StructureAlignment {
         waitingForStructure = false;
         loadedStructure = null;
         selectionOrder = new ArrayList();
+        assignedColors = new HashMap();
     }
     
     public DasCoordinateSystem getCoordinateSystem(){
@@ -142,11 +144,11 @@ public class StructureAlignment {
     public String getFilterBy() {
         return filterBy;
     }
-
+    
     public void setFilterBy(String filterBy) {
         this.filterBy = filterBy;
     }
-
+    
     public int getNrStructures(){
         if ( structures == null)
             return 0;
@@ -203,20 +205,20 @@ public class StructureAlignment {
     }    
     
     public String[] getAccessionCodes() {
-		return accessionCodes;
-	}
-
-	public void setAccessionCodes(String[] accessionCodes) {
-		this.accessionCodes = accessionCodes;
-	}
-
-	public boolean isZeroMatrix(Matrix m){
-       
+        return accessionCodes;
+    }
+    
+    public void setAccessionCodes(String[] accessionCodes) {
+        this.accessionCodes = accessionCodes;
+    }
+    
+    public boolean isZeroMatrix(Matrix m){
+        
         for ( int x=0;x<3;x++){
             for ( int y=0;y<3;y++){
                 double val = m.get(x,y);
                 if ( val != 0.0){
-                   return false;
+                    return false;
                 }
             }
         }
@@ -248,7 +250,7 @@ public class StructureAlignment {
     }
     
     public void setAlignment(Alignment alignment) throws StructureException {
-       
+        
         
         // convert the alignment object into the internal matrices, vectors
         Annotation[] maxs = alignment.getMatrices();
@@ -256,7 +258,7 @@ public class StructureAlignment {
         Annotation[] objects = alignment.getObjects();
         System.out.println(objects[0]);
         Annotation[] vectors = alignment.getVectors();
-       
+        
         
         int n = objects.length;
         
@@ -272,7 +274,7 @@ public class StructureAlignment {
         }
         
         
-       
+        
         //zero.print(3,3);
         List objectNew   = new ArrayList();
         List matricesNew = new ArrayList();
@@ -302,23 +304,23 @@ public class StructureAlignment {
         objects      = (Annotation[]) objectNew.toArray(   new Annotation[objectNew.size()]);
         matrices     = (Matrix[])     matricesNew.toArray( new Matrix[matricesNew.size()]);
         vectors      = (Annotation[]) vectorsNew.toArray(  new Annotation[vectorsNew.size()]);
-       
+        
         Annotation[] blockx  = alignment.getBlocks();
         Annotation[] allMaxes =(Annotation[]) annoMax.toArray(new Annotation[annoMax.size()]); 
         try {
             this.alignment = newAlignmentFromCheckedData(objects, allMaxes, vectors,blockx);
         } catch (DASException e) {
             e.printStackTrace();
-          
+            
         }
         
         sortedBlocks = sortBlocks(blockx);
         
         /*System.out.println(n);
-        System.out.println(objects.length);
-        System.out.println(matrices.length);
-        System.out.println(vectors.length);
-        */
+         System.out.println(objects.length);
+         System.out.println(matrices.length);
+         System.out.println(vectors.length);
+         */
         
         n = objects.length;
         nrSelected = 0;
@@ -343,7 +345,7 @@ public class StructureAlignment {
             loaded[i]         = false;
         } 
         
-       
+        
         
     }
     
@@ -372,7 +374,9 @@ public class StructureAlignment {
     public void deselect(int pos){
         selection[pos] = false;
         nrSelected--;
-        selectionOrder.remove(new Integer(pos));
+        Integer ipos = new Integer(pos);
+        selectionOrder.remove(ipos);
+        assignedColors.remove(ipos);
         
     }
     
@@ -408,9 +412,9 @@ public class StructureAlignment {
     
     
     public String getRasmolScript(){
-    
+        
         return getRasmolScript(getLastSelectedPos()); 
-            
+        
         
     }
     
@@ -419,7 +423,7 @@ public class StructureAlignment {
         
         String cmd = "select *; backbone 0.3;";
         
-
+        
         if ( firstSelectedPos < 0)
             return cmd;
         
@@ -430,13 +434,13 @@ public class StructureAlignment {
         int modelcount = 1;
         cmd += "select */"+modelcount+"; ";
         cmd += " color [" +chaincol.getRed()+","+chaincol.getGreen() +","+chaincol.getBlue() +"];";
-              
+        
         if ( (sortedBlocks != null)&&(sortedBlocks.length > 0)) {
             cmd += getRasmolFromSortedBlock(firstSelectedPos, modelcount);
         } else {
             cmd += getRasmolScriptFromPrepared(firstSelectedPos);
         }    
-       
+        
         
         for ( int p=0;p<selection.length;p++){
             
@@ -468,10 +472,10 @@ public class StructureAlignment {
     }
     
     private String getRasmolScriptFromPrepared(int p){
-    	if ( rasmolScripts == null)
-    		return "";
-    	else 
-    		return rasmolScripts[p];
+        if ( rasmolScripts == null)
+            return "";
+        else 
+            return rasmolScripts[p];
     }
     
     private String getRasmolFromSortedBlock(int p, int modelcount){
@@ -534,7 +538,7 @@ public class StructureAlignment {
     public Structure createArtificalStructure(){
         
         int firstOne = getLastSelectedPos() ;        
-         
+        
         return createArtificalStructure(firstOne);
         
     }
@@ -554,7 +558,7 @@ public class StructureAlignment {
         //logger.info("firstPosition " + firstPosition);
         Structure newStruc = new StructureImpl();
         newStruc.setNmr(true);
-                
+        
         
         if ( firstPosition == -1 )
             return newStruc;
@@ -576,7 +580,7 @@ public class StructureAlignment {
         }
         
         
-      
+        
         int n = intObjectIds.length;
         for (int i=0;i<n;i++){
             if ( i == firstPosition )
@@ -607,39 +611,46 @@ public class StructureAlignment {
      * @return Color
      */
     public Color getColor(int position){
-    	
-    	if ( position == 0 ) {
-    		if ( coordSys.toString().equals("CASP,Protein Structure")){
-    			return Color.white;
-    		}
-    	}
-    	
-         float stepsize   = 0;
-         
-         // do a circle of 6 colors...
-         
-         int NR_COLS = 6;
-         stepsize = 1.0f / (float)NR_COLS ;
-         float saturation = 1.0f;
-         float brightness = 1.0f;
+        
+        if ( position == 0 ) {
+            if ( coordSys.toString().equals("CASP,Protein Structure")){
+                return Color.white;
+            }
+        }
+        
+        float stepsize   = 0;
+        
+        // do a circle of 6 colors...
+        
+        int NR_COLS = 6;
+        stepsize = 1.0f / (float)NR_COLS ;
+        float saturation = 1.0f;
+        float brightness = 1.0f;
         
         Integer selectionPosition = new Integer(position);
-
+        
         if (!  selectionOrder.contains(selectionPosition)) {
+            Color col = (Color) assignedColors.get(selectionPosition);
+            if ( col != null)
+                return col;
             int pos = ( position % NR_COLS );
             
             //System.out.println("color: position " + position + " nrSel " + nrSelected + " " + pos );
             
             float hue = ( pos * stepsize );
-            Color col = Color.getHSBColor(hue,saturation,brightness);
+            col = Color.getHSBColor(hue,saturation,brightness);
+            assignedColors.put(selectionPosition,col);
             return col;
             
         } else {           
-            
+            Color col = (Color) assignedColors.get(selectionPosition);
+            if ( col != null)
+                return col;
             int selectPos = selectionOrder.indexOf(selectionPosition);
             int pos = ( selectPos % NR_COLS);
             float hue = ( pos * stepsize );
-            Color col = Color.getHSBColor(hue,saturation,brightness);
+            col = Color.getHSBColor(hue,saturation,brightness);
+            assignedColors.put(selectionPosition,col);
             return col;
             
         }
@@ -652,35 +663,35 @@ public class StructureAlignment {
      * @return the accession code for object nr X.
      */
     private String getAccesionCodeForObject(int pos){
-    	
-    	//TODO:  move these rules to a config file!
-    	
-    	//TODO: the SISYPHUS should acutally use the dbAccesionId codes as foreign IDS
-    	//TODO:  update the SISYPHUS das server
-    	
-    	String pdbCode = "";
-    	
-    	if ((coordSys != null) &&( coordSys.toString().equals("CASP,Protein Structure")))
-    		pdbCode = accessionCodes[pos];
-    	
-    	else {
-    		pdbCode = intObjectIds[pos].substring(0,4);
-    	}
-    	
-    	return pdbCode;
-
+        
+        //TODO:  move these rules to a config file!
+        
+        //TODO: the SISYPHUS should acutally use the dbAccesionId codes as foreign IDS
+        //TODO:  update the SISYPHUS das server
+        
+        String pdbCode = "";
+        
+        if ((coordSys != null) &&( coordSys.toString().equals("CASP,Protein Structure")))
+            pdbCode = accessionCodes[pos];
+        
+        else {
+            pdbCode = intObjectIds[pos].substring(0,4);
+        }
+        
+        return pdbCode;
+        
     }
-   
+    
     
     
     public Structure getStructure(int pos) throws StructureException{
         
-    	if ( loaded[pos])
+        if ( loaded[pos])
             return returnStructureOrRange(pos,structures[pos]);
         
-    	
-    	String pdbCode = getAccesionCodeForObject(pos);
-    	
+        
+        String pdbCode = getAccesionCodeForObject(pos);
+        
         
         // show busy frame...
         ProgressThreadDrawer drawer = new ProgressThreadDrawer(pdbCode);
@@ -693,18 +704,18 @@ public class StructureAlignment {
         Structure s = null;
         
         /*StructureThread sthread = new StructureThread(pdbCode,structureServers);
-        sthread.addStructureListener(new MyStructureListener(this));
-        waitingForStructure = true;
-        sthread.start();
-       
-        while ( waitingForStructure){
-            try {
-                System.out.println("waitingForStructure " + waitingForStructure);
-                wait(100);             
-            } catch (InterruptedException ex){
-                waitingForStructure = false;
-            }
-        }*/
+         sthread.addStructureListener(new MyStructureListener(this));
+         waitingForStructure = true;
+         sthread.start();
+         
+         while ( waitingForStructure){
+         try {
+         System.out.println("waitingForStructure " + waitingForStructure);
+         wait(100);             
+         } catch (InterruptedException ex){
+         waitingForStructure = false;
+         }
+         }*/
         
         
         
@@ -718,8 +729,8 @@ public class StructureAlignment {
             try {
                 s = dasc.getStructureById(pdbCode);
                 if ( s != null) {
-                	if ( s.size() > 0)
-                		break;
+                    if ( s.size() > 0)
+                        break;
                 }
             } catch (IOException e){
                 continue;
@@ -739,7 +750,7 @@ public class StructureAlignment {
         Atom vector = shiftVectors[pos];
         
         //System.out.println("applying rotation matrix");
-       // m.print(3,3);
+        // m.print(3,3);
         
         Calc.rotate(s,m);
         Calc.shift(s,vector);
@@ -755,7 +766,7 @@ public class StructureAlignment {
     }
     
     private Structure returnStructureOrRange(int pos, Structure s){
-      
+        
         String property = SpiceMenuListener.structureDisplayProperty;
         
         String val = System.getProperty(property);
@@ -796,9 +807,9 @@ public class StructureAlignment {
         Map protectionMap = new HashMap();
         
         if ( object.containsProperty("details")){
-
+            
             List details = (List) object.getProperty("details");
-              
+            
             for ( int det = 0 ; det< details.size();det++) {
                 Annotation detanno = (Annotation) details.get(det);
                 String property = (String)detanno.getProperty("property");
@@ -808,7 +819,7 @@ public class StructureAlignment {
                 
                 String detail = (String) detanno.getProperty("detail");
                 //System.out.println("got detail " + detail);
-              
+                
                 
                 // split up the structure and add the region to the new structure...
                 int cpos = detail.indexOf(":");
@@ -833,7 +844,7 @@ public class StructureAlignment {
                 
                 
                 Object prot = protectionMap.get(chainId);
-
+                
                 List protectedResidues;
                 if ( prot == null)
                     protectedResidues = new ArrayList();
@@ -914,14 +925,14 @@ public class StructureAlignment {
             Iterator giter = origGroups.iterator();
             
             while (giter.hasNext()){
-              Group orig = (Group) giter.next();
-              Group n = (Group) orig.clone();
-              if ( ! residues.contains(orig.getPDBCode())){
-                  // this group has been
-                  n.clearAtoms();
-
-              }
-              newChain.addGroup(n);              
+                Group orig = (Group) giter.next();
+                Group n = (Group) orig.clone();
+                if ( ! residues.contains(orig.getPDBCode())){
+                    // this group has been
+                    n.clearAtoms();
+                    
+                }
+                newChain.addGroup(n);              
             }
             newStruc.addChain(newChain);                        
         }
@@ -971,7 +982,7 @@ public class StructureAlignment {
     public void setSelected(int pos, boolean flag){
         selection[pos] = flag;
     }
-
+    
     /** convert the Matrix annotation to a Matrix
      * 
      * @param anno
@@ -996,7 +1007,7 @@ public class StructureAlignment {
 
 
 class ProgressThreadDrawer extends Thread {
-
+    
     JProgressBar progress;
     static int interval = 100;
     JFrame frame;
@@ -1014,20 +1025,20 @@ class ProgressThreadDrawer extends Thread {
                 terminate();                
             }
             public void windowOpened(WindowEvent arg0) {
-             }
-
+            }
+            
             public void windowClosed(WindowEvent arg0) {
-             }
-
+            }
+            
             public void windowIconified(WindowEvent arg0) {
-             }
-
+            }
+            
             public void windowDeiconified(WindowEvent arg0) {
-             }
-
+            }
+            
             public void windowActivated(WindowEvent arg0) {
-             }
-
+            }
+            
             public void windowDeactivated(WindowEvent arg0) {
                 
             }
@@ -1047,15 +1058,15 @@ class ProgressThreadDrawer extends Thread {
     
     public void showProgressFrame(){
         
-       JFrame progressFrame = frame;
+        JFrame progressFrame = frame;
         
         ImageIcon icon = SpiceApplication.createImageIcon("spice16x16.gif");
         if (icon != null) {
             progressFrame.setIconImage(icon.getImage());
         }
-                
+        
         JFrame.setDefaultLookAndFeelDecorated(false);
-   
+        
         
         JPanel panel = new JPanel();
         panel.setBackground(SequenceScalePanel.BACKGROUND_COLOR);
@@ -1072,7 +1083,7 @@ class ProgressThreadDrawer extends Thread {
         progressBar.setValue(0);
         progressBar.setMaximumSize(new Dimension(400,20));
         progressBar.setBorder(BorderFactory.createEmptyBorder());
-                
+        
         progressFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         
         
@@ -1101,7 +1112,7 @@ class ProgressThreadDrawer extends Thread {
         progressFrame.repaint();
         
         progressFrame.setVisible(true);        
-       
+        
         progress =progressBar;
     }
     
@@ -1116,7 +1127,7 @@ class ProgressThreadDrawer extends Thread {
                 //System.out.println("repainting frame");
                 progress.repaint();
                 frame.repaint();
-               
+                
                 if ( !terminated){
                     finished =false;
                     break;
