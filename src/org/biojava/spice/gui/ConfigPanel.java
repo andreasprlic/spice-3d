@@ -220,7 +220,7 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
         regdesc.setEditable(false);
         regdesc.setBorder(BorderFactory.createEmptyBorder());
         v.add(regdesc);
-        String url = RegistryConfiguration.DEFAULTREGISTRY;
+        String url = SpiceDefaults.REGISTRY;
         if ( config != null )
             url = config.getRegistryUrl().toString();
         JTextField registry = new JTextField(url);

@@ -45,11 +45,19 @@ public class MenuCreator {
     public static JMenu createAlignmentMenu(SpiceMenuListener ml){
         String menuText = bundle.getString("org.biojava.spice.gui.menu.AlignmentMenu");
         JMenu amenu = new JMenu(menuText);
+        
         String toggleText = bundle.getString("org.biojava.spice.gui.menu.AlignmentToggleStructure");
         JMenuItem region = new JMenuItem(toggleText);
         region.addActionListener(ml);
         region.setMnemonic(KeyEvent.VK_T);
         amenu.add(region);
+        
+        String switchText = bundle.getString("org.biojava.spice.gui.menu.AlignmentServerSwitch");
+        JMenuItem switcher = new JMenuItem(switchText);
+        switcher.addActionListener(ml);
+        switcher.setMnemonic(KeyEvent.VK_S);
+        amenu.add(switcher);
+        
         return amenu;
     }
 

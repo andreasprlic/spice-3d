@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.Group;
 import org.biojava.bio.structure.Structure;
+import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.eventmodel.SequenceEvent;
 import org.biojava.dasobert.eventmodel.SequenceListener;
 import org.biojava.spice.config.RegistryConfiguration;
@@ -40,6 +41,7 @@ import org.biojava.spice.manypanel.eventmodel.StructureAlignmentListener;
 import org.biojava.spice.manypanel.managers.StructureManager;
 import org.biojava.spice.server.SpiceServer;
 import org.biojava.spice.utils.BrowserOpener;
+import org.biojava.spice.ResourceManager;
 import org.biojava.spice.SPICEFrame;
 import org.biojava.spice.SpiceStartParameters;
 //import org.biojava.spice.Panel.seqfeat.*;
@@ -338,7 +340,14 @@ SequenceListener
             }
             
            
+        } else if ( cmd.equals(ResourceManager.getString("org.biojava.spice.gui.menu.AlignmentServerSwitch"))) {
             
+            logger.info("requested alignment switch");
+            if ( spice instanceof SpiceApplication) {
+                SpiceApplication sp = (SpiceApplication) spice;
+                AlignmentServerSwitcher switcher = new AlignmentServerSwitcher(sp);
+              
+            }
             
         
         } else {

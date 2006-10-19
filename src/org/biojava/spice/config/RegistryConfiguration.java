@@ -63,11 +63,7 @@ public class RegistryConfiguration
     Date   lastContact         ;
     URL registryUrl         ;
     
-    //static String PDBCOORDSYS     = "PDBresnum,Protein Structure";
-    //static String UNIPROTCOORDSYS = "UniProt,Protein Sequence";
-    
-    public static String DEFAULTREGISTRY = "http://das.sanger.ac.uk/registry/das1/sources";
-    
+      
     static Logger logger      = Logger.getLogger("org.biojava.spice");
     
     public RegistryConfiguration () {
@@ -81,7 +77,7 @@ public class RegistryConfiguration
         updateBehave      = "always";
         lastContact       = new Date(0) ;
         try {
-            registryUrl       = new URL(DEFAULTREGISTRY);
+            registryUrl       = new URL(SpiceDefaults.REGISTRY);
         } catch( MalformedURLException e ){
             e.printStackTrace();
             registryUrl = null;
@@ -442,6 +438,7 @@ public class RegistryConfiguration
      * @return List
      */
     public List getServers(String capability) {
+        
         ArrayList retservers = new ArrayList();
         
         Iterator iter = allservers.iterator();
@@ -457,8 +454,7 @@ public class RegistryConfiguration
                 }
             }
         }
-        
-        
+                
         return retservers ;
     }
     
