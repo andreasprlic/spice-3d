@@ -345,7 +345,7 @@ SequenceListener
             logger.info("requested alignment switch");
             if ( spice instanceof SpiceApplication) {
                 SpiceApplication sp = (SpiceApplication) spice;
-                AlignmentServerSwitcher switcher = new AlignmentServerSwitcher(sp);
+                new AlignmentServerSwitcher(sp);
               
             }
             

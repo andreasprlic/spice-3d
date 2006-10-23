@@ -113,6 +113,12 @@ implements JmolCommander
     }
     
     
+    public void clearDisplay(){
+        executeCmd("zap;");
+        setStructure(new StructureImpl());
+    }
+    
+    
     /** returns the JmolViewer
      * 
      * @return the viewer

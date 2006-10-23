@@ -22,6 +22,7 @@
  */
 package org.biojava.spice.gui;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.biojava.spice.config.SpiceDefaults;
@@ -30,15 +31,20 @@ import org.biojava.spice.gui.logging.LoggingPanel;
 public class LoggingPanelManager {
 
     public static Logger logger =  Logger.getLogger(SpiceDefaults.LOGGER);
-       
+      
+    public static final LoggingPanel loggingPanel = new LoggingPanel(logger);
+    
     public LoggingPanelManager() {
         super();
     }
     
+    public static void setLogLevel(Level level){
+        loggingPanel.getHandler().setLevel(level); 
+        logger.setLevel(level);
+    }
+    
     public static void show(){
-        final LoggingPanel loggingPanel = new LoggingPanel(logger);
-        loggingPanel.getHandler().setLevel(SpiceDefaults.LOG_LEVEL); 
-        logger.setLevel(SpiceDefaults.LOG_LEVEL);
+        setLogLevel(SpiceDefaults.LOG_LEVEL);        
         loggingPanel.show(null);
         
     }

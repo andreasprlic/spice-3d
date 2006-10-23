@@ -34,14 +34,14 @@ import org.biojava.spice.config.RegistryConfiguration;
 
 public class AlignmentServerSwitcher  {
 
-    SpiceApplication spice;
+   
     
     public AlignmentServerSwitcher(SpiceApplication spice) {
         super();
-        this.spice = spice;
+     
         
-        SpiceApplication sp = (SpiceApplication) spice;
-        List servers = sp.getConfiguration().getServers("alignment");
+        
+        List servers = spice.getConfiguration().getServers("alignment");
         //SpiceDasSource[] servs = (SpiceDasSource[])servers.toArray(new SpiceDasSource[servers.size()]);
        
         String[] options = new String[servers.size()]; 
@@ -59,13 +59,13 @@ public class AlignmentServerSwitcher  {
         
         
         JFrame frame = new JFrame("Switch Alignment Server");
-        String msg = "`Please choose your preferred alignment server ... ";
+        String msg = "Choose preferred alignment server ... ";
         
         
         
         String selectedValue =(String) JOptionPane.showInputDialog(frame,
                 msg,
-                "please choose SPICE window",
+                "Choose preferred alignment server",
                 JOptionPane.PLAIN_MESSAGE,
                 null,
                 options,
@@ -83,6 +83,9 @@ public class AlignmentServerSwitcher  {
                 RegistryConfiguration config = spice.getConfiguration();
                 config.moveToPosition(sd.getUrl(),0);
                 spice.newConfigRetrieved(config);
+             
+                // trigger reload...
+                spice.reload();
                 
             }
         }

@@ -116,6 +116,13 @@ implements StructureListener
         alignmentChooser.clearListeners();
     }
     
+    
+    public void clearDisplay(){
+        alignmentChooser.setStructureAlignment(null);
+        StructureEvent event = new StructureEvent(new StructureImpl());
+        chainDisplay.newStructure(event);
+    }
+    
     public StructureAlignmentChooser getAlignmentChooser(){
         return alignmentChooser;
     }
@@ -165,8 +172,7 @@ implements StructureListener
         JTextField searchBox = alignmentChooser.getSearchBox();
         horBox.add(searchBox);
         
-        ImageIcon icon = alignmentChooser.getDeleteIcon();
-        
+        ImageIcon icon = alignmentChooser.getDeleteIcon();        
         
         Action action = new AbstractAction("X") {
             
@@ -177,7 +183,12 @@ implements StructureListener
                 JTextField searchBox = alignmentChooser.getSearchBox();
                 searchBox.setText("");
                 //KeyEvent(Component source, int id, long when, int modifiers, int keyCode, char keyChar) 
-                KeyEvent event = new KeyEvent(searchBox,1,new java.util.Date().getTime(),1,KeyEvent.VK_BACK_SPACE,KeyEvent.CHAR_UNDEFINED);
+                KeyEvent event = new KeyEvent(searchBox,
+                        1,
+                        new java.util.Date().getTime(),
+                        1,
+                        KeyEvent.VK_BACK_SPACE,
+                        KeyEvent.CHAR_UNDEFINED);
                 
                 KeyListener[] listeners = searchBox.getKeyListeners();
                 for (int i=0 ; i< listeners.length ;i++){

@@ -110,8 +110,7 @@ ConfigurationListener
     
     URL[] REGISTRY_URLS    ; // the url to the registration server
      
-    static int    DEFAULT_Y_SCROLL = 50 ;
-    
+    static int    DEFAULT_Y_SCROLL = 50 ;    
         
     RegistryConfiguration config      ;
     Structure structure ; 
@@ -167,6 +166,10 @@ ConfigurationListener
     Box vBox;
     
     static SegmentPopupFrame popupFrame = new SegmentPopupFrame();
+    
+    
+    String currentAccessionCode = "";
+    String currentType          = "";
     
     /** 
      * start the spice appplication
@@ -349,13 +352,7 @@ ConfigurationListener
     public void setSpiceServer(SpiceServer server){     
         spiceServer = server; 
     }
-   
-   
-    
-    
-    
-    
-    
+      
     /**
      *  statusPanel   = StatusPanel(); 
      * seq_pos        = new JTextField();
@@ -603,6 +600,20 @@ ConfigurationListener
             processNextInQueue();
     }
     
+    /** force a re-load of all the currently displayed data
+     * 
+     *
+     */
+    public void reload(){
+        logger.info("reloading display");
+        
+        structurePanel.clearDisplay();
+        browserPane.clearDisplay();
+        selectionPanel.clearDisplay();
+        
+        load(currentType, currentAccessionCode);
+        
+    }
     
     private void processNextInQueue(){
         
@@ -628,22 +639,22 @@ ConfigurationListener
         
         
         
-        if (type.equals("PDB")){
+        if (type.equals(SpiceDefaults.PDBType)){
             
             this.loadStructure(code);
            
         }
-        else if (type.equals("UniProt")) {
+        else if (type.equals(SpiceDefaults.UniProtType)) {
             //logger.info("got uniprot");
             // connect to Uniprot -pdb alignment service, get PDB code and load it ...
             loadUniprot(code);
             
         }
-        else if (type.equals("ENSP")) {
+        else if (type.equals(SpiceDefaults.EnspType)) {
             loadEnsp(code);
             
         }
-        else if (type.equals("alignment")){
+        else if (type.equals(SpiceDefaults.AlignmentType)){
             // spice will be running in structure alignment mode
             String aligcs = startParameters.getStructureAlignmentMode();
             DasCoordinateSystem dcs = DasCoordinateSystem.fromString(aligcs);
@@ -676,12 +687,16 @@ ConfigurationListener
      protein structure
      */
     protected void loadUniprot(String uniprot) {
+        
+        currentType = SpiceDefaults.UniProtType;
+        currentAccessionCode = uniprot;
+        
         logger.info("SpiceApplication loadUniprot " + uniprot);
         System.setProperty("SPICE:drawStructureRegion","false");
         if ( config == null){
             // we have to wait until contacting the DAS registry is finished ...
             Map m = new HashMap();
-            m.put("type","UniProt");
+            m.put("type",SpiceDefaults.UniProtType);
             m.put("code", uniprot);
             loadQueue.add(m);
             return;
@@ -697,11 +712,14 @@ ConfigurationListener
     */
    protected void loadEnsp(String ensp) {
        //logger.info("SpiceApplication loadEnsp" + ensp);
+       currentType = SpiceDefaults.EnspType;
+       currentAccessionCode = ensp;
+       
        System.setProperty("SPICE:drawStructureRegion","false");
        if ( config == null){
            // we have to wait until contacting the DAS registry is finished ...
            Map m = new HashMap();
-           m.put("type","Ensp");
+           m.put("type",SpiceDefaults.EnspType);
            m.put("code", ensp);
            loadQueue.add(m);
            return;
@@ -722,6 +740,10 @@ ConfigurationListener
      call the setStructure method to set the protein structure.
      */
     protected void loadStructure(String pdbcod) {
+        
+        currentType = SpiceDefaults.PDBType;
+        currentAccessionCode = pdbcod;
+        
         System.setProperty("SPICE:drawStructureRegion","false");
         //currentChain = null ;
         setCurrentChain(null,-1);
@@ -738,7 +760,7 @@ ConfigurationListener
         if ( config == null){
             // we have to wait until contacting the DAS registry is finished ...
             Map m = new HashMap();
-            m.put("type","PDB");
+            m.put("type",SpiceDefaults.PDBType);
             m.put("code", pdbcod);
             loadQueue.add(m);
             return;
@@ -760,6 +782,10 @@ ConfigurationListener
      * @param aligCs the coordinate system of the alignment server to use
      */
     public void loadAlignment(String alignmentCode, DasCoordinateSystem aligCs){
+        
+        currentType = SpiceDefaults.AlignmentType;
+        currentAccessionCode = alignmentCode;
+        
         logger.info("loading Structure alignment for coordinate system " + aligCs.toString());
         List aligservers = config.getServers("alignment", aligCs.toString());
         logger.info("found " +aligservers.size() + "alignment servers");

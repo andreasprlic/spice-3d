@@ -54,6 +54,15 @@ public interface SPICEFrame
      */
     public void load(String type, String code);
 	
+    
+    /** reload the currently displayed data
+     * 
+     *
+     */
+    public void reload();
+        
+    
+    
     /** retrieve configuration for DAS servers to use 
      * @return RegistryConfiguration the config
      * */    

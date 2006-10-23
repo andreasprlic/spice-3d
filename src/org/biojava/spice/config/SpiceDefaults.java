@@ -38,7 +38,7 @@ public class SpiceDefaults {
 	public static final String LOGGER = "org.biojava.spice";
 	public static final Level  LOG_LEVEL = Level.INFO;
 	
-	public static final String REGISTRY    = ResourceManager.getString("org.biojava.spice.SpiceDefaults.Registry");
+	public static final String REGISTRY  = ResourceManager.getString("org.biojava.spice.SpiceDefaults.Registry");
 	
 	public static String PDBCOORDSYS     = ResourceManager.getString("org.biojava.spice.SpiceDefaults.PDBCoordSys");
     public static String UNIPROTCOORDSYS = ResourceManager.getString("org.biojava.spice.SpiceDefaults.UniProtCoordSys");
@@ -59,12 +59,21 @@ public class SpiceDefaults {
     
     public static final List argumentTypes;
     
+    public static final String EnspType      = "ENSP";
+    public static final String UniProtType   = "UniProt";
+    public static final String PDBType       = "PDB";
+    public static final String AlignmentType = "alignment";
+    
+    
     	static { 
     			argumentTypes = new ArrayList();
-    			argumentTypes.add("PDB");
-    			argumentTypes.add("UniProt");
-    			argumentTypes.add("ENSP");
-    			argumentTypes.add("alignment");
+    			argumentTypes.add(PDBType);
+    			argumentTypes.add(UniProtType);
+    			argumentTypes.add(EnspType);
+    			argumentTypes.add(AlignmentType);
     	}
+        
+    
+        
     
 }

@@ -71,7 +71,7 @@ import org.biojava.spice.config.SpiceDefaults;
 public class ConfigPanel extends JPanel implements ConfigurationListener{
     
     private static final long serialVersionUID = 8273923744127087421L;
-    static Logger    logger      = Logger.getLogger("org.biojava.spice"); //$NON-NLS-1$
+    static Logger    logger      =  Logger.getLogger(SpiceDefaults.LOGGER); //$NON-NLS-1$
    
     static String[] DASSOURCE_FIELDS = new String[] { 
         ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Url"), //$NON-NLS-1$
@@ -234,9 +234,76 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
         jmoldesc.setBorder(BorderFactory.createEmptyBorder());
         v.add(jmoldesc);
         
-        String[] windowPosition = {ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.31"), ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.32"),ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.33"),ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.34")}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+        String[] windowPosition = {ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.31"),
+                ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.32"),
+                ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.33"),
+                ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.34")}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+        
         JComboBox windowlayout = new JComboBox(windowPosition);
         v.add(windowlayout);
+        
+        // the logging level
+        JTextField logLevelDesc = new JTextField(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.LogLevelFieldDesc"));
+        logLevelDesc.setEditable(false);
+        logLevelDesc.setBorder(BorderFactory.createEmptyBorder());
+        v.add(logLevelDesc);
+        
+        String[] logLevels = {
+                ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.LogLevel.Severe"),
+                ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.LogLevel.Warning"),
+                ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.LogLevel.Info"),
+                ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.LogLevel.Config"),
+                ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.LogLevel.Fine"),
+                ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.LogLevel.Finer"),
+                ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.LogLevel.Finest")
+        };
+        
+        JComboBox logLevelsBox = new JComboBox(logLevels);
+        v.add(logLevelsBox);
+        
+        // get current loglevel
+        String currentLogLevel = logger.getLevel().getName(); 
+            
+        int currentLogPos = 0;
+        for( int i =0 ; i < logLevels.length ;i++){
+            String testLevel = logLevels[i];
+            if ( currentLogLevel.equalsIgnoreCase(testLevel)) {
+                currentLogPos = i;
+                break;
+            }
+        }
+        logLevelsBox.setSelectedIndex(currentLogPos);
+        logLevelsBox.addActionListener(new ActionListener(){
+
+            public void actionPerformed(ActionEvent e) {
+                JComboBox cb = (JComboBox) e.getSource();
+                
+                String cmd = (String) cb.getSelectedItem();
+               
+                if ( cmd.equalsIgnoreCase(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.LogLevel.Severe")))
+                    setLevel(Level.SEVERE);
+                    
+                else if ( cmd.equalsIgnoreCase(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.LogLevel.Warning")))
+                    setLevel(Level.WARNING);                    
+                
+                else if( cmd.equalsIgnoreCase(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.LogLevel.Info")))
+                    setLevel(Level.INFO);                    
+                    
+                else if ( cmd.equalsIgnoreCase( ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.LogLevel.Config")))
+                    setLevel(Level.CONFIG);                    
+                
+                else if ( cmd.equalsIgnoreCase( ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.LogLevel.Fine")))
+                    setLevel(Level.FINE);                    
+                
+                else if ( cmd.equalsIgnoreCase( ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.LogLevel.Finer")))
+                    setLevel(Level.FINER);                    
+                    
+                else if ( cmd.equalsIgnoreCase( ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.LogLevel.Finest")))
+                    setLevel(Level.FINEST);                    
+                
+            }
+            
+        });
         
         generalConfigForm.add(v);
         //generalConfigForm.add(contactRegistryNow);
@@ -244,6 +311,12 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
         return generalConfigForm;
         
         
+    }
+    
+    private void setLevel(Level level){
+        logger.info("setting log level to " + level);
+        logger.setLevel(level);   
+        LoggingPanelManager.setLogLevel(level);
     }
     
     protected JPanel getLocalPDBPanel() {

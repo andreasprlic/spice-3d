@@ -32,6 +32,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import org.biojava.dasobert.das.SpiceDasSource;
+import org.biojava.spice.ResourceManager;
 import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.gui.ConfigPanel;
 
@@ -76,8 +77,8 @@ public class ConfigGui {
         vbox.add(tpd);
         
         
-        JButton saveb   = new JButton("Save");
-        JButton cancelb = new JButton("Close");
+        JButton saveb   = new JButton(ResourceManager.getString("org.biojava.spice.action.save"));
+        JButton cancelb = new JButton(ResourceManager.getString("org.biojava.spice.action.close"));
         
         saveb.addActionListener(   new ButtonListener(frame, tpd) );
         cancelb.addActionListener( new ButtonListener(frame, tpd) );
@@ -134,9 +135,9 @@ implements ActionListener
     public void actionPerformed(ActionEvent e) {
         String cmd = e.getActionCommand();
    
-        if ( cmd.equals("Close")) {
+        if ( cmd.equals(ResourceManager.getString("org.biojava.spice.action.close"))) {
             parent.dispose();
-        } else  if (cmd.equals("Save")) {
+        } else  if (cmd.equals(ResourceManager.getString("org.biojava.spice.action.save"))) {
             
             configpane.saveConfiguration();
             parent.dispose();
