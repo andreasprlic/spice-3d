@@ -40,8 +40,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List             ;
 import java.util.Map;
-import java.net.MalformedURLException;
 import java.net.URL                    ;
+import java.net.URLEncoder;
 
 //import java.util.Iterator;
 
@@ -99,8 +99,9 @@ extends Thread
         String queryString = url + "features?segment="+ accessionCode ;
         URL Url = null ;
         try {
-            Url = new URL(queryString);
-        } catch (MalformedURLException e ) {
+            
+            Url = new URL(URLEncoder.encode(queryString, "UTF-8"));
+        } catch (Exception e ) {
             logger.warning("got MalformedURL from das source " +ds);
             e.printStackTrace();
            
