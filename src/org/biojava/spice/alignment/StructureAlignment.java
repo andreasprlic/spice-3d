@@ -27,6 +27,7 @@ import java.awt.Dimension;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -46,6 +47,7 @@ import javax.swing.JProgressBar;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.program.das.dasalignment.Alignment;
 import org.biojava.bio.program.das.dasalignment.DASException;
+import org.biojava.bio.program.das.dasstructure.DASStructureCall;
 import org.biojava.bio.structure.Atom;
 import org.biojava.bio.structure.Calc;
 import org.biojava.bio.structure.Chain;
@@ -691,7 +693,7 @@ public class StructureAlignment {
         
         
         String pdbCode = getAccesionCodeForObject(pos);
-        
+        logger.info("got accession code " + pdbCode + " for Object " + pos);
         
         // show busy frame...
         ProgressThreadDrawer drawer = new ProgressThreadDrawer(pdbCode);
@@ -726,8 +728,11 @@ public class StructureAlignment {
             String dasstructurecommand = ds.getUrl() + "structure?model=1&query=";
             DASStructureClient dasc= new DASStructureClient(dasstructurecommand);
             
+            
             try {
-                s = dasc.getStructureById(pdbCode);
+                // encode the pdbCode - in case there is a # char in it (happened for CASP)
+                String encodedPdbCode =  URLEncoder.encode(pdbCode,"UTF-8");
+                s = dasc.getStructureById(encodedPdbCode);
                 if ( s != null) {
                     if ( s.size() > 0)
                         break;
