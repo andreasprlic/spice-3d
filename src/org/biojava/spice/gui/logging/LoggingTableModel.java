@@ -139,7 +139,7 @@ final class LoggingTableModel extends Handler implements TableModel {
     /**
      * The format to use for formatting time.
      */
-    private final DateFormat dateFormat = DateFormat.getTimeInstance(DateFormat.MEDIUM);
+    protected final DateFormat dateFormat = DateFormat.getTimeInstance(DateFormat.MEDIUM);
 
     /**
      * Construct the handler.
@@ -314,16 +314,16 @@ final class LoggingTableModel extends Handler implements TableModel {
      * Returns the name of the column at <code>columnIndex</code>.
      */
     public String getColumnName(final int columnIndex) {
-	switch (columnNames[columnIndex]) {
-	case LOGGER:      return "Logger";  
-	case CLASS:       return "Class";   
-	case METHOD:      return "Method";  
-	case TIME_OF_DAY: return "Time" ;   
-	case LEVEL:       return "Level" ;  
-	case MESSAGE:     return "Message"; 
-	default:          throw new AssertionError(columnIndex);
-	}
-
+        switch (columnNames[columnIndex]) {
+        case LOGGER:      return "Logger";  
+        case CLASS:       return "Class";   
+        case METHOD:      return "Method";  
+        case TIME_OF_DAY: return "Time" ;   
+        case LEVEL:       return "Level" ;  
+        case MESSAGE:     return "Message"; 
+        default:          throw new AssertionError(columnIndex);
+        }
+        
     }
 
     /**

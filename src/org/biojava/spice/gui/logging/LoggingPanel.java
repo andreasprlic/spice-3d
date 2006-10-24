@@ -50,6 +50,7 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableColumnModelListener;
 import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.ListSelectionEvent;
@@ -72,6 +73,7 @@ import java.awt.Frame;
 import java.awt.Dialog;
 import java.awt.Component;
 import java.awt.BorderLayout;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
 
@@ -82,6 +84,7 @@ import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
 //Collections
+import java.util.Date;
 import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -229,7 +232,7 @@ public class LoggingPanel extends JPanel {
                         public void run()
                         {
                             scroll.getVerticalScrollBar().setValue(scroll.getVerticalScrollBar().getMaximum());
-                          
+                            
                         }
                             });
                 }
@@ -243,62 +246,35 @@ public class LoggingPanel extends JPanel {
         
         Action clearAction = new AbstractAction(ResourceManager.getString("org.biojava.spice.action.clear")) {
             
-            /**
-             * 
-             */
             private static final long serialVersionUID = 1L;
             
             public void actionPerformed(ActionEvent arg0) {
                 LoggingTableModel ltm = (LoggingTableModel) table.getModel();
                 ltm.clearRecords();
-                table.repaint();
-                
-            }
-            
+                table.repaint();                
+            }            
         };
         
         JButton clearButton = new JButton(clearAction);
         
         Action closeAction = new AbstractAction(ResourceManager.getString("org.biojava.spice.action.close")) {
-            
-            /**
-             * 
-             */
+
             private static final long serialVersionUID = 1L;
             
             public void actionPerformed(ActionEvent arg0) {
-                frame.dispose();
-                
-            }
-            
+                frame.dispose();                
+            }            
         };
         
-        JButton closeButton = new JButton(closeAction);
-        
-        
-        //Box hBox = Box.createHorizontalBox();
-        //hBox.add(clearButton,BorderLayout.WEST);
-        //vBox.add(Box.createGlue());
-        //vBox.add(clearButton);
-        
-        /*JButton close = new JButton("Close");
-         close.addActionListener(new ActionListener(){
-         public void actionPerformed(ActionEvent event) {
-         /hm do not know about frame here :-/
-          dispose();
-          }	
-          });	
-          */	
-        
+        JButton closeButton = new JButton(closeAction);        
+                
         Box hBoxb = Box.createHorizontalBox();
         hBoxb.add(Box.createGlue());
         
         hBoxb.add(clearButton,BorderLayout.EAST);
         hBoxb.add(closeButton,BorderLayout.EAST);
-        //hBoxb.add(close,BorderLayout.EAST);
         
         vBox.add(hBoxb);
-        
         
         add(vBox);
         
@@ -306,6 +282,34 @@ public class LoggingPanel extends JPanel {
         setLevelColor(Level.CONFIG,  null,             null);
         setLevelColor(Level.WARNING, Color.RED,        null);
         setLevelColor(Level.SEVERE,  Color.WHITE, Color.RED);
+        
+        /// add a selection Listener
+        ListSelectionModel smodel = table.getSelectionModel();
+        smodel.addListSelectionListener(new ListSelectionListener(){
+
+            public void valueChanged(ListSelectionEvent e) {
+                if ( e.getValueIsAdjusting())
+                    return;
+                ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+                if ( lsm.isSelectionEmpty())
+                    return;
+                int selectRow = lsm.getMinSelectionIndex();
+                
+                LogRecord record = model.getLogRecord(selectRow);
+                
+                LogPopupFrame popup = new LogPopupFrame(record);
+                
+                int posY = selectRow * 16;
+                int posX = 0;
+                MouseEvent mevent = new MouseEvent(table,1,new Date().getTime(), 1, posX ,posY,1,true);
+                popup.updateFramePosition(mevent);
+                popup.showFrame();
+                
+                
+            }
+            
+        });
+        
         
     }
     
