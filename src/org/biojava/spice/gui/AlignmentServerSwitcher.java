@@ -39,8 +39,7 @@ public class AlignmentServerSwitcher  {
     public AlignmentServerSwitcher(SpiceApplication spice) {
         super();
      
-        
-        
+                
         List servers = spice.getConfiguration().getServers("alignment");
         //SpiceDasSource[] servs = (SpiceDasSource[])servers.toArray(new SpiceDasSource[servers.size()]);
        
@@ -52,7 +51,8 @@ public class AlignmentServerSwitcher  {
             i++;
             SpiceDasSource source = (SpiceDasSource)iter.next();
             //System.out.println(source);
-            options[i] = source.toString();
+            String txt = source.getNickname() + " - " + source.getDescription();
+            options[i] = txt;
         }
         
         

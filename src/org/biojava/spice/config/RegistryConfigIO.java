@@ -114,7 +114,7 @@ implements Runnable, ConfigurationListener
             
         } catch ( ConfigurationException e) {
             //e.printStackTrace();
-            logger.log(Level.WARNING,e.getMessage());
+            logger.log(Level.WARNING,e.getMessage(),e.getCause());
         }
         
         
@@ -332,8 +332,8 @@ implements Runnable, ConfigurationListener
             PersistentConfig ps = new PersistentConfig();
             ps.save(config);
         }
-        catch ( Exception e) {
-            logger.log(Level.WARNING,e.getMessage() + "while saving config locally");
+        catch ( Exception e) {            
+            logger.log(Level.WARNING,e.getMessage() + "while saving config locally",e);
         }
         
         notifyConfigListeners();

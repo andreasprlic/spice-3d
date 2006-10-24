@@ -24,6 +24,7 @@ package org.biojava.spice.utils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -60,7 +61,7 @@ public class BrowserOpener {
             
             return showDocument(url);
         } catch (MalformedURLException e){
-            logger.warning("malformed URL "+urlstring);
+            logger.log(Level.WARNING,"malformed URL "+urlstring, e.getCause());
             return false;
         }
     }

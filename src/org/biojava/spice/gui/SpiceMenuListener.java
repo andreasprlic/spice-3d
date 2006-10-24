@@ -31,7 +31,6 @@ import java.util.logging.Logger;
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.Group;
 import org.biojava.bio.structure.Structure;
-import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.eventmodel.SequenceEvent;
 import org.biojava.dasobert.eventmodel.SequenceListener;
 import org.biojava.spice.config.RegistryConfiguration;
@@ -342,7 +341,7 @@ SequenceListener
            
         } else if ( cmd.equals(ResourceManager.getString("org.biojava.spice.gui.menu.AlignmentServerSwitch"))) {
             
-            logger.info("requested alignment switch");
+            logger.finest("requested alignment switch");
             if ( spice instanceof SpiceApplication) {
                 SpiceApplication sp = (SpiceApplication) spice;
                 new AlignmentServerSwitcher(sp);

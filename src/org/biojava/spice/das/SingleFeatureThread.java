@@ -29,6 +29,7 @@ import org.biojava.dasobert.das.DAS_FeatureRetrieve;
 import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.dasregistry.DasSource;
 import org.biojava.dasobert.eventmodel.*;
+import org.biojava.spice.config.SpiceDefaults;
 import org.biojava.spice.manypanel.drawable.*;
 import org.biojava.spice.manypanel.eventmodel.DasSourceEvent;
 import org.biojava.spice.manypanel.eventmodel.DasSourceListener;
@@ -40,6 +41,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List             ;
 import java.util.Map;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URL                    ;
 import java.net.URLEncoder;
 
@@ -68,7 +71,7 @@ extends Thread
     List dasSourceListeners;
     List featureListeners;
     
-    static Logger logger = Logger.getLogger("org.biojava.spice");
+    static Logger logger = Logger.getLogger(SpiceDefaults.LOGGER);
     
     /** contact a single DAS feature server and retreive features
      * 
@@ -96,12 +99,18 @@ extends Thread
         }
         
         
-        String queryString = url + "features?segment="+ accessionCode ;
+        String queryString = "";
+        try {
+            queryString = url + "features?segment=" + URLEncoder.encode(  accessionCode, "UTF-8");
+        }catch (UnsupportedEncodingException e){
+            e.printStackTrace();
+        }
+        
         URL Url = null ;
         try {
             
-            Url = new URL(URLEncoder.encode(queryString, "UTF-8"));
-        } catch (Exception e ) {
+            Url = new URL(queryString);
+        } catch (MalformedURLException e ) {
             logger.warning("got MalformedURL from das source " +ds);
             e.printStackTrace();
            
@@ -146,9 +155,9 @@ extends Thread
         }
         
         notifyLoadingStarted();
-        
-                
-        //logger.finer("opening " + dascommand);
+                        
+        //System.out.println(dascommand);
+        logger.finest("do feature fetch from " + dascommand);
         DAS_FeatureRetrieve ftmp = new DAS_FeatureRetrieve(dascommand);
         
         
@@ -162,6 +171,7 @@ extends Thread
                 
             }
             notifyComeBackLater(comeBackLater);
+            
             // server is still calculating - asks us to come back later
             try {
                 wait (comeBackLater);

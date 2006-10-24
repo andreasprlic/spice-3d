@@ -310,6 +310,8 @@ implements MouseListener, MouseMotionListener{
         int posx = p.x;
         int posy = p.y;
         Component compo = e.getComponent();
+         
+        
         Point screenTopLeft = compo.getLocationOnScreen();
         int cx = screenTopLeft.x;
         int cy = screenTopLeft.y;
@@ -399,9 +401,7 @@ implements MouseListener, MouseMotionListener{
         updateFramePosition(e);  
     }
     
-    public void mouseExited(MouseEvent arg0) {    
-        //System.out.println("mouse exited marking for hide...");
-        //markForHide();        
+    public void mouseExited(MouseEvent arg0) {                
     }
     
     

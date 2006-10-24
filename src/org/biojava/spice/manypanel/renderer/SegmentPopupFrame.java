@@ -64,8 +64,8 @@ SequenceListener
     Container content ;
     JPanel panel;
   
-    private static final int FRAME_WIDTH        = 300;
-    private static final int FRAME_PREF_HEIGHT  = 250;
+    public static final int FRAME_WIDTH        = 300;
+    public static final int FRAME_PREF_HEIGHT  = 250;
     //private static final int FRAME_MAX_HEIGHT   = 300;
     
     private static String font  =  "<b><font color=\"#0000FF\">";

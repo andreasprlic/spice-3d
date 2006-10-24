@@ -64,6 +64,7 @@ public class SpiceDefaults {
     public static final String PDBType       = "PDB";
     public static final String AlignmentType = "alignment";
     
+    public static final String newline;
     
     	static { 
     			argumentTypes = new ArrayList();
@@ -71,6 +72,8 @@ public class SpiceDefaults {
     			argumentTypes.add(UniProtType);
     			argumentTypes.add(EnspType);
     			argumentTypes.add(AlignmentType);
+                
+                newline = System.getProperty("line.separator");
     	}
         
     

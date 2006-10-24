@@ -27,6 +27,7 @@ import org.biojava.spice.SPICEFrame;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.io.*;
 
@@ -118,7 +119,7 @@ class ServerListeningThread extends Thread {
         try {
             serverSocket = new ServerSocket(port);
         } catch (IOException e) {
-            logger.warning("Could not listen on port: "+port);
+            logger.log(Level.WARNING,"Could not listen on port: "+port , e.getCause());
             
         }
         listening = true;
@@ -127,7 +128,7 @@ class ServerListeningThread extends Thread {
             while (listening)
                 new SpiceMultiServerThread(serverSocket.accept(), server).start();
         } catch (IOException e){
-            logger.warning("something went wrong whith SpiceMultiServerThread " + e.getMessage() );
+            logger.log(Level.WARNING,"something went wrong whith SpiceMultiServerThread " + e.getMessage(), e.getCause() );
             e.printStackTrace();
         }
         System.out.println("server stopped.");

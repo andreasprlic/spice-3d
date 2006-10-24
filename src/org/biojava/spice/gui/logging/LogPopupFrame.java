@@ -33,7 +33,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-
 import org.biojava.spice.gui.AbstractPopupFrame;
 import org.biojava.spice.manypanel.renderer.SegmentPopupFrame;
 
@@ -49,7 +48,7 @@ public class LogPopupFrame extends AbstractPopupFrame{
         this.record = record;
 
         editorP =  new JEditorPane("text/html", "");
-        
+        editorP.setEditable(false);
         String html = record2HTML(record);
         editorP.setText(html);
         
@@ -62,10 +61,18 @@ public class LogPopupFrame extends AbstractPopupFrame{
         return text;
     }
     
+    
     private void endStringBuffer(StringBuffer text){
         text.append("</font></body></html>");
     }
     
+    
+    private String protect(String html){
+        html = html.replaceAll("<","&lt;");
+        html = html.replaceAll(">","&gt;");
+            
+        return html;
+    }
     private String record2HTML(LogRecord record){
         StringBuffer buf =  startStringBuffer();
         
@@ -73,20 +80,34 @@ public class LogPopupFrame extends AbstractPopupFrame{
         buf.append("<b>Method:</b> "+record.getSourceMethodName()+"<br>");
         buf.append("<b>Message:</b> "+record.getMessage()+"<br>");
         buf.append("<b>Time:</b> " + dateFormat.format(new Date(record.getMillis())) + "<br>");
+        
         if ( record.getThrown() != null) {
-            buf.append("<b>Trace:</b> ");
         
-            buf.append("<pre>");
+            buf.append("<b>Trace:</b><br><font size=\"1\">");
+                   
+            StackTraceElement[] stack = record.getThrown().getStackTrace();
+            
+            buf.append("stack length: " + stack.length +"<br>");
+            
+            for (int i=0 ; i< stack.length ; i++ ) {
+                StackTraceElement e = stack[i];
+                buf.append(
+                        "at " + protect(e.getClassName())   +
+                        "."   +  protect(e.getMethodName()) +
+                        "("   + protect(e.getFileName())    + 
+                        ":"   + e.getLineNumber() +")"      +                            
+                        " <br>");
+            }
         
-            buf.append(record.getThrown().getStackTrace());
-        
-            buf.append("</pre><br>");
+            buf.append("</font><br>");
         }
         
         endStringBuffer(buf);
         
         
-        return buf.toString();
+        String s = buf.toString();
+      
+        return s;
     }
 
     public Container getContent() {
@@ -97,9 +118,6 @@ public class LogPopupFrame extends AbstractPopupFrame{
         panel.setBorder(BorderFactory.createEmptyBorder());
         
         panel.setPreferredSize(new Dimension(SegmentPopupFrame.FRAME_WIDTH,SegmentPopupFrame.FRAME_PREF_HEIGHT));
-
-        
-        
         editorP.setPreferredSize(new Dimension(SegmentPopupFrame.FRAME_WIDTH,SegmentPopupFrame.FRAME_PREF_HEIGHT));
         
         JScrollPane scroll = new JScrollPane(editorP);
@@ -107,7 +125,7 @@ public class LogPopupFrame extends AbstractPopupFrame{
         
         
         panel.add(scroll);
-        
+        panel.repaint();
         return panel;
         
         

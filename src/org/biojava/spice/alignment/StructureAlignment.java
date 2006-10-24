@@ -47,7 +47,6 @@ import javax.swing.JProgressBar;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.program.das.dasalignment.Alignment;
 import org.biojava.bio.program.das.dasalignment.DASException;
-import org.biojava.bio.program.das.dasstructure.DASStructureCall;
 import org.biojava.bio.structure.Atom;
 import org.biojava.bio.structure.Calc;
 import org.biojava.bio.structure.Chain;
