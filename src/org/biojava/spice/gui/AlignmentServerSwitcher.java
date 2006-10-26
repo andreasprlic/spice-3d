@@ -24,6 +24,7 @@ package org.biojava.spice.gui;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -31,18 +32,22 @@ import javax.swing.JOptionPane;
 import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.config.RegistryConfiguration;
+import org.biojava.spice.config.SpiceDefaults;
 
 public class AlignmentServerSwitcher  {
-
-   
+    
+    public static Logger logger =  Logger.getLogger(SpiceDefaults.LOGGER);
     
     public AlignmentServerSwitcher(SpiceApplication spice) {
         super();
-     
-                
+        
+        
         List servers = spice.getConfiguration().getServers("alignment");
         //SpiceDasSource[] servs = (SpiceDasSource[])servers.toArray(new SpiceDasSource[servers.size()]);
-       
+        
+        
+        
+        
         String[] options = new String[servers.size()]; 
         
         Iterator iter = servers.iterator();
@@ -70,20 +75,42 @@ public class AlignmentServerSwitcher  {
                 null,
                 options,
                 options[0]
-                );
+        );
         
         if (selectedValue == null)
             return ;
         
         for(int counter = 0, maxCounter = options.length;
-            counter < maxCounter; counter++) {
+        counter < maxCounter; counter++) {
             if(options[counter].equals(selectedValue)) {
                 SpiceDasSource sd = (SpiceDasSource) servers.get(counter);
                 //System.out.println("you want server " + counter);
                 RegistryConfiguration config = spice.getConfiguration();
+
+                
+                // TODO: solve this in a nicer way!!!
+                // e.g. use coordinate systems ...
+                // for CASP - also the structure servers need to change position -
+                // this is because they serve the structures already aligned, rather
+                // than letting spice do the rotations :-/
+                if ( sd.getNickname().equals("lgaalignments_dep")){
+                    
+                    moveStructureServerToTop("depstructure",config);
+                    
+                } else if ( sd.getNickname().equals("lgaalignments_indep")){
+                    
+                    moveStructureServerToTop("indepstructure",config);
+                    
+                } else if ( sd.getNickname().equals("dal_alignment")){
+                    
+                    moveStructureServerToTop("dalstructure",config);
+                    
+                }
+                
+                logger.fine("moving alignment server " + sd.getUrl() + " to top position in config");
                 config.moveToPosition(sd.getUrl(),0);
                 spice.newConfigRetrieved(config);
-             
+                
                 // trigger reload...
                 spice.reload();
                 
@@ -91,9 +118,28 @@ public class AlignmentServerSwitcher  {
         }
         
         
-
+        
     }
-
+    
+    
+    private void moveStructureServerToTop(String nickname, RegistryConfiguration config){
+        
+        List servers = config.getAllServers();
+        Iterator iter = servers.iterator();
+        while (iter.hasNext()){
+            SpiceDasSource ds = (SpiceDasSource) iter.next();
+            if ( ds.getNickname().equalsIgnoreCase(nickname)){
+                if ( ds.hasCapability("structure")){
+                    logger.finest("moving structure server " + nickname + " to top");
+                    config.moveToPosition(ds.getUrl(),0);
+                    return;
+                }
+                // this is not a structure server, so do nothing
+                return;
+            }
+        }
+        
+    }
     
     
 }

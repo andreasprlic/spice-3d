@@ -725,12 +725,15 @@ public class StructureAlignment {
         for (int i=0;i< structureServers.length;i++){
             Das1Source ds = structureServers[i];
             String dasstructurecommand = ds.getUrl() + "structure?model=1&query=";
+            
+            
             DASStructureClient dasc= new DASStructureClient(dasstructurecommand);
             
             
             try {
                 // encode the pdbCode - in case there is a # char in it (happened for CASP)
                 String encodedPdbCode =  URLEncoder.encode(pdbCode,"UTF-8");
+                logger.info("requesting structure from " + dasstructurecommand + encodedPdbCode);
                 s = dasc.getStructureById(encodedPdbCode);
                 if ( s != null) {
                     if ( s.size() > 0)

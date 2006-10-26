@@ -60,6 +60,7 @@ import org.biojava.bio.structure.jama.Matrix;
 import org.biojava.spice.ResourceManager;
 import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.alignment.StructureAlignment;
+import org.biojava.spice.config.SpiceDefaults;
 import org.biojava.spice.jmol.StructurePanel;
 import org.biojava.spice.jmol.StructurePanelListener;
 import org.biojava.spice.manypanel.eventmodel.StructureAlignmentListener;
@@ -84,7 +85,7 @@ StructureAlignmentListener {
     
     static final long serialVersionUID = 65937284545329877l;
     
-    public static Logger logger =  Logger.getLogger("org.biojava.spice");
+    public static Logger logger =  Logger.getLogger(SpiceDefaults.LOGGER);
     
     List checkButtons;
     StructureAlignment structureAlignment;
