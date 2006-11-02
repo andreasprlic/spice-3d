@@ -24,6 +24,9 @@ package org.biojava.spice;
 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
+
+import org.biojava.spice.config.SpiceDefaults;
 
 /** A class that manages the Strings that are defined in the spice.properties file. 
  * This will be usefull for internationalisation. 
@@ -41,6 +44,8 @@ public class ResourceManager {
 
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
 
+    public static Logger logger = Logger.getLogger(SpiceDefaults.LOGGER);
+    
     private ResourceManager() {
     }
 
@@ -49,6 +54,7 @@ public class ResourceManager {
         try {
             return RESOURCE_BUNDLE.getString(key);
         } catch (MissingResourceException e) {
+        	logger.config(e.getMessage());
             return '!' + key + '!';
         }
     }
