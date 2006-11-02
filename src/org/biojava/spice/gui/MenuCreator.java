@@ -24,18 +24,16 @@ package org.biojava.spice.gui;
 
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.util.ResourceBundle;
-
 import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
+import org.biojava.spice.ResourceManager;
 import org.biojava.spice.SpiceApplication;
 
 public class MenuCreator {
 
-    static String baseName = "spice";
-    static ResourceBundle bundle = ResourceBundle.getBundle(baseName);
+  
     
     public MenuCreator() {
         super();
@@ -43,16 +41,16 @@ public class MenuCreator {
     }
     
     public static JMenu createAlignmentMenu(SpiceMenuListener ml){
-        String menuText = bundle.getString("org.biojava.spice.gui.menu.AlignmentMenu");
+        String menuText = ResourceManager.getString("org.biojava.spice.gui.menu.AlignmentMenu");
         JMenu amenu = new JMenu(menuText);
         
-        String toggleText = bundle.getString("org.biojava.spice.gui.menu.AlignmentToggleStructure");
+        String toggleText = ResourceManager.getString("org.biojava.spice.gui.menu.AlignmentToggleStructure");
         JMenuItem region = new JMenuItem(toggleText);
         region.addActionListener(ml);
         region.setMnemonic(KeyEvent.VK_T);
         amenu.add(region);
         
-        String switchText = bundle.getString("org.biojava.spice.gui.menu.AlignmentServerSwitch");
+        String switchText = ResourceManager.getString("org.biojava.spice.gui.menu.AlignmentServerSwitch");
         JMenuItem switcher = new JMenuItem(switchText);
         switcher.addActionListener(ml);
         switcher.setMnemonic(KeyEvent.VK_S);
@@ -66,16 +64,16 @@ public class MenuCreator {
     }
     
     public static JMenu createHelpMenu(SpiceMenuListener ml){
-        String menuText = bundle.getString("org.biojava.spice.gui.menu.HelpMenu");
+        String menuText = ResourceManager.getString("org.biojava.spice.gui.menu.HelpMenu");
         JMenu help = new JMenu(menuText);
         help.setMnemonic(KeyEvent.VK_H);
-        String helpDesc = bundle.getString("org.biojava.spice.gui.menu.HelpMenuDesc");
+        String helpDesc = ResourceManager.getString("org.biojava.spice.gui.menu.HelpMenuDesc");
         help.getAccessibleContext().setAccessibleDescription(helpDesc);
       
         
         ImageIcon helpIcon = createImageIcon("help.png");
         
-        String aboutSpice = bundle.getString("org.biojava.spice.gui.menu.AboutSpice");
+        String aboutSpice = ResourceManager.getString("org.biojava.spice.gui.menu.AboutSpice");
         JMenuItem aboutspice;
         if ( helpIcon == null )
             aboutspice = new JMenuItem(aboutSpice);
@@ -85,7 +83,7 @@ public class MenuCreator {
         aboutspice.setMnemonic(KeyEvent.VK_A);
         help.add(aboutspice);
         
-        String techInfo = bundle.getString("org.biojava.spice.gui.menu.TechInfo");
+        String techInfo = ResourceManager.getString("org.biojava.spice.gui.menu.TechInfo");
         JMenuItem techinfo;
         if ( helpIcon == null )
             techinfo = new JMenuItem(techInfo);
@@ -95,7 +93,7 @@ public class MenuCreator {
         techinfo.setMnemonic(KeyEvent.VK_T);
         help.add(techinfo);
         
-        String manual = bundle.getString("org.biojava.spice.gui.menu.Manual");
+        String manual = ResourceManager.getString("org.biojava.spice.gui.menu.Manual");
         JMenuItem spicemanual;
         ImageIcon manualIcon =  createImageIcon("toggle_log.png");
         if ( manualIcon == null)
@@ -111,13 +109,13 @@ public class MenuCreator {
     }
     
     public static JMenu createFileMenu(SpiceMenuListener ml){
-        String fileMenu = bundle.getString("org.biojava.spice.gui.menu.FileMenu");
+        String fileMenu = ResourceManager.getString("org.biojava.spice.gui.menu.FileMenu");
         JMenu file = new JMenu(fileMenu);
         file.setMnemonic(KeyEvent.VK_F);
-        String fileMenuDesc =bundle.getString("org.biojava.spice.gui.menu.FileMenuDesc");
+        String fileMenuDesc =ResourceManager.getString("org.biojava.spice.gui.menu.FileMenuDesc");
         file.getAccessibleContext().setAccessibleDescription(fileMenuDesc);
         
-        String newWindowTxt =bundle.getString("org.biojava.spice.gui.menu.NewWindow");
+        String newWindowTxt =ResourceManager.getString("org.biojava.spice.gui.menu.NewWindow");
         JMenuItem newWindow;
         ImageIcon nwIcon = createImageIcon("window_new.png");
         if ( nwIcon == null)
@@ -127,7 +125,7 @@ public class MenuCreator {
         
         newWindow.setMnemonic(KeyEvent.VK_N);
         
-        String newTabTxt =bundle.getString("org.biojava.spice.gui.menu.NewTab");
+        String newTabTxt =ResourceManager.getString("org.biojava.spice.gui.menu.NewTab");
         JMenuItem newTab;
         ImageIcon tabIcon = createImageIcon("view-right.png");
         if ( tabIcon == null)
@@ -135,7 +133,7 @@ public class MenuCreator {
         else
             newTab = new JMenuItem(newTabTxt, tabIcon);
         
-        String openTxt =bundle.getString("org.biojava.spice.gui.menu.Open");
+        String openTxt =ResourceManager.getString("org.biojava.spice.gui.menu.Open");
         JMenuItem openpdb;
         ImageIcon openIcon = createImageIcon("network.png");
         if ( openIcon == null)
@@ -176,7 +174,7 @@ public class MenuCreator {
         revert.setMnemonic(KeyEvent.VK_L);
         */
         
-        String exitTxt =bundle.getString("org.biojava.spice.gui.menu.Exit");
+        String exitTxt =ResourceManager.getString("org.biojava.spice.gui.menu.Exit");
         ImageIcon exitIcon = createImageIcon("exit.png");
         JMenuItem exit;
         if ( exitIcon != null)
@@ -185,7 +183,7 @@ public class MenuCreator {
             exit    = new JMenuItem(exitTxt);
         exit.setMnemonic(KeyEvent.VK_X);
         
-        String propertiesTxt =bundle.getString("org.biojava.spice.gui.menu.Properties");
+        String propertiesTxt =ResourceManager.getString("org.biojava.spice.gui.menu.Properties");
         ImageIcon propIcon = createImageIcon("configure.png");
         JMenuItem props ;
         if ( propIcon != null )
