@@ -150,7 +150,8 @@ public class MenuAlignmentListener implements AlignmentListener {
         if ( annos.length < 2)
             return sort;
         
-        Annotation a = annos[2];
+        // why is this annotation nr 2?
+        Annotation a = annos[1];
         
         List details = (List) a.getProperty("details");
         Iterator iter = details.iterator();

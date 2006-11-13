@@ -22,6 +22,7 @@
  */
 package org.biojava.spice.gui;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
@@ -30,6 +31,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import org.biojava.dasobert.das.SpiceDasSource;
+import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
 import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.config.RegistryConfiguration;
 import org.biojava.spice.config.SpiceDefaults;
@@ -38,23 +40,38 @@ public class AlignmentServerSwitcher  {
     
     public static Logger logger =  Logger.getLogger(SpiceDefaults.LOGGER);
     
+    public static final String STRUCTURE_CATEGORY = "Protein Structure";
+    
     public AlignmentServerSwitcher(SpiceApplication spice) {
         super();
         
         
-        List servers = spice.getConfiguration().getServers("alignment");
-        //SpiceDasSource[] servs = (SpiceDasSource[])servers.toArray(new SpiceDasSource[servers.size()]);
+        List servers = spice.getConfiguration().getServers("alignment" );
         
-        
-        
-        
-        String[] options = new String[servers.size()]; 
-        
+        List structureservers = new ArrayList();
         Iterator iter = servers.iterator();
-        int i=-1;
         while (iter.hasNext()){
-            i++;
             SpiceDasSource source = (SpiceDasSource)iter.next();
+            DasCoordinateSystem[] csses = source.getCoordinateSystem();
+            for ( int i =0 ; i< csses.length ; i++){
+                DasCoordinateSystem cs = csses[i];
+                String cat = cs.getCategory();
+                
+                if ( cat.equals(STRUCTURE_CATEGORY)) {
+                    structureservers.add(source);
+                    break;
+                }
+            }
+        }
+        
+        
+        String[] options = new String[structureservers.size()]; 
+        
+        Iterator iter2 = structureservers.iterator();
+        int i=-1;
+        while (iter2.hasNext()){
+            i++;
+            SpiceDasSource source = (SpiceDasSource)iter2.next();
             //System.out.println(source);
             String txt = source.getNickname() + " - " + source.getDescription();
             options[i] = txt;
