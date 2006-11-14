@@ -390,6 +390,10 @@ StructureAlignmentListener {
      *
      */
     public void recalcAlignmentDisplay() {
+    	
+    	if (structureAlignment.getNrStructures() ==0)
+    		return;
+    	
         logger.info("recalculating the alignment display");
         Structure newStruc = structureAlignment.createArtificalStructure(referenceStructure);
         String cmd = structureAlignment.getRasmolScript(referenceStructure);                    
