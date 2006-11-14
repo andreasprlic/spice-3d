@@ -81,6 +81,13 @@ public class Spice {
      */
     public static void main(String[] argv) {
         
+    	if ( argv.length == 1){
+    		if (argv[0].equals("-version")) 
+    			System.out.println("SPICE version: " + AboutDialog.VERSION);
+    		
+    		return;
+    	}
+    	
         javax.swing.SwingUtilities.invokeLater(new SpiceRunnable(argv));
         
     }
