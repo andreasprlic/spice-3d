@@ -101,14 +101,14 @@ public class StatusPanel extends JPanel {
         arrowPanel = new ArrowPanel();
         hBox.add(arrowPanel);
         arrowPanel.setBackground(BG_COLOR);
-        arrowPanel.setMaximumSize(new Dimension (120,20));
-        arrowPanel.setPreferredSize(new Dimension(120,20));
-        accessionCode = new JTextField("    ");
-        accessionCode.setEditable(false);
+        arrowPanel.setMaximumSize(new Dimension (60,20));
+        arrowPanel.setPreferredSize(new Dimension(60,20));
         
+        accessionCode = new JTextField("    ");
+        accessionCode.setEditable(false);        
         accessionCode.setBorder(BorderFactory.createEmptyBorder());
-        accessionCode.setMaximumSize(new Dimension(180,20));
-        accessionCode.setPreferredSize(new Dimension(120,20));
+        accessionCode.setMaximumSize(new Dimension(300,20));
+        accessionCode.setPreferredSize(new Dimension(200,20));
         accessionCode.setBackground(BG_COLOR);
        
         
