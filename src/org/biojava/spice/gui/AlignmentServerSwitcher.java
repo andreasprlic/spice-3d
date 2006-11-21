@@ -44,8 +44,7 @@ public class AlignmentServerSwitcher  {
     
     public AlignmentServerSwitcher(SpiceApplication spice) {
         super();
-        
-        
+                
         List servers = spice.getConfiguration().getServers("alignment" );
         
         List structureservers = new ArrayList();
@@ -123,7 +122,7 @@ public class AlignmentServerSwitcher  {
                     moveStructureServerToTop("dalstructure",config);
                     
                 }
-                
+                 
                 logger.fine("moving alignment server " + sd.getUrl() + " to top position in config");
                 config.moveToPosition(sd.getUrl(),0);
                 spice.newConfigRetrieved(config);

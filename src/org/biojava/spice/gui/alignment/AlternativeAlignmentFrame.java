@@ -138,7 +138,7 @@ extends JFrame{
             data[i][0] = new Integer(i+1);
             data[i][1] = new Integer(alig.getEqr());
             data[i][2] = new Double(alig.getScore());
-            data[i][3] = new Double(alig.getRms());
+            data[i][3] = new Double(alig.getRmsd());
             data[i][4] = new Integer(alig.getGaps());
             
             

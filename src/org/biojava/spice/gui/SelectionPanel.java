@@ -210,7 +210,7 @@ implements StructureListener
       
         
         Dimension dim = new Dimension(100,200);
-        logger.finest("setting selection panel size" + dim);
+        //logger.finest("setting selection panel size" + dim);
         this.setPreferredSize(dim);
         this.setSize(dim);
         

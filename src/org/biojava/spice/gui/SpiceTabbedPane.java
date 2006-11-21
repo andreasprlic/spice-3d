@@ -49,8 +49,11 @@ implements WindowListener{
     SpiceServer server;
     
     static final long serialVersionUID = 7893248790189123l;
+    
+    //TODO: move this to resources config file...
     static final ImageIcon spiceIcon = SpiceApplication.createImageIcon("spice16x16.gif");
     static final ImageIcon delTabIcon = SpiceApplication.createImageIcon("editdelete.png");
+    public static final String EMPTY_TAB_TXT = " - ";
     
     static Logger logger      = Logger.getLogger("org.biojava.spice");
     
@@ -108,6 +111,7 @@ implements WindowListener{
                 frame.setJMenuBar(menu);
                 
                 setFrameTitle(spice);
+                setTabTitle(spice,getSpiceText(spice));
                 
             }
             
@@ -128,6 +132,7 @@ implements WindowListener{
     }
     
     public void setFrameTitle(String text){
+    	
         frame.setTitle(text);
         frame.repaint();
     }
@@ -138,8 +143,25 @@ implements WindowListener{
         if ( ! (tabText.equals(""))){
             txt += " - " + tabText;
         }
+       // logger.info("setting frame title to " + txt);
         setFrameTitle(txt);
+        //setTabTitle(spice,tabText);
         
+    }
+    
+    public void setTabTitle(SPICEFrame spice, String title){
+    	//logger.info("getting tab for spice " + spice);
+    	int i = getTabForSpice(spice);
+    	if ( title.equals(""))
+    		title = EMPTY_TAB_TXT;
+    	  if ( i > -1) {
+    		 // logger.info("setting tab text");
+    		  
+              setTitleAt(i,title);
+    	  } else {
+    		 // logger.info("tab not found!");
+    	  }
+    	
     }
     
     private void registerSpiceListeners(SPICEFrame spice){
@@ -217,6 +239,7 @@ implements WindowListener{
                 //logger.info("topancesot is not jframe " + conti);
             }
             addTab(sp1);
+            setTabTitle(sp1, getSpiceText(sp1));
         }                                    
         
         addTab(sp);
@@ -319,6 +342,13 @@ implements WindowListener{
         if ( ! (ensp.equals("")))
             txt += ensp;
         
+        String s = spice.getPreferredStructureAlignmentServerName();
+        
+        if ( ! s.equals("")) {
+        	if ( ! txt.endsWith(" - "))
+        		txt+=" - ";
+        	txt +=  s;
+        }
         return txt;
     }
     
@@ -357,10 +387,11 @@ SequenceListener
     public void newStructure(StructureEvent event) {
         //logger.info("got new structure");
         int i =  tabPane.getTabForSpice(spice);
-        
+        String txt = tabPane.getSpiceText(spice);
         if ( tabPane.getTabCount() > 0)
-            tabPane.setTitleAt(i,tabPane.getSpiceText(spice));
+            tabPane.setTitleAt(i,txt);
         tabPane.setFrameTitle(spice);
+        tabPane.setTabTitle(spice, txt);
     }
     
     public void selectedChain(StructureEvent event) {}
@@ -374,10 +405,11 @@ SequenceListener
     public void newSequence(SequenceEvent e) {
 
         
-        int i =  tabPane.getTabForSpice(spice);
-        if ( tabPane.getTabCount() > 0)
-            tabPane.setTitleAt(i,tabPane.getSpiceText(spice));
+        //int i =  tabPane.getTabForSpice(spice);
+        //if ( tabPane.getTabCount() > 0)
+        //    tabPane.setTitleAt(i,tabPane.getSpiceText(spice));
         tabPane.setFrameTitle(spice);
+        tabPane.setTabTitle(spice, tabPane.getSpiceText(spice));
         
     }
 

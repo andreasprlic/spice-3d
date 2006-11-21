@@ -36,7 +36,7 @@ import org.biojava.spice.manypanel.renderer.SequenceScalePanel;
 import java.util.logging.*                 ;
 import java.awt.Dimension;
 
-import javax.jnlp.UnavailableServiceException;
+//import javax.jnlp.UnavailableServiceException;
 import javax.swing.Box                     ;
 import javax.swing.ImageIcon               ;
 import javax.swing.JLabel                  ;
@@ -156,8 +156,8 @@ implements Runnable, ConfigurationListener
             persistentconfig  = loadLocalConfig();
             //} catch ( javax.jnlp.UnavailableServiceException e) {
             
-        } catch ( UnavailableServiceException ue){
-        	logger.info("java web start not available, can not read config from local cache");
+       // } catch ( UnavailableServiceException ue){
+        //	logger.info("java web start not available, can not read config from local cache");
         } catch ( Exception e) {
             //System.err.println("an error occured during loading of local config");
             e.printStackTrace();

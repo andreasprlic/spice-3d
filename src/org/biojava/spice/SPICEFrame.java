@@ -61,7 +61,8 @@ public interface SPICEFrame
      */
     public void reload();
         
-    
+    public String getPreferredStructureAlignmentServerName();
+	public void setPreferredStructureAlignmentServerName(String name);
     
     /** retrieve configuration for DAS servers to use 
      * @return RegistryConfiguration the config

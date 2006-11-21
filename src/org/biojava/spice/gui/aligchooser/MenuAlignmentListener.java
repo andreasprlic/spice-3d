@@ -113,6 +113,9 @@ public class MenuAlignmentListener implements AlignmentListener {
                 //System.out.println(det);
                 if ( property.equals(filterProperty)) {
                     String detail = (String) det.getProperty("detail");
+                    if ( StructureAlignmentChooser.shouldIgnoreDetail(detail))
+                    	continue;
+                    
                     m.put( detail,"");
                 }
             }
@@ -158,10 +161,13 @@ public class MenuAlignmentListener implements AlignmentListener {
         while (iter.hasNext()){
             Annotation det = (Annotation) iter.next();
             String property = (String) det.getProperty("property");
-            //String value    = (String) det.getProperty("detail");
+         
+            
             //System.out.println("prop " + property + " " + value);
             
             boolean okProperty = false;
+            
+            
             Iterator iter2 = supportedDetailsList.iterator();
             while (iter2.hasNext()){
                 String supported = (String)iter2.next();
@@ -170,6 +176,10 @@ public class MenuAlignmentListener implements AlignmentListener {
                     break;
                 }
             }
+            
+            String value    = (String) det.getProperty("detail");
+            if ( StructureAlignmentChooser.shouldIgnoreDetail(value))
+            	okProperty = false;            
             
             if ( okProperty) {
                 JMenuItem item = new JMenuItem(property);

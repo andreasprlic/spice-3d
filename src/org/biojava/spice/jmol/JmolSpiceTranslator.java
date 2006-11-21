@@ -303,5 +303,10 @@ implements JmolStatusListener, StructureListener
         // TODO Auto-generated method stub
         
     }
+
+	public String eval(String strEval) {
+		System.out.println("strEval called" + strEval);
+		return null;
+	}
     
 }

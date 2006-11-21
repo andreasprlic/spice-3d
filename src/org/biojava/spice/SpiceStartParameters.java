@@ -72,7 +72,6 @@ public class SpiceStartParameters {
       
     private String structureAlignmentMode;
 
-
     public SpiceStartParameters() {
         super();
         pdbcoordsys     = SpiceDefaults.PDBCOORDSYS;
@@ -88,6 +87,7 @@ public class SpiceStartParameters {
         noRegistryContact       = false;
         structureAlignmentMode  = "";
         openDialogCoords        = "";
+      
     }
 
     
@@ -102,9 +102,7 @@ public class SpiceStartParameters {
         this.openDialogCoords = openDialogCoords;
     }
 
-
-
-    public String getStructureAlignmentMode() {
+	public String getStructureAlignmentMode() {
         return structureAlignmentMode;
     }
 
