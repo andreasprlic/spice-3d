@@ -313,12 +313,12 @@ StructureAlignmentListener {
         Color background = getBackground();
         
         int displayPosition = 1;
-        
+        Color col = structureAlignment.getColor(0);
         for ( int i=0; i< ids.length;i++){
             String id = ids[i];
-            Color col = structureAlignment.getColor(i);
+            
             if ( ( i == 0 ) || (structureAlignment.isSelected(i))){
-                
+            	col = structureAlignment.getColor(i);
                 UIManager.put("CheckBox.background", col);
                 UIManager.put("CheckBox.interiorBackground", col);
                 UIManager.put("CheckBox.highlite", col);

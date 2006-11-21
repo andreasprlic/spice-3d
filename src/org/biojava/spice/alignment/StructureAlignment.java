@@ -93,7 +93,7 @@ public class StructureAlignment {
     boolean waitingForStructure;
     
     Structure loadedStructure;
-    
+    int selectionCounter = 0;
     static Matrix zero;
     
     static {
@@ -375,9 +375,20 @@ public class StructureAlignment {
     public void deselect(int pos){
         selection[pos] = false;
         nrSelected--;
-        Integer ipos = new Integer(pos);
-        selectionOrder.remove(ipos);
-        assignedColors.remove(ipos);
+        
+        Iterator iter = selectionOrder.iterator();
+        Integer position = null;
+        while (iter.hasNext()){
+        	Integer currentPos = (Integer)iter.next();
+        	if ( currentPos.intValue() == pos) {
+        		position = currentPos;
+        		break;
+        	}
+        }
+        
+        selectionOrder.remove(position);
+        //Integer ipos = new Integer(pos);
+        assignedColors.remove(position);
         
     }
     
@@ -421,7 +432,7 @@ public class StructureAlignment {
     
     
     public String getRasmolScript(int firstSelectedPos){
-        
+        //logger.info("get Rasmol script " + firstSelectedPos);
         String cmd = "select *; backbone 0.3;";
         
         
@@ -480,7 +491,7 @@ public class StructureAlignment {
     }
     
     private String getRasmolFromSortedBlock(int p, int modelcount){
-        
+        //logger.info("get RasmolScriptFromSortedBlock" + p + " " + modelcount );
         String cmd = "";
         String intId = intObjectIds[p];
         //logger.info("get rasmol sc ript from sorted blocks for " + intId );
@@ -621,40 +632,57 @@ public class StructureAlignment {
         
         float stepsize   = 0;
         
-        // do a circle of 6 colors...
+        // do a circle of 7 colors...
         
-        int NR_COLS = 6;
+        float NR_COLS = 6.5f;
         stepsize = 1.0f / (float)NR_COLS ;
         float saturation = 1.0f;
         float brightness = 1.0f;
         
         Integer selectionPosition = new Integer(position);
         
-        if (!  selectionOrder.contains(selectionPosition)) {
+        	
+        if ( selectionOrder.contains(selectionPosition)){
+        	//System.out.println(position + " " + assignedColors);
+        	//System.out.println(selectionOrder);
+        
+        	//logger.info("in selectionOrder " + position);
             Color col = (Color) assignedColors.get(selectionPosition);
+           
             if ( col != null)
                 return col;
-            int pos = ( position % NR_COLS );
             
-            //System.out.println("color: position " + position + " nrSel " + nrSelected + " " + pos );
-            
-            float hue = ( pos * stepsize );
-            col = Color.getHSBColor(hue,saturation,brightness);
-            assignedColors.put(selectionPosition,col);
-            return col;
-            
-        } else {           
-            Color col = (Color) assignedColors.get(selectionPosition);
-            if ( col != null)
-                return col;
+            // the first time this color is selected, but no color assigned, yet...
+            /*
             int selectPos = selectionOrder.indexOf(selectionPosition);
-            int pos = ( selectPos % NR_COLS);
-            float hue = ( pos * stepsize );
+            float pos = ( selectPos % NR_COLS);
+            float hue = ( pos* stepsize );
             col = Color.getHSBColor(hue,saturation,brightness);
             assignedColors.put(selectionPosition,col);
             return col;
-            
-        }
+            */
+        } 
+        
+        // the backup plan ...
+        //logger.info(position + " doing the backup coloring plan");
+        Color col ;
+        //= (Color) assignedColors.get(selectionPosition);
+        //if ( col != null)
+        //	return col;
+        selectionCounter +=1 ;
+        if ( selectionCounter > 666)
+        	selectionCounter = 0;
+        float pos = ( selectionCounter % NR_COLS );
+        //float pos = ( selectionOrder.size() % NR_COLS );
+
+        //System.out.println("color: position " + position + " nrSel " + nrSelected + " " + pos );
+
+        float hue = ( pos  * stepsize );
+        col = Color.getHSBColor(hue,saturation,brightness);
+        assignedColors.put(selectionPosition,col);
+        return col;
+
+
     }
     
     
