@@ -156,8 +156,8 @@ implements WindowListener{
     		title = EMPTY_TAB_TXT;
     	  if ( i > -1) {
     		 // logger.info("setting tab text");
-    		  
-              setTitleAt(i,title);
+    		  if ( getTabCount() > 0)
+    			  setTitleAt(i,title);
     	  } else {
     		 // logger.info("tab not found!");
     	  }
