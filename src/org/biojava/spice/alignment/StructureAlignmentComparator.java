@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.biojava.bio.Annotation;
+import org.biojava.spice.gui.aligchooser.MenuAlignmentListener;
 
 public  class StructureAlignmentComparator implements Comparator{
 
@@ -67,6 +68,13 @@ public  class StructureAlignmentComparator implements Comparator{
         Annotation o1 = (Annotation) arg0;
         Annotation o2 = (Annotation) arg1;
         
+        
+        if ( field.equals(MenuAlignmentListener.SORT_BY_NAME)) {
+        	String s1 = (String)o1.getProperty("dbAccessionId");
+        	String s2 = (String)o2.getProperty("dbAccessionId");
+        	//System.out.println(s1 + " " + s2) ;
+        	return s1.compareToIgnoreCase(s2);
+        }
         List det1 = (List) o1.getProperty("details");
         List det2 = (List) o2.getProperty("details");
         

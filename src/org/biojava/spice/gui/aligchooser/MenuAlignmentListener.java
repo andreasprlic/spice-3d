@@ -40,12 +40,13 @@ import org.biojava.dasobert.eventmodel.AlignmentListener;
 
 public class MenuAlignmentListener implements AlignmentListener {
     
-    private static final String[] supportedDetails = new String[] { "GDT_TS","LGA_S","LGA_Q","RMSD","Seq_Id","DAL0","DAL4","DALI" };
+    private static final String[] supportedDetails =
+    	new String[] { "GDT_TS","LGA_S","LGA_Q","RMSD","Seq_Id","DAL0","DAL4","DALI" };
     
     public static final String filterProperty = "filterBy";
     public static final String showAllObjects = "show all";
     public static final List supportedDetailsList ;
-    
+    public static final String SORT_BY_NAME = "Name";
     static {
         
         supportedDetailsList = Arrays.asList(supportedDetails);
@@ -147,7 +148,9 @@ public class MenuAlignmentListener implements AlignmentListener {
     public static JMenu getSortMenuFromAlignment(Alignment ali, ActionListener listener){
         
         JMenu sort = new JMenu(menuSortText);
-        
+        JMenuItem sortName = new JMenuItem(SORT_BY_NAME);
+        sortName.addActionListener(listener);
+        sort.add(sortName);
         Annotation[] annos = ali.getObjects();
         
         if ( annos.length < 2)
@@ -189,8 +192,7 @@ public class MenuAlignmentListener implements AlignmentListener {
             }
             
         }
-        
-        
+                
         return sort;
     }
     

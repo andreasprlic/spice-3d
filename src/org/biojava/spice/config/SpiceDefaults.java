@@ -36,7 +36,7 @@ public class SpiceDefaults {
 
 	// logging stuff
 	public static final String LOGGER = "org.biojava.spice";
-	public static final Level  LOG_LEVEL = Level.FINEST;
+	public static final Level  LOG_LEVEL = Level.INFO;
 	
 	public static final String REGISTRY  = ResourceManager.getString("org.biojava.spice.SpiceDefaults.Registry");
 	

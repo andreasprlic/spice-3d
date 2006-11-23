@@ -104,7 +104,7 @@ implements MouseListener, ActionListener
     }
 
     public void actionPerformed(ActionEvent e) {
-       // System.out.println("sort by" + e.getActionCommand());
+    	//System.out.println("sort by" + e.getActionCommand());
         
         String sortfield = e.getActionCommand();
         
@@ -123,7 +123,8 @@ implements MouseListener, ActionListener
         Arrays.sort(objects,sorter);
         
         
-        if ( ! sortfield.equals("RMSD")) {
+        if ( ! (sortfield.equals("RMSD") || 
+        		sortfield.equals(MenuAlignmentListener.SORT_BY_NAME))) {
             // reverse the order!
             List tl = Arrays.asList(objects);
             List tmplst = new ArrayList(tl);
