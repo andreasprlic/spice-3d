@@ -46,7 +46,6 @@ import javax.swing.JTextField;
 
 import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.spice.config.RegistryConfiguration;
-import org.biojava.spice.config.SpiceDefaults;
 import org.biojava.spice.manypanel.eventmodel.StructureAlignmentListener;
 
 
@@ -297,7 +296,8 @@ public class AlignmentGui extends JFrame{
         String chain2 = f22.getText();
         
         
-        List servs =  config.getServers("structure",SpiceDefaults.PDBCOORDSYS);
+        //List servs =  config.getServers("structure",SpiceDefaults.PDBCOORDSYS);
+        List servs =  config.getServers("structure");
         
         SpiceDasSource[] structureServers = (SpiceDasSource[] ) servs.toArray(new SpiceDasSource[servs.size()]);
         

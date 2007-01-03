@@ -38,15 +38,19 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
+import org.biojava.bio.program.das.dasalignment.Alignment;
+import org.biojava.bio.program.das.dasalignment.DASException;
 import org.biojava.bio.structure.Atom;
 import org.biojava.bio.structure.AtomImpl;
 import org.biojava.bio.structure.Calc;
 import org.biojava.bio.structure.Structure;
+import org.biojava.bio.structure.StructureException;
 import org.biojava.bio.structure.align.pairwise.AlternativeAlignment;
 import org.biojava.bio.structure.jama.Matrix;
 import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
 import org.biojava.spice.alignment.StructureAlignment;
 import org.biojava.spice.config.SpiceDefaults;
+import org.biojava.spice.das.AlignmentTools;
 import org.biojava.spice.manypanel.eventmodel.StructureAlignmentListener;
 
 /** a frame showing the alternative alignments, which are the result of a structure superimposition
@@ -78,9 +82,9 @@ extends JFrame{
         this.getContentPane().add(panel);
         resource = ResourceBundle.getBundle(baseName);
     
-        structure1 = s1;
-        structure2 = s2;
-        String pdb1= s1.getPDBCode();
+        structure1  = s1;
+        structure2  = s2;
+        String pdb1 = s1.getPDBCode();
         String pdb2 = s2.getPDBCode();
         
         String t = resource.getString("alignment.resultframe.title");
@@ -153,6 +157,7 @@ extends JFrame{
         return data;
     }
     
+    
     protected void showAlternative(int position){
         if ( position > aligs.length){
             return;
@@ -162,12 +167,12 @@ extends JFrame{
         
         // create the structure alignment object and tell the listeners ...
         
-        String defaultCoordSys = SpiceDefaults.PDBCOORDSYS;
+        String defaultCoordSys = SpiceDefaults.CASPCOORDSYS;
         DasCoordinateSystem defaultcs = DasCoordinateSystem.fromString(defaultCoordSys);
         StructureAlignment salig = new StructureAlignment(defaultcs);
        
-        salig.setLoaded(new boolean[] {true,true});
         
+       
         Matrix m1 = Matrix.identity(3,3);
         Matrix m2 = alig.getRotationMatrix();
         
@@ -176,13 +181,31 @@ extends JFrame{
         String pdb1 = structure1.getPDBCode();
         String pdb2 = structure2.getPDBCode();
         salig.setIntObjectIds(new String[]{pdb1,pdb2});
-        
-        salig.setSelection(new boolean[] {true,true});
-        
+
         Atom shift1 = new AtomImpl();
         shift1.setCoords(new double[]{0,0,1});
         Atom shift2 = alig.getShift();
         salig.setShiftVectors(new Atom[] {shift1,shift2});
+        
+        Alignment dasalig = new Alignment();
+        
+        try {
+            AlignmentTools.addObject(dasalig,pdb1,pdb1,"","PROTEIN","DAS","",defaultCoordSys,null);                
+            AlignmentTools.addObject(dasalig,pdb2,pdb2,"","PROTEIN","DAS","",defaultCoordSys,null);
+            
+            AlignmentTools.addMatrix(dasalig,pdb1,m1);
+            AlignmentTools.addMatrix(dasalig,pdb2,m2);
+            
+            AlignmentTools.addVector(dasalig,pdb1,shift1);
+            AlignmentTools.addVector(dasalig,pdb2,shift2);
+            
+            salig.setAlignment(dasalig);
+        } catch (StructureException e){
+            e.printStackTrace();
+        } catch (DASException e){
+            e.printStackTrace();
+        }
+        
         
         Structure s3 = (Structure)structure2.clone();
        
@@ -190,6 +213,8 @@ extends JFrame{
         Calc.shift(s3,shift2);
         
         salig.setStructures(new Structure[] {structure1, s3});
+        salig.setLoaded(new boolean[] {true,true});
+        salig.setSelection(new boolean[] {true,true});
         
         String[] scripts = createRasmolScripts(alig,salig);
         salig.setRasmolScripts(scripts);

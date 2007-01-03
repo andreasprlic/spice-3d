@@ -86,7 +86,12 @@ public class AlignmentCalc implements Runnable {
      * @param chain2
      * @param servers array of structure servers
      */
-    public AlignmentCalc(AlignmentGui parent, String pdb1, String chain1 , String pdb2, String chain2, SpiceDasSource[] servers) {
+    public AlignmentCalc(AlignmentGui parent, 
+            String pdb1, 
+            String chain1 , 
+            String pdb2, 
+            String chain2, 
+            SpiceDasSource[] servers) {
         super();
         
         this.parent= parent;
@@ -107,7 +112,10 @@ public class AlignmentCalc implements Runnable {
      */
     public void run() {
         logger.info("starting calculation with" + servers.length + " servers");
-        
+        if ( servers.length == 0) {
+            cleanup();
+            return;
+        }
         StructureThread sthread1 = new StructureThread(pdb1,servers);
         sthread1.addStructureListener(myStructureListener1);
         
