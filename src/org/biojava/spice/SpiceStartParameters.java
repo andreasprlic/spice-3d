@@ -64,6 +64,7 @@ public class SpiceStartParameters {
     private String pdbcoordsys;
     private String uniprotcoordsys;
     private String enspcoordsys;
+
     
     private String openDialogCoords;
     
