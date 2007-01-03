@@ -256,8 +256,7 @@ public class StructureAlignment {
         // convert the alignment object into the internal matrices, vectors
         Annotation[] maxs = alignment.getMatrices();
         
-        Annotation[] objects = alignment.getObjects();
-        System.out.println(objects[0]);
+        Annotation[] objects = alignment.getObjects();        
         Annotation[] vectors = alignment.getVectors();
         
         
@@ -715,7 +714,7 @@ public class StructureAlignment {
     
     public Structure getStructure(int pos) throws StructureException{
         
-        if ( loaded[pos])
+        if ( loaded[pos] )
             return returnStructureOrRange(pos,structures[pos]);
         
         
