@@ -106,7 +106,7 @@ ConfigurationListener
 
 	public static Logger logger =  Logger.getLogger(SpiceDefaults.LOGGER);
 
-	static String baseName="spice";
+	static String baseName = "spice";
 
 	URL[] REGISTRY_URLS    ; // the url to the registration server
 

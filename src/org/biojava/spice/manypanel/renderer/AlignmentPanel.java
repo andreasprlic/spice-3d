@@ -32,7 +32,6 @@ import java.awt.geom.GeneralPath;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -41,6 +40,7 @@ import javax.swing.JPanel;
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.ChainImpl;
 import org.biojava.bio.structure.Group;
+import org.biojava.spice.ResourceManager;
 
 public class AlignmentPanel extends JPanel {
     
@@ -54,21 +54,20 @@ public class AlignmentPanel extends JPanel {
     public static Color COLOR_MISMATCH_ONE;
     public static Color COLOR_MISMATCH_TWO;
     
-    static String baseName = "spice";
-    
+  
     static {
-        ResourceBundle bundle = ResourceBundle.getBundle(baseName);
+     
         
-        String col1 = bundle.getString("org.biojava.spice.manypanel.renderer.AlignmentPanel.ColorMatchOne");
+        String col1 = ResourceManager.getString("org.biojava.spice.manypanel.renderer.AlignmentPanel.ColorMatchOne");
         COLOR_MATCH_ONE= Color.decode(col1); 
         
-        String col2 = bundle.getString("org.biojava.spice.manypanel.renderer.AlignmentPanel.ColorMatchTwo");
+        String col2 = ResourceManager.getString("org.biojava.spice.manypanel.renderer.AlignmentPanel.ColorMatchTwo");
         COLOR_MATCH_TWO = Color.decode(col2);
         
-        String col3 = bundle.getString("org.biojava.spice.manypanel.renderer.AlignmentPanel.ColorMisMatchOne");
+        String col3 = ResourceManager.getString("org.biojava.spice.manypanel.renderer.AlignmentPanel.ColorMisMatchOne");
         COLOR_MISMATCH_ONE= Color.decode(col3); 
         
-        String col4 = bundle.getString("org.biojava.spice.manypanel.renderer.AlignmentPanel.ColorMisMatchTwo");
+        String col4 = ResourceManager.getString("org.biojava.spice.manypanel.renderer.AlignmentPanel.ColorMisMatchTwo");
         COLOR_MISMATCH_TWO= Color.decode(col4); 
     }
     

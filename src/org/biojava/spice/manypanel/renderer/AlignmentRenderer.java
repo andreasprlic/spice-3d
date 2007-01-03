@@ -221,7 +221,7 @@ extends JPanel {
         //scrollPane.setPreferredSize(viewSize);
         //cursorPanel.setPreferredSize(viewSize);
         //alignmentPanel.setPreferredSize(viewSize);
-        alignmentPanel.repaint();
+        //alignmentPanel.repaint();
         alignmentPanel.revalidate();
         cursorPanel.repaint();
         cursorPanel.revalidate();
