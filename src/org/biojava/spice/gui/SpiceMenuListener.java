@@ -138,7 +138,7 @@ SequenceListener
             
             
         }
-        else if ( cmd.equals("Open") ) {
+        else if ( cmd.equals(ResourceManager.getString("org.biojava.spice.gui.menu.Open")) ) {
             if ( spice instanceof SpiceApplication){
                 SpiceApplication sp = (SpiceApplication)spice;
                 OpenDialog op = new OpenDialog(sp);
