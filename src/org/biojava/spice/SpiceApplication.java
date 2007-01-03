@@ -210,10 +210,18 @@ ConfigurationListener
 		if (startParameters.getStructureAlignmentMode().equals(SpiceDefaults.CASPCOORDSYS)){
 			browserPane = new BrowserPane(startParameters.getPdbcoordsys());
 		} else  {
+            
+            if ( startParameters.getCodetype().equals("GENCODE")) {
+                browserPane = new BrowserPane(startParameters.getPdbcoordsys(),
+                        startParameters.getUniprotcoordsys(), 
+                        SpiceDefaults.GENCODECOORDSYS);
+            } else {
+            
 			// init the 2D display
 			browserPane = new BrowserPane(startParameters.getPdbcoordsys(),
 					startParameters.getUniprotcoordsys(), 
 					startParameters.getEnspcoordsys());
+            }
 		}
 
 		structurePanel      = new StructurePanel();
@@ -663,8 +671,9 @@ ConfigurationListener
 			 loadUniprot(code);
 
 		 }
-		 else if (type.equals(SpiceDefaults.EnspType)) {
-			 loadEnsp(code);
+		 else if (type.equals(SpiceDefaults.EnspType) || 
+                 type.equalsIgnoreCase(SpiceDefaults.GENCODEType)) {
+			 loadEnsp(code,type);
 
 		 }
 		 else if (type.equals(SpiceDefaults.AlignmentType)){
@@ -724,15 +733,20 @@ ConfigurationListener
     protein structure
 	  */
 	 protected void loadEnsp(String ensp) {
+	     loadEnsp(ensp, SpiceDefaults.EnspType);
+     }
+     
+     protected void loadEnsp(String ensp, String type){
+         
 		 //logger.info("SpiceApplication loadEnsp" + ensp);
-		 currentType = SpiceDefaults.EnspType;
+		 currentType = type;
 		 currentAccessionCode = ensp;
 
 		 System.setProperty("SPICE:drawStructureRegion","false");
 		 if ( config == null){
 			 // we have to wait until contacting the DAS registry is finished ...
 			 Map m = new HashMap();
-			 m.put("type",SpiceDefaults.EnspType);
+			 m.put("type",type);
 			 m.put("code", ensp);
 			 loadQueue.add(m);
 			 return;
