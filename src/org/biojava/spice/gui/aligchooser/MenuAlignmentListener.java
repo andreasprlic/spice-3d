@@ -23,6 +23,7 @@
 package org.biojava.spice.gui.aligchooser;
 
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -104,7 +105,12 @@ public class MenuAlignmentListener implements AlignmentListener {
         
         for ( int i=1 ; i < annos.length ; i ++) {
             Annotation a = annos[i];
-            List details = (List) a.getProperty("details");
+            List details;
+            if ( a.containsProperty("details"))
+                details = (List) a.getProperty("details");
+            else
+                details = new ArrayList();
+            
             Iterator iter = details.iterator();
             
          
@@ -159,7 +165,12 @@ public class MenuAlignmentListener implements AlignmentListener {
         // why is this annotation nr 2?
         Annotation a = annos[1];
         
-        List details = (List) a.getProperty("details");
+        List details ;
+        if ( a.containsProperty("details") )
+            details = (List) a.getProperty("details");
+        else
+            details = new ArrayList();
+        
         Iterator iter = details.iterator();
         while (iter.hasNext()){
             Annotation det = (Annotation) iter.next();
