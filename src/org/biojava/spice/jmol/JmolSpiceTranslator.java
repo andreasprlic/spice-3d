@@ -305,8 +305,7 @@ implements JmolStatusListener, StructureListener
     }
 
 	public String eval(String strEval) {
-		System.out.println("strEval called" + strEval);
+	//	System.out.println("strEval called" + strEval);
 		return null;
 	}
-    
 }

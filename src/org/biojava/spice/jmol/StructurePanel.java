@@ -75,7 +75,7 @@ implements JmolCommander
     public StructurePanel() {
         super();        
         
-        adapter = new SmarterJmolAdapter(null);
+        adapter = new SmarterJmolAdapter();
         
         viewer  = org.jmol.viewer.Viewer.allocateViewer(this, adapter);
         
