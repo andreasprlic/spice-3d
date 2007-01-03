@@ -44,7 +44,8 @@ public class SpiceDefaults {
     public static String UNIPROTCOORDSYS = ResourceManager.getString("org.biojava.spice.SpiceDefaults.UniProtCoordSys");
     public static String ENSPCOORDSYS    = ResourceManager.getString("org.biojava.spice.SpiceDefaults.ENSPCoordSys");
     public static String CASPCOORDSYS    = ResourceManager.getString("org.biojava.spice.SpiceDefaults.CASPCoordSys");
-	
+	public static String GENCODECOORDSYS = ResourceManager.getString("org.biojava.spice.SpiceDefaults.GENCODECoordSys");
+    
     public static final Color HELIX_COLOR  = new Color(255,51,51);
     public static final Color STRAND_COLOR = new Color(255,204,51);
     public static final Color TURN_COLOR   = new Color(204,204,204); 
@@ -63,6 +64,7 @@ public class SpiceDefaults {
     public static final String UniProtType   = "UniProt";
     public static final String PDBType       = "PDB";
     public static final String AlignmentType = "alignment";
+    public static final String GENCODEType   = "Gencode";
     
     public static final String newline;
     
