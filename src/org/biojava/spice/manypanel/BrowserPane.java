@@ -413,7 +413,10 @@ ChangeListener
         addEnspListener(enspManager);
         
         enspRenderer = new SequenceRenderer();
-        enspRenderer.getStatusPanel().setName("ENSP");
+        if ( ENSPCOORDSYS.equals(SpiceDefaults.GENCODECOORDSYS))
+            enspRenderer.getStatusPanel().setName("GENCODE");
+        else
+            enspRenderer.getStatusPanel().setName("ENSP");
         enspRenderer.setBackground(BG_COLOR);
         
         ComponentResizedChainListener enspComponentWidthSetter = new ComponentResizedChainListener(enspRenderer);
@@ -1006,7 +1009,7 @@ ChangeListener
             DasCoordinateSystem thiscs  =  coordsys[i];
             //System.out.println("comparing " + cs.toString() + " " + thiscs.toString());
             if ( cs.toString().equals( thiscs.toString()) ) {
-                //System.out.println("match");
+               //System.out.println("match");
                 return true ;
             }
             

@@ -218,7 +218,7 @@ implements StructureListener{
     }
     
     public void setAlignmentServers(SpiceDasSource[] servers){
-        //logger.info(panelName+ " got "+servers.length+"  alignmentservers");
+        logger.info(panelName+ " got "+servers.length+"  alignmentservers");
         alignmentServers = servers;
     }
     public SequenceListener getSeq1Listener(){
@@ -608,7 +608,7 @@ implements StructureListener{
     */  
     private void requestAlignment(AlignmentParameters params){
         // TODO fix this:
-        
+        logger.info(panelName +" requesting alignment " + params);
         // the alignmetn server should use the correct coord sys ...
         if ( params.getSubjectCoordinateSystem().toString().equals(SpiceDefaults.ENSPCOORDSYS)) {
             DasCoordinateSystem ecs = new DasCoordinateSystem();
