@@ -144,17 +144,20 @@ public class MenuCreator {
         openpdb.setMnemonic(KeyEvent.VK_O);
         
         // currently disabled
-        /*
-        JMenuItem align;
-        ImageIcon alignIcon = createImageIcon("align.png");
-        if ( alignIcon == null) {
-            align = new JMenuItem("Align");
-        } else
-            align = new JMenuItem("Align", alignIcon);
-        align.setMnemonic(KeyEvent.VK_A);
-        align.addActionListener  (  ml );
-        file.add( align );
-        */
+        
+        String showAlignmentMenu = ResourceManager.getString("org.biojava.spice.SpiceDefaults.ShowStructureAlignmentMenu");
+        JMenuItem align = null;
+        if ( showAlignmentMenu.equals("true") ) {
+        
+            ImageIcon alignIcon = createImageIcon("align.png");
+            if ( alignIcon == null) {
+                align = new JMenuItem("Align");
+            } else
+                align = new JMenuItem("Align", alignIcon);
+            align.setMnemonic(KeyEvent.VK_A);
+            align.addActionListener  (  ml );
+           
+        }
         
         /*
         JMenuItem save ;
@@ -211,8 +214,11 @@ public class MenuCreator {
         //file.add( save    );
         //file.add( revert  );
         
-        //file.addSeparator();
-
+        
+        if ( showAlignmentMenu.equals("true") ) {
+            file.addSeparator();
+            file.add(align);   
+        }
         
         file.addSeparator();
         file.add( props   );
