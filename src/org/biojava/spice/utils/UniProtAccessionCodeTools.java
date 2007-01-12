@@ -26,11 +26,16 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.biojava.dasobert.das.DAS_FeatureRetrieve;
+import org.biojava.spice.config.SpiceDefaults;
 
 public class UniProtAccessionCodeTools {
 
+    
+    static Logger logger = Logger.getLogger(SpiceDefaults.LOGGER);
+    
     public UniProtAccessionCodeTools() {
         super();
 
@@ -69,15 +74,17 @@ public class UniProtAccessionCodeTools {
             return "";
         }
         
+        logger.info("converting swiss prot entry name to accession code: " + entry_name);
         DAS_FeatureRetrieve ftmp = new DAS_FeatureRetrieve(cmd);
         List features = ftmp.get_features();
         
         if ( features.size() > 1) {
             Map f1 = (Map)features.get(0);
             String ac = (String)f1.get("id");
+            
             return ac;            
         }
-                
+        logger.info("could not convert...");    
         return "";
         
     }
