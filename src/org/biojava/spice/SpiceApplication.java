@@ -88,6 +88,7 @@ import org.biojava.spice.manypanel.eventmodel.StructureAlignmentListener;
 import org.biojava.spice.manypanel.renderer.SegmentPopupFrame;
 import org.biojava.spice.server.SpiceServer;
 import org.biojava.spice.utils.BrowserOpener;
+import org.biojava.spice.utils.UniProtAccessionCodeTools;
 import org.jmol.api.JmolViewer;
 
 
@@ -211,7 +212,7 @@ ConfigurationListener
 			browserPane = new BrowserPane(startParameters.getPdbcoordsys());
 		} else  {
             
-            if ( startParameters.getCodetype().equals("GENCODE")) {
+            if ( startParameters.getCodetype().equalsIgnoreCase("GENCODE")) {
                 browserPane = new BrowserPane(startParameters.getPdbcoordsys(),
                         startParameters.getUniprotcoordsys(), 
                         SpiceDefaults.GENCODECOORDSYS);
@@ -711,6 +712,13 @@ ConfigurationListener
 	 protected void loadUniprot(String uniprot) {
 
 		 currentType = SpiceDefaults.UniProtType;
+         
+         if ( UniProtAccessionCodeTools.isEntryName(uniprot)){
+             String ac = UniProtAccessionCodeTools.translateName2Accession(uniprot);
+             if ( ! ac.equals(""))
+                 uniprot = ac;
+         }
+         
 		 currentAccessionCode = uniprot;
 
 		 logger.info("SpiceApplication loadUniprot " + uniprot);
