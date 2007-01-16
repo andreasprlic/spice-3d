@@ -139,7 +139,9 @@ public class AlignmentPanel extends JPanel {
         scrollLeftX2 =v;
     }
     public void setAlignmentMap1(Map m){
-        alignmentMap1 = m;
+        synchronized (alignmentMap1) {
+            alignmentMap1 = m;
+        }
     }
     
     public void setAlignmentMap2(Map m){
@@ -155,15 +157,16 @@ public class AlignmentPanel extends JPanel {
         this.repaint();
     }
     
-   
-    
-    
     public void paint(Graphics g){
        
         super.paint(g);
         
-        Graphics2D g2D = (Graphics2D) g;
+        //TODO: find the bug why sometimes start with UniProt does not color alignment correctly
         
+        //System.out.println("sequence1 " + sequence1.getSequence());
+        //System.out.println("sequence2 " + sequence2.getSequence());       
+        
+        Graphics2D g2D = (Graphics2D) g;        
         
         g2D.setColor(SequenceScalePanel.SEQUENCE_COLOR);
         int aminosize1 = Math.round(1*scale1);
@@ -172,8 +175,7 @@ public class AlignmentPanel extends JPanel {
         
         int aminosize2 = Math.round(scale2);
         if ( aminosize2 <1)
-            aminosize2 = 1;
-                
+            aminosize2 = 1;                
         
         
         g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
@@ -217,6 +219,8 @@ public class AlignmentPanel extends JPanel {
             Group g1 = null;
             Group g2 = null;
             
+            
+            
             //logger.info("seq1 length " + sequence1.getLength() + " " + h1);
             if ( sequence1.getLength() > h1)
                 g1 = sequence1.getGroup(h1);
@@ -234,13 +238,16 @@ public class AlignmentPanel extends JPanel {
                 else
                     g2D.setColor(COLOR_MATCH_TWO);
             } else {
+                //if (g1 != null && g2 != null)
+                //    System.out.println(h1 + " " + g1 + " "+ h2 + " "  + g2);
                 if (h1 % 2 == 0)
                     g2D.setColor(COLOR_MISMATCH_ONE);
                 else
                     g2D.setColor(COLOR_MISMATCH_TWO);
             
             }
-                        
+            
+          
             GeneralPath path = new GeneralPath();
             path.moveTo(p1,0);            
             path.lineTo(p2,h);
@@ -248,6 +255,7 @@ public class AlignmentPanel extends JPanel {
             path.lineTo(p1+aminosize1+1,0);
             path.lineTo(p1,0);
             g2D.fill(path);
+                      
             
         }
         g2D.setComposite(oldComp);
