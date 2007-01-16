@@ -317,17 +317,36 @@ public class DasSourceConfigPanel {
                     return ;
                 }
                 
-                if  (
-                        ( code == KeyEvent.VK_PAGE_UP) || 
-                        ( code == KeyEvent.VK_UP) ||
-                        ( code == KeyEvent.VK_PAGE_DOWN) ||
-                        ( code == KeyEvent.VK_DOWN) 
-                )
+                if ( code == KeyEvent.VK_PAGE_UP) {
+                    config.moveServer(selectMoveStartPosition,0);
+                    updateDasSourceTable();
+               
+                }
+                
+                else if  ( code == KeyEvent.VK_UP) {                                        
+                    System.out.println("moving DAS source to position " + minIndex);
                     
-                {
                     config.moveServer(selectMoveStartPosition,minIndex);
                     updateDasSourceTable();
+               
+                } else if ( code == KeyEvent.VK_DOWN)  {
+                    System.out.println("moving DAS source to position " + minIndex + 1);
+                    
+                    config.moveServer(selectMoveStartPosition,minIndex + 1);
+                    updateDasSourceTable();
+                    
+                } else if  ( code == KeyEvent.VK_PAGE_DOWN) {
+                    int nrservers = config.getAllServers().size();
+                    config.moveServer(selectMoveStartPosition,nrservers);
+                    updateDasSourceTable();
+                    
                 }
+    
+        
+     
+                
+                
+                
                 selectMoveStartPosition = minIndex ;
             }            
         });
