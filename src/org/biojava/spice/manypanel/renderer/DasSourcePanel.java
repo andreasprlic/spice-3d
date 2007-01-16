@@ -44,6 +44,7 @@ import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.eventmodel.*;
 import org.biojava.spice.ResourceManager;
 import org.biojava.spice.SpiceApplication;
+import org.biojava.spice.config.SpiceDefaults;
 import org.biojava.spice.feature.Feature;
 import org.biojava.spice.feature.Segment;
 import org.biojava.spice.manypanel.eventmodel.FeatureListener;
@@ -62,14 +63,14 @@ implements FeatureListener,SpiceFeatureListener
 {
     static final long serialVersionUID = 17439836750348543l;
     
-    static Logger logger = Logger.getLogger("org.biojava.spice");
+    static Logger logger = Logger.getLogger(SpiceDefaults.LOGGER);
     
     public static final Font  plainFont;
     public static final Font  headFont; 
     public static final Color SELECTED_FEATURE_COLOR;
     
     
-    private static final String DISULFID = "DISULFID"; 
+     
     
     
     float     scale;
@@ -170,8 +171,12 @@ implements FeatureListener,SpiceFeatureListener
                 
         int y = SequenceScalePanel.DEFAULT_Y_START + SequenceScalePanel.DEFAULT_Y_STEP ;      
         
-        drawFeatures(g2D,features,y);
+        g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+        Composite oldComp = g2D.getComposite();
+        g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));  
         
+        drawFeatures(g2D,features,y);
+        g2D.setComposite(oldComp);
         
         if ( selected ){
             // the whole featureview has been selected
@@ -181,8 +186,6 @@ implements FeatureListener,SpiceFeatureListener
             g2D.fillRect(0,y,getWidth(),getHeight());
             
         }
-        
-       
     }
     
     /** draw the features starting at position y
@@ -588,7 +591,7 @@ implements FeatureListener,SpiceFeatureListener
             setColor(g,feature,new HashMap());
             String featureType = feature.getType();
             
-            if (  featureType.equals(DISULFID)){
+            if (  featureType.equals(SpiceDefaults.DISULFID_TYPE)){
                 drawSpanFeature(feature,f,SequenceScalePanel.DEFAULT_Y_HEIGHT,g,y);
                 
             } else if (  featureType.equals("SECSTRUC") || 
@@ -752,7 +755,7 @@ implements FeatureListener,SpiceFeatureListener
             g.setColor(c);
         } else {
             //logger.info("no stylesheet defined color found for" + feature.getName());
-            if ( feature.getType().equals(DISULFID)){
+            if ( feature.getType().equals(SpiceDefaults.DISULFID_TYPE)){
                 g.setColor(Color.yellow);
             } else {
                 setDefaultColor(g,feature);
@@ -800,7 +803,7 @@ implements FeatureListener,SpiceFeatureListener
             String featureType = feat.getType();
             
             // disulfid bridges are never overwritten...            
-            if (  featureType.equals(DISULFID)){ 
+            if (  featureType.equals(SpiceDefaults.DISULFID_TYPE)){ 
                 drawSpanFeature(feat,f,SequenceScalePanel.DEFAULT_Y_HEIGHT,g,y);
                 continue;
             }
@@ -866,7 +869,7 @@ implements FeatureListener,SpiceFeatureListener
                 
                 //logger.finest("no matching stylesheet found for feature type " + featureType);
                 // no stylesheet type has been found that describes how to paint this feature - use default...
-                if (  featureType.equals(DISULFID)){
+                if (  featureType.equals(SpiceDefaults.DISULFID_TYPE)){
                     drawSpanFeature(feat,f,SequenceScalePanel.DEFAULT_Y_HEIGHT,g,y);
                 } else if (  featureType.equals("SECSTRUC") || 
                         featureType.equals("HELIX") || 
