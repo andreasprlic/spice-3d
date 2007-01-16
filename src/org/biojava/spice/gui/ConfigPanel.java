@@ -77,6 +77,7 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
         ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Url"), //$NON-NLS-1$
         ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Adminemail"),  //$NON-NLS-1$
         ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Capabilities"), //$NON-NLS-1$
+        ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.CoordinateSystems"), //$NON-NLS-1$
         ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Description"), //$NON-NLS-1$
         ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Public"), //$NON-NLS-1$
         ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Active") //$NON-NLS-1$
