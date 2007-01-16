@@ -160,12 +160,6 @@ public class AlignmentPanel extends JPanel {
     public void paint(Graphics g){
        
         super.paint(g);
-        
-        //TODO: find the bug why sometimes start with UniProt does not color alignment correctly
-        
-        //System.out.println("sequence1 " + sequence1.getSequence());
-        //System.out.println("sequence2 " + sequence2.getSequence());       
-        
         Graphics2D g2D = (Graphics2D) g;        
         
         g2D.setColor(SequenceScalePanel.SEQUENCE_COLOR);

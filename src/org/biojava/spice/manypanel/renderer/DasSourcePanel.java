@@ -70,9 +70,6 @@ implements FeatureListener,SpiceFeatureListener
     public static final Color SELECTED_FEATURE_COLOR;
     
     
-     
-    
-    
     float     scale;
     boolean   selected;
     boolean   featureSelected;

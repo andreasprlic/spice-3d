@@ -88,9 +88,9 @@ ChangeListener
     List structureListeners;
     List uniProtListeners;
     List enspListeners;
-    StructureRenderer structureRenderer ;
-    SequenceRenderer seqRenderer;
-    SequenceRenderer enspRenderer;
+    StructureRenderer renderer_Pdb ;
+    SequenceRenderer renderer_UP;
+    SequenceRenderer renderer_Ensp;
     
     int storeStart;
     int storeEnd;
@@ -98,10 +98,13 @@ ChangeListener
     StructureManager strucManager;
     SequenceManager seqManager;
     SequenceManager enspManager;
-    AlignmentManager aligManager;
-    AlignmentManager ensaligManager;
-    AlignmentRenderer seqAligRenderer;
-    AlignmentRenderer enspAligRenderer;
+    
+    AlignmentManager aligManager_PdbUp;
+    AlignmentManager aligManager_UpEnsp;
+    
+    AlignmentRenderer aligRenderer_PdbUp;
+    AlignmentRenderer aligRenderer_UpEnsp;
+    
     FeatureManager pdbFeatureManager;
     FeatureManager upFeatureManager;
     FeatureManager enspFeatureManager;
@@ -135,7 +138,7 @@ ChangeListener
         
         //Dimension d = new Dimension(DEFAULT_PANE_WIDTH,DEFAULT_PANE_HEIGHT);
         //split2.setPreferredSize(d);
-        contentPanel.add(structureRenderer);
+        contentPanel.add(renderer_Pdb);
         
         
         /// and now ...
@@ -195,15 +198,15 @@ ChangeListener
         //
         
         
-        JSplitPane splito = new JSplitPane(JSplitPane.VERTICAL_SPLIT,structureRenderer,seqAligRenderer);
+        JSplitPane splito = new JSplitPane(JSplitPane.VERTICAL_SPLIT,renderer_Pdb,aligRenderer_PdbUp);
         splito.setOneTouchExpandable(true);
         splito.setResizeWeight(1.0);
         splito.setBorder(BorderFactory.createEmptyBorder());
         
-        MyPropertyChangeListener mpcl = new MyPropertyChangeListener(seqAligRenderer,this,splito,"bottom");
+        MyPropertyChangeListener mpcl = new MyPropertyChangeListener(aligRenderer_PdbUp,this,splito,"bottom");
         splito.addPropertyChangeListener("dividerLocation", mpcl );
         
-        JSplitPane split1 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,splito,seqRenderer);
+        JSplitPane split1 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,splito,renderer_UP);
         split1.setOneTouchExpandable(true);
         // uniprot panel gets a little more space, because so many more DAS sources...
         split1.setResizeWeight(0.5);
@@ -218,7 +221,7 @@ ChangeListener
 //      p2.add(enspAligRenderer);
 //      p2.add(enspRenderer);
         
-        JSplitPane splitb = new JSplitPane(JSplitPane.VERTICAL_SPLIT,enspAligRenderer,enspRenderer);
+        JSplitPane splitb = new JSplitPane(JSplitPane.VERTICAL_SPLIT,aligRenderer_UpEnsp,renderer_Ensp);
         splitb.setOneTouchExpandable(true);
         splitb.setResizeWeight(0);
         splitb.setBorder(BorderFactory.createEmptyBorder());
@@ -227,7 +230,7 @@ ChangeListener
         
         //splitb.addComponentListener(mycompo2);
         
-        MyPropertyChangeListener mpcl2 = new MyPropertyChangeListener(enspAligRenderer,this,splitb,"top");
+        MyPropertyChangeListener mpcl2 = new MyPropertyChangeListener(aligRenderer_UpEnsp,this,splitb,"top");
         splitb.addPropertyChangeListener("dividerLocation",mpcl2);
         
         JSplitPane split2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,split1,splitb);
@@ -275,6 +278,11 @@ ChangeListener
     }
     
     private void initPanels(String PDBCOORDSYS, String UNIPROTCOORDSYS, String ENSPCOORDSYS) {
+        
+        // TODO: actually the initialization of all the Listeners is pretty horrible and
+        // it would be nice to have something easier for doing so. It is the result of the
+        // event model as being used by SPICE. AP 20070116
+        
         contentPanel = new JPanel();
         
         String bgcol = ResourceManager.getString("org.biojava.spice.manypanel.renderer.BackgroundColor");
@@ -282,51 +290,33 @@ ChangeListener
         
         contentPanel.setLayout(new BoxLayout(contentPanel,BoxLayout.X_AXIS));
         
-        
         structureListeners = new ArrayList();
         uniProtListeners   = new ArrayList();
         enspListeners      = new ArrayList();
         allsources         = new ArrayList();
         
-        
-        
         strucManager = new StructureManager();
         addStructureListener(strucManager);
         
-        structureRenderer = new StructureRenderer();
-        //structureRenderer = new StructureRenderer(); 
-        structureRenderer.getStatusPanel().setName("PDB");
-        structureRenderer.setBackground(BG_COLOR);
+        renderer_Pdb = new StructureRenderer();
+        renderer_Pdb.getStatusPanel().setName("PDB");
+        renderer_Pdb.setBackground(BG_COLOR);
         
-        ComponentResizedChainListener strucComponentWidthSetter = new ComponentResizedChainListener(structureRenderer);
+        ComponentResizedChainListener strucComponentWidthSetter = new ComponentResizedChainListener(renderer_Pdb);
         contentPanel.addComponentListener(strucComponentWidthSetter);
         
-        
-        strucManager.addStructureRenderer(structureRenderer);
+        strucManager.addStructureRenderer(renderer_Pdb);
         
         DasCoordinateSystem dcs = DasCoordinateSystem.fromString(PDBCOORDSYS);
         strucManager.setCoordinateSystem(dcs);
         
-        
         pdbFeatureManager = new FeatureManager();
         pdbFeatureManager.setCoordinateSystem(dcs);
-        pdbFeatureManager.addDasSourceListener(structureRenderer);
-        //addStructureListener(fm);
+        pdbFeatureManager.addDasSourceListener(renderer_Pdb);
+       
         FeatureRenderer featureRenderer = new FeatureRenderer();
         pdbFeatureManager.addFeatureRenderer(featureRenderer);
-        
-        
-        
-        //fm.addDasSourceListener(structureRenderer);
-        
-        //structureRenderer.addFeatureRenderer(featureRenderer);
-        
-        
-        // link the feature manager to the StructureManager        
-        //strucManager.setFeatureManager(fm);
         strucManager.addSequenceListener(pdbFeatureManager);
-        //structureSequencePane.set
-        
         
         
         ///////////////
@@ -336,25 +326,24 @@ ChangeListener
         seqManager = new SequenceManager();
         addUniProtListener(seqManager);
         
-        seqRenderer = new SequenceRenderer();
-        seqRenderer.getStatusPanel().setName("UniProt");
-        seqRenderer.setBackground(BG_COLOR);
+        renderer_UP = new SequenceRenderer();
+        renderer_UP.getStatusPanel().setName("UniProt");
+        renderer_UP.setBackground(BG_COLOR);
         
-        ComponentResizedChainListener seqComponentWidthSetter = new ComponentResizedChainListener(seqRenderer);
+        ComponentResizedChainListener seqComponentWidthSetter = new ComponentResizedChainListener(renderer_UP);
         contentPanel.addComponentListener(seqComponentWidthSetter);
         
         DasCoordinateSystem seqdcs = DasCoordinateSystem.fromString(UNIPROTCOORDSYS);
         seqManager.setCoordinateSystem(seqdcs);
-        seqManager.addSequenceRenderer(seqRenderer);
+        seqManager.addSequenceRenderer(renderer_UP);
         
         upFeatureManager = new FeatureManager();
         upFeatureManager.setCoordinateSystem(seqdcs);
-        upFeatureManager.addDasSourceListener(seqRenderer);
+        upFeatureManager.addDasSourceListener(renderer_UP);
+        
         addUniProtListener(upFeatureManager);
         FeatureRenderer seqFeatureRenderer = new FeatureRenderer();
-        upFeatureManager.addFeatureRenderer(seqFeatureRenderer);
-        
-        //seqManager.setFeatureManager(seqfm);
+        upFeatureManager.addFeatureRenderer(seqFeatureRenderer);        
         seqManager.addSequenceListener(upFeatureManager);
         
         
@@ -362,45 +351,46 @@ ChangeListener
         // now add the Alignment PDB to UniProt
         //////////////
         
-        aligManager = new AlignmentManager("PDB_UP",dcs,seqdcs);
+        aligManager_PdbUp = new AlignmentManager("PDB_UP",dcs,seqdcs);
         
-        strucManager.addStructureListener(aligManager);
-        SequenceListener pdbList = aligManager.getSeq1Listener();
-        SequenceListener upList = aligManager.getSeq2Listener();
-        
+        strucManager.addStructureListener(aligManager_PdbUp);
+
+        SequenceListener pdbList = aligManager_PdbUp.getSeq1Listener();
+        SequenceListener upList  = aligManager_PdbUp.getSeq2Listener();
+       
         strucManager.addSequenceListener(pdbList);
         seqManager.addSequenceListener(upList);
         
-        structureRenderer.addSequenceListener(pdbList);
-        seqRenderer.addSequenceListener(upList);
+        renderer_Pdb.addSequenceListener(pdbList);
+        renderer_UP.addSequenceListener(upList);
         
-        aligManager.addObject1Listener(strucManager);
-        aligManager.addObject2Listener(seqManager);
+        aligManager_PdbUp.addObject1Listener(strucManager);
+        aligManager_PdbUp.addObject2Listener(seqManager);
         
-        CursorPanel[] structureCursors =structureRenderer.getCursorPanels();
+        CursorPanel[] structureCursors =renderer_Pdb.getCursorPanels();
         for (int i = 0; i < structureCursors.length;i++){
-            aligManager.addSequence1Listener(structureCursors[i]);
+            aligManager_PdbUp.addSequence1Listener(structureCursors[i]);
         }
-        CursorPanel[] seqCursors =seqRenderer.getCursorPanels();
+        CursorPanel[] seqCursors =renderer_UP.getCursorPanels();
         for (int i = 0; i < seqCursors.length;i++){        
-            aligManager.addSequence2Listener(seqCursors[i]);
+            aligManager_PdbUp.addSequence2Listener(seqCursors[i]);
         }
         
-        seqAligRenderer = new AlignmentRenderer();
-        aligManager.addAlignmentRenderer(seqAligRenderer);
+        aligRenderer_PdbUp = new AlignmentRenderer();
+        aligManager_PdbUp.addAlignmentRenderer(aligRenderer_PdbUp);
         
-        structureRenderer.addScaleChangeListener(seqAligRenderer.getSeq1ScaleListener());
-        seqRenderer.addScaleChangeListener(seqAligRenderer.getSeq2ScaleListener());
+        renderer_Pdb.addScaleChangeListener(aligRenderer_PdbUp.getSeq1ScaleListener());
+        renderer_UP.addScaleChangeListener(aligRenderer_PdbUp.getSeq2ScaleListener());
         
-        structureRenderer.addSequenceListener(seqAligRenderer.getSequenceListener1());
-        seqRenderer.addSequenceListener(seqAligRenderer.getSequenceListener2());
-        aligManager.addSequence1Listener(seqAligRenderer.getSequenceListener1());
-        aligManager.addSequence2Listener(seqAligRenderer.getSequenceListener2());
+        renderer_Pdb.addSequenceListener(aligRenderer_PdbUp.getSequenceListener1());
+        renderer_UP.addSequenceListener(aligRenderer_PdbUp.getSequenceListener2());
+        aligManager_PdbUp.addSequence1Listener(aligRenderer_PdbUp.getSequenceListener1());
+        aligManager_PdbUp.addSequence2Listener(aligRenderer_PdbUp.getSequenceListener2());
         
-        structureRenderer.addAdjustmentListener(seqAligRenderer.getAdjust1());
-        seqRenderer.addAdjustmentListener(seqAligRenderer.getAdjust2());
+        renderer_Pdb.addAdjustmentListener(aligRenderer_PdbUp.getAdjust1());
+        renderer_UP.addAdjustmentListener(aligRenderer_PdbUp.getAdjust2());
         
-        seqAligRenderer.setPreferredSize(new Dimension(400,20));
+        aligRenderer_PdbUp.setPreferredSize(new Dimension(400,20));
         
         
         
@@ -412,14 +402,14 @@ ChangeListener
         enspManager = new SequenceManager();
         addEnspListener(enspManager);
         
-        enspRenderer = new SequenceRenderer();
+        renderer_Ensp = new SequenceRenderer();
         if ( ENSPCOORDSYS.equals(SpiceDefaults.GENCODECOORDSYS))
-            enspRenderer.getStatusPanel().setName("GENCODE");
+            renderer_Ensp.getStatusPanel().setName("GENCODE");
         else
-            enspRenderer.getStatusPanel().setName("ENSP");
-        enspRenderer.setBackground(BG_COLOR);
+            renderer_Ensp.getStatusPanel().setName("ENSP");
+        renderer_Ensp.setBackground(BG_COLOR);
         
-        ComponentResizedChainListener enspComponentWidthSetter = new ComponentResizedChainListener(enspRenderer);
+        ComponentResizedChainListener enspComponentWidthSetter = new ComponentResizedChainListener(renderer_Ensp);
         contentPanel.addComponentListener(enspComponentWidthSetter);
         
         
@@ -427,11 +417,11 @@ ChangeListener
         enspManager.setCoordinateSystem(enspdcs);
         
         
-        enspManager.addSequenceRenderer(enspRenderer);
+        enspManager.addSequenceRenderer(renderer_Ensp);
         
         enspFeatureManager = new FeatureManager();
         enspFeatureManager.setCoordinateSystem(enspdcs);
-        enspFeatureManager.addDasSourceListener(enspRenderer);
+        enspFeatureManager.addDasSourceListener(renderer_Ensp);
         addEnspListener(enspFeatureManager);
         FeatureRenderer enspFeatureRenderer = new FeatureRenderer();
         enspFeatureManager.addFeatureRenderer(enspFeatureRenderer);
@@ -451,13 +441,13 @@ ChangeListener
         // now add the Alignment ENSP to UniProt
         //////////////
         
-        ensaligManager = new AlignmentManager("UP_ENSP",seqdcs,enspdcs);
+        aligManager_UpEnsp = new AlignmentManager("UP_ENSP",seqdcs,enspdcs);
         
-        SequenceListener upenspList = ensaligManager.getSeq1Listener();
-        SequenceListener enspList   = ensaligManager.getSeq2Listener();
+        SequenceListener upenspList = aligManager_UpEnsp.getSeq1Listener();
+        SequenceListener enspList   = aligManager_UpEnsp.getSeq2Listener();
         
-        seqRenderer.addSequenceListener(upenspList);
-        enspRenderer.addSequenceListener(enspList);
+        renderer_UP.addSequenceListener(upenspList);
+        renderer_Ensp.addSequenceListener(enspList);
         
         //strucManager.addSequenceListener(pdbList);
         seqManager.addSequenceListener(upenspList);
@@ -465,39 +455,41 @@ ChangeListener
         
         
         
-        ensaligManager.addObject1Listener(seqManager);
-        ensaligManager.addObject2Listener(enspManager);
+        aligManager_UpEnsp.addObject1Listener(seqManager);
+        aligManager_UpEnsp.addObject2Listener(enspManager);
         
         for (int i = 0; i < seqCursors.length;i++){        
-            ensaligManager.addSequence1Listener(seqCursors[i]);
+            aligManager_UpEnsp.addSequence1Listener(seqCursors[i]);
         }
-        CursorPanel[] enspCursors = enspRenderer.getCursorPanels();
+        CursorPanel[] enspCursors = renderer_Ensp.getCursorPanels();
         for (int i = 0; i < enspCursors.length;i++){
-            ensaligManager.addSequence2Listener(enspCursors[i]);
+            aligManager_UpEnsp.addSequence2Listener(enspCursors[i]);
         }
-        ensaligManager.addSequence1Listener(upList);
+        aligManager_UpEnsp.addSequence1Listener(upList);
         
-        aligManager.addSequence2Listener(upenspList);
+        aligManager_PdbUp.addSequence2Listener(upenspList);
         
         
-        enspAligRenderer = new AlignmentRenderer();
-        ensaligManager.addAlignmentRenderer(enspAligRenderer);
+        aligRenderer_UpEnsp = new AlignmentRenderer();
+        aligManager_UpEnsp.addAlignmentRenderer(aligRenderer_UpEnsp);
         
-        seqRenderer.addScaleChangeListener(enspAligRenderer.getSeq1ScaleListener());
-        enspRenderer.addScaleChangeListener(enspAligRenderer.getSeq2ScaleListener());
+        renderer_UP.addScaleChangeListener(aligRenderer_UpEnsp.getSeq1ScaleListener());
+        renderer_Ensp.addScaleChangeListener(aligRenderer_UpEnsp.getSeq2ScaleListener());
         
-        seqRenderer.addSequenceListener(enspAligRenderer.getSequenceListener1());
-        enspRenderer.addSequenceListener(enspAligRenderer.getSequenceListener2());
-        aligManager.addSequence2Listener(enspAligRenderer.getSequenceListener1());
-        ensaligManager.addSequence1Listener(enspAligRenderer.getSequenceListener1());
-        ensaligManager.addSequence2Listener(enspAligRenderer.getSequenceListener2());
-        ensaligManager.addSequence1Listener(seqAligRenderer.getSequenceListener2());
+        renderer_UP.addSequenceListener(aligRenderer_UpEnsp.getSequenceListener1());
+        renderer_Ensp.addSequenceListener(aligRenderer_UpEnsp.getSequenceListener2());
+                
+        aligManager_PdbUp.addSequence2Listener(aligRenderer_UpEnsp.getSequenceListener1());
+        aligManager_UpEnsp.addSequence1Listener(aligRenderer_UpEnsp.getSequenceListener1());
+        aligManager_UpEnsp.addSequence2Listener(aligRenderer_UpEnsp.getSequenceListener2());
+        aligManager_UpEnsp.addSequence1Listener(aligRenderer_PdbUp.getSequenceListener2());
+        
         //browserPane.addPane(structureSequencePane);
-        enspAligRenderer.setPreferredSize(new Dimension(400,20));
+        aligRenderer_UpEnsp.setPreferredSize(new Dimension(400,20));
         
         
-        seqRenderer.addAdjustmentListener(enspAligRenderer.getAdjust1());
-        enspRenderer.addAdjustmentListener(enspAligRenderer.getAdjust2());
+        renderer_UP.addAdjustmentListener(aligRenderer_UpEnsp.getAdjust1());
+        renderer_Ensp.addAdjustmentListener(aligRenderer_UpEnsp.getAdjust2());
         
        
         
@@ -512,20 +504,20 @@ ChangeListener
     private void registerEventTranslators(){
 
         
-        ChainRendererMouseListener mouserPdb  = structureRenderer.getChainRendererMouseListener();
-        ChainRendererMouseListener mouserUp   = seqRenderer.getChainRendererMouseListener();
-        ChainRendererMouseListener mouserEnsp = enspRenderer.getChainRendererMouseListener();
+        ChainRendererMouseListener mouserPdb  = renderer_Pdb.getChainRendererMouseListener();
+        ChainRendererMouseListener mouserUp   = renderer_UP.getChainRendererMouseListener();
+        ChainRendererMouseListener mouserEnsp = renderer_Ensp.getChainRendererMouseListener();
         
         // for selection of the whole feature
-        RowHeaderMouseListener upRowHeader   = seqRenderer.getRowHeaderListener();
-        RowHeaderMouseListener pdbRowHeader  = structureRenderer.getRowHeaderListener();
-        RowHeaderMouseListener enspRowHeader = enspRenderer.getRowHeaderListener();
+        RowHeaderMouseListener upRowHeader   = renderer_UP.getRowHeaderListener();
+        RowHeaderMouseListener pdbRowHeader  = renderer_Pdb.getRowHeaderListener();
+        RowHeaderMouseListener enspRowHeader = renderer_Ensp.getRowHeaderListener();
         
-        SpiceFeatureListener li1 = aligManager.getFeatureTranslator1();
-        SpiceFeatureListener li2 = aligManager.getFeatureTranslator2();
+        SpiceFeatureListener li1 = aligManager_PdbUp.getFeatureTranslator1();
+        SpiceFeatureListener li2 = aligManager_PdbUp.getFeatureTranslator2();
         
-        SpiceFeatureListener li3 = ensaligManager.getFeatureTranslator1();
-        SpiceFeatureListener li4 = ensaligManager.getFeatureTranslator2();
+        SpiceFeatureListener li3 = aligManager_UpEnsp.getFeatureTranslator1();
+        SpiceFeatureListener li4 = aligManager_UpEnsp.getFeatureTranslator2();
         
         
         mouserPdb.addSpiceFeatureListener(li1);
@@ -542,9 +534,9 @@ ChangeListener
         // and register the cursor panels ...
                 
         //aligManager.addSeq1FeatureListener(li1);
-        aligManager.addSeq2FeatureListener(li3);
+        aligManager_PdbUp.addSeq2FeatureListener(li3);
 //               
-        ensaligManager.addSeq1FeatureListener(li2);        
+        aligManager_UpEnsp.addSeq1FeatureListener(li2);        
 //        ensaligManager.addSeq2FeatureListener(li4);
     }
     
@@ -555,17 +547,17 @@ ChangeListener
     private void registerManagers(){
         
         
-        ArrowPanel a2 = seqRenderer.getArrowPanel();
-        a2.setUpperAlignmentManager(aligManager);
-        a2.setLowerAlignmentManager(aligManager);
+        ArrowPanel a2 = renderer_UP.getArrowPanel();
+        a2.setUpperAlignmentManager(aligManager_PdbUp);
+        a2.setLowerAlignmentManager(aligManager_PdbUp);
         a2.setUpperObjectListener(strucManager);
         a2.setLowerObjectListener(seqManager);
         
         
-        ArrowPanel a3 = enspRenderer.getArrowPanel();
+        ArrowPanel a3 = renderer_Ensp.getArrowPanel();
         
-        a3.setUpperAlignmentManager(ensaligManager);
-        a3.setLowerAlignmentManager(ensaligManager);
+        a3.setUpperAlignmentManager(aligManager_UpEnsp);
+        a3.setLowerAlignmentManager(aligManager_UpEnsp);
         a3.setUpperObjectListener(seqManager);
         a3.setLowerObjectListener(enspManager);
         
@@ -580,9 +572,9 @@ ChangeListener
         //if (!source.getValueIsAdjusting()) {
         //System.out.println("slider at " +source.getValue());
         int residueSize = (int)source.getValue();
-        structureRenderer.calcScale(residueSize);
-        seqRenderer.calcScale(residueSize);
-        enspRenderer.calcScale(residueSize);
+        renderer_Pdb.calcScale(residueSize);
+        renderer_UP.calcScale(residueSize);
+        renderer_Ensp.calcScale(residueSize);
         contentPanel.repaint();
         
         this.repaint();
@@ -718,11 +710,11 @@ ChangeListener
         enspFeatureManager.setDasSources(enspfeatservs);
         
         SpiceDasSource[] strucaligs = getAlignmentServers(allsources,dcs,seqdcs);
-        aligManager.setAlignmentServers(strucaligs);
+        aligManager_PdbUp.setAlignmentServers(strucaligs);
         
         // get the alignment das source
         SpiceDasSource[] enspupaligs = getAlignmentServers(allsources,seqdcs,enspdcs);
-        ensaligManager.setAlignmentServers(enspupaligs);
+        aligManager_UpEnsp.setAlignmentServers(enspupaligs);
         
         this.repaint();
         
@@ -738,11 +730,11 @@ ChangeListener
             DasCoordinateSystem dcs = cs[i];
             if ( dcs.toString().equals(SpiceDefaults.PDBCOORDSYS)){
                 // remove from structure panel
-                structureRenderer.removeDasSource(event);
+                renderer_Pdb.removeDasSource(event);
             } else if ( dcs.toString().equals(SpiceDefaults.UNIPROTCOORDSYS))
-                seqRenderer.removeDasSource(event);
+                renderer_UP.removeDasSource(event);
             else if ( dcs.toString().equals(SpiceDefaults.ENSPCOORDSYS))
-                enspRenderer.removeDasSource(event);
+                renderer_Ensp.removeDasSource(event);
         }
         
     }
@@ -750,8 +742,8 @@ ChangeListener
     public  void clearDasSources() {
         logger.info("browserPane clear das sources");
         allsources = new ArrayList();
-        ensaligManager.clearDasSources();
-        aligManager.clearDasSources();
+        aligManager_UpEnsp.clearDasSources();
+        aligManager_PdbUp.clearDasSources();
         upFeatureManager.clearDasSources();
         enspManager.clearDasSources();
         seqManager.clearDasSources();
@@ -770,35 +762,35 @@ ChangeListener
     
     
     public void addPDBPositionListener(SequenceListener li){
-        ChainRendererMouseListener mouser = structureRenderer.getChainRendererMouseListener();
+        ChainRendererMouseListener mouser = renderer_Pdb.getChainRendererMouseListener();
         mouser.addSequenceListener(li);
-        aligManager.addSequence1Listener(li);
+        aligManager_PdbUp.addSequence1Listener(li);
     }
     
     public void addPDBSpiceFeatureListener(SpiceFeatureListener li){
         // now done by renderer...
         //ChainRendererMouseListener mouser = structureRenderer.getChainRendererMouseListener();
         //mouser.addSpiceFeatureListener(li);        
-        structureRenderer.addSpiceFeatureListener(li);
-        aligManager.addSeq1FeatureListener(li);
+        renderer_Pdb.addSpiceFeatureListener(li);
+        aligManager_PdbUp.addSeq1FeatureListener(li);
         
     
         
     }
     
     public void addUniProtSpiceFeatureListener(SpiceFeatureListener li){
-        ChainRendererMouseListener seqmouser = seqRenderer.getChainRendererMouseListener();
+        ChainRendererMouseListener seqmouser = renderer_UP.getChainRendererMouseListener();
         seqmouser.addSpiceFeatureListener(li);
         
-        aligManager.addSeq2FeatureListener(li);
-        ensaligManager.addSeq1FeatureListener(li);
+        aligManager_PdbUp.addSeq2FeatureListener(li);
+        aligManager_UpEnsp.addSeq1FeatureListener(li);
         
     }
     
     public void addEnspSpiceFeatureListener(SpiceFeatureListener li){
-        ChainRendererMouseListener enspmouser = enspRenderer.getChainRendererMouseListener();
+        ChainRendererMouseListener enspmouser = renderer_Ensp.getChainRendererMouseListener();
         enspmouser.addSpiceFeatureListener(li);
-        ensaligManager.addSeq2FeatureListener(li);
+        aligManager_UpEnsp.addSeq2FeatureListener(li);
     }
     
     public void addStructureListener(StructureListener li){
@@ -817,17 +809,17 @@ ChangeListener
     
     public void addPDBSequenceListener(SequenceListener li){
         strucManager.addSequenceListener(li);
-        aligManager.addSequence1Listener(li);
+        aligManager_PdbUp.addSequence1Listener(li);
     }
     
     public SequenceListener[] getPDBSequenceListener(){
-        CursorPanel[] cursors = structureRenderer.getCursorPanels();
+        CursorPanel[] cursors = renderer_Pdb.getCursorPanels();
         SequenceListener[] sli = new SequenceListener[cursors.length + 1];
         for ( int i=0;i < cursors.length;i++){
             sli[i] = cursors[i];
             
         }
-        sli[cursors.length] = aligManager.getSeq1Listener();
+        sli[cursors.length] = aligManager_PdbUp.getSeq1Listener();
         return sli;
     }
     public void addUniProtListener(ObjectListener li){
@@ -865,8 +857,8 @@ ChangeListener
         logger.finest("trigger load structure " + pdbcode);
         clearDisplay();
         
-        aligManager.clearAlignment();
-        ensaligManager.clearAlignment();
+        aligManager_PdbUp.clearAlignment();
+        aligManager_UpEnsp.clearAlignment();
         
         
         Iterator iter = structureListeners.iterator();
@@ -899,25 +891,25 @@ ChangeListener
     }
     
     public AlignmentManager getTopAlignmentManager(){
-        return aligManager;
+        return aligManager_PdbUp;
     }
     public AlignmentManager getBottomAlignmentManager(){
-        return ensaligManager;
+        return aligManager_UpEnsp;
     }
     
     
     public void clearDisplay(){
         
-        aligManager.clearAlignment();
+        aligManager_PdbUp.clearAlignment();
         
         
-        ensaligManager.clearAlignment();
+        aligManager_UpEnsp.clearAlignment();
         
         strucManager.clear();
         
-        structureRenderer.clearDisplay();
-        seqRenderer.clearDisplay();
-        enspRenderer.clearDisplay();
+        renderer_Pdb.clearDisplay();
+        renderer_UP.clearDisplay();
+        renderer_Ensp.clearDisplay();
         
         residueSizeSlider.setValue(100);
         
@@ -934,9 +926,9 @@ ChangeListener
         seqManager.clearSequenceListeners();
         enspManager.clearSequenceListeners();
         
-        structureRenderer.clearListeners();
-        seqRenderer.clearListeners();
-        enspRenderer.clearListeners();
+        renderer_Pdb.clearListeners();
+        renderer_UP.clearListeners();
+        renderer_Ensp.clearListeners();
         
         
     }
@@ -947,7 +939,7 @@ ChangeListener
     }
     
     public StructureRenderer getStructureRenderer(){
-        return structureRenderer;
+        return renderer_Pdb;
     }
     
     public SequenceManager getUPManager(){
@@ -959,7 +951,7 @@ ChangeListener
     }
     
     public void setSeqSelection(int start, int end){
-        CursorPanel[] cursors = seqRenderer.getCursorPanels();
+        CursorPanel[] cursors = renderer_UP.getCursorPanels();
         for (int i=0 ; i < cursors.length ; i++) {
             cursors[i].setSeqSelection(start,end);
         }       

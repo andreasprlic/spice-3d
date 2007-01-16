@@ -65,7 +65,7 @@ public class SpiceLayeredPanel
      * this method should be invoked from the
      * event-dispatching thread.
      */
-    private static void createAndShowGUI(String pdbCode) {
+    private static void createAndShowGUI(String code) {
         //Make sure we have nice window decorations.
         JFrame.setDefaultLookAndFeelDecorated(true);
         
@@ -81,7 +81,7 @@ public class SpiceLayeredPanel
                 sds[i] = SpiceDasSource.fromDasSource(d1s);
             }
             browserPane.setDasSources(sds);
-            browserPane.triggerLoadStructure(pdbCode);
+            browserPane.triggerLoadUniProt(code);
             
             //browserPane.triggerLoadUniProt("P50225");
             //browserPane.triggerLoadENSP("ENSP00000346625");
@@ -105,7 +105,7 @@ public class SpiceLayeredPanel
         //creating and showing this application's GUI.
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                createAndShowGUI("1ltl");
+                createAndShowGUI("P50225");
             }
         });
     }

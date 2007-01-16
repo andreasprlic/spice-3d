@@ -394,12 +394,12 @@ implements StructureListener{
     
     
     public void triggerObject1Request(String ac){
-        logger.info("should trigger object 1 request ?" + ac + " " + object1Id);
+        logger.finest("should trigger object 1 request ?" + ac + " " + object1Id);
         if ( ac.equals(object1Id)) {
             //logger.info("no...");
             return;
         }
-        logger.info("yes, do trigger object 1 request " + ac);
+        logger.finest("yes, do trigger object 1 request " + ac);
         object1Id =ac;
         
         Iterator iter = object1Listeners.iterator();
@@ -629,7 +629,7 @@ implements StructureListener{
     
     public void newSequence2(SequenceEvent e){
         logger.finest(panelName+" alignment : new sequence2:"+e.getAccessionCode() + 
-                " currently know 1: >"+object1Id+"< 2: >" + object2Id + "< seq: >" + sequence2.getSequence()+"<");
+                " currently know 1: >"+object1Id+"< 2: >" + object2Id + "< seq: >" + sequence2.getSequence()+"< + e:" + e.getSequence());
         
         String ac = e.getAccessionCode().toLowerCase();
         
@@ -666,7 +666,7 @@ implements StructureListener{
             }
         }
         
-        //logger.info("setting new sequence 2" + e.getSequence());
+        logger.finest("setting new sequence 2" + e.getSequence());
         
         sequence2 = sm.getChainFromString(e.getSequence());
         seqLength2 = sequence2.getLengthAminos();
@@ -676,15 +676,14 @@ implements StructureListener{
         Iterator iter = alignmentRenderers.iterator();
         while (iter.hasNext()){
             AlignmentRenderer re = (AlignmentRenderer)iter.next();
-            re.setSequence1(sequence1);
+            //bug #20157 in RT -> this was set wrongly set to 1!!
+            re.setSequence2(sequence2);
         }
         
         alignment = new Alignment();
         
         alignmentMap1 = new HashMap();
         alignmentMap2 = new HashMap();
-        
-            
                 
         
         if ( (object1Id == null)||(object1Id.equals(""))) {
@@ -1201,14 +1200,15 @@ class AlignmentSequenceListener implements SequenceListener{
         selectionCleared = false;
     }
     
-    public void newSequence(SequenceEvent e) {
+    public synchronized void newSequence(SequenceEvent e) {
+        //System.out.println("alignment sequence listener got sequence " + objectNr + " " +  e.getSequence());
         selectionCleared = false;
         if ( objectNr == 1)
             parent.newSequence1(e);
         else
             parent.newSequence2(e);
     }
-    public void selectedSeqPosition(int position) {
+    public synchronized void selectedSeqPosition(int position) {
         selectionCleared =false;
         if ( selectionLocked )
             return;
@@ -1225,7 +1225,7 @@ class AlignmentSequenceListener implements SequenceListener{
             parent.selectedSeqPosition2(position);
         
     }
-    public void selectedSeqRange(int start, int end) {
+    public synchronized void selectedSeqRange(int start, int end) {
         selectionCleared = false;
        if ( selectionLocked )
            return;
@@ -1254,7 +1254,7 @@ class AlignmentSequenceListener implements SequenceListener{
         parent.selectionLocked2(flag);
     }
     
-    public void newObject(Object object) {
+    public synchronized void newObject(Object object) {
         selectionCleared = false;
         
         if ( objectNr == 1){
@@ -1269,7 +1269,7 @@ class AlignmentSequenceListener implements SequenceListener{
        
     }
     
-    public void newObjectRequested(String accessionCode) {
+    public synchronized void newObjectRequested(String accessionCode) {
      
         
         if ( objectNr == 1){
