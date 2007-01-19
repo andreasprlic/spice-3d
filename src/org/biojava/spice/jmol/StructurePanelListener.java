@@ -73,7 +73,7 @@ JmolCommander
     
     StructurePanel structurePanel ;
     int currentChainNumber ;
-    Structure structure;
+  
     static Logger    logger      = Logger.getLogger("org.biojava.spice");
     int oldpos ;
     boolean selectionIsLocked ;
@@ -94,7 +94,7 @@ JmolCommander
         this.structurePanel = structurePanel;
         currentChainNumber  = 0;       
         selectionIsLocked   = false;
-        structure           = new StructureImpl();
+        
         pdbSelectStart      = null;
         pdbSelectEnd        = null;
         rasmolScript        = null;
@@ -146,21 +146,21 @@ JmolCommander
     */
    public  void setStructure(Structure struc, boolean displayScript) {
        
-       logger.finest("setting structure in StructurePanelListener");
+       logger.info("setting structure in StructurePanelListener");
       
        if ( struc == null ) {
       
            logger.finest("empty structure in StructurePanelListener");
            struc = new StructureImpl();
        } else {
-           logger.finest("structure size: " + structure.size());
+           logger.finest("structure size: " + struc.size());
        }
        
-       this.structure=struc;
+      
        
-       structurePanel.setStructure(structure);
+       structurePanel.setStructure(struc);
        
-       if ( structure.size() > 0)
+       if ( struc.size() > 0)
            
            if ( displayScript)
                executeCmd(INIT_SELECT);
@@ -235,6 +235,7 @@ JmolCommander
     private Chain getChain(int chainnumber) {
         //logger.finest("StructurePanelListener getChain " + chainnumber);
       
+        Structure structure = structurePanel.getStructure();
         
         if ( structure == null ) {
             //logger.log(Level.WARNING,"no structure loaded, yet");
@@ -834,10 +835,12 @@ JmolCommander
     }
     
     private void clearStructure(){
-        structure = new StructureImpl();
-        setStructure(structure);
+
+        setStructure(new StructureImpl());
         clearSelection();
+
     }
+    
     public void noObjectFound(String accessionCode){
        
        clearStructure();

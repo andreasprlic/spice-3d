@@ -28,10 +28,11 @@ import java.awt.*;
 import javax.swing.*;
 import org.jmol.api.*;
 import org.jmol.popup.JmolPopup;
-import org.jmol.adapter.smarter.SmarterJmolAdapter;
+//import org.jmol.adapter.smarter.SmarterJmolAdapter;
 import org.biojava.bio.structure.Structure ;
 import org.biojava.bio.structure.StructureImpl ;
 import org.biojava.spice.ResourceManager;
+import org.biojava.spice.config.SpiceDefaults;
 
 import java.util.logging.*;
 
@@ -56,7 +57,7 @@ implements JmolCommander
     final  Dimension currentSize = new Dimension();
     final Rectangle  rectClip    = new Rectangle();
     
-    static Logger    logger      = Logger.getLogger("org.biojava.spice");
+    static Logger    logger      = Logger.getLogger(SpiceDefaults.LOGGER);
     
     static String    EMPTYCMD =  ResourceManager.getString("org.biojava.spice.panel.StructurePanel.EmptyCmd");
         
@@ -75,7 +76,9 @@ implements JmolCommander
     public StructurePanel() {
         super();        
         
-        adapter = new SmarterJmolAdapter();
+        // TODO: repplace the SmarterJmolAdapter with a SPICE specific adapter!
+        //adapter = new SmarterJmolAdapter();
+        adapter = new SpiceJmolAdapter();
         
         viewer  = org.jmol.viewer.Viewer.allocateViewer(this, adapter);
         
@@ -167,6 +170,13 @@ implements JmolCommander
     }
     
     
+    /** return the currently displayed structure object
+     * 
+     * @return the currently displayed structure
+     */
+    public Structure getStructure(){
+        return structure;
+    }
     
     /** display a new PDB structure in Jmol 
      * @param structure a Biojava structure object    
@@ -186,25 +196,44 @@ implements JmolCommander
         }       
         
         viewer.evalString("exit");
-      
-        String pdbstr = structure.toPDB();
 
-        viewer.openStringInline(pdbstr);
-       
-        String strError = viewer.getOpenFileError();
-        
-        if (strError != null) {
+        if ( adapter instanceof SpiceJmolAdapter){
+            logger.info("using the new SpiceJmolAdapter");
+            SpiceJmolAdapter sad = (SpiceJmolAdapter)adapter;
+            sad.setStructure(structure);
+            viewer.openClientFile("","",structure);
             
-            if (logger.isLoggable(Level.WARNING)) {
-                logger.severe("could not open PDB file in viewer "+ strError);
+        } else {
+            // most likely the adapter is SmarterJmolAdapter
+            // in this case we convert the structure object to a PDB file
+            // and let Jmol parse it again.
+            // disavantage: much slower!
+            
+            logger.info("calling toPDB");
+            String pdbstr = structure.toPDB();
+
+            viewer.openStringInline(pdbstr);
+
+            
+            if ( pdbstr.equals("")){
+                executeCmd(EMPTYCMD);
+            }
+            String strError = viewer.getOpenFileError();
+            if (strError != null) {
+
+                if (logger.isLoggable(Level.WARNING)) {
+                    logger.severe("could not open PDB file in viewer "+ strError);
+                }
             }
         }
         
+        
+
+       
+        
         jmolpopup.updateComputedMenus();
         
-        if ( pdbstr.equals("")){
-            executeCmd(EMPTYCMD);
-        }
+       
         
         logger.finest("end of setStructure");
    
