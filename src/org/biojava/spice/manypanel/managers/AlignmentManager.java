@@ -36,6 +36,7 @@ import org.biojava.spice.feature.Segment;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureEvent;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureListener;
 import org.biojava.spice.manypanel.renderer.AlignmentRenderer;
+import org.biojava.spice.utils.UniProtAccessionCodeTools;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.program.das.dasalignment.Alignment;
 import org.biojava.bio.program.das.dasalignment.DASException;
@@ -81,7 +82,7 @@ implements StructureListener{
     
     MyFeatureTranslator translator1;
     MyFeatureTranslator translator2;
-    
+   
     
     public AlignmentManager(String panelName,DasCoordinateSystem coordSys1, DasCoordinateSystem coordSys2){
         this.panelName = panelName;
@@ -90,6 +91,8 @@ implements StructureListener{
         this.coordSys2 = coordSys2;
         clearDasSources();
    
+        
+        
         object1Listener = new AlignmentSequenceListener(this,1);
         object2Listener = new AlignmentSequenceListener(this,2);
         
@@ -246,8 +249,11 @@ implements StructureListener{
         
         Annotation a1 = os[0];
         Annotation a2 = os[1];
-        String ac1 =  (String) a1.getProperty("dbAccessionId");
-        String ac2 =  (String) a2.getProperty("dbAccessionId");
+        String cs1 = (String) a1.getProperty("dbCoordSys");
+        String cs2 = (String) a2.getProperty("dbCoordSys");
+        String ac1 =  uniProtProtect( (String) a1.getProperty("dbAccessionId"),cs1);
+        String ac2 =  uniProtProtect( (String) a2.getProperty("dbAccessionId"),cs2);
+        
         //logger.info("no alignment for " + ac1 + " " + ac2);
         if ( ac1.equalsIgnoreCase(object1Id)) {
             triggerNoObject2(ac2 );
@@ -262,6 +268,23 @@ implements StructureListener{
         
     }
     
+    private String uniProtProtect(String ac, String csString){
+        ac = ac.toLowerCase();
+        //System.out.println("1: " + csString);
+        if  ( csString.equalsIgnoreCase(SpiceDefaults.UNIPROTCOORDSYS)){
+            if ( UniProtAccessionCodeTools.isEntryName(ac)){
+                String aac = UniProtAccessionCodeTools.translateName2Accession(ac);
+                if ( aac != null && (! aac.equals(""))){
+                    ac = aac;
+                }
+            }
+        }
+
+        //System.out.println("converted unirpto to " + ac  );
+        return ac;
+
+    }
+    
     public void newAlignment(AlignmentEvent event){
         Annotation[] os = event.getAlignment().getObjects();
         if ( os.length < 2){
@@ -272,17 +295,26 @@ implements StructureListener{
         }
         
         super.newAlignment(event);
-         
-       
+                
         Annotation a1 = os[0];
         Annotation a2 = os[1];
         
-        String ac1 =  (String) a1.getProperty("dbAccessionId");
-        String ac2 =  (String) a2.getProperty("dbAccessionId");
-        ac1 = ac1.toLowerCase();
-        ac2 = ac2.toLowerCase();
+        String cs1 = (String) a1.getProperty("dbCoordSys");
         
-        logger.fine(panelName+" got new Alignment "+ac1 + " " + ac2+   " currently know:"+object1Id+" " + object2Id);
+        String ac1 = uniProtProtect( (String) a1.getProperty("dbAccessionId"),cs1);
+        a1.setProperty("dbAccessionId", ac1);
+        
+        
+        String cs2 = (String) a2.getProperty("dbCoordSys");
+        String ac2 = uniProtProtect( (String) a2.getProperty("dbAccessionId"),cs2);
+        a2.setProperty("dbAccessionId", ac2);
+       
+        /*System.out.println(a1);
+        System.out.println(a2);
+        System.out.println(alignment.getObjects()[0]);
+        System.out.println(alignment.getObjects()[1]);
+        */
+        logger.info(panelName+" got new Alignment "+ac1 + " " + ac2+   " currently know:"+object1Id+" " + object2Id);
         
         // we need to find out which of the two objects is object1/object2 ...
         
@@ -335,22 +367,23 @@ implements StructureListener{
         Annotation a1 = os[0];
         Annotation a2 = os[1];
         
-        String ac1 =  (String) a1.getProperty("dbAccessionId");
-        String ac2 =  (String) a2.getProperty("dbAccessionId");
+        String cs1 = (String) a1.getProperty("dbCoordSys");
+        String cs2 = (String) a2.getProperty("dbCoordSys");
         
-        ac1 = ac1.toLowerCase();
-        ac2 = ac2.toLowerCase();
+        String ac1 =  uniProtProtect((String) a1.getProperty("dbAccessionId"),cs1);
+        String ac2 =  uniProtProtect((String) a2.getProperty("dbAccessionId"),cs2);
         
+       
         boolean found1 = false;
         boolean found2 = false;
-        if ( object1Id.equals(ac1) || object2Id.equals(ac1))
+        if ( object1Id.equalsIgnoreCase(ac1) || object2Id.equalsIgnoreCase(ac1))
             found1 =true;
-        if ( object1Id.equals(ac2) || object2Id.equals(ac2))
+        if ( object1Id.equalsIgnoreCase(ac2) || object2Id.equalsIgnoreCase(ac2))
             found2 =true;
         
         if ( ! (found1 && found2)) {
-            //logger.info(panelName + " can not create alignmentChain, yet >" + ac1 + "< >" + ac2 + 
-            //        "< >" + object1Id + "< >" + object2Id+"<");
+            logger.info(panelName + " can not create alignmentChain, yet >" + ac1 + "< >" + ac2 + 
+                    "< >" + object1Id + "< >" + object2Id+"<");
             return;
         }
         
@@ -395,7 +428,7 @@ implements StructureListener{
     
     public void triggerObject1Request(String ac){
         logger.finest("should trigger object 1 request ?" + ac + " " + object1Id);
-        if ( ac.equals(object1Id)) {
+        if ( ac.equalsIgnoreCase(object1Id)) {
             //logger.info("no...");
             return;
         }
@@ -414,7 +447,7 @@ implements StructureListener{
     
     public void triggerObject2Request(String ac){
         //logger.info("should trigger object 2 request ? " + ac);
-        if ( ac.equals(object2Id)) {
+        if ( ac.equalsIgnoreCase(object2Id)) {
             //logger.info("no...");
             return;
         }
@@ -457,15 +490,24 @@ implements StructureListener{
         }
     }
     
+    
+    private boolean isKnownAc(String ac){
+        if ( object1Id.equalsIgnoreCase(ac) || 
+                object2Id.equalsIgnoreCase(ac) 
+                )
+            return true;
+        return false;
+    }
+    
     public void newSequence1(SequenceEvent e){
-       logger.finest(panelName+" alignment : new sequence1:" + e.getAccessionCode() + " currently know:"+object1Id+" " + object2Id);
+       logger.info(panelName+" alignment : new sequence1:" + e.getAccessionCode() + " currently know:"+object1Id+" " + object2Id);
         
        String ac = e.getAccessionCode().toLowerCase();
        SequenceManager sm = new SequenceManager();
-        if (  object1Id.equalsIgnoreCase(ac) || object2Id.equalsIgnoreCase(ac)){
+        if (  isKnownAc(ac)){
             
             if ( alignmentIsLoaded(object1Id,object2Id)) {
-                //logger.info("we got the alignment, now checking sequences");
+                logger.info("we got the alignment, now checking sequences");
                 if ( sequence1.getSequence().equals(e.getSequence())) {
                 // we already go this one, ignore...
                     //logger.info("already loaded, skipping");
@@ -567,8 +609,8 @@ implements StructureListener{
     
     
     private boolean alignmentIsLoaded(String query, String subject){
-        //logger.info(panelName + " requesting new alignment for " + query + " and " + subject);
-        //logger.info("o1: " + object1Id + " o2:" + object2Id);
+        logger.fine(panelName + " is alignment loaded ? for " + query + " and " + subject);
+        logger.fine("o1: " + object1Id + " o2:" + object2Id);
         
         // check if alignment is already known
         Annotation[] os = alignment.getObjects();
@@ -580,17 +622,17 @@ implements StructureListener{
         Annotation a1 = os[0];
         Annotation a2 = os[1];
         
-        String ac1 =  (String) a1.getProperty("dbAccessionId");
-        String ac2 =  (String) a2.getProperty("dbAccessionId");
+        String cs1 = (String) a1.getProperty("dbCoordSys");
+        String cs2 = (String) a2.getProperty("dbCoordSys");
         
-        ac1 = ac1.toLowerCase();
-        ac2 = ac2.toLowerCase();
-        //logger.info("ac1: " + ac1 + " " + ac2);
         
-
+        String ac1 =  uniProtProtect((String) a1.getProperty("dbAccessionId"),cs1);
+        String ac2 =  uniProtProtect((String) a2.getProperty("dbAccessionId"),cs2);
         
-        if   (query.equals(ac1) || query.equals(ac2)) { 
-            if  ( subject.equals(ac1) ||  subject.equals(ac2))
+      
+        
+        if   (query.equalsIgnoreCase(ac1) || query.equalsIgnoreCase(ac2) ) { 
+            if  ( subject.equalsIgnoreCase(ac1) ||  subject.equalsIgnoreCase(ac2))
             {
                 //logger.info("already know alignment, not requesting again");
                 return true;
@@ -608,7 +650,7 @@ implements StructureListener{
     */  
     private void requestAlignment(AlignmentParameters params){
         // TODO fix this:
-        logger.info(panelName +" requesting alignment " + params);
+        logger.fine(panelName +" requesting alignment " + params);
         // the alignmetn server should use the correct coord sys ...
         if ( params.getSubjectCoordinateSystem().toString().equals(SpiceDefaults.ENSPCOORDSYS)) {
             DasCoordinateSystem ecs = new DasCoordinateSystem();
@@ -634,7 +676,7 @@ implements StructureListener{
         String ac = e.getAccessionCode().toLowerCase();
         
         SequenceManager sm = new SequenceManager();
-        if (  object2Id.equalsIgnoreCase(ac) || object1Id.equalsIgnoreCase(ac)){
+        if ( isKnownAc(ac)){
             if ( alignmentIsLoaded(object1Id,object2Id)) {
                 //logger.info("we got the alignment, now checking sequences");
                 String s2 = sequence2.getSequence();
@@ -850,21 +892,7 @@ implements StructureListener{
         object1Listener.selectionLocked(flag);
     }
     
-    /** get the Algignment between two accession codes 
-     * 
-     * @param query1
-     * @param query2
-     * @return null!
-     * @deprecated use requestAlignment!
-     */
-    public Alignment getAlignment(String query1, String query2){
-        return null;
-    }
     
-    
-    public Alignment[] getAllAlignments(String query){
-        return null;
-    }
     
 
     protected void storeAlignment(Alignment ali) throws DASException {

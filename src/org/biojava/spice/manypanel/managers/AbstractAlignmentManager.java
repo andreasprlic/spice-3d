@@ -234,17 +234,27 @@ implements AlignmentListener{
     throws DASException
     {
         //System.out.println("storing alignment");
-             
+             logger.info("storing alignment " + ali);
         
         // go over all blocks of alignment and join pdb info ...
         Annotation seq_object   = getAlignmentObject(ali,coordSys1.toString() );
         
         Annotation stru_object  = getAlignmentObject(ali,coordSys2.toString());
         
-        String obj1Id = seq_object.getProperty("intObjectId").toString();
+        
+        /*
+        String obj1Id = seq_object. getProperty("dbAccessionId").toString();
+        
+        if ( coordSys1.toString().equals(SpiceDefaults.PDBCOORDSYS)){
+            obj1Id = seq_object. getProperty("intObjectId").toString();
+        }
+        String obj2Id = stru_object.getProperty("dbAccessionId").toString();
+        */
+        String obj1Id = seq_object. getProperty("intObjectId").toString();
         String obj2Id = stru_object.getProperty("intObjectId").toString();
         
-        //System.out.println("storing alignment " + obj1Id + " " + obj2Id);
+        
+        logger.info("storing alignment " + obj1Id + " " + obj2Id);
         
         //Simple_AminoAcid_Map current_amino = null ;
         List aligMap1 = AlignmentTool.createAlignmentTable(ali,obj1Id);
@@ -378,22 +388,28 @@ implements AlignmentListener{
             String dbCoordSys = (String)object.getProperty("dbCoordSys");
             
             
-            if ( dbCoordSys.equals(objecttype) ) {      
+            if ( dbCoordSys.equalsIgnoreCase(objecttype) ) {      
                 return object ;
             }
+            //logger.info("otype: " + objecttype + " cs:" + dbCoordSys);
             
             /** TODO: fix this */
             // tmp fix until Alignment server returns the same coordsystems as the registry contains ... :-/
-            if ( objecttype.equals("UniProt,Protein Sequence")){
-                if ( dbCoordSys.equals("UniProt"))
+            if ( objecttype.equals(SpiceDefaults.UNIPROTCOORDSYS )){
+                if ( dbCoordSys.equals("UniProt") || dbCoordSys.equals(SpiceDefaults.UNIPROTCOORDSYS))
                     return object;
             }
-            if ( objecttype.equals("PDBresnum,Protein Structure")){
+            if ( objecttype.equals(SpiceDefaults.PDBCOORDSYS)){
                 if ( dbCoordSys.equals("PDBresnum"))
                     return object;
             }
-            if ( objecttype.equals("Ensembl,Protein Sequence")){
+            if ( objecttype.equals(SpiceDefaults.ENSPCOORDSYS)){
                 if ( dbCoordSys.equals("ENSEMBLPEP"))
+                    return object;
+            }
+            
+            if ( objecttype.equalsIgnoreCase("Gencode_2.2,Protein Sequence")){
+                if (dbCoordSys.equalsIgnoreCase("Gencode_2.2,Protein Sequence,Homo sapiens"))
                     return object;
             }
         }      

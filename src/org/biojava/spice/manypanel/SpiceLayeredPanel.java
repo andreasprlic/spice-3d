@@ -94,8 +94,6 @@ public class SpiceLayeredPanel
         spiceFrame.pack();
         spiceFrame.setVisible(true);
         
-        
-        
     }
     
     

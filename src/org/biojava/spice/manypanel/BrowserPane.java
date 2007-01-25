@@ -61,12 +61,14 @@ import java.beans.PropertyChangeListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+
 /** The main Container for the different sequence and alignment panels
  * 
  * @author Andreas Prlic
  *
  */
 public class BrowserPane 
+
 
 
 /** the contentPane for the frame

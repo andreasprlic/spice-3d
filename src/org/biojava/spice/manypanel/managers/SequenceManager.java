@@ -38,8 +38,10 @@ import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.dasobert.das.SequenceThread;
 import org.biojava.dasobert.eventmodel.*;
+import org.biojava.spice.config.SpiceDefaults;
 import org.biojava.spice.manypanel.drawable.DrawableSequence;
 import org.biojava.spice.manypanel.renderer.*;
+import org.biojava.spice.utils.UniProtAccessionCodeTools;
 
 import java.util.*;
 
@@ -190,6 +192,16 @@ extends AbstractChainManager
     public void newObjectRequested(String accessionCode) {
         logger.finest("SequenceManager new Object Requested");
        
+        
+        if  ( coordinateSystem.toString().equals(SpiceDefaults.UNIPROTCOORDSYS)){
+            if ( UniProtAccessionCodeTools.isEntryName(accessionCode)){
+                String aac = UniProtAccessionCodeTools.translateName2Accession(accessionCode);
+                if ( aac != null && (! aac.equals(""))){
+                    accessionCode = aac;
+                }
+            }
+        }
+        
         //SpiceDasSource[] sds = toSpiceDasSource(dasSources);
         SequenceThread thr = new SequenceThread(accessionCode,dasSources );
         
