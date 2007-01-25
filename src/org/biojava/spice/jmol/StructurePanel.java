@@ -26,6 +26,8 @@ package org.biojava.spice.jmol ;
 
 import java.awt.*;
 import javax.swing.*;
+
+import org.jmol.adapter.smarter.SmarterJmolAdapter;
 import org.jmol.api.*;
 import org.jmol.popup.JmolPopup;
 //import org.jmol.adapter.smarter.SmarterJmolAdapter;
@@ -77,8 +79,8 @@ implements JmolCommander
         super();        
         
         // TODO: repplace the SmarterJmolAdapter with a SPICE specific adapter!
-        //adapter = new SmarterJmolAdapter();
-        adapter = new SpiceJmolAdapter();
+        adapter = new SmarterJmolAdapter();
+        //adapter = new SpiceJmolAdapter();
         
         viewer  = org.jmol.viewer.Viewer.allocateViewer(this, adapter);
         
@@ -185,7 +187,8 @@ implements JmolCommander
     public void setStructure(Structure structure) {
         
         if ( structure == null ) {
-            structure = new StructureImpl();            
+            structure = new StructureImpl();
+           
         }       
         
         
@@ -201,7 +204,27 @@ implements JmolCommander
             logger.info("using the new SpiceJmolAdapter");
             SpiceJmolAdapter sad = (SpiceJmolAdapter)adapter;
             sad.setStructure(structure);
-            viewer.openClientFile("","",structure);
+           
+            
+            class MyRunnable implements Runnable {
+                Structure structure;
+                public MyRunnable(Structure struc){
+                    super();
+                    structure = struc;
+                }
+                public void run() {
+                    viewer.openClientFile("","",structure);         
+                    jmolpopup.updateComputedMenus();
+                    executeCmd(StructurePanelListener.INIT_SELECT);
+                    
+                }
+            }
+            
+            new MyRunnable(structure).run();
+            
+            //SwingUtilities.invokeLater(new MyRunnable(structure));
+
+            
             
         } else {
             // most likely the adapter is SmarterJmolAdapter
@@ -224,6 +247,9 @@ implements JmolCommander
                 if (logger.isLoggable(Level.WARNING)) {
                     logger.severe("could not open PDB file in viewer "+ strError);
                 }
+            } else {
+                jmolpopup.updateComputedMenus();
+                executeCmd(StructurePanelListener.INIT_SELECT);
             }
         }
         

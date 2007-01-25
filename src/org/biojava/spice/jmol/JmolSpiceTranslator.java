@@ -128,8 +128,8 @@ implements JmolStatusListener, StructureListener
         	 //viewer.get
              String info = viewer.getAtomInfo(atomIndex);  
              AtomInfo ai = AtomInfoParser.parse(info);
-             
-             //logger.info(ai+"");
+             logger.info(info);
+             logger.info(ai+"");
            
              //int modelNr = viewer.getAtomModelIndex(atomIndex);
              String pdbcode = ai.getResidueNumber();

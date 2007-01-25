@@ -22,6 +22,8 @@
  */
 package org.biojava.spice.jmol;
 
+import java.util.Hashtable;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import org.biojava.bio.structure.AminoAcidImpl;
@@ -83,12 +85,58 @@ public class SpiceJmolAdapter extends JmolAdapter{
     /** return the number of models (each model is an AtomSet) **/
     public int getAtomSetCount(Object clientFile) {
         
-        
-        return StructureTools.getNrAtoms(structure);
+        return structure.nrModels();   
     }
+    
+    
+    public String getAtomSetCollectionName(Object clientFile) {
+        return null;
+      }
+      
+      public Properties getAtomSetCollectionProperties(Object clientFile) {
+        return null;
+      }
+
+      public Hashtable getAtomSetCollectionAuxiliaryInfo(Object clientFile) {
+        Hashtable tab = new Hashtable();
+        tab.put("isPDB", new Boolean(true));
+        return tab;
+        
+      }
+      
+      public boolean coordinatesAreFractional(Object clientFile) {
+          return false;
+      }
+
+      public JmolAdapter.StructureIterator
+          getStructureIterator(Object clientFile) {
+          logger.info("getStructureIterator");
+          return null;
+      }
+      
+      
+      public int getAtomSetNumber(Object clientFile, int atomSetIndex) {
+        return structure.nrModels();
+      }
+
+      public String getAtomSetName(Object clientFile, int atomSetIndex) {
+          logger.info("getAtomSetName " + atomSetIndex);
+            return null;
+      }
+      
+      public Properties getAtomSetProperties(Object clientFile, int atomSetIndex) {
+          logger.info("getAtomSetProperties " + atomSetIndex);
+        return null;
+      }
+      
+      public Hashtable getAtomSetAuxiliaryInfo(Object clientFile, int atomSetIndex) {
+          logger.info("getAtomSetAuxiliaryInfo " + atomSetIndex);
+        return null;
+      }
+    
 
 
-
+    //[PRO]13.CA #199 34.518997 0.168 11.227
 
     /* **************************************************************
      * the frame iterators
@@ -106,7 +154,17 @@ public class SpiceJmolAdapter extends JmolAdapter{
             atom = new AtomImpl();
         }
         
+       
         
+        public String getElementSymbol() {
+            //if ( atom.getPDBserial() < 200)
+            //    logger.info(atom.getParent().getPDBCode() + " " + atom.getParent().getPDBName() + " " + atom.getPDBserial()+ atom.getFullName() +  " " + JmolUtils.deduceElementSymbol(atom.getFullName()));
+            return JmolUtils.deduceElementSymbol(atom.getFullName());
+            //return "Xx";
+            //return super.getElementSymbol();
+        }
+
+
         public boolean hasNext() {
             if ( iter.hasNext()){
                 atom = (Atom)iter.next();
@@ -143,7 +201,8 @@ public class SpiceJmolAdapter extends JmolAdapter{
 
         public String getAtomName() {
             //System.out.println(atom.getName());
-            return atom.getFullName();
+            //return atom.getFullName();
+            return atom.getName();
         }
 
         public String getGroup3(){
@@ -151,7 +210,7 @@ public class SpiceJmolAdapter extends JmolAdapter{
             Group parent = atom.getParent();
             if (parent != null){
                 //System.out.println(parent.getPDBName());
-                return parent.getPDBCode();
+                return parent.getPDBName();
             }
             return null;
         }
@@ -172,8 +231,10 @@ public class SpiceJmolAdapter extends JmolAdapter{
         }
         
         public char getAlternateLocationID() {
-            if ( atom.getAltLoc().charValue() != ' ')
+            if ( atom.getAltLoc().charValue() != ' ') {
+                logger.info("alternate location at " + atom);
                 return atom.getAltLoc().charValue();
+            }
             else
                 return (char)0;
         }
@@ -190,6 +251,7 @@ public class SpiceJmolAdapter extends JmolAdapter{
             Group parent = atom.getParent();
             if ( parent != null) {
                 if (parent.getType().equals(HetatomImpl.type)){
+                    //System.out.println(atom + " is hetero");
                     return true;
                 }
             }

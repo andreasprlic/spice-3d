@@ -63,7 +63,7 @@ SequenceListener,
 SpiceFeatureListener,
 JmolCommander
 {
-    static String INIT_SELECT;
+    public static String INIT_SELECT;
     
     static {
         INIT_SELECT = ResourceManager.getString("org.biojava.spice.panel.StructurePanelListener.InitScript");
