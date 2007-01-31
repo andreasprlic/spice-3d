@@ -392,7 +392,7 @@ JmolCommander
     }
     
     public void selectedSeqPosition(int seqpos){
-      
+        //logger.info("selected seq pos" + seqpos);
         if ( seqpos == oldpos ) return ;
         
       
@@ -808,7 +808,7 @@ JmolCommander
 
     public synchronized void newStructure(StructureEvent event) {
         logger.info("got new structure " + event.getPDBCode());
-               
+        
         Structure s = event.getStructure();
         setStructure(s);
         setCurrentChainNumber(0);

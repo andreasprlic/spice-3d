@@ -23,10 +23,11 @@
 package org.biojava.spice.jmol;
 
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import org.biojava.bio.structure.AminoAcidImpl;
 import org.biojava.bio.structure.Atom;
 import org.biojava.bio.structure.AtomImpl;
 import org.biojava.bio.structure.Chain;
@@ -65,8 +66,12 @@ public class SpiceJmolAdapter extends JmolAdapter{
     }
     
     public JmolAdapter.AtomIterator getAtomIterator(Object clientFile) {
-        if ( ! (clientFile instanceof Structure))
+        
+        if ( ! (clientFile instanceof Structure)) {
+            logger.info("did not get a structure object ...");
+            logger.info(clientFile.getClass()+"");
             return new ProjectedAtomIterator(new StructureImpl());
+        }
         
         return new ProjectedAtomIterator(structure);
     }
@@ -76,24 +81,25 @@ public class SpiceJmolAdapter extends JmolAdapter{
         // get number atoms ...
         
         return StructureTools.getNrAtoms(structure);
-        
-        
+                
     }
     
     
 
     /** return the number of models (each model is an AtomSet) **/
     public int getAtomSetCount(Object clientFile) {
-        
+        logger.info("get atomsetcount " + structure.nrModels());
         return structure.nrModels();   
     }
     
     
     public String getAtomSetCollectionName(Object clientFile) {
+        logger.info("getAtomSetCollectionName");
         return null;
       }
       
       public Properties getAtomSetCollectionProperties(Object clientFile) {
+          logger.info("getAtomSetCollectionProperties");
         return null;
       }
 
@@ -115,18 +121,18 @@ public class SpiceJmolAdapter extends JmolAdapter{
       }
       
       
-      public int getAtomSetNumber(Object clientFile, int atomSetIndex) {
-        return structure.nrModels();
+      public int getAtomSetNumber(Object clientFile, int atomSetIndex) {        
+              return atomSetIndex + 1;
       }
 
       public String getAtomSetName(Object clientFile, int atomSetIndex) {
-          logger.info("getAtomSetName " + atomSetIndex);
+          logger.info("!!! getAtomSetName " + atomSetIndex);
             return null;
       }
       
       public Properties getAtomSetProperties(Object clientFile, int atomSetIndex) {
           logger.info("getAtomSetProperties " + atomSetIndex);
-        return null;
+          return null;
       }
       
       public Hashtable getAtomSetAuxiliaryInfo(Object clientFile, int atomSetIndex) {
@@ -152,6 +158,8 @@ public class SpiceJmolAdapter extends JmolAdapter{
             iter  = new org.biojava.bio.structure.AtomIterator(structure);
             pos = 0;
             atom = new AtomImpl();
+            this.structure = structure;
+           
         }
         
        
@@ -181,7 +189,7 @@ public class SpiceJmolAdapter extends JmolAdapter{
         }
         
         public int getAtomSerial() { 
-
+            //return pos;
             return atom.getPDBserial(); 
         }
         
@@ -209,27 +217,55 @@ public class SpiceJmolAdapter extends JmolAdapter{
             
             Group parent = atom.getParent();
             if (parent != null){
-                //System.out.println(parent.getPDBName());
+                
                 return parent.getPDBName();
             }
             return null;
         }
-
-        public char getChainID() {
+        
+        public int getSequenceNumber() {
             Group g = atom.getParent();
             if ( g != null ){
-                Chain c = g.getParent();
-                if ( c != null) {
-                    String name = c.getName();
-                    if ( (name != null) && ( name.length() > 0)){
-                        return name.charAt(0);
-                    }
+                
+                    return Integer.parseInt(g.getPDBCode());                
+            }
+            
+            return -1;
+        }
+
+        public char getChainID() {
+           
+            Chain c = iter.getCurrentChain();
+
+            if ( c != null) {
+
+                String name = c.getName();          
+                if ( (name != null) && ( name.length() > 0)){
+                                        return name.charAt(0);
                 }
             }
+
             return ' ';
             
         }
-        
+                        
+        public int getAtomSetIndex() {
+            int idx =  iter.getCurrentModel() ;
+            //if ( structure.nrModels() > 1) 
+            //    idx++;
+                
+            
+            //System.out.println(idx + " " + atom.getParent().getPDBCode() + " " + atom);
+            
+            return idx;
+        }
+
+
+
+       
+
+
+
         public char getAlternateLocationID() {
             if ( atom.getAltLoc().charValue() != ' ') {
                 logger.info("alternate location at " + atom);

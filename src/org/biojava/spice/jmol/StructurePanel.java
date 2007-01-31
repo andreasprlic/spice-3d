@@ -31,6 +31,7 @@ import org.jmol.adapter.smarter.SmarterJmolAdapter;
 import org.jmol.api.*;
 import org.jmol.popup.JmolPopup;
 //import org.jmol.adapter.smarter.SmarterJmolAdapter;
+
 import org.biojava.bio.structure.Structure ;
 import org.biojava.bio.structure.StructureImpl ;
 import org.biojava.spice.ResourceManager;
@@ -79,8 +80,8 @@ implements JmolCommander
         super();        
         
         // TODO: repplace the SmarterJmolAdapter with a SPICE specific adapter!
-        adapter = new SmarterJmolAdapter();
-        //adapter = new SpiceJmolAdapter();
+        //adapter = new SmarterJmolAdapter();
+        adapter = new SpiceJmolAdapter();
         
         viewer  = org.jmol.viewer.Viewer.allocateViewer(this, adapter);
         
@@ -163,7 +164,7 @@ implements JmolCommander
      * @param command - a String containing a RASMOL like command. e.g. "select protein; cartoon on;"
      */
     public void executeCmd(String command) {
-       // logger.info(command);
+        logger.info(command);
         if (viewer.isScriptExecuting()) 
             logger.info("viewer is executing");
         
@@ -191,6 +192,7 @@ implements JmolCommander
            
         }       
         
+        this.structure = structure;
         
         if ( structure.size() < 1 ) {
             //logger.info("got structure of size < 1");
@@ -206,7 +208,7 @@ implements JmolCommander
             sad.setStructure(structure);
            
             
-            class MyRunnable implements Runnable {
+            /*class MyRunnable implements Runnable {
                 Structure structure;
                 public MyRunnable(Structure struc){
                     super();
@@ -223,7 +225,11 @@ implements JmolCommander
             new MyRunnable(structure).run();
             
             //SwingUtilities.invokeLater(new MyRunnable(structure));
-
+             */
+            viewer.openClientFile("","",structure);         
+            jmolpopup.updateComputedMenus();
+            executeCmd(StructurePanelListener.INIT_SELECT);
+            
             
             
         } else {
