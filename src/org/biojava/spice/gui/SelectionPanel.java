@@ -219,7 +219,7 @@ implements StructureListener
         this.repaint();
         if ( splitPanel != null) {
             
-            splitPanel.setDividerLocation(150);
+            splitPanel.setDividerLocation(200);
             splitPanel.repaint();
             
         }

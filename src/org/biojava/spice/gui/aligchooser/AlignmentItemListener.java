@@ -242,7 +242,7 @@ class RadioButtonListener
     }
 
     public void itemStateChanged(ItemEvent e) {
-        System.out.println("pressed radio button! " + e.getStateChange() + " " + ItemEvent.SELECTED);
+        //System.out.println("pressed radio button! " + e.getStateChange() + " " + ItemEvent.SELECTED);
         
         if ( e.getStateChange() != ItemEvent.SELECTED)
             return;
@@ -261,7 +261,7 @@ class RadioButtonListener
                 //box.setSelected(true);
                 label.setSelected(true);
                 parent.updateBox(label, e,i); 
-                System.out.println("update " + e.getStateChange() + " " + ItemEvent.SELECTED);
+                //System.out.println("update " + e.getStateChange() + " " + ItemEvent.SELECTED);
                 Color col ;
                 if ( structureAlignment.isSelected(i))
                     col = structureAlignment.getColor(i);

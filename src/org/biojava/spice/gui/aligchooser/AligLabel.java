@@ -43,6 +43,9 @@ public class AligLabel {
     public AligLabel(String description, Annotation anno,String filterBy){
         
         //UIManager.put("JLabel.height", new Integer(13));
+        if ( description.length() > 16) {
+            description = description.substring(0,16);
+        }
         
        // label = new JLabel(description);
         check = new JCheckBox(description);
