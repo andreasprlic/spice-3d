@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JSplitPane;
@@ -117,13 +118,13 @@ ChangeListener
     
     
     JSlider residueSizeSlider;
-    
+    JLabel  percentageDisplay;
     /** create a BrowserPane that only has a structure Panel
      * 
      * @param PDBCOORDSYS
      */
     public BrowserPane(String PDBCOORDSYS){
-    	
+        
     	initPanels(PDBCOORDSYS, SpiceDefaults.UNIPROTCOORDSYS, SpiceDefaults.ENSPCOORDSYS);
     	
         // reset all the DAS sources...
@@ -159,11 +160,15 @@ ChangeListener
         residueSizeSlider.addChangeListener(this);
         residueSizeSlider.setPreferredSize(new Dimension(100,15));
         
+   
+        
+        updatePercentageDisplay();
         
         Box hBox = Box.createHorizontalBox();
         hBox.setBackground(BG_COLOR);
         hBox.add(Box.createHorizontalGlue());
         hBox.add(residueSizeSlider);
+        hBox.add(percentageDisplay);
         hBox.add(Box.createHorizontalGlue());
         
         // register the managers
@@ -176,6 +181,11 @@ ChangeListener
         this.add(hBox);
         
     	
+    }
+    
+    private void updatePercentageDisplay(){
+    	int perc = residueSizeSlider.getValue();
+    	percentageDisplay.setText(perc+ " %");
     }
     
     /** create a browserPane that has PDB,  Uniprot and ENSP panels
@@ -267,6 +277,7 @@ ChangeListener
         hBox.setBackground(BG_COLOR);
         hBox.add(Box.createHorizontalGlue());
         hBox.add(residueSizeSlider);
+        hBox.add(percentageDisplay);
         hBox.add(Box.createHorizontalGlue());
         
         // register the managers
@@ -286,7 +297,7 @@ ChangeListener
         // event model as being used by SPICE. AP 20070116
         
         contentPanel = new JPanel();
-        
+        percentageDisplay = new JLabel("100 %");
         String bgcol = ResourceManager.getString("org.biojava.spice.manypanel.renderer.BackgroundColor");
         Color BG_COLOR = Color.decode(bgcol);
         
@@ -578,7 +589,7 @@ ChangeListener
         renderer_UP.calcScale(residueSize);
         renderer_Ensp.calcScale(residueSize);
         contentPanel.repaint();
-        
+        updatePercentageDisplay();
         this.repaint();
         this.revalidate();
         //this.updateUI();
