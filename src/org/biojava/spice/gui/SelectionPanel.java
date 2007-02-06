@@ -27,7 +27,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.logging.Logger;
-
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
@@ -88,15 +87,14 @@ implements StructureListener
         this.parentMenu = parentMenu;
         DefaultListModel model = new DefaultListModel();        
         model.add(0,"");
-        this.setBackground(SequenceScalePanel.BACKGROUND_COLOR);
         
         chainList	= new JList(model);        
         checkBox 	= new JCheckBox();
-        
         chainDisplay = new SpiceChainDisplay(chainList);
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         
         hBox = Box.createVerticalBox(); 
+        this.setBackground(SequenceScalePanel.BACKGROUND_COLOR);
         this.add(hBox);
         
         chainList.addListSelectionListener(chainDisplay);
@@ -107,7 +105,7 @@ implements StructureListener
         
 
         alignmentChooser = new StructureAlignmentChooser(parentMenu);
-        setOpaque(false);
+        setOpaque(true);
     }
 
     public void clearListeners(){
