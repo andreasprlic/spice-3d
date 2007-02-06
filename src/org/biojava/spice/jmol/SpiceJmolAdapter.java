@@ -23,8 +23,6 @@
 package org.biojava.spice.jmol;
 
 import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -88,18 +86,18 @@ public class SpiceJmolAdapter extends JmolAdapter{
 
     /** return the number of models (each model is an AtomSet) **/
     public int getAtomSetCount(Object clientFile) {
-        logger.info("get atomsetcount " + structure.nrModels());
+        //logger.info("get atomsetcount " + structure.nrModels());
         return structure.nrModels();   
     }
     
     
     public String getAtomSetCollectionName(Object clientFile) {
-        logger.info("getAtomSetCollectionName");
+        //logger.info("getAtomSetCollectionName");
         return null;
       }
       
       public Properties getAtomSetCollectionProperties(Object clientFile) {
-          logger.info("getAtomSetCollectionProperties");
+          //logger.info("getAtomSetCollectionProperties");
         return null;
       }
 
@@ -116,7 +114,7 @@ public class SpiceJmolAdapter extends JmolAdapter{
 
       public JmolAdapter.StructureIterator
           getStructureIterator(Object clientFile) {
-          logger.info("getStructureIterator");
+         // logger.info("getStructureIterator");
           return null;
       }
       
@@ -126,17 +124,17 @@ public class SpiceJmolAdapter extends JmolAdapter{
       }
 
       public String getAtomSetName(Object clientFile, int atomSetIndex) {
-          logger.info("!!! getAtomSetName " + atomSetIndex);
+         // logger.info("!!! getAtomSetName " + atomSetIndex);
             return null;
       }
       
       public Properties getAtomSetProperties(Object clientFile, int atomSetIndex) {
-          logger.info("getAtomSetProperties " + atomSetIndex);
+         // logger.info("getAtomSetProperties " + atomSetIndex);
           return null;
       }
       
       public Hashtable getAtomSetAuxiliaryInfo(Object clientFile, int atomSetIndex) {
-          logger.info("getAtomSetAuxiliaryInfo " + atomSetIndex);
+          //logger.info("getAtomSetAuxiliaryInfo " + atomSetIndex);
         return null;
       }
     
@@ -154,7 +152,7 @@ public class SpiceJmolAdapter extends JmolAdapter{
         int pos;
         
         ProjectedAtomIterator(Structure structure) {
-            logger.info("new ProjectedAtomIterator");
+          //  logger.info("new ProjectedAtomIterator");
             iter  = new org.biojava.bio.structure.AtomIterator(structure);
             pos = 0;
             atom = new AtomImpl();
@@ -277,8 +275,19 @@ public class SpiceJmolAdapter extends JmolAdapter{
 
 
         public char getInsertionCode() {
-           //TODO add support for insertion codes ...
-            
+           //TODO check support for insertion codes ...
+            Group g = atom.getParent();
+            if ( g != null){
+                String pdbresnum = g.getPDBCode();
+                try {
+                    Integer.parseInt(pdbresnum);
+                } catch (NumberFormatException ex){
+                    
+                    // TODO: check this ...
+                    String insertionCode = pdbresnum.substring(pdbresnum.length()-2,pdbresnum.length());
+                    return insertionCode.charAt(0);
+                }
+            }
             return (char)0;
         }
 

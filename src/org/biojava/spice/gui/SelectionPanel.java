@@ -39,7 +39,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 
@@ -161,12 +160,14 @@ implements StructureListener
         alignmentMode = true;
         hBox.removeAll();
         
-        JScrollPane scroll = new JScrollPane(alignmentChooser);
-        hBox.add(scroll);
-      
-        int nr = strucAli.getNrStructures();
-        scroll.getVerticalScrollBar().setUnitIncrement((nr / 10));
-        alignmentChooser.setScroller(scroll);
+        //JScrollPane scroll = new JScrollPane(alignmentChooser);
+        //scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        //hBox.add(scroll);
+        hBox.add(alignmentChooser);
+        
+        //int nr = strucAli.getNrStructures();
+        //scroll.getVerticalScrollBar().setUnitIncrement((nr / 10));
+        //alignmentChooser.setScroller(scroll);
         
         Box horBox = Box.createHorizontalBox();
         JTextField searchBox = alignmentChooser.getSearchBox();

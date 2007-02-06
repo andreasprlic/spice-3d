@@ -500,14 +500,14 @@ implements StructureListener{
     }
     
     public void newSequence1(SequenceEvent e){
-       logger.info(panelName+" alignment : new sequence1:" + e.getAccessionCode() + " currently know:"+object1Id+" " + object2Id);
+       //logger.info(panelName+" alignment : new sequence1:" + e.getAccessionCode() + " currently know:"+object1Id+" " + object2Id);
         
        String ac = e.getAccessionCode().toLowerCase();
        SequenceManager sm = new SequenceManager();
         if (  isKnownAc(ac)){
             
             if ( alignmentIsLoaded(object1Id,object2Id)) {
-                logger.info("we got the alignment, now checking sequences");
+                //logger.info("we got the alignment, now checking sequences");
                 if ( sequence1.getSequence().equals(e.getSequence())) {
                 // we already go this one, ignore...
                     //logger.info("already loaded, skipping");

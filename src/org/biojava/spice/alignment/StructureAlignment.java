@@ -1010,6 +1010,8 @@ public class StructureAlignment {
     
     
     public boolean isSelected(int pos){
+        if ( pos > selection.length)
+            return false;
         return selection[pos];
     }
     

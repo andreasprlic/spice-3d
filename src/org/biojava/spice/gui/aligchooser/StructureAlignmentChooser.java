@@ -26,22 +26,21 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
@@ -50,11 +49,9 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 
-
 import org.biojava.bio.Annotation;
 
 import org.biojava.bio.structure.Calc;
-import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.StructureException;
 import org.biojava.bio.structure.jama.Matrix;
@@ -65,6 +62,7 @@ import org.biojava.spice.config.SpiceDefaults;
 import org.biojava.spice.jmol.StructurePanel;
 import org.biojava.spice.jmol.StructurePanelListener;
 import org.biojava.spice.manypanel.eventmodel.StructureAlignmentListener;
+import org.biojava.spice.manypanel.renderer.SequenceScalePanel;
 import org.biojava.dasobert.eventmodel.SequenceEvent;
 import org.biojava.dasobert.eventmodel.SequenceListener;
 import org.biojava.dasobert.eventmodel.StructureEvent;
@@ -80,24 +78,28 @@ import javax.vecmath.Matrix3f;
  * @version %I% %G%
  */
 public class StructureAlignmentChooser 
-extends JPanel 
-implements ItemListener, 
+extends JScrollPane 
+implements  
 StructureAlignmentListener {
     
     static final long serialVersionUID = 65937284545329877l;
     
     public static Logger logger =  Logger.getLogger(SpiceDefaults.LOGGER);
     
-    List checkButtons;
-    StructureAlignment structureAlignment;
-    Box vBox;
-    List structureListeners;
-    List pdbSequenceListeners;
+    List labels;
+    ButtonGroup buttonGroup;
     
+    StructureAlignment structureAlignment;
+    
+   // Box vBox;
+    Box vBoxL;
+    Box vBoxR;
+    List structureListeners;
+ 
     int referenceStructure; // the structure at that position is the first one 
     
     JTextField searchBox;
-    JScrollPane scroller;
+    
     StructurePanel structurePanel;
     
     public final static float radiansPerDegree = (float) (2 * Math.PI / 360);
@@ -108,18 +110,40 @@ StructureAlignmentListener {
     JMenuItem sort;
     JMenuItem filter;
     ImageIcon deleteIcon;
+    AlignmentItemListener aliItemListener;
+    JPanel content;
     
     public StructureAlignmentChooser(JMenu parent) {
         super();
+        
+        Box hBox = Box.createHorizontalBox();
+        content = new JPanel();
+        content.add(hBox);
+
+        getViewport().setView(content);
+        
         this.parent = parent;
+        
+        //hBox.setBackground(Color.yellow);
+        content.setBackground(SequenceScalePanel.BACKGROUND_COLOR);
+        //content.setBackground(Color.yellow);
+        this.setBackground(SequenceScalePanel.BACKGROUND_COLOR);
+        
+        content.setBorder(BorderFactory.createEmptyBorder());
+                
+        aliItemListener         = new AlignmentItemListener(this);
         structureListeners 		= new ArrayList();
         structureAlignment 		= new StructureAlignment(null);
-        checkButtons 			= new ArrayList();
-        pdbSequenceListeners 	= new ArrayList();
+
+        labels                  = new ArrayList();
+        buttonGroup             = new ButtonGroup();
+
+        vBoxL                   = Box.createVerticalBox();
+        vBoxR                   = Box.createVerticalBox();
+               
+        hBox.add(vBoxL);      
+        hBox.add(vBoxR);
         
-        vBox 					= Box.createVerticalBox();
-        
-        this.add(vBox);
         referenceStructure = -1;
         
         searchBox = new JTextField();
@@ -128,30 +152,57 @@ StructureAlignmentListener {
         searchBox.addKeyListener(new MyKeyListener(this));
         
         deleteIcon = SpiceApplication.createImageIcon(ResourceManager.getString("org.biojava.spice.Icons.EditDelete"));
+    
+        //int nr = structureAlignment.getNrStructures();
+        this.getVerticalScrollBar().setUnitIncrement(13); // 13 is the default height of a button
+      
+    
     }
     
+    public JPanel getContentPane(){
+        return content;
+    }
+    
+    /** the structure at that position is the first one
+     * 
+     * @return position
+     */ 
+    public int getReferenceStructure() {
+        return referenceStructure;
+    }
+
+
+    /** the structure at that position is the first one
+     * 
+     * 
+     * @param referenceStructure the position
+     */
+    public void setReferenceStructure(int referenceStructure) {
+        this.referenceStructure = referenceStructure;
+    }
+
+
+
     public void setStructurePanel(StructurePanel panel){
         this.structurePanel = panel;
     }
-    
-    public void setScroller(JScrollPane scroll){
-        this.scroller = scroll;
-    }
-    
     
     public void setSortReverse(boolean direction){
         sortReverse = direction;
     }
     
-    protected JScrollPane getScroller(){
-        return scroller;
+    
+    protected List getLabels() {
+        return labels;
     }
     
     public JTextField getSearchBox() {
         return searchBox;
     }
     
-    
+    public void addPDBSequenceListener(SequenceListener li){
+        aliItemListener.addPDBSequenceListener(li);
+    }
     
     public ImageIcon getDeleteIcon() {
         return deleteIcon;
@@ -164,26 +215,40 @@ StructureAlignmentListener {
     public void clearListeners(){
         structureAlignment = new StructureAlignment(null);
         structureListeners.clear();
-        pdbSequenceListeners.clear();
+        aliItemListener.clearListeners();
         parent = null;
     }
     public void addStructureListener(StructureListener li){
         structureListeners.add(li);
     }
-    public void addPDBSequenceListener(SequenceListener li){
-        pdbSequenceListeners.add(li);
+    public List getStructureListeners(){
+        return structureListeners;
     }
+    
     private void clearButtons(){
-        Iterator iter = checkButtons.iterator();
+        Iterator iter = labels.iterator();
         
         while (iter.hasNext()){
-            JCheckBox b = (JCheckBox)iter.next();
-            b.removeItemListener(this);
-            vBox.remove(b);
+            
+            AligLabel l = (AligLabel) iter.next();
+            
+            
+            JCheckBox b = l.getCheck();
+            b.removeItemListener(aliItemListener.getCheckBoxListener());
+            vBoxL.remove(b);
+            
+            
+            JRadioButton r = l.getRadio();
+            r.removeItemListener(aliItemListener.getRadioButtonListener());
+            vBoxR.remove(r);
+            buttonGroup.remove(r);
             
         }
-        checkButtons.clear();
-        vBox.repaint();
+       
+        labels.clear();   
+        vBoxL.repaint();
+        vBoxR.repaint();
+        
     }
     
     public StructureAlignment getStructureAlignment(){
@@ -212,83 +277,13 @@ StructureAlignmentListener {
         
         filter = MenuAlignmentListener.getFilterMenuFromAlignment(structureAlignment.getAlignment(),filterAction);        
         parent.add(filter);
-        
       
-    }
-    
-    /** check if a detail as returned by the DAS response should be displayed
-     * 
-     * @param det
-     * @return flag
-     */
-    protected static boolean shouldIgnoreDetail(String det){
-    	
-    	 if ( det.startsWith("-99.") || det.equals("0.0") || det.startsWith("999."))
-         	return true;
-    	 return false;
-    }
-    
-    private String getButtonTooltip(Annotation anno){
-        String tooltip = "";
-        
-        List details = new ArrayList();
-       // System.out.println(anno);
-        try {
-            details = (List) anno.getProperty("details");
-        } catch (NoSuchElementException e){}
-        
-        if ( details != null) {
-        
-            Iterator iter = details.iterator();
-            while ( iter.hasNext()) {
-                Annotation d = (Annotation) iter.next();
-                String prop = (String) d.getProperty("property");
-                if ( prop.equals(MenuAlignmentListener.filterProperty))
-                    continue;
-                String det  = (String) d.getProperty("detail");
-                if ( shouldIgnoreDetail(det))
-                	continue;
-                if ( ! tooltip.equals("") )
-                    tooltip += " | ";
-                tooltip += prop + " " + det;
-            }                
-        }
-        return tooltip;
-    }
-    
-   
-    
-    /** return true if it should be displayed
-     * 
-     * @param object
-     * @param filterBy
-     * @return flag if is visible or not
-     */
-    private boolean isVisibleAfterFilter(Annotation object, String filterBy){
-        boolean show = true;
-        if ( filterBy == null)
-            return true;
-        if ( filterBy.equalsIgnoreCase(MenuAlignmentListener.showAllObjects))
-            return true;
-        
-        List details = (List) object.getProperty("details");
-        Iterator iter = details.iterator();
-        while ( iter.hasNext()) {
-            Annotation d = (Annotation) iter.next();
-            String prop = (String) d.getProperty("property");
-            if (! prop.equals(MenuAlignmentListener.filterProperty))
-                continue;
-            String det  = (String) d.getProperty("detail");
-            if (! det.equalsIgnoreCase(filterBy)){                
-                return false;
-            }
-        }        
-        return show;
     }
     
     public void setStructureAlignment(StructureAlignment ali){
         
         structureAlignment = ali;
+        aliItemListener.setStructureAlignmnent(ali);
         //logger.info("got new structure alignment");
         if ( (ali != null) && ( ali.getIds().length > 0) )
             System.setProperty("SPICE:drawStructureRegion","true");
@@ -303,7 +298,7 @@ StructureAlignmentListener {
         
         updateMenuItems();
                 
-        AlignmentSortPopup sorter = new AlignmentSortPopup(ali,this, sortReverse);
+        new AlignmentSortPopup(ali,this, sortReverse);
         
         Annotation[] objects = structureAlignment.getAlignment().getObjects();
         
@@ -314,11 +309,13 @@ StructureAlignmentListener {
         
         int displayPosition = 1;
         Color col = structureAlignment.getColor(0);
+        
         for ( int i=0; i< ids.length;i++){
+            
             String id = ids[i];
             
             if ( ( i == 0 ) || (structureAlignment.isSelected(i))){
-            	col = structureAlignment.getColor(i);
+            	    col = structureAlignment.getColor(i);
                 UIManager.put("CheckBox.background", col);
                 UIManager.put("CheckBox.interiorBackground", col);
                 UIManager.put("CheckBox.highlite", col);
@@ -328,27 +325,27 @@ StructureAlignmentListener {
                 UIManager.put("CheckBox.interiorBackground", background);
                 UIManager.put("CheckBox.highlite", background);
             }
-            JCheckBox b = new JCheckBox(displayPosition+" "+id);
-            b.addMouseListener(sorter);
             
-            // get tooltip
-            String tooltip = getButtonTooltip(objects[i]);
             
-            boolean doShow = isVisibleAfterFilter(objects[i],structureAlignment.getFilterBy());
-            if ( ! doShow) {
-                b.setVisible(false);
-            } else {
+            AligLabel label = new AligLabel(displayPosition + " " + id,
+                    objects[i],
+                    structureAlignment.getFilterBy());
+            
+            
+            JCheckBox structureCheckBox = label.getCheck();
+            JRadioButton dasBox = label.getRadio();
+            
+            if ( dasBox.isVisible())
                 displayPosition++;
-            }
-            b.setToolTipText(tooltip);
+            
             
             boolean selected = false;
             if (selectedArr[i]) {
                 selected = true;
                 // always show selected / even if filtered out!
-                if ( ! b.isVisible())
+                if ( ! structureCheckBox.isVisible())
                     displayPosition++;
-                b.setVisible(true);
+                label.setVisible(true);
                 
             }
             
@@ -366,16 +363,23 @@ StructureAlignmentListener {
                 } catch (StructureException e){
                     selected = false;
                 };
-                
-                
-            }
+            }           
+              
+            label.setSelected(selected);
+            labels.add(label);
             
-            b.setSelected(selected);
-            vBox.add(b);
-            checkButtons.add(b);
-            b.addItemListener(this);
+            vBoxL.add(structureCheckBox);
+            vBoxR.add(dasBox);
+            //vBox.add(label.getLabel());
+            
+            buttonGroup.add(dasBox);
+            dasBox.addItemListener(aliItemListener.getRadioButtonListener());
+            structureCheckBox.addItemListener(aliItemListener.getCheckBoxListener());
+            
         }
         
+        aliItemListener.setLabels(labels);
+  
         //      update the structure alignment in the structure display.
         Structure newStruc = structureAlignment.createArtificalStructure();
         
@@ -394,12 +398,11 @@ StructureAlignmentListener {
             if ( li instanceof StructurePanelListener){
                 StructurePanelListener pli = (StructurePanelListener)li;
                 pli.executeCmd(cmd);
-            }
-            
-        }
+            }            
+        }        
         
         
-        repaint();
+        this.repaint();
     }
     
     /** recalculate the displayed alignment. e.g. can be called after toggle full structure
@@ -433,161 +436,7 @@ StructureAlignmentListener {
         }
     }
     
-    protected List getCheckBoxes() {
-        return checkButtons;
-    }
     
-    
-    private void repaintBox(JCheckBox box, int pos, Color backgroundColor) {
-        Color col = backgroundColor;
-        UIManager.put("CheckBox.background", col);
-        UIManager.put("CheckBox.interiorBackground", col);
-        UIManager.put("CheckBox.highlite", col);
-        
-        box.setBackground(col);
-        box.repaint();
-    }
-     
-    
-    /** a checkbox has been clicked - update the 3D display
-     * 
-     * @param box
-     * @param e
-     * @param i
-     */
-    private void updateBox( JCheckBox box, ItemEvent e, int i) {
-
-        
-        
-        String[] ids = structureAlignment.getIds();
-        String id = ids[i];
-        //System.out.println("do something with " + id);
-        if (e.getStateChange() == ItemEvent.DESELECTED) {
-            // remove structure from alignment
-            structureAlignment.deselect(i);
-            box.setBackground(this.getBackground());
-            box.repaint();
-            // display the first one that is selected
-            // set the color to that one 
-            //int j = structureAlignment.getFirstSelectedPos();
-            int j = structureAlignment.getLastSelectedPos();
-            if ( j > -1) {
-                
-                Color col = structureAlignment.getColor(j);
-                System.setProperty("SPICE:StructureRegionColor",new Integer(col.getRGB()).toString());                        
-                
-            }
-            referenceStructure = j;
-            
-        } else {
-            structureAlignment.select(i);
-            // add structure to alignment
-            Color col = structureAlignment.getColor(i);
-            
-            System.setProperty("SPICE:StructureRegionColor",new Integer(col.getRGB()).toString());                                      
-            
-            repaintBox(box,i,col);
-            
-            
-            // check if we can get the structure...
-            Structure struc = null;
-            try {
-                struc = structureAlignment.getStructure(i);
-                referenceStructure = i;
-                if ( struc.size() > 0) {
-                    Chain c1 = struc.getChain(0);
-                    String sequence = c1.getSequence();
-                    String ac = id + "." + c1.getName();
-                    
-                    SequenceEvent sevent = new SequenceEvent(ac,sequence);
-                    //logger.info("*** seqeunce event " + ac);
-                    Iterator iter3 = pdbSequenceListeners.iterator();
-                    while (iter3.hasNext()){
-                        SequenceListener li = (SequenceListener)iter3.next();
-                        li.newSequence(sevent);
-                    }
-                } else {
-                    logger.warning("could not load structure at position " +i );
-                   
-                    box.setSelected(false);
-                }
-                
-            } catch (StructureException ex){
-                ex.printStackTrace();
-                structureAlignment.deselect(i);
-                //return;
-               
-                box.setSelected(false);
-            }
-        }
-        
-        
-        
-        Matrix jmolRotation = getJmolRotation();
-        
-        
-        
-        Structure newStruc = null; 
-//      execute Rasmol cmd...
-        String cmd = null;
-        
-        
-        // update the structure alignment in the structure display.
-        if (e.getStateChange() == ItemEvent.DESELECTED) {
-            newStruc = structureAlignment.createArtificalStructure();
-            cmd = structureAlignment.getRasmolScript();
-            
-        }
-        else {
-            newStruc = structureAlignment.createArtificalStructure(i);
-            cmd = structureAlignment.getRasmolScript(i);                    
-        }
-        
-//        if ( newStruc != null){
-//            if ( jmolRotation != null){
-//                Structure clonedStruc = (Structure) newStruc.clone();
-//                Calc.rotate(clonedStruc,jmolRotation);
-//                newStruc = clonedStruc;
-//            }
-//        }
-        StructureEvent event = new StructureEvent(newStruc);
-        Iterator iter2 = structureListeners.iterator();
-        while (iter2.hasNext()){
-            StructureListener li = (StructureListener)iter2.next();
-            li.newStructure(event);
-            if ( li instanceof StructurePanelListener){
-                StructurePanelListener pli = (StructurePanelListener)li;
-                pli.executeCmd(cmd);
-            }
-            
-        }
-        
-        rotateJmol(jmolRotation);
-    
-    }
-    
-    
-    public void itemStateChanged(ItemEvent e) {
-        
-        Object source = e.getItemSelectable();
-        Iterator iter = checkButtons.iterator();
-        int i=-1;
-        while (iter.hasNext()){
-            i++;
-            Object o = iter.next();
-            JCheckBox box =(JCheckBox)o;
-            if ( o.equals(source)){
-                updateBox(box, e,i);
-            } else {
-                Color col = null;
-                if ( structureAlignment.isSelected(i))
-                    col = structureAlignment.getColor(i);
-                else
-                    col = this.getBackground(); 
-                repaintBox(box,i,col);
-            }           
-        }        
-    }
     
     public void rotateJmol(Matrix jmolRotation) {
         if ( structurePanel != null){
@@ -636,6 +485,11 @@ StructureAlignmentListener {
         }    
         return jmolRotation;
     }    
+    
+    
+     
+    
+    
 }
 
 class MyKeyListener extends KeyAdapter {
@@ -659,8 +513,7 @@ class MyKeyListener extends KeyAdapter {
                 if ( ch != KeyEvent.VK_HOME )
                     search += ch;
         }
-         
-        //System.out.println("search text: " + search);
+                 
         StructureAlignment ali = chooser.getStructureAlignment();
         String[] ids = ali.getIds();
         if ( search.equals("")){
@@ -669,33 +522,36 @@ class MyKeyListener extends KeyAdapter {
         
         Border b = BorderFactory.createMatteBorder(3,3,3,3,Color.blue);
         
-        List checkBoxes = chooser.getCheckBoxes();
+        List labels = chooser.getLabels();
         boolean firstFound = false;
-        
-        JScrollPane scroller = chooser.getScroller();
+           
         int  h = 0;
         for (int i=0; i <ids.length;i++){
-            JCheckBox box = (JCheckBox) checkBoxes.get(i);
+            AligLabel label = (AligLabel)labels.get(i);
+            JCheckBox box = label.getCheck();
+            //JLabel box = label.getLabel();
             
             if ( ids[i].indexOf(search) > -1) {
                 // this is the selected label
                 //System.out.println("selected label " + ids[i]);
-                box.setBorder(b);
-                box.setBorderPainted(true);
+                label.setBorder(b);
+                label.setBorderPainted(true);
                 
                 if ( ! firstFound ) {
                     // scroll to this position
-                    if ( scroller != null){
-                        scroller.getViewport().setViewPosition(new Point (0,h));
+                    if ( chooser != null){
+                    
+                        chooser.getViewport().setViewPosition(new Point (0,h)); 
                     }
                 }
                 firstFound = true;
                 
             } else {
                 // clear checkbutton
-                box.setBorderPainted(false);
+                label.setBorderPainted(false);
+              
             }
-            box.repaint();
+            label.repaint();
             h+= box.getHeight();
         }
         if (! firstFound) {
@@ -707,8 +563,46 @@ class MyKeyListener extends KeyAdapter {
         }
                
     }
+}
+
+
+/** a runnable that notifies sequence listeners
+ * 
+ * @author Andreas Prlic
+ * @since 2:26:13 PM
+ * @version %I% %G%
+ */
+class MySequenceRunnable implements Runnable {
+    
+    String ac;
+    String sequence;
+    List pdbSequenceListeners;
+    
+    public MySequenceRunnable(String ac, String sequence,List pdbSequenceListeners){
+        super();
+        this.ac = ac;
+        this.sequence = sequence;
+        this.pdbSequenceListeners = pdbSequenceListeners;
+    }
+    
+    public void run() {
+        SequenceEvent sevent = new SequenceEvent(ac,sequence);
+        //logger.info("*** seqeunce event " + ac);
+        Iterator iter3 = pdbSequenceListeners.iterator();
+        while (iter3.hasNext()){
+            
+            
+            SequenceListener li = (SequenceListener)iter3.next();
+            li.newSequence(sevent);
+        }
+    }
+}
+
+
+
     
    
-}
+    
+   
 
 

@@ -120,7 +120,7 @@ public class MenuAlignmentListener implements AlignmentListener {
                 //System.out.println(det);
                 if ( property.equals(filterProperty)) {
                     String detail = (String) det.getProperty("detail");
-                    if ( StructureAlignmentChooser.shouldIgnoreDetail(detail))
+                    if ( AligLabel.shouldIgnoreDetail(detail))
                     	continue;
                     
                     m.put( detail,"");
@@ -192,7 +192,7 @@ public class MenuAlignmentListener implements AlignmentListener {
             }
             
             String value    = (String) det.getProperty("detail");
-            if ( StructureAlignmentChooser.shouldIgnoreDetail(value))
+            if ( AligLabel.shouldIgnoreDetail(value))
             	okProperty = false;            
             
             if ( okProperty) {

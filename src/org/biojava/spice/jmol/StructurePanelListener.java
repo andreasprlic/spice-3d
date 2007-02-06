@@ -146,7 +146,7 @@ JmolCommander
     */
    public  void setStructure(Structure struc, boolean displayScript) {
        
-       logger.info("setting structure in StructurePanelListener");
+       //logger.info("setting structure in StructurePanelListener");
       
        if ( struc == null ) {
       

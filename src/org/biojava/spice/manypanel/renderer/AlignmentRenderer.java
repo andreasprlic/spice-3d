@@ -244,7 +244,7 @@ extends JPanel {
         
         cursorPanel.setChain1(c);        
         seq1 = c;
-        System.out.println("alig renderer seq 1 " + c.getSwissprotId() + " " + c.getSequence());
+        //System.out.println("alig renderer seq 1 " + c.getSwissprotId() + " " + c.getSequence());
         updatePanelPositions();
        
         
@@ -254,7 +254,7 @@ extends JPanel {
         alignmentPanel.setSequence2(c);
         cursorPanel.setChain2(c);
         seq2 = c;
-        System.out.println("alig renderer seq 2 " + c.getSwissprotId() + " " + c.getSequence());
+        //System.out.println("alig renderer seq 2 " + c.getSwissprotId() + " " + c.getSequence());
         
         updatePanelPositions();
     

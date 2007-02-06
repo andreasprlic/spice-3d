@@ -27,7 +27,6 @@ package org.biojava.spice.jmol ;
 import java.awt.*;
 import javax.swing.*;
 
-import org.jmol.adapter.smarter.SmarterJmolAdapter;
 import org.jmol.api.*;
 import org.jmol.popup.JmolPopup;
 //import org.jmol.adapter.smarter.SmarterJmolAdapter;
@@ -164,7 +163,7 @@ implements JmolCommander
      * @param command - a String containing a RASMOL like command. e.g. "select protein; cartoon on;"
      */
     public void executeCmd(String command) {
-        logger.info(command);
+        //logger.info(command);
         if (viewer.isScriptExecuting()) 
             logger.info("viewer is executing");
         
@@ -203,7 +202,7 @@ implements JmolCommander
         viewer.evalString("exit");
 
         if ( adapter instanceof SpiceJmolAdapter){
-            logger.info("using the new SpiceJmolAdapter");
+            //logger.info("using the new SpiceJmolAdapter");
             SpiceJmolAdapter sad = (SpiceJmolAdapter)adapter;
             sad.setStructure(structure);
            
@@ -258,15 +257,9 @@ implements JmolCommander
                 executeCmd(StructurePanelListener.INIT_SELECT);
             }
         }
-        
-        
-
-       
-        
+                
         jmolpopup.updateComputedMenus();
-        
-       
-        
+         
         logger.finest("end of setStructure");
    
     }
