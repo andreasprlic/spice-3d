@@ -53,6 +53,7 @@ import org.biojava.spice.alignment.StructureAlignment;
 import org.biojava.spice.gui.aligchooser.StructureAlignmentChooser;
 import org.biojava.spice.jmol.StructurePanel;
 import org.biojava.spice.manypanel.eventmodel.StructureAlignmentListener;
+import org.biojava.spice.manypanel.renderer.SequenceScalePanel;
 
 /** a class that eithe provides a JList or a JCheckbox,
  * depending if spice is running in structure alignment mode or
@@ -87,6 +88,7 @@ implements StructureListener
         this.parentMenu = parentMenu;
         DefaultListModel model = new DefaultListModel();        
         model.add(0,"");
+        this.setBackground(SequenceScalePanel.BACKGROUND_COLOR);
         
         chainList	= new JList(model);        
         checkBox 	= new JCheckBox();
