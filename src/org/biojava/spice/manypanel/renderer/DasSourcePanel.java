@@ -146,7 +146,19 @@ implements FeatureListener,SpiceFeatureListener
     
     public int getDisplayHeight(){
         int h = SequenceScalePanel.DEFAULT_Y_START + SequenceScalePanel.DEFAULT_Y_STEP + SequenceScalePanel.LINE_HEIGHT;
-        h += (drawableDasSource.getFeatures().length +1 ) * SequenceScalePanel.DEFAULT_Y_STEP ;
+        
+        Feature[] feats = drawableDasSource.getFeatures();
+        
+        int l = feats.length;
+        
+        if ( l > 0) {
+            Feature f = (Feature) feats[0];
+            if ( f.getType().equals("hydrophobicity")) {
+                l = 1;
+            }
+        }
+        
+        h += (l +1 ) * SequenceScalePanel.DEFAULT_Y_STEP ;
         //logger.info(dasSource.getDasSource().getNickname() + " height:" + h);
         return h;
     }
@@ -322,6 +334,85 @@ implements FeatureListener,SpiceFeatureListener
             
             drawHelixSegment(segment, drawHeight, g,  y);
             
+        }
+        
+    }
+    
+    
+    
+    private void drawHistogramFeature(Feature[] features,
+            int featurePos, 
+            int drawHeight,
+            Graphics g,
+            int y){
+        
+        if ( featurePos > 0)
+            return;
+        
+        //System.out.println("hydrophobicity " + features.length);
+        Graphics2D g2D =(Graphics2D) g;
+        
+        int aminosize = Math.round(1*scale);
+        if ( aminosize < 1 )
+            aminosize = 1;
+        
+        // get maximum and minimum score
+        double max = 0;
+        double min = 0;
+        for (int i =0 ; i< features.length; i++){
+            Feature f = features[i];
+            String score = f.getScore();
+            
+            double d = 0;
+            try {
+                d = Double.parseDouble(score);
+            } catch (NumberFormatException e){
+                continue;
+            }
+            if ( d > max)
+                max = d;
+            if ( d < min )
+                min = d;
+        }
+        double range = Math.abs(max) + Math.abs(min);
+        
+       // System.out.println("max " + max + " min " + min + " range: " + range);
+        
+        for (int i =0 ; i< features.length; i++){
+            Feature f = features[i];
+            String score = f.getScore();
+            
+            double d = 0;
+            try {
+                d = Double.parseDouble(score);
+            } catch (NumberFormatException e){
+                continue;
+            }
+            
+            // normalize score...
+            double ratio =  ( d + range ) / (range+max) ;
+          
+            Color c = DrawUtils.getColorGradient(Color.red, Color.blue, ratio);
+            g2D.setColor(c);
+            List segments = f.getSegments();
+            
+            // check to make sure there is only one segment, as there should be
+            if ( segments.size() != 1)
+                continue;
+            
+            Segment s = (Segment) segments.get(0);
+            int start = s.getStart() -1 ;
+            int end   = s.getEnd() -1 ;
+            
+            int xstart = coordManager.getPanelPos(start);            
+            int width  = coordManager.getPanelPos(end) - xstart + aminosize +1;
+            
+            int height =  (int)Math.round(drawHeight * ratio);
+            
+            //g2D.fillRect(xstart,y,aminosize,height);
+            //g2D.fillRect(xstart,y+(height/2),width,1);
+            g2D.fillRect(xstart+width-aminosize,y+ height,aminosize, drawHeight - height);
+
         }
         
     }
@@ -591,7 +682,12 @@ implements FeatureListener,SpiceFeatureListener
             if (  featureType.equals(SpiceDefaults.DISULFID_TYPE)){
                 drawSpanFeature(feature,f,SequenceScalePanel.DEFAULT_Y_HEIGHT,g,y);
                 
+            } else if (featureType.equals("hydrophobicity")) {
+                drawHistogramFeature(features,f,SequenceScalePanel.DEFAULT_Y_HEIGHT * 2,g,y);
+                if ( f > 1)
+                    y -= SequenceScalePanel.DEFAULT_Y_STEP;
             } else if (  featureType.equals("SECSTRUC") || 
+            
                     featureType.equals("HELIX") || 
                     featureType.equals("STRAND") || 
                     featureType.equals("COIL") ||

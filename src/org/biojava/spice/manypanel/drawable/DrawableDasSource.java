@@ -219,24 +219,7 @@ FeatureListener{
                     // end of secondary structure
                     secstruc = false ;
                     if ( ! (feat==null)) {
-                        features = testAddFeatures(features,feat);
-                        /*
-                         if ( ! secstrucContained) {
-                         secstrucfeature = feat;
-                         secstrucContained = true;
-                         
-                         //features.add(feat);
-                          } else {
-                          //add this feature data to the secstruc feature...
-                           // do NOT add this feature to features ...
-                            List segs = feat.getSegments();
-                            Iterator iter = segs.iterator();
-                            while (iter.hasNext()){
-                            Segment seg = (Segment)iter.next();
-                            secstrucfeature.addSegment(seg);
-                            }
-                            }
-                            */
+                        features = testAddFeatures(features,feat);                        
                     }
                     
                 }
@@ -320,6 +303,15 @@ FeatureListener{
         return false;
     }
     
+    private boolean isHistogramFeatureType(Feature feat){
+        String type = feat.getType();
+        
+        // todo : move this info into a config file...
+        if ( type.equals("hydrophobicity")){
+            return true;
+        }
+        return false;
+    }
     
     private List testAddFeatures(List features,Feature feat){
         // test if this features is added as a new feature to the features list, or if it is joint with an already existing one...
@@ -339,7 +331,8 @@ FeatureListener{
                     isSecondaryStructureFeat(tmpfeat) && 
                     isSecondaryStructureFeat(feat))
                 sameFeat =true;
-            
+            if ( isHistogramFeatureType(feat))
+                sameFeat = false;
             if ( sameFeat) {
                 
                 // seems to be of same type, method and source, so check if the segments can be joint

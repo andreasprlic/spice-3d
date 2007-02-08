@@ -106,8 +106,6 @@ extends DasSourcePanel{
         g2D.setFont(headFont);
         
         g2D.setColor(TEXT_COLOR);
-      
-        
         
         String str = drawableDasSource.getDasSource().getNickname();
         //logger.info("paint DasSourcePanel "+str);
@@ -124,6 +122,9 @@ extends DasSourcePanel{
         Feature[] features = drawableDasSource.getFeatures();
         for ( int f =0 ; f< features.length;f++) {
             Feature feature = features[f];
+            if ( feature.getType().equals("hydrophobicity"))
+                if (f >0)
+                    continue;
             drawLabel(g,feature,y, stylesheet);
             y += SequenceScalePanel.DEFAULT_Y_STEP;
         }

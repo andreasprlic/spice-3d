@@ -27,6 +27,7 @@ import javax.swing.*;
 import java.awt.Dimension;
 import java.net.*;
 
+import org.biojava.dasobert.das.Capabilities;
 import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.das2.Das2Source;
 import org.biojava.dasobert.das2.DasSourceConverter;
@@ -75,10 +76,19 @@ public class SpiceLayeredPanel
         BrowserPane browserPane = new BrowserPane(PDBCOORDSYS,UNIPROTCOORDSYS,ENSPCOORDSYS);
         try {
             DasSource[] dss = SpiceLayeredPanel.getAllDasSources();
-            SpiceDasSource[] sds = new SpiceDasSource[dss.length];
+            SpiceDasSource[] sds = new SpiceDasSource[dss.length+1] ;
+            Das1Source dLocal = new Das1Source();
+            dLocal.setUrl("http://pfam1b.internal.sanger.ac.uk:9000/das/hydrophobicity/");
+            dLocal.setNickname("KyleDoolittle");
+            dLocal.setCapabilities(new String[]{Capabilities.FEATURES,});
+            DasCoordinateSystem up = DasCoordinateSystem.fromString(UNIPROTCOORDSYS);
+            dLocal.setCoordinateSystem(new DasCoordinateSystem[]{up});
+            
+            sds[0] = SpiceDasSource.fromDasSource(dLocal);
+            
             for (int i =0 ; i < dss.length;i++){
                 Das1Source d1s = DasSourceConverter.toDas1Source((Das2Source)dss[i]);
-                sds[i] = SpiceDasSource.fromDasSource(d1s);
+                sds[i+1] = SpiceDasSource.fromDasSource(d1s);
             }
             browserPane.setDasSources(sds);
             browserPane.triggerLoadUniProt(code);
@@ -103,7 +113,7 @@ public class SpiceLayeredPanel
         //creating and showing this application's GUI.
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                createAndShowGUI("P50225");
+                createAndShowGUI("Q8TCT8");
             }
         });
     }
