@@ -38,31 +38,36 @@ import org.biojava.spice.manypanel.renderer.SegmentPopupFrame;
 
 public class LogPopupFrame extends AbstractPopupFrame{
 
-    LogRecord record ;
+
     JEditorPane editorP;
     
     protected final DateFormat dateFormat = DateFormat.getTimeInstance(DateFormat.MEDIUM);
     
-    public LogPopupFrame(LogRecord record) {
+    public LogPopupFrame() {
         super();
-        this.record = record;
-
         editorP =  new JEditorPane("text/html", "");
-        editorP.setEditable(false);
+        
+        
+    }
+    public LogPopupFrame(LogRecord record) {
+            super();
+
         String html = record2HTML(record);
         editorP.setText(html);
+        editorP.setEditable(false);
+        editorP.repaint();
         
         
     }
     
-    private StringBuffer startStringBuffer(){
+    public StringBuffer startStringBuffer(){
         StringBuffer text = new StringBuffer(
         "<html><body><font size=\"2\" face=\"Verdana, Arial, Helvetica, sans-serif\">");
         return text;
     }
     
     
-    private void endStringBuffer(StringBuffer text){
+    public void endStringBuffer(StringBuffer text){
         text.append("</font></body></html>");
     }
     
@@ -73,19 +78,18 @@ public class LogPopupFrame extends AbstractPopupFrame{
             
         return html;
     }
-    private String record2HTML(LogRecord record){
-        StringBuffer buf =  startStringBuffer();
+    
+    public void record2HTMLBody(LogRecord rec, StringBuffer buf){
+        buf.append("<b>Class:</b> "   +rec.getSourceClassName()+"<br>");
+        buf.append("<b>Method:</b> "  +rec.getSourceMethodName()+"<br>");
+        buf.append("<b>Message:</b> " +rec.getMessage()+"<br>");
+        buf.append("<b>Time:</b> "    + dateFormat.format(new Date(rec.getMillis())) + "<br>");
         
-        buf.append("<b>Class:</b> "+record.getSourceClassName()+"<br>");
-        buf.append("<b>Method:</b> "+record.getSourceMethodName()+"<br>");
-        buf.append("<b>Message:</b> "+record.getMessage()+"<br>");
-        buf.append("<b>Time:</b> " + dateFormat.format(new Date(record.getMillis())) + "<br>");
-        
-        if ( record.getThrown() != null) {
+        if ( rec.getThrown() != null) {
         
             buf.append("<b>Trace:</b><br><font size=\"1\">");
                    
-            StackTraceElement[] stack = record.getThrown().getStackTrace();
+            StackTraceElement[] stack = rec.getThrown().getStackTrace();
             
             buf.append("stack length: " + stack.length +"<br>");
             
@@ -101,6 +105,12 @@ public class LogPopupFrame extends AbstractPopupFrame{
         
             buf.append("</font><br>");
         }
+    }
+    
+    public String record2HTML(LogRecord rec){
+        StringBuffer buf =  startStringBuffer();
+       
+        record2HTMLBody(rec, buf);
         
         endStringBuffer(buf);
         

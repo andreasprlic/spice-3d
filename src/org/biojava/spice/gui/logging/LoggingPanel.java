@@ -39,6 +39,9 @@ package org.biojava.spice.gui.logging;
 //Swing dependencies
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JTable;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
@@ -63,6 +66,8 @@ import javax.swing.JButton;
 import javax.swing.Box;
 
 import org.biojava.spice.ResourceManager;
+import org.biojava.spice.gui.SendEmailGui;
+import org.biojava.spice.utils.SendEmail;
 
 import java.awt.event.ActionEvent          ;
 
@@ -73,6 +78,7 @@ import java.awt.Frame;
 import java.awt.Dialog;
 import java.awt.Component;
 import java.awt.BorderLayout;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
@@ -89,12 +95,7 @@ import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
 
-//Resources
-//disabled by Andreas Prlic
-//import org.geotools.resources.XArray;
-//import org.geotools.resources.gui.Resources;
-//import org.geotools.resources.gui.ResourceKeys;
-//import org.geotools.resources.SwingUtilities;
+
 
 
 /**
@@ -295,9 +296,9 @@ public class LoggingPanel extends JPanel {
                     return;
                 int selectRow = lsm.getMinSelectionIndex();
                 
-                LogRecord record = model.getLogRecord(selectRow);
+                //LogRecord record = model.getLogRecord(selectRow);
                 
-                LogPopupFrame popup = new LogPopupFrame(record);
+                LogPopupFrame popup = new LogPopupFrame();
                 
                 int posY = selectRow * 16;
                 int posX = 0;
@@ -529,6 +530,13 @@ public class LoggingPanel extends JPanel {
         frame.setLocation((dim.width - frameWidth),(dim.height - frameHeight));
         frame.setTitle("SPICE - log");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        
+        // add the send feedback / bugreport menu
+        JMenuBar menuBar = getMenuBar();
+        frame.setJMenuBar(menuBar);
+        
+        
+        
         frame.addWindowListener(new WindowAdapter()
                 {
             public void windowClosed(WindowEvent event) {
@@ -544,6 +552,55 @@ public class LoggingPanel extends JPanel {
         doLayout();
         frame.show();
         return frame;
+    }
+    
+    private JMenuBar getMenuBar(){
+        
+        JMenuBar menuBar = new JMenuBar();
+        
+        JMenu menu = new JMenu(ResourceManager.getString("org.biojava.spice.gui.menu.FeedbackMenu"));
+        
+        JMenuItem email = new JMenuItem(ResourceManager.getString("org.biojava.spice.gui.menu.EmailLog"));
+        menu.add(email);
+        
+        email.addActionListener(new ActionListener(){
+
+            public void actionPerformed(ActionEvent event) {
+               //the user wants to submit the logfile by email
+                
+                int c = model.getRowCount();
+                LogPopupFrame ff = new LogPopupFrame();
+                StringBuffer buf = ff.startStringBuffer();
+                
+                for (int i =0 ; i < c ;i ++){
+                    LogRecord record = model.getLogRecord(i);
+                    if ( record != null){
+                        //System.out.println(record);
+                        ff.record2HTMLBody(record,buf);
+                        buf.append("<hr/>");
+                        
+                    }
+                    
+                }
+                ff.endStringBuffer(buf);
+                String body = buf.toString();
+                
+                //String url = "mailto:"+ ResourceManager.getString("org.biojava.spice.BugReportEmail");
+                //url += "?subject=spice bug report&body="+body;
+                //System.out.println(url);
+                
+                SendEmailGui sender = new SendEmailGui();
+                sender.postMailFromGui(new String[]{ResourceManager.getString("org.biojava.spice.BugReportEmail")},
+                        "bug report from SPICE", 
+                        body, ResourceManager.getString("org.biojava.spice.BugReportEmail"), SendEmail.mailHost);
+                //BrowserOpener.showDocument(url);
+            }
+            
+        });
+        
+        menuBar.add(menu);
+        
+        return menuBar;
     }
     
     /**
