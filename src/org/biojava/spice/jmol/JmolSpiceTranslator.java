@@ -308,4 +308,9 @@ implements JmolStatusListener, StructureListener
 	//	System.out.println("strEval called" + strEval);
 		return null;
 	}
+
+    public void notifyFrameChanged(int frameNo, int fileNo, int modelNo, int firstNo, int LastNo) {
+        //System.out.println("notifyFrameChanged " + frameNo);
+        
+    }
 }
