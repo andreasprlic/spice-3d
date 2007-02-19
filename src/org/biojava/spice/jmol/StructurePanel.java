@@ -78,10 +78,24 @@ implements JmolCommander
     public StructurePanel() {
         super();        
         
-        // TODO: repplace the SmarterJmolAdapter with a SPICE specific adapter!
-        //adapter = new SmarterJmolAdapter();
         adapter = new SpiceJmolAdapter();
         
+        initJmolInstance();
+                
+    }
+    
+    /** reset the Jmol display */
+    public void reset() {
+        viewer.homePosition();
+        
+    }
+    
+    /** if Jmol crahsed, drop it and get a new one
+     * 
+     *
+     */
+    private void initJmolInstance(){
+        logger.info("init jmol instance");
         viewer  = org.jmol.viewer.Viewer.allocateViewer(this, adapter);
         
         jmolpopup = JmolPopup.newJmolPopup(viewer);
@@ -89,7 +103,21 @@ implements JmolCommander
         // this is important to make Jmol thread -safe !!
         viewer.evalString("set scriptQueue on;");
         
+        
     }
+    /** call this upon startup. This is a workaround to a bug in Jmol.
+     * 
+     *
+     */
+    public void initJmolDisplay(){
+        String pdb = "ATOM     63  CA  GLY     9      47.866  28.415   2.952 \n" ;
+        viewer.openStringInline(pdb);
+        executeCmd("select *; spacefill off;");
+        
+        
+    }
+    
+    
     
     /** Add a JmolStatus listener to Jmol
      * 
@@ -140,30 +168,14 @@ implements JmolCommander
         
     }
     
-    /** reset the Jmol display */
-    public void reset() {
-        viewer.homePosition();
-        
-    }
-    
-    /** call this upon startup. This is a workaround to a bug in Jmol.
-     * 
-     *
-     */
-    public void initJmolDisplay(){
-        String pdb = "ATOM     63  CA  GLY     9      47.866  28.415   2.952 \n" ;
-        viewer.openStringInline(pdb);
-        executeCmd("select *; spacefill off;");
-        
-        
-    }
+   
     
     
     /** Send a RASMOL like command to Jmol
      * @param command - a String containing a RASMOL like command. e.g. "select protein; cartoon on;"
      */
     public void executeCmd(String command) {
-        //logger.info(command);
+        logger.info(command);
         if (viewer.isScriptExecuting()) 
             logger.info("viewer is executing");
         
@@ -179,6 +191,9 @@ implements JmolCommander
     public Structure getStructure(){
         return structure;
     }
+    
+    
+    
     
     /** display a new PDB structure in Jmol 
      * @param structure a Biojava structure object    
@@ -199,8 +214,19 @@ implements JmolCommander
             return;
         }       
         
+        if (viewer.isScriptExecuting()) {
+            // something is going wrong with jmol!
+            // drop it an get a new instance
+         
+            logger.info("jmol is still executing - seems to be crashed!");
+            initJmolInstance();
+        }
+        
         viewer.evalString("exit");
-
+        //viewer.evalString("zap");
+        
+         
+        
         if ( adapter instanceof SpiceJmolAdapter){
             //logger.info("using the new SpiceJmolAdapter");
             SpiceJmolAdapter sad = (SpiceJmolAdapter)adapter;
