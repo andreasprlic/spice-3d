@@ -28,6 +28,7 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -441,11 +442,18 @@ StructureAlignmentListener {
     public void rotateJmol(Matrix jmolRotation) {
         if ( structurePanel != null){
             if ( jmolRotation != null) {
- 
+                //jmolRotation.print(3,3);
                 double[] zyz = Calc.getZYZEuler(jmolRotation);
+                DecimalFormat df = new DecimalFormat("0.##");
                 
-                String script = "reset; rotate z "+zyz[0] +"; rotate y " + zyz[1] +"; rotate z"+zyz[2]+";";
-
+                String script = "reset; rotate z "
+                    + df.format(zyz[0]) 
+                    + "; rotate y " 
+                    + df.format(zyz[1]) 
+                    +"; rotate z "
+                    + df.format(zyz[2])+";";
+                    
+         
                 structurePanel.executeCmd(script);
                 /*structurePanel.executeCmd("show orientation");
                 JmolViewer viewer = structurePanel.getViewer();
@@ -469,18 +477,17 @@ StructureAlignmentListener {
             //structurePanel.executeCmd("show orientation;");
             JmolViewer jmol = structurePanel.getViewer();
             Object obj = jmol.getProperty(null,"transformInfo","");
-            //System.out.println(obj);
+           // System.out.println(obj);
             if ( obj instanceof Matrix3f ) {
                 Matrix3f max = (Matrix3f) obj;
                 jmolRotation = new Matrix(3,3);
                 for (int x=0; x<3;x++) {
                     for (int y=0 ; y<3;y++){
                         float val = max.getElement(x,y);
-                        //System.out.println("x " + x + " y " + y + " " + val);
+                       // System.out.println("x " + x + " y " + y + " " + val);
                         jmolRotation.set(x,y,val);
                     }
-                }
-                
+                }                
             }                             
         }    
         return jmolRotation;
