@@ -28,7 +28,6 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -52,7 +51,6 @@ import javax.swing.border.Border;
 
 import org.biojava.bio.Annotation;
 
-import org.biojava.bio.structure.Calc;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.StructureException;
 import org.biojava.bio.structure.jama.Matrix;
@@ -68,9 +66,7 @@ import org.biojava.dasobert.eventmodel.SequenceEvent;
 import org.biojava.dasobert.eventmodel.SequenceListener;
 import org.biojava.dasobert.eventmodel.StructureEvent;
 import org.biojava.dasobert.eventmodel.StructureListener;
-import org.jmol.api.JmolViewer;
 
-import javax.vecmath.Matrix3f;
 
 /** a JPanel that contains radio buttons to choose, which structures to show superimposed
  * 
@@ -220,7 +216,8 @@ StructureAlignmentListener {
         parent = null;
     }
     public void addStructureListener(StructureListener li){
-        structureListeners.add(li);
+    	if ( ! structureListeners.contains(li))
+    		structureListeners.add(li);
     }
     public List getStructureListeners(){
         return structureListeners;
@@ -285,7 +282,7 @@ StructureAlignmentListener {
         
         structureAlignment = ali;
         aliItemListener.setStructureAlignmnent(ali);
-        //logger.info("got new structure alignment");
+     
         if ( (ali != null) && ( ali.getIds().length > 0) )
             System.setProperty("SPICE:drawStructureRegion","true");
         
@@ -315,11 +312,19 @@ StructureAlignmentListener {
             
             String id = ids[i];
             
-            if ( ( i == 0 ) || (structureAlignment.isSelected(i))){
-            	    col = structureAlignment.getColor(i);
+            AligLabel label = new AligLabel(displayPosition + " " + id,
+                    objects[i],
+                    structureAlignment.getFilterBy());
+            
+            if ( ( i == 0 ) || 
+            		(structureAlignment.isSelected(i)))
+            {
+            	//System.out.println("repaint is selected " + i);
+            	col = structureAlignment.getColor(i);
                 UIManager.put("CheckBox.background", col);
                 UIManager.put("CheckBox.interiorBackground", col);
                 UIManager.put("CheckBox.highlite", col);
+                label.setBackground(col);
                 
             } else {
                 UIManager.put("CheckBox.background", background);
@@ -328,9 +333,7 @@ StructureAlignmentListener {
             }
             
             
-            AligLabel label = new AligLabel(displayPosition + " " + id,
-                    objects[i],
-                    structureAlignment.getFilterBy());
+            
             
             
             JCheckBox structureCheckBox = label.getCheck();
@@ -368,7 +371,7 @@ StructureAlignmentListener {
               
             label.setSelected(selected);
             labels.add(label);
-            
+            label.repaint();
             vBoxL.add(structureCheckBox);
             vBoxR.add(dasBox);
             //vBox.add(label.getLabel());
@@ -429,6 +432,7 @@ StructureAlignmentListener {
         while (iter2.hasNext()){
             StructureListener li = (StructureListener)iter2.next();
             li.newStructure(event);
+            
             if ( li instanceof StructurePanelListener){
                 StructurePanelListener pli = (StructurePanelListener)li;
                 pli.executeCmd(cmd);
@@ -440,31 +444,9 @@ StructureAlignmentListener {
     
     
     public void rotateJmol(Matrix jmolRotation) {
-        if ( structurePanel != null){
-            if ( jmolRotation != null) {
-                //jmolRotation.print(3,3);
-                double[] zyz = Calc.getZYZEuler(jmolRotation);
-                DecimalFormat df = new DecimalFormat("0.##");
-                
-                String script = "reset; rotate z "
-                    + df.format(zyz[0]) 
-                    + "; rotate y " 
-                    + df.format(zyz[1]) 
-                    +"; rotate z "
-                    + df.format(zyz[2])+";";
-                    
-         
-                structurePanel.executeCmd(script);
-                /*structurePanel.executeCmd("show orientation");
-                JmolViewer viewer = structurePanel.getViewer();
-                System.out.println("rotating jmol ... " + script);
-                viewer.homePosition();
-                viewer.rotateToZ(Math.round(zyz[0]));
-                viewer.rotateToY(Math.round(zyz[1]));
-                viewer.rotateToZ(Math.round(zyz[2]));
-                */
-            }
-        }
+        if ( structurePanel != null)
+        	structurePanel.rotateJmol(jmolRotation);
+        	
     }
     
     /** get the rotation out of Jmol 
@@ -474,26 +456,10 @@ StructureAlignmentListener {
     public Matrix getJmolRotation(){
         Matrix jmolRotation = null;
         if ( structurePanel != null){
-            //structurePanel.executeCmd("show orientation;");
-            JmolViewer jmol = structurePanel.getViewer();
-            Object obj = jmol.getProperty(null,"transformInfo","");
-           // System.out.println(obj);
-            if ( obj instanceof Matrix3f ) {
-                Matrix3f max = (Matrix3f) obj;
-                jmolRotation = new Matrix(3,3);
-                for (int x=0; x<3;x++) {
-                    for (int y=0 ; y<3;y++){
-                        float val = max.getElement(x,y);
-                       // System.out.println("x " + x + " y " + y + " " + val);
-                        jmolRotation.set(x,y,val);
-                    }
-                }                
-            }                             
+        	jmolRotation = structurePanel.getJmolRotation();
         }    
         return jmolRotation;
     }    
-    
-    
      
     
     

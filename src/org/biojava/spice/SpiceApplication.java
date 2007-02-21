@@ -407,7 +407,7 @@ ConfigurationListener
 		 selectionPanel.setStructurePanel(structurePanel);
 
 		 JScrollPane chainPanel = new JScrollPane(selectionPanel);
-
+		 
 		 selectionPanel.setPreferredSize(new Dimension(60,60));
 
 		 chainPanel.setBorder(BorderFactory.createEmptyBorder());

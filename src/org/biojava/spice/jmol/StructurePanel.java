@@ -26,16 +26,20 @@ package org.biojava.spice.jmol ;
 
 import java.awt.*;
 import javax.swing.*;
+import javax.vecmath.Matrix3f;
 
 import org.jmol.api.*;
 import org.jmol.popup.JmolPopup;
 //import org.jmol.adapter.smarter.SmarterJmolAdapter;
 
+import org.biojava.bio.structure.Calc;
 import org.biojava.bio.structure.Structure ;
 import org.biojava.bio.structure.StructureImpl ;
+import org.biojava.bio.structure.jama.Matrix;
 import org.biojava.spice.ResourceManager;
 import org.biojava.spice.config.SpiceDefaults;
 
+import java.text.DecimalFormat;
 import java.util.logging.*;
 
 
@@ -81,6 +85,7 @@ implements JmolCommander
         adapter = new SpiceJmolAdapter();
         
         initJmolInstance();
+        viewer.openClientFile("","",new StructureImpl());   
                 
     }
     
@@ -96,12 +101,20 @@ implements JmolCommander
      */
     private void initJmolInstance(){
         logger.info("init jmol instance");
+        
+        Matrix jmolRotation = null;
+        if ( viewer != null)
+        	jmolRotation = getJmolRotation();
+        
         viewer  = org.jmol.viewer.Viewer.allocateViewer(this, adapter);
         
         jmolpopup = JmolPopup.newJmolPopup(viewer);
         
         // this is important to make Jmol thread -safe !!
         viewer.evalString("set scriptQueue on;");
+        
+        if ( jmolRotation != null )
+        	rotateJmol(jmolRotation);
         
         
     }
@@ -175,13 +188,72 @@ implements JmolCommander
      * @param command - a String containing a RASMOL like command. e.g. "select protein; cartoon on;"
      */
     public void executeCmd(String command) {
-        logger.info(command);
+        //logger.info(command);
         if (viewer.isScriptExecuting()) 
             logger.info("viewer is executing");
         
         viewer.script(command);
        
     }
+    
+    
+    /** get the rotation out of Jmol 
+    * 
+    * @return the jmol rotation matrix
+    */
+   public Matrix getJmolRotation(){
+       	Matrix jmolRotation = Matrix.identity(3, 3);
+      
+           //structurePanel.executeCmd("show orientation;");
+       	JmolViewer jmol = getViewer();
+       	Object obj = jmol.getProperty(null,"transformInfo","");
+       	// System.out.println(obj);
+       	if ( obj instanceof Matrix3f ) {
+       		Matrix3f max = (Matrix3f) obj;
+       		jmolRotation = new Matrix(3,3);
+       		for (int x=0; x<3;x++) {
+       			for (int y=0 ; y<3;y++){
+       				float val = max.getElement(x,y);
+       				// System.out.println("x " + x + " y " + y + " " + val);
+       				jmolRotation.set(x,y,val);
+       			}
+       		}                
+       	}                               
+       return jmolRotation;
+   }    
+    
+    /** send a rotation to Jmol
+     * 
+     * @param jmolRotation
+     */
+    public void rotateJmol(Matrix jmolRotation) {
+       
+            if ( jmolRotation != null) {
+                //jmolRotation.print(3,3);
+                double[] zyz = Calc.getZYZEuler(jmolRotation);
+                DecimalFormat df = new DecimalFormat("0.##");
+                
+                String script = "reset; rotate z "
+                    + df.format(zyz[0]) 
+                    + "; rotate y " 
+                    + df.format(zyz[1]) 
+                    +"; rotate z "
+                    + df.format(zyz[2])+";";
+                    
+                logger.info(script);
+                executeCmd(script);
+                /*structurePanel.executeCmd("show orientation");
+                JmolViewer viewer = structurePanel.getViewer();
+                System.out.println("rotating jmol ... " + script);
+                viewer.homePosition();
+                viewer.rotateToZ(Math.round(zyz[0]));
+                viewer.rotateToY(Math.round(zyz[1]));
+                viewer.rotateToZ(Math.round(zyz[2]));
+                */
+            }
+        
+    }
+    
     
     
     /** return the currently displayed structure object
@@ -218,7 +290,7 @@ implements JmolCommander
             // something is going wrong with jmol!
             // drop it an get a new instance
          
-            logger.info("jmol is still executing - seems to be crashed!");
+            logger.info("StructurePanel.setStructure(): jmol is still executing - seems to be crashed!");
             initJmolInstance();
         }
         

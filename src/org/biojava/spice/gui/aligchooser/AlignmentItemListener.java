@@ -58,6 +58,9 @@ public class AlignmentItemListener {
     //List checkButtons;
     //List radioButtons;
     List labels;
+    
+    int lastSelectedPosition;
+    
     public static Logger logger =  Logger.getLogger(SpiceDefaults.LOGGER);
     
     public AlignmentItemListener(StructureAlignmentChooser parent) {
@@ -71,9 +74,25 @@ public class AlignmentItemListener {
         //radioButtons = new ArrayList();
         //checkButtons = new ArrayList();
         labels = new ArrayList();
+        
+        lastSelectedPosition = -1;
     }
+   
     
-    public ItemListener getCheckBoxListener(){
+    
+    public int getLastSelectedPosition() {
+		return lastSelectedPosition;
+	}
+
+
+
+	public void setLastSelectedPosition(int lastSelectedPosition) {
+		this.lastSelectedPosition = lastSelectedPosition;
+	}
+
+
+
+	public ItemListener getCheckBoxListener(){
         return checkBoxListener;
     }
     public ItemListener getRadioButtonListener(){
@@ -119,7 +138,14 @@ public class AlignmentItemListener {
 
         String[] ids = structureAlignment.getIds();
         String id = ids[i];
-        //System.out.println("do something with " + id);
+       // System.out.println("AlignmentItemListener updateBox " + i + " id " + id);
+        if ( ( lastSelectedPosition == i)
+        		&& 
+        		(ItemEvent.SELECTED == e.getStateChange())) {
+        	System.out.println("already done!");
+        	return;
+        }
+        setLastSelectedPosition(i);
         
         if (e.getStateChange() == ItemEvent.DESELECTED) {
             // remove structure from alignment
@@ -132,6 +158,7 @@ public class AlignmentItemListener {
             //int j = structureAlignment.getFirstSelectedPos();
             
             int j = structureAlignment.getLastSelectedPos();
+            
             if ( j > -1) {
                 
                 Color col = structureAlignment.getColor(j);
@@ -139,10 +166,11 @@ public class AlignmentItemListener {
                 
             }
             parent.setReferenceStructure(j);
-            
+            setLastSelectedPosition(j);
         } else {
             
             structureAlignment.select(i);
+            setLastSelectedPosition(i);
             // add structure to alignment
             Color col = structureAlignment.getColor(i);
             
@@ -204,6 +232,7 @@ public class AlignmentItemListener {
         Iterator iter2 = parent.getStructureListeners().iterator();
         while (iter2.hasNext()){
             StructureListener li = (StructureListener)iter2.next();
+           // logger.info("setting new structure in StructureListener " + li);
             li.newStructure(event);
             if ( li instanceof StructurePanelListener){
                 StructurePanelListener pli = (StructurePanelListener)li;
@@ -242,7 +271,7 @@ class RadioButtonListener
     }
 
     public void itemStateChanged(ItemEvent e) {
-        //System.out.println("pressed radio button! " + e.getStateChange() + " " + ItemEvent.SELECTED);
+       // System.out.println("pressed radio button! " + e.getStateChange() + " " + ItemEvent.SELECTED);
         
         if ( e.getStateChange() != ItemEvent.SELECTED)
             return;
@@ -251,12 +280,28 @@ class RadioButtonListener
         List labels = parent.getLabels();
         Iterator iter = labels.iterator();
         StructureAlignment structureAlignment = parent.getStructureAlignment();
+        
+        int currentSelected = parent.getLastSelectedPosition();
+        
         int i=-1;
+       
         while ( iter.hasNext()){
             i++;
             AligLabel label = (AligLabel) iter.next();
             JRadioButton b = label.getRadio();
             if ( source.equals(b)){
+            	JCheckBox check = label.getCheck();
+            	System.out.println("found radio " + i + " " + 
+            			b.isSelected() + " " + check.isSelected());
+            	
+            	
+            	if ( (b.isSelected() == check.isSelected()) && 
+            			( currentSelected == i ) ) {
+            		// we already have triggered this - return!
+            		System.out.println("radio already in sync");
+            		return;
+            	}
+            	
                 //JCheckBox box =label.getCheck();
                 //box.setSelected(true);
                 label.setSelected(true);
@@ -297,6 +342,7 @@ class CheckBoxListener
         Object source = e.getItemSelectable();
         List labels = parent.getLabels();
         Iterator iter = labels.iterator();
+        int currentSelected = parent.getLastSelectedPosition();
         int i=-1;
         StructureAlignment structureAlignment = parent.getStructureAlignment();
         while (iter.hasNext()){
@@ -304,18 +350,32 @@ class CheckBoxListener
             i++;
             AligLabel label = (AligLabel)iter.next();
             JCheckBox box =(JCheckBox)label.getCheck();
+            JRadioButton radio = label.getRadio();
             if ( box.equals(source)){
-                //System.out.println("update");
+            
+            	System.out.println("found check " + i + " " + 
+            			"current: " + currentSelected + 
+            			box.isSelected() + " " + radio.isSelected());
+            	
+            	
+            	if ( (box.isSelected() == radio.isSelected()) && 
+            			( currentSelected == i ) ) {
+            		// we already have triggered this - return!
+            		System.out.println("radio already in sync");
+            		return;
+            	}
+            	
+                       
                 parent.updateBox(label, e,i);
                 
                 if (e.getStateChange() == ItemEvent.SELECTED ) {
-                    JRadioButton radio = label.getRadio();
+                    //JRadioButton pradio = label.getRadio();
                     radio.setSelected(true);
                 } else {
                     int pos =  structureAlignment.getLastSelectedPos();
                     AligLabel prevLabel = (AligLabel)labels.get(pos);
-                    JRadioButton radio = prevLabel.getRadio(); 
-                    radio.setSelected(true);
+                    JRadioButton pradio = prevLabel.getRadio(); 
+                    pradio.setSelected(true);
                     
                 }
             } else {

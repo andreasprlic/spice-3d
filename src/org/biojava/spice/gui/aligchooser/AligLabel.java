@@ -30,26 +30,38 @@ import java.util.NoSuchElementException;
 
 import javax.swing.JCheckBox;
 import javax.swing.JRadioButton;
+import javax.swing.UIManager;
 import javax.swing.border.Border;
 
 import org.biojava.bio.Annotation;
+import org.biojava.spice.manypanel.renderer.SequenceScalePanel;
 
-public class AligLabel {
+public class AligLabel 
+{
 
     JCheckBox check;
     JRadioButton radio;
-    //JLabel label;
+   
+    private static final int DEFAULT_HEIGHT = 23;
     
     public AligLabel(String description, Annotation anno,String filterBy){
-        
-        //UIManager.put("JLabel.height", new Integer(13));
+
+    	UIManager.put("JRadioButton.height", "" + DEFAULT_HEIGHT);
+    	UIManager.put("JCheckBox.height",    "" + DEFAULT_HEIGHT);
+
+      
         if ( description.length() > 16) {
             description = description.substring(0,16);
         }
         
-       // label = new JLabel(description);
+       
         check = new JCheckBox(description);
-        radio = new JRadioButton();
+        radio = new JRadioButton(" ");
+        
+        check.setBackground(SequenceScalePanel.BACKGROUND_COLOR);
+        radio.setBackground(SequenceScalePanel.BACKGROUND_COLOR);
+        
+      
         
         // get tooltip
         String tooltip = getButtonTooltip(anno);
@@ -60,7 +72,8 @@ public class AligLabel {
         if ( ! doShow) {
             check.setVisible(false);
             radio.setVisible(false);
-        }        
+        } 
+        repaint();
     }
     
     public void setBorder(Border b){
@@ -76,19 +89,36 @@ public class AligLabel {
     public void setBackground(Color bg){
         check.setBackground(bg);
         radio.setBackground(bg);
-        radio.setForeground(bg);
+        //radio.setForeground(bg);
         //label.setForeground(bg);
     }
     
     public void repaint(){
-        check.repaint();
-        radio.repaint();
+    	
+//    	int w = radio.getWidth();
+//    	if ( w > 0){
+//    		int h = DEFAULT_HEIGHT;
+//    		Dimension d1 = new Dimension(w,h);
+//    		Dimension d2 = new Dimension(check.getWidth(),h);
+//    		radio.setPreferredSize(d1);
+//    		radio.setSize(d1);
+//    		check.setPreferredSize(d2);
+//    		check.setSize(d2);
+//    	}
+    	check.repaint();
+    	radio.repaint();
         //label.repaint();
     }
     
     public void setSelected(boolean flag){
-        check.setSelected(flag);
-        radio.setSelected(flag);
+    	//System.out.println("AligLabel setting to " + true + " radio height:" + radio.getHeight() +
+    	//		" check height: " + check.getHeight());
+    	if ( check.isSelected() != flag)
+    		check.setSelected(flag);
+        if ( radio.isSelected() != flag) {
+        	radio.setSelected(flag);       	
+        }
+        repaint();
     }
     
     public void setVisible(boolean flag){

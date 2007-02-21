@@ -24,7 +24,6 @@ package org.biojava.spice.jmol;
 
 import java.util.Hashtable;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 import org.biojava.bio.structure.Atom;
 import org.biojava.bio.structure.AtomImpl;
@@ -40,7 +39,7 @@ import org.jmol.api.JmolAdapter;
 public class SpiceJmolAdapter extends JmolAdapter{
     
 
-    static Logger    logger      = Logger.getLogger(SpiceDefaults.LOGGER);
+    public static java.util.logging.Logger    logger      = java.util.logging.Logger.getLogger(SpiceDefaults.LOGGER);
     
     Structure structure;
     
