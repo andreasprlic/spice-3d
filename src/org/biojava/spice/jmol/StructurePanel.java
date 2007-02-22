@@ -30,9 +30,7 @@ import javax.vecmath.Matrix3f;
 
 import org.jmol.api.*;
 import org.jmol.popup.JmolPopup;
-//import org.jmol.adapter.smarter.SmarterJmolAdapter;
 
-import org.biojava.bio.structure.AminoAcid;
 import org.biojava.bio.structure.AminoAcidImpl;
 import org.biojava.bio.structure.Atom;
 import org.biojava.bio.structure.AtomImpl;
