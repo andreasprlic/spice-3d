@@ -50,12 +50,14 @@ public class LogPopupFrame extends AbstractPopupFrame{
         
     }
     public LogPopupFrame(LogRecord record) {
-            super();
+         super();
 
         String html = record2HTML(record);
-        editorP.setText(html);
+        editorP =  new JEditorPane("text/html", html);
+        
         editorP.setEditable(false);
         editorP.repaint();
+        editorP.revalidate();
         
         
     }
@@ -136,6 +138,7 @@ public class LogPopupFrame extends AbstractPopupFrame{
         
         panel.add(scroll);
         panel.repaint();
+        panel.revalidate();
         return panel;
         
         

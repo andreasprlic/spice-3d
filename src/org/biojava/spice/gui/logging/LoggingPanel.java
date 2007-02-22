@@ -296,9 +296,9 @@ public class LoggingPanel extends JPanel {
                     return;
                 int selectRow = lsm.getMinSelectionIndex();
                 
-                //LogRecord record = model.getLogRecord(selectRow);
+                LogRecord record = model.getLogRecord(selectRow);
                 
-                LogPopupFrame popup = new LogPopupFrame();
+                LogPopupFrame popup = new LogPopupFrame(record);
                 
                 int posY = selectRow * 16;
                 int posX = 0;
