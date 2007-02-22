@@ -32,9 +32,17 @@ import org.jmol.api.*;
 import org.jmol.popup.JmolPopup;
 //import org.jmol.adapter.smarter.SmarterJmolAdapter;
 
+import org.biojava.bio.structure.AminoAcid;
+import org.biojava.bio.structure.AminoAcidImpl;
+import org.biojava.bio.structure.Atom;
+import org.biojava.bio.structure.AtomImpl;
 import org.biojava.bio.structure.Calc;
+import org.biojava.bio.structure.Chain;
+import org.biojava.bio.structure.ChainImpl;
+import org.biojava.bio.structure.Group;
 import org.biojava.bio.structure.Structure ;
 import org.biojava.bio.structure.StructureImpl ;
+import org.biojava.bio.structure.io.PDBParseException;
 import org.biojava.bio.structure.jama.Matrix;
 import org.biojava.spice.ResourceManager;
 import org.biojava.spice.config.SpiceDefaults;
@@ -85,7 +93,9 @@ implements JmolCommander
         adapter = new SpiceJmolAdapter();
         
         initJmolInstance();
-        viewer.openClientFile("","",new StructureImpl());   
+        initJmolDisplay();
+        
+        //viewer.openClientFile("","",new StructureImpl());   
                 
     }
     
@@ -112,7 +122,7 @@ implements JmolCommander
         
         // this is important to make Jmol thread -safe !!
         viewer.evalString("set scriptQueue on;");
-        
+        //initJmolDisplay();
         if ( jmolRotation != null )
         	rotateJmol(jmolRotation);
         
@@ -123,9 +133,35 @@ implements JmolCommander
      *
      */
     public void initJmolDisplay(){
-        String pdb = "ATOM     63  CA  GLY     9      47.866  28.415   2.952 \n" ;
-        viewer.openStringInline(pdb);
-        executeCmd("select *; spacefill off;");
+    	
+        //String pdb = "ATOM     63  CA  GLY     9      47.866  28.415   2.952 \n" ;
+        //viewer.openStringInline(pdb);
+        
+    	Atom a =new AtomImpl();
+    	a.setName("CA");
+    	a.setFullName(" CA ");
+    	a.setCoords(new double[]{47.866,  28.415,   2.952});
+    	
+    	Group g = new AminoAcidImpl();
+    	g.setPDBCode("9");
+    	try {
+    	g.setPDBName("GLY");
+    	} catch (PDBParseException e){
+    		e.printStackTrace();
+    	}
+    	g.addAtom(a);
+    	
+    	Chain c =new ChainImpl();
+    	c.addGroup(g);
+    	
+    	Structure s = new StructureImpl();
+    	s.addChain(c);
+    	
+    	setStructure(s);
+    	
+    	s.setPDBCode("1AND");
+    	
+    	executeCmd("select *; spacefill off;");
         
         
     }
@@ -251,8 +287,10 @@ implements JmolCommander
                 viewer.rotateToZ(Math.round(zyz[2]));
                 */
             }
+          
         
     }
+    
     
     
     
