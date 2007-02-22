@@ -93,7 +93,8 @@ public class MenuCreator {
         techinfo.setMnemonic(KeyEvent.VK_T);
         help.add(techinfo);
         
-        String manual = ResourceManager.getString("org.biojava.spice.gui.menu.Manual");
+       /* manual is currently out of date :-/
+        *  String manual = ResourceManager.getString("org.biojava.spice.gui.menu.Manual");
         JMenuItem spicemanual;
         ImageIcon manualIcon =  createImageIcon("toggle_log.png");
         if ( manualIcon == null)
@@ -103,7 +104,7 @@ public class MenuCreator {
         spicemanual.addActionListener(ml);
         spicemanual.setMnemonic(KeyEvent.VK_M);
         help.add(spicemanual);
-       
+       */
         
         return help;   
     }
