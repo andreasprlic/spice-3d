@@ -121,10 +121,10 @@ SequenceListener
         
         panel.setPreferredSize(new Dimension(FRAME_WIDTH,FRAME_PREF_HEIGHT));
 
-        editorP.setPreferredSize(new Dimension(FRAME_WIDTH,FRAME_PREF_HEIGHT));
         
         JScrollPane scroll = new JScrollPane(editorP);
         scroll.setBorder(BorderFactory.createEmptyBorder());
+        scroll.setPreferredSize(new Dimension(FRAME_WIDTH,FRAME_PREF_HEIGHT));
         
         
         panel.add(scroll);
