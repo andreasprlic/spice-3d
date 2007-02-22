@@ -719,7 +719,7 @@ public class StructureAlignment {
         
         
         String pdbCode = getAccesionCodeForObject(pos);
-        logger.info("got accession code " + pdbCode + " for Object " + pos);
+        //logger.info("got accession code " + pdbCode + " for Object " + pos);
         
         // show busy frame...
         ProgressThreadDrawer drawer = new ProgressThreadDrawer(pdbCode);
