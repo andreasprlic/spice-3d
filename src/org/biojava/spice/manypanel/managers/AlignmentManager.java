@@ -382,7 +382,7 @@ implements StructureListener{
             found2 =true;
         
         if ( ! (found1 && found2)) {
-            logger.info(panelName + " can not create alignmentChain, yet >" + ac1 + "< >" + ac2 + 
+            logger.fine(panelName + " can not create alignmentChain, yet >" + ac1 + "< >" + ac2 + 
                     "< >" + object1Id + "< >" + object2Id+"<");
             return;
         }
@@ -401,7 +401,7 @@ implements StructureListener{
     }
     
     public void triggerNoObject1(String ac){
-        logger.info("trigger no object 1");
+       // logger.info("trigger no object 1");
         Iterator iter = object1Listeners.iterator();
         if  (! coordSys1.toString().equals(SpiceDefaults.PDBCOORDSYS) )
             ac = ac.toUpperCase();
@@ -414,7 +414,7 @@ implements StructureListener{
     
 
     public void triggerNoObject2(String ac){
-        logger.info("trigger no object 2");
+       // logger.info("trigger no object 2");
         Iterator iter = object2Listeners.iterator();
         if  (! coordSys2.toString().equals(SpiceDefaults.PDBCOORDSYS) )
             ac = ac.toUpperCase();

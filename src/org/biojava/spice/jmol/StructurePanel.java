@@ -274,7 +274,7 @@ implements JmolCommander
                     +"; rotate z "
                     + df.format(zyz[2])+";";
                     
-                logger.info(script);
+               // logger.info(script);
                 executeCmd(script);
                 /*structurePanel.executeCmd("show orientation");
                 JmolViewer viewer = structurePanel.getViewer();

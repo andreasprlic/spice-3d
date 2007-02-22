@@ -50,6 +50,9 @@ import org.biojava.spice.jmol.StructurePanelListener;
 
 public class AlignmentItemListener {
 
+	
+   
+	
     CheckBoxListener checkBoxListener;
     RadioButtonListener    radioButtonListener;
     StructureAlignment structureAlignment;
@@ -61,7 +64,7 @@ public class AlignmentItemListener {
     
     int lastSelectedPosition;
     
-    public static Logger logger =  Logger.getLogger(SpiceDefaults.LOGGER);
+    public static final Logger logger =  Logger.getLogger(SpiceDefaults.LOGGER);
     
     public AlignmentItemListener(StructureAlignmentChooser parent) {
         structureAlignment = new StructureAlignment(null);
@@ -264,6 +267,9 @@ public class AlignmentItemListener {
 
 class RadioButtonListener
     implements ItemListener{
+	
+	 public static final Logger logger =  Logger.getLogger(SpiceDefaults.LOGGER);
+	
     AlignmentItemListener parent;
     
     public RadioButtonListener(AlignmentItemListener parent){
@@ -291,14 +297,14 @@ class RadioButtonListener
             JRadioButton b = label.getRadio();
             if ( source.equals(b)){
             	JCheckBox check = label.getCheck();
-            	System.out.println("found radio " + i + " " + 
+            	logger.finest("found radio " + i + " " + 
             			b.isSelected() + " " + check.isSelected());
             	
             	
             	if ( (b.isSelected() == check.isSelected()) && 
             			( currentSelected == i ) ) {
             		// we already have triggered this - return!
-            		System.out.println("radio already in sync");
+            		logger.finest("radio already in sync");
             		return;
             	}
             	
@@ -325,7 +331,7 @@ class CheckBoxListener
     implements ItemListener{
     
     
-  
+    public static final Logger logger =  Logger.getLogger(SpiceDefaults.LOGGER);
     AlignmentItemListener parent;
     
     public CheckBoxListener(AlignmentItemListener parent){
@@ -353,7 +359,7 @@ class CheckBoxListener
             JRadioButton radio = label.getRadio();
             if ( box.equals(source)){
             
-            	System.out.println("found check " + i + " " + 
+            	logger.finest("found check " + i + " " + 
             			"current: " + currentSelected + 
             			box.isSelected() + " " + radio.isSelected());
             	
@@ -361,7 +367,7 @@ class CheckBoxListener
             	if ( (box.isSelected() == radio.isSelected()) && 
             			( currentSelected == i ) ) {
             		// we already have triggered this - return!
-            		System.out.println("radio already in sync");
+            		logger.finest("radio already in sync");
             		return;
             	}
             	

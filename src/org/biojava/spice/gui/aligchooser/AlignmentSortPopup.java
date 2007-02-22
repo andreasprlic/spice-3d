@@ -112,8 +112,8 @@ implements MouseListener, ActionListener
         // change the order in this alignment and
         // set it back in chooser ...
         
-        //sorter.sort(e.getActionCommand(),sortReverse,alignment,chooser);
         Matrix jmolRotation = chooser.getJmolRotation();
+        
         Alignment a = structureAlignment.getAlignment();
         
         List oldobjects = Arrays.asList(a.getObjects());
@@ -141,9 +141,9 @@ implements MouseListener, ActionListener
         List newobjects = Arrays.asList(objects);
         int nr = structureAlignment.getNrStructures();
         
-        Annotation[] oldmaxs = a.getMatrices();                     
+        Annotation[] oldmaxs    = a.getMatrices();                     
         Annotation[] oldvectors = a.getVectors();
-        Annotation[] oldblocks = a.getBlocks();
+        Annotation[] oldblocks  = a.getBlocks();
         
         Iterator iter = newobjects.iterator();
         int pos = 0;
@@ -212,6 +212,7 @@ implements MouseListener, ActionListener
         newstrucalig.select(newselpos);
         chooser.setStructureAlignment(newstrucalig);
         chooser.rotateJmol(jmolRotation);
+       
     }
 
 }

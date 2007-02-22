@@ -234,7 +234,7 @@ implements AlignmentListener{
     throws DASException
     {
         //System.out.println("storing alignment");
-             logger.info("storing alignment " + ali);
+       //      logger.info("storing alignment " + ali);
         
         // go over all blocks of alignment and join pdb info ...
         Annotation seq_object   = getAlignmentObject(ali,coordSys1.toString() );
@@ -254,7 +254,7 @@ implements AlignmentListener{
         String obj2Id = stru_object.getProperty("intObjectId").toString();
         
         
-        logger.info("storing alignment " + obj1Id + " " + obj2Id);
+       // logger.info("storing alignment " + obj1Id + " " + obj2Id);
         
         //Simple_AminoAcid_Map current_amino = null ;
         List aligMap1 = AlignmentTool.createAlignmentTable(ali,obj1Id);

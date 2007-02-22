@@ -321,6 +321,7 @@ StructureAlignmentListener {
             {
             	//System.out.println("repaint is selected " + i);
             	col = structureAlignment.getColor(i);
+            	//System.out.println(col);
                 UIManager.put("CheckBox.background", col);
                 UIManager.put("CheckBox.interiorBackground", col);
                 UIManager.put("CheckBox.highlite", col);
@@ -338,7 +339,7 @@ StructureAlignmentListener {
             
             JCheckBox structureCheckBox = label.getCheck();
             JRadioButton dasBox = label.getRadio();
-            
+            //System.out.println(dasBox.isVisible());
             if ( dasBox.isVisible())
                 displayPosition++;
             
@@ -380,8 +381,10 @@ StructureAlignmentListener {
             dasBox.addItemListener(aliItemListener.getRadioButtonListener());
             structureCheckBox.addItemListener(aliItemListener.getCheckBoxListener());
             
+            
         }
-        
+        this.repaint();
+       
         aliItemListener.setLabels(labels);
   
         //      update the structure alignment in the structure display.
@@ -390,8 +393,11 @@ StructureAlignmentListener {
         // execute Rasmol cmd...
         String cmd = structureAlignment.getRasmolScript();
         
-        if ( newStruc.size() < 1)
-            return;
+        if ( newStruc.size() < 1) {
+        	//logger.warning("new structure size 0");
+        	repaint();
+        	return;
+        }
         
         StructureEvent event = new StructureEvent(newStruc);
         
@@ -405,8 +411,9 @@ StructureAlignmentListener {
             }            
         }        
         
+        // otherwise the labels are not visible 
+        revalidate();
         
-        this.repaint();
     }
     
     /** recalculate the displayed alignment. e.g. can be called after toggle full structure

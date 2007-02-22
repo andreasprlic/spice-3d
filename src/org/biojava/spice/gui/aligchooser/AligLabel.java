@@ -45,7 +45,7 @@ public class AligLabel
     private static final int DEFAULT_HEIGHT = 23;
     
     public AligLabel(String description, Annotation anno,String filterBy){
-
+    	
     	UIManager.put("JRadioButton.height", "" + DEFAULT_HEIGHT);
     	UIManager.put("JCheckBox.height",    "" + DEFAULT_HEIGHT);
 
