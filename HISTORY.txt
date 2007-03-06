@@ -1,3 +1,31 @@
+0.8.5 - March 6th 2007
+
+* SPICE is being used for the visualisation of the CASP7 results
+see  
+http://www2.predictioncenter.org/casp/casp7/public_tmp/cgi-bin/ 
+results.cgi
+It is now possible to view the 3D alignments of the CASP Targets, the
+submitted protein structure predictions, and the closest protein  
+structures
+from PDB, which could have been used as a template. It is possible to   
+switch
+between the results of the different alignment methods that have been  
+used for
+evaluation of the predictions.
+
+* better Spice - Jmol integration (speedups, better recovery if Jmol  
+fails)
+
+* display of histograms e.g. for hydrophobicity plots
+
+* feedback system to submit bug-reports via the logging panel
+
+
+0.8.4 - 
+
+* This was a series of incremental releases during the end of 2006 
+  in preparation for the CASP-7 meeting.
+
 0.8.3 - August 25th, 2006
 
 * now with improved display of annotated features
