@@ -23,58 +23,62 @@
 package org.biojava.spice.utils;
 
 
-import javax.mail.*;
-import javax.mail.internet.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.logging.Logger;
 
 import org.biojava.spice.ResourceManager;
 
 
-import java.util.*;
 
 public class SendEmail {
 
-    public static String mailHost = ResourceManager.getString("org.biojava.spice.BugReportHost");
+  //  public static String mailHost = ResourceManager.getString("org.biojava.spice.BugReportHost");
 
 
-    public void postMail( String recipients[ ], 
+	static Logger logger      = Logger.getLogger("org.biojava.spice");
+    
+    public void postMail( 
             String subject,
             String message , 
-            String from, 
-            String mailHost) 
-    throws MessagingException
+            String from
+            ) 
+    throws IOException
+ 
     {
-        boolean debug = false;
-
-        //Set the host smtp address
-        Properties props = new Properties();
-        props.put("mail.smtp.host", mailHost);
-
-        // create some properties and get the default Session
-        Session session = Session.getDefaultInstance(props, null);
-        session.setDebug(debug);
-
-        // create a message
-        Message msg = new MimeMessage(session);
-
-        // set the from and to address
-        InternetAddress addressFrom = new InternetAddress(from);
-        msg.setFrom(addressFrom);
-
-        InternetAddress[] addressTo = new InternetAddress[recipients.length]; 
-        for (int i = 0; i < recipients.length; i++)
-        {
-            addressTo[i] = new InternetAddress(recipients[i]);
+    	String br = "<br/>";
+        String data = "From: " + from + br;
+        data += "Subject: " + subject + br;
+        data += "Message: " + message + br;
+        
+        String postURL = ResourceManager.getString("org.biojava.spice.BugReportPost");
+       
+        URL u = new URL(postURL);
+        
+        URLConnection conn = u.openConnection();
+        conn.setDoOutput(true);
+        
+        OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
+        writer.write(data);
+        writer.flush();
+        
+        
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        
+        String msg = "";
+        String line ;
+        while ( (line = reader.readLine() ) != null) {
+            msg += line;
         }
-        msg.setRecipients(Message.RecipientType.TO, addressTo);
-
-
-        // Optional : You can also set your custom headers in the Email if you Want
-        //msg.addHeader("MyHeaderName", "myHeaderValue");
-
-        // Setting the Subject and Content Type
-        msg.setSubject(subject);
-        msg.setContent(message, "text/html");
-        Transport.send(msg);
+        writer.close();
+        reader.close();
+        
+        logger.info("got message " + msg);
+          
     }
 
 }

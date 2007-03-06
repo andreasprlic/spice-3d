@@ -66,6 +66,7 @@ import javax.swing.JButton;
 import javax.swing.Box;
 
 import org.biojava.spice.ResourceManager;
+import org.biojava.spice.gui.AboutDialog;
 import org.biojava.spice.gui.SendEmailGui;
 import org.biojava.spice.utils.SendEmail;
 
@@ -572,6 +573,18 @@ public class LoggingPanel extends JPanel {
                 LogPopupFrame ff = new LogPopupFrame();
                 StringBuffer buf = ff.startStringBuffer();
                 
+                String br = "<br/>";
+                
+                buf.append( "<b>SPICE version :</b> " + AboutDialog.VERSION +br) ;
+                buf.append( "<b>Java version :</b> " + System.getProperty("java.version") + br);
+                buf.append( "<b>Java vendor :</b> " + System.getProperty("java.vendor") +br);
+                buf.append( "<b>Java home :</b> " + System.getProperty("java.home") +br );
+                buf.append( "<b>Os.arch :</b> " + System.getProperty("os.arch") +br); 
+                buf.append( "<b>Os.name :</b> " + System.getProperty("os.name") +br);
+                buf.append( "<b>Os.version :</b> " + System.getProperty("os.version") +br + "<hr/>");
+              
+                
+                
                 for (int i =0 ; i < c ;i ++){
                     LogRecord record = model.getLogRecord(i);
                     if ( record != null){
@@ -592,7 +605,7 @@ public class LoggingPanel extends JPanel {
                 SendEmailGui sender = new SendEmailGui();
                 sender.postMailFromGui(new String[]{ResourceManager.getString("org.biojava.spice.BugReportEmail")},
                         "bug report from SPICE", 
-                        body, ResourceManager.getString("org.biojava.spice.BugReportEmail"), SendEmail.mailHost);
+                        body, ResourceManager.getString("org.biojava.spice.BugReportEmail"));
                 //BrowserOpener.showDocument(url);
             }
             

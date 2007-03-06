@@ -26,9 +26,9 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.logging.Logger;
 
-import javax.mail.MessagingException;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -92,18 +92,18 @@ public class SendEmailGui {
      * @param recipients
      * @param subject
      * @param message
-     * @param from
-     * @param mailHost
+     * @param from     
      */
     public void postMailFromGui(String recipients[ ], 
             String subject, 
             String message , 
-            String from, 
-            String mailHost){
+            String from
+            ){
 
         this.recipients = recipients;
         this.subject = subject;
-        this.message = message;
+        
+        this.message =  message;
        
         
         JFrame frame = new JFrame("send email");
@@ -121,7 +121,7 @@ public class SendEmailGui {
             panel.setLayout (new BoxLayout (panel, BoxLayout.Y_AXIS));
 
             JLabel label = new JLabel (
-            "May I attempt to email this bug report to the author?");
+            "Can I submit this bug report to the authors?");
             label.setAlignmentX(JLabel.CENTER_ALIGNMENT);
             panel.add (label);
             label = new JLabel (
@@ -195,7 +195,7 @@ implements ActionListener {
 
     public void actionPerformed (ActionEvent evt)
     {
-        String[] recipients = parent.getRecipients();
+       
         String subject      = parent.getSubject();
         String from         = parent.getFrom();
         String message      = parent.getMessage();
@@ -203,8 +203,8 @@ implements ActionListener {
         System.out.println("do send email action");
         SendEmail sender = new SendEmail();
         try {
-            sender.postMail(recipients,subject,message,from,SendEmail.mailHost);
-        } catch (MessagingException ex){
+            sender.postMail(subject,message,from);
+        } catch (IOException ex){
             logger.warning(ex.getMessage());
             
         }
