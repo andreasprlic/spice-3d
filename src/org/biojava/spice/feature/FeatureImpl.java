@@ -45,6 +45,29 @@ implements Feature
 
 {
    
+	
+	 public Object clone(){
+	    	
+	    	Feature f = new FeatureImpl();
+	    	f.setName(name);
+	    	f.setMethod(method);
+	    	f.setType(type);
+	    	f.setNote(note);
+	    	f.setLink(link);
+	    	f.setSource(source);
+	    	f.setScore(score);
+	    	
+	    	Iterator iter = segments.iterator();
+	    	
+	    	while (iter.hasNext()){
+	    		Segment s = (Segment) iter.next();
+	    		f.addSegment((Segment)s.clone());
+	    	}
+	    	
+	    	return f;
+	    	
+	    }
+	
     /** draw this feature at graphics g, at a given Y coordinate 
      * the scaling is done at the segment level. Segments know about scaling
      * @deprecated

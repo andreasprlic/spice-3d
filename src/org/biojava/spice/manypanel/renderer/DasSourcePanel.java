@@ -144,6 +144,17 @@ implements FeatureListener,SpiceFeatureListener
         this.repaint();
     }
     
+    private boolean isHistogramType(Feature f){
+    	if ( f.getType().equals("hydrophobicity"))
+    		return true;
+    	
+    	if (drawableDasSource.getType().equalsIgnoreCase(DrawableDasSource.TYPE_HISTOGRAM))
+    		return true;
+    	
+    	return false;
+    	
+    }
+    
     public int getDisplayHeight(){
         int h = SequenceScalePanel.DEFAULT_Y_START + SequenceScalePanel.DEFAULT_Y_STEP + SequenceScalePanel.LINE_HEIGHT;
         
@@ -153,7 +164,7 @@ implements FeatureListener,SpiceFeatureListener
         
         if ( l > 0) {
             Feature f = (Feature) feats[0];
-            if ( f.getType().equals("hydrophobicity")) {
+            if ( isHistogramType(f)) {
                 l = 1;
             }
         }
@@ -177,14 +188,23 @@ implements FeatureListener,SpiceFeatureListener
         Graphics2D g2D = (Graphics2D)g;
         
         Feature[] features = drawableDasSource.getFeatures();
-                
+        
         int y = SequenceScalePanel.DEFAULT_Y_START + SequenceScalePanel.DEFAULT_Y_STEP ;      
         
         g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
         Composite oldComp = g2D.getComposite();
         g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.8f));  
         
-        drawFeatures(g2D,features,y);
+        String dasSourceType = drawableDasSource.getType();
+        if ( dasSourceType.equals(DrawableDasSource.TYPE_HISTOGRAM)) {
+        	//  logger.info("in paint: " + dasSourceType + " for " + drawableDasSource.getDasSource().getNickname());
+              
+        	drawHistogramFeature(features, 0, SequenceScalePanel.DEFAULT_Y_HEIGHT *2, g, y+SequenceScalePanel.DEFAULT_Y_HEIGHT);
+        	
+        } else {
+        
+        	drawFeatures(g2D,features,y);
+        }
         g2D.setComposite(oldComp);
         
         if ( selected ){
@@ -374,10 +394,8 @@ implements FeatureListener,SpiceFeatureListener
             if ( d < min )
                 min = d;
         }
-        double range = Math.abs(max) + Math.abs(min);
-        
-       // System.out.println("max " + max + " min " + min + " range: " + range);
-        
+       
+        double shift = 0 - min;
         for (int i =0 ; i< features.length; i++){
             Feature f = features[i];
             String score = f.getScore();
@@ -389,18 +407,23 @@ implements FeatureListener,SpiceFeatureListener
                 continue;
             }
             
-            // normalize score...
-            double ratio =  ( d + range ) / (range+max) ;
+            // normalize score.
+            
+            
+            double ratio =  ( d + shift ) / (max+shift) ;
           
-            Color c = DrawUtils.getColorGradient(Color.red, Color.blue, ratio);
+            Color c = DrawUtils.getColorGradient(Color.white, Color.red, ratio);
             g2D.setColor(c);
+            
             List segments = f.getSegments();
             
             // check to make sure there is only one segment, as there should be
             if ( segments.size() != 1)
                 continue;
             
+            
             Segment s = (Segment) segments.get(0);
+            s.setColor(c);
             int start = s.getStart() -1 ;
             int end   = s.getEnd() -1 ;
             
@@ -408,11 +431,17 @@ implements FeatureListener,SpiceFeatureListener
             int width  = coordManager.getPanelPos(end) - xstart + aminosize +1;
             
             int height =  (int)Math.round(drawHeight * ratio);
-            
-            //g2D.fillRect(xstart,y,aminosize,height);
-            //g2D.fillRect(xstart,y+(height/2),width,1);
-            g2D.fillRect(xstart+width-aminosize,y+ height,aminosize, drawHeight - height);
+           // System.out.println(" score:" + score + " " + height + " ratio " + ratio + " " + start + " " + end);
+           
+            // the inverse display:
+            // g2D.fillRect(xstart+width-aminosize,y+ height,aminosize, drawHeight - height);
+            g2D.fillRect(xstart+width-aminosize,y+(drawHeight-height),aminosize, height);
 
+        }
+        
+        if ( features.length >0) {
+        	//System.out.println("check draw " + featureSelected + " " +selectedFeaturePos );
+        	checkDrawSelectedFeature(features[0],featurePos,g,y);
         }
         
     }
@@ -1004,7 +1033,10 @@ implements FeatureListener,SpiceFeatureListener
         Feature[] allFeats = drawableDasSource.getFeatures();
         boolean featureOnThisPanel = false;
         for (int i = 0 ; i< allFeats.length;i++){
-            if ( f.equals(allFeats[i])){
+         
+        	if ( drawableDasSource.getType().equals(DrawableDasSource.TYPE_HISTOGRAM))
+        	
+        	if ( f.equals(allFeats[i])){
                 
                 // compare all the segments ...
                 List seg1 = f.getSegments();

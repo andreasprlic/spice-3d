@@ -202,6 +202,44 @@ MouseMotionListener
         DrawableDasSource source = eventPanel.getDrawableDasSource();
         
         Feature[] feats = source.getFeatures();
+        
+/*
+ *    	boolean overSegment = checkOverSegment(f.getSegments(), pos, tmpevent, selectionLocked);
+        	
+        	
+        	if ( overSegment) {
+        		logger.info("over segment remapping feature!");
+        		//hack to copy the score values to the the main feature
+        		// should probably do this in convertEventFeatures...
+        		Segment seg = tmpevent.getSegment();
+        		for ( int i=0 ; i<feats.length;i++){
+        			List segments = feats[i].getSegments();
+        			Iterator siter = segments.iterator();
+        			while (siter.hasNext()){
+        				Segment s = (Segment)siter.next();
+        				if ( s.equals(seg)){
+        					f.setScore(feats[i].getScore());
+        					f.setNote("");
+        					logger.info("your segment is " + seg);
+        				}
+        				
+        			}
+        		
+        		}
+        		
+        		return  tmpevent;
+        	}
+        	return null;
+ * */
+        
+ 
+        if ( source.getType().equalsIgnoreCase(DrawableDasSource.TYPE_HISTOGRAM)){
+        	Feature f = source.convertEventFeatures(feats);
+        	//int pos = getSeqPos(e) ;
+        	SpiceFeatureEvent tmpevent = new SpiceFeatureEvent(source.getDasSource(), f);
+        	return tmpevent;        	       
+        }
+        
         for (int i = 0 ; i< feats.length; i ++){
             h += SequenceScalePanel.DEFAULT_Y_STEP;
             if ( y < h) {
@@ -359,7 +397,7 @@ MouseMotionListener
     
     
     public void mouseReleased(MouseEvent event) {
-        //logger.info("mouse released");
+       // logger.info("mouse released");
         
         
         
@@ -407,7 +445,10 @@ MouseMotionListener
     }
     
     private boolean checkOverSegment(List segments, int pos, SpiceFeatureEvent spiceEvent, boolean selectionLocked){
-        Iterator iter = segments.iterator();
+      
+    	 
+    	
+    	Iterator iter = segments.iterator();
         boolean somethingTriggered = false;
        // if ( event.getClickCount() > 1 ) {
         while (iter.hasNext()) {
@@ -419,6 +460,7 @@ MouseMotionListener
                 popupFrame.showFrame();
                 if ( ! selectionLocked) {
                     spiceEvent.setSegment(s);
+                    spiceEvent.setFeature(null);
                     //triggerSegmentSelected(spiceEvent);
                     triggerNewSequenceRange(s.getStart()-1,s.getEnd()-1);
                     triggerSelectionLocked(true);

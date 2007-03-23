@@ -884,6 +884,8 @@ ConfigurationListener
 			 String localcood = startParameters.getLocalServerCoordSys();
 			 String localname = startParameters.getLocalServerName();
 			 String localcapability = startParameters.getLocalServerCapability();
+			 
+			 String localDisplayType = startParameters.getLocalServerDisplayType();
 			 if (localcapability == null)
 				 localcapability = "features";
 			 //logger.info("adding new local DAS source");
@@ -893,6 +895,14 @@ ConfigurationListener
 			 localDs.setStatus(true);
 			 localDs.setRegistered(false);
 			 localDs.setNickname(localname);
+			 logger.info(localDisplayType);
+			 if (( localDisplayType != null) && 
+					 (! localDisplayType.equals(""))) {
+				 System.out.println("localDIsplayType :" + localDisplayType);
+				 localDs.setDisplayType(localDisplayType);
+			 }
+
+			 
 			 String[] caps = new String[1];
 			 caps[0]=localcapability;
 			 localDs.setCapabilities(caps);

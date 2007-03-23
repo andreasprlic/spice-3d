@@ -30,6 +30,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
+
+
 import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.spice.feature.Feature;
 import org.biojava.spice.gui.DasSourceDialog;
@@ -101,6 +103,17 @@ MouseMotionListener {
         
     }
     
+    private boolean isHistogramType(DrawableDasSource dasSource){
+    	//if ( f.getType().equals("hydrophobicity"))
+    	//	return true;
+    	
+    	if (dasSource.getType().equalsIgnoreCase(DrawableDasSource.TYPE_HISTOGRAM))
+    		return true;
+    	
+    	return false;
+    	
+    }
+    
     
     /** returns the feature if mouse over the link icon 
      * 
@@ -142,7 +155,9 @@ MouseMotionListener {
                 y+= SequenceScalePanel.DEFAULT_Y_STEP;                
                 
                 for (int i =0 ; i < feats.length ; i++){
-                    y += SequenceScalePanel.DEFAULT_Y_STEP;
+                    y += SequenceScalePanel.DEFAULT_Y_STEP;                    
+                    
+                    
                     if ( ye < y) {
                       
                         found = feats[i];
@@ -155,6 +170,10 @@ MouseMotionListener {
                             //logger.info("no link in feature");
                            return null;
                         }
+                    }
+                    // for histogram DAS sources we only consider the first row ...
+                    if ( isHistogramType(dsp.getDasSource())){
+                    	break;
                     }
                 }
             }
@@ -220,6 +239,11 @@ MouseMotionListener {
                 if ( found == null)
                     return null;
                 
+                DrawableDasSource dds = dsp.getDrawableDasSource();
+                if ( isHistogramType(dds)){
+                	found = dds.convertEventFeatures(dds.getFeatures());
+                }
+                
                 SpiceFeatureEvent event = new SpiceFeatureEvent(ds,found);
                 return event;
             }
@@ -230,6 +254,9 @@ MouseMotionListener {
         
         
     }
+    
+   
+    
     
     public void mouseClicked(MouseEvent arg0) {  }
     
@@ -242,6 +269,10 @@ MouseMotionListener {
           
             popupFrame.createContent(event.getFeature());
             popupFrame.showFrame();
+                        
+
+            
+            
             triggerFeatureSelectedEvent(event);       
         }
         
@@ -251,9 +282,11 @@ MouseMotionListener {
         }
         
         
-        Feature f = getLinkFeature(e);
+        Feature f = getLinkFeature(e);        
         if ( f != null){
-            triggerLinkSelected(f);
+        	
+        		triggerLinkSelected(f);
+        	
         }
         
     }

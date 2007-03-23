@@ -33,7 +33,7 @@ import java.util.List;
  * @author Andreas Prlic
  *
  */
-public abstract class AbstractFeature implements Feature {
+public abstract class AbstractFeature implements Feature,Cloneable {
     
     String name   ;
     String method ;
@@ -55,6 +55,9 @@ public abstract class AbstractFeature implements Feature {
         segments = new ArrayList();
         
     }
+    
+    public abstract Object clone();
+   
     
     public String toString() {
         String str = "Feature: method: " + method +" type: " + type ;

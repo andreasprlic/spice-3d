@@ -45,7 +45,7 @@ public interface ObjectManager {
          * 
          * @param dasSources
          */        
-        public void setDasSources(DasSource[] dasSources);
+        public void setDasSources(SpiceDasSource[] dasSources);
         
         /** get the list of available Reference DAS servers 
          * 

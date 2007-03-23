@@ -109,13 +109,13 @@ implements ObjectManager {
     /** add reference DAS source
      * 
      */
-    public void setDasSources(DasSource[] sources) {
+    public void setDasSources(SpiceDasSource[] sources) {
         logger.finest("setting new DAS sources " + sources.length + " previously known: " + dasSources.length);
         List dsses = new ArrayList();
         for ( int i = 0 ; i< sources.length; i++){
             
             
-            SpiceDasSource ds = SpiceDasSource.fromDasSource( sources[i]);
+            SpiceDasSource ds = sources[i];
             DasCoordinateSystem[] dcsarr = ds.getCoordinateSystem();
             boolean knownCoordinateSystem = false;
             for ( int  k =0 ; k < dcsarr.length; k++) {
@@ -135,7 +135,7 @@ implements ObjectManager {
             //System.out.println("comparing with dasSources " + dasSources.length);
             for ( int j = 0 ; j < this.dasSources.length; j++){
                 SpiceDasSource knownDS = this.dasSources[j];
-                System.out.println(ds.getUrl() + " " + knownDS.getUrl() );
+                //System.out.println(ds.getUrl() + " " + knownDS.getUrl() );
                 if ( ds.getUrl().equals(knownDS.getUrl())) {
                     dsses.add(knownDS);   
                     //logger.info(knownDS.getDasSource().getNickname() +  " is a known DAS source");
@@ -151,13 +151,7 @@ implements ObjectManager {
         SpiceDasSource[] drawableDasSources = (SpiceDasSource[]) dsses.toArray(
                 new SpiceDasSource[dsses.size()]);
         
-        //Iterator iter = structureRenderers.iterator();
-        
-        //while (iter.hasNext()){
-          //  StructureRenderer renderer = (StructureRenderer)iter.next();
-            
-            //renderer.setDasSource(drawableDasSources);
-       // }
+      
         this.dasSources = drawableDasSources; 
     }
     

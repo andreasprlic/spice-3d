@@ -460,6 +460,8 @@ public abstract class AbstractChainRenderer
                 drawds.addFeatureListener(panel);
                 drawds.addFeatureListener(this);
                 drawds.setFeatures(dds.getFeatures());
+                logger.info("mapping Drawables " + drawds.getType() + " " + dds.getType());
+                drawds.setType(dds.getType());
                 panel.setDrawableDasSource(drawds);
                 
                 return true;
@@ -504,11 +506,13 @@ public abstract class AbstractChainRenderer
      */
 
     public void newDasSource(DasSourceEvent event) {
-     
+    	
         // the column header drawer ...
         dasScrollPaneRowHeader.newDasSource(event);
         
         DrawableDasSource dds =event.getDasSource();
+        
+        logger.info("new Das Source " + dds.getDasSource().getNickname() + " " + dds.getType());
         //SpiceDasSource ds = dds.getDasSource();
         
         // check if we know this already

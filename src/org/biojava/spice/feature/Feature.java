@@ -31,6 +31,9 @@ import java.util.List;
  */
 public interface Feature {
     
+	
+	public Object clone();
+	
     /** returns true if the specified sequence position is within the range of this Feature
      * 
      * @param seqPosition the position to check

@@ -440,7 +440,7 @@ ChangeListener
         enspFeatureManager.addFeatureRenderer(enspFeatureRenderer);
         
         
-        DasSource[]enspfeatservs = getServers("features",enspdcs);
+        SpiceDasSource[]enspfeatservs = getServers("features",enspdcs);
         
         
         enspFeatureManager.setDasSources(enspfeatservs);
@@ -701,25 +701,29 @@ ChangeListener
         
         
         // set the reference servers 
-        DasSource[]strucservs = getServers("structure",dcs);
+        SpiceDasSource[]strucservs = getServers("structure",dcs);
         strucManager.setDasSources(strucservs);
         
-        DasSource[]seqservs = getServers("sequence",seqdcs);        
+        SpiceDasSource[]seqservs = getServers("sequence",seqdcs);        
         seqManager.setDasSources(seqservs);
         
-        DasSource[]enspservs = getServers("sequence",enspdcs);        
+        SpiceDasSource[]enspservs = getServers("sequence",enspdcs);        
         enspManager.setDasSources(enspservs);        
         
         // set the annotation servers
         
-        DasSource[]featservs = getServers("features",dcs);
+        SpiceDasSource[]featservs = getServers("features",dcs);
         pdbFeatureManager.setDasSources(featservs);
         
         
-        DasSource[]seqfeatservs = getServers("features",seqdcs);        
+        SpiceDasSource[]seqfeatservs = getServers("features",seqdcs);  
+        //logger.info("setting UniProt DAS servers: " + seqfeatservs.length);
+        //for (int i=0 ; i < 3 && i < seqfeatservs.length ; i ++){
+        //	logger.info("setting UP das source " + seqfeatservs[i].getNickname() + " " + seqfeatservs[i].getDisplayType());
+        //}
         upFeatureManager.setDasSources(seqfeatservs);
         
-        DasSource[] enspfeatservs = getServers("features",enspdcs);
+        SpiceDasSource[] enspfeatservs = getServers("features",enspdcs);
         enspFeatureManager.setDasSources(enspfeatservs);
         
         SpiceDasSource[] strucaligs = getAlignmentServers(allsources,dcs,seqdcs);
@@ -736,7 +740,7 @@ ChangeListener
     private void triggerRemoveDasSource(SpiceDasSource ds){
         logger.finest("triggerRemoveDasSource " + ds.getNickname());
         
-        DasSourceEvent event = new DasSourceEvent(DrawableDasSource.fromDasSource((DasSource)ds));
+        DasSourceEvent event = new DasSourceEvent(DrawableDasSource.fromDasSource(ds));
         
         DasCoordinateSystem[] cs = ds.getCoordinateSystem();
         for ( int i=0 ; i< cs.length; i++){
@@ -1024,21 +1028,24 @@ ChangeListener
     }
     
     
-    private DasSource[] getServers(String capability, DasCoordinateSystem coordSys){
+    private SpiceDasSource[] getServers(String capability, DasCoordinateSystem coordSys){
         // get all servers with a particular capability
-        Das1Source servers[] = getServers(capability);
+        SpiceDasSource[] servers = getServers(capability);
         
         // now also check the coordinate system
         ArrayList retservers = new ArrayList();
         for ( int i = 0 ; i < servers.length ; i++ ) {
-            SpiceDasSource ds = SpiceDasSource.fromDasSource((DasSource)servers[i]);
+        	
+            //SpiceDasSource ds = SpiceDasSource.fromDasSource((DasSource)servers[i]);
+            SpiceDasSource ds = servers[i];
             
+                        
             if ( hasCoordSys(coordSys,ds)) {
                 retservers.add(ds);
             }    
         }
         
-        return (DasSource[])retservers.toArray(new Das1Source[retservers.size()]) ;
+        return (SpiceDasSource[])retservers.toArray(new SpiceDasSource[retservers.size()]) ;
     }
     
     
@@ -1053,19 +1060,18 @@ ChangeListener
         return false;
     }
     
-    private Das1Source[] getServers(String capability) {
+    private SpiceDasSource[] getServers(String capability) {
         ArrayList retservers = new ArrayList();
         for ( int i = 0 ; i < allsources.size() ; i++ ) {
-            Das1Source ds = (Das1Source) allsources.get(i);
+            SpiceDasSource ds = (SpiceDasSource) allsources.get(i);
             if ( hasCapability(capability,ds)){
                 
                 retservers.add(ds);
                 
             }
         }
-        
-        
-        return (Das1Source[])retservers.toArray(new Das1Source[retservers.size()]) ;
+                
+        return (SpiceDasSource[])retservers.toArray(new SpiceDasSource[retservers.size()]) ;
     }
     
     public void loadingFinished(DasSourceEvent ds) {

@@ -164,7 +164,6 @@ extends Thread
 
 
 
-
         int comeBackLater = ftmp.getComeBackLater();
         int securityCounter = 0;
         while ( comeBackLater > 0 ) {
@@ -263,7 +262,7 @@ extends Thread
 
     private void notifyLoadingStarted(){
 
-        DrawableDasSource drawableDs = new DrawableDasSource((DasSource)dasSource);
+        DrawableDasSource drawableDs = new DrawableDasSource(dasSource);
         DasSourceEvent dsEvent = new DasSourceEvent(drawableDs);
         Iterator iter = dasSourceListeners.iterator();
         while (iter.hasNext()){
@@ -273,7 +272,7 @@ extends Thread
     }
 
     private void notifyLoadingFinished(){
-        DrawableDasSource drawableDs = new DrawableDasSource((DasSource)dasSource);
+        DrawableDasSource drawableDs = new DrawableDasSource(dasSource);
         DasSourceEvent dsEvent = new DasSourceEvent(drawableDs);
         Iterator iter = dasSourceListeners.iterator();
         while (iter.hasNext()){

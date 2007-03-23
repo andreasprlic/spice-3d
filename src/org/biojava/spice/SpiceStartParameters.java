@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
 import org.biojava.spice.config.SpiceDefaults;
+import org.biojava.spice.manypanel.drawable.DrawableDasSource;
 
 
 /** a class to manage the SPICE statup parameters.
@@ -60,7 +61,7 @@ public class SpiceStartParameters {
     private String localServerCoordSys = "";
     private String localServerName="";
     private String localServerCapability = "";
-    
+    private String localServerDisplayType = "";
     private String pdbcoordsys;
     private String uniprotcoordsys;
     private String enspcoordsys;
@@ -88,9 +89,12 @@ public class SpiceStartParameters {
         noRegistryContact       = false;
         structureAlignmentMode  = "";
         openDialogCoords        = "";
-      
+        localServerDisplayType  = DrawableDasSource.TYPE_DEFAULT;
     }
 
+    
+    
+    
     
     
     public String getOpenDialogCoords() {
@@ -457,6 +461,24 @@ public class SpiceStartParameters {
     public void setLocalServerURL(String localServerURL) {
         this.localServerURL = localServerURL;
     }
+
+
+
+
+
+
+	public String getLocalServerDisplayType() {
+		return localServerDisplayType;
+	}
+
+
+
+
+
+
+	public void setLocalServerDisplayType(String localServerDisplayType) {
+		this.localServerDisplayType = localServerDisplayType;
+	}
         
 
     

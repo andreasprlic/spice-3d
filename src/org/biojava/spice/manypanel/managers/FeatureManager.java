@@ -112,21 +112,20 @@ implements ObjectManager ,SequenceListener{
         this.coordSys = coordSys;
     }
     
-    public SpiceDasSource getKnownDasSource(DrawableDasSource ds){
+    public SpiceDasSource getKnownDasSource(SpiceDasSource ds){
         for (int i = 0 ; i< dasSources.length; i++ ) {
             SpiceDasSource tds = dasSources[i];
-            if ( tds.getUrl().equals(ds.getDasSource().getUrl())){
+            if ( tds.getUrl().equals(ds.getUrl())){
                 return tds;
             }
         }
         return null;
     }
     
-    public void setDasSources(DasSource[] dasSourcs) {
+    public void setDasSources(SpiceDasSource[] dasSourcs) {
         logger.finest("got " + dasSourcs.length + "feature sources for coordSYs " + coordSys);
         
-        
-        
+                
         Iterator iter = featureRenderers.iterator();
         while (iter.hasNext()){
             FeatureRenderer rend = (FeatureRenderer)iter.next();
@@ -138,22 +137,26 @@ implements ObjectManager ,SequenceListener{
         List dsses = new ArrayList();
         for ( int i = 0 ; i< dasSourcs.length; i++){
             //logger.info("got new feature source " + dasSourcs[i].getUrl());
-            DasSource sds = dasSourcs[i];
-            
+            SpiceDasSource sds = dasSourcs[i];
+            //logger.info("got new DAS source in featuremanager "+ sds.getNickname() + " " + sds.getDisplayType());
             // if das source is known, skip            
             
             DrawableDasSource ds = DrawableDasSource.fromDasSource(sds);
-            SpiceDasSource tmp = getKnownDasSource(ds) ;
-            if ( tmp != null) {
-                //dsses.add(tmp);
-                ds = DrawableDasSource.fromDasSource((DasSource)tmp);
-            } else {
+            SpiceDasSource tmp = getKnownDasSource(sds) ;
+            if ( tmp == null) {
+               
                 // really a new DAS source ...
-                //logger.info("new das source " + ds.getDasSource().getNickname() + " " + currentAccessionCode);
-                if ( ( currentAccessionCode != null ) && ( ! currentAccessionCode.equals(""))){
-                    triggerFeatureRequest(currentAccessionCode,ds.getDasSource(),ds);
+               // logger.info("new das source " + ds.getDasSource().getNickname() + " " + currentAccessionCode + " " + ds.getType());
+                if ( ( currentAccessionCode != null ) && 
+                		( ! currentAccessionCode.equals(""))){
+                    triggerFeatureRequest(currentAccessionCode,sds,ds);
                 }
+            } else {
+            	ds.setType(tmp.getDisplayType());
+            	//logger.info("not so new das source " + ds.getType() + " " + sds.getNickname());
+            	
             }
+            
             dsses.add(sds);
             //ds.setLoading(false);
             

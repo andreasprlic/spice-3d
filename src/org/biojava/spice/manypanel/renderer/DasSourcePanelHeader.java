@@ -79,7 +79,13 @@ extends DasSourcePanel{
 
   
     
-    public void paintComponent(Graphics g){
+    public DrawableDasSource getDasSource() {
+		return dasSource;
+	}
+
+
+
+	public void paintComponent(Graphics g){
         int y = SequenceScalePanel.DEFAULT_Y_START + SequenceScalePanel.DEFAULT_Y_STEP ; 
         paintComponent(g,y);
     
@@ -108,7 +114,7 @@ extends DasSourcePanel{
         g2D.setColor(TEXT_COLOR);
         
         String str = drawableDasSource.getDasSource().getNickname();
-        //logger.info("paint DasSourcePanel "+str);
+              
         if ( infoIcon != null)
             infoIcon.paintIcon(null, g, 1,y); 
         else 
@@ -122,13 +128,23 @@ extends DasSourcePanel{
         Feature[] features = drawableDasSource.getFeatures();
         for ( int f =0 ; f< features.length;f++) {
             Feature feature = features[f];
-            if ( feature.getType().equals("hydrophobicity"))
+            if ( isHistogramType(feature))
                 if (f >0)
                     continue;
             drawLabel(g,feature,y, stylesheet);
             y += SequenceScalePanel.DEFAULT_Y_STEP;
         }
         
+    }
+    
+    private boolean isHistogramType(Feature f){
+    	if ( f.getType().equals("hydrophobicity"))
+    		return true;
+    	if (dasSource.getType().equalsIgnoreCase(DrawableDasSource.TYPE_HISTOGRAM))
+    		return true;
+    	
+    	return false;
+    	
     }
     
     /** display the type of the feature at the beginnng of the line

@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.biojava.dasobert.das.SpiceDasSource;
-import org.biojava.dasobert.dasregistry.DasSource;
 import org.biojava.dasobert.eventmodel.*;
 //import org.biojava.servlets.dazzle.datasource.GFFFeature;
 import org.biojava.spice.config.SpiceDefaults;
@@ -48,6 +47,10 @@ FeatureListener{
 
     SpiceDasSource dasSource ;
     Feature[] features;
+    
+    String type;
+    public static final String TYPE_HISTOGRAM = "histogram";
+    public static final String TYPE_DEFAULT   = "default";
     
     public static final  Color[] entColors = new Color []{
         new Color(51,51,255), // blue
@@ -79,17 +82,68 @@ FeatureListener{
     List featureListeners;
     
     
-    public DrawableDasSource(DasSource ds) {
+    public DrawableDasSource(SpiceDasSource ds) {
         super();
-        SpiceDasSource sds = SpiceDasSource.fromDasSource(ds);
-        this.dasSource = sds;   
+        
+        //SpiceDasSource sds = SpiceDasSource.fromDasSource(ds);
+        setType(TYPE_DEFAULT);
+        
+        
+        if ( ds.getDisplayType().equalsIgnoreCase(TYPE_HISTOGRAM)) { 
+        	setType(TYPE_HISTOGRAM);
+        	//logger.info(ds.getNickname() + " is a HISTOGRAM DAS SOURCE");
+        } else {
+        	//logger.info(ds.getNickname() + " is a DEFAULT DAS SOURCE " + ds.getDisplayType());
+        }
+
+        
+       
+                             
+        this.dasSource = ds;   
         clearDisplay();
         clearFeatureListeners();
         loading = false;
+       
+    }
+    
+    
+    public Feature convertEventFeatures(Feature[] features){
+    	
+    	// join all features to one where the segments contain the score...
+    	Feature f = new FeatureImpl();
+    	if ( features.length > 0){
+    		f = (Feature)features[0].clone();
+    		
+    		for(int i = 1 ; i< features.length;i++){
+    			Feature t = features[i];
+    			List segments = t.getSegments();
+    			Iterator iter = segments.iterator();
+    			while (iter.hasNext()){
+    				Segment s = (Segment) iter.next();  
+    				Segment tmp = (Segment)s.clone();
+    				f.addSegment(tmp);
+    			}
+    			
+    		}
+    		
+    		
+    	}
+    	//logger.info("convert features for histogram data " +f );
+    	return f;
     }
 
-    public static DrawableDasSource fromDasSource(DasSource ds){
+    public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public static DrawableDasSource fromDasSource(SpiceDasSource ds){
         DrawableDasSource  dds = new DrawableDasSource(ds);
+       
+        	
         
         return dds ;
     }
@@ -165,7 +219,8 @@ FeatureListener{
     }
  
     public Feature[] getFeatures(){
-        return features;
+    	
+    		return features;
     }
     
     public void clearDisplay(){
@@ -304,12 +359,14 @@ FeatureListener{
     }
     
     private boolean isHistogramFeatureType(Feature feat){
-        String type = feat.getType();
+        String ftype = feat.getType();
         
         // todo : move this info into a config file...
-        if ( type.equals("hydrophobicity")){
+        if ( ftype.equals("hydrophobicity")){
             return true;
         }
+        if ( getType().equals(TYPE_HISTOGRAM) )
+        	return true;
         return false;
     }
     
