@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 
 import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
-import org.biojava.dasobert.dasregistry.DasSource;
 import org.biojava.dasobert.eventmodel.*;
 import org.biojava.spice.manypanel.drawable.DrawableDasSource;
 

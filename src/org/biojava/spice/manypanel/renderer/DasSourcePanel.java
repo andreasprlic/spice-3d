@@ -427,7 +427,7 @@ implements FeatureListener,SpiceFeatureListener
 		
 		double shift   = 0 - min;
 		
-		double prevScore  = -1;
+	
 		int prevStart  = -1;
 		int prevHeight = -1;
 		
@@ -530,8 +530,7 @@ implements FeatureListener,SpiceFeatureListener
 				System.err.println("unknow histogram style " + histogramType);
 			}
 			
-			prevHeight = height;
-			prevScore = d;
+			prevHeight = height;			
 			prevStart = start;
 		}
 

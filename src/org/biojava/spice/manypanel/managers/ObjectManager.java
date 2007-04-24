@@ -24,8 +24,6 @@ package org.biojava.spice.manypanel.managers;
 
 import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
-import org.biojava.dasobert.dasregistry.DasSource;
-
 
 
 public interface ObjectManager {
