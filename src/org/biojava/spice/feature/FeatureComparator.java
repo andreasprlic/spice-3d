@@ -26,6 +26,8 @@
 package org.biojava.spice.feature ;
 
 import java.util.Comparator ;
+import java.util.Iterator;
+import java.util.List;
 
 
 /** a comparator to sort Features byt type
@@ -33,20 +35,47 @@ import java.util.Comparator ;
  */
 
 public class FeatureComparator 
-    implements Comparator
+implements Comparator
 {
 
-    public FeatureComparator() {
-    }
+	public FeatureComparator() {
+	}
 
-    public int compare(Object a, Object b) {
-	FeatureImpl x = (FeatureImpl) a;
-	FeatureImpl y = (FeatureImpl) b;
+	public int compare(Object a, Object b) {
+		FeatureImpl x = (FeatureImpl) a;
+		FeatureImpl y = (FeatureImpl) b;
 
-	String typea = x.getType();
-	String typeb = y.getType();
-	
-	return typea.compareTo(typeb);
-    }
+		String typea = x.getType();
+		String typeb = y.getType();
+
+		if ( ! typea.equals(typeb))
+			return typea.compareTo(typeb);
+
+		List s1 = x.getSegments();
+		List s2 = y.getSegments();
+
+		Iterator iter1 = s1.iterator();
+		Iterator iter2 = s2.iterator();
+
+		while (iter1.hasNext()){
+			Segment seg1 = (Segment)iter1.next();
+			int start1 = seg1.getStart();
+
+			while (iter2.hasNext()){
+				Segment seg2 = (Segment)iter2.next();
+				int start2 = seg2.getStart();
+
+				if ( start1 < start2){
+					return -1;
+				} if ( start1 > start2){
+					return 1;
+				}
+
+			}
+		}
+
+		return 0;
+
+	}
 
 }

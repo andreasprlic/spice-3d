@@ -361,12 +361,51 @@ FeatureListener{
     private boolean isHistogramFeatureType(Feature feat){
         String ftype = feat.getType();
         
+        Map[] style = dasSource.getStylesheet();
+    	if ( style == null)
+    		dasSource.loadStylesheet();
+       
+    	style = getStylesheet();
+    	
+        /*if (dasSource.getNickname().equals("local SNP data")){
+        	System.out.println(" isHistogramFeatyreType? " + ftype + " " + getType());
+        	if ( style == null)        	
+        		System.out.println("no stylesheet found!");
+        }*/
         // todo : move this info into a config file...
         if ( ftype.equals("hydrophobicity")){
             return true;
         }
         if ( getType().equals(TYPE_HISTOGRAM) )
         	return true;
+        
+       
+        
+        if (style != null ) {
+        	
+        	for ( int i =0; i< style.length ; i++){
+        		Map m = style[i];
+        		
+        		// make sure the stylesheet is for this feature type
+        		String styleType = (String) m.get("type");
+        		if ( styleType != null) {
+        			if ( ! styleType.equals(ftype)){
+        				continue;
+        			}
+        		} else {
+        			continue;
+        		}
+        		
+        		String type = (String) m.get("style");
+        		if ( type != null) {
+        			
+        			if ( type.equals("gradient") || ( type.equals("lineplot")) || ( type.equals("histogram"))){
+        				return true;
+        			}
+        		}
+        	}
+        }
+        
         return false;
     }
     
@@ -388,8 +427,11 @@ FeatureListener{
                     isSecondaryStructureFeat(tmpfeat) && 
                     isSecondaryStructureFeat(feat))
                 sameFeat =true;
-            if ( isHistogramFeatureType(feat))
+            if ( isHistogramFeatureType(feat)) {
                 sameFeat = false;
+                // set type of this DAS source to being HISTOGRAM style
+                type = TYPE_HISTOGRAM;
+            }
             if ( sameFeat) {
                 
                 // seems to be of same type, method and source, so check if the segments can be joint

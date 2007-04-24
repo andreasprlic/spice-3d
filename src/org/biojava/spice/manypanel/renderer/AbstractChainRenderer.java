@@ -512,7 +512,7 @@ public abstract class AbstractChainRenderer
         
         DrawableDasSource dds =event.getDasSource();
         
-        logger.info("new Das Source " + dds.getDasSource().getNickname() + " " + dds.getType());
+        //logger.info("new Das Source " + dds.getDasSource().getNickname() + " " + dds.getType());
         //SpiceDasSource ds = dds.getDasSource();
         
         // check if we know this already
