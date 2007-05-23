@@ -898,8 +898,12 @@ ConfigurationListener
 			 logger.info(localDisplayType);
 			 if (( localDisplayType != null) && 
 					 (! localDisplayType.equals(""))) {
-				 System.out.println("localDIsplayType :" + localDisplayType);
+				 //System.out.println("localDIsplayType :" + localDisplayType);
 				 localDs.setDisplayType(localDisplayType);
+			 }
+			 
+			 if (startParameters.isLocalUnlimitedFeatures()){
+				 localDs.setUnlimitedFeatures(true);
 			 }
 
 			 
