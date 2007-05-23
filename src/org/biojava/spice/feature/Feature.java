@@ -22,7 +22,6 @@
  */
 package org.biojava.spice.feature;
 
-import java.awt.Graphics2D;
 import java.util.List;
 
 /**
@@ -89,12 +88,5 @@ public interface Feature {
     public abstract void addSegment(Segment s);
 
     public abstract List getSegments();
-
-    /** draw this feature at graphics g, at a given Y coordinate 
-     * the scaling is done at the segment level. Segments know about scaling
-     * @param y the y position where to start drawing  
-     * @param g the graphics2D object to use for painting
-     * @deprecated
-     * */
-    public abstract void draw(Graphics2D g, int y);
+   
 }

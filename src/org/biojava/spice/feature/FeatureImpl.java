@@ -24,11 +24,7 @@
 
 package org.biojava.spice.feature;
 
-
-
-
 import java.util.Iterator;
-import java.awt.Graphics2D ;
 
 /** a class to store FeatureData and to visualize them
  * coordinate system of features is always UniProt !
@@ -68,22 +64,6 @@ implements Feature
 	    	
 	    }
 	
-    /** draw this feature at graphics g, at a given Y coordinate 
-     * the scaling is done at the segment level. Segments know about scaling
-     * @deprecated
-     * @param g 
-     * @param y
-     */
-    public void draw ( Graphics2D g, int y) {
-        Iterator iter = segments.iterator();
-        
-        while ( iter.hasNext()){
-            Segment s = (Segment) iter.next();
-            s.paint(g,y);
-        }
-    }
-    
-
 }
 
 

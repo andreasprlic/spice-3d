@@ -116,7 +116,7 @@ public abstract class AbstractFeature implements Feature,Cloneable {
     
     /** add a segment to this feature */
     public void addSegment(int start, int end, String name) {
-        Segment s = new Segment() ;
+        Segment s = new SegmentImpl() ;
         s.setStart(start);
         s.setEnd(end) ;
         s.setName(name);
