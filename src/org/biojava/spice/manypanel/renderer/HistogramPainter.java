@@ -26,7 +26,6 @@ package org.biojava.spice.manypanel.renderer;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +33,6 @@ import java.util.Map;
 import org.biojava.spice.feature.HistogramFeature;
 import org.biojava.spice.feature.HistogramSegment;
 import org.biojava.spice.feature.Segment;
-import org.biojava.spice.feature.SegmentComparator;
 
 
 public class HistogramPainter {

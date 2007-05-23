@@ -283,12 +283,7 @@ implements JmolStatusListener, StructureListener
         logger.info("sendSyncScript" + script);
         
     }
-
-    public float functionXY(String functionName, int x, int y) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
+    
     public void notifyAtomHovered(int atomIndex, String strInfo) {
         logger.info("over Atom " + strInfo);
         
@@ -313,4 +308,14 @@ implements JmolStatusListener, StructureListener
         //System.out.println("notifyFrameChanged " + frameNo);
         
     }
+
+	public void notifyResized(int newWidth, int newHeight) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public float[][] functionXY(String functionName, int x, int y) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

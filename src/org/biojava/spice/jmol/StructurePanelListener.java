@@ -37,6 +37,7 @@ import org.biojava.dasobert.eventmodel.StructureListener;
 import org.biojava.spice.ResourceManager;
 import org.biojava.spice.config.SpiceDefaults;
 import org.biojava.spice.feature.Feature;
+import org.biojava.spice.feature.HistogramSegment;
 import org.biojava.spice.feature.Segment;
 
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureEvent;
@@ -454,6 +455,11 @@ JmolCommander
         
     }
     
+    private String getColorString(Color col){
+    	String cmd = " color [" +col.getRed()+","+col.getGreen() +","+col.getBlue() +"];";
+    	return cmd;
+    }
+    
     private void highliteFeature(Feature feature, Map[] stylesheet, boolean color ){
         //logger.info("highlite feature " + feature.getName());
         //Feature feature = (Feature) features.get(featurenr) ;
@@ -476,6 +482,7 @@ JmolCommander
         
         
         //boolean first = true;
+        segmentLoop:
         for ( int i =0; i< segments.size() ; i++ ) {
             
             Segment segment = (Segment) segments.get(i);
@@ -490,6 +497,16 @@ JmolCommander
                 String c = getDisulfidSelect(start,end) ;
                 cmd += "select " + c + " and protein";
                 
+            } else if ( start == end){
+            	
+            	String sel = getSelectStrSingle(currentChainNumber, start);
+            	cmd += "select " + sel +";";
+            	if ( segment instanceof HistogramSegment){
+            		Color col = segment.getColor();
+            		cmd += " " + getColorString(col);
+            		continue segmentLoop;
+            	}
+            
             } else {
                 
                 Group gs = getGroupNext( currentChainNumber,start,"incr");
@@ -556,10 +573,10 @@ JmolCommander
                             if ( color){
                                 Color col = (Color)s.get("color");
                                 if ( col != null )
-                                    cmd += " color [" +col.getRed()+","+col.getGreen() +","+col.getBlue() +"];";
+                                    cmd += getColorString(col);
                                 else {
                                     col = segment.getColor();
-                                    cmd += " color [" +col.getRed()+","+col.getGreen()+","+col.getBlue() +"];";
+                                    cmd += getColorString(col);                                    
                                 }
                             }
                             
@@ -598,6 +615,22 @@ JmolCommander
      
         
         // and now select everything ...
+        cmd += getSelectWholeFeature(feature,chainselect);
+        
+        
+        //logger.finest("cmd: "+cmd);
+        cmd += "; set display selected;";
+        //logger.info(cmd);
+        executeCmd(cmd);
+        
+        
+    }
+    
+    private String getSelectWholeFeature(Feature feature, String chainselect){
+
+        String cmd ="";
+        List segments =feature.getSegments();
+        
         boolean first = true;
         for ( int i =0; i< segments.size() ; i++ ) {
             //
@@ -615,7 +648,12 @@ JmolCommander
                 cmd +="select " + c + " and protein";
 
                 
-            } else {
+            } else if ( start == end) {
+            	String sel = getSelectStrSingle(currentChainNumber, start);
+            	cmd += "select " + sel +";";
+            
+            }else {
+            
                 
                 Group gs = getGroupNext( currentChainNumber,start,"incr");
                 //Group gs = chain.getGroup(start-1);	
@@ -640,13 +678,7 @@ JmolCommander
                 cmd +=  c + " and protein";
             } 
         }
-        
-        //logger.finest("cmd: "+cmd);
-        cmd += "; set display selected;";
-        //logger.info(cmd);
-        executeCmd(cmd);
-        
-        
+        return cmd;
     }
     
     

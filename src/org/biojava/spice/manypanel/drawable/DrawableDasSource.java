@@ -24,6 +24,7 @@ package org.biojava.spice.manypanel.drawable;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -202,12 +203,13 @@ FeatureListener{
 			 Feature f = feats[i];
 
 			 if (f instanceof HistogramFeature ){
-
+				 dasSource.setUnlimitedFeatures(true);
 				 HistogramFeature hf = (HistogramFeature) f;
 
 				 List segments  = hf.getSegments();
-
-
+				 SegmentComparator comp = new SegmentComparator();
+				 Collections.sort(segments,comp);
+				 
 
 				 Iterator iter = segments.iterator();
 
@@ -227,7 +229,7 @@ FeatureListener{
 
 				 hf.setMax(max);
 				 hf.setMin(min);    			    			
-				 logger.info("found max/min " + max + " " +min);
+				 //logger.info("found max/min " + max + " " +min);
 			 }
 		 }
 	 }
@@ -410,12 +412,9 @@ FeatureListener{
 		 style = getStylesheet();
 		 //System.out.println("is HistogramFeature type " + ftype + " " + style );
 
-		 /*if (dasSource.getNickname().equals("local SNP data")){
-        	System.out.println(" isHistogramFeatyreType? " + ftype + " " + getType());
-        	if ( style == null)        	
-        		System.out.println("no stylesheet found!");
-        }*/
+		 
 		 // todo : move this info into a config file...
+		 
 		 if ( ftype.equals("hydrophobicity")){
 			 return true;
 		 }
@@ -489,6 +488,7 @@ FeatureListener{
 
 		 if ( isHistogramFeatureType(newFeature)) {            	
 			 type = TYPE_HISTOGRAM;
+			 
 			 Segment seg = getHistogramSegmentFromFeature(newFeature);
 
 			 while (iter.hasNext()){

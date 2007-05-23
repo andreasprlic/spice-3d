@@ -163,14 +163,14 @@ implements FeatureListener,SpiceFeatureListener
 
 		int l = feats.length;
 
-		boolean firstHisto = false;
+		boolean firstHisto = true;
 		for (int i = 0; i < feats.length; i++) {
 			Feature f = feats[i];
 			
 			if ( f instanceof HistogramFeature){
-				if ( ! firstHisto){
-					l+=2;
-					firstHisto = true;
+				if (  firstHisto){
+					l+=3;
+					firstHisto = false;
 				}
 				// height is double size for histogram features...
 				l+=1;
@@ -378,7 +378,7 @@ implements FeatureListener,SpiceFeatureListener
 			Graphics g,
 			int y){
 
-		Color c1= Color.white;
+		Color c1= Color.blue;
 		Color c2 = Color.red;
 
 		histogramPainter.drawHistogramFeature(feature, featurePos, drawHeight, g, y, c1,c2, "histogram");
@@ -639,7 +639,8 @@ implements FeatureListener,SpiceFeatureListener
 
 	}
 
-	/** check if the feature is selected, if yest, color the background in SELECTED_FEATURE_COLOR
+	/** check if the feature is selected, 
+	 * if yes, color the background in SELECTED_FEATURE_COLOR
 	 * 
 	 * @param feature
 	 * @param featurePos
@@ -665,7 +666,9 @@ implements FeatureListener,SpiceFeatureListener
 				Composite oldComp = g2D.getComposite();
 				g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER ,0.6f));
 				int drawHeight = SequenceScalePanel.DEFAULT_Y_STEP;		
+				
 				if ( feature instanceof HistogramFeature)  {
+					
 					drawHeight = SequenceScalePanel.DEFAULT_Y_STEP *2;
 					y = y - drawHeight - 1;
 				}
@@ -865,8 +868,8 @@ implements FeatureListener,SpiceFeatureListener
 				y += SequenceScalePanel.DEFAULT_Y_STEP;
 				HistogramFeature hf = (HistogramFeature) feature;
 				drawHistogramFeature(hf, 0, SequenceScalePanel.DEFAULT_Y_HEIGHT *2, g, y+SequenceScalePanel.DEFAULT_Y_HEIGHT);
+				y += SequenceScalePanel.DEFAULT_Y_STEP;
 			} else {
-
 
 				setColor(g,feature,new HashMap());
 				String featureType = feature.getType();
@@ -887,6 +890,9 @@ implements FeatureListener,SpiceFeatureListener
 				}
 
 			}
+			if  (feature instanceof HistogramFeature)
+				y+= SequenceScalePanel.DEFAULT_Y_STEP *2 -1;
+			
 			checkDrawSelectedFeature(feature,f,g,y);
 
 			//drawLineFeature(feature,f,DEFAULT_Y_HEIGHT,g,aminosize,fullwidth,y,chainlength,scale);
@@ -988,13 +994,23 @@ implements FeatureListener,SpiceFeatureListener
 			}
 
 			if ( ! matchingStyle){
-				// color has not been set ...
-				setDefaultColor(g,feat);
-
 				//logger.finest("no matching stylesheet found for feature type " + featureType);
 				// no stylesheet type has been found that describes how to paint this feature - use default...
-				if (  featureType.equals(SpiceDefaults.DISULFID_TYPE)){
+
+				
+				// color has not been set ...
+				setDefaultColor(g,feat);
+				if ( feat instanceof HistogramFeature) {
+					//y += SequenceScalePanel.DEFAULT_Y_STEP;
+					HistogramFeature hf = (HistogramFeature) feat;
+					drawHistogramFeature(hf, 0, SequenceScalePanel.DEFAULT_Y_HEIGHT *2, g, y+SequenceScalePanel.DEFAULT_Y_HEIGHT);
+					y += SequenceScalePanel.DEFAULT_Y_STEP*3;
+				}
+					
+				else if (  featureType.equals(SpiceDefaults.DISULFID_TYPE)){
+					
 					drawSpanFeature(feat,f,SequenceScalePanel.DEFAULT_Y_HEIGHT,g,y);
+					
 				} else if (  featureType.equals("SECSTRUC") || 
 						featureType.equals("HELIX") || 
 						featureType.equals("STRAND") || 
@@ -1005,6 +1021,7 @@ implements FeatureListener,SpiceFeatureListener
 				} else { 
 					drawLineFeature(feat,f,SequenceScalePanel.DEFAULT_Y_HEIGHT,g,y);
 				}
+				
 			}
 			checkDrawSelectedFeature(feat,f,g,y);            
 		}

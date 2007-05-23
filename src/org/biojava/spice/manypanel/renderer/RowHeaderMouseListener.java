@@ -342,6 +342,8 @@ MouseMotionListener {
     
     public void triggerFeatureSelectedEvent(SpiceFeatureEvent event) {
         //System.out.println("triggerFeatureSelected");
+    	boolean hf = event.getFeature() instanceof HistogramFeature ;
+    	//logger.info("selected feature " + hf + " " + event.getFeature() );
         Iterator iter = spiceFeatureListeners.iterator();
         while (iter.hasNext()){
             SpiceFeatureListener li = (SpiceFeatureListener) iter.next();

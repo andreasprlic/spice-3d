@@ -116,7 +116,7 @@ implements JmolCommander
         
         viewer  = org.jmol.viewer.Viewer.allocateViewer(this, adapter);
         
-        jmolpopup = JmolPopup.newJmolPopup(viewer);
+        jmolpopup = JmolPopup.newJmolPopup(viewer,true);
         
         // this is important to make Jmol thread -safe !!
         viewer.evalString("set scriptQueue on;");
@@ -222,7 +222,7 @@ implements JmolCommander
      * @param command - a String containing a RASMOL like command. e.g. "select protein; cartoon on;"
      */
     public void executeCmd(String command) {
-        //logger.info(command);
+        logger.info(command);
         if (viewer.isScriptExecuting()) 
             logger.info("viewer is executing");
         
@@ -311,6 +311,8 @@ implements JmolCommander
         
         if ( structure == null ) {
             structure = new StructureImpl();
+            initJmolDisplay();
+            
            
         }       
         
@@ -339,7 +341,6 @@ implements JmolCommander
             //logger.info("using the new SpiceJmolAdapter");
             SpiceJmolAdapter sad = (SpiceJmolAdapter)adapter;
             sad.setStructure(structure);
-           
             
             /*class MyRunnable implements Runnable {
                 Structure structure;

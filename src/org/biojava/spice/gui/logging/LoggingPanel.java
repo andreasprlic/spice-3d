@@ -68,7 +68,6 @@ import javax.swing.Box;
 import org.biojava.spice.ResourceManager;
 import org.biojava.spice.gui.AboutDialog;
 import org.biojava.spice.gui.SendEmailGui;
-import org.biojava.spice.utils.SendEmail;
 
 import java.awt.event.ActionEvent          ;
 

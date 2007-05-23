@@ -38,6 +38,7 @@ import org.biojava.spice.ResourceManager;
 import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.feature.Feature;
 import org.biojava.spice.feature.HistogramFeature;
+import org.biojava.spice.feature.HistogramSegment;
 import org.biojava.spice.feature.Segment;
 import org.biojava.spice.manypanel.drawable.DrawableDasSource;
 
@@ -189,7 +190,8 @@ extends DasSourcePanel{
         if (! foundAStyleSheet) {
             if ( segs.size() > 0){
                 Segment s = (Segment) segs.get(0);
-                c = s.getColor();
+                if ( ! (s instanceof HistogramSegment))
+                	c = s.getColor();
             } 
         }
         g.setColor(c);

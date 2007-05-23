@@ -133,8 +133,9 @@ public class SpiceJmolAdapter extends JmolAdapter{
       }
       
       public Hashtable getAtomSetAuxiliaryInfo(Object clientFile, int atomSetIndex) {
-          //logger.info("getAtomSetAuxiliaryInfo " + atomSetIndex);
-        return null;
+         // logger.info("getAtomSetAuxiliaryInfo " + atomSetIndex);
+          Hashtable tab = new Hashtable();
+        return tab;
       }
     
 
