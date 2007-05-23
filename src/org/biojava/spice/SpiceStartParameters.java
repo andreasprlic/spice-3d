@@ -62,6 +62,7 @@ public class SpiceStartParameters {
     private String localServerName="";
     private String localServerCapability = "";
     private String localServerDisplayType = "";
+    private boolean localUnlimitedFeatures = false;
     private String pdbcoordsys;
     private String uniprotcoordsys;
     private String enspcoordsys;
@@ -93,11 +94,15 @@ public class SpiceStartParameters {
     }
 
     
-    
-    
-    
-    
-    public String getOpenDialogCoords() {
+    public boolean isLocalUnlimitedFeatures() {
+		return localUnlimitedFeatures;
+	}
+
+	public void setLocalUnlimitedFeatures(boolean localUnlimitedFeatures) {
+		this.localUnlimitedFeatures = localUnlimitedFeatures;
+	}
+
+	public String getOpenDialogCoords() {
         return openDialogCoords;
     }
 
