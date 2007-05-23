@@ -35,10 +35,13 @@ import org.biojava.dasobert.eventmodel.SequenceListener;
 import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.feature.Feature;
 import org.biojava.spice.feature.FeatureImpl;
+import org.biojava.spice.feature.HistogramFeature;
 import org.biojava.spice.feature.Segment;
+import org.biojava.spice.feature.SegmentImpl;
 import org.biojava.spice.manypanel.drawable.DrawableDasSource;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureEvent;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureListener;
+
 
 
 
@@ -203,6 +206,8 @@ MouseMotionListener
         
         Feature[] feats = source.getFeatures();
         
+        
+        //TODO: remove comments
 /*
  *    	boolean overSegment = checkOverSegment(f.getSegments(), pos, tmpevent, selectionLocked);
         	
@@ -232,17 +237,39 @@ MouseMotionListener
         	return null;
  * */
         
- 
+        /*
         if ( source.getType().equalsIgnoreCase(DrawableDasSource.TYPE_HISTOGRAM)){
-        	Feature f = source.convertEventFeatures(feats);
-        	//int pos = getSeqPos(e) ;
-        	SpiceFeatureEvent tmpevent = new SpiceFeatureEvent(source.getDasSource(), f);
-        	return tmpevent;        	       
-        }
-        
+
+        	int nrFeatures = HistogramFeatureManager.getNrHistogramFeatures(feats);
+        	int pos = getSeqPos(e) ;
+        	for (int i=0 ; i< nrFeatures;i++){
+        		//Feature f = source.convertEventFeatures(feats);
+        		h += SequenceScalePanel.DEFAULT_Y_STEP *2;
+        		if ( y < h ){
+        			Feature[] histFeats = HistogramFeatureManager.getFeaturesForType(i,feats);
+        			for ( int j=0;j<histFeats.length;j++){
+        				Feature f = histFeats[j];
+        				if (f.overlaps(pos)) {
+        					System.out.println("ChainRenderMouseLIstenergot new feature event at seq " + pos + " " +f.toString());
+        					SpiceFeatureEvent tmpevent = new SpiceFeatureEvent(source.getDasSource(), f);
+        					return tmpevent;        	           			
+        				}
+        			}
+        		}
+        	}
+
+        }*/
+
         for (int i = 0 ; i< feats.length; i ++){
             h += SequenceScalePanel.DEFAULT_Y_STEP;
+            
+            Feature f = feats[i];
+            if ( f instanceof HistogramFeature ) {
+            	h += SequenceScalePanel.DEFAULT_Y_STEP *2;
+            }
+            
             if ( y < h) {
+
                 SpiceFeatureEvent event = new SpiceFeatureEvent(source.getDasSource(), feats[i]);
                 return event;
             }
@@ -446,15 +473,17 @@ MouseMotionListener
     
     private boolean checkOverSegment(List segments, int pos, SpiceFeatureEvent spiceEvent, boolean selectionLocked){
       
-    	 
+    	//System.out.println("chainrenderMouseListener  checkOverSegment " + pos );
     	
     	Iterator iter = segments.iterator();
         boolean somethingTriggered = false;
        // if ( event.getClickCount() > 1 ) {
         while (iter.hasNext()) {
             Segment s = (Segment)iter.next();
+          //  System.out.println(s);            
+           
             if ( s.overlaps(pos+1)) {  
-                //System.out.println(s);
+              // System.out.println(s);
                 popupFrame.createContent(s);  
                 
                 popupFrame.showFrame();
@@ -498,12 +527,7 @@ MouseMotionListener
     protected void triggerNewSequencePosition(int pos, int mouseY){
         if ( selectionLocked )
             return;
-        /*Iterator iter = sequenceListeners.iterator();
-        
-        while(iter.hasNext()){
-            SequenceListener li = (SequenceListener)iter.next();
-            li.selectedSeqPosition(pos);
-        }*/
+  
         
         mySequencePositionTrigger.setPosition(pos,mouseY);
         if ( ! mySequencePositionTrigger.isPainting())
@@ -572,7 +596,7 @@ MouseMotionListener
         Segment segment = event.getSegment();
         
         if ( segment == null){
-            segment = new Segment();
+            segment = new SegmentImpl();
             event.setSegment(segment);
         }
         //logger.info("trigger segment selected " + segment);
@@ -623,7 +647,7 @@ class MyMouseOverSegment implements Runnable {
     
         Segment segment = event.getSegment();
         if ( segment == null){
-            segment = new Segment();
+            segment = new SegmentImpl();
             event.setSegment(segment);
         }
         

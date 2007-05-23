@@ -67,6 +67,7 @@ extends Thread
 
     SpiceDasSource dasSource;
     static int MAX_NR_FEATURES = 300;
+    int maxNrFeatures;
     List dasSourceListeners;
     List featureListeners;
 
@@ -81,6 +82,7 @@ extends Thread
 
         //logger.finest("init new thread " +  " " + accessionCode);
 
+    	maxNrFeatures = MAX_NR_FEATURES;
 
         String url = ds.getUrl() ;
         char lastChar = url.charAt(url.length()-1);        
@@ -124,8 +126,29 @@ extends Thread
         clearFeatureListeners();
         clearDasSourceListeners();
     }
+    
+    
+    
 
-    public void clearFeatureListeners(){
+    public int getMaxNrFeatures() {
+		return maxNrFeatures;
+	}
+
+
+
+    /** set the maximum number of features that should be loaded by this thread.
+     * defaults to MAX_NR_FEATURES
+     * if set to -1 there is no limit
+     * @param maxNrFeatures
+     */
+	public void setMaxNrFeatures(int maxNrFeatures) {
+		this.maxNrFeatures = maxNrFeatures;
+	}
+
+
+
+
+	public void clearFeatureListeners(){
         featureListeners = new ArrayList();
     }
 
@@ -188,15 +211,7 @@ extends Thread
 
         List features = ftmp.get_features();
 
-        int cutoff = MAX_NR_FEATURES;
-
-
-        if ( dasSource.getNickname().equals("KyleDoolittle")){
-            // this should be a histogram DAS source!
-            // set maximum to unlimited
-            cutoff = -1;
-        }
-
+        int cutoff = maxNrFeatures;
 
         // a fallback mechanism to prevent DAS sources from bringing down spice
         if ( cutoff > 0) {

@@ -38,6 +38,8 @@ import javax.swing.event.HyperlinkListener;
 import org.biojava.dasobert.eventmodel.SequenceEvent;
 import org.biojava.dasobert.eventmodel.SequenceListener;
 import org.biojava.spice.feature.Feature;
+import org.biojava.spice.feature.HistogramFeature;
+import org.biojava.spice.feature.HistogramSegment;
 import org.biojava.spice.feature.Segment;
 import org.biojava.spice.gui.AbstractPopupFrame;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureEvent;
@@ -103,12 +105,15 @@ SequenceListener
         
         if ( f.getName() != null)
             text.append(font + "name: " + efont + f.getName() + endl);
-        if ( f.getScore() != null)
-            text.append(font + "score: " + efont + f.getScore()+ endl);
-        
+        if ( ! (f instanceof HistogramFeature)){
+        	if ( f.getScore() != null)
+        		text.append(font + "score: " + efont + f.getScore()+ endl);
+        }
         if ( f.getLink() != null)
             text.append(font + "link: " + efont + ahref + f.getLink() + "\">" + f.getLink()  + ehref + endl);
-        text.append(font + "source: " + efont + ahref  + f.getSource() + "\">"+ f.getSource()+ ehref + endl);
+        
+        
+        text.append(font + ahref  + f.getSource() + "\">show DAS request" + ehref + endl);
                 
     }
     
@@ -165,7 +170,11 @@ SequenceListener
         int end = s.getEnd();
         
         text.append(font + "segment:"+ efont + name + endl);
-        text.append(font + "start:"  + efont + start+ font + " end: " + efont + end +endl);        
+        text.append(font + "start:"  + efont + start+ font + " end: " + efont + end +endl);  
+        if ( s instanceof HistogramSegment){
+        	HistogramSegment hs = (HistogramSegment)s;
+        	text.append(font + "score:" + efont + hs.getScore()+ endl);
+        }
         if ( note != null) {
             Feature f = s.getParent();
             if (! f.getNote().equals(note))

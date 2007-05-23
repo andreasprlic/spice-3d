@@ -45,6 +45,7 @@ import org.biojava.bio.structure.Group;
 import org.biojava.spice.feature.Feature;
 import org.biojava.spice.feature.FeatureImpl;
 import org.biojava.spice.feature.Segment;
+import org.biojava.spice.feature.SegmentImpl;
 import org.biojava.spice.das.AlignmentTools;
 import org.biojava.spice.manypanel.renderer.DasSourcePanel;
 import org.biojava.spice.manypanel.renderer.SequenceScalePanel;
@@ -128,7 +129,7 @@ extends JPanel{
                 if ( start > -1) {
                     //drawStruc(g2D,start,end,aminosize);
                     
-                    Segment s = new Segment();
+                    Segment s = new SegmentImpl();
                     s.setStart(start);
                     s.setEnd(end);
                     structureFeature.addSegment(s);
@@ -138,7 +139,7 @@ extends JPanel{
         }
         // finish
         if ( start > -1) {
-            Segment s = new Segment();
+            Segment s = new SegmentImpl();
             s.setStart(start);
             s.setEnd(end);
             structureFeature.addSegment(s);

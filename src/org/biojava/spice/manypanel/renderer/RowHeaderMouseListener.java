@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 
 import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.spice.feature.Feature;
+import org.biojava.spice.feature.HistogramFeature;
 import org.biojava.spice.gui.DasSourceDialog;
 import org.biojava.spice.manypanel.drawable.DrawableDasSource;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureEvent;
@@ -103,16 +104,7 @@ MouseMotionListener {
         
     }
     
-    private boolean isHistogramType(DrawableDasSource dasSource){
-    	//if ( f.getType().equals("hydrophobicity"))
-    	//	return true;
-    	
-    	if (dasSource.getType().equalsIgnoreCase(DrawableDasSource.TYPE_HISTOGRAM))
-    		return true;
-    	
-    	return false;
-    	
-    }
+    
     
     
     /** returns the feature if mouse over the link icon 
@@ -171,10 +163,7 @@ MouseMotionListener {
                            return null;
                         }
                     }
-                    // for histogram DAS sources we only consider the first row ...
-                    if ( isHistogramType(dsp.getDasSource())){
-                    	break;
-                    }
+                    
                 }
             }
 
@@ -231,6 +220,12 @@ MouseMotionListener {
                 Feature found = null;
                 for (int i =0 ; i < feats.length ; i++){
                     y += SequenceScalePanel.DEFAULT_Y_STEP;
+                    
+                    Feature f = feats[i];
+                    if ( f instanceof HistogramFeature){
+                    	y += SequenceScalePanel.DEFAULT_Y_STEP *2;
+                    }
+                    
                     if ( ye < y) {
                         found = feats[i];
                         break;
@@ -238,11 +233,7 @@ MouseMotionListener {
                 }
                 if ( found == null)
                     return null;
-                
-                DrawableDasSource dds = dsp.getDrawableDasSource();
-                if ( isHistogramType(dds)){
-                	found = dds.convertEventFeatures(dds.getFeatures());
-                }
+                                            
                 
                 SpiceFeatureEvent event = new SpiceFeatureEvent(ds,found);
                 return event;

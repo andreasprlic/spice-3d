@@ -224,7 +224,11 @@ public class SpiceJmolAdapter extends JmolAdapter{
             Group g = atom.getParent();
             if ( g != null ){
                 
-                    return Integer.parseInt(g.getPDBCode());                
+            	try{
+            		return Integer.parseInt(g.getPDBCode());
+            	} catch (NumberFormatException e){
+            		//e.printStackTrace();
+            	}
             }
             
             return -1;

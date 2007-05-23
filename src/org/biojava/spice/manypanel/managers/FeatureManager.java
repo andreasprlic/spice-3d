@@ -237,6 +237,11 @@ implements ObjectManager ,SequenceListener{
         logger.finest("triggering Feature request for" + accessionCode + "  from " + sds);
         SingleFeatureThread thread = new SingleFeatureThread(accessionCode, sds);
         
+        if (sds.hasUnlimitedFeatures()){
+        	// no limit!
+        	thread.setMaxNrFeatures(-1);
+        }
+        
         Iterator iter = dasSourceListeners.iterator();
         while (iter.hasNext()){
             DasSourceListener li = (DasSourceListener)iter.next();

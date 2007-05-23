@@ -35,6 +35,7 @@ import org.biojava.bio.structure.Group;
 import org.biojava.spice.feature.FeatureImpl;
 import org.biojava.spice.feature.Segment;
 import org.biojava.spice.feature.Feature;
+import org.biojava.spice.feature.SegmentImpl;
 
 public class StructureScalePanel 
 extends SequenceScalePanel{
@@ -119,7 +120,7 @@ extends SequenceScalePanel{
     }
     
     private Segment createSegment(int start, int end){
-        Segment s = new Segment();
+        Segment s = new SegmentImpl();
         s.setStart(start+1);
         s.setEnd(end+1);
         s.setName("structure region displayed in 3D display");

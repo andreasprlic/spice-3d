@@ -78,13 +78,17 @@ public class SpiceLayeredPanel
             DasSource[] dss = SpiceLayeredPanel.getAllDasSources();
             SpiceDasSource[] sds = new SpiceDasSource[dss.length+1] ;
             Das1Source dLocal = new Das1Source();
-            dLocal.setUrl("http://pfam1b.internal.sanger.ac.uk:9000/das/hydrophobicity/");
-            dLocal.setNickname("KyleDoolittle");
+            //dLocal.setUrl("http://pfam1b.internal.sanger.ac.uk:9000/das/hydrophobicity/");
+            //dLocal.setNickname("KyleDoolittle");
+            dLocal.setUrl("http://localhost:8080/dazzle/demo_histo/");
+            dLocal.setNickname("Phobius-demo");
             dLocal.setCapabilities(new String[]{Capabilities.FEATURES,});
+            
             DasCoordinateSystem up = DasCoordinateSystem.fromString(UNIPROTCOORDSYS);
             dLocal.setCoordinateSystem(new DasCoordinateSystem[]{up});
             
             sds[0] = SpiceDasSource.fromDasSource(dLocal);
+            sds[0].setUnlimitedFeatures(true); // no restrictions for histogram DAS sources
             
             for (int i =0 ; i < dss.length;i++){
                 Das1Source d1s = DasSourceConverter.toDas1Source((Das2Source)dss[i]);
@@ -113,7 +117,9 @@ public class SpiceLayeredPanel
         //creating and showing this application's GUI.
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                createAndShowGUI("Q8TCT8");
+            	//createAndShowGUI("Q8TCT8");
+            	createAndShowGUI("Q9Y5Y6");
+            	
             }
         });
     }

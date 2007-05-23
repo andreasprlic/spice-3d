@@ -482,7 +482,7 @@ class MyParser
         
     }
     private void addSegment(Attributes attrs){
-        Segment s = new Segment();
+        Segment s = new SegmentImpl();
         s.setParent(currentFeature);
         s.setStart(Integer.parseInt(attrs.getValue("start")));
         s.setEnd(Integer.parseInt(attrs.getValue("end")));

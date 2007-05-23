@@ -28,12 +28,12 @@ import java.awt.Composite;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.util.Arrays;
-import java.util.Comparator;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
@@ -48,7 +48,7 @@ import org.biojava.spice.ResourceManager;
 import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.config.SpiceDefaults;
 import org.biojava.spice.feature.Feature;
-import org.biojava.spice.feature.FeatureComparator;
+import org.biojava.spice.feature.HistogramFeature;
 import org.biojava.spice.feature.Segment;
 import org.biojava.spice.manypanel.eventmodel.FeatureListener;
 import org.biojava.spice.manypanel.eventmodel.SpiceFeatureEvent;
@@ -85,6 +85,8 @@ implements FeatureListener,SpiceFeatureListener
 	ProgressThread    progressThread;
 	DrawableDasSource drawableDasSource;
 	CoordManager coordManager;
+	HistogramPainter 	histogramPainter; 
+
 
 	static {
 
@@ -118,6 +120,8 @@ implements FeatureListener,SpiceFeatureListener
 		linkIcon = SpiceApplication.createImageIcon("firefox10x10.png");
 		infoIcon = SpiceApplication.createImageIcon("messagebox_info16x16.png");
 		coordManager = new CoordManager();
+		histogramPainter = new HistogramPainter(coordManager,scale, chainLength);
+
 	}
 
 
@@ -137,6 +141,7 @@ implements FeatureListener,SpiceFeatureListener
 
 		chainLength = chain.getLengthAminos();
 		coordManager.setLength(chainLength);
+		histogramPainter.setChainLength(chainLength);
 
 	}
 
@@ -144,20 +149,13 @@ implements FeatureListener,SpiceFeatureListener
 
 		this.scale=scale;
 		coordManager.setScale(scale);
+		histogramPainter.setScale(scale);
 		this.repaint();
 	}
 
-	private boolean isHistogramType(Feature f){
-		if ( f.getType().equals("hydrophobicity"))
-			return true;
+	
 
-		if (drawableDasSource.getType().equalsIgnoreCase(DrawableDasSource.TYPE_HISTOGRAM))
-			return true;
-
-		return false;
-
-	}
-
+	
 	public int getDisplayHeight(){
 		int h = SequenceScalePanel.DEFAULT_Y_START + SequenceScalePanel.DEFAULT_Y_STEP + SequenceScalePanel.LINE_HEIGHT;
 
@@ -165,14 +163,24 @@ implements FeatureListener,SpiceFeatureListener
 
 		int l = feats.length;
 
-		if ( l > 0) {
-			Feature f = (Feature) feats[0];
-			if ( isHistogramType(f)) {
-				l = 1;
+		boolean firstHisto = false;
+		for (int i = 0; i < feats.length; i++) {
+			Feature f = feats[i];
+			
+			if ( f instanceof HistogramFeature){
+				if ( ! firstHisto){
+					l+=2;
+					firstHisto = true;
+				}
+				// height is double size for histogram features...
+				l+=1;
 			}
 		}
 
-		h += (l +1 ) * SequenceScalePanel.DEFAULT_Y_STEP ;
+
+
+
+		h += (l + 1 ) * SequenceScalePanel.DEFAULT_Y_STEP ;
 		//logger.info(dasSource.getDasSource().getNickname() + " height:" + h);
 		return h;
 	}
@@ -363,186 +371,8 @@ implements FeatureListener,SpiceFeatureListener
 
 	}
 
-	private void drawHistogramFeature(Feature[] features,
-			int featurePos, 
-			int drawHeight,
-			Graphics g,
-			int y, Color c1, Color c2, 
-			String histogramType){
 
-		if ( featurePos > 0)
-			return;
-
-		//System.out.println("hydrophobicity " + features.length + " " + histogramType);
-		Graphics2D g2D =(Graphics2D) g;
-
-		int aminosize = Math.round(1*scale);
-		if ( aminosize < 1 )
-			aminosize = 1;
-
-		
-		int zeroPos = drawHeight / 2;
-		int zeroY   = y + zeroPos;
-		
-		int maxY = y + drawHeight;
-		
-		if ( histogramType.equals("lineplot")){
-			//		 sort the features by their start position. 
-			Comparator fcomp = new FeatureComparator();
-		
-			Arrays.sort(features,fcomp);
-		}
-		
-		// get maximum and minimum score
-		double max = 0;
-		double min = 0;
-		for (int i =0 ; i< features.length; i++){
-			Feature f = features[i];
-			String score = f.getScore();
-			//System.out.println(score);
-			double d = 0;
-			try {
-				d = Double.parseDouble(score);
-			} catch (NumberFormatException e){
-
-				continue;
-			}
-			if ( d > max)
-				max = d;
-			if ( d < min )
-				min = d;
-		}
-
-	//	System.out.println("max " + max + " min " + min  );
-
-		if ( min < 0) {
-			
-			Color avC = DrawUtils.getColorGradient(c1, c2, 0.5);
-			g2D.setColor(avC);
-			
-			// draw the "0" line ...
-			if ( ! histogramType.equals("gradient"))
-				g2D.drawLine(0,zeroY,coordManager.getPanelPos(chainLength),zeroY );
-		}
-		
-		double shift   = 0 - min;
-		
-	
-		int prevStart  = -1;
-		int prevHeight = -1;
-		
-		for (int i =0 ; i< features.length; i++){
-			Feature f = features[i];
-			String score = f.getScore();
-
-			double d = 0;
-			try {
-				d = Double.parseDouble(score);
-			} catch (NumberFormatException e){
-				e.printStackTrace();
-				continue;
-			}
-
-			// normalize score.
-
-			
-			double ratio =  ( d + shift ) / (max+shift) ;
-
-			/*if ( min < 0) {
-				// 0 is in the middle then
-				if ( d < 0)
-					ratio = Math.abs(d) / Math.abs(min);
-				else
-					ratio = Math.abs(d) / Math.abs(max);
-			}*/
-			//System.out.println(ratio + " d " + d + " max " + max + " " + " min " + min + " shift " + shift);
-			Color c = DrawUtils.getColorGradient(c1, c2, ratio);
-			g2D.setColor(c);
-
-			List segments = f.getSegments();
-
-			// check to make sure there is only one segment, as there should be
-			if ( segments.size() != 1) {
-				System.err.println(" # segments found: " + segments.size());
-				continue;
-			}
-
-
-			Segment s = (Segment) segments.get(0);
-			s.setColor(c);
-			int start = s.getStart() -1 ;
-			int end   = s.getEnd() -1 ;
-
-			int xstart = coordManager.getPanelPos(start);            
-			int width  = coordManager.getPanelPos(end) - xstart + aminosize +1;
-
-			int height =  (int)Math.round(drawHeight * ratio);
-			
-			//if ( d < 0 )
-			//	height = drawHeight - height;
-			
-			// System.out.println("drawHeight:" +drawHeight + " zeroY:" + zeroY +  "score:" + score + " height:" + height + " ratio " + ratio + " " + start + " " + end);
-
-
-			// switch based on the histogramtype:
-
-
-			if ( histogramType.equalsIgnoreCase("histogram")) {
-				//System.out.println("draw a histogram");
-				// the inverse display:
-				// g2D.fillRect(xstart+width-aminosize,y+ height,aminosize, drawHeight - height);
-				
-				int barH = Math.abs(height - zeroPos);
-				if (min <0 ) {
-					if ( height < zeroPos) {
-						//	barH = height;
-						g2D.fillRect(xstart+width-aminosize,zeroY,aminosize, zeroPos-height);
-					} else {
-						g2D.fillRect(xstart+width-aminosize,maxY-height,aminosize,barH);
-					}
-				} else {
-					g2D.fillRect(xstart+width-aminosize,maxY-height,aminosize,height);
-				}
-				
-				/*if ( d >= 0)
-					g2D.fillRect(xstart+width-aminosize,zeroY-height,aminosize, height);
-				else 
-					g2D.fillRect(xstart+width-aminosize,zeroY,aminosize, height);
-					*/
-				
-			} else if ( histogramType.equals("gradient")){
-				// System.out.println("draw a gradient");
-				//g2D.fillRect(xstart+width-aminosize,y+(drawHeight),aminosize, drawHeight);
-				g2D.fillRect(xstart,y,width,drawHeight);
-			}
-			else if ( histogramType.equals("lineplot")){
-				
-				int ystart = maxY - prevHeight;				
-				int yend   = maxY - height; 				
-				
-				if (prevStart != (start - 1))				
-					ystart = maxY-height ;
-								
-				//System.out.println("start " + start + " " + ystart + " " + yend + " score: " + score);
-				g2D.drawLine(xstart,ystart,xstart + aminosize,yend);
-				
-			} else {
-				System.err.println("unknow histogram style " + histogramType);
-			}
-			
-			prevHeight = height;			
-			prevStart = start;
-		}
-
-		if ( features.length >0) {
-			//System.out.println("check draw " + featureSelected + " " +selectedFeaturePos );
-			checkDrawSelectedFeature(features[0],featurePos,g,y);
-		}
-
-	}
-
-
-	private void drawHistogramFeature(Feature[] features,
+	private void drawHistogramFeature(HistogramFeature feature,
 			int featurePos, 
 			int drawHeight,
 			Graphics g,
@@ -551,15 +381,16 @@ implements FeatureListener,SpiceFeatureListener
 		Color c1= Color.white;
 		Color c2 = Color.red;
 
-		drawHistogramFeature(features, featurePos, drawHeight, g, y, c1,c2, "histogram");
+		histogramPainter.drawHistogramFeature(feature, featurePos, drawHeight, g, y, c1,c2, "histogram");
 
 	}
 
-	private void drawHistogramFeature(Feature[] features,
-			int featurePos, 
-			int drawHeight,
+	private int drawHistogramFeature(HistogramFeature feature,
+			int featurePos,	
 			Graphics g,
 			int y, Map styleSheet, String histogramStyle){
+
+		// now set the colors
 
 		Color c1 = Color.white;
 		Color c2 = Color.red;
@@ -577,7 +408,16 @@ implements FeatureListener,SpiceFeatureListener
 		} catch (Exception e){
 		}
 
-		drawHistogramFeature(features, featurePos, drawHeight, g, y, c1,c2, histogramStyle);
+		int drawHeight = SequenceScalePanel.DEFAULT_Y_STEP *2;
+		//HistogramPainter hp = new HistogramPainter(coordManager,scale, chainLength,this);
+		histogramPainter.drawHistogramFeature(feature, featurePos, drawHeight, g, y, c1,c2, histogramStyle);
+
+
+		//drawHistogramFeature(myFeats, 0, SequenceScalePanel.DEFAULT_Y_HEIGHT *2, g, y+SequenceScalePanel.DEFAULT_Y_HEIGHT);
+		// they got double size!
+		y += drawHeight;
+
+		return y;
 
 	}
 
@@ -812,78 +652,31 @@ implements FeatureListener,SpiceFeatureListener
 	 * @param scale
 	 */
 
-	private void checkDrawSelectedFeature(Feature feature,int featurePos, Graphics g,int y){
+	protected void checkDrawSelectedFeature(Feature feature,int featurePos, Graphics g,int y){
 		Graphics2D g2D =(Graphics2D) g;
 		int f = featurePos;
 
 		if ( featureSelected){
-			//logger.info("feature selected " + selectedFeaturePos);
+			//logger.info("checkDrawSelectedFeature " + selectedFeaturePos + " " + feature);
 			if (f == selectedFeaturePos) {
+				//System.out.println(feature);
 				int fullwidth = Math.round(scale*chainLength);
-
 				g2D.setColor(SELECTED_FEATURE_COLOR);
 				Composite oldComp = g2D.getComposite();
-				int drawHeight = SequenceScalePanel.DEFAULT_Y_STEP;
-
 				g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER ,0.6f));
+				int drawHeight = SequenceScalePanel.DEFAULT_Y_STEP;		
+				if ( feature instanceof HistogramFeature)  {
+					drawHeight = SequenceScalePanel.DEFAULT_Y_STEP *2;
+					y = y - drawHeight - 1;
+				}
 				g2D.fillRect(0,y,fullwidth+SequenceScalePanel.DEFAULT_X_START,drawHeight);
 				g2D.setComposite(oldComp);
+				
 			}
 		}
 	}
 
-	private int paintNoStylesheetFeatures(Graphics g, Feature[] features,int y) {
-
-		String dasSourceType = drawableDasSource.getType();
-		if ( dasSourceType.equals(DrawableDasSource.TYPE_HISTOGRAM)) {
-			//logger.info("in paint: " + dasSourceType + " for " + drawableDasSource.getDasSource().getNickname());
-
-			drawHistogramFeature(features, 0, SequenceScalePanel.DEFAULT_Y_HEIGHT *2, g, y+SequenceScalePanel.DEFAULT_Y_HEIGHT);
-
-			return y;
-		}
-
-
-
-
-
-		for ( int f =0 ; f< features.length;f++) {
-
-			y += SequenceScalePanel.DEFAULT_Y_STEP;
-			Feature feature = features[f];
-
-			setColor(g,feature,new HashMap());
-			String featureType = feature.getType();
-
-			if (  featureType.equals(SpiceDefaults.DISULFID_TYPE)){
-				drawSpanFeature(feature,f,SequenceScalePanel.DEFAULT_Y_HEIGHT,g,y);
-
-			} else if (featureType.equals("hydrophobicity")) {
-				drawHistogramFeature(features,f,SequenceScalePanel.DEFAULT_Y_HEIGHT * 2,g,y);
-				if ( f > 1)
-					y -= SequenceScalePanel.DEFAULT_Y_STEP;
-			} else if (  featureType.equals("SECSTRUC") || 
-
-					featureType.equals("HELIX") || 
-					featureType.equals("STRAND") || 
-					featureType.equals("COIL") ||
-					featureType.equals("TURN")
-			){
-				drawSecstrucFeature(feature,f,SequenceScalePanel.DEFAULT_Y_HEIGHT,g,y);
-			} else { 
-				drawLineFeature(feature,f,SequenceScalePanel.DEFAULT_Y_HEIGHT,g,y);
-			}
-
-			checkDrawSelectedFeature(feature,f,g,y);
-
-			//drawLineFeature(feature,f,DEFAULT_Y_HEIGHT,g,aminosize,fullwidth,y,chainlength,scale);
-		}
-		return y;
-
-	}
-
-
-
+	
 
 	/** draw a solid rectangle 
 	 * 
@@ -1058,6 +851,52 @@ implements FeatureListener,SpiceFeatureListener
 		}
 		return h;
 	}
+	
+	private int paintNoStylesheetFeatures(Graphics g, Feature[] features,int y) {
+
+
+		for ( int f =0 ; f< features.length;f++) {
+
+			y += SequenceScalePanel.DEFAULT_Y_STEP;
+
+			Feature feature = features[f];
+
+			if ( feature instanceof HistogramFeature){
+				y += SequenceScalePanel.DEFAULT_Y_STEP;
+				HistogramFeature hf = (HistogramFeature) feature;
+				drawHistogramFeature(hf, 0, SequenceScalePanel.DEFAULT_Y_HEIGHT *2, g, y+SequenceScalePanel.DEFAULT_Y_HEIGHT);
+			} else {
+
+
+				setColor(g,feature,new HashMap());
+				String featureType = feature.getType();
+
+				if (  featureType.equals(SpiceDefaults.DISULFID_TYPE)){
+					drawSpanFeature(feature,f,SequenceScalePanel.DEFAULT_Y_HEIGHT,g,y);
+
+				} else if (  featureType.equals("SECSTRUC") || 
+
+						featureType.equals("HELIX") || 
+						featureType.equals("STRAND") || 
+						featureType.equals("COIL") ||
+						featureType.equals("TURN")
+				){
+					drawSecstrucFeature(feature,f,SequenceScalePanel.DEFAULT_Y_HEIGHT,g,y);
+				} else { 
+					drawLineFeature(feature,f,SequenceScalePanel.DEFAULT_Y_HEIGHT,g,y);
+				}
+
+			}
+			checkDrawSelectedFeature(feature,f,g,y);
+
+			//drawLineFeature(feature,f,DEFAULT_Y_HEIGHT,g,aminosize,fullwidth,y,chainlength,scale);
+		}
+		return y;
+
+	}
+
+
+
 
 	private int paintStylesheetFeatures(Map[] style,Graphics g, Feature[] features,int y) {
 		//logger.info("paintSylesheetFeatures " );
@@ -1091,7 +930,9 @@ implements FeatureListener,SpiceFeatureListener
 					setColor(g,feat,s);
 
 					String featStyle = (String)s.get("style");
+					
 					int h = getDrawHeight(s);
+					
 					if ( featStyle == null) {
 						featStyle = "";
 					}
@@ -1126,24 +967,21 @@ implements FeatureListener,SpiceFeatureListener
 						matchingStyle = true ;
 						drawArrowFeature(feat,f,h,g,y);
 
-					} else if ( featStyle.equals("gradient")) {
-						matchingStyle = true ;
-						drawHistogramFeature(features, f, SequenceScalePanel.DEFAULT_Y_HEIGHT * 2, g, y,s ,"gradient"); 
+					} else if ( feat instanceof HistogramFeature){
+						//y -= SequenceScalePanel.DEFAULT_Y_STEP;
+						//System.out.println("found a histogram feature!");
+
+						HistogramFeature hf = (HistogramFeature ) feat;
+
+						if ( featStyle.equals("gradient") ||
+								featStyle.equals("histogram") ||
+								featStyle.equals("lineplot"))
+							matchingStyle = true ;
+						
+						y = drawHistogramFeature(hf, f, g, y,s ,featStyle);
 
 
-					} else if ( featStyle.equals("histogram")) {
-						//logger.info("drawing histogram + style " + f + " " + features.length);
-						matchingStyle = true ;
-						drawHistogramFeature(features, f, SequenceScalePanel.DEFAULT_Y_HEIGHT * 2, g, y,s,"histogram");                    
-					} else if ( featStyle.equals("lineplot") ) {
-						matchingStyle = true ;
-						drawHistogramFeature(features, f, SequenceScalePanel.DEFAULT_Y_HEIGHT * 2, g, y,s,"lineplot");
-					}
-
-
-
-
-					else {
+					} else {
 						logger.finest("could not find matching feat. style " + featStyle + " falling back to default.");
 					}
 				} 
@@ -1181,7 +1019,7 @@ implements FeatureListener,SpiceFeatureListener
 
 		Feature f = e.getFeature();
 
-		//logger.info("feature selected " + f);
+		//logger.info("feature selected " + f + " " + featureSelected + " pos: " + selectedFeaturePos);
 
 		if ( f == null) {
 			if ( featureSelected){
@@ -1198,42 +1036,42 @@ implements FeatureListener,SpiceFeatureListener
 		boolean featureOnThisPanel = false;
 		for (int i = 0 ; i< allFeats.length;i++){
 
-			if ( drawableDasSource.getType().equals(DrawableDasSource.TYPE_HISTOGRAM))
 
-				if ( f.equals(allFeats[i])){
 
-					// compare all the segments ...
-					List seg1 = f.getSegments();
-					List seg2 = allFeats[i].getSegments();
+			if ( f.equals(allFeats[i])){
 
-					boolean found = true ;
-					Iterator iter1 = seg1.iterator();
-					while ( iter1.hasNext()) {
-						Segment segment1 = (Segment) iter1.next();
-						Iterator iter2 = seg2.iterator();
-						boolean thisOneFound = false;
-						while (iter2.hasNext()){
-							Segment segment2 = (Segment) iter2.next();
-							if ( segment1.equals(segment2)){
-								thisOneFound = true;
-								break;
-							}
-						}
-						if ( ! thisOneFound){
-							// must be another line ...
-							found = false;
+				// compare all the segments ...
+				List seg1 = f.getSegments();
+				List seg2 = allFeats[i].getSegments();
+
+				boolean found = true ;
+				Iterator iter1 = seg1.iterator();
+				while ( iter1.hasNext()) {
+					Segment segment1 = (Segment) iter1.next();
+					Iterator iter2 = seg2.iterator();
+					boolean thisOneFound = false;
+					while (iter2.hasNext()){
+						Segment segment2 = (Segment) iter2.next();
+						if ( segment1.equals(segment2)){
+							thisOneFound = true;
 							break;
 						}
 					}
-					if ( ! found){
-						continue;
+					if ( ! thisOneFound){
+						// must be another line ...
+						found = false;
+						break;
 					}
-					//logger.info("setting feature pos "  + i);
-					selectedFeaturePos = i;
-					featureOnThisPanel = true;
-					featureSelected = true;
-					break;
 				}
+				if ( ! found){
+					continue;
+				}
+				//logger.info("setting feature pos "  + i);
+				selectedFeaturePos = i;
+				featureOnThisPanel = true;
+				featureSelected = true;
+				break;
+			}
 		}
 
 		if ( ! featureOnThisPanel){

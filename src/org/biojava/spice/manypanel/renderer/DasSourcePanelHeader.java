@@ -37,6 +37,7 @@ import javax.swing.ImageIcon;
 import org.biojava.spice.ResourceManager;
 import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.feature.Feature;
+import org.biojava.spice.feature.HistogramFeature;
 import org.biojava.spice.feature.Segment;
 import org.biojava.spice.manypanel.drawable.DrawableDasSource;
 
@@ -124,28 +125,35 @@ extends DasSourcePanel{
         g2D.setFont(plainFont);
         
         y += SequenceScalePanel.DEFAULT_Y_STEP;
-        Map[] stylesheet = drawableDasSource.getStylesheet();
+        
+        Map[] stylesheet   = drawableDasSource.getStylesheet();
         Feature[] features = drawableDasSource.getFeatures();
+        
         for ( int f =0 ; f< features.length;f++) {
+        	
             Feature feature = features[f];
-            if ( isHistogramType(feature))
-                if (f >0)
-                    continue;
+            
+            if ( feature instanceof HistogramFeature) {             
+               	
+            	// histogramfeatures have double height
+            	y += SequenceScalePanel.DEFAULT_Y_STEP ;
+
+            }
+          
             drawLabel(g,feature,y, stylesheet);
-            y += SequenceScalePanel.DEFAULT_Y_STEP;
+            
+            if ( feature instanceof HistogramFeature) {             
+               	
+            	// histogramfeatures have double height
+            	y += SequenceScalePanel.DEFAULT_Y_STEP ;
+
+            }
+            
+            y += SequenceScalePanel.DEFAULT_Y_STEP;            
         }
         
     }
-    
-    private boolean isHistogramType(Feature f){
-    	if ( f.getType().equals("hydrophobicity"))
-    		return true;
-    	if (dasSource.getType().equalsIgnoreCase(DrawableDasSource.TYPE_HISTOGRAM))
-    		return true;
-    	
-    	return false;
-    	
-    }
+      
     
     /** display the type of the feature at the beginnng of the line
      * 
