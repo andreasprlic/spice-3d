@@ -1,3 +1,15 @@
+0.8.6 - May 24th 2007
+
+* We recently defined a convention how to configure and display
+  histogram style data in Ensembl and SPICE. 
+  http://www.dasregistry.org/extension_stylesheet_histogram.jsp
+
+* SPICE has now built in support for this and can display 
+  histograms, line-plots and colour gradients.
+  http://www.efamily.org.uk/software/dasclients/spice/histogram.shtml
+
+
+
 0.8.5 - March 6th 2007
 
 * SPICE is being used for the visualisation of the CASP7 results
@@ -113,7 +125,7 @@ Mainly a bug fixing release with only a few improvements in functionality
 0.7.2 - Aug 10, 2005
 
 * a keyword search to identify matching PDB codes using a webservice  
-  provided by MSD
+<  provided by MSD
 * support for DAS stylesheet command ( allows to control display of  
   features)
 * new ways how to interact with SPICE from the outside - and affect the  
