@@ -78,10 +78,10 @@ public class SpiceLayeredPanel
             DasSource[] dss = SpiceLayeredPanel.getAllDasSources();
             SpiceDasSource[] sds = new SpiceDasSource[dss.length+1] ;
             Das1Source dLocal = new Das1Source();
-            dLocal.setUrl("http://pfam1b.internal.sanger.ac.uk:9000/das/hydrophobicity/");
-            dLocal.setNickname("KyleDoolittle");
-            //dLocal.setUrl("http://localhost:8080/dazzle/demo_histo/");
-            //dLocal.setNickname("Phobius-demo");
+            //dLocal.setUrl("http://pfam1b.internal.sanger.ac.uk:9000/das/hydrophobicity/");
+            //dLocal.setNickname("KyleDoolittle");
+            dLocal.setUrl("http://localhost:8080/dazzle/demo_lineplot/");
+            dLocal.setNickname("Phobius-demo");
             dLocal.setCapabilities(new String[]{Capabilities.FEATURES,});
             
             DasCoordinateSystem up = DasCoordinateSystem.fromString(UNIPROTCOORDSYS);

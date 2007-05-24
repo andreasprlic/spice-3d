@@ -179,6 +179,16 @@ extends Thread
 
         notifyLoadingStarted();
 
+        
+        
+        // now with support for stylesheets.        
+        Map[] typeStyle = dasSource.getStylesheet();
+        // is null if no stylesheet has been loaded ...
+        if ( typeStyle == null){
+            doStyleSheetRequest();
+
+        }
+        
         //System.out.println(dascommand);
         logger.finest("do feature fetch from " + dascommand);
         DAS_FeatureRetrieve ftmp = new DAS_FeatureRetrieve(dascommand);
@@ -227,13 +237,7 @@ extends Thread
         Map[] feats = (Map[])features.toArray(new Map[features.size()]);
         notifyFeatureListeners(feats);
 
-        // now with support for stylesheets.        
-        Map[] typeStyle = dasSource.getStylesheet();
-        // is null if no stylesheet has been loaded ...
-        if ( typeStyle == null){
-            doStyleSheetRequest();
-
-        }
+       
 
 
         notifyLoadingFinished();

@@ -157,31 +157,30 @@ implements FeatureListener,SpiceFeatureListener
 
 	
 	public int getDisplayHeight(){
-		int h = SequenceScalePanel.DEFAULT_Y_START + SequenceScalePanel.DEFAULT_Y_STEP + SequenceScalePanel.LINE_HEIGHT;
+		
+		int h = SequenceScalePanel.DEFAULT_Y_START + 
+		SequenceScalePanel.DEFAULT_Y_STEP + 
+		SequenceScalePanel.LINE_HEIGHT;
 
 		Feature[] feats = drawableDasSource.getFeatures();
 
 		int l = feats.length;
-
-		boolean firstHisto = true;
+		
+		int nrHisto = 0;
 		for (int i = 0; i < feats.length; i++) {
+			
 			Feature f = feats[i];
 			
-			if ( f instanceof HistogramFeature){
-				if (  firstHisto){
-					l+=3;
-					firstHisto = false;
-				}
-				// height is double size for histogram features...
-				l+=1;
-			}
+			if ( f instanceof HistogramFeature)
+				nrHisto++;
+										
 		}
-
-
-
-
-		h += (l + 1 ) * SequenceScalePanel.DEFAULT_Y_STEP ;
-		//logger.info(dasSource.getDasSource().getNickname() + " height:" + h);
+		
+	
+		
+		h += (l + 1 ) * SequenceScalePanel.DEFAULT_Y_STEP + 
+			nrHisto * SequenceScalePanel.DEFAULT_Y_STEP * 2;
+		
 		return h;
 	}
 
@@ -283,20 +282,10 @@ implements FeatureListener,SpiceFeatureListener
 
 	private void drawArrowFeature(Feature feature,int featurePos, int drawHeight,Graphics g,int y) 
 	{
-		//logger.finest("draw Box Feature " + feature );
-
-
-		List segments = feature.getSegments() ;
-		//int f = featurePos;     
-
-		//Segment seg0 = (Segment) segments.get(0) ;
-
-		//Color col =  seg0.getColor(); 
-		//g2D.setColor(col);
-
+	
+		List segments = feature.getSegments() ;	
 
 		for (int s=0; s<segments.size();s++){
-
 
 			Segment segment=(Segment) segments.get(s);
 
@@ -390,10 +379,10 @@ implements FeatureListener,SpiceFeatureListener
 			Graphics g,
 			int y, Map styleSheet, String histogramStyle){
 
-		// now set the colors
+		
 
-		Color c1 = Color.white;
-		Color c2 = Color.red;
+		Color c1 = Color.red;
+		Color c2 = Color.blue;
 
 		try { 
 			String s1 = (String)styleSheet.get("color1");
@@ -409,12 +398,9 @@ implements FeatureListener,SpiceFeatureListener
 		}
 
 		int drawHeight = SequenceScalePanel.DEFAULT_Y_STEP *2;
-		//HistogramPainter hp = new HistogramPainter(coordManager,scale, chainLength,this);
+		
 		histogramPainter.drawHistogramFeature(feature, featurePos, drawHeight, g, y, c1,c2, histogramStyle);
 
-
-		//drawHistogramFeature(myFeats, 0, SequenceScalePanel.DEFAULT_Y_HEIGHT *2, g, y+SequenceScalePanel.DEFAULT_Y_HEIGHT);
-		// they got double size!
 		y += drawHeight;
 
 		return y;
@@ -659,6 +645,7 @@ implements FeatureListener,SpiceFeatureListener
 
 		if ( featureSelected){
 			//logger.info("checkDrawSelectedFeature " + selectedFeaturePos + " " + feature);
+			
 			if (f == selectedFeaturePos) {
 				//System.out.println(feature);
 				int fullwidth = Math.round(scale*chainLength);
@@ -670,7 +657,7 @@ implements FeatureListener,SpiceFeatureListener
 				if ( feature instanceof HistogramFeature)  {
 					
 					drawHeight = SequenceScalePanel.DEFAULT_Y_STEP *2;
-					y = y - drawHeight - 1;
+					y = y - drawHeight ;
 				}
 				g2D.fillRect(0,y,fullwidth+SequenceScalePanel.DEFAULT_X_START,drawHeight);
 				g2D.setComposite(oldComp);
@@ -865,6 +852,7 @@ implements FeatureListener,SpiceFeatureListener
 			Feature feature = features[f];
 
 			if ( feature instanceof HistogramFeature){
+				System.out.println("nostyle histo");
 				y += SequenceScalePanel.DEFAULT_Y_STEP;
 				HistogramFeature hf = (HistogramFeature) feature;
 				drawHistogramFeature(hf, 0, SequenceScalePanel.DEFAULT_Y_HEIGHT *2, g, y+SequenceScalePanel.DEFAULT_Y_HEIGHT);
@@ -905,34 +893,29 @@ implements FeatureListener,SpiceFeatureListener
 
 
 	private int paintStylesheetFeatures(Map[] style,Graphics g, Feature[] features,int y) {
-		//logger.info("paintSylesheetFeatures " );
-		//Graphics2D g2D =(Graphics2D) g;
-
-
-		for ( int f =0 ; f< features.length;f++) {
+		
+		for ( int f =0 ; f< features.length; f++ ) {
 
 			y += SequenceScalePanel.DEFAULT_Y_STEP;
 
-			Feature  feat = features[f];
+			Feature  feat      = features[f];
 			String featureType = feat.getType();
 
 			// disulfid bridges are never overwritten...            
-			if (  featureType.equals(SpiceDefaults.DISULFID_TYPE)){ 
+			if (  featureType.equals(SpiceDefaults.DISULFID_TYPE)){
+				
 				drawSpanFeature(feat,f,SequenceScalePanel.DEFAULT_Y_HEIGHT,g,y);
+				
 				continue;
 			}
 
 			boolean matchingStyle = false ;
 			for (int m=0; m< style.length;m++){
 				Map s = style[m];
-				// logger.finest(" style:" + s);
-
-
+				
 				String styleType = (String) s.get("type");
 
 				if ( styleType.equals(featureType) ){
-					// this style sheet applies here!
-					//logger.info("drawing " + styleType + " with stylesheet support");
 					setColor(g,feat,s);
 
 					String featStyle = (String)s.get("style");
@@ -973,9 +956,7 @@ implements FeatureListener,SpiceFeatureListener
 						matchingStyle = true ;
 						drawArrowFeature(feat,f,h,g,y);
 
-					} else if ( feat instanceof HistogramFeature){
-						//y -= SequenceScalePanel.DEFAULT_Y_STEP;
-						//System.out.println("found a histogram feature!");
+					} else if ( feat instanceof HistogramFeature){						
 
 						HistogramFeature hf = (HistogramFeature ) feat;
 
@@ -1000,11 +981,12 @@ implements FeatureListener,SpiceFeatureListener
 				
 				// color has not been set ...
 				setDefaultColor(g,feat);
+
 				if ( feat instanceof HistogramFeature) {
-					//y += SequenceScalePanel.DEFAULT_Y_STEP;
+				
 					HistogramFeature hf = (HistogramFeature) feat;
 					drawHistogramFeature(hf, 0, SequenceScalePanel.DEFAULT_Y_HEIGHT *2, g, y+SequenceScalePanel.DEFAULT_Y_HEIGHT);
-					y += SequenceScalePanel.DEFAULT_Y_STEP*3;
+					y += SequenceScalePanel.DEFAULT_Y_STEP * 3;
 				}
 					
 				else if (  featureType.equals(SpiceDefaults.DISULFID_TYPE)){

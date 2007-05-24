@@ -112,12 +112,9 @@ public class HistogramPainter {
 		if ( aminosize < 1 )
 			aminosize = 1;
 
-		int zeroPos = drawHeight / 2;
-
-
+		int zeroPos = drawHeight / 2; 
 		int zeroY   = y + zeroPos;
-
-		int maxY = y + drawHeight;
+		int maxY    = y + drawHeight;
 
 
 		//System.out.println("hydrophobicity " + features.length + " " + histogramType );
@@ -144,8 +141,8 @@ public class HistogramPainter {
 
 		double shift   = 0 - min;
 
-		int prevStart  = -1;
-		int prevHeight = -1;
+		int prevStart  = 0;
+		int prevHeight = 0;
 
 
 		List segments = feature.getSegments();
@@ -160,14 +157,13 @@ public class HistogramPainter {
 			HistogramSegment s = (HistogramSegment)seg;
 			
 			
-			double d = s.getScore();
-			
+			double d     =  s.getScore();			
 			double ratio =  ( d + shift ) / (max+shift) ;
 
 			Color c = DrawUtils.getColorGradient(c1, c2, ratio);
 			g2D.setColor(c);
-
 			s.setColor(c);
+			
 			int start = s.getStart() -1 ;
 			int end   = s.getEnd() -1 ;
 
@@ -208,32 +204,33 @@ public class HistogramPainter {
 					g2D.fillRect(xstart+width-aminosize,zeroY,aminosize, height);
 				 */
 
-			} else if ( histogramType.equals("gradient")){
-				// System.out.println("draw a gradient");
-				//g2D.fillRect(xstart+width-aminosize,y+(drawHeight),aminosize, drawHeight);
+			} else if ( histogramType.equals("gradient")) {
+
 				g2D.fillRect(xstart,y,width,drawHeight);
+
 			}
 			else if ( histogramType.equals("lineplot")){
 
-				int ystart = maxY - prevHeight;				
-				int yend   = maxY - height; 				
+				int ystart = maxY - prevHeight ;				
+				int yend   = maxY - height  ; 				
 
 				if (prevStart != (start - 1))				
-					ystart = maxY-height ;
+					ystart = yend;
 
-				//System.out.println("start " + start + " " + ystart + " " + yend + " score: " + score);
 				g2D.drawLine(xstart,ystart,xstart + aminosize,yend);
+
 
 			} else {
 				System.err.println("unknow histogram style " + histogramType);
 			}
 
+			// draw a base line
+			//g2D.setColor(Color.black);
+			//g2D.drawLine(0,maxY,chainLength * aminosize,maxY);
+			
 			prevHeight = height;			
 			prevStart = start;
 		}
-		
-		
-		//parent.checkDrawSelectedFeature(feature,featurePos,g,y);
 		
 
 	}

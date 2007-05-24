@@ -204,6 +204,9 @@ FeatureListener{
 
 			 if (f instanceof HistogramFeature ){
 				 dasSource.setUnlimitedFeatures(true);
+				 
+				 
+				 
 				 HistogramFeature hf = (HistogramFeature) f;
 
 				 List segments  = hf.getSegments();
@@ -225,6 +228,9 @@ FeatureListener{
 					 if ( score < min )
 						 min = score;
 
+					 //if ( f.getType().equals("hydrophobicity"))
+					//	 System.out.println(s.getStart()+"\t"+score);
+					 
 				 }
 
 				 hf.setMax(max);
