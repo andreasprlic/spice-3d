@@ -30,10 +30,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.eventmodel.*;
 //import org.biojava.servlets.dazzle.datasource.GFFFeature;
 import org.biojava.spice.config.SpiceDefaults;
+import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.feature.*;
 import org.biojava.spice.manypanel.eventmodel.FeatureListener;
 

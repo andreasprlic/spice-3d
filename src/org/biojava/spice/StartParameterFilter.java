@@ -26,10 +26,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.dasregistry.Das1Source;
 import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
 import org.biojava.spice.config.SpiceDefaults;
+import org.biojava.spice.das.SpiceDasSource;
 
 
 /** a class that filters SpiceDasSources based on the SpiceStartParameters

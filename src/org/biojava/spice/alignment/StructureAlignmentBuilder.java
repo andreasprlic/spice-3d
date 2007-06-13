@@ -45,12 +45,12 @@ import org.biojava.bio.structure.StructureException;
 //import org.biojava.bio.structure.io.DASStructureClient;
 import org.biojava.dasobert.das.AlignmentParameters;
 import org.biojava.dasobert.das.AlignmentThread;
-import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
 import org.biojava.dasobert.eventmodel.AlignmentEvent;
 import org.biojava.dasobert.eventmodel.AlignmentListener;
 //import org.biojava.dasobert.eventmodel.StructureEvent;
 import org.biojava.dasobert.eventmodel.StructureListener;
+import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.gui.SelectionPanel;
 import org.biojava.spice.jmol.StructurePanel;
 

@@ -31,9 +31,9 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.spice.ResourceManager;
 import org.biojava.spice.SpiceApplication;
+import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.gui.ConfigPanel;
 
 /**

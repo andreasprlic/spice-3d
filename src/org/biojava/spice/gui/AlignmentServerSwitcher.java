@@ -30,11 +30,11 @@ import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
 import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.config.RegistryConfiguration;
 import org.biojava.spice.config.SpiceDefaults;
+import org.biojava.spice.das.SpiceDasSource;
 
 public class AlignmentServerSwitcher  {
     

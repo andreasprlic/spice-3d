@@ -42,11 +42,11 @@ import javax.swing.JProgressBar;
 import java.awt.*;
 
 import org.biojava.bio.structure.Chain;
-import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.eventmodel.*;
 import org.biojava.spice.ResourceManager;
 import org.biojava.spice.SpiceApplication;
 import org.biojava.spice.config.SpiceDefaults;
+import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.feature.Feature;
 import org.biojava.spice.feature.HistogramFeature;
 import org.biojava.spice.feature.Segment;

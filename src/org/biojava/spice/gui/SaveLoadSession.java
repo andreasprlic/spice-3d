@@ -23,6 +23,7 @@
 package org.biojava.spice.gui;
 
 import org.biojava.spice.SpiceApplication;
+import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.feature.*;
 //import org.biojava.spice.Config.*;
 import org.biojava.spice.feature.Segment;

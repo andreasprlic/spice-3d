@@ -33,8 +33,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import org.biojava.bio.structure.*;
-import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.eventmodel.*;
+import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.feature.Feature;
 import org.biojava.spice.manypanel.eventmodel.DasSourceEvent;
 import org.biojava.spice.manypanel.eventmodel.DasSourceListener;

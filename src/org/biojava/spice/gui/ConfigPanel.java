@@ -51,7 +51,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
-import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
 import org.biojava.spice.ResourceManager;
 import org.biojava.spice.SpiceApplication;
@@ -60,6 +59,7 @@ import org.biojava.spice.config.DasSourceConfigPanel;
 import org.biojava.spice.config.RegistryConfigIO;
 import org.biojava.spice.config.RegistryConfiguration;
 import org.biojava.spice.config.SpiceDefaults;
+import org.biojava.spice.das.SpiceDasSource;
 
 
 /** a Component that provides the GUI for configuring SPICE

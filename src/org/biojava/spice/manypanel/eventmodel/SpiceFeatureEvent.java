@@ -22,7 +22,7 @@
  */
 package org.biojava.spice.manypanel.eventmodel;
 
-import org.biojava.dasobert.das.SpiceDasSource;
+import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.feature.Feature;
 import org.biojava.spice.feature.Segment;
 

@@ -30,6 +30,7 @@ import java.util.Iterator;
 
 
 import org.biojava.spice.config.SpiceDefaults;
+import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.feature.Feature;
 import org.biojava.spice.feature.FeatureImpl;
 import org.biojava.spice.feature.Segment;
@@ -45,7 +46,6 @@ import org.biojava.bio.structure.ChainImpl;
 import org.biojava.bio.structure.Structure;
 import org.biojava.dasobert.das.AlignmentParameters;
 import org.biojava.dasobert.das.AlignmentThread;
-import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.dasregistry.*;
 import org.biojava.dasobert.eventmodel.*;
 

@@ -35,10 +35,10 @@ import org.biojava.bio.structure.StructureException;
 import org.biojava.bio.structure.StructureImpl;
 import org.biojava.bio.structure.align.StructurePairAligner;
 import org.biojava.bio.structure.align.pairwise.AlternativeAlignment;
-import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.das.StructureThread;
 import org.biojava.dasobert.eventmodel.StructureEvent;
 import org.biojava.dasobert.eventmodel.StructureListener;
+import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.manypanel.eventmodel.StructureAlignmentListener;
 
 /** a class that obtains two structures via DAS and aligns them

@@ -35,7 +35,6 @@ import org.biojava.bio.program.ssbind.AnnotationFactory;
 import org.biojava.bio.structure.Atom;
 import org.biojava.bio.structure.jama.Matrix;
 import org.biojava.dasobert.das.AlignmentThread;
-import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.util.HttpConnectionTools;
 import org.biojava.spice.config.RegistryConfiguration;
 import java.net.*;

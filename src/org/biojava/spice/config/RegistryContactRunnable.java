@@ -32,12 +32,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.biojava.bio.program.das.dasalignment.DASException;
-import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.das2.Das2Source;
 import org.biojava.dasobert.das2.DasSourceConverter;
 import org.biojava.dasobert.das2.io.DasSourceReaderImpl;
 import org.biojava.dasobert.dasregistry.Das1Source;
 import org.biojava.dasobert.dasregistry.DasSource;
+import org.biojava.spice.das.SpiceDasSource;
 
 
 class RegistryContactRunnable implements Runnable {

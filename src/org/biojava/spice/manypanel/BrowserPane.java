@@ -37,12 +37,12 @@ import java.awt.Color;
 import java.util.*;
 import java.util.logging.Logger;
 
-import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.dasregistry.Das1Source;
 import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
 import org.biojava.dasobert.eventmodel.*;
 import org.biojava.spice.ResourceManager;
 import org.biojava.spice.config.SpiceDefaults;
+import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.manypanel.drawable.DrawableDasSource;
 import org.biojava.spice.manypanel.eventmodel.DasSourceEvent;
 import org.biojava.spice.manypanel.eventmodel.DasSourceListener;

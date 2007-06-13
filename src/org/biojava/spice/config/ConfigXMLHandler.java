@@ -30,8 +30,8 @@ import org.xml.sax.Attributes ;
 import java.net.URL;
 import java.net.MalformedURLException;
 
-import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.dasregistry.*;
+import org.biojava.spice.das.SpiceDasSource;
 
 /**
  * XML content handler for serialisation of RegistryConfiguration class

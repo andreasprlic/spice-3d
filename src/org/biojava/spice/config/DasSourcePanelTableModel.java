@@ -25,7 +25,7 @@ package org.biojava.spice.config;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 
-import org.biojava.dasobert.das.SpiceDasSource;
+import org.biojava.spice.das.SpiceDasSource;
 
 
 public class DasSourcePanelTableModel extends AbstractTableModel {

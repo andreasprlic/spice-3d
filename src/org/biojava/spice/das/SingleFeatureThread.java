@@ -26,7 +26,6 @@ package org.biojava.spice.das ;
 
 
 import org.biojava.dasobert.das.DAS_FeatureRetrieve;
-import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.eventmodel.*;
 import org.biojava.spice.config.SpiceDefaults;
 import org.biojava.spice.manypanel.drawable.*;

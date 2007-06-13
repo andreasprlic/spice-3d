@@ -25,8 +25,8 @@ package org.biojava.spice.config;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
+import org.biojava.spice.das.SpiceDasSource;
 
 /** a class that searches all DasSources for a particular keyword and returns a list of DasSources that match it
  * 

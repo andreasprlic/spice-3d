@@ -44,8 +44,8 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 
-import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.spice.config.RegistryConfiguration;
+import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.manypanel.eventmodel.StructureAlignmentListener;
 
 

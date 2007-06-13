@@ -36,11 +36,11 @@ import java.util.Date                     ;
 import java.util.ArrayList ;
 import java.util.List ;
 
+import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.utils.xml.*            ; 
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.dasregistry.*;
 
 import java.util.Iterator;

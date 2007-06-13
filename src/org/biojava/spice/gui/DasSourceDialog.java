@@ -36,8 +36,8 @@ import javax.swing.JScrollPane;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
-import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
+import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.utils.BrowserOpener;
 
 

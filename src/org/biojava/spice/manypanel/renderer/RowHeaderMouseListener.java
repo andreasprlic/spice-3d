@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 
-import org.biojava.dasobert.das.SpiceDasSource;
+import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.feature.Feature;
 import org.biojava.spice.feature.HistogramFeature;
 import org.biojava.spice.gui.DasSourceDialog;

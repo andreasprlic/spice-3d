@@ -62,11 +62,11 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumn;
 
-import org.biojava.dasobert.das.SpiceDasSource;
 import org.biojava.dasobert.dasregistry.DasCoordinateSystem;
 import org.biojava.spice.ResourceManager;
 import org.biojava.spice.gui.ConfigPanel;
 import org.biojava.spice.config.DasSourcePanelTableModel;
+import org.biojava.spice.das.SpiceDasSource;
 import org.biojava.spice.utils.BrowserOpener;
 
 public class DasSourceConfigPanel {
