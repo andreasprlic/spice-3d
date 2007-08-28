@@ -422,7 +422,7 @@ JmolCommander
     public void featureSelected(SpiceFeatureEvent e){
         
         Feature feat = (Feature) e.getFeature();
-        //logger.info("StructurePanelListener selected feature " + feat);
+        logger.info("StructurePanelListener selected feature " + feat);
         //System.out.println("StructurePanel selected feature " + feat);
         Map[] stylesheet = e.getDasSource().get3DStylesheet();
         highliteFeature(feat,stylesheet,true);
@@ -495,7 +495,7 @@ JmolCommander
             if ( feature.getType().equals(SpiceDefaults.DISULFID_TYPE)){
             
                 String c = getDisulfidSelect(start,end) ;
-                cmd += "select " + c + " and protein";
+                cmd += "select " + c + " and protein ";
                 
             } else if ( start == end){
             	
@@ -650,7 +650,13 @@ JmolCommander
                 
             } else if ( start == end) {
             	String sel = getSelectStrSingle(currentChainNumber, start);
-            	cmd += "select " + sel +";";
+            	if ( first ) {
+            		cmd += "select ";
+            		first = false;
+            	} else {
+            		cmd += ", ";
+            	}
+            	cmd += sel ;
             
             }else {
             
