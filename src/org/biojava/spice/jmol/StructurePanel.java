@@ -222,7 +222,7 @@ implements JmolCommander
      * @param command - a String containing a RASMOL like command. e.g. "select protein; cartoon on;"
      */
     public void executeCmd(String command) {
-        logger.info(command);
+       // logger.info(command);
         if (viewer.isScriptExecuting()) 
             logger.info("viewer is executing");
         
