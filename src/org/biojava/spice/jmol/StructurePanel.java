@@ -103,7 +103,7 @@ implements JmolCommander
         
     }
     
-    /** if Jmol crahsed, drop it and get a new one
+    /** if Jmol crashed, drop it and get a new one
      * 
      *
      */
