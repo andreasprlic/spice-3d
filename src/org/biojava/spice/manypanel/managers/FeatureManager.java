@@ -24,6 +24,7 @@ package org.biojava.spice.manypanel.managers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.biojava.bio.structure.Structure;
@@ -122,8 +123,9 @@ implements ObjectManager ,SequenceListener{
     }
     
     public void setDasSources(SpiceDasSource[] dasSourcs) {
-        logger.finest("got " + dasSourcs.length + "feature sources for coordSYs " + coordSys);
-        
+    	if ( logger.isLoggable(Level.FINEST)){
+    		logger.finest("got " + dasSourcs.length + "feature sources for coordSYs " + coordSys);
+    	}
                 
         Iterator iter = featureRenderers.iterator();
         while (iter.hasNext()){
@@ -234,7 +236,9 @@ implements ObjectManager ,SequenceListener{
     }
     
     private void triggerFeatureRequest(String accessionCode, SpiceDasSource sds, DrawableDasSource ds){
-        logger.finest("triggering Feature request for" + accessionCode + "  from " + sds);
+    	if (logger.isLoggable(Level.FINEST)){
+    		logger.finest("triggering Feature request for" + accessionCode + "  from " + sds);
+    	}
         SingleFeatureThread thread = new SingleFeatureThread(accessionCode, sds);
         
         if (sds.hasUnlimitedFeatures()){

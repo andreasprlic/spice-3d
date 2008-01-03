@@ -23,6 +23,7 @@
 package org.biojava.spice.manypanel.managers;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -109,7 +110,9 @@ implements ObjectManager {
      * 
      */
     public void setDasSources(SpiceDasSource[] sources) {
-        logger.finest("setting new DAS sources " + sources.length + " previously known: " + dasSources.length);
+    	if ( logger.isLoggable(Level.FINEST)) {
+    		logger.finest("setting new DAS sources " + sources.length + " previously known: " + dasSources.length);
+    	}
         List dsses = new ArrayList();
         for ( int i = 0 ; i< sources.length; i++){
             

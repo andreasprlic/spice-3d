@@ -24,6 +24,7 @@ package org.biojava.spice.manypanel.managers;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -190,8 +191,9 @@ extends AbstractChainManager
     
     /** trigger DAS Sequence request */
     public void newObjectRequested(String accessionCode) {
-        logger.finest("SequenceManager new Object Requested");
-       
+    	if (logger.isLoggable(Level.FINEST)){
+    		logger.finest("SequenceManager new Object Requested");
+    	}
         
         if  ( coordinateSystem.toString().equals(SpiceDefaults.UNIPROTCOORDSYS)){
             if ( UniProtAccessionCodeTools.isEntryName(accessionCode)){
@@ -218,8 +220,9 @@ extends AbstractChainManager
     
     public void noObjectFound(String accessionCode){
         // clear the display...
-        logger.finest("SequenceManager noObjectFound " + accessionCode);
-        
+    	if ( logger.isLoggable(Level.FINEST)){
+    		logger.finest("SequenceManager noObjectFound " + accessionCode);
+    	}
         setAccessionCode("");
         DrawableSequence ds = fromString("","");
         Iterator iter = seqRenderers.iterator();
@@ -235,7 +238,9 @@ extends AbstractChainManager
 
 
     public void newSequence(SequenceEvent e) {
-        logger.finest("SequenceManager newSequence " + e.getAccessionCode());
+    	if (logger.isLoggable(Level.FINEST)){
+    		logger.finest("SequenceManager newSequence " + e.getAccessionCode());
+    	}
         String sequence = e.getSequence();
         
         DrawableSequence ds = fromString(e.getAccessionCode(),sequence);

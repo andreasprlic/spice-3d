@@ -293,7 +293,9 @@ implements ObjectManager, StructureListener {
     public void noObjectFound(String accessionCode){
         // clear the display...
         setAccessionCode("");
-        logger.finest("StructureManager noObjectFound");
+        if (logger.isLoggable(Level.FINEST)){
+        	logger.finest("StructureManager noObjectFound");
+        }
         Iterator iter = structureRenderers.iterator();
         while (iter.hasNext()){
             StructureRenderer rend = (StructureRenderer) iter.next();
@@ -348,7 +350,9 @@ implements ObjectManager, StructureListener {
         int nr = event.getCurrentChainNumber();
         //logger.finest("selected chain " + nr);
         if ( nr == currentChainNr){
-            logger.finest("already selected chain nr " + nr + ", not selecting again...");
+        	if (logger.isLoggable(Level.FINEST)){
+        		logger.finest("already selected chain nr " + nr + ", not selecting again...");
+        	}
             return;
         }
         Structure s = event.getStructure();
