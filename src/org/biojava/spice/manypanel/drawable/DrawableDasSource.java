@@ -80,7 +80,7 @@ FeatureListener{
 
 	static Logger logger = Logger.getLogger("org.biojava.spice");
 	boolean loading;
-	List featureListeners;
+	List<FeatureListener> featureListeners;
 
 
 	public DrawableDasSource(SpiceDasSource ds) {
@@ -150,7 +150,7 @@ FeatureListener{
 	}
 	public void clearFeatureListeners(){
 
-		featureListeners = new ArrayList();
+		featureListeners = new ArrayList<FeatureListener>();
 	}
 	public void addFeatureListener(FeatureListener feat){
 		if ( ! featureListeners.contains(feat))
@@ -241,7 +241,7 @@ FeatureListener{
 	 }
 
 	 public void newFeatures(FeatureEvent e){
-		 Map[] feats = e.getFeatures();
+		 Map<String,String>[] feats = e.getFeatures();
 		 //logger.info("got " + feats.length + " features " +
 		 //       featureListeners.size() + " featureListeners");
 		 features = convertMap2Features(feats);
@@ -280,7 +280,7 @@ FeatureListener{
 	 /** returns a list of SPICE-Features objects */
 	 private Feature[] convertMap2Features(Map[] mapfeatures){
 
-		 List features = new ArrayList();
+		 List<Feature> features = new ArrayList<Feature>();
 
 		 boolean secstruc = false ;
 		 //String prevtype = "@prevtype" ;
@@ -486,7 +486,7 @@ FeatureListener{
 		 return s;
 	 }
 
-	 private List testAddFeatures(List features,Feature newFeature){
+	 private List<Feature> testAddFeatures(List<Feature> features,Feature newFeature){
 		 // test if this features is added as a new feature to the features list, or if it is joint with an already existing one...
 		 //System.out.println("testing " + newFeature + " " + newFeature.getScore());   
 		 Iterator iter = features.iterator();
