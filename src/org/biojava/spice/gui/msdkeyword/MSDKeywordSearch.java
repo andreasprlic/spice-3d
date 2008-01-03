@@ -44,14 +44,14 @@ import org.xml.sax.XMLReader;
 /**
  * request all PDB accession codes that match to a particular keyword.
  * All data is retrieved from e.g.
- * http://www.ebi.ac.uk/msd-srv/msdsite/entryQueryXML?act=getall&searchOptions=%26keyword=histone";
+ * http://www.ebi.ac.uk/msd-srv/msdmotif/entryQueryXML?act=getall&searchOptions=%26keyword=histone";
  * 
  * @author Andreas Prlic
  *
  */
 public class MSDKeywordSearch {
 
-	public static String MSDLOCATION = "http://www.ebi.ac.uk/msd-srv/msdsite/entryQueryXML?act=getall&searchOptions=%26keyword=";
+	public static String MSDLOCATION = "http://www.ebi.ac.uk/msd-srv/msdmotif/entryQueryXML?act=getall&searchOptions=%26keyword=";
 
 	static Logger logger = Logger.getLogger("org.biojava.spice");
 	String[] suggestions;
