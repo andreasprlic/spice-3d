@@ -65,7 +65,7 @@ public class AlignmentTools {
      */
      public static void addVector(Alignment ali, String intObjectId, Atom atom) 
      throws DASException {
-            Map anno = new HashMap();
+            Map<String,Object> anno = new HashMap<String,Object>();
             anno.put("intObjectId",intObjectId);            
             anno.put("vector",atom);
             Annotation a = AnnotationFactory.makeAnnotation(anno);
@@ -163,19 +163,25 @@ public class AlignmentTools {
      * @return an array of Alignment object
      */
     public  Alignment[] getAlignments(String code) {
-    	logger.finest("searching for alignments of "+code+" against PDB");
+    	if (logger.isLoggable(Level.FINEST)){
+    		logger.finest("searching for alignments of "+code+" against PDB");
+    	}
+    	
     	Alignment[] alignments = null ;
 
     	List aligservers = config.getServers("alignment");
-    	logger.finest("found " + aligservers.size() + " alignment servers");
+    	if (logger.isLoggable(Level.FINEST)){
+    		logger.finest("found " + aligservers.size() + " alignment servers");
+    	}
 
 	String 	dasalignmentcommand = null  ;
     	
     	// loop over all available alignment servers 
     	for ( int i =0 ; i < aligservers.size() ; i++ ) {
     	    SpiceDasSource sds= (SpiceDasSource)aligservers.get(i);
-    	   
-    	    logger.finest("investigating " + i + " url" + sds.getUrl());
+    	    if (logger.isLoggable(Level.FINEST)){  
+    	    	logger.finest("investigating " + i + " url" + sds.getUrl());
+    	    }
     	    //System.out.println("investigating" + sds.getUrl());
     	    // only consider those serving uniprot and PDB alignments
     	    if ( config.isSeqStrucAlignmentServer(sds) ) {
@@ -193,8 +199,9 @@ public class AlignmentTools {
     		try{
     		    //alignments = dasc.getAlignments(code);
     		    alignments= retreiveAlignments(dasalignmentcommand+code);
-    		    
-    		    logger.finest("DASAlignmentHandler: got "+ alignments.length +" alignment(s):");
+    		    if (logger.isLoggable(Level.FINEST)){
+    		    	logger.finest("DASAlignmentHandler: got "+ alignments.length +" alignment(s):");
+    		    }
     		    if ( alignments.length == 0 ) {
     			// check next alignment server ...
     			continue ;

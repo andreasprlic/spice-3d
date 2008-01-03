@@ -67,8 +67,8 @@ extends Thread
     SpiceDasSource dasSource;
     static int MAX_NR_FEATURES = 300;
     int maxNrFeatures;
-    List dasSourceListeners;
-    List featureListeners;
+    List<DasSourceListener> dasSourceListeners;
+    List<FeatureListener> featureListeners;
 
     static Logger logger = Logger.getLogger(SpiceDefaults.LOGGER);
 
@@ -116,7 +116,9 @@ extends Thread
             e.printStackTrace();
 
         }
-        logger.finest("setting feature request url " + Url);
+        if (logger.isLoggable(Level.FINEST)){
+        	logger.finest("setting feature request url " + Url);
+        }
         dascommand = Url ;
 
 
@@ -148,11 +150,11 @@ extends Thread
 
 
 	public void clearFeatureListeners(){
-        featureListeners = new ArrayList();
+        featureListeners = new ArrayList<FeatureListener>();
     }
 
     public void clearDasSourceListeners(){
-        dasSourceListeners = new ArrayList();
+        dasSourceListeners = new ArrayList<DasSourceListener>();
     }
 
 
@@ -189,7 +191,9 @@ extends Thread
         }
         
         //System.out.println(dascommand);
-        logger.finest("do feature fetch from " + dascommand);
+        if (logger.isLoggable(Level.FINEST)){
+        	logger.finest("do feature fetch from " + dascommand);
+        }
         DAS_FeatureRetrieve ftmp = new DAS_FeatureRetrieve(dascommand);
 
 
@@ -218,7 +222,7 @@ extends Thread
             comeBackLater = ftmp.getComeBackLater(); 
         }
 
-        List features = ftmp.get_features();
+        List<Map<String,String>> features = ftmp.get_features();
 
         int cutoff = maxNrFeatures;
 
@@ -233,7 +237,7 @@ extends Thread
 
 
         // notify FeatureListeners
-        Map[] feats = (Map[])features.toArray(new Map[features.size()]);
+        Map<String,String>[] feats = features.toArray(new Map[features.size()]);
         notifyFeatureListeners(feats);
 
        
@@ -248,7 +252,9 @@ extends Thread
         dasSource.loadStylesheet();
         Map[] typeStyle = dasSource.getStylesheet();
         for ( int m=0; m< typeStyle.length;m++){
-            logger.finest("got stylesheet: " + typeStyle[m]);    
+        	if (logger.isLoggable(Level.FINEST)){
+        		logger.finest("got stylesheet: " + typeStyle[m]);
+        	}
         }
     }
 
@@ -259,20 +265,22 @@ extends Thread
     private void notifyComeBackLater(int comeBackLater){
         FeatureEvent event = new FeatureEvent(new HashMap[0],dasSource);
         event.setComeBackLater(comeBackLater);
-        Iterator fiter = featureListeners.iterator();
+        Iterator<FeatureListener> fiter = featureListeners.iterator();
         while (fiter.hasNext()){
-            FeatureListener fi = (FeatureListener)fiter.next();
+            FeatureListener fi = fiter.next();
             fi.comeBackLater(event);
         }
 
     }
 
-    private void notifyFeatureListeners(Map[] feats){
-        logger.finest("SingleFeatureThread found " + feats.length + " features");
+    private void notifyFeatureListeners(Map<String,String>[] feats){
+    	if (logger.isLoggable(Level.FINEST)){
+    		logger.finest("SingleFeatureThread found " + feats.length + " features");
+    	}
         FeatureEvent fevent = new FeatureEvent(feats,dasSource);
-        Iterator fiter = featureListeners.iterator();
+        Iterator<FeatureListener> fiter = featureListeners.iterator();
         while (fiter.hasNext()){
-            FeatureListener fi = (FeatureListener)fiter.next();
+            FeatureListener fi = fiter.next();
             fi.newFeatures(fevent);
         }
     }
@@ -281,9 +289,9 @@ extends Thread
 
         DrawableDasSource drawableDs = new DrawableDasSource(dasSource);
         DasSourceEvent dsEvent = new DasSourceEvent(drawableDs);
-        Iterator iter = dasSourceListeners.iterator();
+        Iterator<DasSourceListener> iter = dasSourceListeners.iterator();
         while (iter.hasNext()){
-            DasSourceListener li = (DasSourceListener) iter.next();
+            DasSourceListener li = iter.next();
             li.loadingStarted(dsEvent);
         }
     }
@@ -291,9 +299,9 @@ extends Thread
     private void notifyLoadingFinished(){
         DrawableDasSource drawableDs = new DrawableDasSource(dasSource);
         DasSourceEvent dsEvent = new DasSourceEvent(drawableDs);
-        Iterator iter = dasSourceListeners.iterator();
+        Iterator<DasSourceListener> iter = dasSourceListeners.iterator();
         while (iter.hasNext()){
-            DasSourceListener li = (DasSourceListener) iter.next();
+            DasSourceListener li = iter.next();
             li.loadingFinished(dsEvent);
         }
     }
