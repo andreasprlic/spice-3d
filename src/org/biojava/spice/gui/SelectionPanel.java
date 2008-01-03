@@ -26,6 +26,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -277,7 +278,9 @@ implements StructureListener
         alignmentChooser.setStructureAlignment(null);
         
         Dimension dim = new Dimension(30,30);
-        logger.finest("setting SelectionPanel dimension to " + dim);
+        if (logger.isLoggable(Level.FINEST)){
+        	logger.finest("setting SelectionPanel dimension to " + dim);
+        }
         this.setPreferredSize(dim);
         if ( splitPanel != null) {
         	splitPanel.repaint();

@@ -657,7 +657,9 @@ ConfigurationListener
 		 //Thread t = new Thread(runner);
 		 //t.start();
 
-		 logger.finest(msg);
+		 if (logger.isLoggable(Level.FINEST)){
+			 logger.finest(msg);
+		 }
 
 
 
@@ -1193,7 +1195,9 @@ ConfigurationListener
 			 l = config.getAllServers();
 
 		 //Q: if we do not have servers, should we trigger a request for them here?
-		 logger.finest("got " + l.size() + " servers");
+		 if (logger.isLoggable(Level.FINEST)){
+			 logger.finest("got " + l.size() + " servers");
+		 }
 
 		 //if ( logger.isLoggable(Level.FINEST)) {
 		 //Iterator iter = l.iterator();

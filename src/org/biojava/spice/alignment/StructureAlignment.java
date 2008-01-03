@@ -34,6 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -831,8 +832,9 @@ public class StructureAlignment {
         
         if (alignment == null)
             return null;
-        logger.fine("get structure range for " + s.getPDBCode());
-        
+        if (logger.isLoggable(Level.FINE)){
+        	logger.fine("get structure range for " + s.getPDBCode());
+        }
         // check if the alignment has an object detail "region" for this
         // if yes = restrict the used structure...
         Annotation[] objects = alignment.getObjects();

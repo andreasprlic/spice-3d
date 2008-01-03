@@ -25,6 +25,7 @@ package org.biojava.spice.gui;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JFrame;
@@ -123,7 +124,9 @@ public class AlignmentServerSwitcher  {
                     
                 }
                  
-                logger.fine("moving alignment server " + sd.getUrl() + " to top position in config");
+                if (logger.isLoggable(Level.FINE)){
+                	logger.fine("moving alignment server " + sd.getUrl() + " to top position in config");
+                }
                 config.moveToPosition(sd.getUrl(),0);
                 spice.newConfigRetrieved(config);
                 

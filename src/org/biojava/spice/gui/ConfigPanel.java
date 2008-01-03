@@ -513,7 +513,10 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
         if ( pos == 1 ) {       
             
             //System.out.println("adding new local DAS source");
-            logger.finest(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.127")); //$NON-NLS-1$
+        	if (logger.isLoggable(Level.FINEST)) {
+        		logger.finest(ResourceManager
+						.getString("org.biojava.spice.gui.ConfigPanel.127")); //$NON-NLS-1$
+			}
             HashMap formdata = new HashMap();
             int formPos = -1 ;
             for ( int i = 0 ; i < DASSOURCE_FIELDS.length; i++) {
@@ -597,7 +600,9 @@ public class ConfigPanel extends JPanel implements ConfigurationListener{
             String behave = (String)updateBehaveList.getSelectedItem();
             
             //System.out.println("setting update behaviour to " + behave);
-            logger.finest("setting update behaviour to " + behave); //$NON-NLS-1$
+            if (logger.isLoggable(Level.FINEST)){
+            	logger.finest("setting update behaviour to " + behave); //$NON-NLS-1$
+            }
             if ( behave.equals(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.141"))) //$NON-NLS-1$
                 behave = ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.142") ; //$NON-NLS-1$
             config.setUpdateBehave(behave);

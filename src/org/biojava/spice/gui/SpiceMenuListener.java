@@ -27,6 +27,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.Group;
@@ -341,7 +342,9 @@ SequenceListener
            
         } else if ( cmd.equals(ResourceManager.getString("org.biojava.spice.gui.menu.AlignmentServerSwitch"))) {
             
-            logger.finest("requested alignment switch");
+        	 if (logger.isLoggable(Level.FINEST)){
+        		 logger.finest("requested alignment switch");
+        	 }
             if ( spice instanceof SpiceApplication) {
                 SpiceApplication sp = (SpiceApplication) spice;
                 new AlignmentServerSwitcher(sp);
