@@ -34,6 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
@@ -260,8 +261,9 @@ implements FeatureListener,SpiceFeatureListener
 
 
 	public void newFeatures(FeatureEvent e) {
-
-		logger.finest(" dassourcepanel:  das source >" + drawableDasSource.getDasSource().getNickname()+"< got new ("+ drawableDasSource.getFeatures().length + ") features, repaint!");
+		if (logger.isLoggable(Level.FINEST)){
+			logger.finest(" dassourcepanel:  das source >" + drawableDasSource.getDasSource().getNickname()+"< got new ("+ drawableDasSource.getFeatures().length + ") features, repaint!");
+		}
 		int panelWidth = getWidth();
 		int panelHeight = getDisplayHeight();
 		Dimension d = new Dimension(panelWidth,panelHeight);
@@ -969,7 +971,9 @@ implements FeatureListener,SpiceFeatureListener
 
 
 					} else {
-						logger.finest("could not find matching feat. style " + featStyle + " falling back to default.");
+						if (logger.isLoggable(Level.FINEST)){
+							logger.finest("could not find matching feat. style " + featStyle + " falling back to default.");
+						}
 					}
 				} 
 			}

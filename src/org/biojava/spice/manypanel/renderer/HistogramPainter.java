@@ -48,8 +48,7 @@ public class HistogramPainter {
 		this.scale        = scale;
 		this.coordManager = cm;
 		this.chainLength  = chainLength;
-		
-		
+				
 		// a cache to store max and min values
 		cache = new HashMap();
 		

@@ -24,6 +24,7 @@ package org.biojava.spice.manypanel.renderer;
 
 import java.awt.Dimension;
 import java.awt.event.AdjustmentListener;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -456,18 +457,24 @@ public abstract class AbstractChainRenderer
             DrawableDasSource dds = panel.getDrawableDasSource();
             //System.out.println("comparing " + ds.getNickname() + " " + dds.getDasSource().getNickname());
             if ( ds.getUrl().equals(dds.getDasSource().getUrl())) {
-                logger.finest("AbstractChainRenderer known das source!" + ds.getUrl());
+            	if (logger.isLoggable(Level.FINEST)){
+            		logger.finest("AbstractChainRenderer known das source!" + ds.getUrl());
+            	}
                 drawds.addFeatureListener(panel);
                 drawds.addFeatureListener(this);
                 drawds.setFeatures(dds.getFeatures());
-                logger.info("mapping Drawables " + drawds.getType() + " " + dds.getType());
+                if (logger.isLoggable(Level.INFO)){
+                	logger.info("mapping Drawables " + drawds.getType() + " " + dds.getType());
+                }
                 drawds.setType(dds.getType());
                 panel.setDrawableDasSource(drawds);
                 
                 return true;
             }
         }
-        logger.finest("do not know ds  " + ds.getNickname() );
+        if (logger.isLoggable(Level.FINEST)){
+        	logger.finest("do not know ds  " + ds.getNickname() );
+        }
         return false;
     }
     
@@ -475,20 +482,26 @@ public abstract class AbstractChainRenderer
     public void removeDasSource(DasSourceEvent event) {
         
         SpiceDasSource remove = event.getDasSource().getDasSource();
-        logger.finest("AbstractChainrenderer removing DAS source " + remove.getNickname());
+        if (logger.isLoggable(Level.FINEST)){
+        	logger.finest("AbstractChainrenderer removing DAS source " + remove.getNickname());
+        }
         Iterator iter = dasSourcePanels.iterator();
         DasSourcePanel removeMe = null;
         while (iter.hasNext()){
             DasSourcePanel pan = (DasSourcePanel)iter.next();
             DrawableDasSource test = pan.getDrawableDasSource();
-            logger.finest("AbstractChainRenderer comp " + test.getDasSource().getNickname() + " " + remove.getNickname());
+            if ( logger.isLoggable(Level.FINEST)){
+            	logger.finest("AbstractChainRenderer comp " + test.getDasSource().getNickname() + " " + remove.getNickname());
+            }
             if ( test.getDasSource().getUrl().equals(remove.getUrl())){
                 removeMe = pan;  
                 break;
             }
         }
         if ( removeMe != null){
-            logger.finest("removing panel " + dasSourcePanels.contains(removeMe));
+        	if (logger.isLoggable(Level.FINEST)){
+        		logger.finest("removing panel " + dasSourcePanels.contains(removeMe));
+        	}
              
             dasSourcePanels.remove(removeMe);
             layeredPane.remove(removeMe);
