@@ -1,3 +1,18 @@
+0.9 - January 3rd 2008
+
+* From now on SPICE will require Java 1.5+. If you still are using an
+  old Java 1.4 installation on your system, please consider an upgrade.
+  Java 1.4 is in the end of life process http://java.sun.com/j2se/1.4.2/
+
+* updated the keyword search service to the latest version provided by MSD.
+
+* performance improvements.
+
+* the protein structure related DAS servers used by SPICE have been
+  updated to the remediated PDB files already at some point last year.
+
+
+
 0.8.6 - May 24th 2007
 
 * We recently defined a convention how to configure and display
@@ -13,9 +28,7 @@
 0.8.5 - March 6th 2007
 
 * SPICE is being used for the visualisation of the CASP7 results
-see  
-http://www2.predictioncenter.org/casp/casp7/public_tmp/cgi-bin/ 
-results.cgi
+see http://www.predictioncenter.org/casp/casp7/public/cgi-bin/results.cgi
 It is now possible to view the 3D alignments of the CASP Targets, the
 submitted protein structure predictions, and the closest protein  
 structures
