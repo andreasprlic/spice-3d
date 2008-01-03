@@ -1039,7 +1039,7 @@ ConfigurationListener
 		 vBox.add(hBoxb);
 
 		 dialog.getContentPane().add(vBox);
-		 dialog.show();
+		 dialog.setVisible(true);
 
 	 }
 
@@ -1317,7 +1317,7 @@ ConfigurationListener
 
 		 //List groups = chain.getGroups();
 
-		 for ( int i = 0 ; i < chain.getLength(); i++ ) {
+		 for ( int i = 0 ; i < chain.getLengthAminos(); i++ ) {
 			 Group g = chain.getGroup(i);
 			 if ( g.has3D()) 
 				 if (g.getPDBCode().equals(residuePDBcode)) {
@@ -1379,7 +1379,7 @@ class MyDasSourceListener implements DasSourceListener{
 	public void selectedDasSource(DasSourceEvent event){
 		SpiceDasSource ds = event.getDasSource().getDasSource();
 		DasSourceDialog dsd = new DasSourceDialog(ds);
-		dsd.show();
+		dsd.setVisible(true);
 	}
 
 	public void removeDasSource(DasSourceEvent ds){
