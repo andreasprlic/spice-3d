@@ -26,7 +26,7 @@ import org.biojava.bio.BioException;
 /**
  * An exception during the parsing of a PDB file.
  *
- * @author Andreas Prlic, Thomas Down, Benjamin Schuster-B�ckler
+ * @author Andreas Prlic, Thomas Down
  */
 
 public class ConfigurationException extends BioException {
