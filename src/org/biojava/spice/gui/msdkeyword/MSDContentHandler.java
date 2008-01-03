@@ -25,6 +25,8 @@ package org.biojava.spice.gui.msdkeyword;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.text.SimpleDateFormat;
 
 /**
@@ -33,38 +35,41 @@ import java.text.SimpleDateFormat;
  */
 public class MSDContentHandler  extends DefaultHandler{
     
+	public static final Logger logger =  Logger.getLogger("org.biojava.spice");
+	
     /**
      * a class that parses the XML response of a MSD - keyword search.
      * @author Andreas Prlic
      *
      */
     
-    List depositions ;
+    List<Deposition> depositions ;
     Deposition depo;
     String txt;
-    List suggestions;
+    List<String> suggestions;
     
     /**
      * 
      */
     public MSDContentHandler() {
         super();
-        depositions = new ArrayList();
+        depositions = new ArrayList<Deposition>();
         depo = new Deposition();
-        suggestions = new ArrayList();
+        suggestions = new ArrayList<String>();
         
     }
 
     public Deposition[] getDepositions(){
-        return (Deposition[]) depositions.toArray(new Deposition[depositions.size()]);
+        return  depositions.toArray(new Deposition[depositions.size()]);
     }
     
     
     public String[] getSuggestions(){
-        return (String[]) suggestions.toArray(new String[suggestions.size()]);
+        return suggestions.toArray(new String[suggestions.size()]);
     }
     
     public void startElement (String uri, String name, String qName, Attributes atts){
+    
         // reset the character string ...
         txt = "";
         
@@ -75,11 +80,15 @@ public class MSDContentHandler  extends DefaultHandler{
 	        String accessionCode = atts.getValue("accessionCode");
 	        depo.setAccessionCode(accessionCode);
 	        String resolution = atts.getValue("resolution");
-	        float res = Float.parseFloat(resolution);
-	        depo.setResolution(res);
+	        if ( resolution != null){
+	        	float res = Float.parseFloat(resolution);
+	        	depo.setResolution(res);
+	        }
 	        String rfactor = atts.getValue("rfactor");
-	        float rfac = Float.parseFloat(rfactor);
-	        depo.setRfactor(rfac);
+	        if ( rfactor != null){
+	        	float rfac = Float.parseFloat(rfactor);
+	        	depo.setRfactor(rfac);
+	        }
 	        String id = atts.getValue("id");
 	        //int i = Integer.parseInt(id);
 	        depo.setId(id);
@@ -89,10 +98,13 @@ public class MSDContentHandler  extends DefaultHandler{
 	        try {
 	            date = sdf.parse(d);
 	        } catch (Exception e){
-	            //e.printStackTrace();
+	            e.printStackTrace();
 	            
 	        }
 	        depo.setLastModified(date);
+	        if ( logger.isLoggable(Level.FINEST)){
+	        	logger.finest("got new deposition "  + depo);
+	        }
 	    }
 	    
 	    
@@ -100,13 +112,15 @@ public class MSDContentHandler  extends DefaultHandler{
 	}
     
     public void endElement (String uri,String name, String qName){
+    	
         if ( qName.equals("classification")) {
 		    //System.out.println("adding ffeature " + feature);
 		    depo.setClassification(txt);
 		}
         else if ( qName.equals("expData")){
             depo.setExpData(txt);
-        } else if ( qName.equals("title")){
+        } 
+        else if ( qName.equals("title")){
             depo.setTitle(txt);
         }
         else if ( qName.equals("entry")){
@@ -116,12 +130,13 @@ public class MSDContentHandler  extends DefaultHandler{
             suggestions.add(txt);
 	    }
         
+        
     }
     
 	
 	public void characters (char ch[], int start, int length){
 	    for (int i = start; i < start + length; i++) {
-	        txt += ch[i];
+	        txt += ch[i];	        
 	    }
 	
 	}
