@@ -121,7 +121,7 @@ ConfigurationListener
 	Chain currentChain ;
 	int currentChainNumber  ;  
 
-	List loadQueue;
+	List<Map<String,String>> loadQueue;
 
 	JmolSpiceTranslator jmolSpiceTranslator;
 	StructurePanelListener structurePanelListener ;   
@@ -192,7 +192,7 @@ ConfigurationListener
 		preferredStructureAlignmentServerName = "";
 		structureAlignmentMode = false ; 
 
-		loadQueue = new ArrayList();
+		loadQueue = new ArrayList<Map<String,String>>();
 
 		initPanels1();
 
@@ -612,7 +612,7 @@ ConfigurationListener
 	 public void load(String type, String code){
 		 logger.info("loading " +type + " " +code);
 
-		 Map m = new HashMap();
+		 Map<String,String> m = new HashMap<String, String>();
 		 m.put("type",type);
 		 m.put("code",code);
 
@@ -642,7 +642,7 @@ ConfigurationListener
 		 if ( loadQueue.size() <1)
 			 return;
 
-		 Map m = (Map) loadQueue.get(0);
+		 Map<String, String> m =  loadQueue.get(0);
 
 		 String type = (String) m.get("type");
 		 String code = (String) m.get("code");
@@ -727,7 +727,7 @@ ConfigurationListener
 		 System.setProperty("SPICE:drawStructureRegion","false");
 		 if ( config == null){
 			 // we have to wait until contacting the DAS registry is finished ...
-			 Map m = new HashMap();
+			 Map<String, String> m = new HashMap<String,String>();
 			 m.put("type",SpiceDefaults.UniProtType);
 			 m.put("code", uniprot);
 			 loadQueue.add(m);
@@ -755,7 +755,7 @@ ConfigurationListener
 		 System.setProperty("SPICE:drawStructureRegion","false");
 		 if ( config == null){
 			 // we have to wait until contacting the DAS registry is finished ...
-			 Map m = new HashMap();
+			 Map<String,String> m = new HashMap<String, String>();
 			 m.put("type",type);
 			 m.put("code", ensp);
 			 loadQueue.add(m);
@@ -796,7 +796,7 @@ ConfigurationListener
 
 		 if ( config == null){
 			 // we have to wait until contacting the DAS registry is finished ...
-			 Map m = new HashMap();
+			 Map<String,String> m = new HashMap<String, String>();
 			 m.put("type",SpiceDefaults.PDBType);
 			 m.put("code", pdbcod);
 			 loadQueue.add(m);
@@ -824,12 +824,12 @@ ConfigurationListener
 		 currentAccessionCode = alignmentCode;
 
 		 logger.info("loading Structure alignment for coordinate system " + aligCs.toString());
-		 List aligservers = config.getServers("alignment", aligCs.toString());
+		 List<SpiceDasSource> aligservers = config.getServers("alignment", aligCs.toString());
 		 logger.info("found " +aligservers.size() + " alignment servers");
-		 SpiceDasSource[] ads = (SpiceDasSource[])aligservers.toArray(new SpiceDasSource[aligservers.size()]);
+		 SpiceDasSource[] ads = aligservers.toArray(new SpiceDasSource[aligservers.size()]);
 
-		 List strucservers = config.getServers("structure");
-		 SpiceDasSource[] sds = (SpiceDasSource[])strucservers.toArray(new SpiceDasSource[strucservers.size()]);
+		 List<SpiceDasSource> strucservers = config.getServers("structure");
+		 SpiceDasSource[] sds = strucservers.toArray(new SpiceDasSource[strucservers.size()]);
 
 		 StructureAlignmentBuilder sacreator = new StructureAlignmentBuilder(aligCs);
 		 //sacreator.addStructureListener(structurePanelListener);
