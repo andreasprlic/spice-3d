@@ -55,8 +55,8 @@ public class RegistryConfiguration
 	public static final String XML_DTD          = "spiceconfig.dtd";
 
 
-	List allservers            ;
-	List activeservers         ;
+	List<SpiceDasSource> allservers            ;
+	List<SpiceDasSource> activeservers         ;
 	String[] capabilities      ;
 	String[] pdbFileExtensions ;
 	String updateBehave        ;
@@ -69,8 +69,8 @@ public class RegistryConfiguration
 		super();
 
 
-		allservers        = new ArrayList();
-		activeservers     = new ArrayList();
+		allservers        = new ArrayList<SpiceDasSource>();
+		activeservers     = new ArrayList<SpiceDasSource>();
 		capabilities      = new String[] { "sequence","structure","alignment","features","entry_points"} ;
 		pdbFileExtensions = new String[] { ".pdb",".ent"};
 		updateBehave      = "always";
@@ -165,7 +165,7 @@ public class RegistryConfiguration
 	 */
 	public List getLocalServers(){
 
-		ArrayList tmp = new ArrayList();
+		List<SpiceDasSource> tmp = new ArrayList<SpiceDasSource>();
 		for ( int i = 0 ; i < allservers.size() ; i++ ) {
 			SpiceDasSource ds = (SpiceDasSource) allservers.get(i);
 			if ( ! ds.getRegistered() ) 
@@ -416,9 +416,9 @@ public class RegistryConfiguration
 	 * @param coordSys
 	 * @return List of servers
 	 */
-	public List getServers(String capability, String coordSys){
-		List servers = getServers(capability);
-		ArrayList retservers = new ArrayList();
+	public List<SpiceDasSource> getServers(String capability, String coordSys){
+		List<SpiceDasSource> servers = getServers(capability);
+		List<SpiceDasSource> retservers = new ArrayList<SpiceDasSource>();
 
 		Iterator iter = servers.iterator();
 		while ( iter.hasNext()){
@@ -437,9 +437,9 @@ public class RegistryConfiguration
 	 * @param capability
 	 * @return List
 	 */
-	public List getServers(String capability) {
+	public List<SpiceDasSource> getServers(String capability) {
 
-		ArrayList retservers = new ArrayList();
+		List<SpiceDasSource> retservers = new ArrayList<SpiceDasSource>();
 
 		Iterator iter = allservers.iterator();
 		while ( iter.hasNext()){
