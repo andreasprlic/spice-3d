@@ -294,9 +294,8 @@ implements JmolStatusListener, StructureListener
         
     }
 
-    public void createImage(String file, String type, int quality) {
-        // TODO Auto-generated method stub
-        
+    public void createImage(String file, String type, int quality) {        
+    	logger.info("Not Implemented, yet: jmol requested createImage " + file + " " + quality);        
     }
 
 	public String eval(String strEval) {
@@ -317,5 +316,11 @@ implements JmolStatusListener, StructureListener
 	public float[][] functionXY(String functionName, int x, int y) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public void createImage(String file, Object type_or_text_or_bytes, int quality) {
+		// TODO Auto-generated method stub
+		logger.info("Not Implemented, yet: jmol requested createImage " + file + " " + quality);
+		
 	}
 }
