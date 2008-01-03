@@ -264,7 +264,7 @@ class SpiceRunnable implements Runnable {
         SpiceStartParameters params = new SpiceStartParameters();
         // init the configuration
         
-        List mandatoryArgs= new ArrayList();
+        List<String> mandatoryArgs= new ArrayList<String>();
         mandatoryArgs.add("primaryRegistry");
         mandatoryArgs.add("code");
         mandatoryArgs.add("codetype");
