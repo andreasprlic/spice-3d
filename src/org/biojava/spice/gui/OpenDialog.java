@@ -190,7 +190,7 @@ extends JDialog
 
 		JButton openKw = new JButton(ResourceManager.getString("org.biojava.spice.gui.ConfigPanel.Search"));
 		openKw.addActionListener(new OpenActionListener(spice,this));
-		JLabel kwl = new JLabel("keyword:");
+		JLabel kwl = new JLabel("MSD keyword search:");
 		hBox2.add(kwl);
 		hBox2.add(kwsearch);
 		hBox2.add(openKw);
