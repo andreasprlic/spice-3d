@@ -58,7 +58,7 @@ public class SpiceDefaults {
     public static final String MSD_SITE_TYPE = "MSD_SITE";
     
     
-    public static final List argumentTypes;
+    public static final List<String> argumentTypes;
     
     public static final String EnspType      = "ENSP";
     public static final String UniProtType   = "UniProt";
@@ -69,7 +69,7 @@ public class SpiceDefaults {
     public static final String newline;
     
     	static { 
-    			argumentTypes = new ArrayList();
+    			argumentTypes = new ArrayList<String>();
     			argumentTypes.add(PDBType);
     			argumentTypes.add(UniProtType);
     			argumentTypes.add(EnspType);
