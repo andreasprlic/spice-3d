@@ -566,7 +566,9 @@ class MySequenceRunnable implements Runnable {
     }
     
     public void run() {
-        SequenceEvent sevent = new SequenceEvent(ac,sequence);
+    	//TODO: add support for versioning of reference objects
+    	String version = null;
+        SequenceEvent sevent = new SequenceEvent(ac,sequence,version);
         //logger.info("*** seqeunce event " + ac);
         Iterator iter3 = pdbSequenceListeners.iterator();
         while (iter3.hasNext()){

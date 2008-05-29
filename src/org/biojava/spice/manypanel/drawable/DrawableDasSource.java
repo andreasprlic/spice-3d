@@ -192,434 +192,436 @@ FeatureListener{
 	 * 
 	 * @param feats
 	 */
-	 public void setFeatures(Feature[] feats){
-		 features = feats;
-	 }
+	public void setFeatures(Feature[] feats){
+		features = feats;
+	}
 
 
-	 private void calculateMinMaxForHistograms(Feature[] feats){
+	private void calculateMinMaxForHistograms(Feature[] feats){
 
-		 for (int i = 0; i < feats.length; i++) {
-			 Feature f = feats[i];
+		for (int i = 0; i < feats.length; i++) {
+			Feature f = feats[i];
 
-			 if (f instanceof HistogramFeature ){
-				 dasSource.setUnlimitedFeatures(true);
-				 
-				 
-				 
-				 HistogramFeature hf = (HistogramFeature) f;
+			if (f instanceof HistogramFeature ){
+				dasSource.setUnlimitedFeatures(true);
 
-				 List segments  = hf.getSegments();
-				 SegmentComparator comp = new SegmentComparator();
-				 Collections.sort(segments,comp);
-				 
 
-				 Iterator iter = segments.iterator();
 
-				 double max = 0;
-				 double min = 0;
+				HistogramFeature hf = (HistogramFeature) f;
 
-				 while ( iter.hasNext()){
+				List segments  = hf.getSegments();
+				SegmentComparator comp = new SegmentComparator();
+				Collections.sort(segments,comp);
 
-					 HistogramSegment s= (HistogramSegment) iter.next();
-					 double score = s.getScore();
-					 if ( score > max)
-						 max = score;
-					 if ( score < min )
-						 min = score;
 
-					 //if ( f.getType().equals("hydrophobicity"))
+				Iterator iter = segments.iterator();
+
+				double max = 0;
+				double min = 0;
+
+				while ( iter.hasNext()){
+
+					HistogramSegment s= (HistogramSegment) iter.next();
+					double score = s.getScore();
+					if ( score > max)
+						max = score;
+					if ( score < min )
+						min = score;
+
+					//if ( f.getType().equals("hydrophobicity"))
 					//	 System.out.println(s.getStart()+"\t"+score);
-					 
-				 }
-
-				 hf.setMax(max);
-				 hf.setMin(min);    			    			
-				 //logger.info("found max/min " + max + " " +min);
-			 }
-		 }
-	 }
-
-	 public void newFeatures(FeatureEvent e){
-		 Map<String,String>[] feats = e.getFeatures();
-		 //logger.info("got " + feats.length + " features " +
-		 //       featureListeners.size() + " featureListeners");
-		 features = convertMap2Features(feats);
-
-		 // calculate Max and Min of Histogram style features
-		 calculateMinMaxForHistograms(features);
-
-
-
-		 //logger.finest("joined to " + features.length + " features -check:"+feats.length  );
-		 // AbstractChainRenderer is listening to this and
-		 // needs to resize itself
-		 //TODO: this should not be part of the Drawable code but of the DasSourcePanel code...
-		 Iterator iter = featureListeners.iterator();
-		 while (iter.hasNext()){
-			 FeatureListener featL = (FeatureListener)iter.next();
-			 FeatureEvent event = new FeatureEvent(feats,dasSource);
-			 featL.newFeatures(event);
-		 }
-
-	 }
-
-	 public void comeBackLater(FeatureEvent e){
-		 //TODO: display that the server is calculating ...
-	 }
-
-	 public Feature[] getFeatures(){
-
-		 return features;
-	 }
-
-	 public void clearDisplay(){
-		 features = new FeatureImpl[0];
-	 }
-
-	 /** returns a list of SPICE-Features objects */
-	 private Feature[] convertMap2Features(Map[] mapfeatures){
-
-		 List<Feature> features = new ArrayList<Feature>();
-
-		 boolean secstruc = false ;
-		 //String prevtype = "@prevtype" ;
-		 boolean first = true ;
-
-		 FeatureImpl feat    = null ;
-		 Segment segment = null ;
-
-		 //boolean secstrucContained = false;
-		 //Feature secstrucfeature = new FeatureImpl() ;
-		 int featuresCounter = 0;
-		 for (int i = 0 ; i< mapfeatures.length;i++) {
-
-			 Map currentFeatureMap = mapfeatures[i];
-			 String type = (String) currentFeatureMap.get("TYPE") ;
-
-			 // we are skipping literature references for the moment 
-			 // TODO: add a display to spice for non-positional features
-			 //
-			 if ( type.equals("reference") || type.equals("GOA")){
-				 continue ;
-			 }
-
-			 if (! first) 
-			 {
-				 // if not first feature
-
-				 if ( ! secstruc )               
-					 // if not secondary structure ...
-					 features = testAddFeatures(features,feat);
-				 //features.add(feat);
-
-				 else if ( ! 
-						 (
-								 type.equals("HELIX")  || 
-								 type.equals("STRAND") || 
-								 type.equals("TURN")  
-						 ) 
-				 )
-				 {
-					 // end of secondary structure
-					 secstruc = false ;
-					 if ( ! (feat==null)) {
-						 features = testAddFeatures(features,feat);                        
-					 }
-
-				 }
-			 }
-
-			 first = false ;             
-			 if ( ! secstruc) {
-				 featuresCounter +=1;
-				 feat = getNewFeat(currentFeatureMap);       
-			 }
-
-			 //}
-
-
-			 if (type.equals("STRAND")){
-				 secstruc = true ;
-				 currentFeatureMap.put("color",SpiceDefaults.STRAND_COLOR);
-				 currentFeatureMap.put("colorTxt","yellow");
-				 feat.setName("SECSTRUC");       
-				 feat.setType("SECSTRUC");
-			 }
-
-			 else if (type.equals("HELIX")) {
-				 secstruc = true ;
-				 currentFeatureMap.put("color",SpiceDefaults.HELIX_COLOR);
-				 currentFeatureMap.put("colorTxt","red");
-				 feat.setName("SECSTRUC");
-				 feat.setType("SECSTRUC");
-			 }   
-
-			 else if (type.equals("TURN")) {
-				 secstruc = true ;
-				 currentFeatureMap.put("color",SpiceDefaults.TURN_COLOR);
-				 currentFeatureMap.put("colorTxt","white");
-
-				 feat.setName("SECSTRUC");
-				 feat.setType("SECSTRUC");
-			 }     
-			 else {
-				 secstruc = false ;
-				 currentFeatureMap.put("color"   ,entColors[featuresCounter%entColors.length]);
-				 currentFeatureMap.put("colorTxt",txtColors[featuresCounter%txtColors.length]);
-				 try {
-					 feat.setName(type);
-				 } catch ( NullPointerException e) {
-					 //e.printStackTrace();
-					 feat.setName("null");
-				 }
-			 }
-
-			 segment = getNewSegment(currentFeatureMap);
-			 //Feature oldFeat = testIfFit
-			 feat.addSegment(segment);       
-			 //feat.addSegment(currentFeatureMap);
-			 //prevtype = type;
-		 }   
-		 //if ( ! (feat==null))  features.add(feat);
-		 if ( ! (feat==null))  
-			 features =testAddFeatures(features,feat);
-
-
-		 Feature[] fs = new Feature[features.size()];
-		 Iterator iter = features.iterator();
-		 int i = 0;
-		 while (iter.hasNext()){
-			 Feature f = (Feature) iter.next();
-			 fs[i] = f;
-			 i++;
-		 }
-		 return fs;
-	 }
-
-
-	 private boolean isSecondaryStructureFeat(Feature feat){
-		 String type = feat.getType();
-		 if (
-				 type.equals("HELIX")  || 
-				 type.equals("STRAND") || 
-				 type.equals("TURN")
-		 ) return true;
-		 return false;
-	 }
-
-	 private boolean isHistogramFeatureType(Feature feat){
-		 String ftype = feat.getType();
-
-		 Map[] style = dasSource.getStylesheet();
-		 if ( style == null)
-			 dasSource.loadStylesheet();
-
-		 style = getStylesheet();
-		 //System.out.println("is HistogramFeature type " + ftype + " " + style );
-
-		 
-		 // todo : move this info into a config file...
-		 
-		 if ( ftype.equals("hydrophobicity")){
-			 return true;
-		 }
-		 if ( getType().equals(TYPE_HISTOGRAM) )
-			 return true;
-
-
-
-		 if (style != null ) {
-
-			 for ( int i =0; i< style.length ; i++){
-				 Map m = style[i];
-
-				 // make sure the stylesheet is for this feature type
-				 String styleType = (String) m.get("type");
-				 if ( styleType != null) {
-					 if ( ! styleType.equals(ftype)){
-						 continue;
-					 }
-				 } else {
-					 continue;
-				 }
-
-				 String type = (String) m.get("style");
-				 if ( type != null) {
-					 //System.out.println("stylesheet type " + type);
-					 if ( type.equals("gradient") || ( type.equals("lineplot")) || ( type.equals("histogram"))){
-
-						 return true;
-					 }
-				 }
-			 }
-		 }
-
-		 return false;
-	 }
-
-
-	 private HistogramSegment getHistogramSegmentFromFeature(Feature feat){
-		 HistogramSegment s = new HistogramSegment();
-
-		 double score = 0.0;
-
-		 try {
-			 score = Double.parseDouble(feat.getScore());
-
-		 } catch (Exception e){
-			 //e.printStackTrace();
-		 }
-		 s.setScore(score);		
-		 List segments = feat.getSegments();
-		 if (segments.size() > 0){
-			 Segment seg = (Segment) segments.get(0);
-			 s.setName(seg.getName());
-			 s.setStart(seg.getStart());
-			 s.setEnd(seg.getEnd());
-			 s.setNote(seg.getNote());
-			 s.setColor(seg.getColor());
-			 s.setTxtColor(seg.getTxtColor());
-		 }
-
-
-		 return s;
-	 }
-
-	 private List<Feature> testAddFeatures(List<Feature> features,Feature newFeature){
-		 // test if this features is added as a new feature to the features list, or if it is joint with an already existing one...
-		 //System.out.println("testing " + newFeature + " " + newFeature.getScore());   
-		 Iterator iter = features.iterator();
-
-
-		 if ( isHistogramFeatureType(newFeature)) {            	
-			 type = TYPE_HISTOGRAM;
-			 
-			 Segment seg = getHistogramSegmentFromFeature(newFeature);
-
-			 while (iter.hasNext()){
-				 Feature knownFeature = (Feature) iter.next() ;
-				 String knownType = knownFeature.getType();
-
-				 //System.out.println("found histogram style " + feat);
-				 // set type of this DAS source to being HISTOGRAM style
-
-
-				 if ( knownType.equals(newFeature.getType())){
-					 // convert the feature into a HistogramSegment and add to the already known feature
-
-					 knownFeature.addSegment(seg);
-					 // we can return now
-					 return features;
-				 }
-
-
-			 }
-			 // we could not link this to any existing feature
-			 // convert it to a new HistogramFeature
-			 HistogramFeature hfeat = new HistogramFeature();
-
-			 hfeat.setLink(newFeature.getLink());
-			 hfeat.setMethod(newFeature.getMethod());
-			 hfeat.setName(newFeature.getName());
-			 hfeat.setNote(newFeature.getNote());
-			 hfeat.setScore("0");
-			 hfeat.setSource(newFeature.getSource());
-			 hfeat.addSegment(seg);
-			 hfeat.setType(newFeature.getType());
-
-			 newFeature = hfeat;
-			 features.add(newFeature);
-			 return features;
-		 } 
-
-
-
-		 while (iter.hasNext()){
-			 Feature knownFeature = (Feature) iter.next() ;
-			 // this only compares method source and type ...
-			 boolean sameFeat = false;
-			 if ( knownFeature.equals(newFeature))
-				 sameFeat = true;
-
-			 if ( ( knownFeature.getSource().equals(newFeature.getSource() )) &&
-					 ( knownFeature.getMethod().equals(newFeature.getMethod())) &&
-					 isSecondaryStructureFeat(knownFeature) && 
-					 isSecondaryStructureFeat(newFeature))
-				 sameFeat =true;
-
-			 if ( sameFeat) {
-
-				 // seems to be of same type, method and source, so check if the segments can be joint
-
-				 List tmpsegs = knownFeature.getSegments();
-				 Iterator segiter = tmpsegs.iterator();
-				 List newsegs = newFeature.getSegments();
-				 Iterator newsegsiter = newsegs.iterator();
-				 boolean overlap = false;
-				 while (newsegsiter.hasNext()){
-					 Segment newseg = (Segment)newsegsiter.next();
-
-
-					 while (segiter.hasNext()){
-						 Segment tmpseg = (Segment) segiter.next();
-
-						 if (  tmpseg.overlaps(newseg))
-							 overlap = true;
-					 }
-				 }
-
-				 if ( ! overlap){
-					 // add all new segments to old features...
-					 newsegsiter = newsegs.iterator();
-					 while (newsegsiter.hasNext()){
-						 Segment newseg = (Segment)newsegsiter.next();
-						 knownFeature.addSegment(newseg);
-					 }
-
-					 return features;
-				 } 
-			 }
-
-		 }
-
-		 //      if we get here, the  features could not be joint with any other one, so there is always some overlap
-		 // add to the list of known features
-		 features.add(newFeature);
-		 return features;
-	 }
-
-	 private FeatureImpl getNewFeat(Map currentFeatureMap) {
-		 FeatureImpl feat = new FeatureImpl();
-		 //logger.finest(currentFeatureMap);
-		 //System.out.println("DrawableDasSource " + currentFeatureMap);
-		 feat.setSource((String)currentFeatureMap.get("dassource"));
-		 feat.setName(  (String)currentFeatureMap.get("NAME"));
-		 feat.setType(  (String)currentFeatureMap.get("TYPE"));
-		 feat.setLink(  (String)currentFeatureMap.get("LINK"));
-		 feat.setNote(  (String)currentFeatureMap.get("NOTE"));
-		 String method = (String)currentFeatureMap.get("METHOD");
-		 if ( method == null) { method = "";}
-		 feat.setMethod(method);
-		 feat.setScore( (String)currentFeatureMap.get("SCORE"));
-		 return feat ;
-	 }
-
-	 private Segment getNewSegment(Map featureMap) {
-		 Segment s = new SegmentImpl();
-		 String sstart = (String)featureMap.get("START") ;
-		 String send   = (String)featureMap.get("END")   ;
-		 int start = Integer.parseInt(sstart) ;
-		 int end   = Integer.parseInt(send)   ;
-		 s.setStart(start);
-		 s.setEnd(end);
-		 s.setName((String)featureMap.get("TYPE"));
-		 s.setTxtColor((String)featureMap.get("colorTxt"));  
-		 s.setColor((Color)featureMap.get("color"));
-		 s.setNote((String) featureMap.get("NOTE"));
-		 return s ;
-
-	 }
+
+				}
+
+				hf.setMax(max);
+				hf.setMin(min);    			    			
+				//logger.info("found max/min " + max + " " +min);
+			}
+		}
+	}
+
+	public void newFeatures(FeatureEvent e){
+		Map<String,String>[] feats = e.getFeatures();
+		//logger.info("got " + feats.length + " features " +
+		//       featureListeners.size() + " featureListeners");
+		features = convertMap2Features(feats);
+
+		// calculate Max and Min of Histogram style features
+		calculateMinMaxForHistograms(features);
+
+
+
+		//logger.finest("joined to " + features.length + " features -check:"+feats.length  );
+		// AbstractChainRenderer is listening to this and
+		// needs to resize itself
+		//TODO: this should not be part of the Drawable code but of the DasSourcePanel code...
+		Iterator iter = featureListeners.iterator();
+		while (iter.hasNext()){
+			FeatureListener featL = (FeatureListener)iter.next();
+			//TODO: add support for versioning of reference objects
+			String version = null;
+			FeatureEvent event = new FeatureEvent(feats,dasSource,version);
+			featL.newFeatures(event);
+		}
+
+	}
+
+	public void comeBackLater(FeatureEvent e){
+		//TODO: display that the server is calculating ...
+	}
+
+	public Feature[] getFeatures(){
+
+		return features;
+	}
+
+	public void clearDisplay(){
+		features = new FeatureImpl[0];
+	}
+
+	/** returns a list of SPICE-Features objects */
+	private Feature[] convertMap2Features(Map[] mapfeatures){
+
+		List<Feature> features = new ArrayList<Feature>();
+
+		boolean secstruc = false ;
+		//String prevtype = "@prevtype" ;
+		boolean first = true ;
+
+		FeatureImpl feat    = null ;
+		Segment segment = null ;
+
+		//boolean secstrucContained = false;
+		//Feature secstrucfeature = new FeatureImpl() ;
+		int featuresCounter = 0;
+		for (int i = 0 ; i< mapfeatures.length;i++) {
+
+			Map currentFeatureMap = mapfeatures[i];
+			String type = (String) currentFeatureMap.get("TYPE") ;
+
+			// we are skipping literature references for the moment 
+			// TODO: add a display to spice for non-positional features
+			//
+			if ( type.equals("reference") || type.equals("GOA")){
+				continue ;
+			}
+
+			if (! first) 
+			{
+				// if not first feature
+
+				if ( ! secstruc )               
+					// if not secondary structure ...
+					features = testAddFeatures(features,feat);
+				//features.add(feat);
+
+				else if ( ! 
+						(
+								type.equals("HELIX")  || 
+								type.equals("STRAND") || 
+								type.equals("TURN")  
+						) 
+				)
+				{
+					// end of secondary structure
+					secstruc = false ;
+					if ( ! (feat==null)) {
+						features = testAddFeatures(features,feat);                        
+					}
+
+				}
+			}
+
+			first = false ;             
+			if ( ! secstruc) {
+				featuresCounter +=1;
+				feat = getNewFeat(currentFeatureMap);       
+			}
+
+			//}
+
+
+			if (type.equals("STRAND")){
+				secstruc = true ;
+				currentFeatureMap.put("color",SpiceDefaults.STRAND_COLOR);
+				currentFeatureMap.put("colorTxt","yellow");
+				feat.setName("SECSTRUC");       
+				feat.setType("SECSTRUC");
+			}
+
+			else if (type.equals("HELIX")) {
+				secstruc = true ;
+				currentFeatureMap.put("color",SpiceDefaults.HELIX_COLOR);
+				currentFeatureMap.put("colorTxt","red");
+				feat.setName("SECSTRUC");
+				feat.setType("SECSTRUC");
+			}   
+
+			else if (type.equals("TURN")) {
+				secstruc = true ;
+				currentFeatureMap.put("color",SpiceDefaults.TURN_COLOR);
+				currentFeatureMap.put("colorTxt","white");
+
+				feat.setName("SECSTRUC");
+				feat.setType("SECSTRUC");
+			}     
+			else {
+				secstruc = false ;
+				currentFeatureMap.put("color"   ,entColors[featuresCounter%entColors.length]);
+				currentFeatureMap.put("colorTxt",txtColors[featuresCounter%txtColors.length]);
+				try {
+					feat.setName(type);
+				} catch ( NullPointerException e) {
+					//e.printStackTrace();
+					feat.setName("null");
+				}
+			}
+
+			segment = getNewSegment(currentFeatureMap);
+			//Feature oldFeat = testIfFit
+			feat.addSegment(segment);       
+			//feat.addSegment(currentFeatureMap);
+			//prevtype = type;
+		}   
+		//if ( ! (feat==null))  features.add(feat);
+		if ( ! (feat==null))  
+			features =testAddFeatures(features,feat);
+
+
+		Feature[] fs = new Feature[features.size()];
+		Iterator iter = features.iterator();
+		int i = 0;
+		while (iter.hasNext()){
+			Feature f = (Feature) iter.next();
+			fs[i] = f;
+			i++;
+		}
+		return fs;
+	}
+
+
+	private boolean isSecondaryStructureFeat(Feature feat){
+		String type = feat.getType();
+		if (
+				type.equals("HELIX")  || 
+				type.equals("STRAND") || 
+				type.equals("TURN")
+		) return true;
+		return false;
+	}
+
+	private boolean isHistogramFeatureType(Feature feat){
+		String ftype = feat.getType();
+
+		Map[] style = dasSource.getStylesheet();
+		if ( style == null)
+			dasSource.loadStylesheet();
+
+		style = getStylesheet();
+		//System.out.println("is HistogramFeature type " + ftype + " " + style );
+
+
+		// todo : move this info into a config file...
+
+		if ( ftype.equals("hydrophobicity")){
+			return true;
+		}
+		if ( getType().equals(TYPE_HISTOGRAM) )
+			return true;
+
+
+
+		if (style != null ) {
+
+			for ( int i =0; i< style.length ; i++){
+				Map m = style[i];
+
+				// make sure the stylesheet is for this feature type
+				String styleType = (String) m.get("type");
+				if ( styleType != null) {
+					if ( ! styleType.equals(ftype)){
+						continue;
+					}
+				} else {
+					continue;
+				}
+
+				String type = (String) m.get("style");
+				if ( type != null) {
+					//System.out.println("stylesheet type " + type);
+					if ( type.equals("gradient") || ( type.equals("lineplot")) || ( type.equals("histogram"))){
+
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
+	}
+
+
+	private HistogramSegment getHistogramSegmentFromFeature(Feature feat){
+		HistogramSegment s = new HistogramSegment();
+
+		double score = 0.0;
+
+		try {
+			score = Double.parseDouble(feat.getScore());
+
+		} catch (Exception e){
+			//e.printStackTrace();
+		}
+		s.setScore(score);		
+		List segments = feat.getSegments();
+		if (segments.size() > 0){
+			Segment seg = (Segment) segments.get(0);
+			s.setName(seg.getName());
+			s.setStart(seg.getStart());
+			s.setEnd(seg.getEnd());
+			s.setNote(seg.getNote());
+			s.setColor(seg.getColor());
+			s.setTxtColor(seg.getTxtColor());
+		}
+
+
+		return s;
+	}
+
+	private List<Feature> testAddFeatures(List<Feature> features,Feature newFeature){
+		// test if this features is added as a new feature to the features list, or if it is joint with an already existing one...
+		//System.out.println("testing " + newFeature + " " + newFeature.getScore());   
+		Iterator iter = features.iterator();
+
+
+		if ( isHistogramFeatureType(newFeature)) {            	
+			type = TYPE_HISTOGRAM;
+
+			Segment seg = getHistogramSegmentFromFeature(newFeature);
+
+			while (iter.hasNext()){
+				Feature knownFeature = (Feature) iter.next() ;
+				String knownType = knownFeature.getType();
+
+				//System.out.println("found histogram style " + feat);
+				// set type of this DAS source to being HISTOGRAM style
+
+
+				if ( knownType.equals(newFeature.getType())){
+					// convert the feature into a HistogramSegment and add to the already known feature
+
+					knownFeature.addSegment(seg);
+					// we can return now
+					return features;
+				}
+
+
+			}
+			// we could not link this to any existing feature
+			// convert it to a new HistogramFeature
+			HistogramFeature hfeat = new HistogramFeature();
+
+			hfeat.setLink(newFeature.getLink());
+			hfeat.setMethod(newFeature.getMethod());
+			hfeat.setName(newFeature.getName());
+			hfeat.setNote(newFeature.getNote());
+			hfeat.setScore("0");
+			hfeat.setSource(newFeature.getSource());
+			hfeat.addSegment(seg);
+			hfeat.setType(newFeature.getType());
+
+			newFeature = hfeat;
+			features.add(newFeature);
+			return features;
+		} 
+
+
+
+		while (iter.hasNext()){
+			Feature knownFeature = (Feature) iter.next() ;
+			// this only compares method source and type ...
+			boolean sameFeat = false;
+			if ( knownFeature.equals(newFeature))
+				sameFeat = true;
+
+			if ( ( knownFeature.getSource().equals(newFeature.getSource() )) &&
+					( knownFeature.getMethod().equals(newFeature.getMethod())) &&
+					isSecondaryStructureFeat(knownFeature) && 
+					isSecondaryStructureFeat(newFeature))
+				sameFeat =true;
+
+			if ( sameFeat) {
+
+				// seems to be of same type, method and source, so check if the segments can be joint
+
+				List tmpsegs = knownFeature.getSegments();
+				Iterator segiter = tmpsegs.iterator();
+				List newsegs = newFeature.getSegments();
+				Iterator newsegsiter = newsegs.iterator();
+				boolean overlap = false;
+				while (newsegsiter.hasNext()){
+					Segment newseg = (Segment)newsegsiter.next();
+
+
+					while (segiter.hasNext()){
+						Segment tmpseg = (Segment) segiter.next();
+
+						if (  tmpseg.overlaps(newseg))
+							overlap = true;
+					}
+				}
+
+				if ( ! overlap){
+					// add all new segments to old features...
+					newsegsiter = newsegs.iterator();
+					while (newsegsiter.hasNext()){
+						Segment newseg = (Segment)newsegsiter.next();
+						knownFeature.addSegment(newseg);
+					}
+
+					return features;
+				} 
+			}
+
+		}
+
+		//      if we get here, the  features could not be joint with any other one, so there is always some overlap
+		// add to the list of known features
+		features.add(newFeature);
+		return features;
+	}
+
+	private FeatureImpl getNewFeat(Map currentFeatureMap) {
+		FeatureImpl feat = new FeatureImpl();
+		//logger.finest(currentFeatureMap);
+		//System.out.println("DrawableDasSource " + currentFeatureMap);
+		feat.setSource((String)currentFeatureMap.get("dassource"));
+		feat.setName(  (String)currentFeatureMap.get("NAME"));
+		feat.setType(  (String)currentFeatureMap.get("TYPE"));
+		feat.setLink(  (String)currentFeatureMap.get("LINK"));
+		feat.setNote(  (String)currentFeatureMap.get("NOTE"));
+		String method = (String)currentFeatureMap.get("METHOD");
+		if ( method == null) { method = "";}
+		feat.setMethod(method);
+		feat.setScore( (String)currentFeatureMap.get("SCORE"));
+		return feat ;
+	}
+
+	private Segment getNewSegment(Map featureMap) {
+		Segment s = new SegmentImpl();
+		String sstart = (String)featureMap.get("START") ;
+		String send   = (String)featureMap.get("END")   ;
+		int start = Integer.parseInt(sstart) ;
+		int end   = Integer.parseInt(send)   ;
+		s.setStart(start);
+		s.setEnd(end);
+		s.setName((String)featureMap.get("TYPE"));
+		s.setTxtColor((String)featureMap.get("colorTxt"));  
+		s.setColor((Color)featureMap.get("color"));
+		s.setNote((String) featureMap.get("NOTE"));
+		return s ;
+
+	}
 
 
 

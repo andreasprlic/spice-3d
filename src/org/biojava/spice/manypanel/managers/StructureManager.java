@@ -314,7 +314,9 @@ implements ObjectManager, StructureListener {
             code +=".";
         */
         
-        SequenceEvent sevent = new SequenceEvent(code,c.getSequence());
+    	//TODO: add support for versioning of reference objects
+    	String version = null;
+        SequenceEvent sevent = new SequenceEvent(code,c.getSequence(),version);
         
         //featureManager.newSequence(sevent);
         

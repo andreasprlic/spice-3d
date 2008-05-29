@@ -263,7 +263,11 @@ extends Thread
      * @param comeBackLater
      */
     private void notifyComeBackLater(int comeBackLater){
-        FeatureEvent event = new FeatureEvent(new HashMap[0],dasSource);
+    	
+    	//TODO: add support for versioning of reference objects
+    	String version = null;
+    	
+        FeatureEvent event = new FeatureEvent(new HashMap[0],dasSource,version);
         event.setComeBackLater(comeBackLater);
         Iterator<FeatureListener> fiter = featureListeners.iterator();
         while (fiter.hasNext()){
@@ -277,7 +281,9 @@ extends Thread
     	if (logger.isLoggable(Level.FINEST)){
     		logger.finest("SingleFeatureThread found " + feats.length + " features");
     	}
-        FeatureEvent fevent = new FeatureEvent(feats,dasSource);
+    	//TODO: add support for versioning of reference objects
+    	String version = null;
+        FeatureEvent fevent = new FeatureEvent(feats,dasSource,version);
         Iterator<FeatureListener> fiter = featureListeners.iterator();
         while (fiter.hasNext()){
             FeatureListener fi = fiter.next();

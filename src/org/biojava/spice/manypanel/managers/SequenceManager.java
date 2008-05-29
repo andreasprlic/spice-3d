@@ -252,8 +252,9 @@ extends AbstractChainManager
             
             renderer.setDrawableSequence(ds);          
         }
-        
-        SequenceEvent sevent = new SequenceEvent(e.getAccessionCode(),sequence);
+    	//TODO: add support for versioning of reference objects
+    	String version = null;
+        SequenceEvent sevent = new SequenceEvent(e.getAccessionCode(),sequence,version);
         iter = sequenceListeners.iterator();
         while (iter.hasNext()){
             SequenceListener li = (SequenceListener)iter.next();
