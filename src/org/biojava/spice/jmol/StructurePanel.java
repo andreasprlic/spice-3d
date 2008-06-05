@@ -116,7 +116,7 @@ implements JmolCommander
         
         viewer  = org.jmol.viewer.Viewer.allocateViewer(this, adapter);
         
-        jmolpopup = JmolPopup.newJmolPopup(viewer,true,null);
+        jmolpopup = JmolPopup.newJmolPopup(viewer,true);
         
         // this is important to make Jmol thread -safe !!
         viewer.evalString("set scriptQueue on;");
