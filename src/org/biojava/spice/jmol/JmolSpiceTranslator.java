@@ -23,6 +23,7 @@
 package org.biojava.spice.jmol;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -322,5 +323,20 @@ implements JmolStatusListener, StructureListener
 		// TODO Auto-generated method stub
 		logger.info("Not Implemented, yet: jmol requested createImage " + file + " " + quality);
 		
+	}
+
+	public Hashtable getRegistryInfo() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void notifyCallback(int type, Object[] data) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public boolean notifyEnabled(int callback_pick) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }
