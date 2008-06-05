@@ -207,12 +207,23 @@ ConfigurationListener
 	}
 
 	private void initPanels1(){
-
+		
+		if ( logger.isLoggable(Level.FINEST)) {
+			logger.finest("start parameters: " + startParameters.getCodetype() + " " + startParameters.getCode());
+			System.out.println("start parameters: " + startParameters.getCodetype() + " " + startParameters.getCode());
+		}
+		
 		if (startParameters.getStructureAlignmentMode().equals(SpiceDefaults.CASPCOORDSYS)){
 			browserPane = new BrowserPane(startParameters.getPdbcoordsys());
 		} else  {
-            
-            if ( startParameters.getCodetype().equalsIgnoreCase("GENCODE")) {
+			
+			if ( startParameters.getCodetype().equalsIgnoreCase(SpiceDefaults.MODELType)) {
+			
+				
+				browserPane = new BrowserPane(SpiceDefaults.MODELCOORDSYS,
+						startParameters.getUniprotcoordsys(), 
+						startParameters.getEnspcoordsys());
+			} else if ( startParameters.getCodetype().equalsIgnoreCase("GENCODE")) {
                 browserPane = new BrowserPane(startParameters.getPdbcoordsys(),
                         startParameters.getUniprotcoordsys(), 
                         SpiceDefaults.GENCODECOORDSYS);
@@ -661,11 +672,10 @@ ConfigurationListener
 			 logger.finest(msg);
 		 }
 
+		 if (type.equals(SpiceDefaults.PDBType) ||
+				 type.equalsIgnoreCase(SpiceDefaults.MODELType)){
 
-
-		 if (type.equals(SpiceDefaults.PDBType)){
-
-			 this.loadStructure(code);
+			 this.loadStructure(code,type);
 
 		 }
 		 else if (type.equals(SpiceDefaults.UniProtType)) {
@@ -770,15 +780,19 @@ ConfigurationListener
 	 }
 
 
-
+	 
+     
 
 	 /** starts a new thread that retreives protein structure using the
      DAS structure command from some other server this thread will
      call the setStructure method to set the protein structure.
+     *
+     * @param pdbcod an accession code
+     * @param type is it SpiceDefaults.PDBTYpe or SpiceDefaults.MODELType
 	  */
-	 protected void loadStructure(String pdbcod) {
-
-		 currentType = SpiceDefaults.PDBType;
+	 protected void loadStructure(String pdbcod,String type) {
+		 
+		 currentType = type;
 		 currentAccessionCode = pdbcod;
 
 		 System.setProperty("SPICE:drawStructureRegion","false");
@@ -797,7 +811,7 @@ ConfigurationListener
 		 if ( config == null){
 			 // we have to wait until contacting the DAS registry is finished ...
 			 Map<String,String> m = new HashMap<String, String>();
-			 m.put("type",SpiceDefaults.PDBType);
+			 m.put("type",type);
 			 m.put("code", pdbcod);
 			 loadQueue.add(m);
 			 return;
@@ -822,13 +836,19 @@ ConfigurationListener
 
 		 currentType = SpiceDefaults.AlignmentType;
 		 currentAccessionCode = alignmentCode;
-
-		 logger.info("loading Structure alignment for coordinate system " + aligCs.toString());
+		 if (logger.isLoggable(Level.INFO)){
+			 logger.info("loading Structure alignment for coordinate system " + aligCs.toString());
+		 }
 		 List<SpiceDasSource> aligservers = config.getServers("alignment", aligCs.toString());
-		 logger.info("found " +aligservers.size() + " alignment servers");
+		 if (logger.isLoggable(Level.INFO)){
+			 logger.info("found " +aligservers.size() + " alignment servers");
+		 }
 		 SpiceDasSource[] ads = aligservers.toArray(new SpiceDasSource[aligservers.size()]);
 
 		 List<SpiceDasSource> strucservers = config.getServers("structure");
+		 if (logger.isLoggable(Level.INFO)){
+			 logger.info("found " + strucservers.size() + " structure servers");
+		 }
 		 SpiceDasSource[] sds = strucservers.toArray(new SpiceDasSource[strucservers.size()]);
 
 		 StructureAlignmentBuilder sacreator = new StructureAlignmentBuilder(aligCs);
@@ -1342,8 +1362,9 @@ class MyAlignmentListener implements AlignmentListener{
 	public void clearAlignment() {                          
 	}
 
-	public void newAlignment(AlignmentEvent e) {      
-		//parent.logger.info("new alignment myAlignmentthread");
+	public void newAlignment(AlignmentEvent e) {     
+		if (SpiceApplication.logger.isLoggable(Level.FINEST))
+			SpiceApplication.logger.log(Level.FINEST,"new alignment myAlignmentListener");
 		String txt =  e.getAccessionCode();
 
 		Das1Source source = e.getSource();

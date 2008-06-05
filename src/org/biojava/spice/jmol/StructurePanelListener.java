@@ -150,11 +150,14 @@ JmolCommander
        //logger.info("setting structure in StructurePanelListener");
       
        if ( struc == null ) {
-      
-           logger.finest("empty structure in StructurePanelListener");
+    	   if (logger.isLoggable(Level.FINEST)) {
+    		   logger.finest("empty structure in StructurePanelListener");
+    	   }
            struc = new StructureImpl();
        } else {
-           logger.finest("structure size: " + struc.size());
+    	   if (logger.isLoggable(Level.FINEST)) {
+    		   logger.finest("structure size: " + struc.size());
+    	   }
        }
        
       

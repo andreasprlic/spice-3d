@@ -36,7 +36,7 @@ public class SpiceDefaults {
 
 	// logging stuff
 	public static final String LOGGER = "org.biojava.spice";
-	public static final Level  LOG_LEVEL = Level.INFO;
+	public static final Level  LOG_LEVEL = Level.FINEST;
 	
 	public static final String REGISTRY  = ResourceManager.getString("org.biojava.spice.SpiceDefaults.Registry");
 	
@@ -45,7 +45,8 @@ public class SpiceDefaults {
     public static String ENSPCOORDSYS    = ResourceManager.getString("org.biojava.spice.SpiceDefaults.ENSPCoordSys");
     public static String CASPCOORDSYS    = ResourceManager.getString("org.biojava.spice.SpiceDefaults.CASPCoordSys");
 	public static String GENCODECOORDSYS = ResourceManager.getString("org.biojava.spice.SpiceDefaults.GENCODECoordSys");
-    
+	public static String MODELCOORDSYS   = ResourceManager.getString("org.biojava.spice.SpiceDefaults.MODELCoordSys");
+	
     public static final Color HELIX_COLOR  = new Color(255,51,51);
     public static final Color STRAND_COLOR = new Color(255,204,51);
     public static final Color TURN_COLOR   = new Color(204,204,204); 
@@ -65,7 +66,7 @@ public class SpiceDefaults {
     public static final String PDBType       = "PDB";
     public static final String AlignmentType = "alignment";
     public static final String GENCODEType   = "Gencode";
-    
+    public static final String MODELType   	 = "MODEL";
     public static final String newline;
     
     	static { 

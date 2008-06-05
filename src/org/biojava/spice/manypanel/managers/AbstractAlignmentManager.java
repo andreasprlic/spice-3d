@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.biojava.bio.Annotation;
@@ -284,20 +285,21 @@ implements AlignmentListener{
                 continue;
             }
             
-            if ( coordSys1.toString().equals(SpiceDefaults.PDBCOORDSYS)) {
-                
+            //if ( coordSys1.toString().equals(SpiceDefaults.PDBCOORDSYS)) {
+            //logger.info(coordSys1.getCategory() + " " + s1 + " " + s2);
+            
+            if ( coordSys1.getCategory().equals("Protein Structure")){
                 int snew = getSeqPosForPDB(sequence1, s1.toString());
                 s1 = new Integer(snew);
             }
-             
-            if ( coordSys2.toString().equals(SpiceDefaults.PDBCOORDSYS)) {
+            if ( coordSys2.getCategory().equals("Protein Structure")){            
+            //if ( coordSys2.toString().equals(SpiceDefaults.PDBCOORDSYS)) {
                 
                 int snew = getSeqPosForPDB(sequence2, s2.toString());
                 s2 = new Integer(snew);
             }
             
-            
-           
+                       
             alignmentMap1.put(s1,s2);
             alignmentMap2.put(s2,s1);
             
@@ -325,15 +327,17 @@ implements AlignmentListener{
                 String rnum = g.getPDBCode();
                 
                 if ( rnum == null) {
-                    //System.out.println(c.getName() + " " + g.getPDBName());
+                	//System.out.println(c.getName() + " " + g);
                     continue;
                 }
                 if ( rnum.equals(pdbPos)) {
                     //System.out.println(i + " = " + rnum);
                     return i;
                 }
-            }    
-            //logger.warning("could not map pdb pos " + pdbPos + " to sequence!");
+            }
+            //if (logger.isLoggable(Level.FINEST)){
+            	//logger.warning("could not map pdb pos " + pdbPos + " to sequence!");
+            //}
             return -1;
     }
     
@@ -391,7 +395,10 @@ implements AlignmentListener{
             if ( dbCoordSys.equalsIgnoreCase(objecttype) ) {      
                 return object ;
             }
-            //logger.info("otype: " + objecttype + " cs:" + dbCoordSys);
+            
+            if (logger.isLoggable(Level.FINEST)){
+            	logger.finest("otype: " + objecttype + " cs:" + dbCoordSys);
+            }
             
             /** TODO: fix this */
             // tmp fix until Alignment server returns the same coordsystems as the registry contains ... :-/
@@ -403,6 +410,11 @@ implements AlignmentListener{
                 if ( dbCoordSys.equals("PDBresnum"))
                     return object;
             }
+            if ( objecttype.equals(SpiceDefaults.MODELCOORDSYS)){
+                if ( dbCoordSys.equals("MODEL") || dbCoordSys.equals(SpiceDefaults.MODELCOORDSYS))
+                    return object;
+            }
+            
             if ( objecttype.equals(SpiceDefaults.ENSPCOORDSYS)){
                 if ( dbCoordSys.equals("ENSEMBLPEP"))
                     return object;

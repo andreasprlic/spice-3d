@@ -227,7 +227,9 @@ implements ObjectManager, StructureListener {
      */
     public  void newStructure(StructureEvent event) {
         String p = event.getPDBCode();
-        //logger.fine("StructureManager new Structure " + p);
+        if (logger.isLoggable(Level.FINE))
+        	logger.fine("StructureManager new Structure " + p);
+        
         if ( p == null) {
             clear();
             Iterator iter = structureRenderers.iterator();
@@ -244,8 +246,9 @@ implements ObjectManager, StructureListener {
             // we already have got this one ...
             return;
         }
-            
-       // logger.info("got new structure >" + event.getPDBCode() + "< old " + pdbCode + " chain: >" + chain+ "<");
+        
+        
+        //logger.info("got new structure >" + event.getPDBCode() + "< old " + pdbCode + " chain: >" + chain+ "<");
         
         // convert structure to drawable structure ...
         Structure s = event.getStructure();

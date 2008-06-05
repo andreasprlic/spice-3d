@@ -65,6 +65,7 @@ import java.util.ArrayList;
 
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Iterator;
 
@@ -282,7 +283,8 @@ AlignmentListener
         // triger the load of the alignments...
         //Todo add this...
         
-        logger.info("loading  " + code + queryCoordSys);
+    	if ( logger.isLoggable(Level.INFO))
+    		logger.info("loading  " + code + queryCoordSys);
         AlignmentParameters param = new AlignmentParameters();
         
         param.setDasSources(dasSources);
@@ -502,7 +504,9 @@ AlignmentListener
     public void clearSelection() { }
     
     public void newSequence(SequenceEvent e) {
-        
+        if (logger.isLoggable(Level.FINEST)){
+        	logger.finest("got new sequence" + e.getAccessionCode());
+        }
         SequenceManager sm = new SequenceManager();
         chain = sm.getChainFromString(e.getSequence());
         chain.setSwissprotId(e.getAccessionCode());

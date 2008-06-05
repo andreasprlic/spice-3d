@@ -35,6 +35,7 @@ import javax.swing.JSplitPane;
 
 import java.awt.Color;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.biojava.dasobert.dasregistry.Das1Source;
@@ -632,7 +633,7 @@ ChangeListener
         // clear the das sources ...
         clearDasSources();       
          
-        List newsources = new ArrayList();        
+        List<SpiceDasSource> newsources = new ArrayList<SpiceDasSource>();        
         
         // keep the das sources that have already been know...
         // trigger remove of those that are not in list any longer...
@@ -870,7 +871,8 @@ ChangeListener
     }
     
     public void triggerLoadStructure(String pdbcode){
-        logger.finest("trigger load structure " + pdbcode);
+    	if (logger.isLoggable(Level.FINEST))
+    		logger.finest("BrowserPane trigger load structure " + pdbcode);
         clearDisplay();
         
         aligManager_PdbUp.clearAlignment();
@@ -885,7 +887,8 @@ ChangeListener
     }
     
     public void triggerLoadUniProt(String accessionCode){
-        
+    	if (logger.isLoggable(Level.FINEST))
+    		logger.finest("BrowserPane trigger load uniprot " + accessionCode);
         clearDisplay();
         
         Iterator iter = uniProtListeners.iterator();
@@ -1032,14 +1035,15 @@ ChangeListener
         SpiceDasSource[] servers = getServers(capability);
         
         // now also check the coordinate system
-        ArrayList retservers = new ArrayList();
+        List<SpiceDasSource> retservers = new ArrayList<SpiceDasSource>();
         for ( int i = 0 ; i < servers.length ; i++ ) {
         	
             //SpiceDasSource ds = SpiceDasSource.fromDasSource((DasSource)servers[i]);
             SpiceDasSource ds = servers[i];
             
-                        
+                        	
             if ( hasCoordSys(coordSys,ds)) {
+            	//logger.info(ds + " has coordinate system " + coordSys);
                 retservers.add(ds);
             }    
         }

@@ -68,9 +68,9 @@ implements StructureListener{
 
 	List object1Listeners;
 	List object2Listeners;
-	List alignmentRenderers;
+	List<AlignmentRenderer> alignmentRenderers;
 
-	List alignmentListeners;
+	List<AlignmentListener> alignmentListeners;
 
 	String object1Id;
 	String object2Id;
@@ -112,7 +112,7 @@ implements StructureListener{
 
 		clearObjectListeners();
 
-		alignmentListeners = new ArrayList();
+		alignmentListeners = new ArrayList<AlignmentListener>();
 
 		translator1 = new MyFeatureTranslator(1,this);
 		translator2 = new MyFeatureTranslator(2,this);
@@ -171,7 +171,7 @@ implements StructureListener{
 	}
 
 	public void clearAlignmentRenderers(){
-		alignmentRenderers = new ArrayList();
+		alignmentRenderers = new ArrayList<AlignmentRenderer>();
 	}
 
 	public void addAlignmentRenderer(AlignmentRenderer re){
@@ -351,7 +351,7 @@ implements StructureListener{
 			triggerObject1Request(ac1);
 		} else {
 			if (logger.isLoggable(Level.FINE)){
-				logger.fine(panelName+" could not detect correct accessionCode " +ac1 + " " + ac2);
+				logger.warning(panelName+" could not detect correct accessionCode " +ac1 + " " + ac2);
 			}
 		}
 
@@ -510,7 +510,10 @@ implements StructureListener{
 	}
 
 	public void newSequence1(SequenceEvent e){
-		//logger.info(panelName+" alignment : new sequence1:" + e.getAccessionCode() + " currently know:"+object1Id+" " + object2Id);
+		
+		if (logger.isLoggable(Level.FINEST)) {
+			logger.finest("AlignmentManager " + panelName+" alignment : new sequence1:" + e.getAccessionCode() + " currently know:"+object1Id+" " + object2Id);
+		}
 
 		String ac = e.getAccessionCode().toLowerCase();
 		SequenceManager sm = new SequenceManager();
@@ -663,7 +666,7 @@ implements StructureListener{
 	private void requestAlignment(AlignmentParameters params){
 		// TODO fix this:
 		if (logger.isLoggable(Level.FINE)){
-			logger.fine(panelName +" requesting alignment " + params);
+			logger.fine("AlignmentManager " + panelName +" requesting alignment " + params.getQuery() + " " +params.getSubject());
 		}
 		// the alignmetn server should use the correct coord sys ...
 		if ( params.getSubjectCoordinateSystem().toString().equals(SpiceDefaults.ENSPCOORDSYS)) {
@@ -764,13 +767,15 @@ implements StructureListener{
 
 			AlignmentParameters params = new AlignmentParameters();
 
-			if (! coordSys1.toString().equals(SpiceDefaults.PDBCOORDSYS))
+			if (! coordSys1.getCategory().equals("Protein Structure"))
+			//if (! coordSys1.toString().equals(SpiceDefaults.PDBCOORDSYS))
 				o1 = o1.toUpperCase();
 			else {
 				String chainId = getChainIdFromPDBCode(object1Id);
 				params.setSubjectPDBChainId(chainId);
 			}
-			if (! coordSys2.toString().equals(SpiceDefaults.PDBCOORDSYS )) 
+			if (! coordSys2.getCategory().equals("Protein Structure"))
+			//if (! coordSys2.toString().equals(SpiceDefaults.PDBCOORDSYS )) 
 				o2 = o2.toUpperCase();
 			else {
 
@@ -958,7 +963,8 @@ implements StructureListener{
 	public void newStructure(StructureEvent event) {
 
 		//logger.info("alig manager got new structure");
-		if ( coordSys1.toString().equals(SpiceDefaults.PDBCOORDSYS)){
+		if (coordSys1.getCategory().equals("Protein Structure")){
+		//if ( coordSys1.toString().equals(SpiceDefaults.PDBCOORDSYS)){
 			Structure s = event.getStructure();
 			if ( s.size() < 1){
 				return;
@@ -978,7 +984,8 @@ implements StructureListener{
 
 	public void selectedChain(StructureEvent event) {
 		//logger.info("sected chain in aligmanager ");
-		if ( coordSys1.toString().equals(SpiceDefaults.PDBCOORDSYS)){
+		if ( coordSys1.getCategory().equals("Protein Structure")){
+		//if ( coordSys1.toString().equals(SpiceDefaults.PDBCOORDSYS)){
 			Structure s = event.getStructure();
 			int numb = event.getCurrentChainNumber();
 			sequence1 = s.getChain(numb);

@@ -27,6 +27,7 @@ package org.biojava.spice.alignment;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 //import org.biojava.bio.Annotation;
@@ -114,12 +115,15 @@ implements AlignmentListener {
     
     
     public void request(String alignmentCode){
-        logger.info("using " + alignmentServers.length + "alignment servers");
+    	if ( logger.isLoggable(Level.INFO))
+    		logger.info("using " + alignmentServers.length + "alignment servers");
         AlignmentParameters params = new AlignmentParameters();
         params.setDasSources(alignmentServers);
-        logger.info("requesting alignment for" + alignmentCode);
+        if ( logger.isLoggable(Level.INFO))
+        	logger.info("requesting alignment for" + alignmentCode);
         if ( alignmentServers.length > 0){
-            logger.info(alignmentServers[0].getUrl());
+        	if ( logger.isLoggable(Level.INFO))
+        		logger.info(alignmentServers[0].getUrl());
         }
         params.setQuery(alignmentCode);
         

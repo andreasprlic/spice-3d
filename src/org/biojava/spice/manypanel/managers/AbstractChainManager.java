@@ -102,7 +102,9 @@ implements ObjectManager {
     }
     
     public void setCoordinateSystem(DasCoordinateSystem coordSys) {
-        
+    	if ( logger.isLoggable(Level.FINEST)) {
+    		logger.finest(this.getClass().getName() + " setting coord sys: " + coordSys );
+    	}
         coordinateSystem = coordSys;
     }
     
@@ -111,7 +113,7 @@ implements ObjectManager {
      */
     public void setDasSources(SpiceDasSource[] sources) {
     	if ( logger.isLoggable(Level.FINEST)) {
-    		logger.finest("setting new DAS sources " + sources.length + " previously known: " + dasSources.length);
+    		logger.finest(this.getClass().getName() + " setting new DAS sources " + sources.length + " previously known: " + dasSources.length);
     	}
         List dsses = new ArrayList();
         for ( int i = 0 ; i< sources.length; i++){

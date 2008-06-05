@@ -50,7 +50,7 @@ public class SequenceManager
 extends AbstractChainManager
     implements ObjectManager, SequenceListener {
       
-        List seqRenderers;
+        List<SequenceRenderer> seqRenderers;
         
         static Logger logger = Logger.getLogger("org.biojava.spice");
 //      for conversion 3code 1code
@@ -60,7 +60,7 @@ extends AbstractChainManager
     public SequenceManager() {
         super();
         
-        seqRenderers = new ArrayList();
+        seqRenderers = new ArrayList<SequenceRenderer>();
 //      some utils for conversion of 3code to 1code
         Alphabet alpha_prot = ProteinTools.getAlphabet();
         
