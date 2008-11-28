@@ -23,13 +23,15 @@
 
 package org.biojava.spice.jmol ;
 
-
 import java.awt.*;
 import javax.swing.*;
 import javax.vecmath.Matrix3f;
 
-import org.jmol.api.*;
+import org.jmol.api.JmolAdapter;
+import org.jmol.api.JmolStatusListener;
+import org.jmol.api.JmolViewer;
 import org.jmol.popup.JmolPopup;
+import org.jmol.viewer.Viewer;
 
 import org.biojava.bio.structure.AminoAcidImpl;
 import org.biojava.bio.structure.Atom;
@@ -47,7 +49,6 @@ import org.biojava.spice.config.SpiceDefaults;
 
 import java.text.DecimalFormat;
 import java.util.logging.*;
-
 
 
 /** A panel that provides a wrapper around the Jmol viewer. 
@@ -114,9 +115,9 @@ implements JmolCommander
         if ( viewer != null)
         	jmolRotation = getJmolRotation();
         
-        viewer  = org.jmol.viewer.Viewer.allocateViewer(this, adapter);
+        viewer  = new Viewer(this, adapter);
         
-        jmolpopup = JmolPopup.newJmolPopup(viewer,true,null);
+        jmolpopup = JmolPopup.newJmolPopup(viewer,true,null,true);
         
         // this is important to make Jmol thread -safe !!
         viewer.evalString("set scriptQueue on;");
