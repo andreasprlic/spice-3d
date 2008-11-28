@@ -56,6 +56,12 @@ public class MenuCreator {
         switcher.setMnemonic(KeyEvent.VK_S);
         amenu.add(switcher);
         
+        String saveText = ResourceManager.getString("org.biojava.spice.gui.menu.AlignmentSave");
+        JMenuItem sitem = new JMenuItem(saveText);
+        sitem.addActionListener(ml);
+        sitem.setMnemonic(KeyEvent.VK_S);
+        amenu.add(sitem);
+        
         return amenu;
     }
 
