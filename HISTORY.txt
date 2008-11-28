@@ -1,3 +1,7 @@
+0.9.1 - November 27th 2008
+
+* added possibility to export multiple structure alignment as PDB file
+
 0.9 - January 3rd 2008
 
 * From now on SPICE will require Java 1.5+. If you still are using an
