@@ -351,7 +351,14 @@ SequenceListener
               
             }
             
-        
+        } else if (cmd.equals(ResourceManager.getString("org.biojava.spice.gui.menu.AlignmentSave"))) {
+        	logger.info("saving alignment...");
+        	 if ( spice instanceof SpiceApplication) {
+                 SpiceApplication sp = (SpiceApplication) spice;
+                 new AlignmentSaver(sp);
+               
+             }
+        	
         } else {
         
             //System.out.println("unknown menu comand " + cmd);
