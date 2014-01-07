@@ -18,12 +18,13 @@ annotations.
 ##References
 
 
-**Integrating sequence and structural biology with DAS.**
-*Prlić A, Down TA, Kulesha E, Finn RD, Kähäri A and Hubbard TJ*
-BMC bioinformatics 2007;8;333
+**Integrating sequence and structural biology with DAS.**<br/>
+*Prlić A, Down TA, Kulesha E, Finn RD, Kähäri A and Hubbard TJ*<br/>
+BMC Bioinformatics 2007;8;333<br/>
 PUBMED: [17850653](http://www.ncbi.nlm.nih.gov/pubmed/17850653); PMC: [2031907](http://ukpmc.ac.uk/articles/PMC2031907); DOI: [10.1186/1471-2105-8-333](http://dx.doi.org/10.1186%2F1471-2105-8-333)
 
-**Adding some SPICE to DAS.**
-*Prlić A, Down TA and Hubbard TJ*
-Bioinformatics (Oxford, England) 2005;21 Suppl 2;ii40-1
+
+**Adding some SPICE to DAS.**<br/>
+*Prlić A, Down TA and Hubbard TJ*<br/>
+Bioinformatics (Oxford, England) 2005;21 Suppl 2;ii40-1<br/>
 PUBMED: [16204122](http://www.ncbi.nlm.nih.gov/pubmed/16204122); PMC: [2656757](http://ukpmc.ac.uk/articles/PMC2656757); DOI: [10.1093/bioinformatics/bti1106](http://dx.doi.org/10.1093%2Fbioinformatics%2Fbti1106)
