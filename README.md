@@ -1,8 +1,9 @@
 The SPICE DAS client
 ========
 
-A legact repository of the SPICE DAS client [(see reference)](http://www.ncbi.nlm.nih.gov/pubmed/16204122).
+A legacy repository of the SPICE DAS client [(see reference)](http://www.ncbi.nlm.nih.gov/pubmed/16204122).
 
+![A screenshot of SPICE](doc/spice.png)
 
 The Distributed Annotation System (DAS) defines a communication protocol used 
 to exchange biological annotations. It is motivated by the idea that annotations 
@@ -14,4 +15,4 @@ to be applicable to macromolecular structures. This project contains the source 
 for SPICE, aDAS client that can be used to visualize protein sequence and structure 
 annotations.
 
-![A screenshot of SPICE](docs/spice.png)
+
