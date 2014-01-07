@@ -12,7 +12,7 @@ over multiple sites. Data distribution, performed by DAS servers, is separated
 from visualization, which is done by DAS clients. The original DAS protocol was 
 designed to serve annotation of genomic sequences. We have extended the protocol 
 to be applicable to macromolecular structures. This project contains the source code 
-for SPICE, aDAS client that can be used to visualize protein sequence and structure 
+for SPICE, a DAS client that can be used to visualize protein sequence and structure 
 annotations.
 
 
